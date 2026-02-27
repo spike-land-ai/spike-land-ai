@@ -1,0 +1,4 @@
+# Each subdirectory is its own git repo — ignore everything except top-level files
+/*
+!/.gitignore
+!/CLAUDE.md
