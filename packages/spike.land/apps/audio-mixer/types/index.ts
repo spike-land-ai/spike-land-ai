@@ -18,7 +18,7 @@ export interface AudioTrack {
   currentTime: number;
   waveformData: number[];
   type: "file" | "recording";
-  file?: File;
+  file?: File | undefined;
   /** @deprecated Use position instead. Track delay/offset in seconds (-5 to +10) */
   delay: number;
   /** Track position on timeline in seconds (start time). Replaces delay. */
@@ -28,7 +28,7 @@ export interface AudioTrack {
   /** Trim end point in seconds from beginning (defaults to duration) */
   trimEnd: number;
   /** OPFS path where audio data is stored for persistence */
-  opfsPath?: string;
+  opfsPath?: string | undefined;
 }
 
 export interface RecordingState {

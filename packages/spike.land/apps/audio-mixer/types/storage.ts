@@ -18,9 +18,9 @@ export interface SavedTrack {
   duration: number;
   sizeBytes: number;
   storageLocation: StorageLocation;
-  opfsPath?: string;
-  r2Key?: string;
-  r2Url?: string;
+  opfsPath?: string | undefined;
+  r2Key?: string | undefined;
+  r2Url?: string | undefined;
   volume: number;
   muted: boolean;
   solo: boolean;
@@ -41,7 +41,7 @@ export interface SavedTrack {
 export interface AudioProject {
   id: string;
   name: string;
-  description?: string;
+  description?: string | undefined;
   tracks: SavedTrack[];
   masterVolume: number;
   createdAt: string;
@@ -53,8 +53,8 @@ export interface AudioProject {
  */
 export interface StorageResult<T = void> {
   success: boolean;
-  data?: T;
-  error?: string;
+  data?: T | undefined;
+  error?: string | undefined;
 }
 
 /**

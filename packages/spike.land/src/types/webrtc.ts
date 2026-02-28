@@ -10,7 +10,7 @@ export interface StreamMetadata {
     width: number;
     height: number;
     frameRate: number;
-  };
+  } | undefined;
 }
 
 export type WebRTCError =
@@ -22,18 +22,18 @@ export type WebRTCError =
 export interface WebRTCErrorInfo {
   type: WebRTCError;
   message: string;
-  originalError?: Error;
+  originalError?: Error | undefined;
 }
 
 export interface PeerConfig {
-  peerId?: string;
+  peerId?: string | undefined;
   role: "host" | "client";
   serverConfig?: {
     host: string;
     port: number;
     path: string;
     secure: boolean;
-  };
+  } | undefined;
 }
 
 export interface ClientMetadata {

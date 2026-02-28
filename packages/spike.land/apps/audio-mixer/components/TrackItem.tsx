@@ -26,9 +26,9 @@ interface TrackItemProps {
   onMuteToggle: () => void;
   onSoloToggle: () => void;
   onRemove: () => void;
-  onSeek?: (progress: number) => void;
-  onDelayChange?: (delay: number) => void;
-  onTrimChange?: (trimStart: number, trimEnd: number) => void;
+  onSeek?: ((progress: number) => void) | undefined;
+  onDelayChange?: ((delay: number) => void) | undefined;
+  onTrimChange?: ((trimStart: number, trimEnd: number) => void) | undefined;
 }
 
 export function TrackItem({

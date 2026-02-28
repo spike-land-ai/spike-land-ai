@@ -55,6 +55,9 @@
       "@prisma/client/*": [
         "./src/generated/prisma/*"
       ],
+      "@spike-land-ai/chess-engine": [
+        "../chess-engine/src/index.ts"
+      ],
     },
     "types": [
       "@testing-library/jest-dom/vitest",
