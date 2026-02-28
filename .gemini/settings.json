@@ -1,0 +1,10 @@
+{
+  "mcpServers": {
+    "mcp-nanobanana": {
+      "command": "node",
+      "args": ["packages/mcp-nanobanana/dist/cli-server.js"],
+      "cwd": "/Users/z/Developer/spike-land-ai",
+      "trust": true
+    }
+  }
+}
