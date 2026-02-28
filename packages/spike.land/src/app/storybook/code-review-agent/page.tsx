@@ -270,7 +270,7 @@ export default function CodeReviewAgentPage() {
               key={i}
               severity={issue.severity}
               filePath={issue.filePath}
-              lineNumber={issue.lineNumber}
+              {...(issue.lineNumber !== undefined ? { lineNumber: issue.lineNumber } : {})}
               message={issue.message}
               ruleId={issue.ruleId}
             />

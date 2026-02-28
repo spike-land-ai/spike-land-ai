@@ -199,7 +199,7 @@ function SidebarContent({ onLinkClick }: { onLinkClick?: () => void; }) {
   return (
     <div className="flex flex-col h-full bg-background/40 backdrop-blur-xl">
       <div className="p-4">
-        <Link href="/storybook" onClick={onLinkClick} className="group">
+        <Link href="/storybook" {...(onLinkClick !== undefined ? { onClick: onLinkClick } : {})} className="group">
           <h1 className="text-xl font-bold font-heading text-gradient-primary group-hover:opacity-80 transition-opacity">
             Design System
           </h1>
@@ -245,7 +245,7 @@ function SidebarContent({ onLinkClick }: { onLinkClick?: () => void; }) {
       <div className="px-3 mb-2">
         <Link
           href="/storybook"
-          onClick={onLinkClick}
+          {...(onLinkClick !== undefined ? { onClick: onLinkClick } : {})}
           className={cn(
             "flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium transition-all duration-200 relative group",
             pathname === "/storybook"
@@ -312,7 +312,7 @@ function SidebarContent({ onLinkClick }: { onLinkClick?: () => void; }) {
                           <Link
                             key={section.id}
                             href={`/storybook/${section.id}`}
-                            onClick={onLinkClick}
+                            {...(onLinkClick !== undefined ? { onClick: onLinkClick } : {})}
                             ref={isActive ? activeNavRef : undefined}
                             aria-current={isActive ? "page" : undefined}
                             className={cn(

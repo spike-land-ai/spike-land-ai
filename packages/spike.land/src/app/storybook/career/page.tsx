@@ -376,7 +376,7 @@ export default function CareerStorybookPage() {
             <OccupationCard
               key={occ.uri}
               occupation={occ}
-              matchScore={[92, 78, 55, 34][i]}
+              {...(([92, 78, 55, 34][i]) !== undefined ? { matchScore: [92, 78, 55, 34][i] } : {})}
             />
           ))}
         </div>

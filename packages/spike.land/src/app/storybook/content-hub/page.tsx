@@ -179,7 +179,7 @@ export default function ContentHubPage() {
               title={post.title}
               excerpt={post.excerpt}
               status={post.status}
-              publishDate={post.publishDate}
+              {...(post.publishDate !== undefined ? { publishDate: post.publishDate } : {})}
               author={post.author}
               category={post.category}
               readTime={post.readTime}
@@ -217,7 +217,7 @@ export default function ContentHubPage() {
                 views={metrics.views}
                 comments={metrics.comments}
                 shares={metrics.shares}
-                likes={metrics.likes}
+                {...(metrics.likes !== undefined ? { likes: metrics.likes } : {})}
               />
             </div>
           ))}

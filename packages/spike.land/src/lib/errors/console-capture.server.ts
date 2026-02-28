@@ -111,7 +111,7 @@ function parseStackTrace(stack?: string): {
     const match = line.match(/at\s+(?:(.+?)\s+\()?(.+?):(\d+):(\d+)\)?/);
     if (match && match[2] && match[3] && match[4]) {
       return {
-        caller: match[1] || undefined,
+        ...(match[1] ? { caller: match[1] } : {}),
         file: match[2],
         line: parseInt(match[3], 10),
         column: parseInt(match[4], 10),
@@ -215,12 +215,12 @@ export function initializeServerConsoleCapture(): void {
 
     const capturedError: CapturedError = {
       message,
-      stack,
-      sourceFile: location.file,
-      sourceLine: location.line,
-      sourceColumn: location.column,
-      callerName: location.caller,
-      errorType,
+      ...(stack !== undefined ? { stack } : {}),
+      ...(location.file !== undefined ? { sourceFile: location.file } : {}),
+      ...(location.line !== undefined ? { sourceLine: location.line } : {}),
+      ...(location.column !== undefined ? { sourceColumn: location.column } : {}),
+      ...(location.caller !== undefined ? { callerName: location.caller } : {}),
+      ...(errorType !== undefined ? { errorType } : {}),
       metadata: { source: "console" },
       timestamp: new Date().toISOString(),
       environment: "BACKEND",

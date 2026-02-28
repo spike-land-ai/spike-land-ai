@@ -182,7 +182,7 @@ export default function PageBuilderPage() {
               pageCount={project.pageCount}
               publishStatus={project.publishStatus}
               lastModified={project.lastModified}
-              thumbnailUrl={project.thumbnailUrl}
+              {...(project.thumbnailUrl !== undefined ? { thumbnailUrl: project.thumbnailUrl } : {})}
             />
           ))}
         </div>

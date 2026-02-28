@@ -35,15 +35,15 @@ export async function reportErrorsBatchToDatabase(
   await prisma.errorLog.createMany({
     data: errors.map(({ error, environment }) => ({
       message: error.message,
-      stack: error.stack,
-      sourceFile: error.sourceFile,
-      sourceLine: error.sourceLine,
-      sourceColumn: error.sourceColumn,
-      callerName: error.callerName,
-      errorType: error.errorType,
-      errorCode: error.errorCode,
-      route: error.route,
-      userId: error.userId,
+      ...(error.stack !== undefined ? { stack: error.stack } : {}),
+      ...(error.sourceFile !== undefined ? { sourceFile: error.sourceFile } : {}),
+      ...(error.sourceLine !== undefined ? { sourceLine: error.sourceLine } : {}),
+      ...(error.sourceColumn !== undefined ? { sourceColumn: error.sourceColumn } : {}),
+      ...(error.callerName !== undefined ? { callerName: error.callerName } : {}),
+      ...(error.errorType !== undefined ? { errorType: error.errorType } : {}),
+      ...(error.errorCode !== undefined ? { errorCode: error.errorCode } : {}),
+      ...(error.route !== undefined ? { route: error.route } : {}),
+      ...(error.userId !== undefined ? { userId: error.userId } : {}),
       environment,
       metadata: error.metadata
         ? JSON.parse(JSON.stringify(error.metadata))
