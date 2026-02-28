@@ -45,7 +45,7 @@ export async function getOrCreateRoute(
       slug,
       originalUrl,
       status: GeneratedRouteStatus.NEW,
-      requestedById: validUserId,
+      ...(validUserId !== undefined ? { requestedById: validUserId } : {}),
     },
   });
 }

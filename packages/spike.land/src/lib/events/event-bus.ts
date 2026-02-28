@@ -62,7 +62,7 @@ class EventBus {
     const subscription: EventSubscription = {
       id,
       eventType,
-      workspaceId,
+      ...(workspaceId !== undefined ? { workspaceId } : {}),
       handler,
     };
 
