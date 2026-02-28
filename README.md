@@ -170,13 +170,4 @@ npm run w:deploy:prod # Deploy to production
 ## License
 
 MIT
->>>>>>> 5f52c3f (feat: add org README dashboard with SVG visuals)
-
-![architecture](https://github.com/user-attachments/assets/c8cf806d-27b2-4125-b291-fabcdbd5ee60)
-[badges.md](https://github.com/user-attachments/files/25621890/badges.md)![mcp-ecosystem](https://github.com/user-attachments/assets/79ce20d3-6763-44b5-bdbe-98a24a658013)
-![hero-banner](https://github.com/user-attachments/assets/275ad1cb-1dc1-4aec-b6c3-1bfe863c57b9)
-![dependency-flow](https://github.com/user-attachments/assets/ad5332a9-f898-495d-8b86-71ca48178203)
-![ci-pipeline](https://github.com/user-attachments/assets/225f4e90-0d45-4296-a9dc-fec898036798)
-
-
 
