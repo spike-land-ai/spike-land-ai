@@ -42,7 +42,7 @@ export async function getPersonas(options?: {
         && { stressLevel: { gte: options.minStress } }),
     },
     orderBy: { rank: "asc" },
-    take: options?.limit,
+    ...(options?.limit !== undefined ? { take: options.limit } : {}),
   });
 }
 
@@ -101,7 +101,7 @@ export async function createPersona(
       predictedProfit: input.predictedProfit,
       stressLevel: input.stressLevel,
       rank: input.rank,
-      landingPageSlug: input.landingPageSlug,
+      ...(input.landingPageSlug !== undefined ? { landingPageSlug: input.landingPageSlug } : {}),
     },
   });
 }
@@ -148,7 +148,7 @@ export async function bulkCreatePersonas(
       predictedProfit: p.predictedProfit,
       stressLevel: p.stressLevel,
       rank: p.rank,
-      landingPageSlug: p.landingPageSlug,
+      ...(p.landingPageSlug !== undefined ? { landingPageSlug: p.landingPageSlug } : {}),
     })),
     skipDuplicates: true,
   });

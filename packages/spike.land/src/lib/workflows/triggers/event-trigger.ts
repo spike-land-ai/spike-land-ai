@@ -122,13 +122,14 @@ export async function createEventSubscription(
     throw new Error(`Subscription for ${input.eventType} already exists`);
   }
 
+  const filterConfigValue = input.filterConfig != null
+    ? input.filterConfig as Prisma.InputJsonValue
+    : undefined;
   const subscription = await prisma.workflowEventSubscription.create({
     data: {
       workflowId,
       eventType: input.eventType,
-      filterConfig: (input.filterConfig ?? undefined) as
-        | Prisma.InputJsonValue
-        | undefined,
+      ...(filterConfigValue !== undefined ? { filterConfig: filterConfigValue } : {}),
     },
   });
 
@@ -162,12 +163,15 @@ export async function updateEventSubscription(
     throw new Error("Subscription not found");
   }
 
+  const updateFilterConfig = input.filterConfig != null
+    ? input.filterConfig as Prisma.InputJsonValue
+    : undefined;
   const subscription = await prisma.workflowEventSubscription.update({
     where: { id: subscriptionId },
     data: {
-      ...(input.filterConfig !== undefined && {
-        filterConfig: input.filterConfig as Prisma.InputJsonValue | undefined,
-      }),
+      ...(input.filterConfig !== undefined && updateFilterConfig !== undefined
+        ? { filterConfig: updateFilterConfig }
+        : {}),
       ...(input.isActive !== undefined && { isActive: input.isActive }),
     },
   });
@@ -393,13 +397,14 @@ function mapSubscriptionToData(subscription: {
   filterConfig: unknown;
   isActive: boolean;
 }): WorkflowEventSubscriptionData {
+  const filterConfig = subscription.filterConfig != null
+    ? subscription.filterConfig as Record<string, unknown>
+    : undefined;
   return {
     id: subscription.id,
     workflowId: subscription.workflowId,
     eventType: subscription.eventType,
-    filterConfig: subscription.filterConfig as
-      | Record<string, unknown>
-      | undefined,
+    ...(filterConfig !== undefined ? { filterConfig } : {}),
     isActive: subscription.isActive,
   };
 }

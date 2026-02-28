@@ -68,7 +68,7 @@ describe("parseGithubUrl", () => {
 
 describe("githubResolverPlugin", () => {
   function setupPlugin(repoUrl: string, branchOrCommit?: string) {
-    const plugin = githubResolverPlugin({ repoUrl, branchOrCommit });
+    const plugin = githubResolverPlugin({ repoUrl, ...(branchOrCommit !== undefined ? { branchOrCommit } : {}) });
     const resolveCbs: Array<(args: OnResolveArgs) => unknown> = [];
     const loadCbs: Array<(args: OnLoadArgs) => unknown> = [];
 

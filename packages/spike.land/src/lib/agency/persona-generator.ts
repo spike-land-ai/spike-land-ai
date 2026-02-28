@@ -133,7 +133,24 @@ export async function generateAndSavePersonas(
 
   // Assign initial ranks based on generation order (will be recalculated)
   const personasWithRanks: CreatePersonaInput[] = personas.map((p, index) => ({
-    ...p,
+    slug: p.slug,
+    name: p.name,
+    tagline: p.tagline,
+    demographics: {
+      ...(p.demographics.age !== undefined ? { age: p.demographics.age } : {}),
+      ...(p.demographics.gender !== undefined ? { gender: p.demographics.gender } : {}),
+      ...(p.demographics.income !== undefined ? { income: p.demographics.income } : {}),
+      ...(p.demographics.location !== undefined ? { location: p.demographics.location } : {}),
+      ...(p.demographics.platform !== undefined ? { platform: p.demographics.platform } : {}),
+      ...(p.demographics.jobTitle !== undefined ? { jobTitle: p.demographics.jobTitle } : {}),
+    },
+    psychographics: p.psychographics,
+    painPoints: p.painPoints,
+    triggers: p.triggers,
+    primaryHook: p.primaryHook,
+    adCopyVariations: p.adCopyVariations,
+    predictedProfit: p.predictedProfit,
+    stressLevel: p.stressLevel,
     rank: index + 1,
   }));
 

@@ -83,7 +83,7 @@ export function githubResolverPlugin(options: GithubResolverOptions): Plugin {
       build.onLoad({ filter: /.*/, namespace: "github-url" }, async args => {
         if (cache.has(args.path)) {
           return {
-            contents: cache.get(args.path),
+            contents: cache.get(args.path)!,
             loader: guessLoader(args.path),
           };
         }
@@ -110,7 +110,7 @@ export function githubResolverPlugin(options: GithubResolverOptions): Plugin {
         for (const ext of extensions) {
           const tryUrl = fetchPath + ext;
           if (cache.has(tryUrl)) {
-            return { contents: cache.get(tryUrl), loader: guessLoader(tryUrl) };
+            return { contents: cache.get(tryUrl)!, loader: guessLoader(tryUrl) };
           }
           const { data, error } = await tryCatch(fetch(tryUrl));
           if (!error && data && data.ok) {

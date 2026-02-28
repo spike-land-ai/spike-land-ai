@@ -538,7 +538,9 @@ export async function generateSystemReportSummary(
       conversionRate: report.marketing?.conversionRate ?? 0,
     },
     external: {
-      metaTotalSpend: report.external?.metaAds?.totalSpend,
+      ...(report.external?.metaAds?.totalSpend !== undefined
+        ? { metaTotalSpend: report.external.metaAds.totalSpend }
+        : {}),
     },
   };
 }

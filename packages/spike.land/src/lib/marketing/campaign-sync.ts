@@ -261,7 +261,7 @@ async function refreshAccountToken(
         refreshTokenEncrypted: encryptedRefreshToken,
         accessToken: null, // Clear legacy fields
         refreshToken: null,
-        expiresAt: newTokens.expiresAt,
+        ...(newTokens.expiresAt !== undefined ? { expiresAt: newTokens.expiresAt } : {}),
         updatedAt: new Date(),
       },
     }),

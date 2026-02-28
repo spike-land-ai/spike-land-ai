@@ -113,18 +113,18 @@ export async function createCapabilityToken(
       tokenHash,
       agentId: params.agentId,
       grantedByUserId: params.grantedByUserId,
-      grantedByAgentId: params.grantedByAgentId,
+      ...(params.grantedByAgentId !== undefined ? { grantedByAgentId: params.grantedByAgentId } : {}),
       allowedTools: params.allowedTools,
       allowedCategories: params.allowedCategories,
       deniedTools: params.deniedTools,
       workspaceIds: params.workspaceIds ?? [],
       maxTokenBudget: params.maxTokenBudget ?? 100000,
       maxApiCalls: params.maxApiCalls ?? 1000,
-      parentTokenId: params.parentTokenId,
+      ...(params.parentTokenId !== undefined ? { parentTokenId: params.parentTokenId } : {}),
       delegationDepth,
       maxDelegationDepth: params.maxDelegationDepth
         ?? DEFAULT_MAX_DELEGATION_DEPTH,
-      expiresAt: params.expiresAt,
+      ...(params.expiresAt !== undefined ? { expiresAt: params.expiresAt } : {}),
     },
   });
 
@@ -340,7 +340,7 @@ export async function delegateToken(
     maxApiCalls: childCalls,
     parentTokenId,
     maxDelegationDepth: parent.maxDelegationDepth,
-    expiresAt: subset.expiresAt,
+    ...(subset.expiresAt !== undefined ? { expiresAt: subset.expiresAt } : {}),
   });
 }
 

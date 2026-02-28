@@ -84,7 +84,8 @@ export class InProcessToolProvider {
     name: string,
     args: Record<string, unknown>,
   ): Promise<CallToolResult> {
-    return this.registry.callToolDirect(name, args);
+    const result = await this.registry.callToolDirect(name, args);
+    return { ...result, isError: result.isError ?? false };
   }
 
   /** Returns server names for compatibility. */

@@ -112,7 +112,7 @@ export function HealthAlertEmail({
     <BaseEmail
       preview={`${styles.emoji} Account Health Alert: ${accountName}`}
       heading="Account Health Alert"
-      unsubscribeUrl={unsubscribeUrl}
+      {...(unsubscribeUrl !== undefined ? { unsubscribeUrl } : {})}
     >
       {recipientName && <Text style={emailStyles.text}>Hi {recipientName},</Text>}
 

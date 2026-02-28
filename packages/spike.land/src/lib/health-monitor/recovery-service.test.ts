@@ -71,7 +71,7 @@ function makeRecoverySteps(count = 2): RecoveryStep[] {
     order: i + 1,
     title: `Step ${i + 1}`,
     description: `Do step ${i + 1}`,
-    actionUrl: i === 0 ? "/settings" : undefined,
+    ...(i === 0 ? { actionUrl: "/settings" } : {}),
   }));
 }
 
@@ -297,7 +297,6 @@ describe("upsertRecoveryGuidance", () => {
 
     await upsertRecoveryGuidance({
       ...baseOptions,
-      requiresAction: undefined,
     });
 
     const createArg = vi.mocked(prisma.recoveryGuidance.create).mock.calls[0]?.[0];
@@ -311,7 +310,6 @@ describe("upsertRecoveryGuidance", () => {
 
     await upsertRecoveryGuidance({
       ...baseOptions,
-      autoRecoverable: undefined,
     });
 
     const createArg = vi.mocked(prisma.recoveryGuidance.create).mock.calls[0]?.[0];

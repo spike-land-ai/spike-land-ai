@@ -24,8 +24,8 @@ export function makeMove(
       isStalemate: game.isStalemate(),
       isDraw: game.isDraw(),
       isGameOver: game.isGameOver(),
-      captured: result.captured,
-      promotion: result.promotion,
+      ...(result.captured !== undefined ? { captured: result.captured } : {}),
+      ...(result.promotion !== undefined ? { promotion: result.promotion } : {}),
     };
   } catch {
     return {

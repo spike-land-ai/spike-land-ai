@@ -89,8 +89,7 @@ describe("validateWorkflow", () => {
       makeStep({
         name: "Branch",
         type: "ACTION",
-        branchType: "TRUE" as WorkflowStepData["branchType"],
-        parentStepId: undefined,
+        branchType: "TRUE" as NonNullable<WorkflowStepData["branchType"]>,
       }),
     ];
     const result = validateWorkflow(steps);
@@ -137,7 +136,7 @@ describe("validateWorkflow", () => {
         name: "Step",
         type: "ACTION",
         parentStepId: "nonexistent",
-        branchType: "TRUE" as WorkflowStepData["branchType"],
+        branchType: "TRUE" as NonNullable<WorkflowStepData["branchType"]>,
       }),
     ];
     const result = validateWorkflow(steps);

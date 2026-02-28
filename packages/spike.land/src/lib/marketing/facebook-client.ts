@@ -69,7 +69,9 @@ export class FacebookMarketingClient implements IMarketingClient {
     // Trim whitespace/newlines that may be added by environment variable management systems
     this.appId = (process.env.FACEBOOK_MARKETING_APP_ID || "").trim();
     this.appSecret = (process.env.FACEBOOK_MARKETING_APP_SECRET || "").trim();
-    this.accessToken = options?.accessToken;
+    if (options?.accessToken !== undefined) {
+      this.accessToken = options.accessToken;
+    }
 
     if (!this.appId || !this.appSecret) {
       throw new Error(
@@ -190,11 +192,12 @@ export class FacebookMarketingClient implements IMarketingClient {
     // Exchange short-lived token for long-lived token
     const longLivedToken = await this.getLongLivedToken(data.access_token);
 
+    const expiresAt1 = longLivedToken.expires_in
+      ? new Date(Date.now() + longLivedToken.expires_in * 1000)
+      : undefined;
     return {
       accessToken: longLivedToken.access_token,
-      expiresAt: longLivedToken.expires_in
-        ? new Date(Date.now() + longLivedToken.expires_in * 1000)
-        : undefined,
+      ...(expiresAt1 !== undefined ? { expiresAt: expiresAt1 } : {}),
       tokenType: data.token_type || "bearer",
     };
   }
@@ -240,11 +243,12 @@ export class FacebookMarketingClient implements IMarketingClient {
     // For page tokens, you can get a new one with the user token
     const result = await this.getLongLivedToken(refreshToken);
 
+    const expiresAt2 = result.expires_in
+      ? new Date(Date.now() + result.expires_in * 1000)
+      : undefined;
     return {
       accessToken: result.access_token,
-      expiresAt: result.expires_in
-        ? new Date(Date.now() + result.expires_in * 1000)
-        : undefined,
+      ...(expiresAt2 !== undefined ? { expiresAt: expiresAt2 } : {}),
       tokenType: "bearer",
     };
   }

@@ -104,9 +104,7 @@ export async function updateSmartRoutingSettings(
   await prisma.workspace.update({
     where: { id: workspaceId },
     data: {
-      settings: fullSettings as Parameters<
-        typeof prisma.workspace.update
-      >[0]["data"]["settings"],
+      settings: fullSettings as import("@/generated/prisma").Prisma.InputJsonValue,
     },
   });
 

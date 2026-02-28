@@ -113,7 +113,7 @@ export function CrisisAlertEmail({
     <BaseEmail
       preview={`${styles.emoji} ${severity} Crisis Alert: ${formatTriggerType(triggerType)}`}
       heading="Crisis Alert"
-      unsubscribeUrl={unsubscribeUrl}
+      {...(unsubscribeUrl !== undefined ? { unsubscribeUrl } : {})}
     >
       {recipientName && <Text style={emailStyles.text}>Hi {recipientName},</Text>}
 

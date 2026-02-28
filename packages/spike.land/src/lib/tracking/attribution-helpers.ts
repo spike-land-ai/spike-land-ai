@@ -206,12 +206,12 @@ export async function getExternalCampaignId(
  */
 export function extractUTMFromSession(session: VisitorSession): UTMParams {
   return {
-    utm_source: session.utmSource || undefined,
-    utm_medium: session.utmMedium || undefined,
-    utm_campaign: session.utmCampaign || undefined,
-    utm_term: session.utmTerm || undefined,
-    utm_content: session.utmContent || undefined,
-    gclid: session.gclid || undefined,
-    fbclid: session.fbclid || undefined,
+    ...(session.utmSource ? { utm_source: session.utmSource } : {}),
+    ...(session.utmMedium ? { utm_medium: session.utmMedium } : {}),
+    ...(session.utmCampaign ? { utm_campaign: session.utmCampaign } : {}),
+    ...(session.utmTerm ? { utm_term: session.utmTerm } : {}),
+    ...(session.utmContent ? { utm_content: session.utmContent } : {}),
+    ...(session.gclid ? { gclid: session.gclid } : {}),
+    ...(session.fbclid ? { fbclid: session.fbclid } : {}),
   };
 }

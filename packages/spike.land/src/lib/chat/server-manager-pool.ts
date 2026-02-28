@@ -112,7 +112,7 @@ export async function getServerManager(
   try {
     await entry.connecting;
   } finally {
-    entry.connecting = undefined;
+    delete entry.connecting;
   }
 
   return entry.provider as ServerManager;

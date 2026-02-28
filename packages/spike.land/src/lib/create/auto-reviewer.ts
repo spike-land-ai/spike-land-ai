@@ -140,7 +140,7 @@ async function checkHealth(codespaceId: string): Promise<AutoReviewCheck> {
     return {
       name: "health",
       passed: healthy,
-      error: healthy ? undefined : "Codespace is unhealthy",
+      ...(healthy ? {} : { error: "Codespace is unhealthy" }),
       durationMs: Date.now() - start,
     };
   } catch (error) {

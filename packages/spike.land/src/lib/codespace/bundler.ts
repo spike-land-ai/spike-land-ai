@@ -165,7 +165,7 @@ export function serverFetchPlugin(cache: Map<string, string>): Plugin {
 
         // Check import map for exact match
         if (imports[args.path]) {
-          return { path: imports[args.path], namespace: "http-url" };
+          return { path: imports[args.path]!, namespace: "http-url" };
         }
 
         // Relative import inside an http-url module

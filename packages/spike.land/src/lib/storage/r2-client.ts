@@ -67,7 +67,7 @@ export function getStorageConfig(bucketEnvKeys?: string[]): StorageConfig {
     );
   }
 
-  return { accessKeyId, secretAccessKey, bucket, endpoint, region };
+  return { accessKeyId, secretAccessKey, bucket, ...(endpoint !== undefined ? { endpoint } : {}), region };
 }
 
 /**

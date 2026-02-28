@@ -70,7 +70,7 @@ export async function markAsGenerating(
       codespaceUrl,
       status: CreatedAppStatus.GENERATING,
       promptUsed,
-      generatedById: validUserId,
+      ...(validUserId !== undefined ? { generatedById: validUserId } : {}),
       viewCount: 0,
     },
   });

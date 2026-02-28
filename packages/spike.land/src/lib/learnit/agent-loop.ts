@@ -145,7 +145,7 @@ export async function* agentGenerateLearnIt(
     title,
     description,
     content: finalContent,
-    generatedById: userId,
+    ...(userId !== undefined ? { generatedById: userId } : {}),
     aiModel: "claude-opus-4-6",
   });
 

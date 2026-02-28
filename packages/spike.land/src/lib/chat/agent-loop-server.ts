@@ -98,8 +98,8 @@ export function createAgentLoopStream(
 
         const systemPrompt = buildAgentSystemPrompt(promptContext);
         const chatClient = new ChatClient({
-          authToken,
-          apiKey,
+          ...(authToken !== undefined ? { authToken } : {}),
+          ...(apiKey !== undefined ? { apiKey } : {}),
           model: "claude-sonnet-4-6",
           systemPrompt,
         });

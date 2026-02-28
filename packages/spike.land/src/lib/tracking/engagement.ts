@@ -35,12 +35,11 @@ export function createEngagementCollector(
   const data: EngagementData = {
     visitorId,
     page,
-    abVariant,
+    ...(abVariant !== undefined ? { abVariant } : {}),
     scrollDepthMax: 0,
     timeOnPageMs: 0,
     sectionsViewed: [],
     chatOpened: false,
-    ctaClicked: undefined,
     faqExpanded: 0,
   };
 
@@ -75,7 +74,9 @@ export function createEngagementCollector(
         data.chatOpened = true;
         dirty = true;
       } else if (type === "ctaClicked") {
-        data.ctaClicked = value;
+        if (value !== undefined) {
+          data.ctaClicked = value;
+        }
         dirty = true;
       } else if (type === "faqExpanded") {
         data.faqExpanded++;

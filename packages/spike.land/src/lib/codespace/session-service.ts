@@ -234,7 +234,7 @@ export class SessionService {
         css: session.css,
         hash,
         messages: session.messages as unknown as Prisma.InputJsonValue,
-        requiresReRender: session.requiresReRender,
+        ...(session.requiresReRender !== undefined ? { requiresReRender: session.requiresReRender } : {}),
       },
       create: {
         codeSpace,
@@ -244,7 +244,7 @@ export class SessionService {
         css: session.css,
         hash,
         messages: session.messages as unknown as Prisma.InputJsonValue,
-        requiresReRender: session.requiresReRender,
+        ...(session.requiresReRender !== undefined ? { requiresReRender: session.requiresReRender } : {}),
       },
     });
 
@@ -281,7 +281,7 @@ export class SessionService {
         css: session.css,
         hash,
         messages: session.messages as unknown as Prisma.InputJsonValue,
-        requiresReRender: session.requiresReRender,
+        ...(session.requiresReRender !== undefined ? { requiresReRender: session.requiresReRender } : {}),
       },
       create: {
         codeSpace,
@@ -291,7 +291,7 @@ export class SessionService {
         css: session.css,
         hash,
         messages: session.messages as unknown as Prisma.InputJsonValue,
-        requiresReRender: session.requiresReRender,
+        ...(session.requiresReRender !== undefined ? { requiresReRender: session.requiresReRender } : {}),
       },
     });
 

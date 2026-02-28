@@ -57,7 +57,7 @@ export async function submitReview(params: {
       bugs: JSON.parse(JSON.stringify(bugs)),
       score: Math.max(0, Math.min(1, score)),
       approved,
-      comment,
+      ...(comment !== undefined ? { comment } : {}),
     },
   });
 

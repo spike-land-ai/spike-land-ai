@@ -126,7 +126,7 @@ export async function makeGameMove(
   }
 
   const chess = createGame(game.fen);
-  const moveResult = makeMove(chess, { from, to, promotion });
+  const moveResult = makeMove(chess, { from, to, ...(promotion !== undefined ? { promotion } : {}) });
 
   if (!moveResult.success) {
     return moveResult;

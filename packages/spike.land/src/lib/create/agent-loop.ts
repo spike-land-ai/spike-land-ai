@@ -168,7 +168,7 @@ export async function* agentGenerateApp(
     const genResponse = await callClaude({
       systemPrompt: systemPrompt.full,
       stablePrefix: systemPrompt.stablePrefix,
-      dynamicSuffix: systemPrompt.dynamicSuffix || undefined,
+      ...(systemPrompt.dynamicSuffix ? { dynamicSuffix: systemPrompt.dynamicSuffix } : {}),
       userPrompt,
       model: ctx.generationModel,
       maxTokens: adaptiveMaxTokens,
@@ -272,17 +272,18 @@ export async function* agentGenerateApp(
 
         const autoResult = await runAutoReview(codespaceId, ctx.currentCode!);
 
+        const autoFeedback = autoResult.passed
+          ? undefined
+          : Object.values(autoResult.checks)
+            .filter(c => !c.passed)
+            .map(c => `${c.name}: ${c.error}`)
+            .join("; ");
         yield {
           type: "review_complete",
           phase: "AUTO_REVIEW" as const,
           approved: autoResult.passed,
           score: autoResult.score,
-          feedback: autoResult.passed
-            ? undefined
-            : Object.values(autoResult.checks)
-              .filter(c => !c.passed)
-              .map(c => `${c.name}: ${c.error}`)
-              .join("; "),
+          ...(autoFeedback !== undefined ? { feedback: autoFeedback } : {}),
         };
 
         if (!autoResult.passed) {
@@ -319,7 +320,7 @@ export async function* agentGenerateApp(
           phase: "AI_REVIEW" as const,
           approved: aiResult.passed,
           score: aiResult.averageScore,
-          feedback: aiResult.passed ? undefined : aiResult.feedback,
+          ...(!aiResult.passed && aiResult.feedback !== undefined ? { feedback: aiResult.feedback } : {}),
         };
 
         if (!aiResult.passed) {
@@ -421,9 +422,9 @@ export async function* agentGenerateApp(
         ctx.errors.map(e => ({ error: e.error, iteration: e.iteration })),
         {
           type: structuredError.type,
-          library: structuredError.library,
-          lineNumber: structuredError.lineNumber,
-          suggestion: structuredError.suggestion,
+          ...(structuredError.library !== undefined ? { library: structuredError.library } : {}),
+          ...(structuredError.lineNumber !== undefined ? { lineNumber: structuredError.lineNumber } : {}),
+          ...(structuredError.suggestion !== undefined ? { suggestion: structuredError.suggestion } : {}),
         },
       );
 
@@ -433,7 +434,7 @@ export async function* agentGenerateApp(
         const fixResponse = await callClaude({
           systemPrompt: fixSystemPrompt.full,
           stablePrefix: fixSystemPrompt.stablePrefix,
-          dynamicSuffix: fixSystemPrompt.dynamicSuffix || undefined,
+          ...(fixSystemPrompt.dynamicSuffix ? { dynamicSuffix: fixSystemPrompt.dynamicSuffix } : {}),
           userPrompt: fixUserPrompt,
           model: "sonnet",
           maxTokens: FIX_MAX_TOKENS,

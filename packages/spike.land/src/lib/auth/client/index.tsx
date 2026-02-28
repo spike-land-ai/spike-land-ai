@@ -30,7 +30,7 @@ export function useSession() {
                 id: data.user.id,
                 email: data.user.email,
                 name: data.user.name,
-                image: data.user.image,
+                image: data.user.image ?? null,
                 role: (data.user as any).role || "USER",
             }
         };

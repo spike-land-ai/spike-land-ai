@@ -158,7 +158,7 @@ export async function uploadAudioToR2(
       key,
       url: "",
       sizeBytes: 0,
-      error: validation.error,
+      ...(validation.error !== undefined ? { error: validation.error } : {}),
     };
   }
 
@@ -311,9 +311,9 @@ export async function getAudioMetadata(
   return {
     key,
     size: response.ContentLength || 0,
-    lastModified: response.LastModified,
-    contentType: response.ContentType,
-    metadata: response.Metadata,
+    ...(response.LastModified !== undefined ? { lastModified: response.LastModified } : {}),
+    ...(response.ContentType !== undefined ? { contentType: response.ContentType } : {}),
+    ...(response.Metadata !== undefined ? { metadata: response.Metadata } : {}),
   };
 }
 

@@ -445,7 +445,7 @@ export function update(
     id: generateOpId(set),
     replicaId,
     operation,
-    value,
+    ...(value !== undefined ? { value } : {}),
     timestamp: set.timestampCounter,
   };
   set.operationLog.push(opLog);

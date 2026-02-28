@@ -26,8 +26,6 @@ export async function recordSuccessfulSync(
     lastSuccessfulSync: new Date(),
     lastSyncAttempt: new Date(),
     consecutiveErrors: 0, // Reset on success
-    lastError: undefined,
-    lastErrorAt: undefined,
   });
 }
 

@@ -189,11 +189,12 @@ export class WorkspaceCreditManager {
       };
     }
 
+    const resolvedFeature = feature ?? source;
     const creditSource: AiCreditSource = {
-      model,
-      provider,
+      ...(model !== undefined ? { model } : {}),
+      ...(provider !== undefined ? { provider } : {}),
       // Prefer the explicit feature label; fall back to the legacy source string.
-      feature: feature ?? source,
+      ...(resolvedFeature !== undefined ? { feature: resolvedFeature } : {}),
     };
 
     const result = await WorkspaceSubscriptionService.consumeAiCredits(

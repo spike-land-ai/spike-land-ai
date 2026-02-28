@@ -12,27 +12,17 @@ import {
   createWorkflowVersion,
   publishWorkflowVersion,
 } from "@/lib/workflows/workflow-service";
-import type { WorkflowStepType } from "@prisma/client";
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { logger } from "@/lib/logger";
+import type { WorkflowStepData } from "@/types/workflow";
 
 interface RouteParams {
   params: Promise<{ workspaceId: string; workflowId: string; }>;
 }
 
-const stepSchema: z.ZodType<{
-  id?: string | undefined;
-  name: string;
-  type: WorkflowStepType;
-  sequence?: number | undefined;
-  config: Record<string, unknown>;
-  dependencies?: string[] | undefined;
-  parentStepId?: string | null | undefined;
-  branchType?: "IF_TRUE" | "IF_FALSE" | "SWITCH_CASE" | "DEFAULT" | null | undefined;
-  branchCondition?: string | null | undefined;
-}> = z.object({
+const stepSchema = z.object({
   id: z.string().optional(),
   name: z.string().min(1, "Step name is required"),
   type: z.enum(["TRIGGER", "ACTION", "CONDITION"]),
@@ -151,7 +141,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
   const { data: version, error: createError } = await tryCatch(
     createWorkflowVersion(workflowId, workspaceId, {
       ...(versionDesc !== undefined ? { description: versionDesc } : {}),
-      steps,
+      steps: steps as WorkflowStepData[],
     }),
   );
 

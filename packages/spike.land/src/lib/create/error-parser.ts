@@ -28,7 +28,7 @@ export function parseTranspileError(rawError: string): StructuredError {
   ) {
     error.type = "import";
     const moduleMatch = rawError.match(/['"]([^'"]+)['"]/);
-    if (moduleMatch) {
+    if (moduleMatch?.[1] !== undefined) {
       error.library = moduleMatch[1];
     }
   } // Type errors
@@ -48,7 +48,7 @@ export function parseTranspileError(rawError: string): StructuredError {
   ) {
     error.type = "runtime";
     const varMatch = rawError.match(/['"]?(\w+)['"]?\s+is not defined/);
-    if (varMatch) {
+    if (varMatch?.[1] !== undefined) {
       error.component = varMatch[1];
     }
   }
@@ -61,7 +61,7 @@ export function parseTranspileError(rawError: string): StructuredError {
 
   // Extract component name from JSX context
   const compMatch = rawError.match(/<(\w+)/);
-  if (compMatch && !error.component) {
+  if (compMatch?.[1] !== undefined && !error.component) {
     error.component = compMatch[1];
   }
 

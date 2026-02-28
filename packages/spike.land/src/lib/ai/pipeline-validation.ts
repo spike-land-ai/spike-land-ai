@@ -113,7 +113,7 @@ function validateAnalysisConfig(
 ): ValidationResult<AnalysisConfig> {
   const result = AnalysisConfigSchema.safeParse(data);
   if (result.success) {
-    return { success: true, data: result.data };
+    return { success: true, data: result.data as AnalysisConfig };
   }
   return {
     success: false,
@@ -131,7 +131,7 @@ function validateAutoCropConfig(
 ): ValidationResult<AutoCropConfig> {
   const result = AutoCropConfigSchema.safeParse(data);
   if (result.success) {
-    return { success: true, data: result.data };
+    return { success: true, data: result.data as AutoCropConfig };
   }
   return {
     success: false,
@@ -149,7 +149,7 @@ function validatePromptConfig(
 ): ValidationResult<PromptConfig> {
   const result = PromptConfigSchema.safeParse(data);
   if (result.success) {
-    return { success: true, data: result.data };
+    return { success: true, data: result.data as PromptConfig };
   }
   return {
     success: false,
@@ -167,7 +167,7 @@ function validateGenerationConfig(
 ): ValidationResult<GenerationConfig> {
   const result = GenerationConfigSchema.safeParse(data);
   if (result.success) {
-    return { success: true, data: result.data };
+    return { success: true, data: result.data as GenerationConfig };
   }
   return {
     success: false,
@@ -198,7 +198,7 @@ export function validatePipelineConfigs(data: {
     const result = validateAnalysisConfig(data.analysisConfig);
     if (!result.success) {
       errors.analysisConfig = result.errors ?? ["Invalid analysis config"];
-    } else {
+    } else if (result.data !== undefined) {
       validatedData.analysisConfig = result.data;
     }
   }
@@ -207,7 +207,7 @@ export function validatePipelineConfigs(data: {
     const result = validateAutoCropConfig(data.autoCropConfig);
     if (!result.success) {
       errors.autoCropConfig = result.errors ?? ["Invalid auto-crop config"];
-    } else {
+    } else if (result.data !== undefined) {
       validatedData.autoCropConfig = result.data;
     }
   }
@@ -216,7 +216,7 @@ export function validatePipelineConfigs(data: {
     const result = validatePromptConfig(data.promptConfig);
     if (!result.success) {
       errors.promptConfig = result.errors ?? ["Invalid prompt config"];
-    } else {
+    } else if (result.data !== undefined) {
       validatedData.promptConfig = result.data;
     }
   }
@@ -226,11 +226,11 @@ export function validatePipelineConfigs(data: {
     if (!result.success) {
       errors.generationConfig = result.errors
         ?? ["Invalid generation config"];
-    } else {
+    } else if (result.data !== undefined) {
       validatedData.generationConfig = result.data;
     }
   }
 
   const valid = Object.keys(errors).length === 0;
-  return { valid, errors, validatedData: valid ? validatedData : undefined };
+  return { valid, errors, ...(valid ? { validatedData } : {}) };
 }

@@ -32,19 +32,19 @@ export class AIDecisionLogger {
     const { data, error } = await tryCatch(
       prisma.aIDecisionLog.create({
         data: {
-          workspaceId: options.workspaceId,
-          userId: options.userId,
+          ...(options.workspaceId !== undefined ? { workspaceId: options.workspaceId } : {}),
+          ...(options.userId !== undefined ? { userId: options.userId } : {}),
           requestType: options.requestType,
-          inputPrompt: options.inputPrompt,
-          inputContext: options.inputContext as object | undefined,
-          outputResult: options.outputResult,
-          outputMetadata: options.outputMetadata as object | undefined,
-          modelId: options.modelId,
-          modelVersion: options.modelVersion,
-          tokensUsed: options.tokensUsed,
-          latencyMs: options.latencyMs,
+          ...(options.inputPrompt !== undefined ? { inputPrompt: options.inputPrompt } : {}),
+          ...(options.inputContext !== undefined ? { inputContext: options.inputContext as object } : {}),
+          ...(options.outputResult !== undefined ? { outputResult: options.outputResult } : {}),
+          ...(options.outputMetadata !== undefined ? { outputMetadata: options.outputMetadata as object } : {}),
+          ...(options.modelId !== undefined ? { modelId: options.modelId } : {}),
+          ...(options.modelVersion !== undefined ? { modelVersion: options.modelVersion } : {}),
+          ...(options.tokensUsed !== undefined ? { tokensUsed: options.tokensUsed } : {}),
+          ...(options.latencyMs !== undefined ? { latencyMs: options.latencyMs } : {}),
           status: options.status,
-          errorMessage: options.errorMessage,
+          ...(options.errorMessage !== undefined ? { errorMessage: options.errorMessage } : {}),
         },
       }),
     );
@@ -82,11 +82,11 @@ export class AIDecisionLogger {
       outputResult,
       outputMetadata: modelInfo,
       modelId: modelInfo.modelId,
-      modelVersion: modelInfo.modelVersion,
-      tokensUsed: modelInfo.tokensUsed,
-      latencyMs: modelInfo.latencyMs,
+      ...(modelInfo.modelVersion !== undefined ? { modelVersion: modelInfo.modelVersion } : {}),
+      ...(modelInfo.tokensUsed !== undefined ? { tokensUsed: modelInfo.tokensUsed } : {}),
+      ...(modelInfo.latencyMs !== undefined ? { latencyMs: modelInfo.latencyMs } : {}),
       status,
-      errorMessage,
+      ...(errorMessage !== undefined ? { errorMessage } : {}),
     });
   }
 
@@ -114,11 +114,11 @@ export class AIDecisionLogger {
       inputPrompt: content,
       outputMetadata: analysisResult,
       modelId: modelInfo.modelId,
-      modelVersion: modelInfo.modelVersion,
-      tokensUsed: modelInfo.tokensUsed,
-      latencyMs: modelInfo.latencyMs,
+      ...(modelInfo.modelVersion !== undefined ? { modelVersion: modelInfo.modelVersion } : {}),
+      ...(modelInfo.tokensUsed !== undefined ? { tokensUsed: modelInfo.tokensUsed } : {}),
+      ...(modelInfo.latencyMs !== undefined ? { latencyMs: modelInfo.latencyMs } : {}),
       status,
-      errorMessage,
+      ...(errorMessage !== undefined ? { errorMessage } : {}),
     });
   }
 
@@ -147,11 +147,11 @@ export class AIDecisionLogger {
       inputContext,
       outputMetadata: recommendations,
       modelId: modelInfo.modelId,
-      modelVersion: modelInfo.modelVersion,
-      tokensUsed: modelInfo.tokensUsed,
-      latencyMs: modelInfo.latencyMs,
+      ...(modelInfo.modelVersion !== undefined ? { modelVersion: modelInfo.modelVersion } : {}),
+      ...(modelInfo.tokensUsed !== undefined ? { tokensUsed: modelInfo.tokensUsed } : {}),
+      ...(modelInfo.latencyMs !== undefined ? { latencyMs: modelInfo.latencyMs } : {}),
       status,
-      errorMessage,
+      ...(errorMessage !== undefined ? { errorMessage } : {}),
     });
   }
 

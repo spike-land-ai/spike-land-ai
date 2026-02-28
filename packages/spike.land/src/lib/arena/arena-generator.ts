@@ -138,7 +138,7 @@ export async function arenaGenerateFromPrompt(
       const fixSystem = buildFixSystemPrompt("arena", []);
       const fixUser = buildFixUserPrompt(currentCode, errorMsg, errors, {
         type: structuredError.type,
-        library: structuredError.library,
+        ...(structuredError.library !== undefined ? { library: structuredError.library } : {}),
       });
 
       const fixResponse = await callClaude({

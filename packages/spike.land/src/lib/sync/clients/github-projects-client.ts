@@ -200,8 +200,8 @@ export class GitHubProjectsClient {
         title: node.content?.title ?? "",
         body: node.content?.body ?? "",
         status: fieldValues.Status ?? "",
-        issueNumber: node.content?.number,
-        issueUrl: node.content?.url,
+        ...(node.content?.number !== undefined ? { issueNumber: node.content.number } : {}),
+        ...(node.content?.url !== undefined ? { issueUrl: node.content.url } : {}),
         labels: node.content?.labels?.nodes.map(l => l.name) ?? [],
         createdAt: node.createdAt,
         updatedAt: node.updatedAt,
@@ -229,7 +229,7 @@ export class GitHubProjectsClient {
     let cursor: string | undefined;
 
     for (let page = 0; page < 20; page++) {
-      const result = await this.listItems({ first: 100, after: cursor });
+      const result = await this.listItems({ first: 100, ...(cursor !== undefined ? { after: cursor } : {}) });
       if (result.error || !result.data) {
         return {
           data: allItems.length > 0 ? allItems : null,
@@ -440,7 +440,7 @@ export class GitHubProjectsClient {
         id: f.id,
         name: f.name,
         dataType: f.dataType,
-        options: f.options,
+        ...(f.options !== undefined ? { options: f.options } : {}),
       })),
       error: null,
     };

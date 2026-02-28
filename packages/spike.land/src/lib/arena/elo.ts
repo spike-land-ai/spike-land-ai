@@ -123,9 +123,9 @@ export async function updateEloAfterScoring(
     where: { userId: submission.userId },
     data: {
       elo: newElo,
-      wins: isWin ? { increment: 1 } : undefined,
-      losses: isLoss ? { increment: 1 } : undefined,
-      draws: outcome === 0.5 ? { increment: 1 } : undefined,
+      ...(isWin ? { wins: { increment: 1 } } : {}),
+      ...(isLoss ? { losses: { increment: 1 } } : {}),
+      ...(outcome === 0.5 ? { draws: { increment: 1 } } : {}),
       streak: isWin
         ? (playerElo.streak > 0 ? playerElo.streak + 1 : 1)
         : isLoss

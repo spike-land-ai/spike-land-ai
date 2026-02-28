@@ -37,7 +37,7 @@ export async function getPortfolioItems(options?: {
       { sortOrder: "asc" },
       { createdAt: "desc" },
     ],
-    take: options?.limit,
+    ...(options?.limit !== undefined ? { take: options.limit } : {}),
   });
 }
 
@@ -63,8 +63,8 @@ export async function createPortfolioItem(
       slug: input.slug,
       name: input.name,
       description: input.description,
-      url: input.url,
-      githubUrl: input.githubUrl,
+      ...(input.url !== undefined ? { url: input.url } : {}),
+      ...(input.githubUrl !== undefined ? { githubUrl: input.githubUrl } : {}),
       screenshots: input.screenshots ?? [],
       technologies: input.technologies ?? [],
       category: input.category,

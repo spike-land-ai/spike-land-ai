@@ -73,8 +73,12 @@ export class GoogleAdsClient implements IMarketingClient {
     this.clientId = (process.env.GOOGLE_ID || "").trim();
     this.clientSecret = (process.env.GOOGLE_SECRET || "").trim();
     this.developerToken = (process.env.GOOGLE_ADS_DEVELOPER_TOKEN || "").trim();
-    this.accessToken = options?.accessToken;
-    this.customerId = options?.customerId;
+    if (options?.accessToken !== undefined) {
+      this.accessToken = options.accessToken;
+    }
+    if (options?.customerId !== undefined) {
+      this.customerId = options.customerId;
+    }
 
     if (!this.clientId || !this.clientSecret) {
       throw new Error(
@@ -257,12 +261,13 @@ export class GoogleAdsClient implements IMarketingClient {
       );
     }
 
+    const googleExpiresAt1 = data.expires_in
+      ? new Date(Date.now() + data.expires_in * 1000)
+      : undefined;
     return {
       accessToken: data.access_token,
       refreshToken: data.refresh_token,
-      expiresAt: data.expires_in
-        ? new Date(Date.now() + data.expires_in * 1000)
-        : undefined,
+      ...(googleExpiresAt1 !== undefined ? { expiresAt: googleExpiresAt1 } : {}),
       tokenType: data.token_type || "Bearer",
       scope: data.scope,
     };
@@ -308,12 +313,13 @@ export class GoogleAdsClient implements IMarketingClient {
       );
     }
 
+    const googleExpiresAt2 = data.expires_in
+      ? new Date(Date.now() + data.expires_in * 1000)
+      : undefined;
     return {
       accessToken: data.access_token,
       refreshToken, // Keep the same refresh token
-      expiresAt: data.expires_in
-        ? new Date(Date.now() + data.expires_in * 1000)
-        : undefined,
+      ...(googleExpiresAt2 !== undefined ? { expiresAt: googleExpiresAt2 } : {}),
       tokenType: data.token_type || "Bearer",
     };
   }

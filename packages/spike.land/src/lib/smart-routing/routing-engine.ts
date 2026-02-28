@@ -30,7 +30,7 @@ export class RoutingEngine {
         const analysis = await analyzeMessage({
           content: item.content,
           senderName: item.senderName,
-          senderHandle: item.senderHandle || undefined,
+          ...(item.senderHandle ? { senderHandle: item.senderHandle } : {}),
           platform: item.platform,
         });
 

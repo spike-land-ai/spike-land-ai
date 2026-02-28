@@ -81,11 +81,11 @@ function mapOrderRequest(request: PodOrderRequest): ProdigiOrderRequest {
     shippingMethod: request.shippingMethod || "Standard",
     recipient: {
       name: request.shippingAddress.name,
-      email: request.shippingAddress.email,
-      phoneNumber: request.shippingAddress.phone,
+      ...(request.shippingAddress.email !== undefined ? { email: request.shippingAddress.email } : {}),
+      ...(request.shippingAddress.phone !== undefined ? { phoneNumber: request.shippingAddress.phone } : {}),
       address: {
         line1: request.shippingAddress.line1,
-        line2: request.shippingAddress.line2,
+        ...(request.shippingAddress.line2 !== undefined ? { line2: request.shippingAddress.line2 } : {}),
         townOrCity: request.shippingAddress.city,
         postalOrZipCode: request.shippingAddress.postalCode,
         countryCode: request.shippingAddress.countryCode,
@@ -102,7 +102,7 @@ function mapOrderRequest(request: PodOrderRequest): ProdigiOrderRequest {
         },
       ],
     })),
-    metadata: request.metadata,
+    ...(request.metadata !== undefined ? { metadata: request.metadata } : {}),
   };
 }
 
@@ -138,16 +138,15 @@ function mapOrderStatus(
     status = "processing";
   }
 
+  const prodigiShippedAt = shipment?.dispatchDate ? new Date(shipment.dispatchDate) : undefined;
   return {
     providerOrderId: order.id,
     status,
     statusDetail: stage,
-    trackingNumber: shipment?.tracking?.number,
-    trackingUrl: shipment?.tracking?.url,
-    carrier: shipment?.carrier?.name,
-    shippedAt: shipment?.dispatchDate
-      ? new Date(shipment.dispatchDate)
-      : undefined,
+    ...(shipment?.tracking?.number !== undefined ? { trackingNumber: shipment.tracking.number } : {}),
+    ...(shipment?.tracking?.url !== undefined ? { trackingUrl: shipment.tracking.url } : {}),
+    ...(shipment?.carrier?.name !== undefined ? { carrier: shipment.carrier.name } : {}),
+    ...(prodigiShippedAt !== undefined ? { shippedAt: prodigiShippedAt } : {}),
     items: order.items.map(item => ({
       sku: item.sku,
       status: item.status,
@@ -178,14 +177,15 @@ export const prodigiProvider: PodProvider = {
       };
     }
 
+    const prodigiError = data.outcome === "CreatedWithIssues"
+      ? data.order.status.issues?.map(i => i.description).join(", ")
+      : undefined;
     return {
       success: data.outcome === "Created"
         || data.outcome === "CreatedWithIssues",
       providerOrderId: data.order.id,
       status: data.order.status.stage,
-      error: data.outcome === "CreatedWithIssues"
-        ? data.order.status.issues?.map(i => i.description).join(", ")
-        : undefined,
+      ...(prodigiError !== undefined ? { error: prodigiError } : {}),
     };
   },
 

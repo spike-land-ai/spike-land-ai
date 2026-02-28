@@ -32,7 +32,7 @@
     "forceConsistentCasingInFileNames": true,
     // Additional strict options (Resolves #797, #1232):
     "noImplicitOverride": true,
-    // "exactOptionalPropertyTypes": true, // ~675 errors — needs dedicated sprint
+    "exactOptionalPropertyTypes": true,
     "noUncheckedSideEffectImports": true,
     "plugins": [
       {

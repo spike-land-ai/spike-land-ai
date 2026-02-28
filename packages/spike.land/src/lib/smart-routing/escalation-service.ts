@@ -44,7 +44,7 @@ export class EscalationService {
         escalationStatus: EscalationStatus.ESCALATED,
         escalationLevel: nextLevel,
         escalatedAt: new Date(),
-        escalatedToId: targetUserId, // Optionally assign
+        ...(targetUserId !== undefined ? { escalatedToId: targetUserId } : {}),
         // Reset or update SLA deadline for new level
         slaDeadline: this.calculateSLADeadline(
           settings.escalation.slaTimeoutMinutes,
@@ -61,7 +61,7 @@ export class EscalationService {
         toLevel: nextLevel,
         reason,
         triggeredBy: trigger,
-        toUserId: targetUserId,
+        ...(targetUserId !== undefined ? { toUserId: targetUserId } : {}),
       },
     });
 

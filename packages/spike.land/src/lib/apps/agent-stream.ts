@@ -56,7 +56,7 @@ export async function* streamAgentResponse(
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
-    signal,
+    ...(signal !== undefined ? { signal } : {}),
   });
 
   if (!response.ok) throw new Error("Failed to send message to agent");

@@ -161,7 +161,7 @@ export async function extractAndSaveNote(
         tags: parsed.tags,
         sourceSlug: slug,
         sourceError: error.slice(0, 1000),
-        sourceFix: fixedCode?.slice(0, 2000),
+        ...(fixedCode != null ? { sourceFix: fixedCode.slice(0, 2000) } : {}),
       },
     });
 

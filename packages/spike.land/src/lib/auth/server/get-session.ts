@@ -34,10 +34,13 @@ export async function getSession(): Promise<AuthSession | null> {
       const sessionToken = cookieStore.get("better-auth.session_token")?.value;
       if (sessionToken === "mock-session-token") {
         logBypassAttempt("env", true);
+        const e2eEmail = cookieStore.get("e2e-user-email")?.value;
+        const e2eName = cookieStore.get("e2e-user-name")?.value;
+        const e2eRole = cookieStore.get("e2e-user-role")?.value;
         return createMockSession({
-          email: cookieStore.get("e2e-user-email")?.value,
-          name: cookieStore.get("e2e-user-name")?.value,
-          role: cookieStore.get("e2e-user-role")?.value,
+          ...(e2eEmail !== undefined ? { email: e2eEmail } : {}),
+          ...(e2eName !== undefined ? { name: e2eName } : {}),
+          ...(e2eRole !== undefined ? { role: e2eRole } : {}),
         });
       }
     }
@@ -61,10 +64,13 @@ export async function getSession(): Promise<AuthSession | null> {
         logBypassAttempt("header", true);
         const { cookies } = await import("next/headers");
         const { data: cookieStore } = await tryCatch(cookies());
+        const headerEmail = cookieStore?.get("e2e-user-email")?.value;
+        const headerName = cookieStore?.get("e2e-user-name")?.value;
+        const headerRole = cookieStore?.get("e2e-user-role")?.value;
         return createMockSession({
-          email: cookieStore?.get("e2e-user-email")?.value,
-          name: cookieStore?.get("e2e-user-name")?.value,
-          role: cookieStore?.get("e2e-user-role")?.value,
+          ...(headerEmail !== undefined ? { email: headerEmail } : {}),
+          ...(headerName !== undefined ? { name: headerName } : {}),
+          ...(headerRole !== undefined ? { role: headerRole } : {}),
         });
       } else {
         logBypassAttempt("header", false);

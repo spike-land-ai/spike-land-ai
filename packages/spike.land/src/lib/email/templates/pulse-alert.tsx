@@ -132,7 +132,7 @@ export function PulseAlertEmail({
         getMetricName(metricType)
       } ${direction} detected for ${accountName}`}
       heading="Pulse AI Agent Alert"
-      unsubscribeUrl={unsubscribeUrl}
+      {...(unsubscribeUrl !== undefined ? { unsubscribeUrl } : {})}
     >
       <Section style={alertStyle}>
         <Text style={alertTitleStyle}>

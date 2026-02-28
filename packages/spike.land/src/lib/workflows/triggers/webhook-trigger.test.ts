@@ -126,7 +126,11 @@ describe("buildWebhookUrl", () => {
     process.env.NEXT_PUBLIC_APP_URL = "https://example.com";
     const url = buildWebhookUrl("tok");
     expect(url).toBe("https://example.com/api/webhooks/tok");
-    process.env.NEXT_PUBLIC_APP_URL = original;
+    if (original !== undefined) {
+      process.env.NEXT_PUBLIC_APP_URL = original;
+    } else {
+      delete process.env.NEXT_PUBLIC_APP_URL;
+    }
   });
 
   it("falls back to spike.land when env var is not set", () => {
@@ -134,7 +138,11 @@ describe("buildWebhookUrl", () => {
     delete process.env.NEXT_PUBLIC_APP_URL;
     const url = buildWebhookUrl("tok");
     expect(url).toBe("https://spike.land/api/webhooks/tok");
-    process.env.NEXT_PUBLIC_APP_URL = original;
+    if (original !== undefined) {
+      process.env.NEXT_PUBLIC_APP_URL = original;
+    } else {
+      delete process.env.NEXT_PUBLIC_APP_URL;
+    }
   });
 });
 

@@ -3,7 +3,7 @@ import { npmResolverPlugin } from "./npm-resolver";
 import type { OnLoadArgs, OnResolveArgs, PluginBuild } from "@spike-land-ai/esbuild-wasm";
 
 function setupPlugin(mode?: "external" | "bundle", cache?: Map<string, string | Uint8Array>) {
-  const plugin = npmResolverPlugin({ mode, cache });
+  const plugin = npmResolverPlugin({ ...(mode !== undefined ? { mode } : {}), ...(cache !== undefined ? { cache } : {}) });
   const resolveCbs: Array<{ filter: RegExp; ns?: string; cb: (args: OnResolveArgs) => unknown; }> =
     [];
   const loadCbs: Array<(args: OnLoadArgs) => unknown> = [];
@@ -11,7 +11,7 @@ function setupPlugin(mode?: "external" | "bundle", cache?: Map<string, string | 
   const build = {
     onResolve: vi.fn().mockImplementation(
       (opts: { filter: RegExp; namespace?: string; }, cb: (args: OnResolveArgs) => unknown) => {
-        resolveCbs.push({ filter: opts.filter, ns: opts.namespace, cb });
+        resolveCbs.push({ filter: opts.filter, ...(opts.namespace !== undefined ? { ns: opts.namespace } : {}), cb });
       },
     ),
     onLoad: vi.fn().mockImplementation(

@@ -37,9 +37,9 @@ export async function ensureUserExists(session: {
     prisma.user.create({
       data: {
         id: user.id,
-        email: user.email,
-        name: user.name,
-        image: user.image,
+        ...(user.email != null ? { email: user.email } : {}),
+        ...(user.name != null ? { name: user.name } : {}),
+        ...(user.image != null ? { image: user.image } : {}),
       },
       select: { id: true },
     }),
@@ -408,7 +408,7 @@ export async function createLegacyApp(
         userId,
         status: "PROMPTING",
         ...(data.codespaceId && { codespaceId: data.codespaceId }),
-        codespaceUrl,
+        ...(codespaceUrl !== undefined ? { codespaceUrl } : {}),
         requirements: {
           create: {
             description: data.requirements,

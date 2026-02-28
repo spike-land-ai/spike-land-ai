@@ -124,7 +124,7 @@ export async function generateStructuredResponse<T>(
           ...(params.responseJsonSchema && {
             responseJsonSchema: params.responseJsonSchema,
           }),
-          systemInstruction: params.systemPrompt,
+          ...(params.systemPrompt !== undefined ? { systemInstruction: params.systemPrompt } : {}),
           maxOutputTokens: params.maxTokens ?? 4096,
           temperature: params.temperature ?? 0.3,
           ...(params.thinkingBudget != null && {

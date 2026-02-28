@@ -696,7 +696,7 @@ describe("FacebookMarketingClient – listCampaigns", () => {
         ok: true,
         json: () =>
           Promise.resolve({
-            data: [makeFacebookCampaign({ daily_budget: "5000", lifetime_budget: undefined })],
+            data: [makeFacebookCampaign({ daily_budget: "5000" })],
           }),
       });
 
@@ -718,7 +718,6 @@ describe("FacebookMarketingClient – listCampaigns", () => {
           Promise.resolve({
             data: [
               makeFacebookCampaign({
-                daily_budget: undefined,
                 lifetime_budget: "100000",
               }),
             ],
@@ -742,7 +741,7 @@ describe("FacebookMarketingClient – listCampaigns", () => {
         json: () =>
           Promise.resolve({
             data: [
-              makeFacebookCampaign({ daily_budget: undefined, lifetime_budget: undefined }),
+              makeFacebookCampaign({}),
             ],
           }),
       });
@@ -790,7 +789,7 @@ describe("FacebookMarketingClient – listCampaigns", () => {
         json: () =>
           Promise.resolve({
             data: [
-              makeFacebookCampaign({ start_time: undefined, stop_time: undefined }),
+              makeFacebookCampaign({}),
             ],
           }),
       });

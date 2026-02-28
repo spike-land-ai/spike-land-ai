@@ -259,7 +259,7 @@ export async function processAgentChatDirect(
             prisma.appCodeVersion.create({
               data: {
                 appId: id,
-                messageId: agentMessageId,
+                ...(agentMessageId !== undefined ? { messageId: agentMessageId } : {}),
                 code: verifySession.code,
                 hash,
               },

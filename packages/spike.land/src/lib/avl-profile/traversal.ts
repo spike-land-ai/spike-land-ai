@@ -139,7 +139,7 @@ export async function startTraversal(
     return {
       sessionId: session.id,
       status: "QUESTION",
-      question: rootNode.question ?? undefined,
+      ...(rootNode.question != null ? { question: rootNode.question } : {}),
       questionTags: rootNode.questionTags,
       nodeId: rootNode.id,
       round: 0,
@@ -177,7 +177,7 @@ export async function startTraversal(
     return {
       sessionId: session.id,
       status: "QUESTION",
-      question: collisionResult.question,
+      ...(collisionResult.question !== undefined ? { question: collisionResult.question } : {}),
       questionTags: [], // Optionally fetch from the newly created internal node if needed, but handleCollision returns question string.
       nodeId: collisionResult.newQuestionNodeId,
       round: 0,
@@ -198,7 +198,7 @@ export async function startTraversal(
   return {
     sessionId: session.id,
     status: "QUESTION",
-    question: rootNode.question ?? undefined,
+    ...(rootNode.question != null ? { question: rootNode.question } : {}),
     questionTags: rootNode.questionTags,
     nodeId: rootNode.id,
     round: 0,
@@ -298,7 +298,7 @@ export async function continueTraversal(
   return {
     sessionId: session.id,
     status: "QUESTION",
-    question: leafNode.question ?? undefined,
+    ...(leafNode.question != null ? { question: leafNode.question } : {}),
     questionTags: leafNode.questionTags,
     nodeId: leafNode.id,
     round: existing.profileRound + 1,
@@ -369,7 +369,7 @@ export async function answerQuestion(
     return {
       sessionId,
       status: "QUESTION",
-      question: nextNode.question ?? undefined,
+      ...(nextNode.question != null ? { question: nextNode.question } : {}),
       questionTags: nextNode.questionTags,
       nodeId: nextNode.id,
     };

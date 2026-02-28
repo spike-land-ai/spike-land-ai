@@ -192,6 +192,7 @@ function parseAnalysisResponse(text: string): AnalysisDetailedResult {
   const parsed = JSON.parse(jsonText);
 
   // Validate and sanitize the parsed response
+  const colorCastType = validateColorCastType(parsed.defects?.colorCastType);
   return {
     mainSubject: String(parsed.mainSubject || "Unknown subject"),
     imageStyle: validateImageStyle(parsed.imageStyle),
@@ -203,22 +204,24 @@ function parseAnalysisResponse(text: string): AnalysisDetailedResult {
       isLowResolution: Boolean(parsed.defects?.isLowResolution),
       isOverexposed: Boolean(parsed.defects?.isOverexposed),
       hasColorCast: Boolean(parsed.defects?.hasColorCast),
-      colorCastType: validateColorCastType(parsed.defects?.colorCastType),
+      ...(colorCastType !== undefined ? { colorCastType } : {}),
     },
     lightingCondition: String(parsed.lightingCondition || "unknown"),
     cropping: {
       isCroppingNeeded: Boolean(parsed.cropping?.isCroppingNeeded),
-      suggestedCrop: parsed.cropping?.suggestedCrop
+      ...(parsed.cropping?.suggestedCrop
         ? {
-          x: Number(parsed.cropping.suggestedCrop.x) || 0,
-          y: Number(parsed.cropping.suggestedCrop.y) || 0,
-          width: Number(parsed.cropping.suggestedCrop.width) || 1,
-          height: Number(parsed.cropping.suggestedCrop.height) || 1,
+          suggestedCrop: {
+            x: Number(parsed.cropping.suggestedCrop.x) || 0,
+            y: Number(parsed.cropping.suggestedCrop.y) || 0,
+            width: Number(parsed.cropping.suggestedCrop.width) || 1,
+            height: Number(parsed.cropping.suggestedCrop.height) || 1,
+          },
         }
-        : undefined,
-      cropReason: parsed.cropping?.cropReason
-        ? String(parsed.cropping.cropReason)
-        : undefined,
+        : {}),
+      ...(parsed.cropping?.cropReason
+        ? { cropReason: String(parsed.cropping.cropReason) }
+        : {}),
     },
   };
 }

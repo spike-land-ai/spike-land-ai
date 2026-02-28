@@ -117,7 +117,7 @@ export async function upsertRecoveryGuidance(options: {
         title: options.title,
         description: options.description,
         steps: stepsJson,
-        estimatedTime: options.estimatedTime,
+        ...(options.estimatedTime !== undefined ? { estimatedTime: options.estimatedTime } : {}),
         requiresAction: options.requiresAction ?? true,
         autoRecoverable: options.autoRecoverable ?? false,
       },
@@ -131,7 +131,7 @@ export async function upsertRecoveryGuidance(options: {
         title: options.title,
         description: options.description,
         steps: stepsJson,
-        estimatedTime: options.estimatedTime,
+        ...(options.estimatedTime !== undefined ? { estimatedTime: options.estimatedTime } : {}),
         requiresAction: options.requiresAction ?? true,
         autoRecoverable: options.autoRecoverable ?? false,
       },
@@ -484,7 +484,7 @@ export async function markIssueResolved(
     data: {
       resolvedAt: new Date(),
       resolvedById,
-      resolutionNotes: notes,
+      ...(notes !== undefined ? { resolutionNotes: notes } : {}),
     },
   });
 }

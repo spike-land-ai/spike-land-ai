@@ -112,7 +112,7 @@ async function handleSignup(request: NextRequest): Promise<NextResponse> {
   const { authInstance } = await import("@/auth");
   const { data: result, error: authError } = await tryCatch(
     authInstance.api.signUpEmail({
-      body: { email: trimmedEmail, password, name: "" },
+      body: { email: trimmedEmail, password, name: "", role: "" },
     })
   );
 
