@@ -17,6 +17,40 @@ erDiagram
   DateTime updatedAt
   String stripeCustomerId UK "nullable"
   UserRole role
+  Boolean emailVerified
+}
+"account" {
+  String id PK
+  String accountId
+  String providerId
+  String userId FK
+  String accessToken "nullable"
+  String refreshToken "nullable"
+  String idToken "nullable"
+  DateTime accessTokenExpiresAt "nullable"
+  DateTime refreshTokenExpiresAt "nullable"
+  String scope "nullable"
+  String password "nullable"
+  DateTime createdAt
+  DateTime updatedAt
+}
+"session" {
+  String id PK
+  DateTime expiresAt
+  String token UK
+  DateTime createdAt
+  DateTime updatedAt
+  String ipAddress "nullable"
+  String userAgent "nullable"
+  String userId FK
+}
+"verification" {
+  String id PK
+  String identifier
+  String value
+  DateTime expiresAt
+  DateTime createdAt "nullable"
+  DateTime updatedAt "nullable"
 }
 "state_machines" {
   String id PK
@@ -3186,6 +3220,8 @@ erDiagram
   Json metadata "nullable"
   DateTime createdAt
 }
+"account" }o--|| "users" : user
+"session" }o--|| "users" : user
 "state_machines" }o--|| "users" : user
 "state_machines" }o--o| "state_machines" : parentMachine
 "campaign_briefs" }o--o| "brief_templates" : template
@@ -3515,6 +3551,49 @@ Properties as follows:
 - `updatedAt`:
 - `stripeCustomerId`:
 - `role`:
+- `emailVerified`:
+
+### `account`
+
+Properties as follows:
+
+- `id`:
+- `accountId`:
+- `providerId`:
+- `userId`:
+- `accessToken`:
+- `refreshToken`:
+- `idToken`:
+- `accessTokenExpiresAt`:
+- `refreshTokenExpiresAt`:
+- `scope`:
+- `password`:
+- `createdAt`:
+- `updatedAt`:
+
+### `session`
+
+Properties as follows:
+
+- `id`:
+- `expiresAt`:
+- `token`:
+- `createdAt`:
+- `updatedAt`:
+- `ipAddress`:
+- `userAgent`:
+- `userId`:
+
+### `verification`
+
+Properties as follows:
+
+- `id`:
+- `identifier`:
+- `value`:
+- `expiresAt`:
+- `createdAt`:
+- `updatedAt`:
 
 ### `state_machines`
 

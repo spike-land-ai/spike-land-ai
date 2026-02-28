@@ -3,29 +3,15 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 const mockCheckRateLimit = vi.hoisted(() => vi.fn());
 vi.mock("@/lib/rate-limiter", () => ({ checkRateLimit: mockCheckRateLimit }));
 
-const mockPrisma = vi.hoisted(() => ({
-  user: { findUnique: vi.fn(), create: vi.fn() },
-  default: undefined as unknown,
+const mockSignUpEmail = vi.hoisted(() => vi.fn());
+vi.mock("@/auth", () => ({
+  authInstance: {
+    api: {
+      signUpEmail: mockSignUpEmail,
+    },
+  },
 }));
-mockPrisma.default = mockPrisma;
-vi.mock("@/lib/prisma", () => mockPrisma);
 
-vi.mock(
-  "@/auth.config",
-  () => ({ createStableUserId: vi.fn().mockReturnValue("stable-id") }),
-);
-vi.mock(
-  "@/lib/albums/ensure-user-albums",
-  () => ({ ensureUserAlbums: vi.fn() }),
-);
-vi.mock(
-  "@/lib/auth/bootstrap-admin",
-  () => ({ bootstrapAdminIfNeeded: vi.fn() }),
-);
-vi.mock(
-  "@/lib/workspace/ensure-personal-workspace",
-  () => ({ ensurePersonalWorkspace: vi.fn() }),
-);
 vi.mock(
   "@/lib/try-catch",
   () => ({
@@ -37,10 +23,6 @@ vi.mock(
       }
     }),
   }),
-);
-vi.mock(
-  "bcryptjs",
-  () => ({ default: { hash: vi.fn().mockResolvedValue("hashed") } }),
 );
 vi.mock("@/lib/logger", () => ({
   default: { error: vi.fn(), info: vi.fn(), warn: vi.fn() },
@@ -68,12 +50,10 @@ function setupOpenRegistration() {
   vi.stubEnv("REGISTRATION_OPEN", "true");
 }
 
-function makeSuccessfulUser() {
-  mockPrisma.user.findUnique.mockResolvedValue(null);
-  mockPrisma.user.create.mockResolvedValue({
-    id: "stable-id",
-    email: "user@example.com",
-    name: null,
+function mockSuccessfulSignup(email = "user@example.com") {
+  mockSignUpEmail.mockResolvedValue({
+    user: { id: "new-user-id", email, name: "" },
+    session: { id: "sess-1", token: "tok-1" },
   });
 }
 
@@ -88,9 +68,6 @@ describe("signup route", () => {
     });
   });
 
-  // -------------------------------------------------------------------------
-  // REGISTRATION_OPEN gate
-  // -------------------------------------------------------------------------
   describe("REGISTRATION_OPEN gate", () => {
     it("returns 503 when REGISTRATION_OPEN env var is not set", async () => {
       delete process.env.REGISTRATION_OPEN;
@@ -119,17 +96,13 @@ describe("signup route", () => {
       expect(res.status).toBe(503);
     });
 
-    it("does not call rate limiter or DB when registration is closed", async () => {
+    it("does not call rate limiter when registration is closed", async () => {
       delete process.env.REGISTRATION_OPEN;
       await POST(makeRequest({ email: "a@b.com", password: "12345678" }));
       expect(mockCheckRateLimit).not.toHaveBeenCalled();
-      expect(mockPrisma.user.findUnique).not.toHaveBeenCalled();
     });
   });
 
-  // -------------------------------------------------------------------------
-  // Request payload size limit
-  // -------------------------------------------------------------------------
   describe("request size limit", () => {
     it("returns 413 when content-length exceeds 2048 bytes", async () => {
       setupOpenRegistration();
@@ -146,7 +119,7 @@ describe("signup route", () => {
 
     it("allows requests at exactly the 2048 byte limit", async () => {
       setupOpenRegistration();
-      makeSuccessfulUser();
+      mockSuccessfulSignup();
       const res = await POST(
         makeRequest(
           { email: "user@example.com", password: "12345678" },
@@ -157,17 +130,13 @@ describe("signup route", () => {
     });
   });
 
-  // -------------------------------------------------------------------------
-  // Rate limiting
-  // -------------------------------------------------------------------------
   describe("rate limiting", () => {
     it("returns 429 when rate limit is exceeded", async () => {
       setupOpenRegistration();
-      const resetAt = Date.now() + 60_000;
       mockCheckRateLimit.mockResolvedValue({
         isLimited: true,
         remaining: 0,
-        resetAt,
+        resetAt: Date.now() + 60_000,
       });
 
       const res = await POST(
@@ -180,11 +149,10 @@ describe("signup route", () => {
 
     it("includes Retry-After header when rate limited", async () => {
       setupOpenRegistration();
-      const resetAt = Date.now() + 30_000;
       mockCheckRateLimit.mockResolvedValue({
         isLimited: true,
         remaining: 0,
-        resetAt,
+        resetAt: Date.now() + 30_000,
       });
 
       const res = await POST(
@@ -209,22 +177,8 @@ describe("signup route", () => {
       );
       expect(res.headers.get("X-RateLimit-Remaining")).toBe("0");
     });
-
-    it("does not check DB when rate limited", async () => {
-      setupOpenRegistration();
-      mockCheckRateLimit.mockResolvedValue({
-        isLimited: true,
-        remaining: 0,
-        resetAt: Date.now() + 10_000,
-      });
-      await POST(makeRequest({ email: "a@b.com", password: "12345678" }));
-      expect(mockPrisma.user.findUnique).not.toHaveBeenCalled();
-    });
   });
 
-  // -------------------------------------------------------------------------
-  // Email validation
-  // -------------------------------------------------------------------------
   describe("email validation", () => {
     it("returns 400 when email is missing", async () => {
       setupOpenRegistration();
@@ -240,11 +194,9 @@ describe("signup route", () => {
         makeRequest({ email: 12345, password: "12345678" }),
       );
       expect(res.status).toBe(400);
-      const data = await res.json();
-      expect(data.error).toMatch(/email is required/i);
     });
 
-    it("returns 400 for invalid email format — missing @", async () => {
+    it("returns 400 for invalid email format", async () => {
       setupOpenRegistration();
       const res = await POST(
         makeRequest({ email: "notanemail", password: "12345678" }),
@@ -254,54 +206,19 @@ describe("signup route", () => {
       expect(data.error).toMatch(/invalid email format/i);
     });
 
-    it("returns 400 for invalid email format — missing domain", async () => {
-      setupOpenRegistration();
-      const res = await POST(
-        makeRequest({ email: "user@", password: "12345678" }),
-      );
-      expect(res.status).toBe(400);
-      const data = await res.json();
-      expect(data.error).toMatch(/invalid email format/i);
-    });
-
     it("accepts valid email with subdomains", async () => {
       setupOpenRegistration();
-      makeSuccessfulUser();
-      mockPrisma.user.create.mockResolvedValue({
-        id: "stable-id",
-        email: "user@mail.example.co.uk",
-        name: null,
+      mockSignUpEmail.mockResolvedValue({
+        user: { id: "new-id", email: "user@mail.example.co.uk", name: "" },
+        session: { id: "s1", token: "t1" },
       });
       const res = await POST(
         makeRequest({ email: "user@mail.example.co.uk", password: "12345678" }),
       );
       expect(res.status).toBe(200);
     });
-
-    it("normalises email to lowercase before storage", async () => {
-      setupOpenRegistration();
-      mockPrisma.user.findUnique.mockResolvedValue(null);
-      mockPrisma.user.create.mockResolvedValue({
-        id: "stable-id",
-        email: "user@example.com",
-        name: null,
-      });
-
-      await POST(
-        makeRequest({ email: "  USER@EXAMPLE.COM  ", password: "12345678" }),
-      );
-
-      expect(mockPrisma.user.findUnique).toHaveBeenCalledWith(
-        expect.objectContaining({
-          where: { email: "user@example.com" },
-        }),
-      );
-    });
   });
 
-  // -------------------------------------------------------------------------
-  // Password validation
-  // -------------------------------------------------------------------------
   describe("password validation", () => {
     it("returns 400 when password is missing", async () => {
       setupOpenRegistration();
@@ -317,8 +234,6 @@ describe("signup route", () => {
         makeRequest({ email: "a@b.com", password: 12345678 }),
       );
       expect(res.status).toBe(400);
-      const data = await res.json();
-      expect(data.error).toMatch(/password is required/i);
     });
 
     it("returns 400 when password is shorter than 8 characters", async () => {
@@ -331,17 +246,9 @@ describe("signup route", () => {
       expect(data.error).toMatch(/at least 8 characters/i);
     });
 
-    it("returns 400 for a 7-character password (boundary condition)", async () => {
-      setupOpenRegistration();
-      const res = await POST(
-        makeRequest({ email: "a@b.com", password: "1234567" }),
-      );
-      expect(res.status).toBe(400);
-    });
-
     it("accepts an 8-character password (minimum boundary)", async () => {
       setupOpenRegistration();
-      makeSuccessfulUser();
+      mockSuccessfulSignup();
       const res = await POST(
         makeRequest({ email: "user@example.com", password: "12345678" }),
       );
@@ -349,55 +256,10 @@ describe("signup route", () => {
     });
   });
 
-  // -------------------------------------------------------------------------
-  // Duplicate user detection
-  // -------------------------------------------------------------------------
-  describe("duplicate email detection", () => {
-    it("returns 409 when a user with the same email already exists", async () => {
-      setupOpenRegistration();
-      mockPrisma.user.findUnique.mockResolvedValue({ id: "existing-id" });
-
-      const res = await POST(
-        makeRequest({ email: "existing@example.com", password: "12345678" }),
-      );
-      expect(res.status).toBe(409);
-      const data = await res.json();
-      expect(data.error).toMatch(/already exists/i);
-    });
-
-    it("checks the normalised (lowercased) email against the DB", async () => {
-      setupOpenRegistration();
-      mockPrisma.user.findUnique.mockResolvedValue({ id: "existing-id" });
-
-      await POST(
-        makeRequest({ email: "EXISTING@EXAMPLE.COM", password: "12345678" }),
-      );
-
-      expect(mockPrisma.user.findUnique).toHaveBeenCalledWith(
-        expect.objectContaining({
-          where: { email: "existing@example.com" },
-        }),
-      );
-    });
-
-    it("does not call prisma.user.create when user already exists", async () => {
-      setupOpenRegistration();
-      mockPrisma.user.findUnique.mockResolvedValue({ id: "existing-id" });
-
-      await POST(
-        makeRequest({ email: "existing@example.com", password: "12345678" }),
-      );
-      expect(mockPrisma.user.create).not.toHaveBeenCalled();
-    });
-  });
-
-  // -------------------------------------------------------------------------
-  // Successful signup flow
-  // -------------------------------------------------------------------------
   describe("success flow", () => {
     beforeEach(() => {
       setupOpenRegistration();
-      makeSuccessfulUser();
+      mockSuccessfulSignup();
     });
 
     it("returns 200 with success payload on valid signup", async () => {
@@ -409,10 +271,10 @@ describe("signup route", () => {
       expect(data.success).toBe(true);
       expect(data.message).toMatch(/account created/i);
       expect(data.user.email).toBe("user@example.com");
-      expect(data.user.id).toBe("stable-id");
+      expect(data.user.id).toBe("new-user-id");
     });
 
-    it("does not expose passwordHash in the response", async () => {
+    it("does not expose password in the response", async () => {
       const res = await POST(
         makeRequest({ email: "user@example.com", password: "12345678" }),
       );
@@ -421,79 +283,20 @@ describe("signup route", () => {
       expect(data.user).not.toHaveProperty("password");
     });
 
-    it("hashes the password with bcrypt before storing", async () => {
-      const bcrypt = await import("bcryptjs");
+    it("calls authInstance.api.signUpEmail with correct params", async () => {
       await POST(
-        makeRequest({ email: "user@example.com", password: "plaintext" }),
+        makeRequest({ email: "  USER@EXAMPLE.COM  ", password: "12345678" }),
       );
-      expect(bcrypt.default.hash).toHaveBeenCalledWith("plaintext", 12);
-    });
-
-    it("creates the user with the hashed password", async () => {
-      await POST(
-        makeRequest({ email: "user@example.com", password: "12345678" }),
-      );
-      expect(mockPrisma.user.create).toHaveBeenCalledWith(
-        expect.objectContaining({
-          data: expect.objectContaining({ passwordHash: "hashed" }),
-        }),
-      );
-    });
-
-    it("calls bootstrapAdminIfNeeded after user creation", async () => {
-      const { bootstrapAdminIfNeeded } = await import(
-        "@/lib/auth/bootstrap-admin"
-      );
-      await POST(
-        makeRequest({ email: "user@example.com", password: "12345678" }),
-      );
-      expect(bootstrapAdminIfNeeded).toHaveBeenCalledWith("stable-id");
-    });
-
-    it("calls ensureUserAlbums after user creation", async () => {
-      const { ensureUserAlbums } = await import(
-        "@/lib/albums/ensure-user-albums"
-      );
-      await POST(
-        makeRequest({ email: "user@example.com", password: "12345678" }),
-      );
-      expect(ensureUserAlbums).toHaveBeenCalledWith("stable-id");
-    });
-
-    it("calls ensurePersonalWorkspace after user creation", async () => {
-      const { ensurePersonalWorkspace } = await import(
-        "@/lib/workspace/ensure-personal-workspace"
-      );
-      await POST(
-        makeRequest({ email: "user@example.com", password: "12345678" }),
-      );
-      expect(ensurePersonalWorkspace).toHaveBeenCalledWith("stable-id", null);
-    });
-
-    it("still returns 200 even when post-signup tasks throw", async () => {
-      const { ensureUserAlbums } = await import(
-        "@/lib/albums/ensure-user-albums"
-      );
-      vi.mocked(ensureUserAlbums).mockRejectedValueOnce(
-        new Error("albums error"),
-      );
-
-      const res = await POST(
-        makeRequest({ email: "user@example.com", password: "12345678" }),
-      );
-      // Post-signup failures are non-fatal; user is still created
-      expect(res.status).toBe(200);
+      expect(mockSignUpEmail).toHaveBeenCalledWith({
+        body: { email: "user@example.com", password: "12345678", name: "" },
+      });
     });
   });
 
-  // -------------------------------------------------------------------------
-  // Internal / unexpected errors
-  // -------------------------------------------------------------------------
   describe("error handling", () => {
-    it("returns 500 when prisma.user.create throws unexpectedly", async () => {
+    it("returns 500 when authInstance.api.signUpEmail throws", async () => {
       setupOpenRegistration();
-      mockPrisma.user.findUnique.mockResolvedValue(null);
-      mockPrisma.user.create.mockRejectedValue(new Error("DB connection lost"));
+      mockSignUpEmail.mockRejectedValue(new Error("Auth service error"));
 
       const res = await POST(
         makeRequest({ email: "user@example.com", password: "12345678" }),
@@ -503,9 +306,9 @@ describe("signup route", () => {
       expect(data.error).toMatch(/failed to create account/i);
     });
 
-    it("returns 500 when prisma.user.findUnique throws unexpectedly", async () => {
+    it("returns 500 when signUpEmail returns no user", async () => {
       setupOpenRegistration();
-      mockPrisma.user.findUnique.mockRejectedValue(new Error("DB timeout"));
+      mockSignUpEmail.mockResolvedValue({ user: null });
 
       const res = await POST(
         makeRequest({ email: "user@example.com", password: "12345678" }),

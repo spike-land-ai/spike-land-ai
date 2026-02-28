@@ -37,25 +37,25 @@ export function StateMachineView(
       for (const [id, value] of Object.entries(initialData.definition.states)) {
         const state = value as StateNode;
         await sm.addState(newId, id, state.type, {
-          parent: state.parent,
-          initial: state.initial,
-          entry_actions: state.entryActions?.length
-            ? JSON.parse(JSON.stringify(state.entryActions))
-            : undefined,
-          exit_actions: state.exitActions?.length
-            ? JSON.parse(JSON.stringify(state.exitActions))
-            : undefined,
-          history_type: state.historyType,
+          ...(state.parent !== undefined ? { parent: state.parent } : {}),
+          ...(state.initial !== undefined ? { initial: state.initial } : {}),
+          ...(state.entryActions?.length
+            ? { entry_actions: JSON.parse(JSON.stringify(state.entryActions)) }
+            : {}),
+          ...(state.exitActions?.length
+            ? { exit_actions: JSON.parse(JSON.stringify(state.exitActions)) }
+            : {}),
+          ...(state.historyType !== undefined ? { history_type: state.historyType } : {}),
         });
       }
 
       for (const t of initialData.definition.transitions) {
         await sm.addTransition(newId, t.source, t.target, t.event, {
-          guard_expression: t.guard?.expression,
-          actions: t.actions?.length
-            ? JSON.parse(JSON.stringify(t.actions))
-            : undefined,
-          internal: t.internal || undefined,
+          ...(t.guard?.expression !== undefined ? { guard_expression: t.guard.expression } : {}),
+          ...(t.actions?.length
+            ? { actions: JSON.parse(JSON.stringify(t.actions)) }
+            : {}),
+          ...(t.internal ? { internal: t.internal } : {}),
         });
       }
 

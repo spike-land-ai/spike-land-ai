@@ -107,7 +107,7 @@ export async function POST(request: NextRequest) {
       isAuthenticated,
       ...(session?.user?.name ? { userName: session.user.name } : {}),
     },
-    attachments,
+    ...(attachments !== undefined ? { attachments } : {}),
     maxTurns: 10,
   });
 

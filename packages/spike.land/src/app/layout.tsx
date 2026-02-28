@@ -138,7 +138,7 @@ export default async function RootLayout({
             themes={["light", "dark", "theme-soft-light", "theme-deep-dark"]}
             defaultTheme="dark"
             disableTransitionOnChange
-            nonce={nonce ?? undefined}
+            {...(nonce ? { nonce } : {})}
           >
             <QueryProvider>
               <AnimationPerformanceProvider>
@@ -171,8 +171,8 @@ export default async function RootLayout({
         </ViewTransitions>
         <ConsoleCapture />
         <IframeErrorBridge />
-        <MetaPixel nonce={nonce ?? undefined} />
-        <GoogleAnalytics nonce={nonce ?? undefined} />
+        <MetaPixel {...(nonce ? { nonce } : {})} />
+        <GoogleAnalytics {...(nonce ? { nonce } : {})} />
       </body>
     </html>
   );

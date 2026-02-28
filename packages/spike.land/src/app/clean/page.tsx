@@ -198,7 +198,9 @@ export default function CleanPage() {
             totalPoints: streak.totalPoints,
             level: streak.level,
             totalSessions: streak.totalSessions,
-            lastSessionDate: streak.lastSessionDate,
+            ...(streak.lastSessionDate !== undefined
+              ? { lastSessionDate: streak.lastSessionDate }
+              : {}),
           }}
         />
       )}

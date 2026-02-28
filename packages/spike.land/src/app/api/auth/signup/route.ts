@@ -8,13 +8,9 @@ import logger from "@/lib/logger";
  * sign in using the credentials provider.
  */
 
-import { ensureUserAlbums } from "@/lib/albums/ensure-user-albums";
-import { bootstrapAdminIfNeeded } from "@/lib/auth/bootstrap-admin";
-import prisma from "@/lib/prisma";
 import { checkRateLimit } from "@/lib/rate-limiter";
 import { getClientIp } from "@/lib/security/ip";
 import { tryCatch } from "@/lib/try-catch";
-import { ensurePersonalWorkspace } from "@/lib/workspace/ensure-personal-workspace";
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
@@ -112,114 +108,38 @@ async function handleSignup(request: NextRequest): Promise<NextResponse> {
     );
   }
 
-  // Proxy registration to Better Auth MCP Worker
-  const authUrl = process.env.NEXT_PUBLIC_AUTH_URL || "http://localhost:8787";
-  const { data: authResponse, error: authError } = await tryCatch(
-    fetch(`${authUrl}/api/auth/sign-up/email`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email: trimmedEmail, password, name: "" }),
+  // Use local Better Auth instance for registration
+  const { authInstance } = await import("@/auth");
+  const { data: result, error: authError } = await tryCatch(
+    authInstance.api.signUpEmail({
+      body: { email: trimmedEmail, password, name: "" },
     })
   );
 
-  if (authError || !authResponse) {
-    logger.error("Mobile signup error:", authError);
+  if (authError) {
+    logger.error("Signup error:", authError);
     return NextResponse.json(
       { error: "Failed to create account" },
       { status: 500 },
     );
   }
 
-  if (!authResponse.ok) {
-    const errorData = await authResponse.json().catch(() => ({}));
+  if (!result?.user) {
     return NextResponse.json(
-      { error: errorData.message || "Failed to create account" },
-      { status: authResponse.status },
+      { error: "Failed to create account" },
+      { status: 500 },
     );
   }
 
-  const authData = await authResponse.json() as any;
-  const newUser = authData.user;
-
-  // Since better-auth created the user, ensure it exists in Prisma
-  // (Assuming BetterAuth has the same ID logic, or creates a stub in Prisma DB later)
-  // If we need the user to exist in the local Prisma DB for relations:
-  await prisma.user.upsert({
-    where: { id: newUser.id },
-    create: {
-      id: newUser.id,
-      email: newUser.email,
-      name: newUser.name,
-    },
-    update: {},
-  });
-
-  // Handle post-signup tasks (same as OAuth signup in auth.ts handleSignIn)
-  // Bootstrap admin role for first user
-  const { error: bootstrapError } = await tryCatch(
-    bootstrapAdminIfNeeded(newUser.id),
-  );
-  if (bootstrapError) {
-    logger.error("Failed to bootstrap admin:", bootstrapError);
-  }
-
-  /*
-  // Assign referral code to new user
-  const { error: referralCodeError } = await tryCatch(
-    assignReferralCodeToUser(newUser.id),
-  );
-  if (referralCodeError) {
-    logger.error("Failed to assign referral code:", referralCodeError);
-  }
-
-  // Link referral if cookie exists
-  const { error: linkReferralError } = await tryCatch(
-    linkReferralOnSignup(newUser.id),
-  );
-  if (linkReferralError) {
-    logger.error("Failed to link referral on signup:", linkReferralError);
-  }
-  */
-
-  // Create default private and public albums
-  const { error: albumsError } = await tryCatch(ensureUserAlbums(newUser.id));
-  if (albumsError) {
-    logger.error("Failed to create default albums:", albumsError);
-  }
-
-  // Create personal workspace with 100 AI credits
-  const { error: workspaceError } = await tryCatch(
-    ensurePersonalWorkspace(newUser.id, newUser.name),
-  );
-  if (workspaceError) {
-    logger.error("Failed to create personal workspace:", workspaceError);
-  }
-
-  /*
-  // Process referral rewards (email-based signup = email verified)
-  const { data: validation, error: validationError } = await tryCatch(
-    validateReferralAfterVerification(newUser.id),
-  );
-  if (validationError) {
-    logger.error("Failed to validate referral:", validationError);
-  }
-
-  if (validation?.shouldGrantRewards && validation.referralId) {
-    const { error: rewardsError } = await tryCatch(
-      completeReferralAndGrantRewards(validation.referralId),
-    );
-    if (rewardsError) {
-      logger.error("Failed to grant referral rewards:", rewardsError);
-    }
-  }
-  */
+  // Post-signup tasks (workspace, albums, admin bootstrap) are handled
+  // by databaseHooks.user.create.after in src/auth.ts
 
   return NextResponse.json({
     success: true,
     message: "Account created successfully",
     user: {
-      id: newUser.id,
-      email: newUser.email,
+      id: result.user.id,
+      email: result.user.email,
     },
   });
 }

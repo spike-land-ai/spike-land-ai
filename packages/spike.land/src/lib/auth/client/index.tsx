@@ -6,7 +6,7 @@ import type { Session } from "@/lib/auth/types";
 import type { ReactNode } from "react";
 
 export const authClient = createAuthClient({
-    baseURL: process.env.NEXT_PUBLIC_AUTH_URL || process.env.NEXT_PUBLIC_APP_URL || "http://localhost:8787",
+    baseURL: process.env.NEXT_PUBLIC_APP_URL || "",
     plugins: [
         magicLinkClient()
     ]

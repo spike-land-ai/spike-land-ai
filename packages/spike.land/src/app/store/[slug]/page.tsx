@@ -209,7 +209,7 @@ export default async function StoreAppPage({ params }: PageProps) {
             )}
             <StoreInstallButton
               appSlug={app.slug}
-              initialCount={app.installCount}
+              {...(app.installCount !== undefined ? { initialCount: app.installCount } : {})}
             />
             <StoreWishlistButton appSlug={app.slug} />
           </div>

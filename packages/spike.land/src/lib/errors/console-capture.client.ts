@@ -143,7 +143,7 @@ function parseStackTrace(stack?: string): {
     const match = line.match(/at\s+(?:(.+?)\s+\()?(.+?):(\d+):(\d+)\)?/);
     if (match && match[2] && match[3] && match[4]) {
       return {
-        caller: match[1] || undefined,
+        ...(match[1] ? { caller: match[1] } : {}),
         file: match[2],
         line: parseInt(match[3], 10),
         column: parseInt(match[4], 10),
@@ -181,13 +181,13 @@ function createErrorFromConsoleArgs(
 
   return {
     message,
-    stack,
-    sourceFile: location.file,
-    sourceLine: location.line,
-    sourceColumn: location.column,
-    callerName: location.caller,
-    errorType,
-    route: typeof window !== "undefined" ? window.location.pathname : undefined,
+    ...(stack !== undefined ? { stack } : {}),
+    ...(location.file !== undefined ? { sourceFile: location.file } : {}),
+    ...(location.line !== undefined ? { sourceLine: location.line } : {}),
+    ...(location.column !== undefined ? { sourceColumn: location.column } : {}),
+    ...(location.caller !== undefined ? { callerName: location.caller } : {}),
+    ...(errorType !== undefined ? { errorType } : {}),
+    ...(typeof window !== "undefined" ? { route: window.location.pathname } : {}),
     metadata: { source },
     timestamp: new Date().toISOString(),
     environment: "FRONTEND",
@@ -216,10 +216,10 @@ export function initializeConsoleCapture(): void {
   window.addEventListener("error", (event: ErrorEvent) => {
     const capturedError: CapturedError = {
       message: event.error?.message || event.message,
-      stack: event.error?.stack,
-      sourceFile: event.filename || undefined,
-      sourceLine: event.lineno || undefined,
-      sourceColumn: event.colno || undefined,
+      ...(event.error?.stack !== undefined ? { stack: event.error.stack } : {}),
+      ...(event.filename ? { sourceFile: event.filename } : {}),
+      ...(event.lineno ? { sourceLine: event.lineno } : {}),
+      ...(event.colno ? { sourceColumn: event.colno } : {}),
       errorType: event.error?.name || "UncaughtException",
       route: window.location.pathname,
       metadata: { source: "uncaught-exception" as ErrorSource },
@@ -236,13 +236,14 @@ export function initializeConsoleCapture(): void {
       reason instanceof Error ? reason.stack : undefined,
     );
 
+    const rejectionStack = reason instanceof Error ? reason.stack : undefined;
     const capturedError: CapturedError = {
       message: reason instanceof Error ? reason.message : String(reason),
-      stack: reason instanceof Error ? reason.stack : undefined,
-      sourceFile: location.file,
-      sourceLine: location.line,
-      sourceColumn: location.column,
-      callerName: location.caller,
+      ...(rejectionStack !== undefined ? { stack: rejectionStack } : {}),
+      ...(location.file !== undefined ? { sourceFile: location.file } : {}),
+      ...(location.line !== undefined ? { sourceLine: location.line } : {}),
+      ...(location.column !== undefined ? { sourceColumn: location.column } : {}),
+      ...(location.caller !== undefined ? { callerName: location.caller } : {}),
       errorType: reason instanceof Error ? reason.name : "UnhandledRejection",
       route: window.location.pathname,
       metadata: { source: "unhandled-rejection" as ErrorSource },
@@ -276,13 +277,13 @@ export function reportErrorBoundary(
 
   const capturedError: CapturedError = {
     message: error.message,
-    stack: error.stack,
-    sourceFile: location.file,
-    sourceLine: location.line,
-    sourceColumn: location.column,
-    callerName: location.caller,
+    ...(error.stack !== undefined ? { stack: error.stack } : {}),
+    ...(location.file !== undefined ? { sourceFile: location.file } : {}),
+    ...(location.line !== undefined ? { sourceLine: location.line } : {}),
+    ...(location.column !== undefined ? { sourceColumn: location.column } : {}),
+    ...(location.caller !== undefined ? { callerName: location.caller } : {}),
     errorType: error.name,
-    route: typeof window !== "undefined" ? window.location.pathname : undefined,
+    ...(typeof window !== "undefined" ? { route: window.location.pathname } : {}),
     metadata: {
       source: "error-boundary" as ErrorSource,
       componentStack,

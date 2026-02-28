@@ -65,12 +65,12 @@ export async function createAttribution(
       conversionId,
       attributionType,
       conversionType,
-      conversionValue,
+      ...(conversionValue !== undefined ? { conversionValue } : {}),
       platform: derivedPlatform,
-      externalCampaignId,
-      utmCampaign: utmParams?.utm_campaign,
-      utmSource: utmParams?.utm_source,
-      utmMedium: utmParams?.utm_medium,
+      ...(externalCampaignId !== undefined ? { externalCampaignId } : {}),
+      ...(utmParams?.utm_campaign !== undefined ? { utmCampaign: utmParams.utm_campaign } : {}),
+      ...(utmParams?.utm_source !== undefined ? { utmSource: utmParams.utm_source } : {}),
+      ...(utmParams?.utm_medium !== undefined ? { utmMedium: utmParams.utm_medium } : {}),
     },
   });
 }
@@ -141,18 +141,20 @@ async function buildSessionAttribution(
   conversionType: ConversionType,
   conversionValue?: number,
 ): Promise<AttributionParams> {
+  const platform = await determineSessionPlatform(session);
+  const externalCampaignId = (await getExternalCampaignId(session))
+    || session.gclid
+    || session.fbclid
+    || undefined;
   return {
     userId,
     sessionId: session.id,
     conversionId,
     attributionType,
     conversionType,
-    conversionValue,
-    platform: await determineSessionPlatform(session),
-    externalCampaignId: (await getExternalCampaignId(session))
-      || session.gclid
-      || session.fbclid
-      || undefined,
+    ...(conversionValue !== undefined ? { conversionValue } : {}),
+    ...(platform !== undefined ? { platform } : {}),
+    ...(externalCampaignId !== undefined ? { externalCampaignId } : {}),
     utmParams: extractUTMFromSession(session),
   };
 }
@@ -282,6 +284,7 @@ async function createDirectAttribution(
   });
   const conversionId = randomUUID();
 
+  const conversionValueEntry = value !== undefined ? { conversionValue: value } : {};
   await prisma.campaignAttribution.createMany({
     data: [
       {
@@ -290,7 +293,7 @@ async function createDirectAttribution(
         conversionId,
         attributionType: "FIRST_TOUCH",
         conversionType,
-        conversionValue: value,
+        ...conversionValueEntry,
         platform: "DIRECT",
       },
       {
@@ -299,7 +302,7 @@ async function createDirectAttribution(
         conversionId,
         attributionType: "LAST_TOUCH",
         conversionType,
-        conversionValue: value,
+        ...conversionValueEntry,
         platform: "DIRECT",
       },
       {
@@ -308,7 +311,7 @@ async function createDirectAttribution(
         conversionId,
         attributionType: "LINEAR",
         conversionType,
-        conversionValue: value,
+        ...conversionValueEntry,
         platform: "DIRECT",
       },
       {
@@ -317,7 +320,7 @@ async function createDirectAttribution(
         conversionId,
         attributionType: "TIME_DECAY",
         conversionType,
-        conversionValue: value,
+        ...conversionValueEntry,
         platform: "DIRECT",
       },
       {
@@ -326,7 +329,7 @@ async function createDirectAttribution(
         conversionId,
         attributionType: "POSITION_BASED",
         conversionType,
-        conversionValue: value,
+        ...conversionValueEntry,
         platform: "DIRECT",
       },
     ],

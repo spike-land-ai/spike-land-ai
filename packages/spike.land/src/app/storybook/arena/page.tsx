@@ -551,7 +551,7 @@ export default function ArenaPage() {
               userName={sub.userName}
               userImage={sub.userImage}
               reviewCount={sub.reviewCount}
-              errors={sub.errors}
+              {...(sub.errors !== undefined ? { errors: sub.errors } : {})}
             />
           ))}
         </div>

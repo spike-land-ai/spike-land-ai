@@ -21,5 +21,5 @@ export default async function DeviceAuthPage({
     redirect(`/?auth=required&callbackUrl=${encodeURIComponent(callbackUrl)}`);
   }
 
-  return <DeviceVerificationContent initialUserCode={userCode} />;
+  return <DeviceVerificationContent {...(userCode !== undefined ? { initialUserCode: userCode } : {})} />;
 }

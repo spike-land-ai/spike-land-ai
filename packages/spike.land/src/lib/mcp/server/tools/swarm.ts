@@ -388,9 +388,7 @@ export function registerSwarmTools(
             role: "AGENT",
             content,
             isRead: false,
-            metadata: (metadata ?? null) as
-              | import("@/generated/prisma").Prisma.InputJsonValue
-              | null,
+            ...(metadata != null ? { metadata: metadata as import("@/generated/prisma").Prisma.InputJsonValue } : {}),
           },
         });
         return textResult(

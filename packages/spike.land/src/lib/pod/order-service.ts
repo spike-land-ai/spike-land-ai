@@ -92,20 +92,23 @@ export async function submitOrderToPod(
     shippingAddress: {
       name: shippingAddress.name,
       line1: shippingAddress.line1,
-      line2: shippingAddress.line2,
+      ...(shippingAddress.line2 !== undefined ? { line2: shippingAddress.line2 } : {}),
       city: shippingAddress.city,
       postalCode: shippingAddress.postalCode,
       countryCode: shippingAddress.countryCode,
-      phone: shippingAddress.phone,
-      email: order.customerEmail,
+      ...(shippingAddress.phone !== undefined ? { phone: shippingAddress.phone } : {}),
+      ...(order.customerEmail !== undefined ? { email: order.customerEmail } : {}),
     },
     shippingMethod: "Standard",
-    items: prodigiItems.map(item => ({
-      sku: item.variant?.providerSku || item.product.providerSku,
-      quantity: item.quantity,
-      imageUrl: item.imageUrl,
-      customText: item.customText ?? undefined,
-    })),
+    items: prodigiItems.map(item => {
+      const customText = item.customText ?? undefined;
+      return {
+        sku: item.variant?.providerSku || item.product.providerSku,
+        quantity: item.quantity,
+        imageUrl: item.imageUrl,
+        ...(customText !== undefined ? { customText } : {}),
+      };
+    }),
     metadata: {
       orderNumber: order.orderNumber,
       internalOrderId: order.id,
@@ -139,7 +142,7 @@ export async function submitOrderToPod(
 
     return {
       success: false,
-      error: result.error,
+      ...(result.error !== undefined ? { error: result.error } : {}),
     };
   }
 
@@ -151,8 +154,8 @@ export async function submitOrderToPod(
         await tx.merchOrderItem.update({
           where: { id: item.id },
           data: {
-            podOrderId: result.providerOrderId,
-            podStatus: result.status,
+            ...(result.providerOrderId !== undefined ? { podOrderId: result.providerOrderId } : {}),
+            ...(result.status !== undefined ? { podStatus: result.status } : {}),
           },
         });
       }
@@ -182,14 +185,14 @@ export async function submitOrderToPod(
     logger.error("Failed to record POD submission:", updateError);
     return {
       success: true,
-      providerOrderId: result.providerOrderId,
+      ...(result.providerOrderId !== undefined ? { providerOrderId: result.providerOrderId } : {}),
       error: "Order submitted but failed to record in database",
     };
   }
 
   return {
     success: true,
-    providerOrderId: result.providerOrderId,
+    ...(result.providerOrderId !== undefined ? { providerOrderId: result.providerOrderId } : {}),
   };
 }
 
@@ -252,13 +255,13 @@ export async function updateOrderFromWebhook(
           where: { id: existingShipment.id },
           data: {
             trackingNumber,
-            trackingUrl,
-            carrier,
+            ...(trackingUrl !== undefined ? { trackingUrl } : {}),
+            ...(carrier !== undefined ? { carrier } : {}),
             status: orderStatus === "SHIPPED" ? "SHIPPED" : "DELIVERED",
             shippedAt: orderStatus === "SHIPPED"
               ? new Date()
               : existingShipment.shippedAt,
-            deliveredAt: orderStatus === "DELIVERED" ? new Date() : undefined,
+            ...(orderStatus === "DELIVERED" ? { deliveredAt: new Date() } : {}),
           },
         });
       } else {
@@ -268,8 +271,8 @@ export async function updateOrderFromWebhook(
             provider,
             providerShipId: providerOrderId,
             trackingNumber,
-            trackingUrl,
-            carrier,
+            ...(trackingUrl !== undefined ? { trackingUrl } : {}),
+            ...(carrier !== undefined ? { carrier } : {}),
             status: "SHIPPED",
             shippedAt: new Date(),
           },
@@ -381,7 +384,7 @@ async function recordOrderEvent(
     data: {
       orderId,
       type,
-      data: data ?? undefined,
+      ...(data !== undefined ? { data } : {}),
     },
   });
 }

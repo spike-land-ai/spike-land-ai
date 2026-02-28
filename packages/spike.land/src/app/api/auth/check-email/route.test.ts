@@ -5,6 +5,7 @@ vi.mock("@/lib/rate-limiter", () => ({ checkRateLimit: mockCheckRateLimit }));
 
 const mockPrisma = vi.hoisted(() => ({
   user: { findUnique: vi.fn() },
+  account: { findFirst: vi.fn() },
   default: undefined as unknown,
 }));
 mockPrisma.default = mockPrisma;
@@ -79,16 +80,18 @@ describe("check-email route", () => {
     expect(data).toEqual({ exists: false, hasPassword: false });
   });
 
-  it("returns exists:true, hasPassword:false for user without password", async () => {
-    mockPrisma.user.findUnique.mockResolvedValue({ id: "1", passwordHash: null });
+  it("returns exists:true, hasPassword:false for user without credential account", async () => {
+    mockPrisma.user.findUnique.mockResolvedValue({ id: "1" });
+    mockPrisma.account.findFirst.mockResolvedValue(null);
     const res = await POST(makeRequest({ email: "existing@example.com" }));
     expect(res.status).toBe(200);
     const data = await res.json();
     expect(data).toEqual({ exists: true, hasPassword: false });
   });
 
-  it("returns exists:true, hasPassword:true for user with password", async () => {
-    mockPrisma.user.findUnique.mockResolvedValue({ id: "1", passwordHash: "hashed" });
+  it("returns exists:true, hasPassword:true for user with credential account", async () => {
+    mockPrisma.user.findUnique.mockResolvedValue({ id: "1" });
+    mockPrisma.account.findFirst.mockResolvedValue({ id: "acc-1" });
     const res = await POST(makeRequest({ email: "withpass@example.com" }));
     expect(res.status).toBe(200);
     const data = await res.json();

@@ -130,37 +130,27 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  // Fetch from the new Auth MCP Service
-  const authUrl = process.env.NEXT_PUBLIC_AUTH_URL || "http://localhost:8787";
-  const { data: authResponse, error: authError } = await tryCatch(
-    fetch(`${authUrl}/api/auth/sign-in/email`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email: trimmedEmail, password }),
+  // Use local Better Auth instance for sign-in
+  const { authInstance } = await import("@/auth");
+  const { data: signInResult, error: authError } = await tryCatch(
+    authInstance.api.signInEmail({
+      body: { email: trimmedEmail, password },
     })
   );
 
-  if (authError || !authResponse) {
-    logger.error("Mobile signin error:", authError);
+  if (authError || !signInResult?.user) {
+    if (authError) {
+      logger.error("Mobile signin error:", authError);
+    }
     return NextResponse.json(
-      { error: "Failed to sign in" },
-      { status: 500 },
-    );
-  }
-
-  if (!authResponse.ok) {
-    const errorData = await authResponse.json().catch(() => ({}));
-    return NextResponse.json(
-      { error: errorData.message || "Invalid email or password" },
+      { error: "Invalid email or password" },
       { status: 401 },
     );
   }
 
-  const authData = await authResponse.json() as any;
-  const user = authData.user;
+  const user = signInResult.user;
 
-
-  // Create stable user ID (consistent with NextAuth)
+  // Create stable user ID (consistent with auth.config)
   const stableUserId = createStableUserId(trimmedEmail);
 
   // Generate JWT token

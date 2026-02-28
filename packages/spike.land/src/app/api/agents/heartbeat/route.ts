@@ -114,10 +114,10 @@ export async function POST(req: NextRequest) {
   // Process heartbeat in Redis
   const { error: heartbeatError } = await tryCatch(
     processHeartbeat(agentId, status, {
-      projectPath: currentProject,
-      workingDirectory,
-      toolUsage,
-      tokensUsed,
+      ...(currentProject !== undefined ? { projectPath: currentProject } : {}),
+      ...(workingDirectory !== undefined ? { workingDirectory } : {}),
+      ...(toolUsage !== undefined ? { toolUsage } : {}),
+      ...(tokensUsed !== undefined ? { tokensUsed } : {}),
       ...(activity
         ? {
           activity: {

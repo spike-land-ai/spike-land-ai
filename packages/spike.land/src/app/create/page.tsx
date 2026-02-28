@@ -84,7 +84,7 @@ export default async function CreateLanding({ searchParams }: PageProps) {
   return (
     <div className="container mx-auto px-4 space-y-16 py-8">
       {/* Hero Section with ComposerBox and starter idea chips */}
-      <CreateHero prompt={prompt} />
+      <CreateHero {...(prompt !== undefined ? { prompt } : {})} />
 
       {isEmpty ? <EmptyState /> : (
         <>

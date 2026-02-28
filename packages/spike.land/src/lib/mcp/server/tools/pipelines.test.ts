@@ -671,7 +671,7 @@ describe("pipelines tools", () => {
       expect(getText(result)).toContain("Access denied");
     });
 
-    it("should handle null configs by passing undefined", async () => {
+    it("should omit null configs from fork data", async () => {
       mockPrisma.enhancementPipeline.findUnique.mockResolvedValue({
         id: "p-null",
         name: "Null Configs",
@@ -690,16 +690,12 @@ describe("pipelines tools", () => {
       });
       const handler = registry.handlers.get("pipelines_fork")!;
       await handler({ pipeline_id: "p-null" });
-      expect(mockPrisma.enhancementPipeline.create).toHaveBeenCalledWith(
-        expect.objectContaining({
-          data: expect.objectContaining({
-            analysisConfig: undefined,
-            autoCropConfig: undefined,
-            promptConfig: undefined,
-            generationConfig: undefined,
-          }),
-        }),
-      );
+      const createCall = mockPrisma.enhancementPipeline.create.mock.calls[0]![0];
+      // When source configs are null, they should not appear in the create data
+      expect(createCall.data).not.toHaveProperty("analysisConfig");
+      expect(createCall.data).not.toHaveProperty("autoCropConfig");
+      expect(createCall.data).not.toHaveProperty("promptConfig");
+      expect(createCall.data).not.toHaveProperty("generationConfig");
     });
   });
 });

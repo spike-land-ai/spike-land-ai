@@ -3,9 +3,7 @@
  *
  * This is THE key function — all server code calls this instead of
  * importing from `@/auth` directly. The facade delegates to the
- * active auth provider (NextAuth or Better Auth) based on config.
- *
- * Includes E2E bypass logic extracted from the old auth.ts.
+ * active auth provider (Better Auth) and includes E2E bypass logic.
  */
 
 import type { AuthSession } from "../core/types";
@@ -33,7 +31,7 @@ export async function getSession(): Promise<AuthSession | null> {
     const { data: cookieStore } = await tryCatch(cookies());
 
     if (cookieStore) {
-      const sessionToken = cookieStore.get("authjs.session-token")?.value;
+      const sessionToken = cookieStore.get("better-auth.session_token")?.value;
       if (sessionToken === "mock-session-token") {
         logBypassAttempt("env", true);
         return createMockSession({
@@ -74,31 +72,21 @@ export async function getSession(): Promise<AuthSession | null> {
     }
   }
 
-  const { headers } = await import("next/headers");
-  const { data: headersList } = await tryCatch(headers());
-  if (!headersList) return null;
+  // Use local Better Auth instance
+  const { auth } = await import("@/auth");
+  const session = await auth();
+  if (!session?.session || !session?.user) return null;
 
-  const authUrl = process.env.NEXT_PUBLIC_AUTH_URL || "http://localhost:8787";
-  const { data: response, error } = await tryCatch(
-    fetch(`${authUrl}/api/auth/get-session`, {
-      headers: headersList
-    })
-  );
-
-  if (error || !response.ok) return null;
-
-  const sessionData = await response.json() as any;
-  if (!sessionData?.session || !sessionData?.user) return null;
-
-  // Normalize to AuthSession shape
   return {
     user: {
-      id: sessionData.user.id,
-      email: sessionData.user.email,
-      name: sessionData.user.name,
-      image: sessionData.user.image,
-      role: sessionData.user.role || "USER",
+      id: session.user.id,
+      email: session.user.email || "",
+      name: session.user.name || "",
+      image: session.user.image || null,
+      role: (session.user as unknown as { role?: string }).role || "USER",
     },
-    expires: sessionData.session.expiresAt
+    expires: typeof session.session.expiresAt === "string"
+      ? session.session.expiresAt
+      : session.session.expiresAt?.toISOString?.() || new Date(Date.now() + 86400000).toISOString(),
   } as unknown as AuthSession;
 }

@@ -113,7 +113,7 @@ export default function CleanSettingsPage() {
       {showForm
         ? (
           <CleanReminderForm
-            reminder={editing}
+            {...(editing !== undefined ? { reminder: editing } : {})}
             onSave={handleSave}
             onCancel={handleCancel}
           />

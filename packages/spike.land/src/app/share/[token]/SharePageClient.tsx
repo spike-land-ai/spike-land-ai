@@ -128,8 +128,8 @@ export function SharePageClient({
               enhancedLabel="After"
               width={displayWidth}
               height={displayHeight}
-              enhancedWidth={enhancedWidth ?? undefined}
-              enhancedHeight={enhancedHeight ?? undefined}
+              {...(enhancedWidth != null ? { enhancedWidth } : {})}
+              {...(enhancedHeight != null ? { enhancedHeight } : {})}
             />
           </div>
 

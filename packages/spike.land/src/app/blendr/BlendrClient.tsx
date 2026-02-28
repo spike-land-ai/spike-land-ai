@@ -491,11 +491,14 @@ export function BlendrClient({ isAnonymous = false }: BlendrClientProps) {
           open={selectorTarget !== null}
           onOpenChange={open => !open && setSelectorTarget(null)}
           onSelect={handleSelectorSelect}
-          excludeImageId={selectorTarget === "image1"
-            ? image2?.type === "gallery" ? image2.id : undefined
-            : image1?.type === "gallery"
-            ? image1.id
-            : undefined}
+          {...(() => {
+            const excludeId = selectorTarget === "image1"
+              ? image2?.type === "gallery" ? image2.id : undefined
+              : image1?.type === "gallery"
+              ? image1.id
+              : undefined;
+            return excludeId !== undefined ? { excludeImageId: excludeId } : {};
+          })()}
           title={selectorTarget === "image1"
             ? "Select Input Photo 1"
             : "Select Input Photo 2"}

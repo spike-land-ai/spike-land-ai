@@ -128,7 +128,7 @@ export async function createWorkflow(
   const workflow = await prisma.workflow.create({
     data: {
       name,
-      description,
+      ...(description !== undefined ? { description } : {}),
       workspaceId,
       createdById,
       status: "DRAFT",
@@ -275,7 +275,7 @@ export async function createWorkflowVersion(
     data: {
       workflowId,
       version: nextVersion,
-      description: input.description,
+      ...(input.description !== undefined ? { description: input.description } : {}),
       steps: {
         create: input.steps.map((step, index) => ({
           name: step.name,
@@ -488,13 +488,14 @@ function mapVersionToData(version: VersionWithSteps): WorkflowVersionData {
 
 // Helper function to map Prisma step to WorkflowStepData
 function mapStepToData(step: WorkflowStep): WorkflowStepData {
+  const deps = step.dependencies as string[] | undefined;
   return {
     id: step.id,
     name: step.name,
     type: step.type as WorkflowStepType,
     sequence: step.sequence,
     config: step.config as Record<string, unknown>,
-    dependencies: step.dependencies as string[] | undefined,
+    ...(deps !== undefined ? { dependencies: deps } : {}),
     parentStepId: step.parentStepId,
     branchType: step.branchType as BranchType | null,
     branchCondition: step.branchCondition,
@@ -519,12 +520,17 @@ function mapRunToData(run: RunWithLogs): WorkflowRunData {
     status: run.status,
     startedAt: run.startedAt,
     endedAt: run.endedAt,
-    logs: run.logs.map(log => ({
-      stepId: log.stepId ?? undefined,
-      stepStatus: log.stepStatus as WorkflowRunLogEntry["stepStatus"],
-      message: log.message,
-      metadata: log.metadata as Record<string, unknown> | undefined,
-      timestamp: log.timestamp,
-    })),
+    logs: run.logs.map(log => {
+      const stepId = log.stepId ?? undefined;
+      const stepStatus = log.stepStatus as WorkflowRunLogEntry["stepStatus"];
+      const metadata = log.metadata as Record<string, unknown> | undefined;
+      return {
+        ...(stepId !== undefined ? { stepId } : {}),
+        ...(stepStatus !== undefined ? { stepStatus } : {}),
+        message: log.message,
+        ...(metadata !== undefined ? { metadata } : {}),
+        timestamp: log.timestamp,
+      };
+    }),
   };
 }

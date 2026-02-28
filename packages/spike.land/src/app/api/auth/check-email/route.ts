@@ -144,9 +144,27 @@ export async function POST(request: NextRequest) {
     });
   }
 
-  // User exists - since we use Better Auth, we assume they can attempt password login or magic link.
+  // Check if user has a credential (password) account in Better Auth
+  const { data: credentialAccount, error: accountError } = await tryCatch(
+    withTimeout(
+      prisma.account.findFirst({
+        where: { userId: user.id, providerId: "credential" },
+        select: { id: true },
+      }),
+      DB_QUERY_TIMEOUT_MS,
+    ),
+  );
+
+  if (accountError) {
+    logger.error("Email check account query error:", accountError);
+    return NextResponse.json(
+      { error: "Failed to check email" },
+      { status: 500 },
+    );
+  }
+
   return NextResponse.json({
     exists: true,
-    hasPassword: true,
+    hasPassword: !!credentialAccount,
   });
 }

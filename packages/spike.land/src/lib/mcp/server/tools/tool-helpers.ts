@@ -282,9 +282,7 @@ async function recordInvocation(data: {
       sessionId: data.sessionId ?? null,
       tool: data.tool,
       input: data.input as import("@/generated/prisma").Prisma.InputJsonValue,
-      output: (data.output ?? null) as
-        | import("@/generated/prisma").Prisma.InputJsonValue
-        | null,
+      ...(data.output != null ? { output: data.output as import("@/generated/prisma").Prisma.InputJsonValue } : {}),
       durationMs: data.durationMs,
       isError: data.isError,
       error: data.error ?? null,

@@ -1,6 +1,8 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { WebStandardStreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/webStandardStreamableHttp.js";
 import { z } from "zod";
+import { drizzle } from "drizzle-orm/d1";
+import * as schema from "./db/schema";
 import { createAuth, type Env } from "./auth";
 
 // CORS configuration for Better Auth and MCP
@@ -82,9 +84,23 @@ export default {
             "Lookup a user's ID by their email address",
             { email: z.string().email() },
             async ({ email }) => {
-                // Implement database lookup using standard Drizzle here
+                const db = drizzle(env.AUTH_DB, { schema });
+                const result = await db.query.user.findFirst({
+                    where: (u, { eq }) => eq(u.email, email),
+                });
+                if (!result) {
+                    return {
+                        content: [{ type: "text", text: JSON.stringify({ found: false }) }]
+                    };
+                }
                 return {
-                    content: [{ type: "text", text: `Functionality stub for ${email}` }]
+                    content: [{
+                        type: "text",
+                        text: JSON.stringify({
+                            found: true,
+                            user: { id: result.id, email: result.email, name: result.name, role: result.role }
+                        }, null, 2)
+                    }]
                 };
             }
         );
