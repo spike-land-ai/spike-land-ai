@@ -10,7 +10,7 @@ import type { CallToolResult } from "@modelcontextprotocol/sdk/types.js";
 import type { ToolRegistry } from "../tool-registry";
 import { isGitHubProjectsAvailable } from "@/lib/sync/clients/github-projects-client";
 import { createGitHubProjectsClient } from "@/lib/sync/create-sync-clients";
-import { freeTool, workspaceTool } from "../tool-builder/procedures.js";
+import { workspaceTool } from "../tool-builder/procedures.js";
 
 // ========================================
 // Availability
@@ -35,9 +35,6 @@ export function resetBoltState(): void {
     boltPaused = false;
 }
 
-// ========================================
-// Schemas
-// ========================================
 // ========================================
 // Helpers
 // ========================================
@@ -77,11 +74,8 @@ export function registerGatewayTools(
                 })
                 .meta({ category: "gateway", tier: "workspace" })
                 .handler(async ({ input, ctx: _ctx }) => {
-                    const { first } = input;
-
-                    const params = GitHubListIssuesSchema.parse({ first });
                     const client = createGitHubProjectsClient();
-                    const result = await client.listItems({ first: params.first });
+                    const result = await client.listItems({ first: input.first });
 
                     if (result.error) return err(`Error: ${result.error}`);
 
@@ -109,14 +103,11 @@ export function registerGatewayTools(
                 })
                 .meta({ category: "gateway", tier: "workspace" })
                 .handler(async ({ input, ctx: _ctx }) => {
-                    const { title, body, labels } = input;
-
-                    const params = GitHubCreateIssueSchema.parse({ title, body, labels });
                     const client = createGitHubProjectsClient();
                     const result = await client.createIssue({
-                        title: params.title,
-                        body: params.body,
-                        ...(params.labels !== undefined ? { labels: params.labels } : {}),
+                        title: input.title,
+                        body: input.body,
+                        ...(input.labels !== undefined ? { labels: input.labels } : {}),
                     });
 
                     if (result.error) return err(`Error: ${result.error}`);
@@ -136,18 +127,11 @@ export function registerGatewayTools(
                 })
                 .meta({ category: "gateway", tier: "workspace" })
                 .handler(async ({ input, ctx: _ctx }) => {
-                    const { item_id, field_id, value } = input;
-
-                    const params = GitHubUpdateProjectItemSchema.parse({
-                        item_id,
-                        field_id,
-                        value,
-                    });
                     const client = createGitHubProjectsClient();
                     const result = await client.updateItemField(
-                        params.item_id,
-                        params.field_id,
-                        { text: params.value },
+                        input.item_id,
+                        input.field_id,
+                        { text: input.value },
                     );
 
                     if (result.error) return err(`Error: ${result.error}`);
@@ -163,16 +147,13 @@ export function registerGatewayTools(
                 })
                 .meta({ category: "gateway", tier: "workspace" })
                 .handler(async ({ input, ctx: _ctx }) => {
-                    const { issue_number } = input;
-
-                    const params = GitHubGetPRStatusSchema.parse({ issue_number });
                     const client = createGitHubProjectsClient();
-                    const result = await client.getPRStatus(params.issue_number);
+                    const result = await client.getPRStatus(input.issue_number);
 
                     if (result.error) return err(`Error: ${result.error}`);
 
                     const pr = result.data;
-                    let text = `**PR Status for Issue #${params.issue_number}:**\n\n`;
+                    let text = `**PR Status for Issue #${input.issue_number}:**\n\n`;
                     if (!pr?.prNumber) {
                         text += "No linked PR found.";
                     } else {

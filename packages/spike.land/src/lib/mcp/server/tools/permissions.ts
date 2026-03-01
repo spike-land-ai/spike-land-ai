@@ -1,8 +1,7 @@
 import { z } from "zod";
 import type { ToolRegistry } from "../tool-registry";
-import type { CallToolResult } from "@modelcontextprotocol/sdk/types.js";
-import { safeToolCall, textResult } from "./tool-helpers";
-import { freeTool, workspaceTool } from "../tool-builder/procedures.js";
+import { textResult } from "./tool-helpers";
+import { workspaceTool } from "../tool-builder/procedures.js";
 
 export function registerPermissionsTools(
     registry: ToolRegistry,

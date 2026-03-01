@@ -6,10 +6,9 @@
  */
 
 import { z } from "zod";
-import type { CallToolResult } from "@modelcontextprotocol/sdk/types.js";
 import type { ToolRegistry } from "../tool-registry";
 import { jsonResult, safeToolCall, textResult } from "./tool-helpers";
-import { freeTool, workspaceTool } from "../tool-builder/procedures.js";
+import { freeTool } from "../tool-builder/procedures.js";
 
 const LOADER_ENUM = ["tsx", "ts", "jsx", "js"] as const;
 

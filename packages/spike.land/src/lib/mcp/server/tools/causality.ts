@@ -1,9 +1,8 @@
 import { z } from "zod";
-import type { CallToolResult } from "@modelcontextprotocol/sdk/types.js";
 import type { ToolRegistry } from "../tool-registry";
-import { safeToolCall, textResult } from "./tool-helpers";
+import { textResult } from "./tool-helpers";
 import type { LogicalClock } from "@/lib/causality/types";
-import { freeTool, workspaceTool } from "../tool-builder/procedures.js";
+import { freeTool } from "../tool-builder/procedures.js";
 
 // Re-export for test cleanup
 export { clearSystems } from "@/lib/causality/engine";

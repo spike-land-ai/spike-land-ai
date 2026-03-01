@@ -9,11 +9,10 @@
  */
 
 import { z } from "zod";
-import type { CallToolResult } from "@modelcontextprotocol/sdk/types.js";
 import type { ToolRegistry } from "../tool-registry";
 import { encryptSecret } from "../crypto/vault";
 import { SPIKE_LAND_BASE_URL } from "./tool-helpers";
-import { freeTool, workspaceTool } from "../tool-builder/procedures.js";
+import { freeTool } from "../tool-builder/procedures.js";
 
 export function registerBootstrapTools(
     registry: ToolRegistry,

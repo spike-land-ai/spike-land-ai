@@ -7,11 +7,10 @@
  */
 
 import { z } from "zod";
-import type { CallToolResult } from "@modelcontextprotocol/sdk/types.js";
 import type { ToolRegistry } from "../tool-registry";
-import { requireAdminRole, safeToolCall, textResult } from "./tool-helpers";
+import { requireAdminRole, textResult } from "./tool-helpers";
 import { McpError, McpErrorCode } from "../../errors";
-import { freeTool, workspaceTool } from "../tool-builder/procedures.js";
+import { workspaceTool } from "../tool-builder/procedures.js";
 
 export function registerSwarmTools(
     registry: ToolRegistry,

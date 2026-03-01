@@ -7,10 +7,9 @@
  */
 
 import { z } from "zod";
-import type { CallToolResult } from "@modelcontextprotocol/sdk/types.js";
 import type { ToolRegistry } from "../tool-registry";
-import { safeToolCall, textResult } from "./tool-helpers";
-import { freeTool, workspaceTool } from "../tool-builder/procedures.js";
+import { textResult } from "./tool-helpers";
+import { freeTool } from "../tool-builder/procedures.js";
 
 // ── In-memory storage with TTL ────────────────────────────────────────────
 
@@ -427,7 +426,7 @@ export function registerFilesystemTools(
                 ),
             })
             .meta({ category: "filesystem", tier: "free" })
-            .handler(async ({ input, ctx }) => {
+            .handler(async ({ input, ctx: _ctx }) => {
                 const {
                     codespace_id,
                     pattern,
@@ -443,7 +442,7 @@ export function registerFilesystemTools(
                     return textResult(`No files in codespace "${codespace_id}".`);
                 }
 
-                const ctx = context ?? 0;
+                const contextValue = context ?? 0;
                 let re: RegExp;
                 try {
                     re = is_regex
@@ -467,9 +466,9 @@ export function registerFilesystemTools(
                     const lines = content.split("\n");
                     for (let i = 0; i < lines.length; i++) {
                         if (re.test(lines[i]!)) {
-                            if (ctx > 0) {
-                                const start = Math.max(0, i - ctx);
-                                const end = Math.min(lines.length - 1, i + ctx);
+                            if (contextValue > 0) {
+                                const start = Math.max(0, i - contextValue);
+                                const end = Math.min(lines.length - 1, i + contextValue);
                                 for (let j = start; j <= end; j++) {
                                     const prefix = j === i ? ">" : " ";
                                     results.push(`${filePath}:${j + 1}:${prefix} ${lines[j]}`);

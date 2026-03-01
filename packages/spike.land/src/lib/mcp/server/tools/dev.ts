@@ -17,7 +17,7 @@ import {
 } from "node:fs";
 import { execSync } from "node:child_process";
 import { join } from "node:path";
-import { freeTool, workspaceTool } from "../tool-builder/procedures.js";
+import { freeTool } from "../tool-builder/procedures.js";
 
 const CATEGORY = "dev";
 const TIER = "free" as const;
@@ -68,7 +68,7 @@ export function registerDevTools(
             })
             .meta({ category: CATEGORY, tier: TIER })
             .handler(async ({ input, ctx: _ctx }) => {
-                const input = input;
+                
 
                 if (!existsSync(LOG_FILE)) {
                     return errorResult(
@@ -188,7 +188,7 @@ export function registerDevTools(
             })
             .meta({ category: CATEGORY, tier: TIER })
             .handler(async ({ input, ctx: _ctx }) => {
-                const input = input;
+                
 
                 const base = input.commit_hash ?? "HEAD~1";
                 if (!isValidGitRef(base)) {
@@ -240,7 +240,7 @@ export function registerDevTools(
             })
             .meta({ category: CATEGORY, tier: TIER })
             .handler(async ({ input, ctx: _ctx }) => {
-                const input = input;
+                
 
                 mkdirSync(LOG_DIR, { recursive: true });
 

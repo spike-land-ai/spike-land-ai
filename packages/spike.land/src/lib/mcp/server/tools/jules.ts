@@ -5,9 +5,8 @@
  */
 
 import { z } from "zod";
-import type { CallToolResult } from "@modelcontextprotocol/sdk/types.js";
 import type { ToolRegistry } from "../tool-registry";
-import { freeTool, workspaceTool } from "../tool-builder/procedures.js";
+import { freeTool } from "../tool-builder/procedures.js";
 
 const JULES_BASE_URL = "https://jules.googleapis.com/v1alpha";
 const SESSION_ID_PATTERN = /^[a-zA-Z0-9_-]+$/;

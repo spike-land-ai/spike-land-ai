@@ -1,12 +1,3 @@
-/**
- * MCP Registry Discovery Tools
- *
- * Search, evaluate, and auto-configure MCP servers from
- * Smithery, Official MCP Registry, and Glama.
- */
-
-import type { z } from "zod";
-import type { CallToolResult } from "@modelcontextprotocol/sdk/types.js";
 import type { ToolRegistry } from "../tool-registry";
 import { safeToolCall, textResult } from "./tool-helpers";
 import {
@@ -14,7 +5,7 @@ import {
     McpRegistryInstallSchema,
     McpRegistrySearchSchema,
 } from "@/lib/mcp/schemas";
-import { freeTool, workspaceTool } from "../tool-builder/procedures.js";
+import { freeTool } from "../tool-builder/procedures.js";
 
 export function registerMcpRegistryTools(
     registry: ToolRegistry,

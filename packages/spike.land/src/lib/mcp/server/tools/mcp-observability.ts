@@ -6,15 +6,13 @@
  */
 
 import { z } from "zod";
-import type { CallToolResult } from "@modelcontextprotocol/sdk/types.js";
 import type { ToolRegistry } from "../tool-registry";
 import {
     jsonResult,
     requireAdminRole,
-    safeToolCall,
     textResult,
 } from "./tool-helpers";
-import { freeTool, workspaceTool } from "../tool-builder/procedures.js";
+import { workspaceTool } from "../tool-builder/procedures.js";
 
 interface ToolMetricRow {
     tool: string;

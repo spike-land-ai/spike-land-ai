@@ -6,7 +6,6 @@
  */
 
 import { z } from "zod";
-import type { CallToolResult } from "@modelcontextprotocol/sdk/types.js";
 import type { ToolRegistry } from "../tool-registry";
 import { requireAdminRole, safeToolCall, textResult } from "./tool-helpers";
 import { McpError, McpErrorCode } from "../../errors";
@@ -34,8 +33,8 @@ export function registerAiGatewayTools(
         freeTool(userId)
             .tool("ai_list_providers", "List configured AI providers with availability status, default provider, and capabilities.", {})
             .meta({ category: "ai-gateway", tier: "free" })
-            .handler(async ({ input, ctx: _ctx }) => {
-                const _input = input;
+            .handler(async ({ input: _input, ctx: _ctx }) => {
+                
                 return safeToolCall("ai_list_providers", async () => {
                     const { isClaudeConfigured } = await import(
                         "@/lib/ai/claude-client"

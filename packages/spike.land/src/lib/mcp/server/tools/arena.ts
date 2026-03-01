@@ -6,13 +6,12 @@
  */
 
 import { z } from "zod";
-import type { CallToolResult } from "@modelcontextprotocol/sdk/types.js";
 import type { ToolRegistry } from "../tool-registry";
 import prisma from "@/lib/prisma";
 import logger from "@/lib/logger";
 import { arenaGenerateFromPrompt } from "@/lib/arena/arena-generator";
 import { submitReview } from "@/lib/arena/review";
-import { freeTool, workspaceTool } from "../tool-builder/procedures.js";
+import { freeTool } from "../tool-builder/procedures.js";
 
 export function registerArenaTools(
     registry: ToolRegistry,

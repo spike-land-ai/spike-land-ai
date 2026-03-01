@@ -6,11 +6,10 @@
  */
 
 import { z } from "zod";
-import type { CallToolResult } from "@modelcontextprotocol/sdk/types.js";
 import type { ToolRegistry } from "../tool-registry";
-import { safeToolCall, textResult } from "./tool-helpers";
+import { textResult } from "./tool-helpers";
 import type { Prisma } from "@/generated/prisma";
-import { freeTool, workspaceTool } from "../tool-builder/procedures.js";
+import { freeTool } from "../tool-builder/procedures.js";
 
 const BLOCK_TYPES = [
     "HERO",
@@ -232,7 +231,7 @@ export function registerBlocksTools(
                 const prisma = (await import("@/lib/prisma")).default;
 
                 await prisma.$transaction(
-                    blockIds.map((id, index) =>
+                    blockIds.map((id: string, index: number) =>
                         prisma.pageBlock.update({
                             where: { id },
                             data: { sortOrder: index },
@@ -244,7 +243,7 @@ export function registerBlocksTools(
                     `**Blocks Reordered**\n\n`
                     + `**Page ID:** ${pageId}\n`
                     + `**New Order:**\n`
-                    + blockIds.map((id, i) => `  ${i}: ${id}`).join("\n"),
+                    + blockIds.map((id: string, i: number) => `  ${i}: ${id}`).join("\n"),
                 );
             })
     );
@@ -255,8 +254,8 @@ export function registerBlocksTools(
         freeTool(_userId)
             .tool("blocks_list_types", "List all available block types with descriptions.", {})
             .meta({ category: "blocks", tier: "free" })
-            .handler(async ({ input, ctx: _ctx }) => {
-                const _params = input;
+            .handler(async ({ input: _input, ctx: _ctx }) => {
+                
 
                 const { getBlockTypeDescriptions } = await import(
                     "@/lib/dynamic-pages/block-schemas"

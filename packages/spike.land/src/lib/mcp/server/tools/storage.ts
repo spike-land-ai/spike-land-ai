@@ -1,10 +1,9 @@
 import { getPresignedUploadUrl } from "@/lib/storage/r2-client";
 import { z } from "zod";
 import type { ToolRegistry } from "../tool-registry";
-import type { CallToolResult } from "@modelcontextprotocol/sdk/types.js";
 import { safeToolCall, textResult } from "./tool-helpers";
 import path from "path";
-import { freeTool, workspaceTool } from "../tool-builder/procedures.js";
+import { workspaceTool } from "../tool-builder/procedures.js";
 
 export function registerStorageTools(
     registry: ToolRegistry,

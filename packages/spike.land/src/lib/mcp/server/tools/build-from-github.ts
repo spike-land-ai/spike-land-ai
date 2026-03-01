@@ -1,19 +1,7 @@
 import { z } from "zod";
-import type { CallToolResult } from "@modelcontextprotocol/sdk/types.js";
 import type { ToolRegistry } from "../tool-registry";
 import { safeToolCall, textResult } from "./tool-helpers";
-import { freeTool, workspaceTool } from "../tool-builder/procedures.js";
-
-const buildFromGithubInput = z.object({
-    repoUrl: z.string().url().describe("GitHub URL to build from"),
-    branchOrCommit: z.string().optional().describe(
-        "Branch or commit to build from, defaults to main",
-    ),
-    minify: z.boolean().default(true).describe("Whether to minify the output"),
-    npmMode: z.enum(["external", "bundle"]).default("bundle").describe(
-        "Whether to bundle bare imports or externalize them to esm.sh",
-    ),
-});
+import { workspaceTool } from "../tool-builder/procedures.js";
 
 export function registerBuildFromGithubTools(
     registry: ToolRegistry,

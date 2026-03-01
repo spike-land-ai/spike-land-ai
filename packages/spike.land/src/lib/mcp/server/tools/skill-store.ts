@@ -5,11 +5,10 @@
  */
 
 import { z } from "zod";
-import type { CallToolResult } from "@modelcontextprotocol/sdk/types.js";
 import type { SkillCategory, SkillStatus } from "@/generated/prisma";
 import type { ToolRegistry } from "../tool-registry";
-import { safeToolCall, textResult } from "./tool-helpers";
-import { freeTool, workspaceTool } from "../tool-builder/procedures.js";
+import { textResult } from "./tool-helpers";
+import { freeTool } from "../tool-builder/procedures.js";
 
 const SKILL_CATEGORIES = [
     "QUALITY",
@@ -315,7 +314,7 @@ export function registerSkillStoreTools(
             })
             .meta({ category: "skill-store", tier: "free" })
             .handler(async ({ input, ctx: _ctx }) => {
-                const input = input;
+                
 
                 const prisma = (await import("@/lib/prisma")).default;
                 const skill = await prisma.skill.create({

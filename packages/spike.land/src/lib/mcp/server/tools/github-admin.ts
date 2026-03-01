@@ -1,13 +1,6 @@
-/**
- * GitHub Admin MCP Tools
- *
- * Tools for querying GitHub Projects V2 roadmap, issue summaries, and PR status.
- */
-
-import type { CallToolResult } from "@modelcontextprotocol/sdk/types.js";
 import type { ToolRegistry } from "../tool-registry";
-import { safeToolCall, textResult } from "./tool-helpers";
-import { freeTool, workspaceTool } from "../tool-builder/procedures.js";
+import { textResult } from "./tool-helpers";
+import { workspaceTool } from "../tool-builder/procedures.js";
 
 export function registerGitHubAdminTools(
     registry: ToolRegistry,
