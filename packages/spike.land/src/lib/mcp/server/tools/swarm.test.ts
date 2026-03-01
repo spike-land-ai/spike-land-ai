@@ -496,7 +496,7 @@ describe("swarm tools", () => {
       expect(getText(result)).toContain("No agents found");
     });
 
-    it("should include agents when status is an unrecognized value (default branch)", async () => {
+    it("should include all agents when status is 'all' (default branch)", async () => {
       const now = new Date();
       mockPrisma.claudeCodeAgent.findMany.mockResolvedValue([
         {
@@ -510,29 +510,29 @@ describe("swarm tools", () => {
           _count: { messages: 0 },
         },
       ]);
-      // Cast to bypass Zod enum — we want to hit the `return true` default in the filter
-      const result = await registry.call("swarm_list_agents", { status: "unknown_status" as "all" });
+      const result = await registry.call("swarm_list_agents", { status: "all" });
       const text = getText(result);
       expect(text).toContain("Agent1");
     });
 
     it("should check admin role on every swarm tool handler", async () => {
       mockPrisma.user.findUnique.mockResolvedValue({ role: "USER" });
-      const toolNames = [
-        "swarm_list_agents",
-        "swarm_get_agent",
-        "swarm_spawn_agent",
-        "swarm_stop_agent",
-        "swarm_redirect_agent",
-        "swarm_broadcast",
-        "swarm_agent_timeline",
-        "swarm_topology",
-        "swarm_send_message",
-        "swarm_read_messages",
-        "swarm_delegate_task",
+      // Map each tool to its minimum valid input shape (to pass Zod then hit requireAdminRole)
+      const toolCalls: [string, Record<string, unknown>][] = [
+        ["swarm_list_agents", {}],
+        ["swarm_get_agent", { agent_id: "x" }],
+        ["swarm_spawn_agent", { display_name: "bot", machine_id: "m1", session_id: "s1" }],
+        ["swarm_stop_agent", { agent_id: "x" }],
+        ["swarm_redirect_agent", { agent_id: "x" }],
+        ["swarm_broadcast", { content: "hi" }],
+        ["swarm_agent_timeline", { agent_id: "x" }],
+        ["swarm_topology", {}],
+        ["swarm_send_message", { target_agent_id: "x", content: "hi" }],
+        ["swarm_read_messages", { agent_id: "x" }],
+        ["swarm_delegate_task", { target_agent_id: "x", task_description: "do something" }],
       ];
-      for (const toolName of toolNames) {
-                const result = await registry.call(toolName, {});
+      for (const [toolName, args] of toolCalls) {
+        const result = await registry.call(toolName, args);
         expect(getText(result)).toContain("PERMISSION_DENIED");
       }
     });
