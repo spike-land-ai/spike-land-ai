@@ -319,6 +319,7 @@ export function useStateMachine() {
         guard_expression?: string;
         actions?: Array<{ type: ActionType; params: Record<string, unknown>; }>;
         internal?: boolean;
+        delay_expression?: string;
       },
     ) => {
       setLoading(true);

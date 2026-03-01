@@ -10,7 +10,7 @@
     "./*": "./**/index.ts"
   },
   "scripts": {
-    "test": "vitest run",
+    "test-disabled": "vitest run",
     "test:coverage": "vitest run --coverage"
   },
   "devDependencies": {

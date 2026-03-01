@@ -6,6 +6,7 @@ import { AlertCircle, Maximize2, ZoomIn, ZoomOut } from "lucide-react";
 import type { MachineData } from "@/components/state-machine/use-state-machine";
 import { StateNode } from "./StateNode";
 import { TransitionArrow } from "./TransitionArrow";
+import { MermaidViewer } from "@/components/state-machine/MermaidViewer";
 import { cn } from "@/lib/utils";
 
 interface MachineCanvasProps {
@@ -16,7 +17,38 @@ interface MachineCanvasProps {
   onSelectTransition: (id: string) => void;
 }
 
-type CanvasTab = "states" | "transitions";
+type CanvasTab = "states" | "transitions" | "mermaid";
+
+function generateMermaidDiagram(machine: MachineData): string {
+  const { definition, currentStates } = machine;
+  const lines: string[] = ["stateDiagram-v2"];
+
+  if (definition.initial) {
+    lines.push(`    [*] --> ${definition.initial}`);
+  }
+
+  for (const [id, state] of Object.entries(definition.states)) {
+    if (state.type === "final") {
+      lines.push(`    ${id} --> [*]`);
+    }
+  }
+
+  for (const t of definition.transitions) {
+    const label = t.guard
+      ? `${t.event} [${t.guard.expression}]`
+      : t.event;
+    lines.push(`    ${t.source} --> ${t.target} : ${label}`);
+  }
+
+  // Mark active states with a note
+  if (currentStates.length > 0) {
+    for (const active of currentStates) {
+      lines.push(`    note right of ${active} : ACTIVE`);
+    }
+  }
+
+  return lines.join("\n");
+}
 
 function CanvasErrorFallback() {
   return (
@@ -178,7 +210,7 @@ export function MachineCanvas({
   onSelectState,
   onSelectTransition,
 }: MachineCanvasProps) {
-  const [activeTab, setActiveTab] = useState<CanvasTab>("states");
+  const [activeTab, setActiveTab] = useState<CanvasTab>("mermaid");
   const [zoom, setZoom] = useState(100);
 
   const handleZoomIn = useCallback(
@@ -200,7 +232,7 @@ export function MachineCanvas({
         {/* Tab bar + zoom controls */}
         <div className="flex items-center gap-2 px-3 py-2 border-b border-zinc-800/50 bg-zinc-900/20 shrink-0">
           <div className="flex items-center gap-1 bg-zinc-900/50 rounded-lg border border-zinc-800/70 p-0.5">
-            {(["states", "transitions"] as const).map(tab => (
+            {(["mermaid", "states", "transitions"] as const).map(tab => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
@@ -213,7 +245,9 @@ export function MachineCanvas({
               >
                 {tab === "states"
                   ? `States (${Object.keys(machine.definition.states).length})`
-                  : `Transitions (${machine.definition.transitions.length})`}
+                  : tab === "transitions"
+                    ? `Transitions (${machine.definition.transitions.length})`
+                    : "Diagram"}
               </button>
             ))}
           </div>
@@ -261,21 +295,27 @@ export function MachineCanvas({
           className="flex-1 overflow-y-auto custom-scrollbar"
           style={{ fontSize: `${zoom}%` }}
         >
-          {activeTab === "states"
+          {activeTab === "mermaid"
             ? (
-              <StatesList
-                machine={machine}
-                selectedStateId={selectedStateId}
-                onSelectState={onSelectState}
-              />
+              <div className="w-full h-full relative p-4">
+                <MermaidViewer chart={generateMermaidDiagram(machine)} />
+              </div>
             )
-            : (
-              <TransitionsList
-                machine={machine}
-                selectedTransitionId={selectedTransitionId}
-                onSelectTransition={onSelectTransition}
-              />
-            )}
+            : activeTab === "states"
+              ? (
+                <StatesList
+                  machine={machine}
+                  selectedStateId={selectedStateId}
+                  onSelectState={onSelectState}
+                />
+              )
+              : (
+                <TransitionsList
+                  machine={machine}
+                  selectedTransitionId={selectedTransitionId}
+                  onSelectTransition={onSelectTransition}
+                />
+              )}
         </div>
       </div>
     </ErrorBoundary>

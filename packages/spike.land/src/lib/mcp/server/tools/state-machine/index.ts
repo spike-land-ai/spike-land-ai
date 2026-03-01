@@ -262,6 +262,10 @@ export function registerStateMachineTools(
         .boolean()
         .optional()
         .describe("Internal transition (no exit/re-entry of source state)"),
+      delay_expression: z
+        .string()
+        .optional()
+        .describe("Delay in milliseconds evaluated as an expression"),
     },
     handler: async ({
       machine_id,
@@ -271,6 +275,7 @@ export function registerStateMachineTools(
       guard_expression,
       actions,
       internal,
+      delay_expression,
     }: {
       machine_id: string;
       source: string;
@@ -284,6 +289,7 @@ export function registerStateMachineTools(
         }
       >;
       internal?: boolean;
+      delay_expression?: string;
     }): Promise<CallToolResult> => {
       return safeToolCall("sm_add_transition", async () => {
         const guard = guard_expression
@@ -297,6 +303,7 @@ export function registerStateMachineTools(
           ...(guard !== undefined ? { guard } : {}),
           actions: actions ?? [],
           internal: internal ?? false,
+          ...(delay_expression !== undefined ? { delayExpression: delay_expression } : {}),
         });
 
         let text = `**Transition Added**\n\n`;
@@ -408,9 +415,8 @@ export function registerStateMachineTools(
           text += `- **Guard Evaluated:** ${logEntry.guardEvaluated}\n`;
         }
         if (logEntry.actionsExecuted.length > 0) {
-          text += `- **Actions Executed:** ${
-            logEntry.actionsExecuted.map(a => a.type).join(", ")
-          }\n`;
+          text += `- **Actions Executed:** ${logEntry.actionsExecuted.map(a => a.type).join(", ")
+            }\n`;
         }
 
         return textResult(text);
@@ -437,11 +443,10 @@ export function registerStateMachineTools(
         const state = getState(machine_id);
 
         let text = `**Current State**\n\n`;
-        text += `- **Active States:** ${
-          state.activeStates.length > 0
-            ? state.activeStates.join(", ")
-            : "(none)"
-        }\n`;
+        text += `- **Active States:** ${state.activeStates.length > 0
+          ? state.activeStates.join(", ")
+          : "(none)"
+          }\n`;
         text += `- **Context:**\n\`\`\`json\n${JSON.stringify(state.context, null, 2)}\n\`\`\``;
 
         return textResult(text);
@@ -485,9 +490,8 @@ export function registerStateMachineTools(
 
         let text = `**Transition History** (${entries.length} of ${history.length} entries)\n\n`;
         for (const entry of entries) {
-          text += `- **${entry.event}**: ${entry.fromStates.join(", ")} -> ${
-            entry.toStates.join(", ")
-          }`;
+          text += `- **${entry.event}**: ${entry.fromStates.join(", ")} -> ${entry.toStates.join(", ")
+            }`;
           if (entry.guardEvaluated) text += ` [guard: ${entry.guardEvaluated}]`;
           if (entry.actionsExecuted.length > 0) {
             text += ` (actions: ${entry.actionsExecuted.map(a => a.type).join(", ")})`;
@@ -520,11 +524,10 @@ export function registerStateMachineTools(
         const state = getState(machine_id);
 
         let text = `**Machine Reset**\n\n`;
-        text += `- **Active States:** ${
-          state.activeStates.length > 0
-            ? state.activeStates.join(", ")
-            : "(none)"
-        }\n`;
+        text += `- **Active States:** ${state.activeStates.length > 0
+          ? state.activeStates.join(", ")
+          : "(none)"
+          }\n`;
         text += `- **Context:**\n\`\`\`json\n${JSON.stringify(state.context, null, 2)}\n\`\`\``;
 
         return textResult(text);
@@ -653,8 +656,8 @@ export function registerStateMachineTools(
           machine_id,
           userId,
           machine_data as
-            | import("@/lib/state-machine/types").MachineExport
-            | undefined,
+          | import("@/lib/state-machine/types").MachineExport
+          | undefined,
         );
         const url = `https://spike.land/share/sm/${token}`;
 

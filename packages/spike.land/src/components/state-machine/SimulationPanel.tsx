@@ -87,7 +87,6 @@ export function SimulationPanel({
   // Auto-play state
   const [isPlaying, setIsPlaying] = useState(false);
   const [playSpeed, _setPlaySpeed] = useState(1000);
-  const playTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   // Available events from current active states
   const availableEvents = useMemo(() => {
@@ -166,44 +165,28 @@ export function SimulationPanel({
       : playSpeed;
   }, [delayedTransition, evaluateDelay, context, playSpeed]);
 
-  const savedCallback = useRef<() => void>(() => {});
-
-  useEffect(() => {
-    savedCallback.current = () => {
-      if (isSending) return;
-      if (delayedTransition) {
-        handleSend(delayedTransition.event);
-      } else if (availableEvents.length > 0) {
-        const idx = Math.floor(Math.random() * availableEvents.length);
-        const randomEvent = availableEvents[idx];
-        if (randomEvent !== undefined) {
-          handleSend(randomEvent);
-        }
-      } else {
-        setIsPlaying(false);
-      }
-    };
-  }, [isSending, delayedTransition, availableEvents, handleSend]);
-
   // Auto-play logic
   useEffect(() => {
-    if (isPlaying) {
-      playTimerRef.current = setTimeout(() => {
-        savedCallback.current();
+    let timeoutId: NodeJS.Timeout;
+
+    if (isPlaying && !isSending) {
+      timeoutId = setTimeout(() => {
+        if (delayedTransition) {
+          handleSend(delayedTransition.event);
+        } else if (availableEvents.length > 0) {
+          const idx = Math.floor(Math.random() * availableEvents.length);
+          const randomEvent = availableEvents[idx];
+          if (randomEvent) handleSend(randomEvent);
+        } else {
+          setIsPlaying(false);
+        }
       }, delay);
-    } else {
-      if (playTimerRef.current) {
-        clearTimeout(playTimerRef.current);
-        playTimerRef.current = null;
-      }
     }
 
     return () => {
-      if (playTimerRef.current) {
-        clearTimeout(playTimerRef.current);
-      }
+      clearTimeout(timeoutId);
     };
-  }, [isPlaying, delay, currentStates]);
+  }, [isPlaying, delay, isSending, delayedTransition, availableEvents, handleSend]);
 
   // Save context
   const handleSaveContext = useCallback(async () => {
@@ -244,26 +227,26 @@ export function SimulationPanel({
   const tabs: Array<
     { id: TabId; label: string; icon: React.ReactNode; badge?: number; }
   > = [
-    { id: "events", label: "Events", icon: <Zap className="w-3.5 h-3.5" /> },
-    {
-      id: "context",
-      label: "Context",
-      icon: <Braces className="w-3.5 h-3.5" />,
-    },
-    {
-      id: "history",
-      label: "History",
-      icon: <History className="w-3.5 h-3.5" />,
-      badge: transitionLog.length,
-    },
-    {
-      id: "validation",
-      label: "Validate",
-      icon: <ListChecks className="w-3.5 h-3.5" />,
-      badge: validationIssues.length,
-    },
-    { id: "replay", label: "Tests", icon: <Play className="w-3.5 h-3.5" /> },
-  ];
+      { id: "events", label: "Events", icon: <Zap className="w-3.5 h-3.5" /> },
+      {
+        id: "context",
+        label: "Context",
+        icon: <Braces className="w-3.5 h-3.5" />,
+      },
+      {
+        id: "history",
+        label: "History",
+        icon: <History className="w-3.5 h-3.5" />,
+        badge: transitionLog.length,
+      },
+      {
+        id: "validation",
+        label: "Validate",
+        icon: <ListChecks className="w-3.5 h-3.5" />,
+        badge: validationIssues.length,
+      },
+      { id: "replay", label: "Tests", icon: <Play className="w-3.5 h-3.5" /> },
+    ];
 
   return (
     <div className="flex flex-col h-full bg-zinc-950/30 backdrop-blur-md rounded-xl overflow-hidden border border-zinc-800/50 shadow-2xl">
@@ -273,11 +256,10 @@ export function SimulationPanel({
           onClick={() => setIsPlaying(!isPlaying)}
           variant={isPlaying ? "warning" : "success"}
           size="sm"
-          className={`shadow-md transition-all ${
-            isPlaying
-              ? "bg-amber-600/20 text-amber-500 hover:bg-amber-600/30"
-              : "bg-emerald-600/20 text-emerald-500 hover:bg-emerald-600/30"
-          } flex-1 sm:flex-none`}
+          className={`shadow-md transition-all ${isPlaying
+            ? "bg-amber-600/20 text-amber-500 hover:bg-amber-600/30"
+            : "bg-emerald-600/20 text-emerald-500 hover:bg-emerald-600/30"
+            } flex-1 sm:flex-none`}
         >
           {isPlaying
             ? <Pause className="w-4 h-4 mr-2" />
@@ -315,22 +297,20 @@ export function SimulationPanel({
             role="tab"
             aria-selected={activeTab === tab.id}
             onClick={() => setActiveTab(tab.id)}
-            className={`flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-semibold transition-all duration-200 whitespace-nowrap border ${
-              activeTab === tab.id
-                ? "bg-zinc-800/80 text-white border-zinc-700/50 shadow-sm"
-                : "text-zinc-500 hover:text-zinc-300 hover:bg-zinc-900/60 border-transparent"
-            }`}
+            className={`flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-semibold transition-all duration-200 whitespace-nowrap border ${activeTab === tab.id
+              ? "bg-zinc-800/80 text-white border-zinc-700/50 shadow-sm"
+              : "text-zinc-500 hover:text-zinc-300 hover:bg-zinc-900/60 border-transparent"
+              }`}
           >
             {tab.icon}
             {tab.label}
             {tab.badge !== undefined && tab.badge > 0 && (
               <span
                 aria-label={`${tab.badge} item${tab.badge !== 1 ? "s" : ""}`}
-                className={`min-w-[16px] h-4 px-1 rounded-full text-[10px] font-bold flex items-center justify-center ${
-                  tab.id === "validation"
-                    ? "bg-red-500/20 text-red-400 shadow-[0_0_8px_rgba(248,113,113,0.4)]"
-                    : "bg-zinc-700 text-zinc-300"
-                }`}
+                className={`min-w-[16px] h-4 px-1 rounded-full text-[10px] font-bold flex items-center justify-center ${tab.id === "validation"
+                  ? "bg-red-500/20 text-red-400 shadow-[0_0_8px_rgba(248,113,113,0.4)]"
+                  : "bg-zinc-700 text-zinc-300"
+                  }`}
               >
                 {tab.badge}
               </span>
@@ -507,31 +487,31 @@ export function SimulationPanel({
 
                         {(entry.guardEvaluated
                           || entry.actionsExecuted.length > 0) && (
-                          <div className="pt-2 border-t border-zinc-800/50 flex gap-3 text-[10px]">
-                            {entry.guardEvaluated && (
-                              <span className="text-amber-500/70 font-mono">
-                                guard: {entry.guardEvaluated}
-                              </span>
-                            )}
-                            {entry.actionsExecuted.length > 0 && (
-                              <span className="text-indigo-400/70">
-                                actions: {entry.actionsExecuted.map(a => a.type).join(", ")}
-                              </span>
-                            )}
-                          </div>
-                        )}
+                            <div className="pt-2 border-t border-zinc-800/50 flex gap-3 text-[10px]">
+                              {entry.guardEvaluated && (
+                                <span className="text-amber-500/70 font-mono">
+                                  guard: {entry.guardEvaluated}
+                                </span>
+                              )}
+                              {entry.actionsExecuted.length > 0 && (
+                                <span className="text-indigo-400/70">
+                                  actions: {entry.actionsExecuted.map(a => a.type).join(", ")}
+                                </span>
+                              )}
+                            </div>
+                          )}
 
                         {JSON.stringify(entry.beforeContext)
-                            !== JSON.stringify(entry.afterContext) && (
-                          <details className="text-[10px] pt-1">
-                            <summary className="text-zinc-500 cursor-pointer hover:text-zinc-300 transition-colors list-none flex items-center gap-1">
-                              <span className="text-[8px]">▶</span> Context updated
-                            </summary>
-                            <pre className="mt-2 p-2 rounded bg-black/40 text-zinc-400 font-mono whitespace-pre-wrap overflow-x-auto border border-zinc-800">
-                            {JSON.stringify(entry.afterContext, null, 2)}
-                            </pre>
-                          </details>
-                        )}
+                          !== JSON.stringify(entry.afterContext) && (
+                            <details className="text-[10px] pt-1">
+                              <summary className="text-zinc-500 cursor-pointer hover:text-zinc-300 transition-colors list-none flex items-center gap-1">
+                                <span className="text-[8px]">▶</span> Context updated
+                              </summary>
+                              <pre className="mt-2 p-2 rounded bg-black/40 text-zinc-400 font-mono whitespace-pre-wrap overflow-x-auto border border-zinc-800">
+                                {JSON.stringify(entry.afterContext, null, 2)}
+                              </pre>
+                            </details>
+                          )}
                       </div>
                     </div>
                   ))}
@@ -567,16 +547,13 @@ export function SimulationPanel({
                       onClick={() => {
                         if (issue.stateId) onHighlightState(issue.stateId);
                       }}
-                      aria-label={`${
-                        issue.level === "error" ? "Error" : "Warning"
-                      }: ${issue.message}${
-                        issue.stateId ? ` (highlight state ${issue.stateId})` : ""
-                      }`}
-                      className={`w-full text-left p-3.5 rounded-xl border transition-all hover:scale-[1.01] hover:shadow-md ${
-                        issue.level === "error"
-                          ? "bg-red-500/5 border-red-500/20 text-red-300 hover:bg-red-500/10"
-                          : "bg-amber-500/5 border-amber-500/20 text-amber-300 hover:bg-amber-500/10"
-                      }`}
+                      aria-label={`${issue.level === "error" ? "Error" : "Warning"
+                        }: ${issue.message}${issue.stateId ? ` (highlight state ${issue.stateId})` : ""
+                        }`}
+                      className={`w-full text-left p-3.5 rounded-xl border transition-all hover:scale-[1.01] hover:shadow-md ${issue.level === "error"
+                        ? "bg-red-500/5 border-red-500/20 text-red-300 hover:bg-red-500/10"
+                        : "bg-amber-500/5 border-amber-500/20 text-amber-300 hover:bg-amber-500/10"
+                        }`}
                     >
                       <div className="flex items-start gap-3">
                         {issue.level === "error"
