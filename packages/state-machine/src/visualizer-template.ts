@@ -5,7 +5,7 @@
  * state machines deployed to testing.spike.land codespaces.
  */
 
-import type { MachineExport } from "./types";
+import type { MachineExport } from "./types.js";
 
 export function generateVisualizerCode(
   machineExport: MachineExport,

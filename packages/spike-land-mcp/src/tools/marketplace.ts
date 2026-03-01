@@ -31,8 +31,8 @@ export function registerMarketplaceTools(
         "Search the tool marketplace for community-published tools. "
           + "Returns tools matching the query with install counts and author info.",
         {
-          query: z.string().min(1).max(200),
-          limit: z.number().min(1).max(50).optional().default(10),
+          query: z.string().min(1).max(200).describe("Search query to find tools by name or description."),
+          limit: z.number().min(1).max(50).optional().default(10).describe("Maximum number of results to return (1–50)."),
         },
       )
       .meta({ category: "marketplace", tier: "free" })
@@ -85,7 +85,7 @@ export function registerMarketplaceTools(
         "Install a published tool from the marketplace. "
           + "Increments the tool's install count.",
         {
-          tool_id: z.string().min(1),
+          tool_id: z.string().min(1).describe("The unique ID of the marketplace tool."),
         },
       )
       .meta({ category: "marketplace", tier: "free" })
@@ -131,7 +131,7 @@ export function registerMarketplaceTools(
         "marketplace_uninstall",
         "Uninstall a previously installed marketplace tool.",
         {
-          tool_id: z.string().min(1),
+          tool_id: z.string().min(1).describe("The unique ID of the marketplace tool."),
         },
       )
       .meta({ category: "marketplace", tier: "free" })

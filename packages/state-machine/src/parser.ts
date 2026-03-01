@@ -164,6 +164,19 @@ function parsePow(p: Parser): unknown {
   return left;
 }
 
+function resolvePath(obj: unknown, path: string[]): unknown {
+  let value = obj;
+  for (const key of path) {
+    if (value === null || value === undefined) return undefined;
+    if (typeof value === "object") {
+      value = (value as Record<string, unknown>)[key];
+    } else {
+      return undefined;
+    }
+  }
+  return value;
+}
+
 function parsePrimary(p: Parser): unknown {
   skipWhitespace(p);
 
@@ -261,20 +274,17 @@ function parsePrimary(p: Parser): unknown {
   // Context access: context.field.subfield
   if (ident.startsWith("context.")) {
     const path = ident.slice("context.".length).split(".");
-    let value: unknown = p.context;
-    for (const key of path) {
-      if (value === null || value === undefined) return undefined;
-      if (typeof value === "object") {
-        value = (value as Record<string, unknown>)[key];
-      } else {
-        return undefined;
-      }
-    }
-    return value;
+    return resolvePath(p.context, path);
+  }
+
+  // Event access: event.field.subfield (maps to context._event.field.subfield)
+  if (ident.startsWith("event.")) {
+    const path = ["_event", ...ident.slice("event.".length).split(".")];
+    return resolvePath(p.context, path);
   }
 
   throw new Error(
-    `Guard parse error: unknown identifier "${ident}". Use "context.fieldName" for context access.`,
+    `Guard parse error: unknown identifier "${ident}". Use "context.fieldName" or "event.fieldName" for access.`,
   );
 }
 

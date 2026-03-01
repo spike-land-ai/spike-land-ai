@@ -44,6 +44,8 @@ export function validateSchemaDescriptions(
 
 export type ToolComplexity = "primitive" | "composed" | "workflow";
 
+export type ToolStability = "stable" | "beta" | "experimental";
+
 /**
  * Tool dependency declarations for progressive tool activation.
  * Used by standalone store apps and enforced in the registry.
@@ -54,12 +56,21 @@ export interface ToolDependencies {
   requires?: string[] | undefined;
 }
 
+export interface ToolExample {
+  name: string;
+  input: Record<string, unknown>;
+  description: string;
+}
+
 export interface ToolDefinition {
   name: string;
   description: string;
   category: string;
   tier: "free" | "workspace";
   complexity?: ToolComplexity | undefined;
+  version?: string | undefined;
+  stability?: ToolStability | undefined;
+  examples?: ToolExample[] | undefined;
   inputSchema?: z.ZodRawShape | undefined;
   annotations?: ToolAnnotations | undefined;
   dependencies?: ToolDependencies | undefined;
@@ -119,13 +130,17 @@ export class ToolRegistry {
       console.warn(msg);
     }
 
+    const version = def.version ?? "1.0.0";
+    const stability = def.stability ?? "stable";
+
     const registered = this.mcpServer.registerTool(
       def.name,
       {
         description: def.description,
         ...(def.inputSchema !== undefined ? { inputSchema: def.inputSchema } : {}),
         ...(def.annotations !== undefined ? { annotations: def.annotations } : {}),
-        _meta: { category: def.category, tier: def.tier },
+        ...(def.examples !== undefined ? { examples: def.examples } : {}),
+        _meta: { category: def.category, tier: def.tier, version, stability },
       },
       def.handler as unknown as Parameters<McpServer["registerTool"]>[2],
     );
@@ -152,6 +167,9 @@ export class ToolRegistry {
       ...(built.meta.complexity ? { complexity: built.meta.complexity } : {}),
       ...(built.meta.annotations ? { annotations: built.meta.annotations as ToolAnnotations } : {}),
       ...(built.meta.alwaysEnabled !== undefined ? { alwaysEnabled: built.meta.alwaysEnabled } : {}),
+      ...((built.meta as Record<string, unknown>).version ? { version: (built.meta as Record<string, unknown>).version as string } : {}),
+      ...((built.meta as Record<string, unknown>).stability ? { stability: (built.meta as Record<string, unknown>).stability as ToolStability } : {}),
+      ...((built.meta as Record<string, unknown>).examples ? { examples: (built.meta as Record<string, unknown>).examples as ToolExample[] } : {}),
       inputSchema: built.inputSchema,
       handler: built.handler as unknown as ToolDefinition["handler"],
     });
@@ -285,6 +303,9 @@ export class ToolRegistry {
     inputSchema?: z.ZodRawShape;
     enabled: boolean;
     alwaysEnabled?: boolean;
+    version: string;
+    stability: ToolStability;
+    examples?: ToolExample[];
   }> {
     return Array.from(this.tools.values()).map(({ definition, registered }) => ({
       name: definition.name,
@@ -294,6 +315,9 @@ export class ToolRegistry {
       ...(definition.inputSchema !== undefined ? { inputSchema: definition.inputSchema } : {}),
       enabled: registered.enabled ?? false,
       ...(definition.alwaysEnabled !== undefined ? { alwaysEnabled: definition.alwaysEnabled } : {}),
+      version: definition.version ?? "1.0.0",
+      stability: definition.stability ?? "stable",
+      ...(definition.examples !== undefined ? { examples: definition.examples } : {}),
     }));
   }
 

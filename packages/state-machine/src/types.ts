@@ -15,11 +15,44 @@ export type StateType =
 export type HistoryType = "shallow" | "deep";
 export type ActionType = "assign" | "log" | "raise" | "custom";
 
-export interface Action {
+export interface BaseAction {
   type: ActionType;
-  /** For assign: { key: value } pairs. For log: { message }. For raise: { event }. For custom: { name, ...params }. */
   params: Record<string, unknown>;
 }
+
+export interface AssignAction extends BaseAction {
+  type: "assign";
+  params: Record<string, unknown>; // { key: value } pairs
+}
+
+export interface LogAction extends BaseAction {
+  type: "log";
+  params: {
+    message: string;
+    level?: "info" | "warn" | "error";
+  };
+}
+
+export interface RaiseAction extends BaseAction {
+  type: "raise";
+  params: {
+    event: string;
+  };
+}
+
+export interface CustomAction extends BaseAction {
+  type: "custom";
+  params: {
+    name: string;
+    [key: string]: unknown;
+  };
+}
+
+export type Action =
+  | AssignAction
+  | LogAction
+  | RaiseAction
+  | CustomAction;
 
 export interface Guard {
   /** Safe expression string evaluated by recursive-descent parser. e.g. "context.count > 0 && context.active == true" */

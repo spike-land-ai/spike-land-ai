@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from "vitest";
-import { ToolRegistry, validateSchemaDescriptions } from "./registry";
+import { ToolRegistry, validateSchemaDescriptions, type ToolStability } from "./registry";
 import type { McpServer, RegisteredTool } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 
@@ -314,5 +314,168 @@ describe("ToolRegistry", () => {
     const count = registry.enableAll();
     expect(count).toBe(2);
     expect(registry.getEnabledCount()).toBe(2);
+  });
+
+  describe("tool versioning", () => {
+    it("defaults version to 1.0.0 and stability to stable", () => {
+      const server = createMockMcpServer();
+      const registry = new ToolRegistry(server, "user-1");
+
+      registry.register({
+        name: "tool_a",
+        description: "Tool A",
+        category: "storage",
+        tier: "free",
+        handler: () => ({ content: [{ type: "text" as const, text: "a" }] }),
+      });
+
+      const defs = registry.getToolDefinitions();
+      expect(defs[0]!.version).toBe("1.0.0");
+      expect(defs[0]!.stability).toBe("stable");
+    });
+
+    it("passes version and stability to _meta", () => {
+      const server = createMockMcpServer();
+      const registry = new ToolRegistry(server, "user-1");
+
+      registry.register({
+        name: "tool_a",
+        description: "Tool A",
+        category: "storage",
+        tier: "free",
+        version: "2.1.0",
+        stability: "beta",
+        handler: () => ({ content: [{ type: "text" as const, text: "a" }] }),
+      });
+
+      expect(server.registerTool).toHaveBeenCalledWith(
+        "tool_a",
+        expect.objectContaining({
+          _meta: { category: "storage", tier: "free", version: "2.1.0", stability: "beta" },
+        }),
+        expect.any(Function),
+      );
+    });
+
+    it("exposes version and stability in getToolDefinitions", () => {
+      const server = createMockMcpServer();
+      const registry = new ToolRegistry(server, "user-1");
+
+      registry.register({
+        name: "tool_a",
+        description: "Tool A",
+        category: "storage",
+        tier: "free",
+        version: "0.5.0",
+        stability: "experimental",
+        handler: () => ({ content: [{ type: "text" as const, text: "a" }] }),
+      });
+
+      const defs = registry.getToolDefinitions();
+      expect(defs[0]!.version).toBe("0.5.0");
+      expect(defs[0]!.stability).toBe("experimental");
+    });
+
+    it("accepts all stability values", () => {
+      const server = createMockMcpServer();
+      const registry = new ToolRegistry(server, "user-1");
+      const stabilities: ToolStability[] = ["stable", "beta", "experimental"];
+
+      for (const stability of stabilities) {
+        registry.register({
+          name: `tool_${stability}`,
+          description: `Tool ${stability}`,
+          category: "test",
+          tier: "free",
+          stability,
+          handler: () => ({ content: [{ type: "text" as const, text: "ok" }] }),
+        });
+      }
+
+      const defs = registry.getToolDefinitions();
+      expect(defs).toHaveLength(3);
+      expect(defs.map(d => d.stability)).toEqual(stabilities);
+    });
+  });
+
+  describe("tool examples", () => {
+    it("registers tool with examples", () => {
+      const server = createMockMcpServer();
+      const registry = new ToolRegistry(server, "user-1");
+
+      const examples = [
+        { name: "basic usage", input: { query: "hello" }, description: "Simple search" },
+        { name: "advanced usage", input: { query: "hello", limit: 5 }, description: "Search with limit" },
+      ];
+
+      registry.register({
+        name: "search",
+        description: "Search tool",
+        category: "search",
+        tier: "free",
+        examples,
+        handler: () => ({ content: [{ type: "text" as const, text: "ok" }] }),
+      });
+
+      expect(server.registerTool).toHaveBeenCalledWith(
+        "search",
+        expect.objectContaining({ examples }),
+        expect.any(Function),
+      );
+    });
+
+    it("exposes examples in getToolDefinitions", () => {
+      const server = createMockMcpServer();
+      const registry = new ToolRegistry(server, "user-1");
+
+      const examples = [
+        { name: "example1", input: { file: "test.ts" }, description: "Read a file" },
+      ];
+
+      registry.register({
+        name: "read_file",
+        description: "Read a file",
+        category: "fs",
+        tier: "free",
+        examples,
+        handler: () => ({ content: [{ type: "text" as const, text: "ok" }] }),
+      });
+
+      const defs = registry.getToolDefinitions();
+      expect(defs[0]!.examples).toEqual(examples);
+    });
+
+    it("omits examples from _meta when not provided", () => {
+      const server = createMockMcpServer();
+      const registry = new ToolRegistry(server, "user-1");
+
+      registry.register({
+        name: "tool_a",
+        description: "Tool A",
+        category: "storage",
+        tier: "free",
+        handler: () => ({ content: [{ type: "text" as const, text: "a" }] }),
+      });
+
+      const call = (server.registerTool as ReturnType<typeof vi.fn>).mock.calls[0]!;
+      const config = call[1] as Record<string, unknown>;
+      expect(config).not.toHaveProperty("examples");
+    });
+
+    it("does not include examples in getToolDefinitions when not set", () => {
+      const server = createMockMcpServer();
+      const registry = new ToolRegistry(server, "user-1");
+
+      registry.register({
+        name: "tool_a",
+        description: "Tool A",
+        category: "storage",
+        tier: "free",
+        handler: () => ({ content: [{ type: "text" as const, text: "a" }] }),
+      });
+
+      const defs = registry.getToolDefinitions();
+      expect(defs[0]).not.toHaveProperty("examples");
+    });
   });
 });
