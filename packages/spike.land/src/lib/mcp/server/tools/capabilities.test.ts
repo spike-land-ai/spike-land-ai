@@ -191,7 +191,7 @@ describe("capabilities tools", () => {
         createdAt: new Date("2026-01-01"),
         agent: { displayName: "Agent A" },
       }]);
-            const result = await registry.call("capabilities_request_permissions", { status: "PENDING" });
+            const result = await registry.call("capabilities_list_queued_actions", { status: "PENDING" });
       const text = getText(result);
       expect(text).toContain("Permission Requests");
       expect(text).toContain("req-1");
@@ -200,7 +200,7 @@ describe("capabilities tools", () => {
 
     it("should handle empty list", async () => {
       mockPrisma.permissionRequest.findMany.mockResolvedValue([]);
-            const result = await registry.call("capabilities_request_permissions", { status: "PENDING" });
+            const result = await registry.call("capabilities_list_queued_actions", { status: "PENDING" });
       expect(getText(result)).toContain("No PENDING Requests");
     });
 
@@ -215,7 +215,7 @@ describe("capabilities tools", () => {
         createdAt: new Date("2026-01-02"),
         agent: { displayName: "Agent B" },
       }]);
-            const result = await registry.call("capabilities_request_permissions", { status: "DENIED" });
+            const result = await registry.call("capabilities_list_queued_actions", { status: "DENIED" });
       const text = getText(result);
       expect(text).toContain("Too risky");
       expect(text).toContain("DENIED");
