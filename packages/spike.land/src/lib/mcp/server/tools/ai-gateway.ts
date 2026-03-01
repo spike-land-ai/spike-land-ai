@@ -17,7 +17,7 @@ import {
     resolveProvider,
 } from "@/lib/ai/model-registry";
 import type { Prisma } from "@/generated/prisma";
-import { freeTool, workspaceTool } from "../tool-builder/procedures.js";
+import { freeTool, workspaceTool } from "../tool-builder/procedures";
 
 // --- Schemas ---
 // --- Admin helper (imported from tool-helpers) ---

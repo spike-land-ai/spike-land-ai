@@ -7,7 +7,7 @@
 import { z } from "zod";
 import type { ToolRegistry } from "../tool-registry";
 import { safeToolCall, textResult } from "./tool-helpers";
-import { freeTool } from "../tool-builder/procedures.js";
+import { freeTool } from "../tool-builder/procedures";
 
 const MODEL_MAP: Record<string, string> = {
     opus: "claude-4-6-opus",

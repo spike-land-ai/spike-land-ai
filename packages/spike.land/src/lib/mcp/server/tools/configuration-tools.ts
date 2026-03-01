@@ -11,7 +11,7 @@ import {
     requireAdminRole,
     textResult,
 } from "./tool-helpers";
-import { freeTool, workspaceTool } from "../tool-builder/procedures.js";
+import { freeTool, workspaceTool } from "../tool-builder/procedures";
 
 // ── Environment helpers ──
 

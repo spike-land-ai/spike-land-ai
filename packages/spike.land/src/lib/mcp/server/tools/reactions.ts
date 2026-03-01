@@ -7,7 +7,7 @@
 
 import { z } from "zod";
 import type { ToolRegistry } from "../tool-registry";
-import { freeTool } from "../tool-builder/procedures.js";
+import { freeTool } from "../tool-builder/procedures";
 
 export function registerReactionsTools(
     registry: ToolRegistry,

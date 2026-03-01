@@ -3,7 +3,7 @@ import { z } from "zod";
 import type { ToolRegistry } from "../tool-registry";
 import { safeToolCall, textResult } from "./tool-helpers";
 import path from "path";
-import { workspaceTool } from "../tool-builder/procedures.js";
+import { workspaceTool } from "../tool-builder/procedures";
 
 export function registerStorageTools(
     registry: ToolRegistry,

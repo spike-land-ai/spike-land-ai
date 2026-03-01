@@ -10,7 +10,7 @@ import type { CallToolResult } from "@modelcontextprotocol/sdk/types.js";
 import type { ToolRegistry } from "../tool-registry";
 import { isGitHubProjectsAvailable } from "@/lib/sync/clients/github-projects-client";
 import { createGitHubProjectsClient } from "@/lib/sync/create-sync-clients";
-import { workspaceTool } from "../tool-builder/procedures.js";
+import { workspaceTool } from "../tool-builder/procedures";
 
 // ========================================
 // Availability

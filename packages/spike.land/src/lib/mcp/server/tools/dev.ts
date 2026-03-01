@@ -17,7 +17,7 @@ import {
 } from "node:fs";
 import { execSync } from "node:child_process";
 import { join } from "node:path";
-import { freeTool } from "../tool-builder/procedures.js";
+import { freeTool } from "../tool-builder/procedures";
 
 const CATEGORY = "dev";
 const TIER = "free" as const;

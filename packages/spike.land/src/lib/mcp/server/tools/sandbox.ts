@@ -10,7 +10,7 @@ import type { CallToolResult } from "@modelcontextprotocol/sdk/types.js";
 import type { ToolRegistry } from "../tool-registry";
 import { textResult } from "./tool-helpers";
 import { randomUUID } from "node:crypto";
-import { freeTool } from "../tool-builder/procedures.js";
+import { freeTool } from "../tool-builder/procedures";
 
 interface ExecEntry {
     code: string;

@@ -10,7 +10,7 @@ import type { ToolRegistry } from "../tool-registry";
 import logger from "@/lib/logger";
 import { arenaGenerateFromPrompt } from "@/lib/arena/arena-generator";
 import { submitReview } from "@/lib/arena/review";
-import { freeTool } from "../tool-builder/procedures.js";
+import { freeTool } from "../tool-builder/procedures";
 
 export function registerArenaTools(
     registry: ToolRegistry,

@@ -91,16 +91,9 @@ const nextConfig: NextConfig = {
     "typescript",
     "webpack",
   ],
-  // Configure Turbopack for Yarn PnP compatibility
+  // Turbopack configuration
   turbopack: {
     root: __dirname,
-    resolveAlias: {
-      // Point to unplugged next package for PnP compatibility
-      next: path.resolve(
-        __dirname,
-        ".yarn/unplugged/next-virtual-425b36e32e/node_modules/next",
-      ),
-    },
   },
   // Transpile ESM packages to avoid runtime resolution issues with PnP
   transpilePackages: ["next-mdx-remote"],

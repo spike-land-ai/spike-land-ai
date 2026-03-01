@@ -8,7 +8,7 @@
 import { z } from "zod";
 import type { ToolRegistry } from "../tool-registry";
 import { textResult } from "./tool-helpers";
-import { freeTool, workspaceTool } from "../tool-builder/procedures.js";
+import { freeTool, workspaceTool } from "../tool-builder/procedures";
 
 export function registerAvlProfileTools(
     registry: ToolRegistry,

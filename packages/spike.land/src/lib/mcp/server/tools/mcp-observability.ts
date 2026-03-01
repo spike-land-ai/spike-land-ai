@@ -12,7 +12,7 @@ import {
     requireAdminRole,
     textResult,
 } from "./tool-helpers";
-import { workspaceTool } from "../tool-builder/procedures.js";
+import { workspaceTool } from "../tool-builder/procedures";
 
 interface ToolMetricRow {
     tool: string;

@@ -6,7 +6,7 @@
 
 import { z } from "zod";
 import type { ToolRegistry } from "../tool-registry";
-import { freeTool } from "../tool-builder/procedures.js";
+import { freeTool } from "../tool-builder/procedures";
 
 const JULES_BASE_URL = "https://jules.googleapis.com/v1alpha";
 const SESSION_ID_PATTERN = /^[a-zA-Z0-9_-]+$/;

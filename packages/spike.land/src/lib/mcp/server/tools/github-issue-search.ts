@@ -8,7 +8,7 @@
 import { z } from "zod";
 import type { ToolRegistry } from "../tool-registry";
 import { textResult } from "./tool-helpers";
-import { workspaceTool } from "../tool-builder/procedures.js";
+import { workspaceTool } from "../tool-builder/procedures";
 
 interface GitHubSearchItem {
     number: number;

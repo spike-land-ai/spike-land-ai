@@ -8,7 +8,7 @@ import { z } from "zod";
 import type { ToolRegistry } from "../tool-registry";
 import { textResult } from "./tool-helpers";
 import { logger } from "@/lib/logger";
-import { freeTool } from "../tool-builder/procedures.js";
+import { freeTool } from "../tool-builder/procedures";
 
 const MAX_CONTENT_LENGTH = 4000;
 

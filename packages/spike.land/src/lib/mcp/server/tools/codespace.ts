@@ -15,7 +15,7 @@ import {
 } from "@/lib/codespace/session-service";
 import { transpileCode } from "@/lib/codespace/transpile";
 import { SPIKE_LAND_BASE_URL } from "./tool-helpers";
-import { freeTool } from "../tool-builder/procedures.js";
+import { freeTool } from "../tool-builder/procedures";
 
 const COMPONENT_URL = process.env.SPIKE_LAND_COMPONENT_URL
     || "https://testing.spike.land";

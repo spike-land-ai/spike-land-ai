@@ -2,7 +2,7 @@ import { z } from "zod";
 import type { ToolRegistry } from "../tool-registry";
 import { BoxActionType, BoxStatus } from "@prisma/client";
 import { safeToolCall, textResult } from "./tool-helpers";
-import { workspaceTool } from "../tool-builder/procedures.js";
+import { workspaceTool } from "../tool-builder/procedures";
 
 export function registerBoxesTools(
     registry: ToolRegistry,

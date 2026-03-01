@@ -8,7 +8,7 @@ import { z } from "zod";
 import type { SkillCategory, SkillStatus } from "@/generated/prisma";
 import type { ToolRegistry } from "../tool-registry";
 import { textResult } from "./tool-helpers";
-import { freeTool } from "../tool-builder/procedures.js";
+import { freeTool } from "../tool-builder/procedures";
 
 const SKILL_CATEGORIES = [
     "QUALITY",

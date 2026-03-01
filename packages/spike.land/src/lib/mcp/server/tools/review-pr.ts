@@ -20,7 +20,7 @@
 import { z } from "zod";
 import type { ToolRegistry } from "../tool-registry";
 import { textResult } from "./tool-helpers";
-import { freeTool } from "../tool-builder/procedures.js";
+import { freeTool } from "../tool-builder/procedures";
 // ---------------------------------------------------------------------------
 // Inline helpers — no external services needed; logic runs in-process.
 // ---------------------------------------------------------------------------

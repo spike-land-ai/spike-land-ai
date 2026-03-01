@@ -1,7 +1,7 @@
 import { z } from "zod";
 import type { ToolRegistry } from "../tool-registry";
 import { textResult } from "./tool-helpers";
-import { freeTool } from "../tool-builder/procedures.js";
+import { freeTool } from "../tool-builder/procedures";
 
 // Re-export for test cleanup
 export { clearTopologies } from "@/lib/netsim/engine";

@@ -8,7 +8,7 @@ import { z } from "zod";
 import type { ToolRegistry } from "../tool-registry";
 import type { ToolModuleExport } from "../tool-discovery";
 import { textResult } from "./tool-helpers";
-import { freeTool } from "../tool-builder/procedures.js";
+import { freeTool } from "../tool-builder/procedures";
 
 export function registerBillingTools(
     registry: ToolRegistry,

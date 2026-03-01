@@ -10,7 +10,7 @@ import { z } from "zod";
 import type { ToolRegistry } from "../tool-registry";
 import { requireAdminRole, textResult } from "./tool-helpers";
 import { McpError, McpErrorCode } from "../../errors";
-import { workspaceTool } from "../tool-builder/procedures.js";
+import { workspaceTool } from "../tool-builder/procedures";
 
 export function registerSwarmTools(
     registry: ToolRegistry,

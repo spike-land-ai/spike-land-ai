@@ -9,7 +9,7 @@ import { z } from "zod";
 import type { ToolRegistry } from "../tool-registry";
 import { textResult } from "./tool-helpers";
 import { randomUUID } from "node:crypto";
-import { freeTool } from "../tool-builder/procedures.js";
+import { freeTool } from "../tool-builder/procedures";
 
 interface Decision {
     id: string;

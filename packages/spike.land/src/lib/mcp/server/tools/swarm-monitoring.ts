@@ -8,7 +8,7 @@
 import { z } from "zod";
 import type { ToolRegistry } from "../tool-registry";
 import { requireAdminRole, textResult } from "./tool-helpers";
-import { freeTool } from "../tool-builder/procedures.js";
+import { freeTool } from "../tool-builder/procedures";
 
 function periodToMs(period: string): number {
     const map: Record<string, number> = {

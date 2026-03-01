@@ -8,7 +8,7 @@
 import { z } from "zod";
 import type { ToolRegistry } from "../tool-registry";
 import { saveEnabledCategories } from "../category-persistence";
-import { freeTool } from "../tool-builder/procedures.js";
+import { freeTool } from "../tool-builder/procedures";
 
 export function registerGatewayMetaTools(
     registry: ToolRegistry,

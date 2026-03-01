@@ -5,7 +5,7 @@ import {
     McpRegistryInstallSchema,
     McpRegistrySearchSchema,
 } from "@/lib/mcp/schemas";
-import { freeTool } from "../tool-builder/procedures.js";
+import { freeTool } from "../tool-builder/procedures";
 
 export function registerMcpRegistryTools(
     registry: ToolRegistry,

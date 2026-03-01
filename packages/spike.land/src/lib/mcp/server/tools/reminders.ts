@@ -3,7 +3,7 @@ import type { ToolRegistry } from "../tool-registry";
 import type { ToolModuleExport } from "../tool-discovery";
 import { resolveWorkspace, textResult } from "./tool-helpers";
 import { type ReminderType } from "@prisma/client";
-import { workspaceTool } from "../tool-builder/procedures.js";
+import { workspaceTool } from "../tool-builder/procedures";
 
 export function registerRemindersTools(
     registry: ToolRegistry,
