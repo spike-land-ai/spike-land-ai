@@ -30,7 +30,7 @@
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
-    "@spike-land-ai/tsconfig": "workspace:*",
+    "@spike-land-ai/tsconfig": "*",
     "typescript": "5.9.3"
   },
   "peerDependencies": {

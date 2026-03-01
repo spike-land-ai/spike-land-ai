@@ -20,8 +20,8 @@
     },
     "devDependencies": {
         "@cloudflare/workers-types": "^4.20250224.0",
-        "@spike-land-ai/eslint-config": "workspace:*",
-        "@spike-land-ai/tsconfig": "workspace:*",
+        "@spike-land-ai/eslint-config": "*",
+        "@spike-land-ai/tsconfig": "*",
         "drizzle-kit": "^0.30.5",
         "typescript": "^5.0.0",
         "vitest": "^2.0.0",

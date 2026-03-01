@@ -20,8 +20,8 @@
     "test:coverage": "vitest run --coverage"
   },
   "devDependencies": {
-    "@spike-land-ai/eslint-config": "workspace:*",
-    "@spike-land-ai/tsconfig": "workspace:*",
+    "@spike-land-ai/eslint-config": "*",
+    "@spike-land-ai/tsconfig": "*",
     "@types/node": "25.3.2",
     "@vitest/coverage-v8": "4.0.18",
     "typescript": "5.9.3",
