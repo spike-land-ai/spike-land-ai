@@ -1,0 +1,21 @@
+name = "spike-edge"
+main = "src/index.ts"
+compatibility_date = "2025-01-01"
+compatibility_flags = ["nodejs_compat"]
+
+[[r2_buckets]]
+binding = "R2"
+bucket_name = "spike-platform"
+
+[[r2_buckets]]
+binding = "SPA_ASSETS"
+bucket_name = "spike-app-assets"
+
+[durable_objects]
+bindings = [
+  { name = "LIMITERS", class_name = "RateLimiter" }
+]
+
+[[migrations]]
+tag = "v1"
+new_classes = ["RateLimiter"]
