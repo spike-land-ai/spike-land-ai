@@ -1,0 +1,172 @@
+---
+title: "The Database for Agents: How SpacetimeDB Replaced My Entire Backend in a Weekend"
+slug: "the-database-for-agents"
+description: "Last week I solved tool composition. This week I found the database that makes agent coordination a primitive, not a feature. Here's why SpacetimeDB changes everything."
+date: "2026-03-02"
+author: "Zoltan Erdos"
+category: "Developer Experience"
+tags: ["spacetimedb", "mcp", "ai", "agents", "architecture", "real-time", "database"]
+featured: true
+---
+
+![The Database for Agents: SpacetimeDB replaces the entire backend stack — agents subscribe, tools register, tasks flow](/blog/the-database-for-agents/hero.jpeg)
+
+<Callout type="info">
+**TL;DR**
+
+- Traditional backends (PostgreSQL + Prisma + Redis + NextAuth) are designed for human request-response, not for 50 agents subscribing to state changes in real time
+- SpacetimeDB 2.0 collapses the entire stack: tables = schema, reducers = API, `ctx.sender` = auth, subscriptions = real-time
+- Agent coordination (messaging, task queues, tool discovery) becomes 4 tables instead of 4 services
+- Auto-generated TypeScript bindings eliminate schema drift — the module IS the single source of truth
+- One `spacetime publish` deploys what used to require PostgreSQL + Redis + Express + NextAuth + a message bus
+</Callout>
+
+## The Sequel
+
+[Last week I solved tool composition.](/blog/the-architecture-of-scale-building-tools) An immutable, type-safe builder so agents could write their own MCP tools. Middleware stacks. Phantom-branded context types. Zero casts. The whole thing.
+
+But tools need data. Data needs a backbone. And the backbone was still PostgreSQL + Prisma + Redis + NextAuth — a stack designed for request-response, not for 50 agents subscribing to state changes in real time.
+
+The tool-builder gave agents the ability to compose. What it did not give them was the ability to coordinate. An agent could write a tool, but it could not discover another agent's tools. It could not subscribe to task updates. It could not send a message to another agent and get a response without polling a REST endpoint every two seconds.
+
+I had solved composition. I had not solved coordination. Then I found SpacetimeDB.
+
+## The Old Stack and Its Friction
+
+The spike.land platform was built on a stack that would be familiar to anyone who has shipped a Next.js application:
+
+```
+Client → Next.js API Routes → NextAuth Middleware → Prisma ORM → PostgreSQL
+                                                  → Redis (cache + pub/sub)
+                                                  → Stripe (payments)
+```
+
+~520 routes. ~383 API endpoints. 120+ MCP tool files. It worked. It scaled. It had all the problems that every mature Next.js application has.
+
+**Schema drift.** Prisma migrations are a ceremony. The schema lives in `schema.prisma`. The types live in `@prisma/client`. The validation lives in Zod schemas scattered across route handlers. Every schema change touches three places. Miss one and you get a runtime error that the compiler blessed.
+
+**Polling hell.** When an agent wants to know if a new task is available, it calls `GET /api/tasks?status=pending`. When 50 agents want to know, that is 25 requests per second doing nothing useful. Redis pub/sub helps, but now you have two data models: the authoritative one in PostgreSQL and the notification one in Redis. They drift. They always drift.
+
+**Auth ceremony.** NextAuth gives you session tokens, JWT refresh, middleware chains. Every MCP tool needs to verify the caller. That is 120+ tools, each importing the same auth middleware, each checking sessions, each handling the edge case where the token expired between the check and the database call. The auth logic is correct. It is also everywhere.
+
+**No coordination primitive.** Agents can call tools. Agents cannot talk to each other. There is no agent registry. No task queue built into the data model. No message bus that is also the database. Redis pub/sub is a bolt-on. SQS is a bolt-on. Every coordination mechanism is a separate service that needs its own deployment, monitoring, and failure handling.
+
+I had been migrating away from this stack for weeks. spike-app for the frontend. spike-edge for the edge API. mcp-auth for authentication. spike-land-mcp for the MCP registry. Twelve new packages. The migration was underway. But each new package still needed to talk to the others, and the coordination layer was still missing.
+
+## What SpacetimeDB Actually Is
+
+SpacetimeDB is a database that runs your code inside it.
+
+Not "a database with stored procedures." Not "a database with an ORM." A database where you write a module in Rust (or C#), define tables and functions, publish the module, and the database becomes your entire backend. No separate app server. No separate API layer. No separate auth service.
+
+Here is the mental model:
+
+- **Tables** are your schema. You define them in the module. They hold your data. SpacetimeDB has 17 of them in the platform module: `User`, `Agent`, `RegisteredTool`, `McpTask`, `AgentMessage`, `App`, `Page`, `DirectMessage`, and nine more covering the full domain.
+
+- **Reducers** are your API. A reducer is a function that takes a context and arguments, reads and writes tables, and runs inside a transaction. SpacetimeDB has 31 reducers in the platform module: `register_user`, `create_app`, `send_agent_message`, `claim_mcp_task`, `invoke_tool_request`, and twenty-six more. Each one is a typed endpoint. No route definition. No controller. No middleware chain.
+
+- **`ctx.sender`** is your auth. Every reducer receives a `ReducerContext` that includes the caller's `Identity` — a cryptographic identifier derived from the client's connection. You do not check a session token. You do not verify a JWT. You read `ctx.sender` and you know who called you. The identity is the auth primitive.
+
+- **Subscriptions** are your real-time layer. A client subscribes to a SQL query. When the data matching that query changes, SpacetimeDB pushes the delta. Not the whole result set — the delta. Agents subscribe to `SELECT * FROM mcp_task WHERE status = 'pending'` and get notified the instant a new task appears. No polling. No WebSocket plumbing. No Redis pub/sub.
+
+- **Auto-generated bindings** are your types. Run `spacetime generate --lang=typescript` and you get a complete TypeScript client with typed table accessors and typed reducer callers. No Prisma client. No hand-written types. No drift. The bindings are generated from the module, and the module is the source of truth.
+
+The before and after:
+
+| Old Stack | SpacetimeDB Equivalent |
+|-----------|----------------------|
+| Prisma schema + migration | Table definition in module |
+| Express/Hono route handler | Reducer |
+| NextAuth session + JWT | `ctx.sender` (Identity) |
+| Redis pub/sub | Subscription queries |
+| REST API types (manual) | Auto-generated TypeScript bindings |
+| Database + App Server + Auth | One deployed module |
+
+One publish. One binary. One source of truth.
+
+## Schema = API = Auth
+
+This is the section where the thesis becomes concrete.
+
+When you define a `User` table with `identity` as the primary key, you have defined the auth model. Any reducer that reads `ctx.sender` and looks up the `User` table knows who is calling. There are no sessions to manage. No tokens to refresh. No middleware to chain. The database row IS the user. The connection identity IS the credential.
+
+When you define a `register_user` reducer that inserts into the `User` table, you have defined the API endpoint. The reducer validates its arguments (they are typed). It checks `ctx.sender` to see if the user already exists. It inserts the row. It is transactional by default — if anything fails, the write rolls back. No REST route. No controller. No ORM query builder. No try/catch around a Prisma call that might throw a constraint violation.
+
+When you run `spacetime generate --lang=typescript`, you get bindings that look like this conceptually: a `User` class with typed fields, a `registerUser()` function that takes typed arguments, and event callbacks that fire when rows change. The client code is generated from the module. If the module changes, the bindings change. If the bindings change, the TypeScript compiler catches every call site that needs updating. Zero drift. Zero manual synchronization.
+
+The old stack had three sources of truth: the Prisma schema (what the database looks like), the TypeScript types (what the code thinks the database looks like), and the Zod schemas (what the API validates). Keeping them in sync was a job. A boring, error-prone, never-quite-done job.
+
+SpacetimeDB has one source of truth: the module. Everything else is derived. That is not an incremental improvement. That is an entire category of bugs that ceases to exist.
+
+## Agent Coordination as a Primitive
+
+This is where SpacetimeDB stops being a "better database" and becomes "the database for agents."
+
+**The Agent table.** Agents register themselves with capabilities, model type, and status. When an agent connects to SpacetimeDB, the `client_connected` lifecycle hook fires and sets the agent online. When the connection drops, `client_disconnected` sets it offline. No heartbeat polling. No health check endpoint. The database knows who is connected because the database IS the connection layer.
+
+**The AgentMessage table.** Point-to-point messaging between agents. Agent A calls the `send_agent_message` reducer with a recipient identity and a payload. The message is written to the table. Agent B, subscribed to messages where `recipient = self`, gets the delta pushed instantly. No external message bus. No Redis pub/sub. No SQS. The database IS the message bus.
+
+**The McpTask table.** A task queue with claim/complete workflow. An orchestrator calls `invoke_tool_request` with a tool name and arguments. The reducer creates an `McpTask` with status `pending`. Any agent subscribed to pending tasks sees it appear. The first agent to call `claim_mcp_task` wins — the reducer checks the status atomically and transitions it to `in_progress`. When done, `complete_mcp_task` writes the result. The whole workflow is four reducers and one table. No Redis-backed job queue. No Celery. No SQS. No dead letter queue configuration.
+
+**The RegisteredTool table.** Agents register their tools in the database. Other agents query the table to discover what tools exist, who provides them, and what arguments they take. Tool discovery is a subscription. When a new agent comes online and registers its tools, every other agent subscribed to the `RegisteredTool` table sees them appear in real time.
+
+Compare this to the old architecture. Agent messaging needed Redis pub/sub — a separate service with its own deployment, monitoring, and failure modes. Task queuing needed SQS or a Redis-backed job queue — another service. Tool discovery needed a custom registry backed by PostgreSQL — another set of API endpoints. That is three services with three failure domains to replace what SpacetimeDB does with three tables in one module.
+
+The SpacetimeServerTransport pattern makes this even more powerful. Any MCP server can connect to SpacetimeDB and become part of the agent swarm. Its tools auto-register in the `RegisteredTool` table. Incoming tasks auto-route through the `McpTask` table. The server does not need to know about the swarm. It just connects, and the database handles the rest.
+
+## The Migration Math
+
+What we deleted:
+- PostgreSQL as the primary datastore for agent coordination
+- Prisma as the ORM and migration tool
+- Redis as the cache, pub/sub, and job queue
+- NextAuth session management for agent-to-agent auth
+- Dozens of REST API routes that existed solely to bridge agents to data
+
+What we deployed:
+- `spacetimedb-platform` — 17 tables, 31 reducers, one `spacetime publish`
+- `spacetimedb-mcp` — 3 more tables, 8 more reducers, agent coordination focused
+
+What the new stack looks like:
+- **spacetimedb-platform** — the data backbone (one module, one deploy)
+- **spike-edge** — edge API for external clients (Cloudflare Workers + Hono)
+- **spike-app** — frontend SPA (Vite + TanStack Router)
+- **mcp-auth** — authentication for external users (Better Auth on CF Workers)
+- **spike-land-mcp** — MCP registry with 80+ tools (CF Workers + D1)
+
+The old spike.land: one monolithic Next.js application with ~520 routes and ~383 API endpoints, doing everything from serving pages to managing agent tasks to processing payments.
+
+The new stack: 27 packages. But the complexity went down, not up. Each package does one thing. The platform module replaced what used to be scattered across Prisma migrations, Express routes, Redis scripts, and NextAuth callbacks. Infrastructure packages replaced ceremony packages.
+
+## Why This Is a Game Changer
+
+Remember the five-year spike from [yesterday's article](/blog/the-architecture-of-scale-building-tools)? The compound interest keeps paying.
+
+Strict TypeScript everywhere meant the auto-generated SpacetimeDB bindings worked out of the box. No `any` types to accommodate. No loose interfaces to bridge. The bindings dropped in and the compiler verified every call site.
+
+Zod schemas for every MCP tool meant the validation patterns mapped directly to SpacetimeDB reducers. A Zod schema that validates tool input is structurally identical to a reducer's typed arguments. The mental model transfers perfectly.
+
+Dependency injection instead of direct imports meant swapping the Prisma client for SpacetimeDB bindings was a configuration change, not a rewrite. The tools did not care where the data came from. They cared about the interface. The interface stayed the same. The implementation changed.
+
+And the tool-builder from last week? Agents can now write tools that talk to SpacetimeDB directly. The middleware resolves entities from SpacetimeDB tables instead of Prisma queries. The handler calls reducers instead of REST endpoints. The types flow through the same phantom-branded chain. The pattern is identical. The backend is fundamentally different.
+
+What this unlocks:
+
+- Agents coordinate in real time. Subscriptions push state changes. No polling. No webhooks. No "check back in two seconds."
+- Any MCP server becomes part of the swarm with one transport change. Connect to SpacetimeDB, auto-register tools, start receiving tasks.
+- The database IS the coordination layer. No glue code between the datastore and the message bus and the task queue. They are the same system.
+- Schema changes propagate to all clients automatically. Regenerate bindings. Recompile. The compiler tells you what broke.
+
+## Closing
+
+I built the tool composition layer so agents could write their own tools. Then I found the database that makes agent coordination a primitive, not a feature. The two together mean agents do not just write tools — they coordinate, discover each other's capabilities, and route tasks in real time.
+
+Five years of spiking on ESM, TypeScript, and build pipelines. Strict types. Pure functions. Dependency injection. Zod everywhere. None of it was wasted. Every decision that seemed like an over-investment in correctness turned out to be an under-investment in flexibility. When the right database appeared, the codebase was ready for it.
+
+The pattern is clear now. The best infrastructure is the kind that disappears. The best ORM is no ORM. The best auth middleware is no middleware. The best message bus is the database itself.
+
+The best database for agents is one where the agents are the schema.
+
+---
+
+*Zoltan Erdos is a developer based in Brighton, UK, building [spike.land](https://spike.land). He has been spiking on ESM, TypeScript, and build pipelines for five years. He still thinks the best architecture is the one you can delete and rebuild in a day.*
