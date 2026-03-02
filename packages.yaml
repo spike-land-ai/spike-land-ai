@@ -1,0 +1,391 @@
+# spike-land-ai Central Package Manifest
+# All packages except spike.land (legacy, stays in packages/)
+# Used by MCP tools for build, publish, deploy, and mirror operations.
+
+defaults:
+  scope: "@spike-land-ai"
+  registry: https://npm.pkg.github.com
+  license: MIT
+  type: module
+
+packages:
+  # ─── Shared Config ──────────────────────────────────────────────────────────
+  eslint-config:
+    kind: config
+    version: 3.0.0
+    description: Shared ESLint flat config for @spike-land-ai packages
+    entry: index.mjs
+    exports:
+      ".": ./index.mjs
+      "./react": ./react.mjs
+    publish:
+      registries: [github, npm]
+    mirror: spike-land-ai/eslint-config
+
+  tsconfig:
+    kind: config
+    version: 3.0.0
+    description: Shared TypeScript config presets
+    exports:
+      "./tsconfig.base.json": ./tsconfig.base.json
+      "./tsconfig.mcp.json": ./tsconfig.mcp.json
+      "./tsconfig.bundler.json": ./tsconfig.bundler.json
+      "./tsconfig.worker.json": ./tsconfig.worker.json
+    publish:
+      registries: [github, npm]
+    mirror: spike-land-ai/tsconfig
+
+  # ─── Libraries ──────────────────────────────────────────────────────────────
+  shared:
+    kind: library
+    version: 2.0.0
+    description: Shared types, validations, constants, utilities
+    entry: index.ts
+    exports:
+      ".": ./index.ts
+      "./types": ./types/index.ts
+      "./constants": ./constants/index.ts
+      "./utils": ./utils/index.ts
+      "./validators": ./validators/index.ts
+      "./schemas": ./schemas/index.ts
+    publish:
+      registries: [github, npm]
+    mirror: spike-land-ai/shared
+
+  mcp-server-base:
+    kind: library
+    version: 1.0.0
+    description: Shared base utilities for MCP servers
+    entry: index.ts
+    deps: []
+    publish:
+      registries: [github]
+    mirror: spike-land-ai/mcp-server-base
+
+  esbuild-wasm:
+    kind: library
+    version: 0.27.4
+    description: Cross-platform WebAssembly binary for esbuild
+    entry: lib/main.js
+    type: commonjs
+    publish:
+      registries: [github, npm]
+    mirror: spike-land-ai/esbuild-wasm
+
+  react-ts-worker:
+    kind: library
+    version: 1.0.0
+    description: From-scratch React (Fiber reconciler, scheduler, multi-target rendering)
+    entry: react/index.ts
+    exports:
+      ".": ./react/index.ts
+      "./jsx-runtime": ./react/jsx-runtime.ts
+      "./jsx-dev-runtime": ./react/jsx-dev-runtime.ts
+      "./react-dom": ./react-dom/index.ts
+      "./react-dom/client": ./react-dom/client.ts
+      "./react-dom/server": ./react-dom/server.ts
+      "./scheduler": ./scheduler/index.ts
+    publish:
+      registries: [github, npm]
+    mirror: spike-land-ai/react-ts-worker
+
+  spacetimedb-platform:
+    kind: library
+    version: 1.0.0
+    description: SpacetimeDB platform module (14 tables, 30+ reducers)
+    entry: index.ts
+    publish:
+      registries: [github]
+    mirror: spike-land-ai/spacetimedb-platform
+
+  # ─── MCP Servers ────────────────────────────────────────────────────────────
+  bazdmeg-mcp:
+    kind: mcp-server
+    version: 1.0.0
+    description: BAZDMEG MCP server — workspace isolation, quality gates, monorepo tools
+    entry: index.ts
+    bin: index.js
+    deps: [mcp-server-base]
+    publish:
+      registries: [github]
+
+  esbuild-wasm-mcp:
+    kind: mcp-server
+    version: 1.0.0
+    description: MCP server wrapping esbuild-wasm
+    entry: index.ts
+    bin: index.js
+    deps: [esbuild-wasm, mcp-server-base]
+    publish:
+      registries: [github]
+    mirror: spike-land-ai/esbuild-wasm-mcp
+
+  hackernews-mcp:
+    kind: mcp-server
+    version: 1.0.0
+    description: MCP server for HackerNews read/write
+    entry: index.ts
+    bin: index.js
+    deps: [mcp-server-base]
+    publish:
+      registries: [github]
+    mirror: spike-land-ai/hackernews-mcp
+
+  mcp-image-studio:
+    kind: mcp-server
+    version: 2.0.0
+    description: AI image generation, enhancement, albums & pipelines
+    entry: index.ts
+    bin: cli-server.js
+    deps: [mcp-server-base, shared, spacetimedb-platform]
+    publish:
+      registries: [github]
+    mirror: spike-land-ai/mcp-image-studio
+
+  openclaw-mcp:
+    kind: mcp-server
+    version: 1.0.0
+    description: MCP bridge for OpenClaw gateway
+    entry: index.ts
+    bin: cli.js
+    publish:
+      registries: [github]
+    mirror: spike-land-ai/openclaw-mcp
+
+  spacetimedb-mcp:
+    kind: mcp-server
+    version: 1.0.0
+    description: MCP server for SpacetimeDB agent coordination
+    entry: index.ts
+    bin: index.js
+    deps: [mcp-server-base]
+    publish:
+      registries: [github]
+
+  spike-review:
+    kind: mcp-server
+    version: 1.0.0
+    description: AI code review bot with GitHub integration (BAZDMEG gates)
+    entry: index.ts
+    bin: cli.js
+    exports:
+      ".": ./index.ts
+      "./worker": ./worker/index.ts
+    publish:
+      registries: [github]
+    mirror: spike-land-ai/spike-review
+    worker:
+      name: spike-review
+      entry: worker/index.ts
+      compatibility_date: "2025-07-12"
+      compatibility_flags: [nodejs_compat]
+
+  # ─── CLIs ───────────────────────────────────────────────────────────────────
+  spike-cli:
+    kind: cli
+    version: 1.0.0
+    description: MCP multiplexer CLI with Claude chat integration
+    entry: index.ts
+    bin: index.js
+    binName: spike
+    deps: [spacetimedb-platform]
+    publish:
+      registries: [github]
+    mirror: spike-land-ai/spike-cli
+
+  vibe-dev:
+    kind: cli
+    version: 1.0.0
+    description: Docker-based dev workflow tool
+    entry: cli.ts
+    bin: cli.js
+    binName: vibe-dev
+    publish:
+      registries: [github]
+    mirror: spike-land-ai/vibe-dev
+
+  # ─── Domain Packages ────────────────────────────────────────────────────────
+  chess-engine:
+    kind: library
+    version: 1.0.0
+    description: Chess engine with ELO, game/player/challenge managers
+    entry: index.ts
+    publish:
+      registries: [github]
+
+  qa-studio:
+    kind: library
+    version: 1.0.0
+    description: QA Studio browser automation (Playwright)
+    entry: index.ts
+    publish:
+      registries: [github]
+
+  state-machine:
+    kind: library
+    version: 1.0.0
+    description: Statechart engine with guard expression parser
+    entry: index.ts
+    bin: cli.js
+    binName: state-machine-cli
+    exports:
+      ".": ./index.ts
+      "./persistence": ./persistence/index.ts
+    publish:
+      registries: [github]
+
+  # ─── Cloudflare Workers ─────────────────────────────────────────────────────
+  spike-edge:
+    kind: worker
+    version: 1.0.0
+    description: Edge API service (Cloudflare Workers + Hono)
+    entry: index.ts
+    worker:
+      name: spike-edge
+      compatibility_date: "2025-01-01"
+      compatibility_flags: [nodejs_compat]
+      r2_buckets:
+        - binding: R2
+          bucket_name: spike-platform
+        - binding: SPA_ASSETS
+          bucket_name: spike-app-assets
+      durable_objects:
+        - name: LIMITERS
+          class_name: RateLimiter
+      routes:
+        - pattern: edge.spike.land
+          custom_domain: true
+
+  spike-land-backend:
+    kind: worker
+    version: 1.0.0
+    description: Main backend (Durable Objects, Hono, real-time collaboration)
+    entry: cf-workers.ts
+    deps: [code, esbuild-wasm, esbuild-wasm-mcp]
+    worker:
+      name: spike-land
+      compatibility_date: "2025-07-12"
+      compatibility_flags: [nodejs_compat]
+      kv_namespaces:
+        - binding: KV
+          id: e05276b573af4afd905bc6ac1ed371d5
+          preview_id: 9db106837d4d437a962612dd04197581
+      durable_objects:
+        - name: CODE
+          class_name: Code
+        - name: LIMITERS
+          class_name: CodeRateLimiter
+      r2_buckets:
+        - binding: R2
+          bucket_name: npmprod
+        - binding: X9
+          bucket_name: code-chain
+      site:
+        bucket: node_modules/@spike-land-ai/code/dist
+
+  transpile:
+    kind: worker
+    version: 1.0.0
+    description: On-demand JS/TS transpilation via esbuild-wasm
+    entry: index.ts
+    deps: [code, esbuild-wasm]
+    worker:
+      name: esbuild
+      compatibility_date: "2024-12-01"
+      compatibility_flags: [nodejs_compat]
+      rules:
+        - type: CompiledWasm
+          globs: ["**/*.wasm"]
+
+  spike-land-mcp:
+    kind: worker
+    version: 1.0.0
+    description: MCP registry with 80+ tools (Cloudflare Workers + D1)
+    entry: index.ts
+    deps: [mcp-server-base, shared]
+    worker:
+      name: spike-land-mcp
+      compatibility_date: "2025-07-12"
+      compatibility_flags: [nodejs_compat]
+      kv_namespaces:
+        - binding: KV
+          id: adf12f5b631b445086eb029abae41b24
+      d1_databases:
+        - binding: DB
+          database_name: spike-land-mcp
+          database_id: 52b72b0a-c0f8-4d7f-aaec-4f014594d0c1
+          migrations_dir: db/migrations
+      routes:
+        - pattern: "mcp.spike.land/*"
+          zone_name: spike.land
+
+  mcp-auth:
+    kind: worker
+    version: 2.0.0
+    description: Auth MCP server (Better Auth on Cloudflare Workers + Drizzle)
+    entry: index.ts
+    worker:
+      name: mcp-auth
+      compatibility_date: "2025-02-28"
+      compatibility_flags: [nodejs_compat]
+      d1_databases:
+        - binding: AUTH_DB
+          database_name: spike-auth-production
+          database_id: fbe3ebd5-7d2d-4861-bd8c-fa090dff6c30
+      r2_buckets:
+        - binding: AUTH_R2
+          bucket_name: spike-auth-assets
+      routes:
+        - pattern: auth-mcp.spike.land
+          custom_domain: true
+
+  spike-db:
+    kind: worker
+    version: 1.0.0
+    description: Cloudflare Workers Durable Objects SQLite database
+    entry: worker/index.ts
+    worker:
+      name: spike-db
+      compatibility_date: "2025-01-01"
+      compatibility_flags: [nodejs_compat]
+      durable_objects:
+        - name: SPIKE_DATABASE
+          class_name: SpikeDatabase
+          sqlite: true
+
+  code:
+    kind: browser
+    version: 1.0.0
+    description: Monaco Editor-based code editor with live preview
+    entry: modules.ts
+    deps: [esbuild-wasm, spacetimedb-platform, esbuild-wasm-mcp]
+    publish:
+      registries: [github]
+    mirror: spike-land-ai/code
+    worker:
+      name: spike-land-frontend
+      entry: worker.ts
+      compatibility_date: "2025-11-11"
+      assets:
+        directory: ./dist-vite/client
+        not_found_handling: single-page-application
+      routes:
+        - pattern: testing.spike.land
+          custom_domain: true
+
+  # ─── Apps ───────────────────────────────────────────────────────────────────
+  spike-app:
+    kind: browser
+    version: 1.0.0
+    description: Frontend SPA (Vite + TanStack Router)
+    entry: main.tsx
+    private: true
+    vite: true
+
+  # ─── Media ──────────────────────────────────────────────────────────────────
+  video:
+    kind: browser
+    version: 2.0.0
+    description: Educational video compositions (Remotion)
+    entry: index.ts
+    private: true

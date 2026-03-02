@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flory's Analog Watch</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: radial-gradient(ellipse at center, #1a1a2e, #0a0a15);
+            font-family: 'Georgia', serif;
+        }
+
+        .watch-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 30px;
+        }
+
+        .watch {
+            position: relative;
+            width: 350px;
+            height: 350px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, #f5f5f0, #e8e4d8, #d4cfc0);
+            box-shadow: 0 0 0 12px #2c2c2c, 0 0 0 16px #c9a96e, 0 0 0 20px #2c2c2c, 0 20px 60px rgba(0, 0, 0, 0.6), inset 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .watch-brand {
+            position: absolute;
+            top: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 18px;
+            font-weight: bold;
+            color: #2c2c2c;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+        }
+
+        .watch-sub {
+            position: absolute;
+            top: 105px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 10px;
+            color: #888;
+            letter-spacing: 2px;
+        }
+
+        .hour-number {
+            position: absolute;
+            font-size: 22px;
+            font-weight: bold;
+            color: #2c2c2c;
+            transform: translate(-50%, -50%);
+        }
+
+        .hand {
+            position: absolute;
+            bottom: 50%;
+            left: 50%;
+            transform-origin: bottom center;
+            border-radius: 4px;
+        }
+
+        .hour-hand {
+            width: 6px;
+            height: 80px;
+            background: linear-gradient(to top, #2c2c2c, #444);
+            margin-left: -3px;
+            z-index: 3;
+        }
+
+        .minute-hand {
+            width: 4px;
+            height: 110px;
+            background: linear-gradient(to top, #2c2c2c, #555);
+            margin-left: -2px;
+            z-index: 4;
+        }
+
+        .second-hand {
+            width: 2px;
+            height: 125px;
+            background: #c0392b;
+            margin-left: -1px;
+            z-index: 5;
+        }
+
+        .second-hand::after {
+            content: '';
+            position: absolute;
+            bottom: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 2px;
+            height: 30px;
+            background: #c0392b;
+        }
+
+        .center-dot {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 14px;
+            height: 14px;
+            background: radial-gradient(circle, #c0392b, #8b0000);
+            border-radius: 50%;
+            z-index: 6;
+        }
+
+        .center-dot-inner {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 6px;
+            height: 6px;
+            background: #fff;
+            border-radius: 50%;
+            z-index: 7;
+        }
+
+        .date-window {
+            position: absolute;
+            top: 50%;
+            right: 45px;
+            transform: translateY(-50%);
+            width: 36px;
+            height: 24px;
+            background: #fff;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            font-weight: bold;
+            color: #2c2c2c;
+            z-index: 2;
+        }
+
+        .digital-time {
+            color: #c9a96e;
+            font-size: 14px;
+            letter-spacing: 3px;
+        }
+
+        .tick {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            width: 2px;
+            height: 100%;
+            transform-origin: center center;
+        }
+
+        .tick::before {
+            content: '';
+            position: absolute;
+            top: 12px;
+            left: 0;
+            width: 2px;
+            height: 12px;
+            background: #2c2c2c;
+        }
+
+        .tick.major::before {
+            width: 3px;
+            height: 20px;
+            top: 10px;
+            left: -0.5px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="watch-container">
+        <div class="watch" id="watch">
+            <div class="watch-brand">FLORY</div>
+            <div class="watch-sub">LONDON</div>
+            <div class="date-window" id="dateWindow"></div>
+            <div class="hand hour-hand" id="hourHand"></div>
+            <div class="hand minute-hand" id="minuteHand"></div>
+            <div class="hand second-hand" id="secondHand"></div>
+            <div class="center-dot"></div>
+            <div class="center-dot-inner"></div>
+        </div>
+        <div class="digital-time" id="digitalTime"></div>
+    </div>
+    <script>
+        var watch = document.getElementById('watch');
+        for (var i = 0; i < 60; i++) {
+            var tick = document.createElement('div');
+            tick.className = i % 5 === 0 ? 'tick major' : 'tick';
+            tick.style.transform = 'rotate(' + (i * 6) + 'deg)';
+            watch.appendChild(tick);
+        }
+        [12, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].forEach(function (num, i) {
+            var angle = (i * 30 - 90) * (Math.PI / 180);
+            var span = document.createElement('span');
+            span.className = 'hour-number';
+            span.textContent = num;
+            span.style.left = (175 + 130 * Math.cos(angle)) + 'px';
+            span.style.top = (175 + 130 * Math.sin(angle)) + 'px';
+            watch.appendChild(span);
+        });
+        function updateClock() {
+            var now = new Date();
+            var s = now.getSeconds() + now.getMilliseconds() / 1000;
+            var m = now.getMinutes() + s / 60;
+            var h = (now.getHours() % 12) + m / 60;
+            document.getElementById('secondHand').style.transform = 'rotate(' + (s * 6) + 'deg)';
+            document.getElementById('minuteHand').style.transform = 'rotate(' + (m * 6) + 'deg)';
+            document.getElementById('hourHand').style.transform = 'rotate(' + (h * 30) + 'deg)';
+            document.getElementById('dateWindow').textContent = now.getDate();
+            document.getElementById('digitalTime').textContent =
+                String(now.getHours()).padStart(2, '0') + ':' +
+                String(now.getMinutes()).padStart(2, '0') + ':' +
+                String(now.getSeconds()).padStart(2, '0');
+            requestAnimationFrame(updateClock);
+        }
+        updateClock();
+    </script>
+</body>
+
+</html>

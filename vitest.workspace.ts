@@ -1,4 +1,10 @@
-export default [
+import { defineWorkspace } from "vitest/config";
+
+export default defineWorkspace([
+  // New src/ packages (consolidated monorepo)
+  "src/*/vitest.config.ts",
+
+  // Legacy packages/ that haven't migrated yet (including spike.land)
   "packages/shared",
   "packages/esbuild-wasm-mcp",
   "packages/hackernews-mcp",
@@ -24,4 +30,19 @@ export default [
   "packages/spike-edge",
   "packages/spike-land-mcp",
   "packages/state-machine",
-];
+  "packages/qa-studio",
+
+  // Fallback: any src/ package without vitest config
+  {
+    test: {
+      name: "monorepo-src",
+      include: ["src/**/*.test.ts", "src/**/*.test.tsx"],
+      exclude: [
+        "node_modules/**",
+        "dist/**",
+        "packages/**",
+        "src/esbuild-wasm/**",
+      ],
+    },
+  },
+]);
