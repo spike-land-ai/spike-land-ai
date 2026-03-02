@@ -60,9 +60,7 @@ describe("challenge-manager", () => {
   });
 
   it("sendChallenge rejects self-challenge", async () => {
-    await expect(sendChallenge("p1", "p1")).rejects.toThrow(
-      "Cannot challenge yourself",
-    );
+    await expect(sendChallenge("p1", "p1")).rejects.toThrow("Cannot challenge yourself");
     expect(mockPrisma.chessChallenge.create).not.toHaveBeenCalled();
   });
 
@@ -119,9 +117,7 @@ describe("challenge-manager", () => {
       status: "DECLINED",
     });
 
-    await expect(acceptChallenge("c1", "p2")).rejects.toThrow(
-      "Challenge is no longer pending",
-    );
+    await expect(acceptChallenge("c1", "p2")).rejects.toThrow("Challenge is no longer pending");
   });
 
   it("declineChallenge updates status to DECLINED", async () => {

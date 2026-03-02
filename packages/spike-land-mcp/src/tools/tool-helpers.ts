@@ -80,12 +80,7 @@ export class McpError extends Error {
   public readonly retryable: boolean;
   public override readonly cause?: Error;
 
-  constructor(
-    message: string,
-    code: McpErrorCode,
-    retryable?: boolean,
-    cause?: Error,
-  ) {
+  constructor(message: string, code: McpErrorCode, retryable?: boolean, cause?: Error) {
     super(message);
     this.name = "McpError";
     this.code = code;
@@ -123,7 +118,8 @@ function classifyError(error: unknown, toolName: string): ClassifiedToolError {
   const msgLower = msg.toLowerCase();
 
   if (
-    msgLower.includes("model") && (msgLower.includes("not found") || msgLower.includes("not_found"))
+    msgLower.includes("model") &&
+    (msgLower.includes("not found") || msgLower.includes("not_found"))
   ) {
     return {
       code: McpErrorCode.UPSTREAM_SERVICE_ERROR,
@@ -144,9 +140,7 @@ function classifyError(error: unknown, toolName: string): ClassifiedToolError {
         retryable: false,
       };
     }
-    const code = isApp
-      ? McpErrorCode.APP_NOT_FOUND
-      : McpErrorCode.WORKSPACE_NOT_FOUND;
+    const code = isApp ? McpErrorCode.APP_NOT_FOUND : McpErrorCode.WORKSPACE_NOT_FOUND;
     return {
       code,
       message: msg,
@@ -156,8 +150,9 @@ function classifyError(error: unknown, toolName: string): ClassifiedToolError {
   }
 
   if (
-    msgLower.includes("unauthorized") || msgLower.includes("forbidden")
-    || msgLower.includes("403")
+    msgLower.includes("unauthorized") ||
+    msgLower.includes("forbidden") ||
+    msgLower.includes("403")
   ) {
     return {
       code: McpErrorCode.PERMISSION_DENIED,
@@ -168,8 +163,10 @@ function classifyError(error: unknown, toolName: string): ClassifiedToolError {
   }
 
   if (
-    msgLower.includes("conflict") || msgLower.includes("409")
-    || msgLower.includes("already exists") || msgLower.includes("already taken")
+    msgLower.includes("conflict") ||
+    msgLower.includes("409") ||
+    msgLower.includes("already exists") ||
+    msgLower.includes("already taken")
   ) {
     return {
       code: McpErrorCode.CONFLICT,
@@ -179,9 +176,7 @@ function classifyError(error: unknown, toolName: string): ClassifiedToolError {
     };
   }
 
-  if (
-    msgLower.includes("no matching transition") || msgLower.includes("guard")
-  ) {
+  if (msgLower.includes("no matching transition") || msgLower.includes("guard")) {
     return {
       code: McpErrorCode.INVALID_INPUT,
       message: msg,
@@ -191,10 +186,7 @@ function classifyError(error: unknown, toolName: string): ClassifiedToolError {
     };
   }
 
-  if (
-    msgLower.includes("validation") || msgLower.includes("invalid")
-    || msgLower.includes("400")
-  ) {
+  if (msgLower.includes("validation") || msgLower.includes("invalid") || msgLower.includes("400")) {
     return {
       code: McpErrorCode.VALIDATION_ERROR,
       message: msg,
@@ -204,8 +196,9 @@ function classifyError(error: unknown, toolName: string): ClassifiedToolError {
   }
 
   if (
-    msgLower.includes("rate limit") || msgLower.includes("429")
-    || msgLower.includes("too many")
+    msgLower.includes("rate limit") ||
+    msgLower.includes("429") ||
+    msgLower.includes("too many")
   ) {
     return {
       code: McpErrorCode.RATE_LIMITED,
@@ -216,8 +209,9 @@ function classifyError(error: unknown, toolName: string): ClassifiedToolError {
   }
 
   if (
-    msgLower.includes("insufficient") || msgLower.includes("credits")
-    || msgLower.includes("balance")
+    msgLower.includes("insufficient") ||
+    msgLower.includes("credits") ||
+    msgLower.includes("balance")
   ) {
     return {
       code: McpErrorCode.INSUFFICIENT_CREDITS,
@@ -240,10 +234,11 @@ function formatErrorResult(classified: ClassifiedToolError): CallToolResult {
     content: [
       {
         type: "text",
-        text: `**Error: ${classified.code}**\n`
-          + `${classified.message}\n`
-          + `**Suggestion:** ${classified.suggestion}\n`
-          + `**Retryable:** ${classified.retryable}`,
+        text:
+          `**Error: ${classified.code}**\n` +
+          `${classified.message}\n` +
+          `**Suggestion:** ${classified.suggestion}\n` +
+          `**Retryable:** ${classified.retryable}`,
       },
     ],
     isError: true,
@@ -268,16 +263,14 @@ export async function safeToolCall(
     const handlerPromise = handler();
     const result = options?.timeoutMs
       ? await Promise.race([
-        handlerPromise,
-        new Promise<never>((_, reject) =>
-          setTimeout(() =>
-            reject(
-              new Error(
-                `Tool ${toolName} timed out after ${options.timeoutMs}ms`,
-              ),
-            ), options.timeoutMs)
-        ),
-      ])
+          handlerPromise,
+          new Promise<never>((_, reject) =>
+            setTimeout(
+              () => reject(new Error(`Tool ${toolName} timed out after ${options.timeoutMs}ms`)),
+              options.timeoutMs,
+            ),
+          ),
+        ])
       : await handlerPromise;
     return result;
   } catch (error) {
@@ -292,10 +285,10 @@ export async function safeToolCall(
 const MAX_RESPONSE_SIZE = 8192;
 
 export function textResult(text: string): CallToolResult {
-  const truncated = text.length > MAX_RESPONSE_SIZE
-    ? text.slice(0, MAX_RESPONSE_SIZE)
-      + "\n...(truncated, response exceeded 8KB)"
-    : text;
+  const truncated =
+    text.length > MAX_RESPONSE_SIZE
+      ? text.slice(0, MAX_RESPONSE_SIZE) + "\n...(truncated, response exceeded 8KB)"
+      : text;
   return { content: [{ type: "text", text: truncated }] };
 }
 
@@ -330,7 +323,7 @@ export async function apiRequest<T>(
 
   const response = await fetch(url, {
     ...options,
-    headers: { ...headers, ...options.headers as Record<string, string> },
+    headers: { ...headers, ...(options.headers as Record<string, string>) },
   });
 
   if (!response.ok) {
@@ -385,10 +378,7 @@ export async function resolveWorkspace(
     .from(workspaces)
     .innerJoin(
       workspaceMembers,
-      and(
-        eq(workspaceMembers.workspaceId, workspaces.id),
-        eq(workspaceMembers.userId, userId),
-      ),
+      and(eq(workspaceMembers.workspaceId, workspaces.id), eq(workspaceMembers.userId, userId)),
     )
     .where(eq(workspaces.slug, slug))
     .limit(1);
@@ -424,12 +414,7 @@ export async function getVaultSecret(
       encryptedValue: vaultSecrets.encryptedValue,
     })
     .from(vaultSecrets)
-    .where(
-      and(
-        eq(vaultSecrets.userId, userId),
-        eq(vaultSecrets.key, name),
-      ),
-    )
+    .where(and(eq(vaultSecrets.userId, userId), eq(vaultSecrets.key, name)))
     .limit(1);
 
   const secret = result[0];
@@ -437,7 +422,11 @@ export async function getVaultSecret(
 
   try {
     // Encrypted value is stored as base64 JSON: { iv: base64, data: base64, salt: base64 }
-    const parsed = JSON.parse(atob(secret.encryptedValue)) as { iv: string; data: string; salt?: string };
+    const parsed = JSON.parse(atob(secret.encryptedValue)) as {
+      iv: string;
+      data: string;
+      salt?: string;
+    };
     const iv = Uint8Array.from(atob(parsed.iv), (c) => c.charCodeAt(0));
     const data = Uint8Array.from(atob(parsed.data), (c) => c.charCodeAt(0));
 
@@ -461,11 +450,7 @@ export async function getVaultSecret(
       ["decrypt"],
     );
 
-    const decrypted = await crypto.subtle.decrypt(
-      { name: "AES-GCM", iv },
-      cryptoKey,
-      data,
-    );
+    const decrypted = await crypto.subtle.decrypt({ name: "AES-GCM", iv }, cryptoKey, data);
     return new TextDecoder().decode(decrypted);
   } catch (error) {
     console.error("Failed to decrypt vault secret", { userId, name, error });

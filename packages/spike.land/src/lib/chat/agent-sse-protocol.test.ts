@@ -1,17 +1,12 @@
 import { describe, expect, it } from "vitest";
-import {
-  type AgentSSEEvent,
-  encodeSSE,
-  parseSSE,
-  splitSSEBuffer,
-} from "./agent-sse-protocol";
+import { type AgentSSEEvent, encodeSSE, parseSSE, splitSSEBuffer } from "./agent-sse-protocol";
 
 describe("agent-sse-protocol", () => {
   describe("encodeSSE", () => {
     it("encodes a text_delta event", () => {
       const event: AgentSSEEvent = { type: "text_delta", text: "hello" };
       const result = encodeSSE(event);
-      expect(result).toBe("data: {\"type\":\"text_delta\",\"text\":\"hello\"}\n\n");
+      expect(result).toBe('data: {"type":"text_delta","text":"hello"}\n\n');
     });
 
     it("encodes a tool_call_start event", () => {
@@ -23,9 +18,9 @@ describe("agent-sse-protocol", () => {
         input: { query: "test" },
       };
       const result = encodeSSE(event);
-      expect(result).toContain("\"type\":\"tool_call_start\"");
-      expect(result).toContain("\"id\":\"tc1\"");
-      expect(result).toContain("\"serverName\":\"github\"");
+      expect(result).toContain('"type":"tool_call_start"');
+      expect(result).toContain('"id":"tc1"');
+      expect(result).toContain('"serverName":"github"');
       expect(result.startsWith("data: ")).toBe(true);
       expect(result.endsWith("\n\n")).toBe(true);
     });
@@ -36,18 +31,18 @@ describe("agent-sse-protocol", () => {
         usage: { input_tokens: 100, output_tokens: 50 },
       };
       const result = encodeSSE(event);
-      expect(result).toContain("\"input_tokens\":100");
+      expect(result).toContain('"input_tokens":100');
     });
 
     it("encodes an error event", () => {
       const event: AgentSSEEvent = { type: "error", message: "oops" };
-      expect(encodeSSE(event)).toContain("\"message\":\"oops\"");
+      expect(encodeSSE(event)).toContain('"message":"oops"');
     });
   });
 
   describe("parseSSE", () => {
     it("parses a valid data line", () => {
-      const event = parseSSE("data: {\"type\":\"text_delta\",\"text\":\"hi\"}");
+      const event = parseSSE('data: {"type":"text_delta","text":"hi"}');
       expect(event).toEqual({ type: "text_delta", text: "hi" });
     });
 
@@ -89,17 +84,17 @@ describe("agent-sse-protocol", () => {
   describe("splitSSEBuffer", () => {
     it("splits complete events from buffer", () => {
       const buffer =
-        "data: {\"type\":\"text_delta\",\"text\":\"a\"}\n\ndata: {\"type\":\"text_delta\",\"text\":\"b\"}\n\n";
+        'data: {"type":"text_delta","text":"a"}\n\ndata: {"type":"text_delta","text":"b"}\n\n';
       const { events, remainder } = splitSSEBuffer(buffer);
       expect(events).toHaveLength(2);
       expect(remainder).toBe("");
     });
 
     it("preserves incomplete events as remainder", () => {
-      const buffer = "data: {\"type\":\"text_delta\",\"text\":\"a\"}\n\ndata: {\"type\":\"text_d";
+      const buffer = 'data: {"type":"text_delta","text":"a"}\n\ndata: {"type":"text_d';
       const { events, remainder } = splitSSEBuffer(buffer);
       expect(events).toHaveLength(1);
-      expect(remainder).toBe("data: {\"type\":\"text_d");
+      expect(remainder).toBe('data: {"type":"text_d');
     });
 
     it("handles empty buffer", () => {

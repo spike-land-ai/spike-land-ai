@@ -76,17 +76,13 @@ function validateText(text: string): string {
     throw new Error("Text cannot be empty");
   }
   if (text.length > MAX_TEXT_LENGTH) {
-    throw new Error(
-      `Text exceeds maximum length of ${MAX_TEXT_LENGTH} characters`,
-    );
+    throw new Error(`Text exceeds maximum length of ${MAX_TEXT_LENGTH} characters`);
   }
   return text.trim();
 }
 
 function getVoiceId(options: ElevenLabsOptions): string {
-  return options.voiceId
-    || process.env.ELEVENLABS_VOICE_ID?.trim()
-    || DEFAULT_VOICE_ID;
+  return options.voiceId || process.env.ELEVENLABS_VOICE_ID?.trim() || DEFAULT_VOICE_ID;
 }
 
 /**
@@ -128,9 +124,7 @@ export async function synthesizeSpeech(
 
   if (!response.ok) {
     const errorBody = await response.text().catch(() => "Unknown error");
-    throw new Error(
-      `ElevenLabs API returned ${response.status}: ${errorBody}`,
-    );
+    throw new Error(`ElevenLabs API returned ${response.status}: ${errorBody}`);
   }
 
   const arrayBuffer = await response.arrayBuffer();
@@ -144,9 +138,7 @@ export async function synthesizeSpeech(
 export async function synthesizeSpeechWithTimestamps(
   text: string,
   options: ElevenLabsOptions = {},
-): Promise<
-  { audio: Buffer; words: NarrationWord[]; audioDurationSeconds: number; }
-> {
+): Promise<{ audio: Buffer; words: NarrationWord[]; audioDurationSeconds: number }> {
   const apiKey = getApiKey();
   const trimmedText = validateText(text);
   const voiceId = getVoiceId(options);
@@ -178,9 +170,7 @@ export async function synthesizeSpeechWithTimestamps(
 
   if (!response.ok) {
     const errorBody = await response.text().catch(() => "Unknown error");
-    throw new Error(
-      `ElevenLabs API returned ${response.status}: ${errorBody}`,
-    );
+    throw new Error(`ElevenLabs API returned ${response.status}: ${errorBody}`);
   }
 
   const data = (await response.json()) as TimestampResponse;
@@ -190,9 +180,7 @@ export async function synthesizeSpeechWithTimestamps(
 
   // Audio duration is the end time of the last character
   const endTimes = data.alignment.character_end_times_seconds;
-  const audioDurationSeconds = endTimes.length > 0
-    ? endTimes[endTimes.length - 1]!
-    : 0;
+  const audioDurationSeconds = endTimes.length > 0 ? endTimes[endTimes.length - 1]! : 0;
 
   return { audio: audioBuffer, words, audioDurationSeconds };
 }

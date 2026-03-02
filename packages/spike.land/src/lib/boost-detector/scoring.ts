@@ -4,17 +4,9 @@
  * Issue #565 - Content-to-Ads Loop
  */
 
-import type {
-  MarketingPlatform,
-  PostPerformance,
-  PostType,
-} from "@/generated/prisma";
+import type { MarketingPlatform, PostPerformance, PostType } from "@/generated/prisma";
 import prisma from "@/lib/prisma";
-import {
-  type BoostScore,
-  DEFAULT_CONVERSION_VALUE_USD,
-  type ROIPrediction,
-} from "./types";
+import { type BoostScore, DEFAULT_CONVERSION_VALUE_USD, type ROIPrediction } from "./types";
 
 /**
  * Calculate boost score for a post based on performance metrics
@@ -46,18 +38,12 @@ export async function calculateBoostScore(
   }
 
   // Calculate engagement velocity score (0-100)
-  const velocityScore = Math.min(
-    100,
-    (performance.engagementVelocity / 10) * 100,
-  );
+  const velocityScore = Math.min(100, (performance.engagementVelocity / 10) * 100);
 
   // Calculate audience match score (0-100)
   // Based on engagement rate compared to workspace average
   const workspaceAvg = await getWorkspaceAverageEngagementRate(workspaceId);
-  const audienceScore = Math.min(
-    100,
-    (performance.engagementRate / workspaceAvg) * 50,
-  );
+  const audienceScore = Math.min(100, (performance.engagementRate / workspaceAvg) * 50);
 
   // Calculate content type score (0-100)
   // Higher score for posts with media and good structure
@@ -68,10 +54,8 @@ export async function calculateBoostScore(
   const timingScore = 80; // Simplified for now, would analyze publishing time
 
   // Weighted average
-  const totalScore = velocityScore * 0.4
-    + audienceScore * 0.3
-    + contentScore * 0.2
-    + timingScore * 0.1;
+  const totalScore =
+    velocityScore * 0.4 + audienceScore * 0.3 + contentScore * 0.2 + timingScore * 0.1;
 
   // Determine trigger type
   let trigger: "HIGH_ENGAGEMENT" | "VIRAL_VELOCITY" | "CONVERSION_SPIKE" = "HIGH_ENGAGEMENT";
@@ -119,19 +103,14 @@ export async function predictROI(
   const avgConversionRate = calculateAverageConversionRate(historicalCampaigns);
 
   // Apply engagement rate multiplier
-  const engagementMultiplier = Math.max(
-    0.5,
-    Math.min(2.0, postPerformance.engagementRate / 0.05),
-  );
+  const engagementMultiplier = Math.max(0.5, Math.min(2.0, postPerformance.engagementRate / 0.05));
 
   // Predictions
   const estimatedImpressions = Math.round(
     (suggestedBudget / avgCPC) * (1 / avgCTR) * engagementMultiplier,
   );
   const estimatedClicks = Math.round(estimatedImpressions * avgCTR);
-  const estimatedConversions = Math.round(
-    estimatedClicks * avgConversionRate,
-  );
+  const estimatedConversions = Math.round(estimatedClicks * avgConversionRate);
   const estimatedCost = suggestedBudget;
 
   // Calculate ROI
@@ -180,9 +159,7 @@ export async function analyzeEngagementVelocity(
 
 // Helper functions
 
-async function getWorkspaceAverageEngagementRate(
-  workspaceId: string,
-): Promise<number> {
+async function getWorkspaceAverageEngagementRate(workspaceId: string): Promise<number> {
   const result = await prisma.postPerformance.aggregate({
     where: {
       workspaceId,
@@ -222,7 +199,7 @@ async function getHistoricalCampaignData(
     },
   });
 
-  return appliedBoosts.map(boost => ({
+  return appliedBoosts.map((boost) => ({
     impressions: boost.actualImpressions,
     clicks: boost.actualClicks,
     conversions: boost.actualConversions,
@@ -234,9 +211,7 @@ function calculateAverageCTR(campaigns: HistoricalCampaign[]): number {
   if (campaigns.length === 0) return 0.02; // 2% default
 
   const totalCTR = campaigns.reduce((sum, campaign) => {
-    const ctr = campaign.impressions > 0
-      ? campaign.clicks / campaign.impressions
-      : 0;
+    const ctr = campaign.impressions > 0 ? campaign.clicks / campaign.impressions : 0;
     return sum + ctr;
   }, 0);
 
@@ -254,45 +229,37 @@ function calculateAverageCPC(campaigns: HistoricalCampaign[]): number {
   return totalCPC / campaigns.length;
 }
 
-function calculateAverageConversionRate(
-  campaigns: HistoricalCampaign[],
-): number {
+function calculateAverageConversionRate(campaigns: HistoricalCampaign[]): number {
   if (campaigns.length === 0) return 0.05; // 5% default
 
   const totalConversionRate = campaigns.reduce((sum, campaign) => {
-    const convRate = campaign.clicks > 0
-      ? campaign.conversions / campaign.clicks
-      : 0;
+    const convRate = campaign.clicks > 0 ? campaign.conversions / campaign.clicks : 0;
     return sum + convRate;
   }, 0);
 
   return totalConversionRate / campaigns.length;
 }
 
-function getIndustryAveragePrediction(
-  budget: number,
-  platform: MarketingPlatform,
-): ROIPrediction {
+function getIndustryAveragePrediction(budget: number, platform: MarketingPlatform): ROIPrediction {
   // Industry averages vary by platform
-  const metrics = platform === "FACEBOOK"
-    ? {
-      cpc: 1.2,
-      ctr: 0.025,
-      conversionRate: 0.08,
-      costPerConversion: 15,
-    }
-    : {
-      cpc: 2.5,
-      ctr: 0.035,
-      conversionRate: 0.1,
-      costPerConversion: 25,
-    };
+  const metrics =
+    platform === "FACEBOOK"
+      ? {
+          cpc: 1.2,
+          ctr: 0.025,
+          conversionRate: 0.08,
+          costPerConversion: 15,
+        }
+      : {
+          cpc: 2.5,
+          ctr: 0.035,
+          conversionRate: 0.1,
+          costPerConversion: 25,
+        };
 
   const estimatedClicks = Math.round(budget / metrics.cpc);
   const estimatedImpressions = Math.round(estimatedClicks / metrics.ctr);
-  const estimatedConversions = Math.round(
-    estimatedClicks * metrics.conversionRate,
-  );
+  const estimatedConversions = Math.round(estimatedClicks * metrics.conversionRate);
   const estimatedRevenue = estimatedConversions * 50; // $50 per conversion
   const estimatedROI = (estimatedRevenue - budget) / budget;
 

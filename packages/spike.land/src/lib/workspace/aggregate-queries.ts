@@ -5,11 +5,7 @@
  */
 
 import prisma from "@/lib/prisma";
-import type {
-  AggregateKPIs,
-  DateRange,
-  WorkspaceSummary,
-} from "@/types/workspace";
+import type { AggregateKPIs, DateRange, WorkspaceSummary } from "@/types/workspace";
 
 /**
  * Get all workspace IDs that a user has access to
@@ -25,7 +21,7 @@ export async function getUserWorkspaceIds(userId: string): Promise<string[]> {
     },
   });
 
-  return memberships.map(m => m.workspaceId);
+  return memberships.map((m) => m.workspaceId);
 }
 
 /**
@@ -50,77 +46,74 @@ export async function getAggregateKPIs(
   // Build date filter for posts
   const dateFilter = dateRange
     ? {
-      createdAt: {
-        gte: dateRange.startDate,
-        lte: dateRange.endDate,
-      },
-    }
+        createdAt: {
+          gte: dateRange.startDate,
+          lte: dateRange.endDate,
+        },
+      }
     : {};
 
   // Build date filter for metrics
   const metricsDateFilter = dateRange
     ? {
-      date: {
-        gte: dateRange.startDate,
-        lte: dateRange.endDate,
-      },
-    }
+        date: {
+          gte: dateRange.startDate,
+          lte: dateRange.endDate,
+        },
+      }
     : {};
 
   // Run aggregate queries in parallel
-  const [
-    socialAccountCount,
-    scheduledPostCount,
-    publishedPostCount,
-    metricsAggregation,
-  ] = await Promise.all([
-    // Count social accounts
-    prisma.socialAccount.count({
-      where: {
-        workspaceId: { in: workspaceIds },
-      },
-    }),
-
-    // Count scheduled posts (pending)
-    prisma.scheduledPost.count({
-      where: {
-        workspaceId: { in: workspaceIds },
-        status: "SCHEDULED",
-        ...dateFilter,
-      },
-    }),
-
-    // Count published posts
-    prisma.scheduledPost.count({
-      where: {
-        workspaceId: { in: workspaceIds },
-        status: "PUBLISHED",
-        ...dateFilter,
-      },
-    }),
-
-    // Aggregate social metrics using Prisma aggregate
-    prisma.socialMetrics.aggregate({
-      where: {
-        account: {
+  const [socialAccountCount, scheduledPostCount, publishedPostCount, metricsAggregation] =
+    await Promise.all([
+      // Count social accounts
+      prisma.socialAccount.count({
+        where: {
           workspaceId: { in: workspaceIds },
         },
-        ...metricsDateFilter,
-      },
-      _sum: {
-        followers: true,
-        impressions: true,
-        likes: true,
-        comments: true,
-        shares: true,
-      },
-    }),
-  ]);
+      }),
+
+      // Count scheduled posts (pending)
+      prisma.scheduledPost.count({
+        where: {
+          workspaceId: { in: workspaceIds },
+          status: "SCHEDULED",
+          ...dateFilter,
+        },
+      }),
+
+      // Count published posts
+      prisma.scheduledPost.count({
+        where: {
+          workspaceId: { in: workspaceIds },
+          status: "PUBLISHED",
+          ...dateFilter,
+        },
+      }),
+
+      // Aggregate social metrics using Prisma aggregate
+      prisma.socialMetrics.aggregate({
+        where: {
+          account: {
+            workspaceId: { in: workspaceIds },
+          },
+          ...metricsDateFilter,
+        },
+        _sum: {
+          followers: true,
+          impressions: true,
+          likes: true,
+          comments: true,
+          shares: true,
+        },
+      }),
+    ]);
 
   // Calculate engagements from likes + comments + shares
-  const totalEngagements = (metricsAggregation._sum.likes ?? 0)
-    + (metricsAggregation._sum.comments ?? 0)
-    + (metricsAggregation._sum.shares ?? 0);
+  const totalEngagements =
+    (metricsAggregation._sum.likes ?? 0) +
+    (metricsAggregation._sum.comments ?? 0) +
+    (metricsAggregation._sum.shares ?? 0);
   const totalFollowers = metricsAggregation._sum.followers ?? 0;
   const totalImpressions = metricsAggregation._sum.impressions ?? 0;
 
@@ -149,21 +142,21 @@ export async function getWorkspaceSummaries(
   // Build date filter for posts
   const postsDateFilter = dateRange
     ? {
-      createdAt: {
-        gte: dateRange.startDate,
-        lte: dateRange.endDate,
-      },
-    }
+        createdAt: {
+          gte: dateRange.startDate,
+          lte: dateRange.endDate,
+        },
+      }
     : {};
 
   // Build date filter for metrics
   const metricsDateFilter = dateRange
     ? {
-      date: {
-        gte: dateRange.startDate,
-        lte: dateRange.endDate,
-      },
-    }
+        date: {
+          gte: dateRange.startDate,
+          lte: dateRange.endDate,
+        },
+      }
     : {};
 
   // Get workspace details with counts
@@ -196,8 +189,8 @@ export async function getWorkspaceSummaries(
   });
 
   // Fetch metrics for all accounts in these workspaces
-  const metricsPromises = workspaces.map(async workspace => {
-    const accountIds = workspace.socialAccounts.map(a => a.id);
+  const metricsPromises = workspaces.map(async (workspace) => {
+    const accountIds = workspace.socialAccounts.map((a) => a.id);
     if (accountIds.length === 0) {
       return {
         workspaceId: workspace.id,
@@ -223,20 +216,19 @@ export async function getWorkspaceSummaries(
 
     return {
       workspaceId: workspace.id,
-      totalEngagements: (aggregation._sum.likes ?? 0)
-        + (aggregation._sum.comments ?? 0)
-        + (aggregation._sum.shares ?? 0),
+      totalEngagements:
+        (aggregation._sum.likes ?? 0) +
+        (aggregation._sum.comments ?? 0) +
+        (aggregation._sum.shares ?? 0),
       totalFollowers: aggregation._sum.followers ?? 0,
       totalImpressions: aggregation._sum.impressions ?? 0,
     };
   });
 
   const metricsResults = await Promise.all(metricsPromises);
-  const metricsMap = new Map(
-    metricsResults.map(m => [m.workspaceId, m]),
-  );
+  const metricsMap = new Map(metricsResults.map((m) => [m.workspaceId, m]));
 
-  return workspaces.map(workspace => {
+  return workspaces.map((workspace) => {
     const metrics = metricsMap.get(workspace.id) ?? {
       totalEngagements: 0,
       totalFollowers: 0,
@@ -245,19 +237,19 @@ export async function getWorkspaceSummaries(
 
     // Count posts by status
     const scheduledPostCount = workspace.scheduledPosts.filter(
-      p => p.status === "SCHEDULED",
+      (p) => p.status === "SCHEDULED",
     ).length;
     const publishedPostCount = workspace.scheduledPosts.filter(
-      p => p.status === "PUBLISHED",
+      (p) => p.status === "PUBLISHED",
     ).length;
 
     // Find last activity
     const firstPost = workspace.scheduledPosts[0];
     const lastActivityAt = firstPost
       ? workspace.scheduledPosts.reduce(
-        (latest, post) => post.createdAt > latest ? post.createdAt : latest,
-        firstPost.createdAt,
-      )
+          (latest, post) => (post.createdAt > latest ? post.createdAt : latest),
+          firstPost.createdAt,
+        )
       : null;
 
     return {
@@ -285,7 +277,7 @@ export async function getUserFavorites(userId: string): Promise<string[]> {
     orderBy: { createdAt: "desc" },
   });
 
-  return favorites.map(f => f.workspaceId);
+  return favorites.map((f) => f.workspaceId);
 }
 
 /**
@@ -302,7 +294,7 @@ export async function getUserRecentWorkspaces(
     take: limit,
   });
 
-  return recents.map(r => r.workspaceId);
+  return recents.map((r) => r.workspaceId);
 }
 
 /**
@@ -343,10 +335,7 @@ export async function toggleWorkspaceFavorite(
 /**
  * Record workspace access (for recent workspaces tracking)
  */
-export async function recordWorkspaceAccess(
-  userId: string,
-  workspaceId: string,
-): Promise<void> {
+export async function recordWorkspaceAccess(userId: string, workspaceId: string): Promise<void> {
   await prisma.workspaceRecentAccess.upsert({
     where: {
       userId_workspaceId: {
@@ -367,9 +356,7 @@ export async function recordWorkspaceAccess(
 /**
  * Get workspaces with metadata (favorites and recent access)
  */
-export async function getWorkspacesWithMetadata(
-  userId: string,
-): Promise<{
+export async function getWorkspacesWithMetadata(userId: string): Promise<{
   workspaceIds: string[];
   favoriteIds: string[];
   recentIds: string[];

@@ -1,9 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import {
-  getGeminiClient,
-  isGeminiConfigured,
-  resetGeminiClient,
-} from "./gemini-client";
+import { getGeminiClient, isGeminiConfigured, resetGeminiClient } from "./gemini-client";
 import { GoogleGenAI } from "@google/genai";
 import { resolveAIProviderConfig } from "./ai-config-resolver";
 
@@ -31,9 +27,9 @@ describe("gemini-client", () => {
 
   describe("getGeminiClient", () => {
     it("uses config token if available", async () => {
-      vi.mocked(resolveAIProviderConfig).mockResolvedValue(
-        { token: "db-token" } as any,
-      );
+      vi.mocked(resolveAIProviderConfig).mockResolvedValue({
+        token: "db-token",
+      } as unknown as Awaited<ReturnType<typeof resolveAIProviderConfig>>);
 
       const client = await getGeminiClient();
       expect(resolveAIProviderConfig).toHaveBeenCalledWith("google");
@@ -71,9 +67,9 @@ describe("gemini-client", () => {
 
   describe("isGeminiConfigured", () => {
     it("returns true if config has token", async () => {
-      vi.mocked(resolveAIProviderConfig).mockResolvedValue(
-        { token: "db-token" } as any,
-      );
+      vi.mocked(resolveAIProviderConfig).mockResolvedValue({
+        token: "db-token",
+      } as unknown as Awaited<ReturnType<typeof resolveAIProviderConfig>>);
       expect(await isGeminiConfigured()).toBe(true);
     });
 

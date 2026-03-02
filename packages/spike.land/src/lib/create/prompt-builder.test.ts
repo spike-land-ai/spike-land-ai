@@ -42,10 +42,7 @@ describe("constants", () => {
 
 describe("re-exported keyword functions", () => {
   it("extractKeywords splits on separators", () => {
-    expect(extractKeywords("games/tictactoe")).toEqual([
-      "games",
-      "tictactoe",
-    ]);
+    expect(extractKeywords("games/tictactoe")).toEqual(["games", "tictactoe"]);
   });
 
   it("matchesAny returns true on match", () => {
@@ -57,13 +54,13 @@ describe("getMatchedSkills", () => {
   it("returns matches for chart-related topic", () => {
     const skills = getMatchedSkills("chart dashboard");
     expect(skills.length).toBeGreaterThan(0);
-    expect(skills.some(s => s.id === "recharts")).toBe(true);
+    expect(skills.some((s) => s.id === "recharts")).toBe(true);
   });
 
   it("returns matches for 3d topic", () => {
     const skills = getMatchedSkills("3d globe earth");
     expect(skills.length).toBeGreaterThan(0);
-    expect(skills.some(s => s.category === "3d")).toBe(true);
+    expect(skills.some((s) => s.category === "3d")).toBe(true);
   });
 
   it("returns empty for generic topic", () => {
@@ -73,7 +70,7 @@ describe("getMatchedSkills", () => {
 
   it("deduplicates by skill id", () => {
     const skills = getMatchedSkills("chart charts");
-    const ids = skills.map(s => s.id);
+    const ids = skills.map((s) => s.id);
     expect(new Set(ids).size).toBe(ids.length);
   });
 

@@ -15,10 +15,7 @@ interface GameBoardPlaceholderProps {
   pieces?: Piece[];
 }
 
-export function GameBoardPlaceholder({
-  gridSize = 8,
-  pieces = [],
-}: GameBoardPlaceholderProps) {
+export function GameBoardPlaceholder({ gridSize = 8, pieces = [] }: GameBoardPlaceholderProps) {
   const pieceMap = new Map<string, Piece>();
   for (const piece of pieces) {
     pieceMap.set(`${piece.row}-${piece.col}`, piece);
@@ -46,9 +43,9 @@ export function GameBoardPlaceholder({
                   isLight ? "bg-zinc-700" : "bg-zinc-900",
                 )}
                 role="gridcell"
-                aria-label={piece
-                  ? `${piece.label} at row ${row + 1}, column ${col + 1}`
-                  : undefined}
+                aria-label={
+                  piece ? `${piece.label} at row ${row + 1}, column ${col + 1}` : undefined
+                }
               >
                 {piece && (
                   <div
@@ -61,7 +58,7 @@ export function GameBoardPlaceholder({
                 )}
               </div>
             );
-          })
+          }),
         )}
       </div>
     </div>

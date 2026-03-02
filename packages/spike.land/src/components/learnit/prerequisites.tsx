@@ -8,9 +8,7 @@ interface PrerequisitesProps {
   className?: string;
 }
 
-export async function Prerequisites(
-  { topicId, className }: PrerequisitesProps,
-) {
+export async function Prerequisites({ topicId, className }: PrerequisitesProps) {
   const prerequisites = await getPrerequisites(topicId);
 
   if (prerequisites.length === 0) {
@@ -32,7 +30,7 @@ export async function Prerequisites(
         Make sure you understand these topics first:
       </p>
       <ul className="space-y-2">
-        {prerequisites.map(topic => (
+        {prerequisites.map((topic) => (
           <li key={topic.id}>
             <Link
               href={`/learnit/${topic.slug}`}

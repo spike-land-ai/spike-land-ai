@@ -27,38 +27,35 @@ const profileStart: StandaloneToolDefinition = {
       .default("default")
       .describe("Name of the profile tree (default: 'default')."),
   },
-  handler: async (
-    input: never,
-    ctx: ServerContext,
-  ): Promise<CallToolResult> => {
-    const { tree_name } = input as { tree_name?: string; };
+  handler: async (input: never, ctx: ServerContext): Promise<CallToolResult> => {
+    const { tree_name } = input as { tree_name?: string };
     return safeToolCall("profile_start", async () => {
       const { startTraversal } = await import("@/lib/avl-profile/traversal");
       const result = await startTraversal(ctx.userId, tree_name ?? "default");
 
       if (result.status === "ALREADY_PROFILED" && result.profile) {
         return textResult(
-          `**Already Profiled**\n\n`
-            + `**Tags:** ${result.profile.derivedTags.join(", ") || "none"}\n`
-            + `**Leaf Node:** ${result.profile.leafNodeId}\n`
-            + `**Answers:** ${result.profile.answerPath.length} questions answered`,
+          `**Already Profiled**\n\n` +
+            `**Tags:** ${result.profile.derivedTags.join(", ") || "none"}\n` +
+            `**Leaf Node:** ${result.profile.leafNodeId}\n` +
+            `**Answers:** ${result.profile.answerPath.length} questions answered`,
         );
       }
 
       if (result.status === "ASSIGNED" && result.profile) {
         return textResult(
-          `**Profile Created** (first user in tree)\n\n`
-            + `**Tags:** ${result.profile.derivedTags.join(", ") || "none"}\n`
-            + `**Leaf Node:** ${result.profile.leafNodeId}`,
+          `**Profile Created** (first user in tree)\n\n` +
+            `**Tags:** ${result.profile.derivedTags.join(", ") || "none"}\n` +
+            `**Leaf Node:** ${result.profile.leafNodeId}`,
         );
       }
 
       return textResult(
-        `**Profiling Started**\n\n`
-          + `**Session ID:** ${result.sessionId}\n`
-          + `**Question:** ${result.question}\n`
-          + `**Tags:** ${result.questionTags?.join(", ") || "none"}\n\n`
-          + `Answer with \`profile_answer\` (yes = true, no = false).`,
+        `**Profiling Started**\n\n` +
+          `**Session ID:** ${result.sessionId}\n` +
+          `**Question:** ${result.question}\n` +
+          `**Tags:** ${result.questionTags?.join(", ") || "none"}\n\n` +
+          `Answer with \`profile_answer\` (yes = true, no = false).`,
       );
     });
   },
@@ -78,40 +75,35 @@ const profileContinue: StandaloneToolDefinition = {
       .default("default")
       .describe("Name of the profile tree (default: 'default')."),
   },
-  handler: async (
-    input: never,
-    ctx: ServerContext,
-  ): Promise<CallToolResult> => {
-    const { tree_name } = input as { tree_name?: string; };
+  handler: async (input: never, ctx: ServerContext): Promise<CallToolResult> => {
+    const { tree_name } = input as { tree_name?: string };
     return safeToolCall("profile_continue", async () => {
-      const { continueTraversal } = await import(
-        "@/lib/avl-profile/traversal"
-      );
+      const { continueTraversal } = await import("@/lib/avl-profile/traversal");
       const result = await continueTraversal(ctx.userId, tree_name ?? "default");
 
       if (result.status === "ALREADY_PROFILED" && result.profile) {
         return textResult(
-          `**Already Profiled** (Round ${result.round ?? 0})\n\n`
-            + `**Tags:** ${result.profile.derivedTags.join(", ") || "none"}\n`
-            + `**Leaf Node:** ${result.profile.leafNodeId}\n`
-            + `**Answers:** ${result.profile.answerPath.length} questions answered`,
+          `**Already Profiled** (Round ${result.round ?? 0})\n\n` +
+            `**Tags:** ${result.profile.derivedTags.join(", ") || "none"}\n` +
+            `**Leaf Node:** ${result.profile.leafNodeId}\n` +
+            `**Answers:** ${result.profile.answerPath.length} questions answered`,
         );
       }
 
       if (result.status === "ASSIGNED" && result.profile) {
         return textResult(
-          `**Profile Created** (first user in tree)\n\n`
-            + `**Tags:** ${result.profile.derivedTags.join(", ") || "none"}\n`
-            + `**Leaf Node:** ${result.profile.leafNodeId}`,
+          `**Profile Created** (first user in tree)\n\n` +
+            `**Tags:** ${result.profile.derivedTags.join(", ") || "none"}\n` +
+            `**Leaf Node:** ${result.profile.leafNodeId}`,
         );
       }
 
       return textResult(
-        `**New Questions Available** (Round ${result.round ?? 0})\n\n`
-          + `**Session ID:** ${result.sessionId}\n`
-          + `**Question:** ${result.question}\n`
-          + `**Tags:** ${result.questionTags?.join(", ") || "none"}\n\n`
-          + `Answer with \`profile_answer\` (yes = true, no = false).`,
+        `**New Questions Available** (Round ${result.round ?? 0})\n\n` +
+          `**Session ID:** ${result.sessionId}\n` +
+          `**Question:** ${result.question}\n` +
+          `**Tags:** ${result.questionTags?.join(", ") || "none"}\n\n` +
+          `Answer with \`profile_answer\` (yes = true, no = false).`,
       );
     });
   },
@@ -126,44 +118,39 @@ const profileAnswer: StandaloneToolDefinition = {
   alwaysEnabled: true,
   inputSchema: {
     session_id: z.string().min(1).describe("Active traversal session ID."),
-    answer: z.boolean().describe(
-      "Yes (true) or No (false) to the current question.",
-    ),
+    answer: z.boolean().describe("Yes (true) or No (false) to the current question."),
   },
-  handler: async (
-    input: never,
-    ctx: ServerContext,
-  ): Promise<CallToolResult> => {
-    const { session_id, answer } = input as { session_id: string; answer: boolean; };
+  handler: async (input: never, ctx: ServerContext): Promise<CallToolResult> => {
+    const { session_id, answer } = input as { session_id: string; answer: boolean };
     return safeToolCall("profile_answer", async () => {
       const { answerQuestion } = await import("@/lib/avl-profile/traversal");
       const result = await answerQuestion(ctx.userId, session_id, answer);
 
       if (result.status === "ASSIGNED" && result.profile) {
         return textResult(
-          `**Profile Assigned**\n\n`
-            + `**Tags:** ${result.profile.derivedTags.join(", ") || "none"}\n`
-            + `**Leaf Node:** ${result.profile.leafNodeId}\n`
-            + `**Answers:** ${result.profile.answerPath.length} questions answered\n`
-            + `**Round:** ${result.round ?? 0}`,
+          `**Profile Assigned**\n\n` +
+            `**Tags:** ${result.profile.derivedTags.join(", ") || "none"}\n` +
+            `**Leaf Node:** ${result.profile.leafNodeId}\n` +
+            `**Answers:** ${result.profile.answerPath.length} questions answered\n` +
+            `**Round:** ${result.round ?? 0}`,
         );
       }
 
       if (result.status === "COLLISION") {
         return textResult(
-          `**Collision Detected**\n\n`
-            + `**Session ID:** ${result.sessionId}\n`
-            + `**Node ID:** ${result.nodeId}\n\n`
-            + `Another user occupies this leaf. Use \`profile_generate_question\` to resolve the collision.`,
+          `**Collision Detected**\n\n` +
+            `**Session ID:** ${result.sessionId}\n` +
+            `**Node ID:** ${result.nodeId}\n\n` +
+            `Another user occupies this leaf. Use \`profile_generate_question\` to resolve the collision.`,
         );
       }
 
       return textResult(
-        `**Next Question**\n\n`
-          + `**Session ID:** ${result.sessionId}\n`
-          + `**Question:** ${result.question}\n`
-          + `**Tags:** ${result.questionTags?.join(", ") || "none"}\n\n`
-          + `Answer with \`profile_answer\` (yes = true, no = false).`,
+        `**Next Question**\n\n` +
+          `**Session ID:** ${result.sessionId}\n` +
+          `**Question:** ${result.question}\n` +
+          `**Tags:** ${result.questionTags?.join(", ") || "none"}\n\n` +
+          `Answer with \`profile_answer\` (yes = true, no = false).`,
       );
     });
   },
@@ -177,34 +164,29 @@ const profileGet: StandaloneToolDefinition = {
   tier: "free",
   alwaysEnabled: true,
   inputSchema: {},
-  handler: async (
-    _input: never,
-    ctx: ServerContext,
-  ): Promise<CallToolResult> => {
+  handler: async (_input: never, ctx: ServerContext): Promise<CallToolResult> => {
     return safeToolCall("profile_get", async () => {
       const { getUserProfile } = await import("@/lib/avl-profile/traversal");
       const profile = await getUserProfile(ctx.userId);
 
       if (!profile) {
-        return textResult(
-          "**No Profile Found**\n\nUse `profile_start` to begin profiling.",
-        );
+        return textResult("**No Profile Found**\n\nUse `profile_start` to begin profiling.");
       }
 
       const answersFormatted = profile.answerPath
         .map(
-          (a: { question: string; answer: boolean; questionTags: string[]; }) =>
+          (a: { question: string; answer: boolean; questionTags: string[] }) =>
             `- ${a.question} → **${a.answer ? "Yes" : "No"}** (tags: ${a.questionTags.join(", ")})`,
         )
         .join("\n");
 
       return textResult(
-        `**User Profile**\n\n`
-          + `**Tags:** ${profile.derivedTags.join(", ") || "none"}\n`
-          + `**Leaf Node:** ${profile.leafNodeId}\n`
-          + `**Tree:** ${profile.treeId}\n\n`
-          + `**Round:** ${profile.profileRound ?? 0}\n\n`
-          + `**Answer Path:**\n${answersFormatted || "No answers recorded"}`,
+        `**User Profile**\n\n` +
+          `**Tags:** ${profile.derivedTags.join(", ") || "none"}\n` +
+          `**Leaf Node:** ${profile.leafNodeId}\n` +
+          `**Tree:** ${profile.treeId}\n\n` +
+          `**Round:** ${profile.profileRound ?? 0}\n\n` +
+          `**Answer Path:**\n${answersFormatted || "No answers recorded"}`,
       );
     });
   },
@@ -223,28 +205,23 @@ const profileTreeStats: StandaloneToolDefinition = {
       .default("default")
       .describe("Name of the profile tree (default: 'default')."),
   },
-  handler: async (
-    input: never,
-    _ctx: ServerContext,
-  ): Promise<CallToolResult> => {
-    const { tree_name } = input as { tree_name?: string; };
+  handler: async (input: never, _ctx: ServerContext): Promise<CallToolResult> => {
+    const { tree_name } = input as { tree_name?: string };
     return safeToolCall("profile_tree_stats", async () => {
-      const { getTreeStats } = await import(
-        "@/lib/avl-profile/tree-manager"
-      );
+      const { getTreeStats } = await import("@/lib/avl-profile/tree-manager");
       const stats = await getTreeStats(tree_name ?? "default");
 
       return textResult(
-        `**AVL Profile Tree: ${stats.name}**\n\n`
-          + `| Metric | Value |\n`
-          + `|--------|-------|\n`
-          + `| Total Nodes | ${stats.nodeCount} |\n`
-          + `| Internal Nodes | ${stats.internalNodes} |\n`
-          + `| Leaf Nodes | ${stats.leafNodes} |\n`
-          + `| Occupied Leaves | ${stats.occupiedLeaves} |\n`
-          + `| Empty Leaves | ${stats.emptyLeaves} |\n`
-          + `| Users | ${stats.userCount} |\n`
-          + `| Max Depth | ${stats.maxDepth} |`,
+        `**AVL Profile Tree: ${stats.name}**\n\n` +
+          `| Metric | Value |\n` +
+          `|--------|-------|\n` +
+          `| Total Nodes | ${stats.nodeCount} |\n` +
+          `| Internal Nodes | ${stats.internalNodes} |\n` +
+          `| Leaf Nodes | ${stats.leafNodes} |\n` +
+          `| Occupied Leaves | ${stats.occupiedLeaves} |\n` +
+          `| Empty Leaves | ${stats.emptyLeaves} |\n` +
+          `| Users | ${stats.userCount} |\n` +
+          `| Max Depth | ${stats.maxDepth} |`,
       );
     });
   },
@@ -266,10 +243,7 @@ const profileGenerateQuestion: StandaloneToolDefinition = {
       .optional()
       .describe("Optional context hint for better question generation."),
   },
-  handler: async (
-    input: never,
-    _ctx: ServerContext,
-  ): Promise<CallToolResult> => {
+  handler: async (input: never, _ctx: ServerContext): Promise<CallToolResult> => {
     const { used_questions, context_hint } = input as {
       used_questions?: string[];
       context_hint?: string;
@@ -285,9 +259,9 @@ const profileGenerateQuestion: StandaloneToolDefinition = {
       );
 
       return textResult(
-        `**Generated Question**\n\n`
-          + `**Question:** ${question.question}\n`
-          + `**Tags:** ${question.tags.join(", ")}`,
+        `**Generated Question**\n\n` +
+          `**Question:** ${question.question}\n` +
+          `**Tags:** ${question.tags.join(", ")}`,
       );
     });
   },
@@ -301,14 +275,9 @@ const profileReset: StandaloneToolDefinition = {
   tier: "free",
   alwaysEnabled: true,
   inputSchema: {},
-  handler: async (
-    _input: never,
-    ctx: ServerContext,
-  ): Promise<CallToolResult> => {
+  handler: async (_input: never, ctx: ServerContext): Promise<CallToolResult> => {
     return safeToolCall("profile_reset", async () => {
-      const { resetUserProfile } = await import(
-        "@/lib/avl-profile/traversal"
-      );
+      const { resetUserProfile } = await import("@/lib/avl-profile/traversal");
       await resetUserProfile(ctx.userId);
 
       return textResult(
@@ -328,7 +297,7 @@ interface AnswerStep {
 
 interface ProfileRow {
   userId: string;
-  user: { name: string | null; email: string | null; };
+  user: { name: string | null; email: string | null };
   leafNodeId: string;
   answerPath: AnswerStep[];
   derivedTags: string[];
@@ -383,10 +352,7 @@ const profileGetLeaderboard: StandaloneToolDefinition = {
         "Sort criterion: 'depth' (uniqueness depth in tree), 'speed' (fastest to profile), 'questions_answered'.",
       ),
   },
-  handler: async (
-    input: never,
-    _ctx: ServerContext,
-  ): Promise<CallToolResult> => {
+  handler: async (input: never, _ctx: ServerContext): Promise<CallToolResult> => {
     const { limit = 10, sort_by = "depth" } = input as {
       limit?: number;
       sort_by?: "depth" | "speed" | "questions_answered";
@@ -399,17 +365,17 @@ const profileGetLeaderboard: StandaloneToolDefinition = {
         take: 200,
       });
 
-      const profiles = rawProfiles.map(p => ({
+      const profiles = rawProfiles.map((p) => ({
         userId: p.userId,
-        user: p.user as { name: string | null; email: string | null; },
+        user: p.user as { name: string | null; email: string | null },
         leafNodeId: p.leafNodeId,
         answerPath: p.answerPath as unknown as AnswerStep[],
         derivedTags: p.derivedTags,
         completedAt: p.completedAt,
-        createdAt: (p as unknown as { createdAt: Date; }).createdAt,
+        createdAt: (p as unknown as { createdAt: Date }).createdAt,
       }));
 
-      const enriched = profiles.map(p => ({
+      const enriched = profiles.map((p) => ({
         depth: leafDepth(p.leafNodeId),
         questions: p.answerPath.length,
         completedAt: p.completedAt,
@@ -424,29 +390,27 @@ const profileGetLeaderboard: StandaloneToolDefinition = {
         enriched.sort((a, b) => b.depth - a.depth || b.questions - a.questions);
       }
 
-      const entries = enriched
-        .slice(0, limit)
-        .map((e, i) => ({
-          rank: i + 1,
-          displayName: e.name,
-          uniquenessDepth: e.depth,
-          totalQuestions: e.questions,
-          dateAchieved: e.completedAt.toISOString().split("T")[0] ?? "",
-        }));
+      const entries = enriched.slice(0, limit).map((e, i) => ({
+        rank: i + 1,
+        displayName: e.name,
+        uniquenessDepth: e.depth,
+        totalQuestions: e.questions,
+        dateAchieved: e.completedAt.toISOString().split("T")[0] ?? "",
+      }));
 
       if (entries.length === 0) {
-        return textResult(
-          "**beUniq Leaderboard**\n\nNo completed profiles yet. Be the first!",
-        );
+        return textResult("**beUniq Leaderboard**\n\nNo completed profiles yet. Be the first!");
       }
 
-      const header = `**beUniq Leaderboard** (sorted by: ${sort_by})\n\n`
-        + `| Rank | Player | Depth | Questions | Date |\n`
-        + `|------|--------|-------|-----------|------|\n`;
+      const header =
+        `**beUniq Leaderboard** (sorted by: ${sort_by})\n\n` +
+        `| Rank | Player | Depth | Questions | Date |\n` +
+        `|------|--------|-------|-----------|------|\n`;
 
       const rows = entries
-        .map(e =>
-          `| ${e.rank} | ${e.displayName} | ${e.uniquenessDepth} | ${e.totalQuestions} | ${e.dateAchieved} |`
+        .map(
+          (e) =>
+            `| ${e.rank} | ${e.displayName} | ${e.uniquenessDepth} | ${e.totalQuestions} | ${e.dateAchieved} |`,
         )
         .join("\n");
 
@@ -471,11 +435,8 @@ const profileShareResult: StandaloneToolDefinition = {
         "Output format: 'text' (plain summary), 'card' (rich formatted card), 'link' (shareable URL).",
       ),
   },
-  handler: async (
-    input: never,
-    ctx: ServerContext,
-  ): Promise<CallToolResult> => {
-    const { format = "text" } = input as { format?: "text" | "card" | "link"; };
+  handler: async (input: never, ctx: ServerContext): Promise<CallToolResult> => {
+    const { format = "text" } = input as { format?: "text" | "card" | "link" };
     return safeToolCall("profile_share_result", async () => {
       const prisma = (await import("@/lib/prisma")).default;
 
@@ -492,12 +453,12 @@ const profileShareResult: StandaloneToolDefinition = {
 
       const profile: ProfileRow = {
         userId: rawProfile.userId,
-        user: rawProfile.user as { name: string | null; email: string | null; },
+        user: rawProfile.user as { name: string | null; email: string | null },
         leafNodeId: rawProfile.leafNodeId,
         answerPath: rawProfile.answerPath as unknown as AnswerStep[],
         derivedTags: rawProfile.derivedTags,
         completedAt: rawProfile.completedAt,
-        createdAt: (rawProfile as unknown as { createdAt: Date; }).createdAt,
+        createdAt: (rawProfile as unknown as { createdAt: Date }).createdAt,
       };
 
       const depth = leafDepth(profile.leafNodeId);
@@ -513,24 +474,24 @@ const profileShareResult: StandaloneToolDefinition = {
 
       if (format === "card") {
         const card =
-          `\u2554\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2557\n`
-          + `\u2551         beUniq Profile Card          \u2551\n`
-          + `\u2560\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2563\n`
-          + `\u2551  Player:    ${name.padEnd(25)}\u2551\n`
-          + `\u2551  Depth:     ${String(depth).padEnd(25)}\u2551\n`
-          + `\u2551  Questions: ${String(totalQuestions).padEnd(25)}\u2551\n`
-          + `\u2551  Tags:      ${(tags.slice(0, 3).join(", ") || "none").padEnd(25)}\u2551\n`
-          + `\u255a\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u255d\n`
-          + `spike.land/beuniq`;
+          `\u2554\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2557\n` +
+          `\u2551         beUniq Profile Card          \u2551\n` +
+          `\u2560\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2563\n` +
+          `\u2551  Player:    ${name.padEnd(25)}\u2551\n` +
+          `\u2551  Depth:     ${String(depth).padEnd(25)}\u2551\n` +
+          `\u2551  Questions: ${String(totalQuestions).padEnd(25)}\u2551\n` +
+          `\u2551  Tags:      ${(tags.slice(0, 3).join(", ") || "none").padEnd(25)}\u2551\n` +
+          `\u255a\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u255d\n` +
+          `spike.land/beuniq`;
         return textResult(`**beUniq Profile Card**\n\n\`\`\`\n${card}\n\`\`\``);
       }
 
       return textResult(
-        `**Share Your Result**\n\n`
-          + `I am uniquely me at depth ${depth} on the beUniq tree!\n\n`
-          + `Personality tags: ${tags.join(", ") || "none"}\n`
-          + `Questions answered: ${totalQuestions}\n\n`
-          + `Discover your uniqueness at spike.land/beuniq`,
+        `**Share Your Result**\n\n` +
+          `I am uniquely me at depth ${depth} on the beUniq tree!\n\n` +
+          `Personality tags: ${tags.join(", ") || "none"}\n` +
+          `Questions answered: ${totalQuestions}\n\n` +
+          `Discover your uniqueness at spike.land/beuniq`,
       );
     });
   },
@@ -544,16 +505,10 @@ const profileCompare: StandaloneToolDefinition = {
   tier: "free",
   alwaysEnabled: true,
   inputSchema: {
-    other_user_id: z
-      .string()
-      .min(1)
-      .describe("User ID of the other player to compare against."),
+    other_user_id: z.string().min(1).describe("User ID of the other player to compare against."),
   },
-  handler: async (
-    input: never,
-    ctx: ServerContext,
-  ): Promise<CallToolResult> => {
-    const { other_user_id } = input as { other_user_id: string; };
+  handler: async (input: never, ctx: ServerContext): Promise<CallToolResult> => {
+    const { other_user_id } = input as { other_user_id: string };
     return safeToolCall("profile_compare", async () => {
       const prisma = (await import("@/lib/prisma")).default;
 
@@ -582,12 +537,12 @@ const profileCompare: StandaloneToolDefinition = {
 
       const toRow = (r: NonNullable<typeof rawMine>): ProfileRow => ({
         userId: r.userId,
-        user: r.user as { name: string | null; email: string | null; },
+        user: r.user as { name: string | null; email: string | null },
         leafNodeId: r.leafNodeId,
         answerPath: r.answerPath as unknown as AnswerStep[],
         derivedTags: r.derivedTags,
         completedAt: r.completedAt,
-        createdAt: (r as unknown as { createdAt: Date; }).createdAt,
+        createdAt: (r as unknown as { createdAt: Date }).createdAt,
       });
 
       const myProfile = toRow(rawMine);
@@ -611,28 +566,28 @@ const profileCompare: StandaloneToolDefinition = {
 
       const myTags = new Set(myProfile.derivedTags);
       const theirTags = new Set(otherProfile.derivedTags);
-      const sharedTags = [...myTags].filter(t => theirTags.has(t));
+      const sharedTags = [...myTags].filter((t) => theirTags.has(t));
       const totalUniqueTags = new Set([...myTags, ...theirTags]).size;
-      const overlapPct = totalUniqueTags > 0
-        ? Math.round((sharedTags.length / totalUniqueTags) * 100)
-        : 0;
+      const overlapPct =
+        totalUniqueTags > 0 ? Math.round((sharedTags.length / totalUniqueTags) * 100) : 0;
 
-      const divergenceQuestion = divergenceIndex < minLen
-        ? myPath[divergenceIndex]!.question
-        : "Paths are identical through all shared questions";
+      const divergenceQuestion =
+        divergenceIndex < minLen
+          ? myPath[divergenceIndex]!.question
+          : "Paths are identical through all shared questions";
 
       const otherName = resolveDisplayName(otherProfile);
 
       return textResult(
-        `**Profile Comparison**\n\n`
-          + `**Comparing with:** ${otherName}\n\n`
-          + `| Metric | Value |\n`
-          + `|--------|-------|\n`
-          + `| Common answers | ${commonCount} |\n`
-          + `| Divergence at question | ${divergenceIndex + 1} |\n`
-          + `| Personality overlap | ${overlapPct}% |\n`
-          + `| Shared tags | ${sharedTags.join(", ") || "none"} |\n\n`
-          + `**Divergence point:** "${divergenceQuestion}"`,
+        `**Profile Comparison**\n\n` +
+          `**Comparing with:** ${otherName}\n\n` +
+          `| Metric | Value |\n` +
+          `|--------|-------|\n` +
+          `| Common answers | ${commonCount} |\n` +
+          `| Divergence at question | ${divergenceIndex + 1} |\n` +
+          `| Personality overlap | ${overlapPct}% |\n` +
+          `| Shared tags | ${sharedTags.join(", ") || "none"} |\n\n` +
+          `**Divergence point:** "${divergenceQuestion}"`,
       );
     });
   },
@@ -646,10 +601,7 @@ const profileGetInsights: StandaloneToolDefinition = {
   tier: "free",
   alwaysEnabled: true,
   inputSchema: {},
-  handler: async (
-    _input: never,
-    ctx: ServerContext,
-  ): Promise<CallToolResult> => {
+  handler: async (_input: never, ctx: ServerContext): Promise<CallToolResult> => {
     return safeToolCall("profile_get_insights", async () => {
       const prisma = (await import("@/lib/prisma")).default;
 
@@ -658,36 +610,32 @@ const profileGetInsights: StandaloneToolDefinition = {
       });
 
       if (!rawProfile) {
-        return textResult(
-          "**No Profile**\n\nComplete profiling first with `profile_start`.",
-        );
+        return textResult("**No Profile**\n\nComplete profiling first with `profile_start`.");
       }
 
       const tags = rawProfile.derivedTags;
       const answerPath = rawProfile.answerPath as unknown as AnswerStep[];
       const confidence = tagConfidence(tags, answerPath);
 
-      const sorted = [...tags].sort(
-        (a, b) => (confidence[b] ?? 0) - (confidence[a] ?? 0),
-      );
+      const sorted = [...tags].sort((a, b) => (confidence[b] ?? 0) - (confidence[a] ?? 0));
       const dominant = sorted.slice(0, 3);
-      const rare = sorted.slice(-2).filter(t => (confidence[t] ?? 0) < 40);
+      const rare = sorted.slice(-2).filter((t) => (confidence[t] ?? 0) < 40);
 
       const depth = leafDepth(rawProfile.leafNodeId);
       const totalUsers = await prisma.avlUserProfile.count();
       const rarity = totalUsers > 0 ? `1 in ${totalUsers}` : "uniquely you";
 
       const confidenceLines = sorted
-        .map(t => `- **${t}**: ${confidence[t] ?? 0}% confidence`)
+        .map((t) => `- **${t}**: ${confidence[t] ?? 0}% confidence`)
         .join("\n");
 
       return textResult(
-        `**Personality Insights**\n\n`
-          + `**Dominant Traits:** ${dominant.join(", ") || "none"}\n\n`
-          + `**Tag Confidence Scores:**\n${confidenceLines || "No tags yet"}\n\n`
-          + `**Rare Combinations:** ${rare.join(", ") || "none identified"}\n\n`
-          + `**Fun Fact:** You sit at depth ${depth} in the beUniq tree. `
-          + `Your exact personality path is ${rarity} among all profiled players.`,
+        `**Personality Insights**\n\n` +
+          `**Dominant Traits:** ${dominant.join(", ") || "none"}\n\n` +
+          `**Tag Confidence Scores:**\n${confidenceLines || "No tags yet"}\n\n` +
+          `**Rare Combinations:** ${rare.join(", ") || "none identified"}\n\n` +
+          `**Fun Fact:** You sit at depth ${depth} in the beUniq tree. ` +
+          `Your exact personality path is ${rarity} among all profiled players.`,
       );
     });
   },

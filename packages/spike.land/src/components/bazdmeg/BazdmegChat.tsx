@@ -18,7 +18,7 @@ export function BazdmegChat({ onChatOpened }: BazdmegChatProps) {
   const [placeholder, setPlaceholder] = useState("Ask about spike.land...");
 
   useEffect(() => {
-    import("@/lib/constants/placeholders").then(m => {
+    import("@/lib/constants/placeholders").then((m) => {
       setPlaceholder(m.getRandomPlaceholder());
     });
   }, []);
@@ -33,9 +33,7 @@ export function BazdmegChat({ onChatOpened }: BazdmegChatProps) {
     return id;
   });
 
-  const { messages, isStreaming, error, sendMessage } = useChatStream(
-    sessionId,
-  );
+  const { messages, isStreaming, error, sendMessage } = useChatStream(sessionId);
 
   // Scroll to bottom on new messages
   useEffect(() => {
@@ -110,15 +108,10 @@ export function BazdmegChat({ onChatOpened }: BazdmegChatProps) {
         )}
 
         {messages.map((msg, i) => (
-          <div
-            key={i}
-            className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
-          >
+          <div key={i} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
             <div
               className={`max-w-[85%] rounded-xl px-3 py-2 text-sm ${
-                msg.role === "user"
-                  ? "bg-amber-500/20 text-amber-100"
-                  : "bg-white/5 text-zinc-300"
+                msg.role === "user" ? "bg-amber-500/20 text-amber-100" : "bg-white/5 text-zinc-300"
               }`}
             >
               {msg.content || (
@@ -153,7 +146,7 @@ export function BazdmegChat({ onChatOpened }: BazdmegChatProps) {
           <Textarea
             ref={textareaRef}
             value={input}
-            onChange={e => setInput(e.target.value)}
+            onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder={placeholder}
             className="min-h-[40px] max-h-[100px] resize-none border-white/10 bg-white/5 text-sm text-white placeholder:text-zinc-500"

@@ -36,10 +36,8 @@ export async function getPersonas(options?: {
 }): Promise<AgencyPersona[]> {
   return prisma.agencyPersona.findMany({
     where: {
-      ...(options?.minProfit !== undefined
-        && { predictedProfit: { gte: options.minProfit } }),
-      ...(options?.minStress !== undefined
-        && { stressLevel: { gte: options.minStress } }),
+      ...(options?.minProfit !== undefined && { predictedProfit: { gte: options.minProfit } }),
+      ...(options?.minStress !== undefined && { stressLevel: { gte: options.minStress } }),
     },
     orderBy: { rank: "asc" },
     ...(options?.limit !== undefined ? { take: options.limit } : {}),
@@ -49,9 +47,7 @@ export async function getPersonas(options?: {
 /**
  * Get a single persona by slug
  */
-export async function getPersonaBySlug(
-  slug: string,
-): Promise<AgencyPersona | null> {
+export async function getPersonaBySlug(slug: string): Promise<AgencyPersona | null> {
   return prisma.agencyPersona.findUnique({
     where: { slug },
   });
@@ -60,9 +56,7 @@ export async function getPersonaBySlug(
 /**
  * Get top personas by predicted profit
  */
-export async function getTopPersonasByProfit(
-  limit = 10,
-): Promise<AgencyPersona[]> {
+export async function getTopPersonasByProfit(limit = 10): Promise<AgencyPersona[]> {
   return prisma.agencyPersona.findMany({
     orderBy: { predictedProfit: "desc" },
     take: limit,
@@ -72,9 +66,7 @@ export async function getTopPersonasByProfit(
 /**
  * Get most stressed personas (highest urgency)
  */
-export async function getMostStressedPersonas(
-  limit = 10,
-): Promise<AgencyPersona[]> {
+export async function getMostStressedPersonas(limit = 10): Promise<AgencyPersona[]> {
   return prisma.agencyPersona.findMany({
     orderBy: { stressLevel: "desc" },
     take: limit,
@@ -84,9 +76,7 @@ export async function getMostStressedPersonas(
 /**
  * Create a new persona
  */
-export async function createPersona(
-  input: CreatePersonaInput,
-): Promise<AgencyPersona> {
+export async function createPersona(input: CreatePersonaInput): Promise<AgencyPersona> {
   return prisma.agencyPersona.create({
     data: {
       slug: input.slug,
@@ -131,11 +121,9 @@ export async function deletePersona(slug: string): Promise<void> {
 /**
  * Bulk create personas
  */
-export async function bulkCreatePersonas(
-  personas: CreatePersonaInput[],
-): Promise<number> {
+export async function bulkCreatePersonas(personas: CreatePersonaInput[]): Promise<number> {
   const result = await prisma.agencyPersona.createMany({
-    data: personas.map(p => ({
+    data: personas.map((p) => ({
       slug: p.slug,
       name: p.name,
       tagline: p.tagline,
@@ -165,7 +153,7 @@ export async function recalculateRanks(): Promise<void> {
   });
 
   // Score = (profit * 0.6) + (stress * 0.4) - higher is better
-  const scored = personas.map(p => ({
+  const scored = personas.map((p) => ({
     id: p.id,
     score: p.predictedProfit * 0.6 + p.stressLevel * 40, // stress is 0-10, normalize to 0-400
   }));
@@ -179,7 +167,7 @@ export async function recalculateRanks(): Promise<void> {
       prisma.agencyPersona.update({
         where: { id: p.id },
         data: { rank: index + 1 },
-      })
+      }),
     ),
   );
 }

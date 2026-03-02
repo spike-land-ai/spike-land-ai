@@ -1,9 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import {
-  detectPlatform,
-  getCameraPermissionInstructions,
-} from "./detect-platform";
+import { detectPlatform, getCameraPermissionInstructions } from "./detect-platform";
 
 describe("detectPlatform", () => {
   it("detects iOS Safari", () => {

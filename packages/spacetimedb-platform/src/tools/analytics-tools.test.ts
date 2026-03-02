@@ -29,7 +29,9 @@ describe("analytics-tools", () => {
   describe("stdb_record_event", () => {
     it("records an event", async () => {
       const result = await server.call("stdb_record_event", {
-        source: "web", eventType: "page_view", metadataJson: '{"page":"/home"}',
+        source: "web",
+        eventType: "page_view",
+        metadataJson: '{"page":"/home"}',
       });
       const parsed = JSON.parse(result.content[0].text);
       expect(parsed.recorded).toBe(true);
@@ -43,25 +45,35 @@ describe("analytics-tools", () => {
       const dcServer = createMockServer();
       registerAnalyticsTools(dcServer as unknown as McpServer, dcClient);
       const result = await dcServer.call("stdb_record_event", {
-        source: "x", eventType: "y", metadataJson: "{}",
+        source: "x",
+        eventType: "y",
+        metadataJson: "{}",
       });
       expect(result.isError).toBe(true);
       expect(JSON.parse(result.content[0].text).error).toBe("NOT_CONNECTED");
     });
 
     it("returns REDUCER_FAILED on error", async () => {
-      client.recordEvent = vi.fn(async () => { throw new Error("Reducer panicked"); });
+      client.recordEvent = vi.fn(async () => {
+        throw new Error("Reducer panicked");
+      });
       const result = await server.call("stdb_record_event", {
-        source: "x", eventType: "y", metadataJson: "{}",
+        source: "x",
+        eventType: "y",
+        metadataJson: "{}",
       });
       expect(result.isError).toBe(true);
       expect(JSON.parse(result.content[0].text).error).toBe("REDUCER_FAILED");
     });
 
     it("handles non-Error thrown values", async () => {
-      client.recordEvent = vi.fn(async () => { throw "string error"; });
+      client.recordEvent = vi.fn(async () => {
+        throw "string error";
+      });
       const result = await server.call("stdb_record_event", {
-        source: "x", eventType: "y", metadataJson: "{}",
+        source: "x",
+        eventType: "y",
+        metadataJson: "{}",
       });
       expect(result.isError).toBe(true);
     });
@@ -72,8 +84,22 @@ describe("analytics-tools", () => {
   describe("stdb_query_events", () => {
     it("queries all events", async () => {
       client._platformEvents.push(
-        { id: 1n, source: "web", eventType: "view", metadataJson: "{}", userIdentity: "u1", timestamp: 1000n },
-        { id: 2n, source: "api", eventType: "call", metadataJson: "{}", userIdentity: undefined, timestamp: 2000n },
+        {
+          id: 1n,
+          source: "web",
+          eventType: "view",
+          metadataJson: "{}",
+          userIdentity: "u1",
+          timestamp: 1000n,
+        },
+        {
+          id: 2n,
+          source: "api",
+          eventType: "call",
+          metadataJson: "{}",
+          userIdentity: undefined,
+          timestamp: 2000n,
+        },
       );
       const result = await server.call("stdb_query_events", { limit: 100 });
       const parsed = JSON.parse(result.content[0].text);
@@ -82,8 +108,22 @@ describe("analytics-tools", () => {
 
     it("filters by event type", async () => {
       client._platformEvents.push(
-        { id: 1n, source: "web", eventType: "view", metadataJson: "{}", userIdentity: undefined, timestamp: 1000n },
-        { id: 2n, source: "web", eventType: "click", metadataJson: "{}", userIdentity: undefined, timestamp: 2000n },
+        {
+          id: 1n,
+          source: "web",
+          eventType: "view",
+          metadataJson: "{}",
+          userIdentity: undefined,
+          timestamp: 1000n,
+        },
+        {
+          id: 2n,
+          source: "web",
+          eventType: "click",
+          metadataJson: "{}",
+          userIdentity: undefined,
+          timestamp: 2000n,
+        },
       );
       const result = await server.call("stdb_query_events", { eventType: "click", limit: 100 });
       const parsed = JSON.parse(result.content[0].text);
@@ -93,8 +133,22 @@ describe("analytics-tools", () => {
 
     it("filters by source", async () => {
       client._platformEvents.push(
-        { id: 1n, source: "web", eventType: "view", metadataJson: "{}", userIdentity: undefined, timestamp: 1000n },
-        { id: 2n, source: "api", eventType: "view", metadataJson: "{}", userIdentity: undefined, timestamp: 2000n },
+        {
+          id: 1n,
+          source: "web",
+          eventType: "view",
+          metadataJson: "{}",
+          userIdentity: undefined,
+          timestamp: 1000n,
+        },
+        {
+          id: 2n,
+          source: "api",
+          eventType: "view",
+          metadataJson: "{}",
+          userIdentity: undefined,
+          timestamp: 2000n,
+        },
       );
       const result = await server.call("stdb_query_events", { source: "api", limit: 100 });
       const parsed = JSON.parse(result.content[0].text);
@@ -105,8 +159,12 @@ describe("analytics-tools", () => {
     it("respects limit", async () => {
       for (let i = 0; i < 5; i++) {
         client._platformEvents.push({
-          id: BigInt(i), source: "web", eventType: "view", metadataJson: "{}",
-          userIdentity: undefined, timestamp: BigInt(i * 1000),
+          id: BigInt(i),
+          source: "web",
+          eventType: "view",
+          metadataJson: "{}",
+          userIdentity: undefined,
+          timestamp: BigInt(i * 1000),
         });
       }
       const result = await server.call("stdb_query_events", { limit: 2 });
@@ -128,9 +186,30 @@ describe("analytics-tools", () => {
   describe("stdb_analytics_dashboard", () => {
     it("returns dashboard summary", async () => {
       client._platformEvents.push(
-        { id: 1n, source: "web", eventType: "view", metadataJson: "{}", userIdentity: undefined, timestamp: 1000n },
-        { id: 2n, source: "web", eventType: "click", metadataJson: "{}", userIdentity: undefined, timestamp: 2000n },
-        { id: 3n, source: "api", eventType: "view", metadataJson: "{}", userIdentity: undefined, timestamp: 3000n },
+        {
+          id: 1n,
+          source: "web",
+          eventType: "view",
+          metadataJson: "{}",
+          userIdentity: undefined,
+          timestamp: 1000n,
+        },
+        {
+          id: 2n,
+          source: "web",
+          eventType: "click",
+          metadataJson: "{}",
+          userIdentity: undefined,
+          timestamp: 2000n,
+        },
+        {
+          id: 3n,
+          source: "api",
+          eventType: "view",
+          metadataJson: "{}",
+          userIdentity: undefined,
+          timestamp: 3000n,
+        },
       );
       const result = await server.call("stdb_analytics_dashboard", {});
       const parsed = JSON.parse(result.content[0].text);
@@ -186,7 +265,9 @@ describe("analytics-tools", () => {
     });
 
     it("returns QUERY_FAILED on error", async () => {
-      client.getHealthStatus = vi.fn(() => { throw new Error("DB error"); });
+      client.getHealthStatus = vi.fn(() => {
+        throw new Error("DB error");
+      });
       const result = await server.call("stdb_health_check", {});
       expect(result.isError).toBe(true);
       expect(JSON.parse(result.content[0].text).error).toBe("QUERY_FAILED");

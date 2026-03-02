@@ -5,13 +5,7 @@
  * event bus integration.
  */
 
-import {
-  beforeEach,
-  describe,
-  expect,
-  it,
-  vi,
-} from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 // Use vi.hoisted() so variables are available inside vi.mock() factory closures
 const {
@@ -94,14 +88,16 @@ function makeEvent(overrides: Partial<WorkflowEvent> = {}): WorkflowEvent {
   };
 }
 
-function makeSubscription(overrides: Partial<{
-  id: string;
-  workflowId: string;
-  eventType: WorkflowEvent["type"];
-  filterConfig: unknown;
-  isActive: boolean;
-  createdAt: Date;
-}> = {}) {
+function makeSubscription(
+  overrides: Partial<{
+    id: string;
+    workflowId: string;
+    eventType: WorkflowEvent["type"];
+    filterConfig: unknown;
+    isActive: boolean;
+    createdAt: Date;
+  }> = {},
+) {
   return {
     id: "sub-1",
     workflowId: "wf-1",
@@ -113,11 +109,13 @@ function makeSubscription(overrides: Partial<{
   };
 }
 
-function makeWorkflow(overrides: Partial<{
-  id: string;
-  workspaceId: string;
-  status: string;
-}> = {}) {
+function makeWorkflow(
+  overrides: Partial<{
+    id: string;
+    workspaceId: string;
+    status: string;
+  }> = {},
+) {
   return {
     id: "wf-1",
     workspaceId: "ws-1",
@@ -313,26 +311,24 @@ describe("updateEventSubscription", () => {
   it("throws when workflow is not found", async () => {
     mockWorkflowFindFirst.mockResolvedValue(null);
 
-    await expect(
-      updateEventSubscription("sub-1", "wf-1", "ws-1", {}),
-    ).rejects.toThrow("Workflow not found");
+    await expect(updateEventSubscription("sub-1", "wf-1", "ws-1", {})).rejects.toThrow(
+      "Workflow not found",
+    );
   });
 
   it("throws when subscription is not found", async () => {
     mockWorkflowFindFirst.mockResolvedValue(makeWorkflow());
     mockWorkflowEventSubscriptionFindFirst.mockResolvedValue(null);
 
-    await expect(
-      updateEventSubscription("missing", "wf-1", "ws-1", {}),
-    ).rejects.toThrow("Subscription not found");
+    await expect(updateEventSubscription("missing", "wf-1", "ws-1", {})).rejects.toThrow(
+      "Subscription not found",
+    );
   });
 
   it("updates isActive flag", async () => {
     mockWorkflowFindFirst.mockResolvedValue(makeWorkflow());
     mockWorkflowEventSubscriptionFindFirst.mockResolvedValue(makeSubscription());
-    mockWorkflowEventSubscriptionUpdate.mockResolvedValue(
-      makeSubscription({ isActive: false }),
-    );
+    mockWorkflowEventSubscriptionUpdate.mockResolvedValue(makeSubscription({ isActive: false }));
 
     const result = await updateEventSubscription("sub-1", "wf-1", "ws-1", {
       isActive: false,
@@ -356,9 +352,7 @@ describe("deleteEventSubscription", () => {
     mockWorkflowEventSubscriptionFindFirst.mockResolvedValue(makeSubscription());
     mockWorkflowEventSubscriptionDelete.mockResolvedValue(makeSubscription());
 
-    await expect(
-      deleteEventSubscription("sub-1", "wf-1", "ws-1"),
-    ).resolves.toBeUndefined();
+    await expect(deleteEventSubscription("sub-1", "wf-1", "ws-1")).resolves.toBeUndefined();
 
     expect(mockWorkflowEventSubscriptionDelete).toHaveBeenCalledWith({
       where: { id: "sub-1" },
@@ -368,18 +362,18 @@ describe("deleteEventSubscription", () => {
   it("throws when workflow is not found", async () => {
     mockWorkflowFindFirst.mockResolvedValue(null);
 
-    await expect(
-      deleteEventSubscription("sub-1", "wf-1", "ws-1"),
-    ).rejects.toThrow("Workflow not found");
+    await expect(deleteEventSubscription("sub-1", "wf-1", "ws-1")).rejects.toThrow(
+      "Workflow not found",
+    );
   });
 
   it("throws when subscription is not found", async () => {
     mockWorkflowFindFirst.mockResolvedValue(makeWorkflow());
     mockWorkflowEventSubscriptionFindFirst.mockResolvedValue(null);
 
-    await expect(
-      deleteEventSubscription("missing", "wf-1", "ws-1"),
-    ).rejects.toThrow("Subscription not found");
+    await expect(deleteEventSubscription("missing", "wf-1", "ws-1")).rejects.toThrow(
+      "Subscription not found",
+    );
   });
 });
 
@@ -418,9 +412,9 @@ describe("getWorkflowEventSubscriptions", () => {
   it("throws when workflow is not found", async () => {
     mockWorkflowFindFirst.mockResolvedValue(null);
 
-    await expect(
-      getWorkflowEventSubscriptions("missing", "ws-1"),
-    ).rejects.toThrow("Workflow not found");
+    await expect(getWorkflowEventSubscriptions("missing", "ws-1")).rejects.toThrow(
+      "Workflow not found",
+    );
   });
 });
 
@@ -594,10 +588,7 @@ describe("initializeEventSubscriptions", () => {
   });
 
   it("registers subscriptions for all active workflows", async () => {
-    const workflows = [
-      makeWorkflow({ id: "wf-1" }),
-      makeWorkflow({ id: "wf-2" }),
-    ];
+    const workflows = [makeWorkflow({ id: "wf-1" }), makeWorkflow({ id: "wf-2" })];
     mockWorkflowFindMany.mockResolvedValue(workflows);
     mockWorkflowEventSubscriptionFindMany.mockResolvedValue([]);
 

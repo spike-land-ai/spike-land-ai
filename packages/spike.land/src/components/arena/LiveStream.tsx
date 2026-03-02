@@ -30,10 +30,10 @@ export function LiveStream({ challengeId, submissionId }: LiveStreamProps) {
 
     const addLog = (message: string, type: LogEntry["type"] = "info") => {
       const id = ++idRef.current;
-      setLogs(prev => [...prev, { id, message, type, timestamp: Date.now() }]);
+      setLogs((prev) => [...prev, { id, message, type, timestamp: Date.now() }]);
     };
 
-    eventSource.onmessage = event => {
+    eventSource.onmessage = (event) => {
       try {
         const parsed = JSON.parse(event.data);
 
@@ -42,7 +42,7 @@ export function LiveStream({ challengeId, submissionId }: LiveStreamProps) {
             addLog("Connected to stream");
             break;
           case "phase_update": {
-            const data = parsed.data as { phase?: string; message?: string; };
+            const data = parsed.data as { phase?: string; message?: string };
             if (data.phase) setPhase(data.phase as ArenaPhase);
             if (data.message) addLog(data.message);
             break;
@@ -51,7 +51,7 @@ export function LiveStream({ challengeId, submissionId }: LiveStreamProps) {
             addLog("Code generated successfully", "success");
             break;
           case "error_detected": {
-            const errData = parsed.data as { error?: string; };
+            const errData = parsed.data as { error?: string };
             addLog(`Error: ${errData.error || "Unknown"}`, "error");
             break;
           }
@@ -59,7 +59,7 @@ export function LiveStream({ challengeId, submissionId }: LiveStreamProps) {
             addLog("Error fixed", "success");
             break;
           case "transpile_success": {
-            const tsData = parsed.data as { codespaceUrl?: string; };
+            const tsData = parsed.data as { codespaceUrl?: string };
             if (tsData.codespaceUrl) setCodespaceUrl(tsData.codespaceUrl);
             addLog("Transpilation successful!", "success");
             setPhase("REVIEWING");
@@ -80,7 +80,7 @@ export function LiveStream({ challengeId, submissionId }: LiveStreamProps) {
             break;
           }
           case "failed": {
-            const failData = parsed.data as { message?: string; };
+            const failData = parsed.data as { message?: string };
             addLog(failData.message || "Generation failed", "error");
             setPhase("FAILED");
             break;
@@ -114,20 +114,18 @@ export function LiveStream({ challengeId, submissionId }: LiveStreamProps) {
         ref={logRef}
         className="bg-zinc-950 border border-zinc-800 rounded-lg p-4 h-64 overflow-y-auto font-mono text-xs"
       >
-        {logs.map(log => (
+        {logs.map((log) => (
           <div
             key={log.id}
             className={`mb-1 ${
               log.type === "error"
                 ? "text-red-400"
                 : log.type === "success"
-                ? "text-green-400"
-                : "text-zinc-400"
+                  ? "text-green-400"
+                  : "text-zinc-400"
             }`}
           >
-            <span className="text-zinc-600">
-              [{new Date(log.timestamp).toLocaleTimeString()}]
-            </span>{" "}
+            <span className="text-zinc-600">[{new Date(log.timestamp).toLocaleTimeString()}]</span>{" "}
             {log.message}
           </div>
         ))}
@@ -137,9 +135,7 @@ export function LiveStream({ challengeId, submissionId }: LiveStreamProps) {
       {/* Live preview iframe */}
       {codespaceUrl && (
         <div>
-          <h3 className="text-sm font-medium text-zinc-300 mb-2">
-            Live Preview
-          </h3>
+          <h3 className="text-sm font-medium text-zinc-300 mb-2">Live Preview</h3>
           <div className="border border-zinc-800 rounded-lg overflow-hidden bg-white">
             <iframe
               src={codespaceUrl}

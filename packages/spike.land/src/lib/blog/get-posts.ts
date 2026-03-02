@@ -29,9 +29,9 @@ export const getPostSlugs = cache(function getPostSlugs(): string[] {
 
   const slugSafePattern = /^[a-zA-Z0-9_-]+$/;
   return files
-    .filter(file => file.toString().endsWith(".mdx"))
-    .map(file => file.toString().replace(/\.mdx$/, ""))
-    .filter(slug => slugSafePattern.test(slug));
+    .filter((file) => file.toString().endsWith(".mdx"))
+    .map((file) => file.toString().replace(/\.mdx$/, ""))
+    .filter((slug) => slugSafePattern.test(slug));
 });
 
 /**
@@ -52,7 +52,7 @@ function readPostData(slug: string): BlogPost | null {
   }
 
   const { data: fileContents, error: readError } = tryCatchSync(() =>
-    fs.readFileSync(filePath, "utf8")
+    fs.readFileSync(filePath, "utf8"),
   );
 
   if (readError) {
@@ -63,10 +63,7 @@ function readPostData(slug: string): BlogPost | null {
   const { data: parsed, error: parseError } = tryCatchSync(() => matter(fileContents));
 
   if (parseError) {
-    logger.error(
-      `Failed to parse frontmatter in ${slug}.mdx:`,
-      parseError.message,
-    );
+    logger.error(`Failed to parse frontmatter in ${slug}.mdx:`, parseError.message);
     return null;
   }
 
@@ -75,10 +72,7 @@ function readPostData(slug: string): BlogPost | null {
   const { data: stats, error: readingTimeError } = tryCatchSync(() => readingTime(content));
 
   if (readingTimeError) {
-    logger.error(
-      `Failed to calculate reading time for ${slug}.mdx:`,
-      readingTimeError.message,
-    );
+    logger.error(`Failed to calculate reading time for ${slug}.mdx:`, readingTimeError.message);
     return null;
   }
 
@@ -86,10 +80,7 @@ function readPostData(slug: string): BlogPost | null {
   const parseResult = blogPostFrontmatterSchema.safeParse(data);
 
   if (!parseResult.success) {
-    logger.error(
-      `Invalid frontmatter in ${slug}.mdx:`,
-      parseResult.error.flatten().fieldErrors,
-    );
+    logger.error(`Invalid frontmatter in ${slug}.mdx:`, parseResult.error.flatten().fieldErrors);
     return null;
   }
 
@@ -105,11 +96,9 @@ function readPostData(slug: string): BlogPost | null {
  * Get a single blog post by slug.
  * Validates frontmatter using Zod schema.
  */
-export const getPostBySlug = cache(
-  function getPostBySlug(slug: string): BlogPost | null {
-    return readPostData(slug);
-  },
-);
+export const getPostBySlug = cache(function getPostBySlug(slug: string): BlogPost | null {
+  return readPostData(slug);
+});
 
 /**
  * Get all blog posts with metadata (for listing pages)
@@ -120,7 +109,7 @@ export const getAllPosts = cache(function getAllPosts(): BlogPostMeta[] {
   const slugs = getPostSlugs();
 
   const posts = slugs
-    .map(slug => {
+    .map((slug) => {
       const post = readPostData(slug);
       if (!post) return null;
 
@@ -132,7 +121,7 @@ export const getAllPosts = cache(function getAllPosts(): BlogPostMeta[] {
     })
     .filter((post): post is BlogPostMeta => post !== null)
     // Filter out unlisted posts (listed defaults to true via Zod schema)
-    .filter(post => post.frontmatter.listed !== false);
+    .filter((post) => post.frontmatter.listed !== false);
 
   // Sort by date (newest first)
   return posts.sort((a, b) => {
@@ -147,7 +136,7 @@ export const getAllPosts = cache(function getAllPosts(): BlogPostMeta[] {
  */
 export function getPostsByCategory(category: string): BlogPostMeta[] {
   return getAllPosts().filter(
-    post => post.frontmatter.category.toLowerCase() === category.toLowerCase(),
+    (post) => post.frontmatter.category.toLowerCase() === category.toLowerCase(),
   );
 }
 
@@ -155,8 +144,8 @@ export function getPostsByCategory(category: string): BlogPostMeta[] {
  * Get posts by tag
  */
 export function getPostsByTag(tag: string): BlogPostMeta[] {
-  return getAllPosts().filter(post =>
-    post.frontmatter.tags.some(t => t.toLowerCase() === tag.toLowerCase())
+  return getAllPosts().filter((post) =>
+    post.frontmatter.tags.some((t) => t.toLowerCase() === tag.toLowerCase()),
   );
 }
 
@@ -164,7 +153,7 @@ export function getPostsByTag(tag: string): BlogPostMeta[] {
  * Get featured posts
  */
 export function getFeaturedPosts(): BlogPostMeta[] {
-  return getAllPosts().filter(post => post.frontmatter.featured);
+  return getAllPosts().filter((post) => post.frontmatter.featured);
 }
 
 /**
@@ -172,7 +161,7 @@ export function getFeaturedPosts(): BlogPostMeta[] {
  */
 export function getAllCategories(): string[] {
   const posts = getAllPosts();
-  const categories = new Set(posts.map(post => post.frontmatter.category));
+  const categories = new Set(posts.map((post) => post.frontmatter.category));
   return Array.from(categories).sort();
 }
 
@@ -181,7 +170,7 @@ export function getAllCategories(): string[] {
  */
 export function getAllTags(): string[] {
   const posts = getAllPosts();
-  const tags = new Set(posts.flatMap(post => post.frontmatter.tags));
+  const tags = new Set(posts.flatMap((post) => post.frontmatter.tags));
   return Array.from(tags).sort();
 }
 
@@ -191,10 +180,7 @@ const SLUG_PATTERN = /^[a-zA-Z0-9_-]+$/;
  * Read and parse a persona variant MDX file.
  * Looks for content/blog/{slug}/{personaSlug}.mdx
  */
-export function readVariantData(
-  slug: string,
-  personaSlug: string,
-): BlogPost | null {
+export function readVariantData(slug: string, personaSlug: string): BlogPost | null {
   if (!SLUG_PATTERN.test(slug) || !SLUG_PATTERN.test(personaSlug)) {
     logger.error(`Invalid slug or personaSlug: ${slug}/${personaSlug}`);
     return null;
@@ -207,24 +193,18 @@ export function readVariantData(
   }
 
   const { data: fileContents, error: readError } = tryCatchSync(() =>
-    fs.readFileSync(filePath, "utf8")
+    fs.readFileSync(filePath, "utf8"),
   );
 
   if (readError) {
-    logger.error(
-      `Failed to read ${slug}/${personaSlug}.mdx:`,
-      readError.message,
-    );
+    logger.error(`Failed to read ${slug}/${personaSlug}.mdx:`, readError.message);
     return null;
   }
 
   const { data: parsed, error: parseError } = tryCatchSync(() => matter(fileContents));
 
   if (parseError) {
-    logger.error(
-      `Failed to parse frontmatter in ${slug}/${personaSlug}.mdx:`,
-      parseError.message,
-    );
+    logger.error(`Failed to parse frontmatter in ${slug}/${personaSlug}.mdx:`, parseError.message);
     return null;
   }
 

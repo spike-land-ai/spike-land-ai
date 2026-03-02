@@ -110,9 +110,7 @@ describe("characterTimestampsToWords", () => {
 describe("synthesizeSpeech", () => {
   it("should throw when ELEVENLABS_API_KEY is missing", async () => {
     delete process.env.ELEVENLABS_API_KEY;
-    await expect(synthesizeSpeech("Hello")).rejects.toThrow(
-      "ELEVENLABS_API_KEY is not configured",
-    );
+    await expect(synthesizeSpeech("Hello")).rejects.toThrow("ELEVENLABS_API_KEY is not configured");
   });
 
   it("should throw for empty text", async () => {
@@ -120,9 +118,7 @@ describe("synthesizeSpeech", () => {
   });
 
   it("should throw for whitespace-only text", async () => {
-    await expect(synthesizeSpeech("   ")).rejects.toThrow(
-      "Text cannot be empty",
-    );
+    await expect(synthesizeSpeech("   ")).rejects.toThrow("Text cannot be empty");
   });
 
   it("should throw for text exceeding max length", async () => {
@@ -183,10 +179,7 @@ describe("synthesizeSpeech", () => {
       .mockResolvedValue(mockResponse as unknown as Response);
 
     await synthesizeSpeech("Test");
-    expect(fetchSpy).toHaveBeenCalledWith(
-      expect.stringContaining("/env-voice"),
-      expect.anything(),
-    );
+    expect(fetchSpy).toHaveBeenCalledWith(expect.stringContaining("/env-voice"), expect.anything());
   });
 
   it("should throw on non-ok response", async () => {
@@ -202,9 +195,7 @@ describe("synthesizeSpeech", () => {
   });
 
   it("should throw on fetch error", async () => {
-    vi.spyOn(globalThis, "fetch").mockRejectedValue(
-      new Error("Network error"),
-    );
+    vi.spyOn(globalThis, "fetch").mockRejectedValue(new Error("Network error"));
 
     await expect(synthesizeSpeech("Hello")).rejects.toThrow(
       "ElevenLabs API request failed: Network error",

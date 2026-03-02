@@ -2,11 +2,7 @@
 // Pure logic — no React, no DOM, no xterm import.
 // Communicates via callbacks.
 
-import type {
-  McpCategory,
-  McpSuperCategory,
-  McpToolDef,
-} from "@/components/mcp/mcp-tool-registry";
+import type { McpCategory, McpSuperCategory, McpToolDef } from "@/components/mcp/mcp-tool-registry";
 import {
   c,
   formatError,
@@ -28,10 +24,7 @@ export interface ShellCallbacks {
   /** Clear terminal screen */
   clear: () => void;
   /** Execute an MCP tool call — returns the JSON response */
-  executeTool: (
-    toolName: string,
-    params: Record<string, unknown>,
-  ) => Promise<unknown>;
+  executeTool: (toolName: string, params: Record<string, unknown>) => Promise<unknown>;
   /** Called when an image URL is detected in a response */
   onImageUrl?: (url: string) => void;
 }
@@ -57,19 +50,16 @@ export class TerminalShell {
   private categories: McpCategory[];
   private superCategories: McpSuperCategory[];
   private toolNames: string[];
-  private toolsByCategory: Record<
-    string,
-    Array<{ name: string; description: string; }>
-  >;
+  private toolsByCategory: Record<string, Array<{ name: string; description: string }>>;
 
   private cb: ShellCallbacks;
 
   constructor(callbacks: ShellCallbacks, options: ShellOptions) {
     this.cb = callbacks;
     this.tools = options.tools;
-    this.categories = options.categories.filter(cat => cat.toolCount > 0);
+    this.categories = options.categories.filter((cat) => cat.toolCount > 0);
     this.superCategories = options.superCategories ?? [];
-    this.toolNames = this.tools.map(t => t.name).sort();
+    this.toolNames = this.tools.map((t) => t.name).sort();
 
     // Group tools by category for list display
     this.toolsByCategory = {};
@@ -174,8 +164,7 @@ export class TerminalShell {
       this.cb.write(ch);
     } else {
       // Insert in middle
-      this.line = this.line.slice(0, this.cursorPos) + ch
-        + this.line.slice(this.cursorPos);
+      this.line = this.line.slice(0, this.cursorPos) + ch + this.line.slice(this.cursorPos);
       this.cursorPos++;
       this.redrawLine();
     }
@@ -183,8 +172,7 @@ export class TerminalShell {
 
   private backspace(): void {
     if (this.cursorPos === 0) return;
-    this.line = this.line.slice(0, this.cursorPos - 1)
-      + this.line.slice(this.cursorPos);
+    this.line = this.line.slice(0, this.cursorPos - 1) + this.line.slice(this.cursorPos);
     this.cursorPos--;
     this.redrawLine();
   }
@@ -269,7 +257,7 @@ export class TerminalShell {
     // Only complete the first word (tool name)
     if (prefix.includes(" ")) return;
 
-    const matches = this.toolNames.filter(n => n.startsWith(prefix));
+    const matches = this.toolNames.filter((n) => n.startsWith(prefix));
     if (matches.length === 0) return;
 
     if (matches.length === 1) {
@@ -284,9 +272,7 @@ export class TerminalShell {
       const colWidth = 28;
       for (let i = 0; i < matches.length; i += maxPerRow) {
         const row = matches.slice(i, i + maxPerRow);
-        this.cb.write(
-          "  " + row.map(m => c.green(m.padEnd(colWidth))).join("") + "\r\n",
-        );
+        this.cb.write("  " + row.map((m) => c.green(m.padEnd(colWidth))).join("") + "\r\n");
       }
       this.cb.write(PROMPT + this.line);
       // Re-position cursor
@@ -371,14 +357,14 @@ export class TerminalShell {
       return;
     }
 
-    const tool = this.tools.find(t => t.name === args || t.name === args.toLowerCase());
+    const tool = this.tools.find((t) => t.name === args || t.name === args.toLowerCase());
     if (tool) {
       this.cb.write(formatToolHelp(tool));
     } else {
       this.cb.write(
-        `\r\n  ${c.yellow(`Unknown tool: "${args}"`)}. Use ${
-          c.green("list")
-        } to see available tools.\r\n\r\n`,
+        `\r\n  ${c.yellow(`Unknown tool: "${args}"`)}. Use ${c.green(
+          "list",
+        )} to see available tools.\r\n\r\n`,
       );
     }
     this.cb.write(PROMPT);
@@ -405,8 +391,8 @@ export class TerminalShell {
 
     const q = query.toLowerCase();
     const results = this.tools
-      .filter(t => t.name.includes(q) || t.description.toLowerCase().includes(q))
-      .map(t => ({
+      .filter((t) => t.name.includes(q) || t.description.toLowerCase().includes(q))
+      .map((t) => ({
         name: t.name,
         description: t.description,
         category: t.category,
@@ -418,13 +404,13 @@ export class TerminalShell {
   }
 
   private async cmdTool(name: string, argsStr: string): Promise<void> {
-    const tool = this.tools.find(t => t.name === name);
+    const tool = this.tools.find((t) => t.name === name);
     if (!tool) {
       this.cb.write(`\r\n  ${c.red("Unknown command:")} ${c.white(name)}\r\n`);
       this.cb.write(
-        `  ${c.dim("Type")} ${c.green("help")} ${c.dim("for available commands, or")} ${
-          c.green("search " + name)
-        } ${c.dim("to find tools.")}\r\n\r\n`,
+        `  ${c.dim("Type")} ${c.green("help")} ${c.dim("for available commands, or")} ${c.green(
+          "search " + name,
+        )} ${c.dim("to find tools.")}\r\n\r\n`,
       );
       this.cb.write(PROMPT);
       return;
@@ -436,16 +422,12 @@ export class TerminalShell {
     // Start spinner
     this.executing = true;
     let frame = 0;
-    this.cb.write(
-      `  ${c.cyan(SPINNER_FRAMES[0]!)} ${c.dim(`Running ${name}...`)}`,
-    );
+    this.cb.write(`  ${c.cyan(SPINNER_FRAMES[0]!)} ${c.dim(`Running ${name}...`)}`);
 
     this.spinnerTimer = setInterval(() => {
       frame = (frame + 1) % SPINNER_FRAMES.length;
       // Move to start of line, rewrite spinner
-      this.cb.write(
-        `\r  ${c.cyan(SPINNER_FRAMES[frame]!)} ${c.dim(`Running ${name}...`)}`,
-      );
+      this.cb.write(`\r  ${c.cyan(SPINNER_FRAMES[frame]!)} ${c.dim(`Running ${name}...`)}`);
     }, 80);
 
     const start = Date.now();
@@ -470,13 +452,7 @@ export class TerminalShell {
       const elapsed = Date.now() - start;
       this.stopSpinner();
       this.cb.write("\r\x1b[2K");
-      this.cb.write(
-        formatError(
-          name,
-          err instanceof Error ? err.message : String(err),
-          elapsed,
-        ),
-      );
+      this.cb.write(formatError(name, err instanceof Error ? err.message : String(err), elapsed));
     }
 
     this.executing = false;
@@ -493,10 +469,7 @@ export class TerminalShell {
 
 // ── Helpers ──────────────────────────────────────────────────────────
 
-function parseToolArgs(
-  argsStr: string,
-  tool?: McpToolDef,
-): Record<string, unknown> {
+function parseToolArgs(argsStr: string, tool?: McpToolDef): Record<string, unknown> {
   if (!argsStr) return {};
 
   const trimmed = argsStr.trim();
@@ -526,8 +499,8 @@ function parseToolArgs(
 
     // Clean up value
     if (
-      (value.startsWith("\"") && value.endsWith("\""))
-      || (value.startsWith("'") && value.endsWith("'"))
+      (value.startsWith('"') && value.endsWith('"')) ||
+      (value.startsWith("'") && value.endsWith("'"))
     ) {
       value = value.slice(1, -1);
       // Unescape: \" -> ", \\ -> \, etc.
@@ -561,10 +534,7 @@ function parseToolArgs(
   const positionalValues: unknown[] = [];
   while ((m = posPattern.exec(remaining)) !== null) {
     let val = m[1] as string;
-    if (
-      (val.startsWith("\"") && val.endsWith("\""))
-      || (val.startsWith("'") && val.endsWith("'"))
-    ) {
+    if ((val.startsWith('"') && val.endsWith('"')) || (val.startsWith("'") && val.endsWith("'"))) {
       val = val.slice(1, -1).replace(/\\(.)/g, "$1");
     }
     positionalValues.push(val);
@@ -585,13 +555,12 @@ function parseToolArgs(
         } else if (p.type === "boolean") {
           if (val === "true") finalVal = true;
           if (val === "false") finalVal = false;
-        } else if (
-          typeof val === "string"
-          && (val.startsWith("{") || val.startsWith("["))
-        ) {
+        } else if (typeof val === "string" && (val.startsWith("{") || val.startsWith("["))) {
           try {
             finalVal = JSON.parse(val);
-          } catch { /* ignore */ }
+          } catch {
+            /* ignore */
+          }
         }
 
         params[p.name] = finalVal;

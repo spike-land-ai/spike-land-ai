@@ -4,11 +4,7 @@
 
 "use client";
 
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import { Magnet, ZoomIn, ZoomOut } from "lucide-react";
 import type { SnapGrid } from "../../types";
@@ -22,7 +18,7 @@ interface TimelineControlsProps {
   onSnapGridChange: (grid: SnapGrid) => void;
 }
 
-const SNAP_GRID_OPTIONS: { value: SnapGrid; label: string; }[] = [
+const SNAP_GRID_OPTIONS: { value: SnapGrid; label: string }[] = [
   { value: 0.1, label: "0.1s" },
   { value: 0.25, label: "0.25s" },
   { value: 0.5, label: "0.5s" },
@@ -68,7 +64,7 @@ export function TimelineControls({
             max="200"
             step="5"
             value={zoom}
-            onChange={e => onZoomChange(parseInt(e.target.value))}
+            onChange={(e) => onZoomChange(parseInt(e.target.value))}
             className="w-28 h-1 bg-white/10 rounded-lg appearance-none cursor-pointer accent-primary"
             aria-label="Timeline zoom"
           />
@@ -115,15 +111,11 @@ export function TimelineControls({
         {snapEnabled && (
           <select
             value={snapGrid}
-            onChange={e => onSnapGridChange(parseFloat(e.target.value) as SnapGrid)}
+            onChange={(e) => onSnapGridChange(parseFloat(e.target.value) as SnapGrid)}
             className="px-3 py-1.5 text-xs bg-white/5 text-gray-300 rounded-xl border border-white/10 focus:outline-none focus:border-primary/50 transition-colors font-mono"
           >
-            {SNAP_GRID_OPTIONS.map(option => (
-              <option
-                key={option.value}
-                value={option.value}
-                className="bg-gray-900"
-              >
+            {SNAP_GRID_OPTIONS.map((option) => (
+              <option key={option.value} value={option.value} className="bg-gray-900">
                 {option.label}
               </option>
             ))}

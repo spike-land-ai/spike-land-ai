@@ -36,10 +36,7 @@ export interface AutoReviewResult {
  * @param codespaceId - The codespace to review
  * @param code - The source code to transpile-check (optional, fetched from session if missing)
  */
-export async function runAutoReview(
-  codespaceId: string,
-  code?: string,
-): Promise<AutoReviewResult> {
+export async function runAutoReview(codespaceId: string, code?: string): Promise<AutoReviewResult> {
   const checks = await Promise.all([
     checkTranspile(codespaceId, code),
     checkBundle(codespaceId),
@@ -49,7 +46,7 @@ export async function runAutoReview(
   const [transpile, bundle, health] = checks;
 
   const passed = transpile.passed && bundle.passed && health.passed;
-  const passedCount = checks.filter(c => c.passed).length;
+  const passedCount = checks.filter((c) => c.passed).length;
   const score = passedCount / checks.length;
 
   return {
@@ -59,10 +56,7 @@ export async function runAutoReview(
   };
 }
 
-async function checkTranspile(
-  codespaceId: string,
-  code?: string,
-): Promise<AutoReviewCheck> {
+async function checkTranspile(codespaceId: string, code?: string): Promise<AutoReviewCheck> {
   const start = Date.now();
   try {
     let sourceCode = code;
@@ -108,9 +102,9 @@ async function checkBundle(codespaceId: string): Promise<AutoReviewCheck> {
 
     // Verify transpiled output exists and is non-trivial
     const hasTranspiled = Boolean(
-      session.transpiled
-        && session.transpiled.length > 50
-        && !session.transpiled.includes("404 - for now"),
+      session.transpiled &&
+        session.transpiled.length > 50 &&
+        !session.transpiled.includes("404 - for now"),
     );
 
     if (!hasTranspiled) {

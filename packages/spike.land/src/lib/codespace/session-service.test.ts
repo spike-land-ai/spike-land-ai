@@ -57,18 +57,20 @@ const { SessionService } = await import("./session-service");
 // Helpers
 // ---------------------------------------------------------------------------
 
-function makeDbSession(overrides: Partial<{
-  id: string;
-  codeSpace: string;
-  code: string;
-  transpiled: string;
-  html: string;
-  css: string;
-  hash: string;
-  messages: unknown;
-  requiresReRender: boolean;
-  appId: string | null;
-}> = {}) {
+function makeDbSession(
+  overrides: Partial<{
+    id: string;
+    codeSpace: string;
+    code: string;
+    transpiled: string;
+    html: string;
+    css: string;
+    hash: string;
+    messages: unknown;
+    requiresReRender: boolean;
+    appId: string | null;
+  }> = {},
+) {
   return {
     id: "cuid-123",
     codeSpace: "my-app",
@@ -164,10 +166,7 @@ describe("SessionService", () => {
     it("should return cached health status for all items if present", async () => {
       mockRedisMget.mockResolvedValue([true, false]);
 
-      const result = await SessionService.checkSessionsHealth([
-        "app-1",
-        "app-2",
-      ]);
+      const result = await SessionService.checkSessionsHealth(["app-1", "app-2"]);
 
       expect(result.get("app-1")).toBe(true);
       expect(result.get("app-2")).toBe(false);
@@ -183,15 +182,14 @@ describe("SessionService", () => {
       mockRedisMget.mockResolvedValue([true, null]);
 
       // DB returns app-2 as healthy
-      mockQueryRaw.mockResolvedValue([{
-        codeSpace: "app-2",
-        is_healthy: true,
-      }]);
-
-      const result = await SessionService.checkSessionsHealth([
-        "app-1",
-        "app-2",
+      mockQueryRaw.mockResolvedValue([
+        {
+          codeSpace: "app-2",
+          is_healthy: true,
+        },
       ]);
+
+      const result = await SessionService.checkSessionsHealth(["app-1", "app-2"]);
 
       expect(result.get("app-1")).toBe(true);
       expect(result.get("app-2")).toBe(true);
@@ -200,11 +198,7 @@ describe("SessionService", () => {
       expect(mockQueryRaw).toHaveBeenCalled();
 
       // Should have updated cache for app-2
-      expect(mockRedisSet).toHaveBeenCalledWith(
-        "codespace:health:app-2",
-        true,
-        expect.any(Object),
-      );
+      expect(mockRedisSet).toHaveBeenCalledWith("codespace:health:app-2", true, expect.any(Object));
     });
 
     it("should mark items missing from DB as unhealthy", async () => {
@@ -324,11 +318,7 @@ describe("SessionService", () => {
         messages: [],
       };
 
-      const result = await SessionService.updateSession(
-        "my-app",
-        newSession,
-        "expected-hash",
-      );
+      const result = await SessionService.updateSession("my-app", newSession, "expected-hash");
 
       expect(result.success).toBe(true);
       expect(result.session).toBeDefined();
@@ -336,9 +326,7 @@ describe("SessionService", () => {
 
     it("should return conflict when hash mismatches", async () => {
       mockUpdateMany.mockResolvedValue({ count: 0 });
-      mockFindUnique.mockResolvedValue(
-        makeDbSession({ hash: "actual-hash" }),
-      );
+      mockFindUnique.mockResolvedValue(makeDbSession({ hash: "actual-hash" }));
 
       const newSession: ICodeSession = {
         code: "updated",
@@ -349,11 +337,7 @@ describe("SessionService", () => {
         messages: [],
       };
 
-      const result = await SessionService.updateSession(
-        "my-app",
-        newSession,
-        "wrong-hash",
-      );
+      const result = await SessionService.updateSession("my-app", newSession, "wrong-hash");
 
       expect(result.success).toBe(false);
       expect(result.error).toBe("Conflict: Hash mismatch");
@@ -372,11 +356,7 @@ describe("SessionService", () => {
         messages: [],
       };
 
-      const result = await SessionService.updateSession(
-        "nonexistent",
-        newSession,
-        "some-hash",
-      );
+      const result = await SessionService.updateSession("nonexistent", newSession, "some-hash");
 
       expect(result.success).toBe(false);
       expect(result.error).toBe("Codespace not found");

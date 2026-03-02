@@ -33,7 +33,9 @@ describe("content-tools", () => {
   describe("stdb_create_page", () => {
     it("creates a page", async () => {
       const result = await server.call("stdb_create_page", {
-        slug: "hello-world", title: "Hello World", description: "A test page",
+        slug: "hello-world",
+        title: "Hello World",
+        description: "A test page",
       });
       const parsed = JSON.parse(result.content[0].text);
       expect(parsed.created).toBe(true);
@@ -46,16 +48,22 @@ describe("content-tools", () => {
       const dcServer = createMockServer();
       registerContentTools(dcServer as unknown as McpServer, dcClient);
       const result = await dcServer.call("stdb_create_page", {
-        slug: "x", title: "X", description: "",
+        slug: "x",
+        title: "X",
+        description: "",
       });
       expect(result.isError).toBe(true);
       expect(JSON.parse(result.content[0].text).error).toBe("NOT_CONNECTED");
     });
 
     it("returns REDUCER_FAILED on error", async () => {
-      client.createPage = vi.fn(async () => { throw new Error("Duplicate slug"); });
+      client.createPage = vi.fn(async () => {
+        throw new Error("Duplicate slug");
+      });
       const result = await server.call("stdb_create_page", {
-        slug: "x", title: "X", description: "",
+        slug: "x",
+        title: "X",
+        description: "",
       });
       expect(result.isError).toBe(true);
       expect(JSON.parse(result.content[0].text).error).toBe("REDUCER_FAILED");
@@ -67,8 +75,13 @@ describe("content-tools", () => {
   describe("stdb_get_page", () => {
     it("gets an existing page", async () => {
       client._pages.push({
-        id: 1n, slug: "hello", title: "Hello", description: "Desc",
-        ownerIdentity: "o1", createdAt: 1000n, updatedAt: 2000n,
+        id: 1n,
+        slug: "hello",
+        title: "Hello",
+        description: "Desc",
+        ownerIdentity: "o1",
+        createdAt: 1000n,
+        updatedAt: 2000n,
       });
       const result = await server.call("stdb_get_page", { slug: "hello" });
       const parsed = JSON.parse(result.content[0].text);
@@ -96,11 +109,17 @@ describe("content-tools", () => {
   describe("stdb_update_page", () => {
     it("updates a page", async () => {
       client._pages.push({
-        id: 1n, slug: "hello", title: "Hello", description: "Old",
-        ownerIdentity: "o1", createdAt: 1000n, updatedAt: 1000n,
+        id: 1n,
+        slug: "hello",
+        title: "Hello",
+        description: "Old",
+        ownerIdentity: "o1",
+        createdAt: 1000n,
+        updatedAt: 1000n,
       });
       const result = await server.call("stdb_update_page", {
-        slug: "hello", title: "Updated",
+        slug: "hello",
+        title: "Updated",
       });
       const parsed = JSON.parse(result.content[0].text);
       expect(parsed.updated).toBe(true);
@@ -108,7 +127,8 @@ describe("content-tools", () => {
 
     it("returns REDUCER_FAILED for missing page", async () => {
       const result = await server.call("stdb_update_page", {
-        slug: "missing", title: "X",
+        slug: "missing",
+        title: "X",
       });
       expect(result.isError).toBe(true);
       expect(JSON.parse(result.content[0].text).error).toBe("REDUCER_FAILED");
@@ -120,8 +140,13 @@ describe("content-tools", () => {
   describe("stdb_delete_page", () => {
     it("deletes a page", async () => {
       client._pages.push({
-        id: 1n, slug: "hello", title: "Hello", description: "",
-        ownerIdentity: "o1", createdAt: 1000n, updatedAt: 1000n,
+        id: 1n,
+        slug: "hello",
+        title: "Hello",
+        description: "",
+        ownerIdentity: "o1",
+        createdAt: 1000n,
+        updatedAt: 1000n,
       });
       const result = await server.call("stdb_delete_page", { slug: "hello" });
       const parsed = JSON.parse(result.content[0].text);
@@ -139,7 +164,10 @@ describe("content-tools", () => {
   describe("stdb_create_block", () => {
     it("creates a block", async () => {
       const result = await server.call("stdb_create_block", {
-        pageId: "1", blockType: "text", contentJson: '{"text":"Hello"}', sortOrder: 0,
+        pageId: "1",
+        blockType: "text",
+        contentJson: '{"text":"Hello"}',
+        sortOrder: 0,
       });
       const parsed = JSON.parse(result.content[0].text);
       expect(parsed.created).toBe(true);
@@ -152,7 +180,10 @@ describe("content-tools", () => {
       const dcServer = createMockServer();
       registerContentTools(dcServer as unknown as McpServer, dcClient);
       const result = await dcServer.call("stdb_create_block", {
-        pageId: "1", blockType: "text", contentJson: "{}", sortOrder: 0,
+        pageId: "1",
+        blockType: "text",
+        contentJson: "{}",
+        sortOrder: 0,
       });
       expect(result.isError).toBe(true);
     });
@@ -163,11 +194,17 @@ describe("content-tools", () => {
   describe("stdb_update_block", () => {
     it("updates a block", async () => {
       client._pageBlocks.push({
-        id: 1n, pageId: 1n, blockType: "text", contentJson: '{"old":true}',
-        sortOrder: 0, createdAt: 1000n, updatedAt: 1000n,
+        id: 1n,
+        pageId: 1n,
+        blockType: "text",
+        contentJson: '{"old":true}',
+        sortOrder: 0,
+        createdAt: 1000n,
+        updatedAt: 1000n,
       });
       const result = await server.call("stdb_update_block", {
-        blockId: "1", contentJson: '{"new":true}',
+        blockId: "1",
+        contentJson: '{"new":true}',
       });
       const parsed = JSON.parse(result.content[0].text);
       expect(parsed.updated).toBe(true);
@@ -175,7 +212,8 @@ describe("content-tools", () => {
 
     it("returns REDUCER_FAILED for missing block", async () => {
       const result = await server.call("stdb_update_block", {
-        blockId: "999", contentJson: "{}",
+        blockId: "999",
+        contentJson: "{}",
       });
       expect(result.isError).toBe(true);
     });
@@ -186,8 +224,13 @@ describe("content-tools", () => {
   describe("stdb_delete_block", () => {
     it("deletes a block", async () => {
       client._pageBlocks.push({
-        id: 1n, pageId: 1n, blockType: "text", contentJson: "{}",
-        sortOrder: 0, createdAt: 1000n, updatedAt: 1000n,
+        id: 1n,
+        pageId: 1n,
+        blockType: "text",
+        contentJson: "{}",
+        sortOrder: 0,
+        createdAt: 1000n,
+        updatedAt: 1000n,
       });
       const result = await server.call("stdb_delete_block", { blockId: "1" });
       const parsed = JSON.parse(result.content[0].text);
@@ -205,11 +248,28 @@ describe("content-tools", () => {
   describe("stdb_reorder_blocks", () => {
     it("reorders blocks", async () => {
       client._pageBlocks.push(
-        { id: 1n, pageId: 1n, blockType: "text", contentJson: "{}", sortOrder: 0, createdAt: 1000n, updatedAt: 1000n },
-        { id: 2n, pageId: 1n, blockType: "code", contentJson: "{}", sortOrder: 1, createdAt: 1000n, updatedAt: 1000n },
+        {
+          id: 1n,
+          pageId: 1n,
+          blockType: "text",
+          contentJson: "{}",
+          sortOrder: 0,
+          createdAt: 1000n,
+          updatedAt: 1000n,
+        },
+        {
+          id: 2n,
+          pageId: 1n,
+          blockType: "code",
+          contentJson: "{}",
+          sortOrder: 1,
+          createdAt: 1000n,
+          updatedAt: 1000n,
+        },
       );
       const result = await server.call("stdb_reorder_blocks", {
-        pageId: "1", blockIds: ["2", "1"],
+        pageId: "1",
+        blockIds: ["2", "1"],
       });
       const parsed = JSON.parse(result.content[0].text);
       expect(parsed.reordered).toBe(true);
@@ -222,7 +282,8 @@ describe("content-tools", () => {
       const dcServer = createMockServer();
       registerContentTools(dcServer as unknown as McpServer, dcClient);
       const result = await dcServer.call("stdb_reorder_blocks", {
-        pageId: "1", blockIds: ["1"],
+        pageId: "1",
+        blockIds: ["1"],
       });
       expect(result.isError).toBe(true);
     });

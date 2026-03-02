@@ -1,8 +1,5 @@
 import { describe, expect, it } from "vitest";
-import {
-  buildAgentSystemPrompt,
-  getAgentChatConfig,
-} from "./agent-system-prompt";
+import { buildAgentSystemPrompt, getAgentChatConfig } from "./agent-system-prompt";
 
 describe("buildAgentSystemPrompt", () => {
   it("includes user name when provided", () => {

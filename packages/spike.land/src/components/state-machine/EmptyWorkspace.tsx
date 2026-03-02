@@ -1,9 +1,13 @@
 import { GitBranch, LayoutTemplate, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-export function EmptyWorkspace(
-  { onNew, onTemplate }: { onNew: () => void; onTemplate: () => void; },
-) {
+export function EmptyWorkspace({
+  onNew,
+  onTemplate,
+}: {
+  onNew: () => void;
+  onTemplate: () => void;
+}) {
   return (
     <div className="flex-1 flex items-center justify-center relative overflow-hidden bg-zinc-950">
       {/* Background glow */}

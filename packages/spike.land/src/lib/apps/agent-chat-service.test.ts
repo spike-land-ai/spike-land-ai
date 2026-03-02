@@ -40,14 +40,14 @@ describe("agent-chat-service", () => {
   describe("emitStage", () => {
     it("enqueues formatted stage status", () => {
       const enqueue = vi.fn();
-      const controller = { enqueue } as any;
+      const controller = { enqueue } as unknown as ReadableStreamDefaultController;
       emitStage(controller, "processing", "test-tool");
 
       expect(enqueue).toHaveBeenCalled();
       const callArg = enqueue.mock.calls[0]![0];
       const decoded = new TextDecoder().decode(callArg);
-      expect(decoded).toContain("\"stage\":\"processing\"");
-      expect(decoded).toContain("\"tool\":\"test-tool\"");
+      expect(decoded).toContain('"stage":"processing"');
+      expect(decoded).toContain('"tool":"test-tool"');
     });
   });
 
@@ -58,16 +58,22 @@ describe("agent-chat-service", () => {
         yield {
           type: "assistant",
           message: {
-            content: [{
-              type: "text",
-              text: "{\"name\": \"Test App\", \"description\": \"A test app\"}",
-            }],
+            content: [
+              {
+                type: "text",
+                text: '{"name": "Test App", "description": "A test app"}',
+              },
+            ],
           },
         };
       }
 
-      vi.mocked(query).mockResolvedValue(mockResult() as any);
-      vi.mocked(prisma.app.update).mockResolvedValue({} as any);
+      vi.mocked(query).mockResolvedValue(
+        mockResult() as unknown as Awaited<ReturnType<typeof query>>,
+      );
+      vi.mocked(prisma.app.update).mockResolvedValue(
+        {} as unknown as Awaited<ReturnType<typeof prisma.app.update>>,
+      );
 
       await generateAppDetails("app-1", "agent response", "user prompt");
 
@@ -88,7 +94,9 @@ describe("agent-chat-service", () => {
         };
       }
 
-      vi.mocked(query).mockResolvedValue(mockResult() as any);
+      vi.mocked(query).mockResolvedValue(
+        mockResult() as unknown as Awaited<ReturnType<typeof query>>,
+      );
       await generateAppDetails("app-1", "agent response", "user prompt");
 
       expect(prisma.app.update).not.toHaveBeenCalled();

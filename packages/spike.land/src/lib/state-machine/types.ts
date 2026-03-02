@@ -6,12 +6,7 @@
  * actions, history states, and final states.
  */
 
-export type StateType =
-  | "atomic"
-  | "compound"
-  | "parallel"
-  | "final"
-  | "history";
+export type StateType = "atomic" | "compound" | "parallel" | "final" | "history";
 export type HistoryType = "shallow" | "deep";
 export type ActionType = "assign" | "log" | "raise" | "custom";
 

@@ -166,9 +166,7 @@ describe("AuthDialog", () => {
 
   it("shows description for accessibility", () => {
     render(<AuthDialog {...defaultProps} />);
-    expect(
-      screen.getByText("The AI development platform"),
-    ).toBeInTheDocument();
+    expect(screen.getByText("The AI development platform")).toBeInTheDocument();
   });
 
   it("always shows all OAuth buttons (hardcoded in better-auth)", () => {

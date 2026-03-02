@@ -5,7 +5,7 @@ describe("Guard Expression Parser", () => {
   const context = {
     count: 10,
     user: { name: "John", active: true },
-    _event: { type: "CLICK", value: 42 }
+    _event: { type: "CLICK", value: 42 },
   };
 
   it("should evaluate arithmetic expressions", () => {

@@ -29,7 +29,7 @@ function platformColor(platform: string): string {
 }
 
 export function ScheduleCalendar({ posts }: ScheduleCalendarProps) {
-  const postsByDay = Array.from({ length: 7 }, (_, i) => posts.filter(p => p.dayOfWeek === i));
+  const postsByDay = Array.from({ length: 7 }, (_, i) => posts.filter((p) => p.dayOfWeek === i));
 
   return (
     <Card className="bg-zinc-900 border-zinc-800 w-full">
@@ -38,11 +38,8 @@ export function ScheduleCalendar({ posts }: ScheduleCalendarProps) {
       </CardHeader>
       <CardContent>
         <div className="grid grid-cols-7 gap-1">
-          {DAY_LABELS.map(day => (
-            <div
-              key={day}
-              className="text-center text-xs font-medium text-zinc-500 pb-2"
-            >
+          {DAY_LABELS.map((day) => (
+            <div key={day} className="text-center text-xs font-medium text-zinc-500 pb-2">
               {day}
             </div>
           ))}
@@ -51,7 +48,7 @@ export function ScheduleCalendar({ posts }: ScheduleCalendarProps) {
               key={dayIndex}
               className="min-h-[80px] rounded-lg bg-zinc-800/50 border border-zinc-800 p-1.5 space-y-1"
             >
-              {dayPosts.map(post => (
+              {dayPosts.map((post) => (
                 <div
                   key={post.id}
                   className="group relative"
@@ -64,10 +61,7 @@ export function ScheduleCalendar({ posts }: ScheduleCalendarProps) {
                     )}
                   >
                     <span
-                      className={cn(
-                        "w-2 h-2 rounded-full shrink-0",
-                        platformColor(post.platform),
-                      )}
+                      className={cn("w-2 h-2 rounded-full shrink-0", platformColor(post.platform))}
                     />
                     <span className="text-[10px] text-zinc-400 truncate leading-tight">
                       {post.time}

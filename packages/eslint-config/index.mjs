@@ -15,10 +15,7 @@
 import tseslint from "typescript-eslint";
 
 const sharedRules = {
-  ...tseslint.configs.recommended.reduce(
-    (acc, config) => ({ ...acc, ...config.rules }),
-    {},
-  ),
+  ...tseslint.configs.recommended.reduce((acc, config) => ({ ...acc, ...config.rules }), {}),
   "@typescript-eslint/no-unused-vars": [
     "error",
     {
@@ -27,6 +24,7 @@ const sharedRules = {
       caughtErrorsIgnorePattern: "^_",
     },
   ],
+  "@typescript-eslint/no-explicit-any": "error",
   "@typescript-eslint/consistent-type-imports": [
     "error",
     {
@@ -41,7 +39,6 @@ const sharedRules = {
 const testOverrides = {
   files: ["**/*.test.ts", "**/*.test.tsx", "**/*.spec.ts", "**/*.spec.tsx"],
   rules: {
-    "@typescript-eslint/no-explicit-any": "off",
     "dot-notation": "off",
   },
 };

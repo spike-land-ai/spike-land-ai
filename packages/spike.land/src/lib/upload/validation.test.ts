@@ -11,11 +11,7 @@ import {
 } from "./validation";
 
 // Helper to create mock File objects
-function createFile(
-  name: string,
-  size: number,
-  type: string,
-): File {
+function createFile(name: string, size: number, type: string): File {
   const content = new Uint8Array(size);
   return new File([content], name, { type });
 }
@@ -203,10 +199,7 @@ describe("validateFile", () => {
 
 describe("validateFiles", () => {
   it("accepts valid file list", () => {
-    const files = [
-      createFile("a.jpg", 100, "image/jpeg"),
-      createFile("b.png", 200, "image/png"),
-    ];
+    const files = [createFile("a.jpg", 100, "image/jpeg"), createFile("b.png", 200, "image/png")];
     const result = validateFiles(files);
     expect(result.valid).toBe(true);
     expect(result.validFiles).toHaveLength(2);
@@ -263,9 +256,7 @@ describe("getValidationSummary", () => {
       valid: false,
       errors: ["bad.txt: Invalid file type"],
       validFiles: [createFile("a.jpg", 100, "image/jpeg")],
-      invalidFiles: [
-        { file: createFile("bad.txt", 100, "text/plain"), error: "Invalid" },
-      ],
+      invalidFiles: [{ file: createFile("bad.txt", 100, "text/plain"), error: "Invalid" }],
     };
     const summary = getValidationSummary(result);
     expect(summary).toContain("1 valid file(s)");
@@ -277,9 +268,7 @@ describe("getValidationSummary", () => {
       valid: false,
       errors: ["bad"],
       validFiles: [],
-      invalidFiles: [
-        { file: createFile("bad.txt", 100, "text/plain"), error: "Invalid" },
-      ],
+      invalidFiles: [{ file: createFile("bad.txt", 100, "text/plain"), error: "Invalid" }],
     };
     const summary = getValidationSummary(result);
     expect(summary).toContain("1 invalid file(s)");

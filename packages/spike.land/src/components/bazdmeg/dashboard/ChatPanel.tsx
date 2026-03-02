@@ -46,9 +46,7 @@ export function ChatPanel({
   // Auto-scroll
   useEffect(() => {
     if (scrollAreaRef.current) {
-      const viewport = scrollAreaRef.current.querySelector(
-        "[data-radix-scroll-area-viewport]",
-      );
+      const viewport = scrollAreaRef.current.querySelector("[data-radix-scroll-area-viewport]");
       if (viewport) {
         viewport.scrollTop = viewport.scrollHeight;
       }
@@ -65,12 +63,12 @@ export function ChatPanel({
       content,
       createdAt: new Date().toISOString(),
     };
-    setMessages(prev => [...prev, userMsg]);
+    setMessages((prev) => [...prev, userMsg]);
     setInput("");
     setIsStreaming(true);
 
     const agentMsgId = `agent-${Date.now()}`;
-    setMessages(prev => [
+    setMessages((prev) => [
       ...prev,
       {
         id: agentMsgId,
@@ -94,8 +92,8 @@ export function ChatPanel({
 
     if (fetchError || !response || !response.ok) {
       const errorText = response ? await response.text() : "Network error";
-      setMessages(prev =>
-        prev.map(m => m.id === agentMsgId ? { ...m, content: `Error: ${errorText}` } : m)
+      setMessages((prev) =>
+        prev.map((m) => (m.id === agentMsgId ? { ...m, content: `Error: ${errorText}` } : m)),
       );
       setIsStreaming(false);
       return;
@@ -103,8 +101,8 @@ export function ChatPanel({
 
     const reader = response.body?.getReader();
     if (!reader) {
-      setMessages(prev =>
-        prev.map(m => m.id === agentMsgId ? { ...m, content: "Error: No stream" } : m)
+      setMessages((prev) =>
+        prev.map((m) => (m.id === agentMsgId ? { ...m, content: "Error: No stream" } : m)),
       );
       setIsStreaming(false);
       return;
@@ -134,23 +132,21 @@ export function ChatPanel({
             };
 
             if (event.type === "chunk" && event.content) {
-              setMessages(prev =>
-                prev.map(m =>
-                  m.id === agentMsgId
-                    ? { ...m, content: m.content + event.content }
-                    : m
-                )
+              setMessages((prev) =>
+                prev.map((m) =>
+                  m.id === agentMsgId ? { ...m, content: m.content + event.content } : m,
+                ),
               );
             } else if (event.type === "error" && event.content) {
-              setMessages(prev =>
-                prev.map(m =>
+              setMessages((prev) =>
+                prev.map((m) =>
                   m.id === agentMsgId
                     ? {
-                      ...m,
-                      content: m.content + `\n\nError: ${event.content}`,
-                    }
-                    : m
-                )
+                        ...m,
+                        content: m.content + `\n\nError: ${event.content}`,
+                      }
+                    : m,
+                ),
               );
             }
           } catch {
@@ -177,9 +173,7 @@ export function ChatPanel({
       <div className="flex items-center justify-center h-full">
         <div className="text-center">
           <Bot className="h-8 w-8 text-zinc-700 mx-auto mb-2" />
-          <p className="text-xs text-zinc-600">
-            Select a ticket to start planning
-          </p>
+          <p className="text-xs text-zinc-600">Select a ticket to start planning</p>
         </div>
       </div>
     );
@@ -191,13 +185,9 @@ export function ChatPanel({
       <div className="px-3 py-2 border-b border-white/10">
         <div className="flex items-center gap-2">
           <Bot className="h-3.5 w-3.5 text-amber-500" />
-          <h3 className="text-xs font-medium text-zinc-400">
-            Plan with Opus
-          </h3>
+          <h3 className="text-xs font-medium text-zinc-400">Plan with Opus</h3>
           {isStreaming && (
-            <span className="text-[10px] text-amber-400 animate-pulse">
-              Thinking...
-            </span>
+            <span className="text-[10px] text-amber-400 animate-pulse">Thinking...</span>
           )}
         </div>
       </div>
@@ -216,7 +206,7 @@ export function ChatPanel({
                   "Create a plan for this ticket",
                   "What files need to change?",
                   "Suggest edge cases",
-                ].map(s => (
+                ].map((s) => (
                   <button
                     key={s}
                     onClick={() => {
@@ -232,7 +222,9 @@ export function ChatPanel({
             </div>
           )}
 
-          {messages.map(msg => <ChatBubble key={msg.id} message={msg} />)}
+          {messages.map((msg) => (
+            <ChatBubble key={msg.id} message={msg} />
+          ))}
         </div>
       </ScrollArea>
 
@@ -241,11 +233,9 @@ export function ChatPanel({
         <div className="flex gap-2">
           <Textarea
             ref={textareaRef}
-            placeholder={isDisabled
-              ? "Chat disabled while Jules is working"
-              : "Plan with Opus..."}
+            placeholder={isDisabled ? "Chat disabled while Jules is working" : "Plan with Opus..."}
             value={input}
-            onChange={e => setInput(e.target.value)}
+            onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
             disabled={isStreaming || isDisabled}
             className="min-h-[40px] max-h-[80px] resize-none bg-zinc-800 border-zinc-700 text-white text-xs placeholder:text-zinc-600 focus:border-amber-500/50"
@@ -257,9 +247,11 @@ export function ChatPanel({
             aria-label={isStreaming ? "Sending message" : "Send message"}
             className="h-[40px] w-[40px] bg-amber-500 hover:bg-amber-600 text-black shrink-0"
           >
-            {isStreaming
-              ? <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden="true" />
-              : <Send className="h-3.5 w-3.5" aria-hidden="true" />}
+            {isStreaming ? (
+              <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden="true" />
+            ) : (
+              <Send className="h-3.5 w-3.5" aria-hidden="true" />
+            )}
           </Button>
         </div>
       </div>
@@ -267,7 +259,7 @@ export function ChatPanel({
   );
 }
 
-const ChatBubble = memo(function ChatBubble({ message }: { message: ChatMessage; }) {
+const ChatBubble = memo(function ChatBubble({ message }: { message: ChatMessage }) {
   const isUser = message.role === "USER";
 
   return (

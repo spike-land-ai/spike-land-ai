@@ -16,10 +16,7 @@ import type { UTMParams } from "./utm-capture";
  * @param conversionDate - The conversion date
  * @returns Number of days difference (can be fractional)
  */
-export function calculateDaysDifference(
-  sessionDate: Date,
-  conversionDate: Date,
-): number {
+export function calculateDaysDifference(sessionDate: Date, conversionDate: Date): number {
   const diffMs = conversionDate.getTime() - sessionDate.getTime();
   return diffMs / (1000 * 60 * 60 * 24); // Convert milliseconds to days
 }
@@ -46,11 +43,8 @@ export function calculateTimeDecayAttribution(
   const decayRate = Math.log(0.5) / halfLifeDays;
 
   // Calculate raw weights using exponential decay
-  const rawWeights = sessions.map(session => {
-    const daysBefore = calculateDaysDifference(
-      session.sessionStart,
-      conversionDate,
-    );
+  const rawWeights = sessions.map((session) => {
+    const daysBefore = calculateDaysDifference(session.sessionStart, conversionDate);
     // Clamp to 0 if future date (shouldn't happen, but safe)
     const daysAgo = Math.max(0, daysBefore);
     return Math.exp(decayRate * daysAgo);
@@ -60,7 +54,7 @@ export function calculateTimeDecayAttribution(
   const totalWeight = rawWeights.reduce((sum, w) => sum + w, 0);
   if (totalWeight === 0) return sessions.map(() => 1 / sessions.length); // Fallback to equal
 
-  return rawWeights.map(w => w / totalWeight);
+  return rawWeights.map((w) => w / totalWeight);
 }
 
 /**
@@ -105,9 +99,7 @@ export function calculatePositionBasedAttribution(
  * @param url - The URL string to parse
  * @returns The hostname or null if parsing fails
  */
-export async function safeParseUrlHostname(
-  url: string,
-): Promise<string | null> {
+export async function safeParseUrlHostname(url: string): Promise<string | null> {
   const { data, error } = await tryCatch(
     Promise.resolve().then(() => new URL(url).hostname.toLowerCase()),
   );
@@ -123,9 +115,7 @@ export async function safeParseUrlHostname(
  * @param session - The visitor session
  * @returns Platform identifier
  */
-export async function determineSessionPlatform(
-  session: VisitorSession,
-): Promise<string> {
+export async function determineSessionPlatform(session: VisitorSession): Promise<string> {
   // Check click IDs first
   if (session.gclid) {
     return "GOOGLE_ADS";
@@ -141,10 +131,10 @@ export async function determineSessionPlatform(
       return "GOOGLE_ADS";
     }
     if (
-      source.includes("facebook")
-      || source.includes("fb")
-      || source.includes("instagram")
-      || source.includes("meta")
+      source.includes("facebook") ||
+      source.includes("fb") ||
+      source.includes("instagram") ||
+      source.includes("meta")
     ) {
       return "FACEBOOK";
     }
@@ -157,12 +147,13 @@ export async function determineSessionPlatform(
     const hostname = await safeParseUrlHostname(referrer);
     if (hostname) {
       // Check if the hostname ends with the search engine domain
-      const isOrganic = hostname === "google.com"
-        || hostname.endsWith(".google.com")
-        || hostname === "bing.com"
-        || hostname.endsWith(".bing.com")
-        || hostname === "duckduckgo.com"
-        || hostname.endsWith(".duckduckgo.com");
+      const isOrganic =
+        hostname === "google.com" ||
+        hostname.endsWith(".google.com") ||
+        hostname === "bing.com" ||
+        hostname.endsWith(".bing.com") ||
+        hostname === "duckduckgo.com" ||
+        hostname.endsWith(".duckduckgo.com");
       if (isOrganic) {
         return "ORGANIC";
       }
@@ -179,9 +170,7 @@ export async function determineSessionPlatform(
  * @param session - The visitor session
  * @returns The external campaign ID or null
  */
-export async function getExternalCampaignId(
-  session: VisitorSession,
-): Promise<string | null> {
+export async function getExternalCampaignId(session: VisitorSession): Promise<string | null> {
   if (!session.utmCampaign) {
     return null;
   }

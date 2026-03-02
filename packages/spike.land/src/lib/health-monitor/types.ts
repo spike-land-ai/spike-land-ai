@@ -103,10 +103,10 @@ export interface HealthWeights {
  * Default weights for health score calculation
  */
 export const DEFAULT_HEALTH_WEIGHTS: HealthWeights = {
-  syncStatus: 0.30, // 30%
+  syncStatus: 0.3, // 30%
   rateLimitUsage: 0.25, // 25%
   errorFrequency: 0.25, // 25%
-  tokenHealth: 0.20, // 20%
+  tokenHealth: 0.2, // 20%
 };
 
 /**

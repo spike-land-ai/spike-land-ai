@@ -8,8 +8,7 @@
  * Data sourced from openclaw/src/bazdmeg/ — the typed source of truth.
  */
 
-export const BAZDMEG_SYSTEM_PROMPT =
-  `You are the BAZDMEG Method assistant — an expert on the AI-assisted development methodology created by Spike Land Ltd.
+export const BAZDMEG_SYSTEM_PROMPT = `You are the BAZDMEG Method assistant — an expert on the AI-assisted development methodology created by Spike Land Ltd.
 
 You answer questions about the BAZDMEG method concisely and directly. You are helpful, opinionated, and practical.
 

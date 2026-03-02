@@ -209,11 +209,8 @@ export function SessionTracker() {
 
     // Mark UTM as captured if we found any params
     if (
-      !utmAlreadyCaptured
-      && (utmParams.utmSource
-        || utmParams.gclid
-        || utmParams.fbclid
-        || utmParams.utmCampaign)
+      !utmAlreadyCaptured &&
+      (utmParams.utmSource || utmParams.gclid || utmParams.fbclid || utmParams.utmCampaign)
     ) {
       sessionStorage.setItem(UTM_CAPTURED_KEY, "true");
     }
@@ -274,12 +271,7 @@ export function SessionTracker() {
    * Track a custom event
    */
   const trackEvent = useCallback(
-    async (
-      name: string,
-      category?: string,
-      value?: number,
-      metadata?: Record<string, unknown>,
-    ) => {
+    async (name: string, category?: string, value?: number, metadata?: Record<string, unknown>) => {
       if (!hasConsent() || !sessionIdRef.current) return;
 
       await debouncedApiCall("/api/tracking/event", {
@@ -299,22 +291,15 @@ export function SessionTracker() {
   const handleScroll = useCallback(() => {
     if (!hasConsent() || !sessionIdRef.current) return;
 
-    const scrollHeight = document.documentElement.scrollHeight
-      - window.innerHeight;
+    const scrollHeight = document.documentElement.scrollHeight - window.innerHeight;
     if (scrollHeight <= 0) return;
 
     const scrollPercentage = Math.round((window.scrollY / scrollHeight) * 100);
-    maxScrollDepthRef.current = Math.max(
-      maxScrollDepthRef.current,
-      scrollPercentage,
-    );
+    maxScrollDepthRef.current = Math.max(maxScrollDepthRef.current, scrollPercentage);
 
     // Track milestones using the allowed event names
     for (const milestone of SCROLL_MILESTONES) {
-      if (
-        scrollPercentage >= milestone
-        && !trackedScrollMilestonesRef.current.has(milestone)
-      ) {
+      if (scrollPercentage >= milestone && !trackedScrollMilestonesRef.current.has(milestone)) {
         trackedScrollMilestonesRef.current.add(milestone);
         trackEvent(`page_scroll_${milestone}`, "engagement", milestone, {
           path: pathname,
@@ -329,15 +314,10 @@ export function SessionTracker() {
   const checkTimeMilestones = useCallback(() => {
     if (!hasConsent() || !sessionIdRef.current) return;
 
-    const timeOnPage = Math.floor(
-      (Date.now() - pageStartTimeRef.current) / 1000,
-    );
+    const timeOnPage = Math.floor((Date.now() - pageStartTimeRef.current) / 1000);
 
     for (const milestone of TIME_MILESTONES) {
-      if (
-        timeOnPage >= milestone
-        && !trackedTimeMilestonesRef.current.has(milestone)
-      ) {
+      if (timeOnPage >= milestone && !trackedTimeMilestonesRef.current.has(milestone)) {
         trackedTimeMilestonesRef.current.add(milestone);
         trackEvent(`time_on_page_${milestone}s`, "engagement", milestone, {
           path: pathname,

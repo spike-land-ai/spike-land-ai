@@ -24,27 +24,13 @@ export function TableLighting() {
       />
 
       {/* Warm fill light from opposite direction */}
-      <directionalLight
-        position={[-4, 8, -4]}
-        intensity={0.4}
-        color="#ffe4c4"
-      />
+      <directionalLight position={[-4, 8, -4]} intensity={0.4} color="#ffe4c4" />
 
       {/* Cool rim light for depth */}
-      <directionalLight
-        position={[0, 6, -8]}
-        intensity={0.3}
-        color="#e6f0ff"
-      />
+      <directionalLight position={[0, 6, -8]} intensity={0.3} color="#e6f0ff" />
 
       {/* Soft point light for ambient glow */}
-      <pointLight
-        position={[0, 5, 0]}
-        intensity={0.5}
-        color="#fffaf0"
-        distance={20}
-        decay={2}
-      />
+      <pointLight position={[0, 5, 0]} intensity={0.5} color="#fffaf0" distance={20} decay={2} />
 
       {/* Contact shadows for grounding objects */}
       <ContactShadows
@@ -57,9 +43,7 @@ export function TableLighting() {
       />
 
       {/* Subtle hemisphere light for natural outdoor-like lighting */}
-      <hemisphereLight
-        args={["#87ceeb", "#2d4a3e", 0.3]}
-      />
+      <hemisphereLight args={["#87ceeb", "#2d4a3e", 0.3]} />
     </>
   );
 }

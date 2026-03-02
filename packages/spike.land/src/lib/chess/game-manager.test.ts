@@ -53,9 +53,7 @@ import {
 
 const INITIAL_FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 
-function makeGameRecord(
-  overrides: Record<string, unknown> = {},
-): Record<string, unknown> {
+function makeGameRecord(overrides: Record<string, unknown> = {}): Record<string, unknown> {
   return {
     id: "game-1",
     whitePlayerId: "white-player",
@@ -76,9 +74,7 @@ function makeGameRecord(
   };
 }
 
-function makeMoveResult(
-  overrides: Record<string, unknown> = {},
-): Record<string, unknown> {
+function makeMoveResult(overrides: Record<string, unknown> = {}): Record<string, unknown> {
   return {
     success: true,
     san: "e4",
@@ -94,9 +90,7 @@ function makeMoveResult(
   };
 }
 
-function makeGameState(
-  overrides: Record<string, unknown> = {},
-): Record<string, unknown> {
+function makeGameState(overrides: Record<string, unknown> = {}): Record<string, unknown> {
   return {
     fen: "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq - 0 1",
     pgn: "1. e4",
@@ -114,9 +108,7 @@ function makeGameState(
   };
 }
 
-function makePlayer(
-  overrides: Record<string, unknown> = {},
-): Record<string, unknown> {
+function makePlayer(overrides: Record<string, unknown> = {}): Record<string, unknown> {
   return {
     id: "player-1",
     userId: "user-1",
@@ -203,9 +195,7 @@ describe("game-manager", () => {
     });
 
     it("rejects if game is not WAITING", async () => {
-      mockPrisma.chessGame.findUnique.mockResolvedValue(
-        makeGameRecord({ status: "ACTIVE" }),
-      );
+      mockPrisma.chessGame.findUnique.mockResolvedValue(makeGameRecord({ status: "ACTIVE" }));
 
       await expect(joinGame("game-1", "black-player")).rejects.toThrow(
         "Game is not waiting for a player",
@@ -217,9 +207,7 @@ describe("game-manager", () => {
         makeGameRecord({ status: "WAITING", blackPlayerId: null }),
       );
 
-      await expect(joinGame("game-1", "white-player")).rejects.toThrow(
-        "Cannot join your own game",
-      );
+      await expect(joinGame("game-1", "white-player")).rejects.toThrow("Cannot join your own game");
     });
   });
 
@@ -227,9 +215,9 @@ describe("game-manager", () => {
     it("rejects if game not found", async () => {
       mockPrisma.chessGame.findUnique.mockResolvedValue(null);
 
-      await expect(
-        makeGameMove("nonexistent", "white-player", "e2", "e4"),
-      ).rejects.toThrow("Game not found");
+      await expect(makeGameMove("nonexistent", "white-player", "e2", "e4")).rejects.toThrow(
+        "Game not found",
+      );
     });
 
     it("returns failed move result without saving when engine rejects move", async () => {
@@ -279,18 +267,18 @@ describe("game-manager", () => {
       const game = makeGameRecord({ moveCount: 0 });
       mockPrisma.chessGame.findUnique.mockResolvedValue(game);
 
-      await expect(
-        makeGameMove("game-1", "black-player", "e7", "e5"),
-      ).rejects.toThrow("Not your turn");
+      await expect(makeGameMove("game-1", "black-player", "e7", "e5")).rejects.toThrow(
+        "Not your turn",
+      );
     });
 
     it("rejects if game is not ACTIVE", async () => {
       const game = makeGameRecord({ status: "CHECKMATE" });
       mockPrisma.chessGame.findUnique.mockResolvedValue(game);
 
-      await expect(
-        makeGameMove("game-1", "white-player", "e2", "e4"),
-      ).rejects.toThrow("Game is not active");
+      await expect(makeGameMove("game-1", "white-player", "e2", "e4")).rejects.toThrow(
+        "Game is not active",
+      );
     });
 
     it("updates game status on checkmate", async () => {
@@ -301,9 +289,7 @@ describe("game-manager", () => {
       });
       const gameState = makeGameState({ isCheckmate: true, isGameOver: true });
 
-      mockPrisma.chessGame.findUnique
-        .mockResolvedValueOnce(game)
-        .mockResolvedValueOnce(game);
+      mockPrisma.chessGame.findUnique.mockResolvedValueOnce(game).mockResolvedValueOnce(game);
       mockEngine.createGame.mockReturnValue({});
       mockEngine.makeMove.mockReturnValue(moveResult);
       mockEngine.getGameState.mockReturnValue(gameState);
@@ -332,9 +318,7 @@ describe("game-manager", () => {
         isDraw: true,
       });
 
-      mockPrisma.chessGame.findUnique
-        .mockResolvedValueOnce(game)
-        .mockResolvedValueOnce(game);
+      mockPrisma.chessGame.findUnique.mockResolvedValueOnce(game).mockResolvedValueOnce(game);
       mockEngine.createGame.mockReturnValue({});
       mockEngine.makeMove.mockReturnValue(moveResult);
       mockEngine.getGameState.mockReturnValue(gameState);
@@ -355,9 +339,7 @@ describe("game-manager", () => {
       const moveResult = makeMoveResult({ isDraw: true, isGameOver: true });
       const gameState = makeGameState({ isDraw: true, isGameOver: true });
 
-      mockPrisma.chessGame.findUnique
-        .mockResolvedValueOnce(game)
-        .mockResolvedValueOnce(game);
+      mockPrisma.chessGame.findUnique.mockResolvedValueOnce(game).mockResolvedValueOnce(game);
       mockEngine.createGame.mockReturnValue({});
       mockEngine.makeMove.mockReturnValue(moveResult);
       mockEngine.getGameState.mockReturnValue(gameState);
@@ -437,9 +419,7 @@ describe("game-manager", () => {
       });
       const gameState = makeGameState({ isCheckmate: true, isGameOver: true });
 
-      mockPrisma.chessGame.findUnique
-        .mockResolvedValueOnce(game)
-        .mockResolvedValueOnce(game);
+      mockPrisma.chessGame.findUnique.mockResolvedValueOnce(game).mockResolvedValueOnce(game);
       mockEngine.createGame.mockReturnValue({});
       mockEngine.makeMove.mockReturnValue(moveResult);
       mockEngine.getGameState.mockReturnValue(gameState);
@@ -459,11 +439,7 @@ describe("game-manager", () => {
 
       await makeGameMove("game-1", "white-player", "e2", "e4");
 
-      expect(mockElo.calculateEloChange).toHaveBeenCalledWith(
-        1200,
-        1200,
-        "white",
-      );
+      expect(mockElo.calculateEloChange).toHaveBeenCalledWith(1200, 1200, "white");
     });
   });
 
@@ -499,10 +475,7 @@ describe("game-manager", () => {
       expect(mockPrisma.chessGame.findMany).toHaveBeenCalledWith(
         expect.objectContaining({
           where: {
-            OR: [
-              { whitePlayerId: "white-player" },
-              { blackPlayerId: "white-player" },
-            ],
+            OR: [{ whitePlayerId: "white-player" }, { blackPlayerId: "white-player" }],
           },
         }),
       );
@@ -516,10 +489,7 @@ describe("game-manager", () => {
       expect(mockPrisma.chessGame.findMany).toHaveBeenCalledWith(
         expect.objectContaining({
           where: {
-            OR: [
-              { whitePlayerId: "white-player" },
-              { blackPlayerId: "white-player" },
-            ],
+            OR: [{ whitePlayerId: "white-player" }, { blackPlayerId: "white-player" }],
             status: "ACTIVE",
           },
         }),
@@ -539,9 +509,7 @@ describe("game-manager", () => {
       });
 
       const game = makeGameRecord();
-      mockPrisma.chessGame.findUnique
-        .mockResolvedValueOnce(game)
-        .mockResolvedValueOnce(game);
+      mockPrisma.chessGame.findUnique.mockResolvedValueOnce(game).mockResolvedValueOnce(game);
       mockPrisma.chessGame.update.mockResolvedValue({});
       mockPrisma.chessPlayer.findUnique
         .mockResolvedValueOnce(whitePlayer)
@@ -583,9 +551,7 @@ describe("game-manager", () => {
       });
 
       const game = makeGameRecord();
-      mockPrisma.chessGame.findUnique
-        .mockResolvedValueOnce(game)
-        .mockResolvedValueOnce(game);
+      mockPrisma.chessGame.findUnique.mockResolvedValueOnce(game).mockResolvedValueOnce(game);
       mockPrisma.chessGame.update.mockResolvedValue({});
       mockPrisma.chessPlayer.findUnique
         .mockResolvedValueOnce(whitePlayer)
@@ -601,11 +567,7 @@ describe("game-manager", () => {
 
       await resignGame("game-1", "white-player");
 
-      expect(mockElo.calculateEloChange).toHaveBeenCalledWith(
-        1200,
-        1200,
-        "black",
-      );
+      expect(mockElo.calculateEloChange).toHaveBeenCalledWith(1200, 1200, "black");
     });
   });
 
@@ -621,18 +583,14 @@ describe("game-manager", () => {
     it("throws if game not found", async () => {
       mockPrisma.chessGame.findUnique.mockResolvedValue(null);
 
-      await expect(offerDraw("nonexistent", "white-player")).rejects.toThrow(
-        "Game not found",
-      );
+      await expect(offerDraw("nonexistent", "white-player")).rejects.toThrow("Game not found");
     });
 
     it("throws if game is not active", async () => {
       const game = makeGameRecord({ status: "CHECKMATE" });
       mockPrisma.chessGame.findUnique.mockResolvedValue(game);
 
-      await expect(offerDraw("game-1", "white-player")).rejects.toThrow(
-        "Game is not active",
-      );
+      await expect(offerDraw("game-1", "white-player")).rejects.toThrow("Game is not active");
     });
 
     it("throws if player is not in the game", async () => {
@@ -657,18 +615,14 @@ describe("game-manager", () => {
     it("throws if game not found", async () => {
       mockPrisma.chessGame.findUnique.mockResolvedValue(null);
 
-      await expect(declineDraw("nonexistent", "white-player")).rejects.toThrow(
-        "Game not found",
-      );
+      await expect(declineDraw("nonexistent", "white-player")).rejects.toThrow("Game not found");
     });
 
     it("throws if game is not active", async () => {
       const game = makeGameRecord({ status: "DRAW" });
       mockPrisma.chessGame.findUnique.mockResolvedValue(game);
 
-      await expect(declineDraw("game-1", "white-player")).rejects.toThrow(
-        "Game is not active",
-      );
+      await expect(declineDraw("game-1", "white-player")).rejects.toThrow("Game is not active");
     });
 
     it("throws if player is not in the game", async () => {
@@ -723,11 +677,7 @@ describe("game-manager", () => {
 
       await acceptDraw("game-1", "white-player");
 
-      expect(mockElo.calculateEloChange).toHaveBeenCalledWith(
-        1200,
-        1200,
-        "draw",
-      );
+      expect(mockElo.calculateEloChange).toHaveBeenCalledWith(1200, 1200, "draw");
     });
   });
 
@@ -789,9 +739,7 @@ describe("game-manager", () => {
       });
 
       const game = makeGameRecord();
-      mockPrisma.chessGame.findUnique
-        .mockResolvedValueOnce(game)
-        .mockResolvedValueOnce(game);
+      mockPrisma.chessGame.findUnique.mockResolvedValueOnce(game).mockResolvedValueOnce(game);
       mockPrisma.chessGame.update.mockResolvedValue({});
       mockPrisma.chessPlayer.findUnique
         .mockResolvedValueOnce(whitePlayer)
@@ -815,9 +763,7 @@ describe("game-manager", () => {
 
     it("updates game status", async () => {
       const game = makeGameRecord();
-      mockPrisma.chessGame.findUnique
-        .mockResolvedValueOnce(game)
-        .mockResolvedValueOnce(game);
+      mockPrisma.chessGame.findUnique.mockResolvedValueOnce(game).mockResolvedValueOnce(game);
       mockPrisma.chessGame.update.mockResolvedValue({});
       mockPrisma.chessPlayer.findUnique.mockResolvedValue(null);
 
@@ -858,11 +804,7 @@ describe("game-manager", () => {
 
       await finalizeGame("game-1", "white", "white-player");
 
-      expect(mockElo.calculateEloChange).toHaveBeenCalledWith(
-        1200,
-        1200,
-        "white",
-      );
+      expect(mockElo.calculateEloChange).toHaveBeenCalledWith(1200, 1200, "white");
     });
 
     it("updates both players' ELO", async () => {

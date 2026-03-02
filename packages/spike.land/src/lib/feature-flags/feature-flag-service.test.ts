@@ -14,12 +14,14 @@ vi.mock("@/lib/prisma", () => ({
 
 import { FeatureFlagService } from "./feature-flag-service";
 
-function makeFlag(overrides: {
-  name?: string;
-  isEnabled?: boolean;
-  enabledFor?: string[];
-  percentage?: number;
-} = {}) {
+function makeFlag(
+  overrides: {
+    name?: string;
+    isEnabled?: boolean;
+    enabledFor?: string[];
+    percentage?: number;
+  } = {},
+) {
   return {
     name: "test-feature",
     isEnabled: true,
@@ -60,32 +62,24 @@ describe("FeatureFlagService", () => {
     });
 
     it("returns true for 100% percentage rollout", async () => {
-      mockFeatureFlag.findUnique.mockResolvedValue(
-        makeFlag({ percentage: 100 }),
-      );
+      mockFeatureFlag.findUnique.mockResolvedValue(makeFlag({ percentage: 100 }));
       expect(await FeatureFlagService.isFeatureEnabled("test-feature")).toBe(true);
     });
 
     it("returns false for 0% percentage rollout with no entityId", async () => {
-      mockFeatureFlag.findUnique.mockResolvedValue(
-        makeFlag({ percentage: 0 }),
-      );
+      mockFeatureFlag.findUnique.mockResolvedValue(makeFlag({ percentage: 0 }));
       expect(await FeatureFlagService.isFeatureEnabled("test-feature")).toBe(false);
     });
 
     it("uses hash-based percentage check for entityId", async () => {
-      mockFeatureFlag.findUnique.mockResolvedValue(
-        makeFlag({ percentage: 50 }),
-      );
+      mockFeatureFlag.findUnique.mockResolvedValue(makeFlag({ percentage: 50 }));
       // With an entityId, result depends on hash — just verify it returns a boolean
       const result = await FeatureFlagService.isFeatureEnabled("test-feature", "user_hash_test");
       expect(typeof result).toBe("boolean");
     });
 
     it("returns false for 0% percentage with entityId not in enabledFor", async () => {
-      mockFeatureFlag.findUnique.mockResolvedValue(
-        makeFlag({ percentage: 0, enabledFor: [] }),
-      );
+      mockFeatureFlag.findUnique.mockResolvedValue(makeFlag({ percentage: 0, enabledFor: [] }));
       expect(await FeatureFlagService.isFeatureEnabled("test-feature", "user_abc")).toBe(false);
     });
 

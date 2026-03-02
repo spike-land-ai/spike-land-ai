@@ -1,9 +1,6 @@
 import type { EloUpdate, GameResult } from "./types";
 
-export function expectedScore(
-  playerElo: number,
-  opponentElo: number,
-): number {
+export function expectedScore(playerElo: number, opponentElo: number): number {
   return 1 / (1 + Math.pow(10, (opponentElo - playerElo) / 400));
 }
 

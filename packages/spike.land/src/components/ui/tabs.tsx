@@ -11,9 +11,7 @@ const TabsList = React.forwardRef<
   React.ElementRef<typeof TabsPrimitive.List>,
   React.ComponentPropsWithoutRef<typeof TabsPrimitive.List>
 >(({ className, ...props }, ref) => {
-  const [indicatorStyle, setIndicatorStyle] = React.useState<
-    React.CSSProperties
-  >({
+  const [indicatorStyle, setIndicatorStyle] = React.useState<React.CSSProperties>({
     left: 0,
     top: 4,
     width: 0,
@@ -35,18 +33,16 @@ const TabsList = React.forwardRef<
         return;
       }
 
-      const activeTrigger = list.querySelector(
-        "[data-state=\"active\"]",
-      ) as HTMLElement;
+      const activeTrigger = list.querySelector('[data-state="active"]') as HTMLElement;
       if (activeTrigger) {
-        setIndicatorStyle(prev => {
+        setIndicatorStyle((prev) => {
           // Avoid state updates if nothing changed
           if (
-            prev.left === activeTrigger.offsetLeft
-            && prev.top === activeTrigger.offsetTop
-            && prev.width === activeTrigger.offsetWidth
-            && prev.height === activeTrigger.offsetHeight
-            && prev.opacity === 1
+            prev.left === activeTrigger.offsetLeft &&
+            prev.top === activeTrigger.offsetTop &&
+            prev.width === activeTrigger.offsetWidth &&
+            prev.height === activeTrigger.offsetHeight &&
+            prev.opacity === 1
           ) {
             return prev;
           }
@@ -77,11 +73,9 @@ const TabsList = React.forwardRef<
     const list = listRef.current;
     if (!list) return;
 
-    const observer = new MutationObserver(mutations => {
+    const observer = new MutationObserver((mutations) => {
       const hasStateChange = mutations.some(
-        mutation =>
-          mutation.type === "attributes"
-          && mutation.attributeName === "data-state",
+        (mutation) => mutation.type === "attributes" && mutation.attributeName === "data-state",
       );
 
       if (hasStateChange) {
@@ -100,7 +94,7 @@ const TabsList = React.forwardRef<
 
   return (
     <TabsPrimitive.List
-      ref={node => {
+      ref={(node) => {
         if (typeof ref === "function") ref(node);
         else if (ref) {
           (ref as React.MutableRefObject<typeof node>).current = node;

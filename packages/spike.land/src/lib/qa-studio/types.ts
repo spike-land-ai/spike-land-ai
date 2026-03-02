@@ -15,7 +15,7 @@ export interface QaScreenshotResult {
 
 export interface QaAccessibilityResult {
   score: number;
-  violations: Array<{ issue: string; impact: string; }>;
+  violations: Array<{ issue: string; impact: string }>;
   standard: string;
 }
 

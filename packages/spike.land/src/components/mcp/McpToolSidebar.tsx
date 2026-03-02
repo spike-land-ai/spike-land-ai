@@ -21,19 +21,9 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
 
 interface McpToolSidebarProps {
@@ -57,7 +47,7 @@ function SearchInput({
       <Input
         placeholder="Search tools..."
         value={query}
-        onChange={e => onChange(e.target.value)}
+        onChange={(e) => onChange(e.target.value)}
         className="h-8 pl-8 pr-8 text-xs bg-white/5 border-white/10"
       />
       {query && (
@@ -123,7 +113,7 @@ function SidebarContent({
   onSelectTool,
   initialCategory,
   onToolClick,
-}: McpToolSidebarProps & { onToolClick?: () => void; }) {
+}: McpToolSidebarProps & { onToolClick?: () => void }) {
   const [searchQuery, setSearchQuery] = useState("");
 
   const searchResults = useMemo(() => {
@@ -131,12 +121,8 @@ function SidebarContent({
     return searchToolsSemantic(searchQuery.trim());
   }, [searchQuery]);
 
-  const initialSuperId = initialCategory
-    ? getSuperCategoryForCategory(initialCategory)
-    : undefined;
-  const initialSubId = initialCategory
-    ? getSubcategoryForCategory(initialCategory)
-    : undefined;
+  const initialSuperId = initialCategory ? getSuperCategoryForCategory(initialCategory) : undefined;
+  const initialSubId = initialCategory ? getSubcategoryForCategory(initialCategory) : undefined;
 
   return (
     <>
@@ -146,39 +132,35 @@ function SidebarContent({
         onClear={() => setSearchQuery("")}
       />
       <ScrollArea className="h-full pr-4">
-        {searchQuery.trim().length >= 2
-          ? (
-            searchResults.length > 0
-              ? (
-                <SearchResults
-                  results={searchResults}
-                  selectedTool={selectedTool}
-                  onSelectTool={onSelectTool}
-                  onToolClick={onToolClick}
-                />
-              )
-              : (
-                <p className="text-xs text-muted-foreground px-3 py-4">
-                  No tools found for &ldquo;{searchQuery}&rdquo;
-                </p>
-              )
+        {searchQuery.trim().length >= 2 ? (
+          searchResults.length > 0 ? (
+            <SearchResults
+              results={searchResults}
+              selectedTool={selectedTool}
+              onSelectTool={onSelectTool}
+              onToolClick={onToolClick}
+            />
+          ) : (
+            <p className="text-xs text-muted-foreground px-3 py-4">
+              No tools found for &ldquo;{searchQuery}&rdquo;
+            </p>
           )
-          : (
-            <div className="space-y-1 p-1">
-              {MCP_SUPER_CATEGORIES.map(superCat => (
-                <SuperCategoryGroup
-                  key={superCat.id}
-                  superCategory={superCat}
-                  defaultOpen={superCat.id === initialSuperId}
-                  initialSubId={initialSubId}
-                  initialCategory={initialCategory}
-                  selectedTool={selectedTool}
-                  onSelectTool={onSelectTool}
-                  onToolClick={onToolClick}
-                />
-              ))}
-            </div>
-          )}
+        ) : (
+          <div className="space-y-1 p-1">
+            {MCP_SUPER_CATEGORIES.map((superCat) => (
+              <SuperCategoryGroup
+                key={superCat.id}
+                superCategory={superCat}
+                defaultOpen={superCat.id === initialSuperId}
+                initialSubId={initialSubId}
+                initialCategory={initialCategory}
+                selectedTool={selectedTool}
+                onSelectTool={onSelectTool}
+                onToolClick={onToolClick}
+              />
+            ))}
+          </div>
+        )}
       </ScrollArea>
     </>
   );
@@ -227,7 +209,7 @@ function SuperCategoryGroup({
         </button>
       </CollapsibleTrigger>
       <CollapsibleContent className="space-y-0.5 pl-3 pt-0.5 animate-accordion-down">
-        {superCategory.subcategories.map(sub => (
+        {superCategory.subcategories.map((sub) => (
           <SubcategoryGroup
             key={sub.id}
             subcategory={sub}
@@ -287,29 +269,27 @@ function SubcategoryGroup({
         </button>
       </CollapsibleTrigger>
       <CollapsibleContent className="space-y-0.5 pl-3 pt-0.5 animate-accordion-down">
-        {singleCategory
-          ? (
-            // Single category → show tools directly
-            <ToolList
-              categoryId={subcategory.categories[0]!.id}
+        {singleCategory ? (
+          // Single category → show tools directly
+          <ToolList
+            categoryId={subcategory.categories[0]!.id}
+            selectedTool={selectedTool}
+            onSelectTool={onSelectTool}
+            onToolClick={onToolClick}
+          />
+        ) : (
+          // Multiple categories → show category groups
+          subcategory.categories.map((cat) => (
+            <CategoryGroup
+              key={cat.id}
+              category={cat}
+              defaultOpen={cat.id === initialCategory}
               selectedTool={selectedTool}
               onSelectTool={onSelectTool}
               onToolClick={onToolClick}
             />
-          )
-          : (
-            // Multiple categories → show category groups
-            subcategory.categories.map(cat => (
-              <CategoryGroup
-                key={cat.id}
-                category={cat}
-                defaultOpen={cat.id === initialCategory}
-                selectedTool={selectedTool}
-                onSelectTool={onSelectTool}
-                onToolClick={onToolClick}
-              />
-            ))
-          )}
+          ))
+        )}
       </CollapsibleContent>
     </Collapsible>
   );
@@ -322,7 +302,7 @@ function CategoryGroup({
   onSelectTool,
   onToolClick,
 }: {
-  category: { id: string; name: string; icon: string; toolCount: number; };
+  category: { id: string; name: string; icon: string; toolCount: number };
   defaultOpen: boolean;
   selectedTool: McpToolDef | null;
   onSelectTool: (tool: McpToolDef) => void;
@@ -380,7 +360,7 @@ const ToolList = memo(function ToolList({
 
   return (
     <>
-      {tools.map(tool => (
+      {tools.map((tool) => (
         <button
           key={tool.name}
           onClick={() => {
@@ -425,10 +405,7 @@ export function McpToolSidebar(props: McpToolSidebarProps) {
               <SheetTitle>MCP Tools</SheetTitle>
             </SheetHeader>
             <div className="p-4 h-[calc(100dvh-5rem)]">
-              <SidebarContent
-                {...props}
-                onToolClick={() => setSheetOpen(false)}
-              />
+              <SidebarContent {...props} onToolClick={() => setSheetOpen(false)} />
             </div>
           </SheetContent>
         </Sheet>

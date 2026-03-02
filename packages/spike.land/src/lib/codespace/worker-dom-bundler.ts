@@ -36,7 +36,7 @@ function workerDomPlugin(cache: Map<string, string>): Plugin {
     name: "worker-dom-resolve",
     setup(build) {
       // Intercept react-ts-worker/* bare imports and resolve to local dist
-      build.onResolve({ filter: /^react-ts-worker\// }, args => {
+      build.onResolve({ filter: /^react-ts-worker\// }, (args) => {
         // e.g. "react-ts-worker/react" -> "react/index.js"
         const subpath = args.path.replace(/^react-ts-worker\//, "");
         const resolved = path.join(distDir, subpath);
@@ -80,16 +80,14 @@ self.onmessage = function(ev) {
 export async function bundleWorkerDom(session: {
   transpiled: string;
   codeSpace: string;
-}): Promise<{ workerJs: string; applierJs: string; }> {
+}): Promise<{ workerJs: string; applierJs: string }> {
   const cache = new Map<string, string>();
 
   // --- Worker bundle ---
   let workerCode = session.transpiled || "";
 
   // Extract the default-exported component name and replace with bootstrap
-  const exportMatch = workerCode.match(
-    /export\s*\{\s*(\w+)\s+as\s+default\s*\}\s*;?\s*$/,
-  );
+  const exportMatch = workerCode.match(/export\s*\{\s*(\w+)\s+as\s+default\s*\}\s*;?\s*$/);
   if (exportMatch) {
     const componentName = exportMatch[1]!;
     workerCode = workerCode.replace(
@@ -130,9 +128,7 @@ export async function bundleWorkerDom(session: {
     }
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
-    throw new Error(
-      `Worker-DOM worker bundle failed for ${session.codeSpace}: ${message}`,
-    );
+    throw new Error(`Worker-DOM worker bundle failed for ${session.codeSpace}: ${message}`);
   }
 
   // --- Applier bundle ---
@@ -170,9 +166,7 @@ globalThis.__WorkerDOMApplier = MainThreadApplier;
     }
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
-    throw new Error(
-      `Worker-DOM applier bundle failed for ${session.codeSpace}: ${message}`,
-    );
+    throw new Error(`Worker-DOM applier bundle failed for ${session.codeSpace}: ${message}`);
   }
 
   return { workerJs, applierJs };

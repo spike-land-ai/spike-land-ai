@@ -83,9 +83,7 @@ describe("scout-competitor validations", () => {
     });
 
     it("should reject URL over 2000 chars", () => {
-      const result = websiteUrlSchema.safeParse(
-        "https://example.com/" + "a".repeat(2000),
-      );
+      const result = websiteUrlSchema.safeParse("https://example.com/" + "a".repeat(2000));
       expect(result.success).toBe(false);
     });
   });

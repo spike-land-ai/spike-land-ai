@@ -24,21 +24,21 @@ export function registerEsbuildTools(
   // --- esbuild_transpile ---
   registry.registerBuilt(
     t
-      .tool("esbuild_transpile", "Transpile TSX/JSX/TS/JS code to browser-ready ESM JavaScript via spike.land esbuild-wasm.", {
-        code: z.string().min(1).describe("Source code to transpile."),
-        loader: z.enum(LOADER_ENUM).optional().default("tsx").describe(
-          "Source language loader.",
-        ),
-        minify: z.boolean().optional().default(false).describe(
-          "Whether to minify the output.",
-        ),
-        jsx_import_source: z.string().optional().default("@emotion/react").describe(
-          "JSX import source for automatic JSX runtime.",
-        ),
-        target: z.string().optional().default("es2024").describe(
-          "JavaScript target version.",
-        ),
-      })
+      .tool(
+        "esbuild_transpile",
+        "Transpile TSX/JSX/TS/JS code to browser-ready ESM JavaScript via spike.land esbuild-wasm.",
+        {
+          code: z.string().min(1).describe("Source code to transpile."),
+          loader: z.enum(LOADER_ENUM).optional().default("tsx").describe("Source language loader."),
+          minify: z.boolean().optional().default(false).describe("Whether to minify the output."),
+          jsx_import_source: z
+            .string()
+            .optional()
+            .default("@emotion/react")
+            .describe("JSX import source for automatic JSX runtime."),
+          target: z.string().optional().default("es2024").describe("JavaScript target version."),
+        },
+      )
       .meta({ category: "esbuild", tier: "free" })
       .handler(async ({ input }) => {
         return safeToolCall("esbuild_transpile", async () => {
@@ -56,9 +56,10 @@ export function registerEsbuildTools(
             }),
           });
 
-          const warnings = result.warnings.length > 0
-            ? `\n\n**Warnings (${result.warnings.length}):**\n${result.warnings.map(w => `- ${w.text}`).join("\n")}`
-            : "";
+          const warnings =
+            result.warnings.length > 0
+              ? `\n\n**Warnings (${result.warnings.length}):**\n${result.warnings.map((w) => `- ${w.text}`).join("\n")}`
+              : "";
 
           return textResult(
             `**Transpiled** (${input.loader} → esm, target=${input.target}, minify=${input.minify})${warnings}\n\n\`\`\`js\n${result.code}\`\`\``,
@@ -70,12 +71,14 @@ export function registerEsbuildTools(
   // --- esbuild_validate ---
   registry.registerBuilt(
     t
-      .tool("esbuild_validate", "Syntax-check TSX/JSX/TS/JS code without producing output — fast validation.", {
-        code: z.string().min(1).describe("Source code to syntax-check."),
-        loader: z.enum(LOADER_ENUM).optional().default("tsx").describe(
-          "Source language loader.",
-        ),
-      })
+      .tool(
+        "esbuild_validate",
+        "Syntax-check TSX/JSX/TS/JS code without producing output — fast validation.",
+        {
+          code: z.string().min(1).describe("Source code to syntax-check."),
+          loader: z.enum(LOADER_ENUM).optional().default("tsx").describe("Source language loader."),
+        },
+      )
       .meta({ category: "esbuild", tier: "free" })
       .handler(async ({ input }) => {
         return safeToolCall("esbuild_validate", async () => {
@@ -105,9 +108,13 @@ export function registerEsbuildTools(
   // --- esbuild_parse_errors ---
   registry.registerBuilt(
     t
-      .tool("esbuild_parse_errors", "Parse raw esbuild error text into structured line/column/message objects.", {
-        error_text: z.string().min(1).describe("Raw esbuild error text to parse."),
-      })
+      .tool(
+        "esbuild_parse_errors",
+        "Parse raw esbuild error text into structured line/column/message objects.",
+        {
+          error_text: z.string().min(1).describe("Raw esbuild error text to parse."),
+        },
+      )
       .meta({ category: "esbuild", tier: "free" })
       .handler(async ({ input }) => {
         return safeToolCall("esbuild_parse_errors", async () => {
@@ -133,10 +140,7 @@ export function registerEsbuildTools(
             errors.push({ text: input.error_text.trim() });
           }
 
-          return jsonResult(
-            `**Parsed** ${errors.length} error(s) from esbuild output.`,
-            errors,
-          );
+          return jsonResult(`**Parsed** ${errors.length} error(s) from esbuild output.`, errors);
         });
       }),
   );
@@ -148,15 +152,12 @@ export function registerEsbuildTools(
       .meta({ category: "esbuild", tier: "free" })
       .handler(async () => {
         return safeToolCall("esbuild_info", async () => {
-          return jsonResult(
-            "**esbuild-wasm** — available via spike.land API",
-            {
-              runtime: "cloudflare-workers-proxy",
-              supported_loaders: ["tsx", "ts", "jsx", "js", "css", "json"],
-              supported_targets: ["es2020", "es2022", "es2024", "esnext"],
-              note: "Transpilation is proxied through spike.land API",
-            },
-          );
+          return jsonResult("**esbuild-wasm** — available via spike.land API", {
+            runtime: "cloudflare-workers-proxy",
+            supported_loaders: ["tsx", "ts", "jsx", "js", "css", "json"],
+            supported_targets: ["es2020", "es2022", "es2024", "esnext"],
+            note: "Transpilation is proxied through spike.land API",
+          });
         });
       }),
   );

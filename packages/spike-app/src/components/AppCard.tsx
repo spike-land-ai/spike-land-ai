@@ -38,9 +38,7 @@ export function AppCard({
         <h3 className="font-semibold leading-tight">{name}</h3>
         <StatusBadge status={status} />
       </div>
-      {description && (
-        <p className="mt-2 line-clamp-2 text-sm text-gray-500">{description}</p>
-      )}
+      {description && <p className="mt-2 line-clamp-2 text-sm text-gray-500">{description}</p>}
       <div className="mt-3 flex items-center gap-2 text-xs text-gray-400">
         {category && (
           <span

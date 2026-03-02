@@ -20,22 +20,19 @@ export async function trackServerEvent(
   eventName: string,
   params: EventParams = {},
 ): Promise<void> {
-  const measurementId = process.env.GA_MEASUREMENT_ID
-    || process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
+  const measurementId = process.env.GA_MEASUREMENT_ID || process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
   const apiSecret = process.env.GA_API_SECRET;
 
   if (!measurementId || !apiSecret) {
     if (process.env.NODE_ENV === "development") {
-      logger.debug(
-        "GA_MEASUREMENT_ID or GA_API_SECRET is missing. Skipping GA event tracking.",
-        { eventName },
-      );
+      logger.debug("GA_MEASUREMENT_ID or GA_API_SECRET is missing. Skipping GA event tracking.", {
+        eventName,
+      });
     }
     return;
   }
 
-  const url =
-    `https://www.google-analytics.com/mp/collect?measurement_id=${measurementId}&api_secret=${apiSecret}`;
+  const url = `https://www.google-analytics.com/mp/collect?measurement_id=${measurementId}&api_secret=${apiSecret}`;
 
   // Filter out undefined and null values
   const cleanParams: Record<string, string | number | boolean> = {};
@@ -43,9 +40,7 @@ export async function trackServerEvent(
     if (value !== undefined && value !== null) {
       if (typeof value === "string") {
         // GA limits string parameters to 100 characters usually, but we'll try to truncate error messages if needed.
-        cleanParams[key] = value.length > 500
-          ? value.substring(0, 500) + "..."
-          : value;
+        cleanParams[key] = value.length > 500 ? value.substring(0, 500) + "..." : value;
       } else {
         cleanParams[key] = value;
       }

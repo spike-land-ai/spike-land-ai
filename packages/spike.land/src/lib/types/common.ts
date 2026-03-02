@@ -61,34 +61,29 @@ export interface LinkedInApiErrorBody {
 /**
  * Type guard for Facebook API error response
  */
-export function isFacebookErrorResponse(
-  body: unknown,
-): body is { error: FacebookApiError; } {
+export function isFacebookErrorResponse(body: unknown): body is { error: FacebookApiError } {
   return (
-    typeof body === "object"
-    && body !== null
-    && "error" in body
-    && typeof (body as Record<string, unknown>).error === "object"
-    && (body as Record<string, unknown>).error !== null
-    && "code"
-      in ((body as Record<string, unknown>).error as Record<string, unknown>)
+    typeof body === "object" &&
+    body !== null &&
+    "error" in body &&
+    typeof (body as Record<string, unknown>).error === "object" &&
+    (body as Record<string, unknown>).error !== null &&
+    "code" in ((body as Record<string, unknown>).error as Record<string, unknown>)
   );
 }
 
 /**
  * Type guard for LinkedIn rate limit error
  */
-export function isLinkedInRateLimitError(
-  body: unknown,
-): body is LinkedInApiErrorBody {
+export function isLinkedInRateLimitError(body: unknown): body is LinkedInApiErrorBody {
   if (typeof body !== "object" || body === null) {
     return false;
   }
   const errorBody = body as Record<string, unknown>;
   return (
-    errorBody.status === 429
-    || (typeof errorBody.message === "string"
-      && errorBody.message.toLowerCase().includes("rate limit"))
+    errorBody.status === 429 ||
+    (typeof errorBody.message === "string" &&
+      errorBody.message.toLowerCase().includes("rate limit"))
   );
 }
 
@@ -101,11 +96,11 @@ export function isLinkedInRateLimitError(
  */
 export interface ContentSuggestionWhereInput {
   workspaceId: string;
-  status?: { in: string[]; };
-  contentType?: { in: string[]; };
-  suggestedPlatforms?: { hasSome: string[]; };
-  overallScore?: { gte: number; };
-  expiresAt?: { lt: Date; };
+  status?: { in: string[] };
+  contentType?: { in: string[] };
+  suggestedPlatforms?: { hasSome: string[] };
+  overallScore?: { gte: number };
+  expiresAt?: { lt: Date };
 }
 
 /**
@@ -174,10 +169,10 @@ export interface ErrorWithResponse extends Error {
  */
 export function hasCodeProperty(error: unknown): error is ErrorWithCode {
   return (
-    error instanceof Error
-    && "code" in error
-    && (typeof (error as ErrorWithCode).code === "string"
-      || typeof (error as ErrorWithCode).code === "number")
+    error instanceof Error &&
+    "code" in error &&
+    (typeof (error as ErrorWithCode).code === "string" ||
+      typeof (error as ErrorWithCode).code === "number")
   );
 }
 
@@ -186,24 +181,22 @@ export function hasCodeProperty(error: unknown): error is ErrorWithCode {
  */
 export function hasStatusProperty(error: unknown): error is ErrorWithStatus {
   return (
-    error instanceof Error
-    && "status" in error
-    && typeof (error as ErrorWithStatus).status === "number"
+    error instanceof Error &&
+    "status" in error &&
+    typeof (error as ErrorWithStatus).status === "number"
   );
 }
 
 /**
  * Type guard for errors with response property
  */
-export function hasResponseProperty(
-  error: unknown,
-): error is ErrorWithResponse {
+export function hasResponseProperty(error: unknown): error is ErrorWithResponse {
   return (
-    error instanceof Error
-    && "response" in error
-    && typeof (error as ErrorWithResponse).response === "object"
-    && (error as ErrorWithResponse).response !== null
-    && "status" in (error as ErrorWithResponse).response
+    error instanceof Error &&
+    "response" in error &&
+    typeof (error as ErrorWithResponse).response === "object" &&
+    (error as ErrorWithResponse).response !== null &&
+    "status" in (error as ErrorWithResponse).response
   );
 }
 
@@ -219,9 +212,7 @@ export type RequireKeys<T, K extends keyof T> = T & Required<Pick<T, K>>;
 /**
  * Make specific keys of an object optional
  */
-export type OptionalKeys<T, K extends keyof T> =
-  & Omit<T, K>
-  & Partial<Pick<T, K>>;
+export type OptionalKeys<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
 
 /**
  * Extract non-null values from a type
@@ -239,12 +230,12 @@ export type JsonValue =
   | boolean
   | null
   | JsonValue[]
-  | { [key: string]: JsonValue; };
+  | { [key: string]: JsonValue };
 
 /**
  * Type for objects with string keys and unknown values (safer than Record<string, unknown>)
  */
-export type StringKeyedObject = { [key: string]: unknown; };
+export type StringKeyedObject = { [key: string]: unknown };
 
 // =============================================================================
 // Console and Logging Types
@@ -293,7 +284,7 @@ export type AsyncCallback<T, R = void> = (value: T) => Promise<R>;
 /**
  * Facebook error response type (alias for compatibility with rate-limit-tracker)
  */
-export type FacebookErrorResponse = { error: FacebookApiError; };
+export type FacebookErrorResponse = { error: FacebookApiError };
 
 /**
  * LinkedIn error response type (alias for compatibility with rate-limit-tracker)
@@ -303,25 +294,17 @@ export type LinkedInErrorResponse = LinkedInApiErrorBody;
 /**
  * Union type for social platform error responses
  */
-export type SocialPlatformErrorResponse =
-  | FacebookErrorResponse
-  | LinkedInErrorResponse;
+export type SocialPlatformErrorResponse = FacebookErrorResponse | LinkedInErrorResponse;
 
 /**
  * Type guard for LinkedIn error response
  */
-export function isLinkedInErrorResponse(
-  body: unknown,
-): body is LinkedInErrorResponse {
+export function isLinkedInErrorResponse(body: unknown): body is LinkedInErrorResponse {
   if (typeof body !== "object" || body === null) {
     return false;
   }
   const errorBody = body as Record<string, unknown>;
-  return (
-    "status" in errorBody
-    || "message" in errorBody
-    || "serviceErrorCode" in errorBody
-  );
+  return "status" in errorBody || "message" in errorBody || "serviceErrorCode" in errorBody;
 }
 
 // =============================================================================

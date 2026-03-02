@@ -613,10 +613,12 @@ describe("publishWorkflowVersion", () => {
   it("throws when validation for publish fails", async () => {
     mockValidateForPublish.mockReturnValue({
       valid: false,
-      errors: [{
-        code: "NO_TRIGGER_FOR_PUBLISH",
-        message: "Workflow must have at least one trigger",
-      }],
+      errors: [
+        {
+          code: "NO_TRIGGER_FOR_PUBLISH",
+          message: "Workflow must have at least one trigger",
+        },
+      ],
       warnings: [],
     });
 

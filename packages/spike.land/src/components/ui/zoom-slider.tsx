@@ -14,11 +14,7 @@ interface ZoomSliderProps {
   className?: string;
 }
 
-export function ZoomSlider({
-  value: controlledValue,
-  onChange,
-  className,
-}: ZoomSliderProps) {
+export function ZoomSlider({ value: controlledValue, onChange, className }: ZoomSliderProps) {
   const [internalValue, setInternalValue] = useState<ZoomLevel>(3);
   const [isMounted, setIsMounted] = useState(false);
 

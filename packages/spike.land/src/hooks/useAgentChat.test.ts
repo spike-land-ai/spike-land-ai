@@ -110,7 +110,7 @@ describe("useAgentChat", () => {
     // Should have tool_call block and text block
     expect(blocks?.length).toBeGreaterThanOrEqual(2);
 
-    const toolBlock = blocks?.find(b => b.type === "tool_call");
+    const toolBlock = blocks?.find((b) => b.type === "tool_call");
     expect(toolBlock).toBeDefined();
     if (toolBlock && toolBlock.type === "tool_call") {
       expect(toolBlock.name).toBe("github__search");
@@ -121,9 +121,7 @@ describe("useAgentChat", () => {
 
   it("handles error events", async () => {
     fetchSpy.mockResolvedValueOnce(
-      createMockSSEResponse([
-        { type: "error", message: "Rate limited" },
-      ]),
+      createMockSSEResponse([{ type: "error", message: "Rate limited" }]),
     );
 
     const { result } = renderHook(() => useAgentChat("session-3"));
@@ -161,10 +159,7 @@ describe("useAgentChat", () => {
 
   it("clears messages", async () => {
     fetchSpy.mockResolvedValueOnce(
-      createMockSSEResponse([
-        { type: "text_delta", text: "response" },
-        { type: "done" },
-      ]),
+      createMockSSEResponse([{ type: "text_delta", text: "response" }, { type: "done" }]),
     );
 
     const { result } = renderHook(() => useAgentChat("session-5"));

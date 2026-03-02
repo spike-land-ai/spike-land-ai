@@ -8,10 +8,7 @@ interface MagicLinkEmailProps {
 
 export function MagicLinkEmail({ url, host }: MagicLinkEmailProps) {
   return (
-    <BaseEmail
-      preview={`Sign in to ${host}`}
-      heading="Sign in to Spike Land"
-    >
+    <BaseEmail preview={`Sign in to ${host}`} heading="Sign in to Spike Land">
       <Text style={emailStyles.text}>
         Click the button below to sign in. This link expires in 10 minutes.
       </Text>

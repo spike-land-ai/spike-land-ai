@@ -71,14 +71,8 @@ const builderFn = tier === "workspace" ? "workspaceTool" : "freeTool";
 
 // ─── Paths ───
 
-const TOOLS_DIR = path.resolve(
-  __dirname,
-  "../src/lib/mcp/server/tools",
-);
-const MANIFEST_PATH = path.resolve(
-  __dirname,
-  "../src/lib/mcp/server/tool-manifest.ts",
-);
+const TOOLS_DIR = path.resolve(__dirname, "../src/lib/mcp/server/tools");
+const MANIFEST_PATH = path.resolve(__dirname, "../src/lib/mcp/server/tool-manifest.ts");
 
 const toolFile = path.join(TOOLS_DIR, `${toolName}.ts`);
 const testFile = path.join(TOOLS_DIR, `${toolName}.test.ts`);
@@ -201,10 +195,7 @@ if (!lastImportMatch) {
 
 const importInsertPos = lastImportMatch.index + lastImportMatch[0].length;
 const withImport =
-  manifest.slice(0, importInsertPos) +
-  "\n" +
-  importLine +
-  manifest.slice(importInsertPos);
+  manifest.slice(0, importInsertPos) + "\n" + importLine + manifest.slice(importInsertPos);
 
 // Add entry before the closing ]; of TOOL_MODULES
 const closingBracket = withImport.lastIndexOf("];");

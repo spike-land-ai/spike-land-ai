@@ -19,10 +19,7 @@
 
 import { PrismaPg } from "@prisma/adapter-pg";
 import { type ObjectiveType, PrismaClient } from "@prisma/client";
-import {
-  CampaignObjectivesSchema,
-  TargetAudienceSchema,
-} from "@spike-land-ai/shared/validations";
+import { CampaignObjectivesSchema, TargetAudienceSchema } from "@spike-land-ai/shared/validations";
 import { config } from "dotenv";
 
 // Load environment variables
@@ -75,9 +72,7 @@ async function backfillCampaignBrief(
 ): Promise<void> {
   // Validate and parse target audience JSON
   const audienceResult = TargetAudienceSchema.safeParse(targetAudienceJson);
-  const objectivesResult = CampaignObjectivesSchema.safeParse(
-    campaignObjectivesJson,
-  );
+  const objectivesResult = CampaignObjectivesSchema.safeParse(campaignObjectivesJson);
 
   if (!audienceResult.success) {
     console.warn(
@@ -97,22 +92,20 @@ async function backfillCampaignBrief(
     console.log(`  [DRY RUN] Would migrate brief ${briefId}`);
     if (audienceResult.success) {
       console.log(
-        `    - Target audience: ageRange=${audienceResult.data.ageRange?.min}-${audienceResult.data.ageRange?.max}, `
-          + `genders=${audienceResult.data.genders?.length ?? 0}, `
-          + `locations=${audienceResult.data.locations?.length ?? 0}`,
+        `    - Target audience: ageRange=${audienceResult.data.ageRange?.min}-${audienceResult.data.ageRange?.max}, ` +
+          `genders=${audienceResult.data.genders?.length ?? 0}, ` +
+          `locations=${audienceResult.data.locations?.length ?? 0}`,
       );
     }
     if (objectivesResult.success) {
-      console.log(
-        `    - Objectives: ${objectivesResult.data.length} objectives`,
-      );
+      console.log(`    - Objectives: ${objectivesResult.data.length} objectives`);
     }
     stats.processedBriefs++;
     return;
   }
 
   // Use transaction for atomicity
-  await prisma.$transaction(async tx => {
+  await prisma.$transaction(async (tx) => {
     // Create CampaignTargetAudience if valid JSON
     if (audienceResult.success && audienceResult.data) {
       const audience = audienceResult.data;
@@ -150,9 +143,7 @@ async function backfillCampaignBrief(
       for (const obj of objectivesResult.data) {
         const objectiveType = objectiveTypeMap[obj.type];
         if (!objectiveType) {
-          console.warn(
-            `  [WARN] Brief ${briefId}: Unknown objective type: ${obj.type}`,
-          );
+          console.warn(`  [WARN] Brief ${briefId}: Unknown objective type: ${obj.type}`);
           continue;
         }
 
@@ -217,12 +208,7 @@ async function main() {
     }
 
     try {
-      await backfillCampaignBrief(
-        brief.id,
-        brief.targetAudience,
-        brief.campaignObjectives,
-        dryRun,
-      );
+      await backfillCampaignBrief(brief.id, brief.targetAudience, brief.campaignObjectives, dryRun);
       console.log(`  [OK] Migrated successfully`);
     } catch (error) {
       console.error(`  [ERROR] Failed to migrate:`, error);
@@ -263,15 +249,13 @@ async function main() {
     console.log(`CampaignObjectives:      ${objectiveCount}`);
 
     if (audienceCount < briefCount) {
-      console.log(
-        `\n[NOTE] ${briefCount - audienceCount} briefs have no target audience data`,
-      );
+      console.log(`\n[NOTE] ${briefCount - audienceCount} briefs have no target audience data`);
     }
   }
 }
 
 main()
-  .catch(e => {
+  .catch((e) => {
     console.error("Fatal error:", e);
     process.exit(1);
   })

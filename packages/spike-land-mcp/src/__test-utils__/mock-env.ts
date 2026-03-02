@@ -17,16 +17,14 @@ export function createMockKV(): KVNamespace {
       return entry.value;
     },
     put: async (key: string, value: string, opts?: { expirationTtl?: number }) => {
-      const expiration = opts?.expirationTtl
-        ? Date.now() / 1000 + opts.expirationTtl
-        : undefined;
+      const expiration = opts?.expirationTtl ? Date.now() / 1000 + opts.expirationTtl : undefined;
       store.set(key, { value, expiration });
     },
     delete: async (key: string) => {
       store.delete(key);
     },
     list: async () => ({
-      keys: Array.from(store.keys()).map(name => ({ name })),
+      keys: Array.from(store.keys()).map((name) => ({ name })),
       list_complete: true,
       cacheStatus: null,
     }),
@@ -84,18 +82,20 @@ export function createMockD1(
 export const mockKV = createMockKV;
 
 /** Create a full mock Env object. */
-export function mockEnv(overrides?: Partial<{
-  DB: D1Database;
-  KV: KVNamespace;
-  MCP_JWT_SECRET: string;
-  MCP_INTERNAL_SECRET: string;
-  ANTHROPIC_API_KEY: string;
-  OPENAI_API_KEY: string;
-  GEMINI_API_KEY: string;
-  ELEVENLABS_API_KEY: string;
-  APP_ENV: string;
-  SPIKE_LAND_URL: string;
-}>) {
+export function mockEnv(
+  overrides?: Partial<{
+    DB: D1Database;
+    KV: KVNamespace;
+    MCP_JWT_SECRET: string;
+    MCP_INTERNAL_SECRET: string;
+    ANTHROPIC_API_KEY: string;
+    OPENAI_API_KEY: string;
+    GEMINI_API_KEY: string;
+    ELEVENLABS_API_KEY: string;
+    APP_ENV: string;
+    SPIKE_LAND_URL: string;
+  }>,
+) {
   return {
     DB: overrides?.DB ?? createMockD1(),
     KV: overrides?.KV ?? createMockKV(),

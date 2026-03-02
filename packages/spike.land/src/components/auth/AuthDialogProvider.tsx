@@ -47,7 +47,7 @@ export function AuthDialogProvider({ children }: AuthDialogProviderProps) {
       {children}
       <AuthDialog
         open={isOpen}
-        onOpenChange={open => {
+        onOpenChange={(open) => {
           if (!open) closeAuthDialog();
         }}
         callbackUrl={callbackUrl}

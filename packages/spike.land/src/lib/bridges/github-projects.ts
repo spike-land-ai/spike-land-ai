@@ -72,13 +72,13 @@ async function graphqlFetch<T>(
       return null;
     }
 
-    const body = await res.json() as {
+    const body = (await res.json()) as {
       data?: T;
-      errors?: Array<{ message: string; }>;
+      errors?: Array<{ message: string }>;
     };
     if (body.errors?.length) {
       logger.warn("GitHub GraphQL returned errors", {
-        errors: body.errors.map(e => e.message),
+        errors: body.errors.map((e) => e.message),
       });
       return null;
     }
@@ -95,13 +95,13 @@ async function graphqlFetch<T>(
 
 interface ProjectItemNode {
   id: string;
-  fieldValueByName: { name: string; } | null;
+  fieldValueByName: { name: string } | null;
   content: {
     __typename: string;
     title: string;
     url?: string;
-    labels?: { nodes: Array<{ name: string; }>; };
-    assignees?: { nodes: Array<{ login: string; }>; };
+    labels?: { nodes: Array<{ name: string }> };
+    assignees?: { nodes: Array<{ login: string }> };
   } | null;
 }
 
@@ -144,24 +144,24 @@ export async function getRoadmapItems(): Promise<RoadmapItem[] | null> {
   const data = await graphqlFetch<{
     user: {
       projectV2: {
-        items: { nodes: ProjectItemNode[]; };
+        items: { nodes: ProjectItemNode[] };
       };
     };
   }>(query, { owner: OWNER, number: PROJECT_NUMBER });
 
   if (!data) return null;
 
-  return data.user.projectV2.items.nodes.map(node => ({
+  return data.user.projectV2.items.nodes.map((node) => ({
     id: node.id,
     title: node.content?.title ?? "Untitled",
     status: node.fieldValueByName?.name ?? "No Status",
     type: (node.content?.__typename === "PullRequest"
       ? "PULL_REQUEST"
       : node.content?.__typename === "DraftIssue"
-      ? "DRAFT_ISSUE"
-      : "ISSUE") as RoadmapItem["type"],
-    labels: node.content?.labels?.nodes.map(l => l.name) ?? [],
-    assignees: node.content?.assignees?.nodes.map(a => a.login) ?? [],
+        ? "DRAFT_ISSUE"
+        : "ISSUE") as RoadmapItem["type"],
+    labels: node.content?.labels?.nodes.map((l) => l.name) ?? [],
+    assignees: node.content?.assignees?.nodes.map((a) => a.login) ?? [],
     url: node.content?.url ?? null,
   }));
 }
@@ -187,15 +187,15 @@ export async function getIssuesSummary(): Promise<IssueSummary | null> {
 
   const data = await graphqlFetch<{
     repository: {
-      open: { totalCount: number; };
-      closed: { totalCount: number; };
+      open: { totalCount: number };
+      closed: { totalCount: number };
       recent: {
         nodes: Array<{
           number: number;
           title: string;
           state: string;
           updatedAt: string;
-          labels: { nodes: Array<{ name: string; }>; };
+          labels: { nodes: Array<{ name: string }> };
         }>;
       };
     };
@@ -214,7 +214,7 @@ export async function getIssuesSummary(): Promise<IssueSummary | null> {
     open: data.repository.open.totalCount,
     closed: data.repository.closed.totalCount,
     byLabel,
-    recentlyUpdated: data.repository.recent.nodes.map(n => ({
+    recentlyUpdated: data.repository.recent.nodes.map((n) => ({
       number: n.number,
       title: n.title,
       state: n.state,
@@ -252,20 +252,20 @@ export async function getPRStatus(): Promise<PRStatusSummary | null> {
 
   const data = await graphqlFetch<{
     repository: {
-      open: { totalCount: number; };
-      merged: { totalCount: number; };
+      open: { totalCount: number };
+      merged: { totalCount: number };
       pending: {
         nodes: Array<{
           number: number;
           title: string;
-          author: { login: string; };
+          author: { login: string };
           isDraft: boolean;
           reviewDecision: string | null;
           updatedAt: string;
           commits: {
             nodes: Array<{
               commit: {
-                statusCheckRollup: { state: string; } | null;
+                statusCheckRollup: { state: string } | null;
               };
             }>;
           };
@@ -279,12 +279,11 @@ export async function getPRStatus(): Promise<PRStatusSummary | null> {
   return {
     open: data.repository.open.totalCount,
     merged: data.repository.merged.totalCount,
-    pending: data.repository.pending.nodes.map(pr => ({
+    pending: data.repository.pending.nodes.map((pr) => ({
       number: pr.number,
       title: pr.title,
       author: pr.author.login,
-      checksStatus: pr.commits.nodes[0]?.commit.statusCheckRollup?.state
-        ?? "UNKNOWN",
+      checksStatus: pr.commits.nodes[0]?.commit.statusCheckRollup?.state ?? "UNKNOWN",
       reviewDecision: pr.reviewDecision ?? "NONE",
       isDraft: pr.isDraft,
       updatedAt: pr.updatedAt,

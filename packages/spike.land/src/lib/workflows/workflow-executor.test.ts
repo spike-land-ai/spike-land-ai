@@ -50,7 +50,7 @@ import type { WorkflowExecutionContext, WorkflowStepData } from "@/types/workflo
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
 function makeStep(
-  overrides: Partial<WorkflowStepData> & { id: string; name: string; },
+  overrides: Partial<WorkflowStepData> & { id: string; name: string },
 ): WorkflowStepData {
   return {
     type: "ACTION",
@@ -482,11 +482,11 @@ describe("executeWorkflow", () => {
     expect(result.status).toBe("FAILED");
     expect(result.error).toBe("step failed hard");
     // Only s1 and s2 run; s3 is not reached because execution stops on failure
-    const statuses = result.stepResults.map(r => r.status);
+    const statuses = result.stepResults.map((r) => r.status);
     expect(statuses).toContain("COMPLETED"); // s1
     expect(statuses).toContain("FAILED"); // s2
     // s3 should NOT be present since we stop after failure
-    expect(result.stepResults.find(r => r.stepId === "s3")).toBeUndefined();
+    expect(result.stepResults.find((r) => r.stepId === "s3")).toBeUndefined();
   });
 
   it("marks run as FAILED in DB when step fails", async () => {
@@ -607,7 +607,7 @@ describe("executeWorkflow", () => {
   it("executes steps in sequence order (dependency resolution)", async () => {
     const executionOrder: string[] = [];
 
-    registerStepHandler("order_step", async step => {
+    registerStepHandler("order_step", async (step) => {
       executionOrder.push(step.id!);
       return { output: {} };
     });
@@ -682,8 +682,8 @@ describe("executeWorkflow", () => {
 
     const result = await executeWorkflow(BASE_CTX);
 
-    const trueBranchResult = result.stepResults.find(r => r.stepId === "true-branch");
-    const falseBranchResult = result.stepResults.find(r => r.stepId === "false-branch");
+    const trueBranchResult = result.stepResults.find((r) => r.stepId === "true-branch");
+    const falseBranchResult = result.stepResults.find((r) => r.stepId === "false-branch");
 
     expect(trueBranchResult?.status).toBe("COMPLETED");
     expect(falseBranchResult?.status).toBe("SKIPPED");
@@ -727,8 +727,8 @@ describe("executeWorkflow", () => {
 
     const result = await executeWorkflow(BASE_CTX);
 
-    expect(result.stepResults.find(r => r.stepId === "true-b")?.status).toBe("SKIPPED");
-    expect(result.stepResults.find(r => r.stepId === "false-b")?.status).toBe("COMPLETED");
+    expect(result.stepResults.find((r) => r.stepId === "true-b")?.status).toBe("SKIPPED");
+    expect(result.stepResults.find((r) => r.stepId === "false-b")?.status).toBe("COMPLETED");
   });
 
   it("always executes DEFAULT branches regardless of condition result", async () => {
@@ -759,7 +759,7 @@ describe("executeWorkflow", () => {
 
     const result = await executeWorkflow(BASE_CTX);
 
-    expect(result.stepResults.find(r => r.stepId === "default-b")?.status).toBe("COMPLETED");
+    expect(result.stepResults.find((r) => r.stepId === "default-b")?.status).toBe("COMPLETED");
   });
 
   it("recursively skips descendants of skipped steps", async () => {
@@ -798,8 +798,8 @@ describe("executeWorkflow", () => {
 
     const result = await executeWorkflow(BASE_CTX);
 
-    expect(result.stepResults.find(r => r.stepId === "false-parent")?.status).toBe("SKIPPED");
-    expect(result.stepResults.find(r => r.stepId === "false-child")?.status).toBe("SKIPPED");
+    expect(result.stepResults.find((r) => r.stepId === "false-parent")?.status).toBe("SKIPPED");
+    expect(result.stepResults.find((r) => r.stepId === "false-child")?.status).toBe("SKIPPED");
   });
 
   it("creates a workflowRunLog entry for trigger info on start", async () => {

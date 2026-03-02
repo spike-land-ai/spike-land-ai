@@ -39,15 +39,15 @@ const OAuthLink = table(
 
 // ─── Tables: MCP Tool Registry ───
 
-const ToolEntry = table(
-  { name: "tool_entry", public: true },
+const RegisteredTool = table(
+  { name: "registered_tool", public: true },
   {
     id: t.u64().autoInc().primaryKey(),
-    name: t.string().unique(),
-    category: t.string(),
+    name: t.string().index("btree"),
     description: t.string(),
-    tier: t.string(),
-    enabled: t.bool(),
+    inputSchema: t.string(),
+    providerIdentity: t.identity().index("btree"),
+    category: t.string(),
     createdAt: t.u64(),
   },
 );
@@ -141,17 +141,19 @@ const AgentMessage = table(
   },
 );
 
-const Task = table(
-  { name: "task", public: true },
+const McpTask = table(
+  { name: "mcp_task", public: true },
   {
     id: t.u64().autoInc().primaryKey(),
-    description: t.string(),
-    assignedTo: t.option(t.identity()),
-    status: t.string(),
-    priority: t.u8(),
-    context: t.string(),
-    createdBy: t.identity(),
+    toolName: t.string(),
+    argumentsJson: t.string(),
+    requesterIdentity: t.identity(),
+    providerIdentity: t.option(t.identity()),
+    status: t.string(), // "pending", "claimed", "completed", "failed"
+    resultJson: t.option(t.string()),
+    error: t.option(t.string()),
     createdAt: t.u64(),
+    completedAt: t.option(t.u64()),
   },
 );
 
@@ -178,6 +180,21 @@ const PageBlock = table(
     blockType: t.string(),
     contentJson: t.string(),
     sortOrder: t.u32(),
+  },
+);
+
+
+const CodeSession = table(
+  { name: "code_session", public: true },
+  {
+    codeSpace: t.string().primaryKey(),
+    code: t.string(),
+    html: t.string(),
+    css: t.string(),
+    transpiled: t.string(),
+    messagesJson: t.string(),
+    lastUpdatedBy: t.identity(),
+    updatedAt: t.u64(),
   },
 );
 
@@ -222,55 +239,67 @@ const HealthCheck = table(
 
 // ─── Schema ───
 
-const spacetimedb = schema(
-  User,
-  OAuthLink,
-  ToolEntry,
-  ToolUsage,
-  UserToolPreference,
-  App,
-  AppVersion,
-  AppMessage,
-  Agent,
-  AgentMessage,
-  Task,
-  Page,
-  PageBlock,
-  DirectMessage,
-  PlatformEvent,
-  HealthCheck,
-);
+const spacetimedb = schema({
+  user: User,
+  oauth_link: OAuthLink,
+  registered_tool: RegisteredTool,
+  tool_usage: ToolUsage,
+  user_tool_preference: UserToolPreference,
+  app: App,
+  app_version: AppVersion,
+  app_message: AppMessage,
+  agent: Agent,
+  agent_message: AgentMessage,
+  mcp_task: McpTask,
+  page: Page,
+  page_block: PageBlock,
+  code_session: CodeSession,
+  direct_message: DirectMessage,
+  platform_event: PlatformEvent,
+  health_check: HealthCheck,
+});
 
 // ─── Lifecycle ───
 
-spacetimedb.init((_ctx) => {});
+export const init = spacetimedb.init((_ctx) => {});
 
-spacetimedb.clientConnected((ctx) => {
+export const onConnect = spacetimedb.clientConnected((ctx) => {
   const existing = ctx.db.user.identity.find(ctx.sender);
   if (existing) {
     ctx.db.user.identity.update({
       ...existing,
       online: true,
-      lastSeen: BigInt(ctx.timestamp.microsSinceEpoch),
+      lastSeen: BigInt(ctx.timestamp.microsSinceUnixEpoch),
     });
   }
 });
 
-spacetimedb.clientDisconnected((ctx) => {
-  const existing = ctx.db.user.identity.find(ctx.sender);
-  if (existing) {
+export const onDisconnect = spacetimedb.clientDisconnected((ctx) => {
+  const existingUser = ctx.db.user.identity.find(ctx.sender);
+  if (existingUser) {
     ctx.db.user.identity.update({
-      ...existing,
+      ...existingUser,
       online: false,
-      lastSeen: BigInt(ctx.timestamp.microsSinceEpoch),
+      lastSeen: BigInt(ctx.timestamp.microsSinceUnixEpoch),
     });
+  }
+  const existingAgent = ctx.db.agent.identity.find(ctx.sender);
+  if (existingAgent) {
+    ctx.db.agent.identity.update({
+      ...existingAgent,
+      online: false,
+      lastSeen: BigInt(ctx.timestamp.microsSinceUnixEpoch),
+    });
+  }
+  // Remove registered tools from this disconnected leaf server
+  for (const tool of ctx.db.registered_tool.providerIdentity.filter(ctx.sender)) {
+    ctx.db.registered_tool.id.delete(tool.id);
   }
 });
 
 // ─── User Reducers ───
 
-spacetimedb.reducer(
-  "register_user",
+export const register_user = spacetimedb.reducer(
   {
     handle: t.string(),
     displayName: t.string(),
@@ -293,14 +322,13 @@ spacetimedb.reducer(
       avatarUrl,
       role: "user",
       online: true,
-      lastSeen: BigInt(ctx.timestamp.microsSinceEpoch),
-      createdAt: BigInt(ctx.timestamp.microsSinceEpoch),
+      lastSeen: BigInt(ctx.timestamp.microsSinceUnixEpoch),
+      createdAt: BigInt(ctx.timestamp.microsSinceUnixEpoch),
     });
   },
 );
 
-spacetimedb.reducer(
-  "update_profile",
+export const update_profile = spacetimedb.reducer(
   {
     displayName: t.string(),
     email: t.string(),
@@ -320,8 +348,7 @@ spacetimedb.reducer(
   },
 );
 
-spacetimedb.reducer(
-  "link_oauth",
+export const link_oauth = spacetimedb.reducer(
   { provider: t.string(), providerAccountId: t.string() },
   (ctx, { provider, providerAccountId }) => {
     if (!provider || !providerAccountId) {
@@ -332,108 +359,126 @@ spacetimedb.reducer(
       userIdentity: ctx.sender,
       provider,
       providerAccountId,
-      createdAt: BigInt(ctx.timestamp.microsSinceEpoch),
+      createdAt: BigInt(ctx.timestamp.microsSinceUnixEpoch),
     });
   },
 );
 
-// ─── Tool Registry Reducers ───
+// ─── MCP Tool Swarm Reducers ───
 
-spacetimedb.reducer(
-  "create_tool_entry",
+export const register_tool = spacetimedb.reducer(
   {
     name: t.string(),
-    category: t.string(),
     description: t.string(),
-    tier: t.string(),
+    inputSchema: t.string(),
+    category: t.string(),
   },
-  (ctx, { name, category, description, tier }) => {
+  (ctx, { name, description, inputSchema, category }) => {
     if (!name) {
       throw new SenderError("Tool name must not be empty");
     }
-    ctx.db.tool_entry.insert({
+    // Remove if already exists for this provider
+    for (const tool of ctx.db.registered_tool.providerIdentity.filter(ctx.sender)) {
+      if (tool.name === name) {
+        ctx.db.registered_tool.id.delete(tool.id);
+      }
+    }
+    ctx.db.registered_tool.insert({
       id: BigInt(0),
       name,
-      category,
       description,
-      tier: tier || "free",
-      enabled: true,
-      createdAt: BigInt(ctx.timestamp.microsSinceEpoch),
+      inputSchema,
+      providerIdentity: ctx.sender,
+      category,
+      createdAt: BigInt(ctx.timestamp.microsSinceUnixEpoch),
     });
   },
 );
 
-spacetimedb.reducer(
-  "update_tool_entry",
-  {
-    toolId: t.u64(),
-    category: t.string(),
-    description: t.string(),
-    tier: t.string(),
-    enabled: t.bool(),
-  },
-  (ctx, { toolId, category, description, tier, enabled }) => {
-    const tool = ctx.db.tool_entry.id.find(toolId);
-    if (!tool) {
-      throw new SenderError("Tool not found");
+export const unregister_tool = spacetimedb.reducer(
+  { name: t.string() },
+  (ctx, { name }) => {
+    for (const tool of ctx.db.registered_tool.providerIdentity.filter(ctx.sender)) {
+      if (tool.name === name) {
+        ctx.db.registered_tool.id.delete(tool.id);
+      }
     }
-    ctx.db.tool_entry.id.update({
-      ...tool,
-      category,
-      description,
-      tier,
-      enabled,
-    });
-  },
+  }
 );
 
-spacetimedb.reducer(
-  "record_tool_usage",
+export const invoke_tool_request = spacetimedb.reducer(
   {
     toolName: t.string(),
-    durationMs: t.u32(),
-    success: t.bool(),
+    argumentsJson: t.string(),
   },
-  (ctx, { toolName, durationMs, success }) => {
+  (ctx, { toolName, argumentsJson }) => {
     if (!toolName) {
       throw new SenderError("Tool name must not be empty");
     }
-    ctx.db.tool_usage.insert({
+    // Auth & Capability Check could go here!
+    // For now, any agent can request
+    ctx.db.mcp_task.insert({
       id: BigInt(0),
       toolName,
-      userIdentity: ctx.sender,
-      timestamp: BigInt(ctx.timestamp.microsSinceEpoch),
-      durationMs,
-      success,
+      argumentsJson,
+      requesterIdentity: ctx.sender,
+      providerIdentity: undefined,
+      status: "pending",
+      resultJson: undefined,
+      error: undefined,
+      createdAt: BigInt(ctx.timestamp.microsSinceUnixEpoch),
+      completedAt: undefined,
     });
-  },
+  }
 );
 
-spacetimedb.reducer(
-  "set_user_tool_preference",
-  {
-    toolName: t.string(),
-    enabled: t.bool(),
-    customConfig: t.string(),
-  },
-  (ctx, { toolName, enabled, customConfig }) => {
-    if (!toolName) {
-      throw new SenderError("Tool name must not be empty");
+export const claim_mcp_task = spacetimedb.reducer(
+  { taskId: t.u64() },
+  (ctx, { taskId }) => {
+    const task = ctx.db.mcp_task.id.find(taskId);
+    if (!task) {
+      throw new SenderError("Task not found");
     }
-    ctx.db.user_tool_preference.insert({
-      id: BigInt(0),
-      userIdentity: ctx.sender,
-      toolName,
-      enabled,
-      customConfig,
+    if (task.status !== "pending") {
+      throw new SenderError("Task is not available for claiming");
+    }
+    
+    ctx.db.mcp_task.id.update({
+      ...task,
+      providerIdentity: ctx.sender,
+      status: "claimed",
     });
+  }
+);
+
+export const complete_mcp_task = spacetimedb.reducer(
+  {
+    taskId: t.u64(),
+    resultJson: t.option(t.string()),
+    error: t.option(t.string()),
   },
+  (ctx, { taskId, resultJson, error }) => {
+    const task = ctx.db.mcp_task.id.find(taskId);
+    if (!task) {
+      throw new SenderError("Task not found");
+    }
+    if (task.providerIdentity !== ctx.sender) {
+      throw new SenderError("Only the claiming provider can complete this task");
+    }
+    
+    ctx.db.mcp_task.id.update({
+      ...task,
+      status: error ? "failed" : "completed",
+      resultJson,
+      error,
+      completedAt: BigInt(ctx.timestamp.microsSinceUnixEpoch),
+    });
+  }
 );
 
 // ─── App Reducers ───
 
-spacetimedb.reducer(
-  "create_app",
+export const create_app = spacetimedb.reducer(
   {
     slug: t.string(),
     name: t.string(),
@@ -443,7 +488,7 @@ spacetimedb.reducer(
     if (!slug || !name) {
       throw new SenderError("Slug and name are required");
     }
-    const now = BigInt(ctx.timestamp.microsSinceEpoch);
+    const now = BigInt(ctx.timestamp.microsSinceUnixEpoch);
     ctx.db.app.insert({
       id: BigInt(0),
       slug,
@@ -458,8 +503,7 @@ spacetimedb.reducer(
   },
 );
 
-spacetimedb.reducer(
-  "update_app",
+export const update_app = spacetimedb.reducer(
   {
     appId: t.u64(),
     name: t.string(),
@@ -479,13 +523,12 @@ spacetimedb.reducer(
       name,
       description,
       r2CodeKey,
-      updatedAt: BigInt(ctx.timestamp.microsSinceEpoch),
+      updatedAt: BigInt(ctx.timestamp.microsSinceUnixEpoch),
     });
   },
 );
 
-spacetimedb.reducer(
-  "update_app_status",
+export const update_app_status = spacetimedb.reducer(
   { appId: t.u64(), status: t.string() },
   (ctx, { appId, status }) => {
     const app = ctx.db.app.id.find(appId);
@@ -498,54 +541,47 @@ spacetimedb.reducer(
     ctx.db.app.id.update({
       ...app,
       status,
-      updatedAt: BigInt(ctx.timestamp.microsSinceEpoch),
+      updatedAt: BigInt(ctx.timestamp.microsSinceUnixEpoch),
     });
   },
 );
 
-spacetimedb.reducer(
-  "delete_app",
-  { appId: t.u64() },
-  (ctx, { appId }) => {
-    const app = ctx.db.app.id.find(appId);
-    if (!app) {
-      throw new SenderError("App not found");
-    }
-    if (app.ownerIdentity !== ctx.sender) {
-      throw new SenderError("Only the owner can delete this app");
-    }
-    ctx.db.app.id.update({
-      ...app,
-      status: "deleted",
-      updatedAt: BigInt(ctx.timestamp.microsSinceEpoch),
-    });
-  },
-);
+export const delete_app = spacetimedb.reducer(
+  { appId: t.u64() }, (ctx, { appId }) => {
+  const app = ctx.db.app.id.find(appId);
+  if (!app) {
+    throw new SenderError("App not found");
+  }
+  if (app.ownerIdentity !== ctx.sender) {
+    throw new SenderError("Only the owner can delete this app");
+  }
+  ctx.db.app.id.update({
+    ...app,
+    status: "deleted",
+    updatedAt: BigInt(ctx.timestamp.microsSinceUnixEpoch),
+  });
+});
 
-spacetimedb.reducer(
-  "restore_app",
-  { appId: t.u64() },
-  (ctx, { appId }) => {
-    const app = ctx.db.app.id.find(appId);
-    if (!app) {
-      throw new SenderError("App not found");
-    }
-    if (app.ownerIdentity !== ctx.sender) {
-      throw new SenderError("Only the owner can restore this app");
-    }
-    if (app.status !== "deleted") {
-      throw new SenderError("App is not deleted");
-    }
-    ctx.db.app.id.update({
-      ...app,
-      status: "prompting",
-      updatedAt: BigInt(ctx.timestamp.microsSinceEpoch),
-    });
-  },
-);
+export const restore_app = spacetimedb.reducer(
+  { appId: t.u64() }, (ctx, { appId }) => {
+  const app = ctx.db.app.id.find(appId);
+  if (!app) {
+    throw new SenderError("App not found");
+  }
+  if (app.ownerIdentity !== ctx.sender) {
+    throw new SenderError("Only the owner can restore this app");
+  }
+  if (app.status !== "deleted") {
+    throw new SenderError("App is not deleted");
+  }
+  ctx.db.app.id.update({
+    ...app,
+    status: "prompting",
+    updatedAt: BigInt(ctx.timestamp.microsSinceUnixEpoch),
+  });
+});
 
-spacetimedb.reducer(
-  "create_app_version",
+export const create_app_version = spacetimedb.reducer(
   {
     appId: t.u64(),
     version: t.u32(),
@@ -564,13 +600,12 @@ spacetimedb.reducer(
       codeHash,
       changeDescription,
       createdBy: ctx.sender,
-      createdAt: BigInt(ctx.timestamp.microsSinceEpoch),
+      createdAt: BigInt(ctx.timestamp.microsSinceUnixEpoch),
     });
   },
 );
 
-spacetimedb.reducer(
-  "send_app_message",
+export const send_app_message = spacetimedb.reducer(
   {
     appId: t.u64(),
     role: t.string(),
@@ -585,15 +620,14 @@ spacetimedb.reducer(
       appId,
       role,
       content,
-      createdAt: BigInt(ctx.timestamp.microsSinceEpoch),
+      createdAt: BigInt(ctx.timestamp.microsSinceUnixEpoch),
     });
   },
 );
 
 // ─── Agent Reducers ───
 
-spacetimedb.reducer(
-  "register_agent",
+export const register_agent = spacetimedb.reducer(
   { displayName: t.string(), capabilities: t.array(t.string()) },
   (ctx, { displayName, capabilities }) => {
     if (!displayName) {
@@ -606,7 +640,7 @@ spacetimedb.reducer(
         displayName,
         capabilities,
         online: true,
-        lastSeen: BigInt(ctx.timestamp.microsSinceEpoch),
+        lastSeen: BigInt(ctx.timestamp.microsSinceUnixEpoch),
       });
     } else {
       ctx.db.agent.insert({
@@ -614,13 +648,14 @@ spacetimedb.reducer(
         displayName,
         capabilities,
         online: true,
-        lastSeen: BigInt(ctx.timestamp.microsSinceEpoch),
+        lastSeen: BigInt(ctx.timestamp.microsSinceUnixEpoch),
       });
     }
   },
 );
 
-spacetimedb.reducer("unregister_agent", {}, (ctx) => {
+export const unregister_agent = spacetimedb.reducer(
+  {}, (ctx) => {
   const existing = ctx.db.agent.identity.find(ctx.sender);
   if (!existing) {
     throw new SenderError("Agent not registered");
@@ -628,12 +663,11 @@ spacetimedb.reducer("unregister_agent", {}, (ctx) => {
   ctx.db.agent.identity.update({
     ...existing,
     online: false,
-    lastSeen: BigInt(ctx.timestamp.microsSinceEpoch),
+    lastSeen: BigInt(ctx.timestamp.microsSinceUnixEpoch),
   });
 });
 
-spacetimedb.reducer(
-  "send_agent_message",
+export const send_agent_message = spacetimedb.reducer(
   { toAgent: t.identity(), content: t.string() },
   (ctx, { toAgent, content }) => {
     if (!content) {
@@ -644,14 +678,13 @@ spacetimedb.reducer(
       fromAgent: ctx.sender,
       toAgent,
       content,
-      timestamp: BigInt(ctx.timestamp.microsSinceEpoch),
+      timestamp: BigInt(ctx.timestamp.microsSinceUnixEpoch),
       delivered: false,
     });
   },
 );
 
-spacetimedb.reducer(
-  "mark_agent_message_delivered",
+export const mark_agent_message_delivered = spacetimedb.reducer(
   { messageId: t.u64() },
   (ctx, { messageId }) => {
     const msg = ctx.db.agent_message.id.find(messageId);
@@ -665,69 +698,9 @@ spacetimedb.reducer(
   },
 );
 
-// ─── Task Reducers ───
-
-spacetimedb.reducer(
-  "create_task",
-  {
-    description: t.string(),
-    priority: t.u8(),
-    context: t.string(),
-  },
-  (ctx, { description, priority, context: taskContext }) => {
-    if (!description) {
-      throw new SenderError("Task description must not be empty");
-    }
-    ctx.db.task.insert({
-      id: BigInt(0),
-      description,
-      assignedTo: undefined,
-      status: "pending",
-      priority,
-      context: taskContext,
-      createdBy: ctx.sender,
-      createdAt: BigInt(ctx.timestamp.microsSinceEpoch),
-    });
-  },
-);
-
-spacetimedb.reducer("claim_task", { taskId: t.u64() }, (ctx, { taskId }) => {
-  const task = ctx.db.task.id.find(taskId);
-  if (!task) {
-    throw new SenderError("Task not found");
-  }
-  if (task.status !== "pending") {
-    throw new SenderError("Task is not available for claiming");
-  }
-  if (task.assignedTo !== undefined) {
-    throw new SenderError("Task is already assigned");
-  }
-  ctx.db.task.id.update({
-    ...task,
-    assignedTo: ctx.sender,
-    status: "in_progress",
-  });
-});
-
-spacetimedb.reducer(
-  "complete_task",
-  { taskId: t.u64() },
-  (ctx, { taskId }) => {
-    const task = ctx.db.task.id.find(taskId);
-    if (!task) {
-      throw new SenderError("Task not found");
-    }
-    if (task.assignedTo !== ctx.sender) {
-      throw new SenderError("Can only complete tasks assigned to you");
-    }
-    ctx.db.task.id.update({ ...task, status: "completed" });
-  },
-);
-
 // ─── Page Reducers ───
 
-spacetimedb.reducer(
-  "create_page",
+export const create_page = spacetimedb.reducer(
   {
     slug: t.string(),
     title: t.string(),
@@ -737,7 +710,7 @@ spacetimedb.reducer(
     if (!slug || !title) {
       throw new SenderError("Slug and title are required");
     }
-    const now = BigInt(ctx.timestamp.microsSinceEpoch);
+    const now = BigInt(ctx.timestamp.microsSinceUnixEpoch);
     ctx.db.page.insert({
       id: BigInt(0),
       slug,
@@ -750,8 +723,7 @@ spacetimedb.reducer(
   },
 );
 
-spacetimedb.reducer(
-  "update_page",
+export const update_page = spacetimedb.reducer(
   {
     pageId: t.u64(),
     title: t.string(),
@@ -768,25 +740,21 @@ spacetimedb.reducer(
       title,
       description,
       published,
-      updatedAt: BigInt(ctx.timestamp.microsSinceEpoch),
+      updatedAt: BigInt(ctx.timestamp.microsSinceUnixEpoch),
     });
   },
 );
 
-spacetimedb.reducer(
-  "delete_page",
-  { pageId: t.u64() },
-  (ctx, { pageId }) => {
-    const page = ctx.db.page.id.find(pageId);
-    if (!page) {
-      throw new SenderError("Page not found");
-    }
-    ctx.db.page.id.delete(pageId);
-  },
-);
+export const delete_page = spacetimedb.reducer(
+  { pageId: t.u64() }, (ctx, { pageId }) => {
+  const page = ctx.db.page.id.find(pageId);
+  if (!page) {
+    throw new SenderError("Page not found");
+  }
+  ctx.db.page.id.delete(pageId);
+});
 
-spacetimedb.reducer(
-  "create_page_block",
+export const create_page_block = spacetimedb.reducer(
   {
     pageId: t.u64(),
     blockType: t.string(),
@@ -808,8 +776,7 @@ spacetimedb.reducer(
   },
 );
 
-spacetimedb.reducer(
-  "update_page_block",
+export const update_page_block = spacetimedb.reducer(
   {
     blockId: t.u64(),
     blockType: t.string(),
@@ -830,20 +797,16 @@ spacetimedb.reducer(
   },
 );
 
-spacetimedb.reducer(
-  "delete_page_block",
-  { blockId: t.u64() },
-  (ctx, { blockId }) => {
-    const block = ctx.db.page_block.id.find(blockId);
-    if (!block) {
-      throw new SenderError("Page block not found");
-    }
-    ctx.db.page_block.id.delete(blockId);
-  },
-);
+export const delete_page_block = spacetimedb.reducer(
+  { blockId: t.u64() }, (ctx, { blockId }) => {
+  const block = ctx.db.page_block.id.find(blockId);
+  if (!block) {
+    throw new SenderError("Page block not found");
+  }
+  ctx.db.page_block.id.delete(blockId);
+});
 
-spacetimedb.reducer(
-  "reorder_page_blocks",
+export const reorder_page_blocks = spacetimedb.reducer(
   {
     blockIds: t.array(t.u64()),
   },
@@ -860,8 +823,7 @@ spacetimedb.reducer(
 
 // ─── Direct Message Reducers ───
 
-spacetimedb.reducer(
-  "send_dm",
+export const send_dm = spacetimedb.reducer(
   { toIdentity: t.identity(), content: t.string() },
   (ctx, { toIdentity, content }) => {
     if (!content) {
@@ -873,30 +835,26 @@ spacetimedb.reducer(
       toIdentity,
       content,
       readStatus: false,
-      createdAt: BigInt(ctx.timestamp.microsSinceEpoch),
+      createdAt: BigInt(ctx.timestamp.microsSinceUnixEpoch),
     });
   },
 );
 
-spacetimedb.reducer(
-  "mark_dm_read",
-  { messageId: t.u64() },
-  (ctx, { messageId }) => {
-    const dm = ctx.db.direct_message.id.find(messageId);
-    if (!dm) {
-      throw new SenderError("Message not found");
-    }
-    if (dm.toIdentity !== ctx.sender) {
-      throw new SenderError("Can only mark own messages as read");
-    }
-    ctx.db.direct_message.id.update({ ...dm, readStatus: true });
-  },
-);
+export const mark_dm_read = spacetimedb.reducer(
+  { messageId: t.u64() }, (ctx, { messageId }) => {
+  const dm = ctx.db.direct_message.id.find(messageId);
+  if (!dm) {
+    throw new SenderError("Message not found");
+  }
+  if (dm.toIdentity !== ctx.sender) {
+    throw new SenderError("Can only mark own messages as read");
+  }
+  ctx.db.direct_message.id.update({ ...dm, readStatus: true });
+});
 
 // ─── Monitoring Reducers ───
 
-spacetimedb.reducer(
-  "record_platform_event",
+export const record_platform_event = spacetimedb.reducer(
   {
     source: t.string(),
     eventType: t.string(),
@@ -912,13 +870,12 @@ spacetimedb.reducer(
       eventType,
       metadataJson,
       userIdentity: ctx.sender,
-      timestamp: BigInt(ctx.timestamp.microsSinceEpoch),
+      timestamp: BigInt(ctx.timestamp.microsSinceUnixEpoch),
     });
   },
 );
 
-spacetimedb.reducer(
-  "record_health_check",
+export const record_health_check = spacetimedb.reducer(
   {
     service: t.string(),
     status: t.string(),
@@ -933,9 +890,54 @@ spacetimedb.reducer(
       service,
       status,
       latencyMs,
-      checkedAt: BigInt(ctx.timestamp.microsSinceEpoch),
+      checkedAt: BigInt(ctx.timestamp.microsSinceUnixEpoch),
     });
   },
 );
 
 export default spacetimedb;
+
+
+// ─── Code Session Reducers ───
+
+export const update_code_session = spacetimedb.reducer(
+  {
+    codeSpace: t.string(),
+    code: t.string(),
+    html: t.string(),
+    css: t.string(),
+    transpiled: t.string(),
+    messagesJson: t.string(),
+  },
+  (ctx, { codeSpace, code, html, css, transpiled, messagesJson }) => {
+    if (!codeSpace) {
+      throw new SenderError("CodeSpace is required");
+    }
+    const now = BigInt(ctx.timestamp.microsSinceUnixEpoch);
+    const existing = ctx.db.code_session.codeSpace.find(codeSpace);
+    
+    if (existing) {
+      ctx.db.code_session.codeSpace.update({
+        ...existing,
+        code,
+        html,
+        css,
+        transpiled,
+        messagesJson,
+        lastUpdatedBy: ctx.sender,
+        updatedAt: now,
+      });
+    } else {
+      ctx.db.code_session.insert({
+        codeSpace,
+        code,
+        html,
+        css,
+        transpiled,
+        messagesJson,
+        lastUpdatedBy: ctx.sender,
+        updatedAt: now,
+      });
+    }
+  },
+);

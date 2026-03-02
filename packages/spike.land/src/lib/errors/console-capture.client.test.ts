@@ -14,18 +14,16 @@ import {
 } from "./console-capture.client";
 
 function getLastFetchBody(): {
-  errors: Array<
-    {
-      message: string;
-      errorType?: string;
-      environment?: string;
-      metadata?: Record<string, unknown>;
-    }
-  >;
+  errors: Array<{
+    message: string;
+    errorType?: string;
+    environment?: string;
+    metadata?: Record<string, unknown>;
+  }>;
 } {
   const lastCall = mockFetch.mock.lastCall;
   expect(lastCall).toBeDefined();
-  const body = (lastCall as unknown as [string, { body: string; }])[1].body;
+  const body = (lastCall as unknown as [string, { body: string }])[1].body;
   return JSON.parse(body) as ReturnType<typeof getLastFetchBody>;
 }
 
@@ -100,9 +98,7 @@ describe("Client Console Capture → ErrorLog pipeline", () => {
 
     expect(mockFetch).toHaveBeenCalled();
     const body = getLastFetchBody();
-    const boundaryError = body.errors.find(
-      e => e.message === "boundary error",
-    );
+    const boundaryError = body.errors.find((e) => e.message === "boundary error");
     expect(boundaryError).toBeDefined();
     expect(boundaryError?.metadata).toEqual(
       expect.objectContaining({
@@ -125,9 +121,7 @@ describe("Client Console Capture → ErrorLog pipeline", () => {
 
     expect(mockFetch).toHaveBeenCalled();
     const body = getLastFetchBody();
-    const dupes = body.errors.filter(
-      e => e.message === "duplicate error",
-    );
+    const dupes = body.errors.filter((e) => e.message === "duplicate error");
     expect(dupes).toHaveLength(1);
   });
 });

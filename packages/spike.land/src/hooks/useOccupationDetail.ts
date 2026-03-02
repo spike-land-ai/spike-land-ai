@@ -4,11 +4,9 @@ import { useQuery } from "@tanstack/react-query";
 import type { Occupation, SalaryData } from "@/lib/career/types";
 
 async function fetchOccupation(uri: string): Promise<Occupation | null> {
-  const response = await fetch(
-    `/api/career/occupations/${encodeURIComponent(uri)}`,
-  );
+  const response = await fetch(`/api/career/occupations/${encodeURIComponent(uri)}`);
   if (!response.ok) return null;
-  const data = (await response.json()) as { occupation: Occupation; };
+  const data = (await response.json()) as { occupation: Occupation };
   return data.occupation;
 }
 

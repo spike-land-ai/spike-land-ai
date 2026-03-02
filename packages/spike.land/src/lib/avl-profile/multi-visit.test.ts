@@ -85,12 +85,14 @@ describe("multi-visit integration", () => {
       userId: "user-1",
       treeId: "tree-1",
       leafNodeId: "leaf-1",
-      answerPath: [{
-        nodeId: "n1",
-        question: "Q1?",
-        questionTags: ["t1"],
-        answer: true,
-      }],
+      answerPath: [
+        {
+          nodeId: "n1",
+          question: "Q1?",
+          questionTags: ["t1"],
+          answer: true,
+        },
+      ],
       derivedTags: ["developer"],
       profileVector: {},
       completedAt: new Date(),
@@ -121,12 +123,14 @@ describe("multi-visit integration", () => {
       userId: "user-1",
       treeId: "tree-1",
       leafNodeId: "leaf-1",
-      answerPath: [{
-        nodeId: "n1",
-        question: "Q1?",
-        questionTags: ["t1"],
-        answer: true,
-      }],
+      answerPath: [
+        {
+          nodeId: "n1",
+          question: "Q1?",
+          questionTags: ["t1"],
+          answer: true,
+        },
+      ],
       derivedTags: ["developer"],
       profileVector: {},
       completedAt: new Date(),

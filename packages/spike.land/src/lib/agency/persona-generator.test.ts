@@ -14,14 +14,10 @@ vi.mock("./persona-service", () => ({
 }));
 
 const { generateStructuredResponse } = await import("@/lib/ai/gemini-client");
-const { bulkCreatePersonas, recalculateRanks } = await import(
-  "./persona-service"
+const { bulkCreatePersonas, recalculateRanks } = await import("./persona-service");
+const { generatePersonas, generateAndSavePersonas, generateTargetedPersona } = await import(
+  "./persona-generator"
 );
-const {
-  generatePersonas,
-  generateAndSavePersonas,
-  generateTargetedPersona,
-} = await import("./persona-generator");
 
 const validPersona = {
   slug: "startup-steve",
@@ -76,9 +72,7 @@ describe("generatePersonas", () => {
   });
 
   it("throws when AI call fails", async () => {
-    vi.mocked(generateStructuredResponse).mockRejectedValue(
-      new Error("AI unavailable"),
-    );
+    vi.mocked(generateStructuredResponse).mockRejectedValue(new Error("AI unavailable"));
     await expect(generatePersonas(1)).rejects.toThrow("AI unavailable");
   });
 });
@@ -93,9 +87,7 @@ describe("generateAndSavePersonas", () => {
     expect(result.generated).toBe(1);
     expect(result.saved).toBe(1);
     expect(bulkCreatePersonas).toHaveBeenCalledWith(
-      expect.arrayContaining([
-        expect.objectContaining({ slug: "startup-steve", rank: 1 }),
-      ]),
+      expect.arrayContaining([expect.objectContaining({ slug: "startup-steve", rank: 1 })]),
     );
     expect(recalculateRanks).toHaveBeenCalled();
   });
@@ -143,9 +135,7 @@ describe("generateTargetedPersona", () => {
   });
 
   it("returns null when AI call fails", async () => {
-    vi.mocked(generateStructuredResponse).mockRejectedValue(
-      new Error("fail"),
-    );
+    vi.mocked(generateStructuredResponse).mockRejectedValue(new Error("fail"));
     const result = await generateTargetedPersona({
       industry: "tech",
       companySize: "startup",

@@ -35,11 +35,7 @@ interface TimelineProps {
   onRemoveTrack: (trackId: string) => void;
   onScrubAudio?: (time: number) => void;
   onSoloPreview?: (trackId: string) => void;
-  onCrossProjectDrop?: (
-    sourceProjectId: string,
-    trackId: string,
-    position: number,
-  ) => void;
+  onCrossProjectDrop?: (sourceProjectId: string, trackId: string, position: number) => void;
   // Recording preview
   isRecording?: boolean;
   recordingDuration?: number;
@@ -115,7 +111,7 @@ export function Timeline({
   // Calculate total duration (including track positions and recording preview)
   const totalDuration = Math.max(
     10, // Minimum 10 seconds
-    ...tracks.map(t => {
+    ...tracks.map((t) => {
       const effectiveTrimEnd = t.trimEnd > 0 ? t.trimEnd : t.duration;
       const trimmedDuration = effectiveTrimEnd - t.trimStart;
       return (t.position ?? t.delay ?? 0) + trimmedDuration;
@@ -161,8 +157,8 @@ export function Timeline({
     (e: React.MouseEvent) => {
       // Only handle clicks on the background, not on tracks
       if (
-        e.target !== e.currentTarget
-        && (e.target as HTMLElement).closest("[data-timeline-track]")
+        e.target !== e.currentTarget &&
+        (e.target as HTMLElement).closest("[data-timeline-track]")
       ) {
         return;
       }
@@ -213,7 +209,7 @@ export function Timeline({
 
   // Selected track
   const selectedTrack = selectedTrackId
-    ? tracks.find(t => t.id === selectedTrackId) || null
+    ? tracks.find((t) => t.id === selectedTrackId) || null
     : null;
 
   return (
@@ -235,7 +231,7 @@ export function Timeline({
         <div
           className="overflow-x-auto scrollbar-none"
           style={{ overflowY: "hidden" }}
-          ref={el => {
+          ref={(el) => {
             // Sync scroll with tracks viewport
             if (el) {
               el.addEventListener("scroll", () => {
@@ -247,11 +243,7 @@ export function Timeline({
           }}
         >
           <div className="bg-black/20">
-            <TimelineRuler
-              zoom={zoom}
-              duration={totalDuration}
-              onSeek={onPlayheadSeek}
-            />
+            <TimelineRuler zoom={zoom} duration={totalDuration} onSeek={onPlayheadSeek} />
           </div>
         </div>
       </div>
@@ -305,12 +297,10 @@ export function Timeline({
                   isSelected={track.id === selectedTrackId}
                   playheadTime={playheadTime}
                   snapTime={snapTime}
-                  onPositionChange={position => onTrackPositionChange(track.id, position)}
+                  onPositionChange={(position) => onTrackPositionChange(track.id, position)}
                   onTrimChange={(trimStart, trimEnd) => onTrimChange(track.id, trimStart, trimEnd)}
                   onSelect={() => onSelectTrack(track.id)}
-                  onClickPlay={onSoloPreview
-                    ? () => onSoloPreview(track.id)
-                    : undefined}
+                  onClickPlay={onSoloPreview ? () => onSoloPreview(track.id) : undefined}
                 />
               </div>
             ))}
@@ -338,10 +328,8 @@ export function Timeline({
                   {/* Recording indicator dot */}
                   <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse flex-shrink-0" />
                   <span className="text-[10px] font-mono text-white/80 truncate">
-                    Recording... {Math.floor(recordingDuration / 60)}:{String(
-                      Math.floor(recordingDuration % 60),
-                    )
-                      .padStart(2, "0")}
+                    Recording... {Math.floor(recordingDuration / 60)}:
+                    {String(Math.floor(recordingDuration % 60)).padStart(2, "0")}
                   </span>
                 </div>
               </div>
@@ -349,12 +337,7 @@ export function Timeline({
           </div>
 
           {/* Playhead */}
-          <Playhead
-            time={playheadTime}
-            zoom={zoom}
-            height={tracksHeight}
-            onSeek={onPlayheadSeek}
-          />
+          <Playhead time={playheadTime} zoom={zoom} height={tracksHeight} onSeek={onPlayheadSeek} />
 
           {/* Empty state */}
           {tracks.length === 0 && (
@@ -363,9 +346,7 @@ export function Timeline({
                 <Plus className="w-8 h-8 opacity-20" />
               </div>
               <p className="font-medium">No tracks in project</p>
-              <p className="text-sm opacity-60">
-                Add audio files or record to get started
-              </p>
+              <p className="text-sm opacity-60">Add audio files or record to get started</p>
             </div>
           )}
         </div>
@@ -376,11 +357,12 @@ export function Timeline({
         <div className="border-t border-primary/20 bg-primary/5 backdrop-blur-md">
           <SelectedTrackPanel
             track={selectedTrack}
-            onVolumeChange={volume => selectedTrackId && onVolumeChange(selectedTrackId, volume)}
+            onVolumeChange={(volume) => selectedTrackId && onVolumeChange(selectedTrackId, volume)}
             onMuteToggle={() => selectedTrackId && onMuteToggle(selectedTrackId)}
             onSoloToggle={() => selectedTrackId && onSoloToggle(selectedTrackId)}
             onTrimChange={(start, end) =>
-              selectedTrackId && onTrimChange(selectedTrackId, start, end)}
+              selectedTrackId && onTrimChange(selectedTrackId, start, end)
+            }
             onRemove={() => selectedTrackId && onRemoveTrack(selectedTrackId)}
           />
         </div>

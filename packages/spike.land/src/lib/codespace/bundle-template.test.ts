@@ -11,7 +11,7 @@ const BASE_OPTS = {
 describe("buildBundleHtml", () => {
   it("produces valid HTML with embed div", () => {
     const html = buildBundleHtml(BASE_OPTS);
-    expect(html).toContain("<div id=\"embed\">");
+    expect(html).toContain('<div id="embed">');
   });
 
   it("uses a 15s render timeout", () => {
@@ -29,8 +29,8 @@ describe("buildBundleHtml", () => {
 
   it("includes error reporting via postMessage", () => {
     const html = buildBundleHtml(BASE_OPTS);
-    expect(html).toContain("type: \"iframe-error\"");
-    expect(html).toContain("source: \"spike-land-bundle\"");
+    expect(html).toContain('type: "iframe-error"');
+    expect(html).toContain('source: "spike-land-bundle"');
     expect(html).toContain("parent.postMessage");
   });
 

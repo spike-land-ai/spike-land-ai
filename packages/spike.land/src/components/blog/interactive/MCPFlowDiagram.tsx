@@ -14,22 +14,23 @@ const NODES = [
 const NODE_COUNT = NODES.length;
 const SEGMENT = 1 / NODE_COUNT;
 
-function NodeBox(
-  { emoji, label, sublabel, active }: {
-    emoji: string;
-    label: string;
-    sublabel: string;
-    active: boolean;
-  },
-) {
+function NodeBox({
+  emoji,
+  label,
+  sublabel,
+  active,
+}: {
+  emoji: string;
+  label: string;
+  sublabel: string;
+  active: boolean;
+}) {
   return (
     <div className="flex flex-col items-center gap-3">
       <motion.div
         animate={{
           scale: active ? 1.05 : 1,
-          backgroundColor: active
-            ? "rgba(6, 182, 212, 0.1)"
-            : "rgba(30, 41, 59, 0.5)",
+          backgroundColor: active ? "rgba(6, 182, 212, 0.1)" : "rgba(30, 41, 59, 0.5)",
           borderColor: active ? "rgb(6, 182, 212)" : "rgb(51, 65, 85)",
           boxShadow: active ? "0 0 20px rgba(6, 182, 212, 0.2)" : "none",
           opacity: active ? 1 : 0.4,
@@ -58,9 +59,7 @@ function NodeBox(
   );
 }
 
-function Connector(
-  { vertical, progress }: { vertical?: boolean; progress: number; },
-) {
+function Connector({ vertical, progress }: { vertical?: boolean; progress: number }) {
   const size = vertical ? 32 : 64;
   return (
     <div
@@ -68,11 +67,7 @@ function Connector(
         vertical ? "flex md:hidden" : "hidden md:flex"
       } items-center justify-center flex-shrink-0 ${vertical ? "h-8" : "w-16 pt-[-2.5rem]"}`}
     >
-      <svg
-        width={vertical ? 12 : size}
-        height={vertical ? size : 12}
-        className="overflow-visible"
-      >
+      <svg width={vertical ? 12 : size} height={vertical ? size : 12} className="overflow-visible">
         <line
           x1={0}
           y1={vertical ? 0 : 6}
@@ -134,16 +129,10 @@ export function MCPFlowDiagram() {
       <div className="relative flex flex-col md:flex-row items-center justify-center gap-0">
         {NODES.map((node, i) => {
           const active = progress >= i * SEGMENT;
-          const lineP = Math.min(
-            Math.max((progress - i * SEGMENT) / SEGMENT, 0),
-            1,
-          );
+          const lineP = Math.min(Math.max((progress - i * SEGMENT) / SEGMENT, 0), 1);
 
           return (
-            <div
-              key={node.label}
-              className="flex flex-col md:flex-row items-center"
-            >
+            <div key={node.label} className="flex flex-col md:flex-row items-center">
               <NodeBox
                 emoji={node.emoji}
                 label={node.label}

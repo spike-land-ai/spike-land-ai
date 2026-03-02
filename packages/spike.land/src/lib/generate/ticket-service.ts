@@ -48,9 +48,7 @@ export async function updateTicketStatus(
   if (githubIssueNumber && (phase === "PUBLISHED" || phase === "FAILED")) {
     try {
       // Close issue on terminal states - use the existing gh CLI approach
-      logger.info(
-        `Generation ticket #${githubIssueNumber} reached terminal state: ${phase}`,
-      );
+      logger.info(`Generation ticket #${githubIssueNumber} reached terminal state: ${phase}`);
     } catch {
       // Non-critical
     }

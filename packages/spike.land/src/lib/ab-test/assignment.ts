@@ -19,16 +19,11 @@ export function setVariantCookie(variant: string): void {
 }
 
 /** Fetch variant assignment from API, returns "control" on failure */
-export async function fetchVariantAssignment(
-  testId: string,
-  visitorId: string,
-): Promise<string> {
+export async function fetchVariantAssignment(testId: string, visitorId: string): Promise<string> {
   try {
-    const res = await fetch(
-      `/api/ab-test/assign?testId=${testId}&visitorId=${visitorId}`,
-    );
+    const res = await fetch(`/api/ab-test/assign?testId=${testId}&visitorId=${visitorId}`);
     if (!res.ok) throw new Error("Not found");
-    const data = (await res.json()) as { variantName?: string; };
+    const data = (await res.json()) as { variantName?: string };
     return data.variantName || "control";
   } catch {
     return "control";

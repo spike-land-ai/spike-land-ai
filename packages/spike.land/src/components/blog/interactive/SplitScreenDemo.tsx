@@ -43,13 +43,7 @@ const VIBE_SNIPPETS: readonly string[] = [
   "pray it works",
 ];
 
-const VIBE_COLORS: readonly string[] = [
-  "#ef4444",
-  "#f97316",
-  "#eab308",
-  "#ec4899",
-  "#a855f7",
-];
+const VIBE_COLORS: readonly string[] = ["#ef4444", "#f97316", "#eab308", "#ec4899", "#a855f7"];
 
 const STRUCTURED_ITEMS: readonly StructuredItem[] = [
   {
@@ -114,7 +108,7 @@ function useCountUp(target: number, duration: number): number {
 
 // ─── Vibe Coding Panel (Left 40%) ────────────────────────────────────────────
 
-function VibeCodingPanel({ shouldReduceMotion }: { shouldReduceMotion: boolean; }) {
+function VibeCodingPanel({ shouldReduceMotion }: { shouldReduceMotion: boolean }) {
   const percentage = useCountUp(40, 1200);
   const [snippets, setSnippets] = useState<CodeSnippet[]>([]);
   const nextId = useRef(0);
@@ -146,7 +140,7 @@ function VibeCodingPanel({ shouldReduceMotion }: { shouldReduceMotion: boolean; 
         rotation: (Math.random() - 0.5) * 30,
         scale: 0.75 + Math.random() * 0.5,
       };
-      setSnippets(prev => [...prev.slice(-14), snippet]);
+      setSnippets((prev) => [...prev.slice(-14), snippet]);
     };
 
     spawn();
@@ -172,7 +166,7 @@ function VibeCodingPanel({ shouldReduceMotion }: { shouldReduceMotion: boolean; 
 
       {/* Animated snippets */}
       <div className="absolute inset-0">
-        {snippets.map(snippet => (
+        {snippets.map((snippet) => (
           <motion.div
             key={snippet.id}
             initial={shouldReduceMotion ? false : { opacity: 0, scale: 0.5, y: 10 }}
@@ -222,7 +216,7 @@ function VibeCodingPanel({ shouldReduceMotion }: { shouldReduceMotion: boolean; 
 
 // ─── Context Engineering Panel (Right 60%) ───────────────────────────────────
 
-function ContextEngineeringPanel({ shouldReduceMotion }: { shouldReduceMotion: boolean; }) {
+function ContextEngineeringPanel({ shouldReduceMotion }: { shouldReduceMotion: boolean }) {
   const percentage = useCountUp(60, 1400);
 
   return (
@@ -308,7 +302,7 @@ function ContextEngineeringPanel({ shouldReduceMotion }: { shouldReduceMotion: b
 
 // ─── Split Divider ────────────────────────────────────────────────────────────
 
-function SplitDivider({ shouldReduceMotion }: { shouldReduceMotion: boolean; }) {
+function SplitDivider({ shouldReduceMotion }: { shouldReduceMotion: boolean }) {
   return (
     <div className="absolute inset-y-0 flex flex-col items-center z-10" style={{ left: "40%" }}>
       <div
@@ -383,8 +377,8 @@ export function SplitScreenDemo() {
       {/* Footer insight bar */}
       <div className="bg-slate-900/90 border-t border-slate-800 px-5 py-2.5 flex items-center justify-between">
         <p className="text-[11px] font-mono text-slate-500">
-          <span className="text-white">Key insight:</span>{" "}
-          the 60% spent on context engineering determines the quality of the remaining 40%.
+          <span className="text-white">Key insight:</span> the 60% spent on context engineering
+          determines the quality of the remaining 40%.
         </p>
         <div className="flex items-center gap-1.5 flex-shrink-0">
           <div className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />

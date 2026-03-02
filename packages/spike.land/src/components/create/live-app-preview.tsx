@@ -37,8 +37,8 @@ export function LiveAppPreview({
     setState("loaded");
     // Background health check
     fetch(`/api/create/health?codespaceId=${codespaceId}`)
-      .then(res => res.json())
-      .then(data => {
+      .then((res) => res.json())
+      .then((data) => {
         if (data && !data.healthy) {
           setState("error");
         }
@@ -61,7 +61,7 @@ export function LiveAppPreview({
     if (!container) return;
 
     const observer = new IntersectionObserver(
-      entries => {
+      (entries) => {
         const entry = entries[0];
         if (entry?.isIntersecting) {
           setIsVisible(true);
@@ -79,9 +79,9 @@ export function LiveAppPreview({
   useEffect(() => {
     function handleMessage(event: MessageEvent): void {
       if (
-        event.data?.type === "iframe-error"
-        && event.data?.source === "spike-land-bundle"
-        && event.data?.codeSpace === codespaceId
+        event.data?.type === "iframe-error" &&
+        event.data?.source === "spike-land-bundle" &&
+        event.data?.codeSpace === codespaceId
       ) {
         setState("error");
         onHealthStatus?.(false);
@@ -99,7 +99,7 @@ export function LiveAppPreview({
 
     // Timeout fallback
     const timeoutId = setTimeout(() => {
-      setState(prev => (prev === "loading" ? "error" : prev));
+      setState((prev) => (prev === "loading" ? "error" : prev));
     }, LOAD_TIMEOUT_MS);
 
     return () => clearTimeout(timeoutId);
@@ -109,10 +109,7 @@ export function LiveAppPreview({
   const showIframe = state === "loading" || state === "loaded";
 
   return (
-    <div
-      ref={containerRef}
-      className={cn("relative overflow-hidden", className)}
-    >
+    <div ref={containerRef} className={cn("relative overflow-hidden", className)}>
       {/* Loading skeleton */}
       {(state === "idle" || state === "loading") && (
         <div className="absolute inset-0 z-10">
@@ -131,9 +128,7 @@ export function LiveAppPreview({
               {fallbackTitle}
             </span>
           )}
-          <span className="text-xs text-muted-foreground">
-            Preview unavailable
-          </span>
+          <span className="text-xs text-muted-foreground">Preview unavailable</span>
         </div>
       )}
 
@@ -141,14 +136,16 @@ export function LiveAppPreview({
       {showIframe && (
         <div
           className="w-full h-full"
-          style={isScaled
-            ? {
-              transform: `scale(${scale})`,
-              transformOrigin: "top left",
-              width: `${100 / scale}%`,
-              height: `${100 / scale}%`,
-            }
-            : undefined}
+          style={
+            isScaled
+              ? {
+                  transform: `scale(${scale})`,
+                  transformOrigin: "top left",
+                  width: `${100 / scale}%`,
+                  height: `${100 / scale}%`,
+                }
+              : undefined
+          }
         >
           <iframe
             src={iframeSrc}

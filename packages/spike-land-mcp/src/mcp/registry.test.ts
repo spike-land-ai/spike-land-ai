@@ -8,9 +8,15 @@ function createMockMcpServer(): McpServer {
     registerTool: vi.fn((_name: string, _config: unknown, handler: unknown): RegisteredTool => {
       let isEnabled = true;
       return {
-        enable: () => { isEnabled = true; },
-        disable: () => { isEnabled = false; },
-        get enabled() { return isEnabled; },
+        enable: () => {
+          isEnabled = true;
+        },
+        disable: () => {
+          isEnabled = false;
+        },
+        get enabled() {
+          return isEnabled;
+        },
         update: vi.fn(),
         remove: vi.fn(),
         handler: handler as RegisteredTool["handler"],
@@ -171,7 +177,7 @@ describe("ToolRegistry", () => {
 
     const results = await registry.searchTools("storage");
     expect(results.length).toBeGreaterThanOrEqual(1);
-    expect(results.some(r => r.name === "upload_file")).toBe(true);
+    expect(results.some((r) => r.name === "upload_file")).toBe(true);
   });
 
   it("listCategories returns correct structure", () => {
@@ -394,7 +400,7 @@ describe("ToolRegistry", () => {
 
       const defs = registry.getToolDefinitions();
       expect(defs).toHaveLength(3);
-      expect(defs.map(d => d.stability)).toEqual(stabilities);
+      expect(defs.map((d) => d.stability)).toEqual(stabilities);
     });
   });
 
@@ -405,7 +411,11 @@ describe("ToolRegistry", () => {
 
       const examples = [
         { name: "basic usage", input: { query: "hello" }, description: "Simple search" },
-        { name: "advanced usage", input: { query: "hello", limit: 5 }, description: "Search with limit" },
+        {
+          name: "advanced usage",
+          input: { query: "hello", limit: 5 },
+          description: "Search with limit",
+        },
       ];
 
       registry.register({

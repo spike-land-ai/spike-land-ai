@@ -1,10 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import {
-  FALLBACK_SKILL,
-  SKILL_DEFINITIONS,
-  type SkillDefinition,
-} from "./skill-definitions";
+import { FALLBACK_SKILL, SKILL_DEFINITIONS, type SkillDefinition } from "./skill-definitions";
 
 describe("SKILL_DEFINITIONS", () => {
   it("is a non-empty array", () => {
@@ -25,7 +21,7 @@ describe("SKILL_DEFINITIONS", () => {
   });
 
   it("has unique skill IDs", () => {
-    const ids = SKILL_DEFINITIONS.map(s => s.id);
+    const ids = SKILL_DEFINITIONS.map((s) => s.id);
     const unique = new Set(ids);
     expect(unique.size).toBe(ids.length);
   });

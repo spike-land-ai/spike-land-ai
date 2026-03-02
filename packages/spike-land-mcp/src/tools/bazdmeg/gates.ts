@@ -44,10 +44,14 @@ export function registerBazdmegGatesTools(
 
           const statusLabel = (status: string): string => {
             switch (status) {
-              case "GREEN": return "[GREEN]";
-              case "YELLOW": return "[YELLOW]";
-              case "RED": return "[RED]";
-              default: return `[${status}]`;
+              case "GREEN":
+                return "[GREEN]";
+              case "YELLOW":
+                return "[YELLOW]";
+              case "RED":
+                return "[RED]";
+              default:
+                return `[${status}]`;
             }
           };
 
@@ -80,9 +84,9 @@ export function registerBazdmegGatesTools(
         "Admin override for a specific workflow gate. Marks it as GREEN with the given reason.",
         {
           sessionId: z.string().describe("Session ID"),
-          gateName: z.string().describe(
-            "Gate name to override (Brainstorming, Planning, TDD, Review, Verification)",
-          ),
+          gateName: z
+            .string()
+            .describe("Gate name to override (Brainstorming, Planning, TDD, Review, Verification)"),
           reason: z.string().describe("Reason for override"),
         },
       )
@@ -99,9 +103,9 @@ export function registerBazdmegGatesTools(
           });
 
           return textResult(
-            `**Gate Override Applied**\n\n`
-            + `Gate "${input.gateName}" overridden to GREEN.\n`
-            + `Reason: ${input.reason}`,
+            `**Gate Override Applied**\n\n` +
+              `Gate "${input.gateName}" overridden to GREEN.\n` +
+              `Reason: ${input.reason}`,
           );
         });
       }),

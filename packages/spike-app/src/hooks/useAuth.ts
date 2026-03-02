@@ -16,10 +16,7 @@ function mapProfile(profile: Record<string, unknown>): AppUser {
     name: (profile.name as string) ?? null,
     email: (profile.email as string) ?? null,
     picture: (profile.picture as string) ?? null,
-    preferred_username:
-      (profile.preferred_username as string) ??
-      (profile.login as string) ??
-      null,
+    preferred_username: (profile.preferred_username as string) ?? (profile.login as string) ?? null,
   };
 }
 

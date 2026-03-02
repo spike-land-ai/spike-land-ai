@@ -14,9 +14,7 @@ describe("parseSSEEvent", () => {
   });
 
   it("parses a status event", () => {
-    const event = parseSSEEvent(
-      JSON.stringify({ type: "status", data: { status: "LIVE" } }),
-    );
+    const event = parseSSEEvent(JSON.stringify({ type: "status", data: { status: "LIVE" } }));
     expect(event).toEqual({
       type: "status",
       data: { status: "LIVE" },
@@ -34,9 +32,7 @@ describe("parseSSEEvent", () => {
   });
 
   it("parses code_updated event", () => {
-    const event = parseSSEEvent(
-      JSON.stringify({ type: "code_updated", data: {} }),
-    );
+    const event = parseSSEEvent(JSON.stringify({ type: "code_updated", data: {} }));
     expect(event).toEqual({ type: "code_updated", data: {} });
   });
 
@@ -55,9 +51,7 @@ describe("parseSSEEvent", () => {
   });
 
   it("returns null for unknown event type", () => {
-    expect(
-      parseSSEEvent(JSON.stringify({ type: "unknown_type", data: {} })),
-    ).toBeNull();
+    expect(parseSSEEvent(JSON.stringify({ type: "unknown_type", data: {} }))).toBeNull();
   });
 
   it("returns null for missing type field", () => {

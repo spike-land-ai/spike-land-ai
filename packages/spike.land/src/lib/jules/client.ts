@@ -36,15 +36,13 @@ function validateSessionId(sessionId: string): void {
 }
 
 function normalizeSessionName(sessionId: string): string {
-  return sessionId.startsWith("sessions/")
-    ? sessionId
-    : `sessions/${sessionId}`;
+  return sessionId.startsWith("sessions/") ? sessionId : `sessions/${sessionId}`;
 }
 
 export async function julesRequest<T>(
   endpoint: string,
   options: RequestInit = {},
-): Promise<{ data: T | null; error: string | null; }> {
+): Promise<{ data: T | null; error: string | null }> {
   const apiKey = process.env.JULES_API_KEY;
   if (!apiKey) {
     return { data: null, error: "Jules API not configured on server" };
@@ -63,8 +61,9 @@ export async function julesRequest<T>(
     if (!response.ok) {
       return {
         data: null,
-        error: (json as { error?: { message?: string; }; })?.error?.message
-          || `API error: ${response.status}`,
+        error:
+          (json as { error?: { message?: string } })?.error?.message ||
+          `API error: ${response.status}`,
       };
     }
     return { data: json as T, error: null };
@@ -83,11 +82,11 @@ export function isJulesAvailable(): boolean {
 export async function listSessions(options?: {
   status?: string;
   pageSize?: number;
-}): Promise<{ data: JulesSession[] | null; error: string | null; }> {
+}): Promise<{ data: JulesSession[] | null; error: string | null }> {
   const params = new URLSearchParams();
   if (options?.pageSize) params.set("pageSize", String(options.pageSize));
 
-  const result = await julesRequest<{ sessions: JulesSession[]; }>(
+  const result = await julesRequest<{ sessions: JulesSession[] }>(
     `/sessions${params.toString() ? `?${params}` : ""}`,
   );
 
@@ -95,7 +94,7 @@ export async function listSessions(options?: {
 
   let sessions = result.data?.sessions || [];
   if (options?.status) {
-    sessions = sessions.filter(s => s.state === options.status);
+    sessions = sessions.filter((s) => s.state === options.status);
   }
 
   return { data: sessions, error: null };
@@ -103,12 +102,12 @@ export async function listSessions(options?: {
 
 export async function createSession(
   params: JulesCreateSessionParams,
-): Promise<{ data: JulesSession | null; error: string | null; }> {
+): Promise<{ data: JulesSession | null; error: string | null }> {
   const source = params.sourceRepo
     ? `sources/github/${params.sourceRepo}`
     : `sources/github/${process.env.GITHUB_OWNER || "spike-land-ai"}/${
-      process.env.GITHUB_REPO || "spike.land"
-    }`;
+        process.env.GITHUB_REPO || "spike.land"
+      }`;
 
   return julesRequest<JulesSession>("/sessions", {
     method: "POST",
@@ -129,9 +128,9 @@ export async function createSession(
 
 export async function getSession(
   sessionId: string,
-  options?: { includeActivities?: boolean; },
+  options?: { includeActivities?: boolean },
 ): Promise<{
-  data: (JulesSession & { activities?: JulesActivity[]; }) | null;
+  data: (JulesSession & { activities?: JulesActivity[] }) | null;
   error: string | null;
 }> {
   validateSessionId(sessionId);
@@ -140,10 +139,10 @@ export async function getSession(
   const result = await julesRequest<JulesSession>(`/${name}`);
   if (result.error || !result.data) return { data: null, error: result.error };
 
-  const session: JulesSession & { activities?: JulesActivity[]; } = result.data;
+  const session: JulesSession & { activities?: JulesActivity[] } = result.data;
 
   if (options?.includeActivities) {
-    const activities = await julesRequest<{ activities: JulesActivity[]; }>(
+    const activities = await julesRequest<{ activities: JulesActivity[] }>(
       `/${name}/activities?pageSize=10`,
     );
     if (activities.data?.activities) {
@@ -156,10 +155,10 @@ export async function getSession(
 
 export async function approveSessionPlan(
   sessionId: string,
-): Promise<{ data: { state: string; } | null; error: string | null; }> {
+): Promise<{ data: { state: string } | null; error: string | null }> {
   validateSessionId(sessionId);
   const name = normalizeSessionName(sessionId);
-  return julesRequest<{ state: string; }>(`/${name}:approvePlan`, {
+  return julesRequest<{ state: string }>(`/${name}:approvePlan`, {
     method: "POST",
   });
 }
@@ -167,10 +166,10 @@ export async function approveSessionPlan(
 export async function sendMessage(
   sessionId: string,
   message: string,
-): Promise<{ data: { state: string; } | null; error: string | null; }> {
+): Promise<{ data: { state: string } | null; error: string | null }> {
   validateSessionId(sessionId);
   const name = normalizeSessionName(sessionId);
-  return julesRequest<{ state: string; }>(`/${name}:sendMessage`, {
+  return julesRequest<{ state: string }>(`/${name}:sendMessage`, {
     method: "POST",
     body: JSON.stringify({ prompt: message }),
   });

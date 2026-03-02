@@ -16,8 +16,8 @@ export interface ArchitectureDesign {
 }
 
 export interface DependencyGraph {
-  nodes: Array<{ id: string; label: string; type: string; }>;
-  edges: Array<{ from: string; to: string; type: "import" | "call"; }>;
+  nodes: Array<{ id: string; label: string; type: string }>;
+  edges: Array<{ from: string; to: string; type: "import" | "call" }>;
 }
 
 export interface FilePlanTask {

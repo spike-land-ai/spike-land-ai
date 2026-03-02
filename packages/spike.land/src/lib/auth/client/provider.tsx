@@ -16,11 +16,11 @@ interface SessionProviderProps {
 }
 
 export function SessionProvider({ children, session }: SessionProviderProps) {
-  const sessionProp = session as Parameters<typeof NextAuthSessionProvider>[0]["session"] | undefined;
+  const sessionProp = session as
+    | Parameters<typeof NextAuthSessionProvider>[0]["session"]
+    | undefined;
   return (
-    <NextAuthSessionProvider
-      {...(sessionProp !== undefined ? { session: sessionProp } : {})}
-    >
+    <NextAuthSessionProvider {...(sessionProp !== undefined ? { session: sessionProp } : {})}>
       {children}
     </NextAuthSessionProvider>
   );

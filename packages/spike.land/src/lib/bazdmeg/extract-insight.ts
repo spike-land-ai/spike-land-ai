@@ -1,8 +1,7 @@
 import { getClaudeClient } from "@/lib/ai/claude-client";
 import logger from "@/lib/logger";
 
-const INSIGHT_EXTRACTION_PROMPT =
-  `You extract concise insights from Q&A exchanges about the BAZDMEG methodology.
+const INSIGHT_EXTRACTION_PROMPT = `You extract concise insights from Q&A exchanges about the BAZDMEG methodology.
 
 Given a question and answer, return a JSON object:
 {
@@ -104,9 +103,7 @@ function parseInsight(text: string): ExtractedInsight | null {
 
     return {
       insight: String(parsed.insight).slice(0, 500),
-      tags: Array.isArray(parsed.tags)
-        ? parsed.tags.map(String).slice(0, 10)
-        : [],
+      tags: Array.isArray(parsed.tags) ? parsed.tags.map(String).slice(0, 10) : [],
       skip: false,
     };
   } catch {

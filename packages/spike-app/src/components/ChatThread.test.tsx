@@ -18,15 +18,11 @@ describe("ChatThread", () => {
 
   it("shows empty state when no messages", () => {
     render(<ChatThread messages={[]} onSendMessage={mockSend} />);
-    expect(
-      screen.getByText("No messages yet. Start a conversation."),
-    ).toBeInTheDocument();
+    expect(screen.getByText("No messages yet. Start a conversation.")).toBeInTheDocument();
   });
 
   it("shows loading indicator when isLoading", () => {
-    const { container } = render(
-      <ChatThread messages={[]} onSendMessage={mockSend} isLoading />,
-    );
+    const { container } = render(<ChatThread messages={[]} onSendMessage={mockSend} isLoading />);
     // Three bouncing dots
     const dots = container.querySelectorAll(".animate-bounce");
     expect(dots).toHaveLength(3);
@@ -82,9 +78,7 @@ describe("ChatThread", () => {
   });
 
   it("send button is disabled when loading", () => {
-    render(
-      <ChatThread messages={[]} onSendMessage={mockSend} isLoading />,
-    );
+    render(<ChatThread messages={[]} onSendMessage={mockSend} isLoading />);
 
     const textarea = screen.getByPlaceholderText(/Type a message/);
     fireEvent.change(textarea, { target: { value: "hello" } });

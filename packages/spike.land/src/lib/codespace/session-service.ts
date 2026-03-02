@@ -56,10 +56,7 @@ export class SessionService {
     try {
       await redis.set(cacheKey, session, { ex: SESSION_CACHE_TTL });
     } catch (e) {
-      logger.error(
-        `[SessionService] Failed to cache session for ${codeSpace}`,
-        { error: e },
-      );
+      logger.error(`[SessionService] Failed to cache session for ${codeSpace}`, { error: e });
     }
 
     return session;
@@ -79,15 +76,12 @@ export class SessionService {
         return cached;
       }
     } catch (e) {
-      logger.error(
-        `[SessionService] Redis error for ${codeSpace} health check`,
-        { error: e },
-      );
+      logger.error(`[SessionService] Redis error for ${codeSpace} health check`, { error: e });
     }
 
     // Fallback to PostgreSQL
     // Use raw SQL to avoid fetching megabytes of uncompressed text into the Node.js process
-    const result = await prisma.$queryRaw<{ is_healthy: boolean; }[]>`
+    const result = await prisma.$queryRaw<{ is_healthy: boolean }[]>`
       SELECT 
         (LENGTH(code) > 100 AND 
          LENGTH(transpiled) > 0 AND 
@@ -120,14 +114,12 @@ export class SessionService {
    * Batch check if multiple codespace sessions are healthy.
    * This reduces N+1 queries when filtering lists of apps.
    */
-  static async checkSessionsHealth(
-    codeSpaces: string[],
-  ): Promise<Map<string, boolean>> {
+  static async checkSessionsHealth(codeSpaces: string[]): Promise<Map<string, boolean>> {
     const results = new Map<string, boolean>();
     if (codeSpaces.length === 0) return results;
 
     const uniqueSpaces = Array.from(new Set(codeSpaces));
-    const keys = uniqueSpaces.map(cs => `codespace:health:${cs}`);
+    const keys = uniqueSpaces.map((cs) => `codespace:health:${cs}`);
 
     // Try cache first
     let cached: (boolean | null)[] = [];
@@ -158,9 +150,7 @@ export class SessionService {
 
     // Fallback to DB
     try {
-      const dbResults = await prisma.$queryRaw<
-        { codeSpace: string; is_healthy: boolean; }[]
-      >`
+      const dbResults = await prisma.$queryRaw<{ codeSpace: string; is_healthy: boolean }[]>`
         SELECT
           "codeSpace",
           (LENGTH(code) > 100 AND
@@ -173,7 +163,7 @@ export class SessionService {
 
       const dbMap = new Map<string, boolean>();
       if (dbResults) {
-        dbResults.forEach(row => {
+        dbResults.forEach((row) => {
           dbMap.set(row.codeSpace, Boolean(row.is_healthy));
           results.set(row.codeSpace, Boolean(row.is_healthy));
         });
@@ -182,7 +172,7 @@ export class SessionService {
       // Update Redis (use individual set calls - the async proxy doesn't support pipeline()) - Cache block cleared
       const cacheUpdates: Promise<unknown>[] = [];
 
-      missing.forEach(cs => {
+      missing.forEach((cs) => {
         // If not in DB map, it means it doesn't exist, so unhealthy
         const isHealthy = dbMap.get(cs) ?? false;
 
@@ -206,7 +196,7 @@ export class SessionService {
         error: e,
       });
       // If DB fails, assume unhealthy for missing ones to be safe
-      missing.forEach(cs => {
+      missing.forEach((cs) => {
         if (!results.has(cs)) results.set(cs, false);
       });
     }
@@ -234,7 +224,9 @@ export class SessionService {
         css: session.css,
         hash,
         messages: session.messages as unknown as Prisma.InputJsonValue,
-        ...(session.requiresReRender !== undefined ? { requiresReRender: session.requiresReRender } : {}),
+        ...(session.requiresReRender !== undefined
+          ? { requiresReRender: session.requiresReRender }
+          : {}),
       },
       create: {
         codeSpace,
@@ -244,7 +236,9 @@ export class SessionService {
         css: session.css,
         hash,
         messages: session.messages as unknown as Prisma.InputJsonValue,
-        ...(session.requiresReRender !== undefined ? { requiresReRender: session.requiresReRender } : {}),
+        ...(session.requiresReRender !== undefined
+          ? { requiresReRender: session.requiresReRender }
+          : {}),
       },
     });
 
@@ -281,7 +275,9 @@ export class SessionService {
         css: session.css,
         hash,
         messages: session.messages as unknown as Prisma.InputJsonValue,
-        ...(session.requiresReRender !== undefined ? { requiresReRender: session.requiresReRender } : {}),
+        ...(session.requiresReRender !== undefined
+          ? { requiresReRender: session.requiresReRender }
+          : {}),
       },
       create: {
         codeSpace,
@@ -291,7 +287,9 @@ export class SessionService {
         css: session.css,
         hash,
         messages: session.messages as unknown as Prisma.InputJsonValue,
-        ...(session.requiresReRender !== undefined ? { requiresReRender: session.requiresReRender } : {}),
+        ...(session.requiresReRender !== undefined
+          ? { requiresReRender: session.requiresReRender }
+          : {}),
       },
     });
 
@@ -309,7 +307,7 @@ export class SessionService {
     codeSpace: string,
     newSession: ICodeSession,
     expectedHash: string,
-  ): Promise<{ success: boolean; session?: ICodeSession; error?: string; }> {
+  ): Promise<{ success: boolean; session?: ICodeSession; error?: string }> {
     const newHash = computeSessionHash(newSession);
 
     // Update with optimistic locking
@@ -361,11 +359,14 @@ export class SessionService {
     // Broadcast the update for real-time sync
     // If this codespace is linked to an app, we use that for broadcasting
     // Fetch once to check for appId if not already present (optimization: check newSession first)
-    const appId = newSession.appId
-      || (await prisma.codespaceSession.findUnique({
-        where: { codeSpace },
-        select: { appId: true },
-      }))?.appId;
+    const appId =
+      newSession.appId ||
+      (
+        await prisma.codespaceSession.findUnique({
+          where: { codeSpace },
+          select: { appId: true },
+        })
+      )?.appId;
 
     const broadcastId = appId || `codespace:${codeSpace}`;
 
@@ -377,11 +378,8 @@ export class SessionService {
         appId,
       },
       timestamp: Date.now(),
-    }).catch(err => {
-      logger.error(
-        `[SessionService] Failed to broadcast update for ${codeSpace}`,
-        { error: err },
-      );
+    }).catch((err) => {
+      logger.error(`[SessionService] Failed to broadcast update for ${codeSpace}`, { error: err });
     });
 
     return { success: true, session: { ...newSession, hash: newHash } };
@@ -432,10 +430,7 @@ export class SessionService {
   /**
    * Get a specific version of a codespace.
    */
-  static async getVersion(
-    codeSpace: string,
-    number: number,
-  ): Promise<CodeVersion | null> {
+  static async getVersion(codeSpace: string, number: number): Promise<CodeVersion | null> {
     const version = await prisma.codespaceVersion.findFirst({
       where: {
         session: { codeSpace },
@@ -461,7 +456,7 @@ export class SessionService {
    */
   static async getVersionsList(
     codeSpace: string,
-  ): Promise<Array<{ number: number; hash: string; createdAt: number; }>> {
+  ): Promise<Array<{ number: number; hash: string; createdAt: number }>> {
     const versions = await prisma.codespaceVersion.findMany({
       where: {
         session: { codeSpace },
@@ -474,7 +469,7 @@ export class SessionService {
       },
     });
 
-    return versions.map(v => ({
+    return versions.map((v) => ({
       number: v.number,
       hash: v.hash,
       createdAt: v.createdAt.getTime(),
@@ -483,22 +478,12 @@ export class SessionService {
 }
 
 export const getSession = SessionService.getSession.bind(SessionService);
-export const checkSessionHealth = SessionService.checkSessionHealth.bind(
-  SessionService,
-);
-export const checkSessionsHealth = SessionService.checkSessionsHealth.bind(
-  SessionService,
-);
-export const initializeSession = SessionService.initializeSession.bind(
-  SessionService,
-);
-export const getOrCreateSession = SessionService.getOrCreateSession.bind(
-  SessionService,
-);
+export const checkSessionHealth = SessionService.checkSessionHealth.bind(SessionService);
+export const checkSessionsHealth = SessionService.checkSessionsHealth.bind(SessionService);
+export const initializeSession = SessionService.initializeSession.bind(SessionService);
+export const getOrCreateSession = SessionService.getOrCreateSession.bind(SessionService);
 export const updateSession = SessionService.updateSession.bind(SessionService);
 export const upsertSession = SessionService.upsertSession.bind(SessionService);
 export const saveVersion = SessionService.saveVersion.bind(SessionService);
 export const getVersion = SessionService.getVersion.bind(SessionService);
-export const getVersionsList = SessionService.getVersionsList.bind(
-  SessionService,
-);
+export const getVersionsList = SessionService.getVersionsList.bind(SessionService);

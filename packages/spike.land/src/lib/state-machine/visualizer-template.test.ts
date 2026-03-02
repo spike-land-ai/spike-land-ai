@@ -164,9 +164,9 @@ function makeParallelExport(): MachineExport {
 describe("generateVisualizerCode", () => {
   it("should return a string containing React imports", () => {
     const code = generateVisualizerCode(makeTrafficLightExport(), false);
-    expect(code).toContain("from \"https://esm.sh/react@18\"");
-    expect(code).toContain("from \"https://esm.sh/d3@7\"");
-    expect(code).toContain("from \"https://esm.sh/dagre@0.8.5\"");
+    expect(code).toContain('from "https://esm.sh/react@18"');
+    expect(code).toContain('from "https://esm.sh/d3@7"');
+    expect(code).toContain('from "https://esm.sh/dagre@0.8.5"');
   });
 
   it("should embed machine data as JSON", () => {

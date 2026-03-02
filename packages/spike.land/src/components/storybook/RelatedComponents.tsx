@@ -8,12 +8,12 @@ interface RelatedComponentsProps {
 }
 
 export function RelatedComponents({ currentId }: RelatedComponentsProps) {
-  const currentSection = storybookSections.find(s => s.id === currentId);
+  const currentSection = storybookSections.find((s) => s.id === currentId);
 
   if (!currentSection) return null;
 
   const relatedSections = storybookSections.filter(
-    s => s.category === currentSection.category && s.id !== currentId,
+    (s) => s.category === currentSection.category && s.id !== currentId,
   );
 
   if (relatedSections.length === 0) return null;
@@ -24,7 +24,7 @@ export function RelatedComponents({ currentId }: RelatedComponentsProps) {
         Related Components
       </h2>
       <div className="flex gap-3 overflow-x-auto pb-2 md:grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 md:overflow-visible md:pb-0">
-        {relatedSections.map(section => {
+        {relatedSections.map((section) => {
           const IconComponent = storybookIconMap[section.icon as keyof typeof storybookIconMap];
           return (
             <Link

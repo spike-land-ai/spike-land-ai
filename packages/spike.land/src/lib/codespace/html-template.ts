@@ -1,7 +1,6 @@
 import { ESM_CDN, ESM_DEPS_PARAM, REACT_VERSION } from "./constants";
 
-const COMPONENT_URL = process.env.SPIKE_LAND_COMPONENT_URL
-  ?? "https://testing.spike.land";
+const COMPONENT_URL = process.env.SPIKE_LAND_COMPONENT_URL ?? "https://testing.spike.land";
 
 const D = ESM_DEPS_PARAM;
 
@@ -152,7 +151,7 @@ export const HTML_TEMPLATE = `<!DOCTYPE html>
 export const IMPORT_MAP = {
   imports: {
     "@/": `${COMPONENT_URL}/@/`,
-    "react": `${ESM_CDN}/react@${REACT_VERSION}`,
+    react: `${ESM_CDN}/react@${REACT_VERSION}`,
     "react/jsx-runtime": `${ESM_CDN}/react@${REACT_VERSION}/jsx-runtime`,
     "react/jsx-dev-runtime": `${ESM_CDN}/react@${REACT_VERSION}/jsx-dev-runtime`,
     "react-dom": `${ESM_CDN}/react-dom@${REACT_VERSION}?${D}`,
@@ -163,7 +162,7 @@ export const IMPORT_MAP = {
     "@emotion/react/jsx-dev-runtime": `${ESM_CDN}/@emotion/react/jsx-dev-runtime?${D}`,
     "@emotion/styled": `${ESM_CDN}/@emotion/styled?${D}`,
     "framer-motion": `${ESM_CDN}/framer-motion?${D}`,
-    "recharts": `${ESM_CDN}/recharts?${D}`,
+    recharts: `${ESM_CDN}/recharts?${D}`,
     "@dnd-kit/core": `${ESM_CDN}/@dnd-kit/core?${D}`,
     "@dnd-kit/sortable": `${ESM_CDN}/@dnd-kit/sortable?${D}`,
     "@dnd-kit/utilities": `${ESM_CDN}/@dnd-kit/utilities?${D}`,
@@ -277,12 +276,11 @@ createRoot(document.getElementById("embed")).render(jsx($1, {}));`,
     .replace(/<script/gi, "&lt;script")
     .replace(/<\/script/gi, "&lt;/script");
 
-  return HTML_TEMPLATE
-    .replace("// IMPORTMAP", importMapJson)
+  return HTML_TEMPLATE.replace("// IMPORTMAP", importMapJson)
     .replace("<!-- HTML_CONTENT -->", safeHtml)
     .replace("/* criticalCss */", safeCss)
     .replace(
-      "<script type=\"module\" src=\"/start.mjs\"></script>",
+      '<script type="module" src="/start.mjs"></script>',
       `<script type="module">${safeCode}</script>`,
     );
 }

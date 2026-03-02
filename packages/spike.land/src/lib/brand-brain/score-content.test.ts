@@ -80,9 +80,7 @@ function makeValidGeminiResponse() {
   return {
     score: 85,
     violations: [],
-    suggestions: [
-      { category: "TONE", recommendation: "Use active voice", priority: "LOW" },
-    ],
+    suggestions: [{ category: "TONE", recommendation: "Use active voice", priority: "LOW" }],
     toneAnalysis: {
       formalCasual: 45,
       technicalSimple: 55,
@@ -189,9 +187,7 @@ describe("scoreContent", () => {
 
   it("throws when generateStructuredResponse fails", async () => {
     mockGenerateStructuredResponse.mockRejectedValue(new Error("API error"));
-    await expect(scoreContent(makeParams())).rejects.toThrow(
-      "Failed to score content: API error",
-    );
+    await expect(scoreContent(makeParams())).rejects.toThrow("Failed to score content: API error");
   });
 
   it("throws when AI response fails Zod validation", async () => {
@@ -230,9 +226,7 @@ describe("scoreContent", () => {
     const geminiResponse = {
       ...makeValidGeminiResponse(),
       score: 70,
-      violations: [
-        { type: "TONE_MISMATCH", severity: "MEDIUM", message: "Slightly off tone" },
-      ],
+      violations: [{ type: "TONE_MISMATCH", severity: "MEDIUM", message: "Slightly off tone" }],
     };
     mockGenerateStructuredResponse.mockResolvedValue(geminiResponse);
     const result = await scoreContent(makeParams({ strictMode: false }));

@@ -15,10 +15,7 @@ vi.mock("next/navigation", () => ({
 
 vi.mock("next/script", () => ({
   default: (props: Record<string, unknown>) => (
-    <span
-      data-testid={props.id ?? "gtag-script"}
-      data-src={props.src as string}
-    />
+    <span data-testid={props.id ?? "gtag-script"} data-src={props.src as string} />
   ),
 }));
 
@@ -67,10 +64,7 @@ describe("GoogleAnalytics", () => {
     }));
     vi.mock("next/script", () => ({
       default: (props: Record<string, unknown>) => (
-        <span
-          data-testid={props.id ?? "gtag-script"}
-          data-src={props.src as string}
-        />
+        <span data-testid={props.id ?? "gtag-script"} data-src={props.src as string} />
       ),
     }));
 
@@ -84,10 +78,7 @@ describe("GoogleAnalytics", () => {
     const { GoogleAnalytics } = await import("./GoogleAnalytics");
     const addEventSpy = vi.spyOn(window, "addEventListener");
     render(<GoogleAnalytics />);
-    expect(addEventSpy).toHaveBeenCalledWith(
-      "consent-changed",
-      expect.any(Function),
-    );
+    expect(addEventSpy).toHaveBeenCalledWith("consent-changed", expect.any(Function));
     addEventSpy.mockRestore();
   });
 
@@ -96,10 +87,7 @@ describe("GoogleAnalytics", () => {
     const removeEventSpy = vi.spyOn(window, "removeEventListener");
     const { unmount } = render(<GoogleAnalytics />);
     unmount();
-    expect(removeEventSpy).toHaveBeenCalledWith(
-      "consent-changed",
-      expect.any(Function),
-    );
+    expect(removeEventSpy).toHaveBeenCalledWith("consent-changed", expect.any(Function));
     removeEventSpy.mockRestore();
   });
 });

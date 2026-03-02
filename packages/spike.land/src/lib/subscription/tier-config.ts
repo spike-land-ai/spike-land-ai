@@ -26,10 +26,7 @@ export interface TierLimits {
  * Workspace tier limits configuration
  * -1 indicates unlimited
  */
-export const WORKSPACE_TIER_LIMITS: Record<
-  WorkspaceSubscriptionTier,
-  TierLimits
-> = {
+export const WORKSPACE_TIER_LIMITS: Record<WorkspaceSubscriptionTier, TierLimits> = {
   FREE: {
     maxSocialAccounts: 5,
     maxScheduledPosts: 100,
@@ -59,10 +56,7 @@ export const WORKSPACE_TIER_LIMITS: Record<
 /**
  * Display names for workspace subscription tiers
  */
-export const WORKSPACE_TIER_DISPLAY_NAMES: Record<
-  WorkspaceSubscriptionTier,
-  string
-> = {
+export const WORKSPACE_TIER_DISPLAY_NAMES: Record<WorkspaceSubscriptionTier, string> = {
   FREE: "Free",
   PRO: "Pro",
   BUSINESS: "Business",
@@ -71,11 +65,7 @@ export const WORKSPACE_TIER_DISPLAY_NAMES: Record<
 /**
  * Tier order for upgrade/downgrade comparisons
  */
-export const WORKSPACE_TIER_ORDER: WorkspaceSubscriptionTier[] = [
-  "FREE",
-  "PRO",
-  "BUSINESS",
-];
+export const WORKSPACE_TIER_ORDER: WorkspaceSubscriptionTier[] = ["FREE", "PRO", "BUSINESS"];
 
 /**
  * Check if a limit is unlimited (-1)

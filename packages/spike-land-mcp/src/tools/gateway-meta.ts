@@ -25,11 +25,19 @@ export function registerGatewayMetaTools(
   // search_tools
   registry.registerBuilt(
     t
-      .tool("search_tools", "Search all available spike.land tools by keyword or description. Also searches the marketplace for community-published tools.", {
-        query: z.string().min(1).max(200).describe("Search query"),
-        limit: z.number().min(1).max(50).optional().default(10).describe("Maximum results"),
-        semantic: z.boolean().optional().default(false).describe("Use AI-powered semantic search with synonym expansion"),
-      })
+      .tool(
+        "search_tools",
+        "Search all available spike.land tools by keyword or description. Also searches the marketplace for community-published tools.",
+        {
+          query: z.string().min(1).max(200).describe("Search query"),
+          limit: z.number().min(1).max(50).optional().default(10).describe("Maximum results"),
+          semantic: z
+            .boolean()
+            .optional()
+            .default(false)
+            .describe("Use AI-powered semantic search with synonym expansion"),
+        },
+      )
       .meta({ category: "gateway-meta", tier: "free" })
       .handler(async ({ input }) => {
         const { query, limit, semantic } = input;
@@ -38,14 +46,16 @@ export function registerGatewayMetaTools(
           const semanticResults = registry.searchToolsSemantic(query, limit);
           if (semanticResults.length === 0) {
             return {
-              content: [{
-                type: "text",
-                text: `No tools found matching "${query}" (semantic). Try different keywords or use list_categories.`,
-              }],
+              content: [
+                {
+                  type: "text",
+                  text: `No tools found matching "${query}" (semantic). Try different keywords or use list_categories.`,
+                },
+              ],
             };
           }
 
-          const names = semanticResults.map(r => r.name);
+          const names = semanticResults.map((r) => r.name);
           const newlyEnabled = registry.enableTools(names);
 
           if (newlyEnabled.length > 0) {
@@ -56,7 +66,9 @@ export function registerGatewayMetaTools(
           for (const result of semanticResults) {
             const status = newlyEnabled.includes(result.name)
               ? " (now activated)"
-              : result.enabled ? "" : " (inactive)";
+              : result.enabled
+                ? ""
+                : " (inactive)";
             text += `- **${result.name}**${status}\n  ${result.description}\n  Category: ${result.category} | Tier: ${result.tier} | Similarity: ${result.score}\n`;
             if (result.suggestedParams && Object.keys(result.suggestedParams).length > 0) {
               text += `  Suggested params: ${JSON.stringify(result.suggestedParams)}\n`;
@@ -111,17 +123,19 @@ export function registerGatewayMetaTools(
 
         if (results.length === 0 && marketplaceTools.length === 0) {
           return {
-            content: [{
-              type: "text",
-              text: `No tools found matching "${query}". Try different keywords or use list_categories.`,
-            }],
+            content: [
+              {
+                type: "text",
+                text: `No tools found matching "${query}". Try different keywords or use list_categories.`,
+              },
+            ],
           };
         }
 
         let text = "";
 
         if (results.length > 0) {
-          const names = results.map(r => r.name);
+          const names = results.map((r) => r.name);
           const newlyEnabled = registry.enableTools(names);
 
           if (newlyEnabled.length > 0) {
@@ -132,7 +146,9 @@ export function registerGatewayMetaTools(
           for (const result of results) {
             const status = newlyEnabled.includes(result.name)
               ? " (now activated)"
-              : result.enabled ? "" : " (inactive)";
+              : result.enabled
+                ? ""
+                : " (inactive)";
             text += `- **${result.name}**${status}\n  ${result.description}\n  Category: ${result.category} | Tier: ${result.tier}\n\n`;
           }
 
@@ -157,23 +173,26 @@ export function registerGatewayMetaTools(
   // list_categories
   registry.registerBuilt(
     t
-      .tool("list_categories", "List all available tool categories with descriptions and tool counts.", {})
+      .tool(
+        "list_categories",
+        "List all available tool categories with descriptions and tool counts.",
+        {},
+      )
       .meta({ category: "gateway-meta", tier: "free" })
       .handler(async () => {
         const categories = registry.listCategories();
 
         let text = `**spike.land Tool Categories (${registry.getToolCount()} total tools):**\n\n`;
 
-        const freeCategories = categories.filter(c => c.tier === "free");
-        const workspaceCategories = categories.filter(c => c.tier === "workspace");
+        const freeCategories = categories.filter((c) => c.tier === "free");
+        const workspaceCategories = categories.filter((c) => c.tier === "workspace");
 
         if (freeCategories.length > 0) {
           text += `### Free\n\n`;
           for (const cat of freeCategories) {
             if (cat.name === "gateway-meta") continue;
-            const status = cat.enabledCount > 0
-              ? ` (${cat.enabledCount}/${cat.toolCount} active)`
-              : "";
+            const status =
+              cat.enabledCount > 0 ? ` (${cat.enabledCount}/${cat.toolCount} active)` : "";
             text += `- **${cat.name}** (${cat.toolCount} tools)${status}\n  ${cat.description}\n\n`;
           }
         }
@@ -181,9 +200,8 @@ export function registerGatewayMetaTools(
         if (workspaceCategories.length > 0) {
           text += `### Workspace Required\n\n`;
           for (const cat of workspaceCategories) {
-            const status = cat.enabledCount > 0
-              ? ` (${cat.enabledCount}/${cat.toolCount} active)`
-              : "";
+            const status =
+              cat.enabledCount > 0 ? ` (${cat.enabledCount}/${cat.toolCount} active)` : "";
             text += `- **${cat.name}** (${cat.toolCount} tools)${status}\n  ${cat.description}\n\n`;
           }
         }
@@ -208,20 +226,27 @@ export function registerGatewayMetaTools(
         if (enabled.length === 0) {
           if (!registry.hasCategory(category)) {
             const categories = registry.listCategories();
-            const available = categories.map(c => c.name).filter(n => n !== "gateway-meta").join(", ");
+            const available = categories
+              .map((c) => c.name)
+              .filter((n) => n !== "gateway-meta")
+              .join(", ");
             return {
-              content: [{
-                type: "text",
-                text: `Category "${category}" not found. Available: ${available}`,
-              }],
+              content: [
+                {
+                  type: "text",
+                  text: `Category "${category}" not found. Available: ${available}`,
+                },
+              ],
               isError: true,
             };
           }
           return {
-            content: [{
-              type: "text",
-              text: `All tools in "${category}" are already active.`,
-            }],
+            content: [
+              {
+                type: "text",
+                text: `All tools in "${category}" are already active.`,
+              },
+            ],
           };
         }
 
@@ -242,10 +267,12 @@ export function registerGatewayMetaTools(
       .meta({ category: "gateway-meta", tier: "free" })
       .handler(async () => {
         return {
-          content: [{
-            type: "text",
-            text: `Balance checking not available in edge mode. Visit https://spike.land/settings?tab=billing to view your balance.`,
-          }],
+          content: [
+            {
+              type: "text",
+              text: `Balance checking not available in edge mode. Visit https://spike.land/settings?tab=billing to view your balance.`,
+            },
+          ],
         };
       }),
   );
@@ -253,7 +280,11 @@ export function registerGatewayMetaTools(
   // get_status
   registry.registerBuilt(
     t
-      .tool("get_status", "Get platform status including available features, tool counts, and active categories.", {})
+      .tool(
+        "get_status",
+        "Get platform status including available features, tool counts, and active categories.",
+        {},
+      )
       .meta({ category: "gateway-meta", tier: "free" })
       .handler(async () => {
         const categories = registry.listCategories();
@@ -265,9 +296,9 @@ export function registerGatewayMetaTools(
         text += `**Active Tools:** ${enabledTools}\n`;
         text += `**Categories:** ${categories.length}\n\n`;
 
-        const activeCategories = categories.filter(c => c.enabledCount > 0);
-        const inactiveCategories = categories.filter(c =>
-          c.enabledCount === 0 && c.name !== "gateway-meta",
+        const activeCategories = categories.filter((c) => c.enabledCount > 0);
+        const inactiveCategories = categories.filter(
+          (c) => c.enabledCount === 0 && c.name !== "gateway-meta",
         );
 
         if (activeCategories.length > 0) {

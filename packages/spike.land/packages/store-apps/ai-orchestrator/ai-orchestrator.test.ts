@@ -13,13 +13,13 @@ describe("AI Orchestrator tools", () => {
   });
 
   it("covers swarm and swarm-monitoring categories", () => {
-    const categories = new Set(aiOrchestratorTools.map(t => t.category));
+    const categories = new Set(aiOrchestratorTools.map((t) => t.category));
     expect(categories).toContain("swarm");
     expect(categories).toContain("swarm-monitoring");
   });
 
   it("swarm management tools are workspace tier", () => {
-    const swarmTools = aiOrchestratorTools.filter(t => t.category === "swarm");
+    const swarmTools = aiOrchestratorTools.filter((t) => t.category === "swarm");
     expect(swarmTools.length).toBe(11);
     for (const tool of swarmTools) {
       expect(tool.tier).toBe("workspace");
@@ -27,7 +27,7 @@ describe("AI Orchestrator tools", () => {
   });
 
   it("monitoring tools are free tier and always enabled", () => {
-    const monTools = aiOrchestratorTools.filter(t => t.category === "swarm-monitoring");
+    const monTools = aiOrchestratorTools.filter((t) => t.category === "swarm-monitoring");
     expect(monTools.length).toBe(4);
     for (const tool of monTools) {
       expect(tool.tier).toBe("free");
@@ -36,7 +36,7 @@ describe("AI Orchestrator tools", () => {
   });
 
   it("has expected tool names", () => {
-    const names = aiOrchestratorTools.map(t => t.name);
+    const names = aiOrchestratorTools.map((t) => t.name);
     expect(names).toContain("swarm_list_agents");
     expect(names).toContain("swarm_spawn_agent");
     expect(names).toContain("swarm_stop_agent");

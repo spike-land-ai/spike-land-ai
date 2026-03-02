@@ -13,10 +13,7 @@ import type {
   LinkedInErrorResponse,
   SocialPlatformErrorResponse,
 } from "@/lib/types/common";
-import {
-  isFacebookErrorResponse,
-  isLinkedInErrorResponse,
-} from "@/lib/types/common";
+import { isFacebookErrorResponse, isLinkedInErrorResponse } from "@/lib/types/common";
 // Duplicate imports removed
 import type { SocialPlatform } from "@prisma/client";
 
@@ -66,9 +63,7 @@ export function parseFacebookRateLimits(
       const usage = JSON.parse(businessUsage);
       // Format: { "accountId": [{ "call_count": X, "total_cputime": Y, "total_time": Z }] }
       const values = Object.values(usage) as Array<
-        Array<
-          { call_count?: number; total_cputime?: number; total_time?: number; }
-        >
+        Array<{ call_count?: number; total_cputime?: number; total_time?: number }>
       >;
       const firstValue = values[0];
       const data = firstValue?.[0];
@@ -86,13 +81,10 @@ export function parseFacebookRateLimits(
     } catch (error) {
       // Facebook may return malformed JSON in x-business-use-case-usage header
       // Fall through to try x-app-usage header instead
-      logger.debug(
-        "Failed to parse x-business-use-case-usage header",
-        {
-          error: error instanceof Error ? error.message : String(error),
-          headerValue: businessUsage,
-        },
-      );
+      logger.debug("Failed to parse x-business-use-case-usage header", {
+        error: error instanceof Error ? error.message : String(error),
+        headerValue: businessUsage,
+      });
       // Continue to try x-app-usage
     }
   }
@@ -117,13 +109,10 @@ export function parseFacebookRateLimits(
     } catch (error) {
       // Facebook may return malformed JSON in x-app-usage header
       // This is not critical - function will return null to indicate no rate limit data available
-      logger.debug(
-        "Failed to parse x-app-usage header",
-        {
-          error: error instanceof Error ? error.message : String(error),
-          headerValue: appUsage,
-        },
-      );
+      logger.debug("Failed to parse x-app-usage header", {
+        error: error instanceof Error ? error.message : String(error),
+        headerValue: appUsage,
+      });
       // Return null below
     }
   }
@@ -156,8 +145,8 @@ export function parseLinkedInRateLimits(
   // Check for rate limit error in response body
   if (isLinkedInErrorResponse(body)) {
     if (
-      body.status === 429
-      || (body.message && body.message.toLowerCase().includes("rate limit"))
+      body.status === 429 ||
+      (body.message && body.message.toLowerCase().includes("rate limit"))
     ) {
       return {
         remaining: 0,
@@ -187,17 +176,11 @@ export function parseRateLimitHeaders(
     case "FACEBOOK":
     case "INSTAGRAM":
       // Narrow the type to FacebookErrorResponse for Facebook/Instagram
-      return parseFacebookRateLimits(
-        headers,
-        isFacebookErrorResponse(body) ? body : undefined,
-      );
+      return parseFacebookRateLimits(headers, isFacebookErrorResponse(body) ? body : undefined);
 
     case "LINKEDIN":
       // Narrow the type to LinkedInErrorResponse for LinkedIn
-      return parseLinkedInRateLimits(
-        headers,
-        isLinkedInErrorResponse(body) ? body : undefined,
-      );
+      return parseLinkedInRateLimits(headers, isLinkedInErrorResponse(body) ? body : undefined);
 
     case "YOUTUBE":
       // YouTube uses quota-based limits, not easily tracked per-request
@@ -247,25 +230,19 @@ export async function clearAccountRateLimit(accountId: string): Promise<void> {
 /**
  * Get rate limit usage for an account
  */
-export async function getRateLimitUsage(
-  accountId: string,
-): Promise<RateLimitUsage | null> {
+export async function getRateLimitUsage(accountId: string): Promise<RateLimitUsage | null> {
   const health = await prisma.socialAccountHealth.findUnique({
     where: { accountId },
   });
 
-  if (
-    !health
-    || health.rateLimitRemaining === null
-    || health.rateLimitTotal === null
-  ) {
+  if (!health || health.rateLimitRemaining === null || health.rateLimitTotal === null) {
     return null;
   }
 
-  const percentUsed = health.rateLimitTotal > 0
-    ? ((health.rateLimitTotal - health.rateLimitRemaining)
-      / health.rateLimitTotal) * 100
-    : 0;
+  const percentUsed =
+    health.rateLimitTotal > 0
+      ? ((health.rateLimitTotal - health.rateLimitRemaining) / health.rateLimitTotal) * 100
+      : 0;
 
   return {
     remaining: health.rateLimitRemaining,
@@ -278,9 +255,7 @@ export async function getRateLimitUsage(
 /**
  * Check for rate-limited accounts in a workspace and clear expired limits
  */
-export async function checkAndClearExpiredRateLimits(
-  workspaceId: string,
-): Promise<number> {
+export async function checkAndClearExpiredRateLimits(workspaceId: string): Promise<number> {
   const now = new Date();
 
   // Find accounts with expired rate limits

@@ -38,10 +38,7 @@ function constantTimeCompare(a: string, b: string): boolean {
 
 function getBypassMembershipRole(session: Session): WorkspaceRole {
   const role = session.user?.role as string | undefined;
-  if (
-    role === "OWNER" || role === "ADMIN" || role === "MEMBER"
-    || role === "VIEWER"
-  ) {
+  if (role === "OWNER" || role === "ADMIN" || role === "MEMBER" || role === "VIEWER") {
     return role;
   }
 
@@ -60,19 +57,20 @@ async function getE2EBypassMembership(
   // Mirror auth.ts behavior: allow bypass outside strict production.
   // Use environment variable for domain check to prevent Host header injection
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || "";
-  const isStagingDomain = appUrl === "https://next.spike.land"
-    || appUrl.includes("localhost");
-  const isStrictProduction = process.env.NODE_ENV === "production"
-    && process.env.APP_ENV === "production"
-    && !isStagingDomain;
+  const isStagingDomain = appUrl === "https://next.spike.land" || appUrl.includes("localhost");
+  const isStrictProduction =
+    process.env.NODE_ENV === "production" &&
+    process.env.APP_ENV === "production" &&
+    !isStagingDomain;
 
-  const headerBypassEnabled = !isStrictProduction
-    && !!bypassSecret
-    && !!bypassHeader
-    && constantTimeCompare(bypassHeader, bypassSecret);
+  const headerBypassEnabled =
+    !isStrictProduction &&
+    !!bypassSecret &&
+    !!bypassHeader &&
+    constantTimeCompare(bypassHeader, bypassSecret);
 
-  const envBypassEnabled = process.env.NODE_ENV !== "production"
-    && process.env.E2E_BYPASS_AUTH === "true";
+  const envBypassEnabled =
+    process.env.NODE_ENV !== "production" && process.env.E2E_BYPASS_AUTH === "true";
 
   if (!headerBypassEnabled && !envBypassEnabled) {
     return null;
@@ -270,10 +268,7 @@ export async function requireWorkspaceMembership(
  * @param workspaceId - Workspace ID to check
  * @returns true if user is owner
  */
-export async function isWorkspaceOwner(
-  userId: string,
-  workspaceId: string,
-): Promise<boolean> {
+export async function isWorkspaceOwner(userId: string, workspaceId: string): Promise<boolean> {
   const membership = await getWorkspaceMembership(userId, workspaceId);
   return membership?.role === "OWNER";
 }
@@ -285,10 +280,7 @@ export async function isWorkspaceOwner(
  * @param workspaceId - Workspace ID to check
  * @returns true if user is admin or owner
  */
-export async function isWorkspaceAdmin(
-  userId: string,
-  workspaceId: string,
-): Promise<boolean> {
+export async function isWorkspaceAdmin(userId: string, workspaceId: string): Promise<boolean> {
   const membership = await getWorkspaceMembership(userId, workspaceId);
   return membership?.role === "OWNER" || membership?.role === "ADMIN";
 }

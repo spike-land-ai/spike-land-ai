@@ -14,10 +14,7 @@ import { InProcessToolProvider } from "./in-process-tool-provider";
 import logger from "@/lib/logger";
 
 /** Duck-type interface covering what runAgentLoop actually uses. */
-type ToolProvider = Pick<
-  ServerManager,
-  "getAllTools" | "callTool" | "closeAll"
->;
+type ToolProvider = Pick<ServerManager, "getAllTools" | "callTool" | "closeAll">;
 
 const DEFAULT_TTL_MS = 5 * 60 * 1000; // 5 minutes
 
@@ -70,9 +67,7 @@ function startCleanupTimer() {
  * Get or create a tool provider (ServerManager or InProcessToolProvider) for the given user.
  * The provider is cached and reused across requests.
  */
-export async function getServerManager(
-  userId: string,
-): Promise<ServerManager> {
+export async function getServerManager(userId: string): Promise<ServerManager> {
   const existing = pool.get(userId);
   if (existing) {
     existing.lastUsed = Date.now();
@@ -129,9 +124,7 @@ export async function removeServerManager(userId: string): Promise<void> {
 
 /** Close all managers (for graceful shutdown). */
 export async function closeAllManagers(): Promise<void> {
-  await Promise.allSettled(
-    [...pool.values()].map(e => e.provider.closeAll()),
-  );
+  await Promise.allSettled([...pool.values()].map((e) => e.provider.closeAll()));
   pool.clear();
   if (cleanupTimer) {
     clearInterval(cleanupTimer);

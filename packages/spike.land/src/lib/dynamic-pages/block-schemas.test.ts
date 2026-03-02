@@ -225,11 +225,13 @@ describe("TestimonialsContentSchema", () => {
 
   it("accepts optional role and avatarUrl", () => {
     const result = TestimonialsContentSchema.safeParse({
-      testimonials: [{
-        ...validTestimonial,
-        role: "CTO",
-        avatarUrl: "/avatar.jpg",
-      }],
+      testimonials: [
+        {
+          ...validTestimonial,
+          role: "CTO",
+          avatarUrl: "/avatar.jpg",
+        },
+      ],
     });
     expect(result.success).toBe(true);
   });
@@ -412,14 +414,16 @@ describe("AppGridContentSchema", () => {
   it("accepts all optional fields", () => {
     const result = AppGridContentSchema.safeParse({
       sectionTitle: "Apps",
-      apps: [{
-        name: "Toolbox",
-        tagline: "All-in-one",
-        icon: "Wrench",
-        category: "Utilities",
-        mcpTools: ["tool1"],
-        features: ["feat1"],
-      }],
+      apps: [
+        {
+          name: "Toolbox",
+          tagline: "All-in-one",
+          icon: "Wrench",
+          category: "Utilities",
+          mcpTools: ["tool1"],
+          features: ["feat1"],
+        },
+      ],
       categories: ["Utilities", "Productivity"],
     });
     expect(result.success).toBe(true);
@@ -604,16 +608,7 @@ describe("validateBlockContent", () => {
 
 describe("RESERVED_SLUGS", () => {
   it("contains expected reserved slugs", () => {
-    const expected = [
-      "connect",
-      "store",
-      "api",
-      "admin",
-      "auth",
-      "login",
-      "signup",
-      "dashboard",
-    ];
+    const expected = ["connect", "store", "api", "admin", "auth", "login", "signup", "dashboard"];
     for (const slug of expected) {
       expect(RESERVED_SLUGS).toContain(slug);
     }

@@ -1,7 +1,7 @@
 import type { ConventionRule, ReviewFinding } from "./types";
 
 export function checkConventions(
-  files: Array<{ path: string; content: string; }>,
+  files: Array<{ path: string; content: string }>,
   rules: ConventionRule[],
 ): ReviewFinding[] {
   const findings: ReviewFinding[] = [];
@@ -31,10 +31,7 @@ export function checkConventions(
   return findings;
 }
 
-export function analyzeComplexity(
-  content: string,
-  path: string,
-): ReviewFinding[] {
+export function analyzeComplexity(content: string, path: string): ReviewFinding[] {
   const findings: ReviewFinding[] = [];
   const lines = content.split("\n");
 

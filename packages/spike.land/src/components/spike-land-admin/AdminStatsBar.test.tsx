@@ -35,17 +35,13 @@ describe("AdminStatsBar", () => {
   });
 
   it("renders stat icons when provided", () => {
-    const statsWithIcons = [
-      { label: "Users", value: 100, icon: "👤" },
-    ];
+    const statsWithIcons = [{ label: "Users", value: 100, icon: "👤" }];
     render(<AdminStatsBar stats={statsWithIcons} />);
     expect(screen.getByText("👤")).toBeDefined();
   });
 
   it("renders numeric values correctly", () => {
-    const statsWithNumber = [
-      { label: "Active Sessions", value: 42 },
-    ];
+    const statsWithNumber = [{ label: "Active Sessions", value: 42 }];
     render(<AdminStatsBar stats={statsWithNumber} />);
     expect(screen.getByText("42")).toBeDefined();
   });

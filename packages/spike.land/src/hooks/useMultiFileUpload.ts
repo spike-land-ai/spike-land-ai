@@ -51,12 +51,7 @@ interface UseMultiFileUploadReturn {
 
 const DEFAULT_MAX_FILES = 20;
 const DEFAULT_MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB
-const ALLOWED_FILE_TYPES = [
-  "image/jpeg",
-  "image/png",
-  "image/webp",
-  "image/gif",
-];
+const ALLOWED_FILE_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
 
 /**
  * Custom hook for uploading multiple files with progress tracking
@@ -103,11 +98,8 @@ export function useMultiFileUpload(
    * Update a file's status by its unique ID
    */
   const updateFileById = useCallback(
-    (
-      fileId: string,
-      update: Partial<Omit<FileUploadStatus, "id" | "file">>,
-    ) => {
-      setFiles(prev => prev.map(f => (f.id === fileId ? { ...f, ...update } : f)));
+    (fileId: string, update: Partial<Omit<FileUploadStatus, "id" | "file">>) => {
+      setFiles((prev) => prev.map((f) => (f.id === fileId ? { ...f, ...update } : f)));
     },
     [],
   );
@@ -167,7 +159,7 @@ export function useMultiFileUpload(
             method: "POST",
             body: formData,
             signal,
-          })
+          }),
         ),
       );
 
@@ -179,9 +171,7 @@ export function useMultiFileUpload(
           return;
         }
 
-        const errorMessage = fetchError instanceof Error
-          ? fetchError.message
-          : "Upload failed";
+        const errorMessage = fetchError instanceof Error ? fetchError.message : "Upload failed";
 
         updateFileById(fileId, {
           status: "failed",
@@ -202,7 +192,7 @@ export function useMultiFileUpload(
 
       // Parse JSON response
       const { data, error: jsonError } = await tryCatch(
-        response.json() as Promise<{ imageId: string; }>,
+        response.json() as Promise<{ imageId: string }>,
       );
 
       if (jsonError) {
@@ -232,11 +222,7 @@ export function useMultiFileUpload(
    * Upload all files sequentially
    */
   const uploadSequential = useCallback(
-    async (
-      fileStatuses: FileUploadStatus[],
-      signal: AbortSignal,
-      targetAlbumId?: string,
-    ) => {
+    async (fileStatuses: FileUploadStatus[], signal: AbortSignal, targetAlbumId?: string) => {
       for (const fileStatus of fileStatuses) {
         if (signal.aborted) break;
         await uploadSingleFile(fileStatus, signal, targetAlbumId);
@@ -249,13 +235,9 @@ export function useMultiFileUpload(
    * Upload all files in parallel
    */
   const uploadParallel = useCallback(
-    async (
-      fileStatuses: FileUploadStatus[],
-      signal: AbortSignal,
-      targetAlbumId?: string,
-    ) => {
+    async (fileStatuses: FileUploadStatus[], signal: AbortSignal, targetAlbumId?: string) => {
       await Promise.all(
-        fileStatuses.map(fileStatus => uploadSingleFile(fileStatus, signal, targetAlbumId)),
+        fileStatuses.map((fileStatus) => uploadSingleFile(fileStatus, signal, targetAlbumId)),
       );
     },
     [uploadSingleFile],
@@ -278,7 +260,7 @@ export function useMultiFileUpload(
       }
 
       // Validate all files upfront and assign unique IDs
-      const fileStatuses: FileUploadStatus[] = filesToUpload.map(file => {
+      const fileStatuses: FileUploadStatus[] = filesToUpload.map((file) => {
         const validationError = validateFile(file);
         return {
           id: generateFileId(),
@@ -305,7 +287,7 @@ export function useMultiFileUpload(
       await tryCatch(uploadPromise);
 
       // Call onUploadComplete callback (always called after upload attempts)
-      setFiles(currentFiles => {
+      setFiles((currentFiles) => {
         if (onUploadComplete) {
           onUploadComplete(currentFiles);
         }
@@ -336,12 +318,12 @@ export function useMultiFileUpload(
       abortControllerRef.current = null;
     }
     // Mark all in-progress and pending files as cancelled
-    setFiles(prev =>
-      prev.map(f =>
+    setFiles((prev) =>
+      prev.map((f) =>
         f.status === "uploading" || f.status === "pending"
           ? { ...f, status: "cancelled" as const }
-          : f
-      )
+          : f,
+      ),
     );
     setIsUploading(false);
   }, []);
@@ -357,29 +339,32 @@ export function useMultiFileUpload(
   /**
    * Calculate overall progress (0-100)
    */
-  const progress = files.length === 0 ? 0 : Math.round(
-    files.reduce((sum, f) => {
-      if (f.status === "completed") return sum + 100;
-      if (f.status === "failed") return sum + 100;
-      if (f.status === "cancelled") return sum + 100; // Treat cancelled as complete for progress
-      return sum + f.progress;
-    }, 0) / files.length,
-  );
+  const progress =
+    files.length === 0
+      ? 0
+      : Math.round(
+          files.reduce((sum, f) => {
+            if (f.status === "completed") return sum + 100;
+            if (f.status === "failed") return sum + 100;
+            if (f.status === "cancelled") return sum + 100; // Treat cancelled as complete for progress
+            return sum + f.progress;
+          }, 0) / files.length,
+        );
 
   /**
    * Count completed files
    */
-  const completedCount = files.filter(f => f.status === "completed").length;
+  const completedCount = files.filter((f) => f.status === "completed").length;
 
   /**
    * Count failed files
    */
-  const failedCount = files.filter(f => f.status === "failed").length;
+  const failedCount = files.filter((f) => f.status === "failed").length;
 
   /**
    * Count cancelled files
    */
-  const cancelledCount = files.filter(f => f.status === "cancelled").length;
+  const cancelledCount = files.filter((f) => f.status === "cancelled").length;
 
   return {
     upload,

@@ -15,7 +15,10 @@ const STOP_WORDS = new Set([
 ]);
 
 export function extractKeywords(topic: string): string[] {
-  return topic.toLowerCase().split(/[/\-_\s]+/).filter(k => k && !STOP_WORDS.has(k));
+  return topic
+    .toLowerCase()
+    .split(/[/\-_\s]+/)
+    .filter((k) => k && !STOP_WORDS.has(k));
 }
 
 export function isCompoundMatch(keyword: string, trigger: string): boolean {
@@ -24,5 +27,5 @@ export function isCompoundMatch(keyword: string, trigger: string): boolean {
 }
 
 export function matchesAny(keywords: string[], triggers: string[]): boolean {
-  return triggers.some(t => keywords.some(k => k === t || isCompoundMatch(k, t)));
+  return triggers.some((t) => keywords.some((k) => k === t || isCompoundMatch(k, t)));
 }

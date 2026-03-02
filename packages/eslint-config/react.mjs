@@ -30,7 +30,7 @@ export function createReactConfig({ ignores = [] } = {}) {
     files: ["**/*.ts", "**/*.tsx"],
     jsx: true,
     extraPlugins: {
-      "react": reactPlugin,
+      react: reactPlugin,
       "react-hooks": reactHooksPlugin,
     },
     extraRules: {

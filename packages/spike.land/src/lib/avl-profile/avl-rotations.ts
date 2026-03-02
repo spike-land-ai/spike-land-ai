@@ -15,10 +15,7 @@ export type PrismaTransaction = Omit<
 /**
  * Get the height of a node. Returns -1 for null/missing nodes.
  */
-export async function getHeight(
-  nodeId: string | null,
-  tx: PrismaTransaction,
-): Promise<number> {
+export async function getHeight(nodeId: string | null, tx: PrismaTransaction): Promise<number> {
   if (!nodeId) return -1;
 
   const node = await tx.avlProfileNode.findUnique({
@@ -32,10 +29,7 @@ export async function getHeight(
 /**
  * Compute balance factor: yesChild.height - noChild.height
  */
-export async function getBalanceFactor(
-  nodeId: string,
-  tx: PrismaTransaction,
-): Promise<number> {
+export async function getBalanceFactor(nodeId: string, tx: PrismaTransaction): Promise<number> {
   const node = await tx.avlProfileNode.findUnique({
     where: { id: nodeId },
     select: { yesChildId: true, noChildId: true },
@@ -52,10 +46,7 @@ export async function getBalanceFactor(
 /**
  * Recalculate and persist height and balanceFactor from children's heights.
  */
-export async function updateHeight(
-  nodeId: string,
-  tx: PrismaTransaction,
-): Promise<void> {
+export async function updateHeight(nodeId: string, tx: PrismaTransaction): Promise<void> {
   const node = await tx.avlProfileNode.findUnique({
     where: { id: nodeId },
     select: { yesChildId: true, noChildId: true },
@@ -85,10 +76,7 @@ export async function updateHeight(
  *
  * Returns the new root ID (yesChild's id).
  */
-export async function rightRotate(
-  nodeId: string,
-  tx: PrismaTransaction,
-): Promise<string> {
+export async function rightRotate(nodeId: string, tx: PrismaTransaction): Promise<string> {
   const node = await tx.avlProfileNode.findUniqueOrThrow({
     where: { id: nodeId },
     select: {
@@ -174,10 +162,7 @@ export async function rightRotate(
  *
  * Returns the new root ID (noChild's id).
  */
-export async function leftRotate(
-  nodeId: string,
-  tx: PrismaTransaction,
-): Promise<string> {
+export async function leftRotate(nodeId: string, tx: PrismaTransaction): Promise<string> {
   const node = await tx.avlProfileNode.findUniqueOrThrow({
     where: { id: nodeId },
     select: {
@@ -263,10 +248,7 @@ export async function leftRotate(
  *
  * Returns the (possibly new) root ID of this subtree.
  */
-export async function rebalance(
-  nodeId: string,
-  tx: PrismaTransaction,
-): Promise<string> {
+export async function rebalance(nodeId: string, tx: PrismaTransaction): Promise<string> {
   const bf = await getBalanceFactor(nodeId, tx);
 
   if (bf > 1) {
@@ -324,17 +306,13 @@ export async function rebalance(
  * If a rotation changes a subtree root, updates the parent's child pointer
  * and the tree's rootNodeId if necessary.
  */
-export async function rebalanceUpward(
-  nodeId: string,
-  tx: PrismaTransaction,
-): Promise<void> {
+export async function rebalanceUpward(nodeId: string, tx: PrismaTransaction): Promise<void> {
   let currentId: string | null = nodeId;
 
   while (currentId) {
     // Fetch the node to know its parent before any rotation
-    const current:
-      | { id: string; parentId: string | null; treeId: string; }
-      | null = await tx.avlProfileNode.findUnique({
+    const current: { id: string; parentId: string | null; treeId: string } | null =
+      await tx.avlProfileNode.findUnique({
         where: { id: currentId },
         select: { id: true, parentId: true, treeId: true },
       });

@@ -29,9 +29,7 @@ export function PersonaLandingPreview() {
   if (!hasPersona || !landing) {
     return (
       <div className="my-8 p-6 rounded-xl border border-border bg-card text-center">
-        <p className="text-lg font-semibold text-foreground mb-2">
-          Personalise your experience
-        </p>
+        <p className="text-lg font-semibold text-foreground mb-2">Personalise your experience</p>
         <p className="text-muted-foreground mb-4">
           Take the onboarding quiz to see content tailored to your needs.
         </p>
@@ -47,9 +45,7 @@ export function PersonaLandingPreview() {
   return (
     <div className="my-8 rounded-xl border border-border bg-gradient-to-br from-card to-muted/30 overflow-hidden">
       <div className="p-6 space-y-4">
-        <h3 className="font-heading text-2xl font-bold text-foreground">
-          {landing.headline}
-        </h3>
+        <h3 className="font-heading text-2xl font-bold text-foreground">{landing.headline}</h3>
         <p className="text-muted-foreground">{landing.subheadline}</p>
 
         <div className="space-y-2">
@@ -57,12 +53,10 @@ export function PersonaLandingPreview() {
             Pain points we solve
           </h4>
           <ul className="space-y-1">
-            {landing.painPoints.map(pp => (
+            {landing.painPoints.map((pp) => (
               <li key={pp.title} className="text-foreground">
                 <span className="font-semibold">{pp.title}</span>{" "}
-                <span className="text-muted-foreground">
-                  &mdash; {pp.description}
-                </span>
+                <span className="text-muted-foreground">&mdash; {pp.description}</span>
               </li>
             ))}
           </ul>
@@ -73,25 +67,16 @@ export function PersonaLandingPreview() {
             Recommended tools
           </h4>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            {landing.features.map(feat => (
-              <div
-                key={feat.appSlug}
-                className="p-3 rounded-lg border border-border bg-card"
-              >
-                <p className="font-semibold text-foreground text-sm">
-                  {feat.title}
-                </p>
-                <p className="text-xs text-muted-foreground mt-1">
-                  {feat.description}
-                </p>
+            {landing.features.map((feat) => (
+              <div key={feat.appSlug} className="p-3 rounded-lg border border-border bg-card">
+                <p className="font-semibold text-foreground text-sm">{feat.title}</p>
+                <p className="text-xs text-muted-foreground mt-1">{feat.description}</p>
               </div>
             ))}
           </div>
         </div>
 
-        <p className="text-sm italic text-muted-foreground">
-          {landing.brightonMessage}
-        </p>
+        <p className="text-sm italic text-muted-foreground">{landing.brightonMessage}</p>
 
         <div className="pt-2">
           <Button asChild size="lg">

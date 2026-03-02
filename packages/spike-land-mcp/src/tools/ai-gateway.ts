@@ -85,9 +85,7 @@ const MODEL_REGISTRY: ModelInfo[] = [
 
 function resolveModel(modelInput: string): ModelInfo | undefined {
   const lower = modelInput.toLowerCase();
-  return MODEL_REGISTRY.find(
-    (m) => m.id === lower || m.aliases.includes(lower),
-  );
+  return MODEL_REGISTRY.find((m) => m.id === lower || m.aliases.includes(lower));
 }
 
 function resolveProvider(
@@ -380,9 +378,7 @@ export function registerAiGatewayTools(
             maxOutputTokens: m.maxOutputTokens,
           }));
 
-          return textResult(
-            JSON.stringify({ models: result, count: result.length }, null, 2),
-          );
+          return textResult(JSON.stringify({ models: result, count: result.length }, null, 2));
         });
       }),
   );
@@ -394,26 +390,18 @@ export function registerAiGatewayTools(
         "ai_chat",
         "Send a message to any configured AI provider (Anthropic, OpenAI, or Google) with automatic provider/model detection.",
         {
-          message: z
-            .string()
-            .min(1)
-            .describe("The message to send to the AI model."),
+          message: z.string().min(1).describe("The message to send to the AI model."),
           provider: z
             .enum(["anthropic", "openai", "google"])
             .optional()
-            .describe(
-              "Explicit provider override. Auto-detected from model if omitted.",
-            ),
+            .describe("Explicit provider override. Auto-detected from model if omitted."),
           model: z
             .string()
             .optional()
             .describe(
               "Model ID or alias (e.g. 'opus', 'gemini-flash', 'gpt4o'). Defaults to provider's default.",
             ),
-          system_prompt: z
-            .string()
-            .optional()
-            .describe("Optional system prompt."),
+          system_prompt: z.string().optional().describe("Optional system prompt."),
           max_tokens: z
             .number()
             .int()
@@ -421,24 +409,12 @@ export function registerAiGatewayTools(
             .max(65536)
             .optional()
             .describe("Maximum output tokens."),
-          temperature: z
-            .number()
-            .min(0)
-            .max(2)
-            .optional()
-            .describe("Sampling temperature."),
+          temperature: z.number().min(0).max(2).optional().describe("Sampling temperature."),
         },
       )
       .meta({ category: "ai-gateway", tier: "workspace" })
       .handler(async ({ input }) => {
-        const {
-          message,
-          provider,
-          model,
-          system_prompt,
-          max_tokens,
-          temperature,
-        } = input;
+        const { message, provider, model, system_prompt, max_tokens, temperature } = input;
         return safeToolCall("ai_chat", async () => {
           const resolvedProvider = resolveProvider(model, provider);
           const resolvedModelInfo = model ? resolveModel(model) : undefined;
@@ -449,7 +425,14 @@ export function registerAiGatewayTools(
           if (resolvedProvider === "anthropic") {
             modelId = resolvedModelInfo?.id ?? "claude-4-6-sonnet";
             const maxTokens = max_tokens ?? resolvedModelInfo?.maxOutputTokens ?? 16384;
-            result = await callAnthropic(env, message, modelId, maxTokens, system_prompt, temperature);
+            result = await callAnthropic(
+              env,
+              message,
+              modelId,
+              maxTokens,
+              system_prompt,
+              temperature,
+            );
           } else if (resolvedProvider === "openai") {
             modelId = resolvedModelInfo?.id ?? "gpt-4o";
             const maxTokens = max_tokens ?? resolvedModelInfo?.maxOutputTokens ?? 16384;

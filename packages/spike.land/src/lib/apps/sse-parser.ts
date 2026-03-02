@@ -27,12 +27,12 @@ export function parseSSEEvent(eventData: string): SSEEvent | null {
   try {
     const parsed = JSON.parse(eventData);
     if (
-      typeof parsed !== "object"
-      || parsed === null
-      || typeof parsed.type !== "string"
-      || !VALID_SSE_TYPES.has(parsed.type)
-      || typeof parsed.data !== "object"
-      || parsed.data === null
+      typeof parsed !== "object" ||
+      parsed === null ||
+      typeof parsed.type !== "string" ||
+      !VALID_SSE_TYPES.has(parsed.type) ||
+      typeof parsed.data !== "object" ||
+      parsed.data === null
     ) {
       return null;
     }

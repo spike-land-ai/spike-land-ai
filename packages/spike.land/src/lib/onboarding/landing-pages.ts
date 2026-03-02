@@ -9,8 +9,8 @@ export interface LandingPageContent {
   slug: string;
   headline: string;
   subheadline: string;
-  painPoints: { title: string; description: string; }[];
-  features: { title: string; description: string; appSlug: string; }[];
+  painPoints: { title: string; description: string }[];
+  features: { title: string; description: string; appSlug: string }[];
   brightonMessage: string;
   ctaLabel: string;
   ctaHref: string;
@@ -886,8 +886,6 @@ export const LANDING_PAGES: LandingPageContent[] = [
 /**
  * Look up a landing page by persona slug.
  */
-export function getLandingPageBySlug(
-  slug: string,
-): LandingPageContent | undefined {
-  return LANDING_PAGES.find(lp => lp.slug === slug);
+export function getLandingPageBySlug(slug: string): LandingPageContent | undefined {
+  return LANDING_PAGES.find((lp) => lp.slug === slug);
 }

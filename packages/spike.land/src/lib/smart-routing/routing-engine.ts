@@ -38,9 +38,8 @@ export class RoutingEngine {
         const { score, factors } = calculatePriorityScore({
           analysis,
           item,
-          senderFollowers: (item.metadata as Record<string, unknown>)
-            ?.followers_count as number
-            || 0,
+          senderFollowers:
+            ((item.metadata as Record<string, unknown>)?.followers_count as number) || 0,
           settings,
         });
 
@@ -65,7 +64,7 @@ export class RoutingEngine {
         // 4. Store Suggested Responses
         if (analysis.suggestedResponses?.length) {
           await prisma.inboxSuggestedResponse.createMany({
-            data: analysis.suggestedResponses.map(content => ({
+            data: analysis.suggestedResponses.map((content) => ({
               inboxItemId: itemId,
               content,
               confidenceScore: 0.8, // Gemini doesn't give this per suggestion yet
@@ -78,8 +77,8 @@ export class RoutingEngine {
         // 5. Auto-Escalation Check
         // If sentiment is very negative or urgency is critical
         if (
-          analysis.sentimentScore <= settings.negativeSentimentThreshold
-          || analysis.urgency === "critical"
+          analysis.sentimentScore <= settings.negativeSentimentThreshold ||
+          analysis.urgency === "critical"
         ) {
           const escalationService = new EscalationService(workspaceId);
           await escalationService.escalateItem(
@@ -89,10 +88,7 @@ export class RoutingEngine {
           );
         }
       } catch (error) {
-        logger.error(
-          `Failed to process smart routing for item ${itemId}`,
-          error,
-        );
+        logger.error(`Failed to process smart routing for item ${itemId}`, error);
       }
     }
   }

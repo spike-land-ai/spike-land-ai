@@ -5,15 +5,7 @@
 
 "use client";
 
-import {
-  Clock,
-  Mic,
-  Pause,
-  Play,
-  Trash2,
-  Volume2,
-  VolumeX,
-} from "lucide-react";
+import { Clock, Mic, Pause, Play, Trash2, Volume2, VolumeX } from "lucide-react";
 import { formatTime } from "../lib/audio-engine";
 import type { AudioTrack } from "../types";
 import { Waveform } from "./Waveform";
@@ -50,12 +42,8 @@ export function TrackItem({
   const trimmedDuration = Math.max(0, effectiveTrimEnd - track.trimStart);
 
   // Normalize trim values to 0-1 for waveform display
-  const normalizedTrimStart = track.duration > 0
-    ? track.trimStart / track.duration
-    : 0;
-  const normalizedTrimEnd = track.duration > 0
-    ? effectiveTrimEnd / track.duration
-    : 1;
+  const normalizedTrimStart = track.duration > 0 ? track.trimStart / track.duration : 0;
+  const normalizedTrimEnd = track.duration > 0 ? effectiveTrimEnd / track.duration : 1;
 
   const handleTrimStartChange = (normalizedValue: number) => {
     const trimStartSeconds = normalizedValue * track.duration;
@@ -73,28 +61,20 @@ export function TrackItem({
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           {track.type === "recording" && <Mic className="w-4 h-4 text-red-400" />}
-          <span className="text-white font-medium truncate max-w-[200px]">
-            {track.name}
-          </span>
+          <span className="text-white font-medium truncate max-w-[200px]">{track.name}</span>
           <span className="text-gray-400 text-sm">
-            {trimmedDuration !== track.duration
-              ? (
-                <>
-                  {formatTime(trimmedDuration)}
-                  <span className="text-gray-500 ml-1">
-                    (from {formatTime(track.duration)})
-                  </span>
-                </>
-              )
-              : (
-                formatTime(track.duration)
-              )}
+            {trimmedDuration !== track.duration ? (
+              <>
+                {formatTime(trimmedDuration)}
+                <span className="text-gray-500 ml-1">(from {formatTime(track.duration)})</span>
+              </>
+            ) : (
+              formatTime(track.duration)
+            )}
           </span>
           {track.delay !== 0 && (
             <span className="text-blue-400 text-sm">
-              {track.delay > 0
-                ? `+${track.delay.toFixed(1)}s`
-                : `${track.delay.toFixed(1)}s`}
+              {track.delay > 0 ? `+${track.delay.toFixed(1)}s` : `${track.delay.toFixed(1)}s`}
             </span>
           )}
         </div>
@@ -133,33 +113,25 @@ export function TrackItem({
           className="p-2 rounded-full bg-blue-600 hover:bg-blue-700 text-white transition-colors"
           aria-label={track.isPlaying ? "Stop" : "Play"}
         >
-          {track.isPlaying
-            ? <Pause className="w-4 h-4" />
-            : <Play className="w-4 h-4" />}
+          {track.isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
         </button>
 
         {/* Mute/Unmute */}
         <button
           onClick={onMuteToggle}
           className={`p-2 rounded transition-colors ${
-            track.muted
-              ? "bg-red-600 text-white"
-              : "bg-gray-700 text-gray-300 hover:bg-gray-600"
+            track.muted ? "bg-red-600 text-white" : "bg-gray-700 text-gray-300 hover:bg-gray-600"
           }`}
           aria-label={track.muted ? "Unmute" : "Mute"}
         >
-          {track.muted
-            ? <VolumeX className="w-4 h-4" />
-            : <Volume2 className="w-4 h-4" />}
+          {track.muted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
         </button>
 
         {/* Solo */}
         <button
           onClick={onSoloToggle}
           className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
-            track.solo
-              ? "bg-yellow-600 text-white"
-              : "bg-gray-700 text-gray-300 hover:bg-gray-600"
+            track.solo ? "bg-yellow-600 text-white" : "bg-gray-700 text-gray-300 hover:bg-gray-600"
           }`}
           aria-label={track.solo ? "Disable solo" : "Enable solo"}
         >
@@ -175,7 +147,7 @@ export function TrackItem({
             max="1"
             step="0.01"
             value={track.volume}
-            onChange={e => onVolumeChange(parseFloat(e.target.value))}
+            onChange={(e) => onVolumeChange(parseFloat(e.target.value))}
             className="flex-1 h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-blue-600"
             aria-label="Track volume"
           />
@@ -194,14 +166,12 @@ export function TrackItem({
               max="10"
               step="0.1"
               value={track.delay}
-              onChange={e => onDelayChange(parseFloat(e.target.value))}
+              onChange={(e) => onDelayChange(parseFloat(e.target.value))}
               className="w-24 h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-blue-600"
               aria-label="Track delay"
             />
             <span className="text-gray-400 text-sm w-12 text-right">
-              {track.delay > 0
-                ? `+${track.delay.toFixed(1)}`
-                : track.delay.toFixed(1)}s
+              {track.delay > 0 ? `+${track.delay.toFixed(1)}` : track.delay.toFixed(1)}s
             </span>
           </div>
         )}

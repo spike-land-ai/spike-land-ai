@@ -11,9 +11,7 @@ interface CleanCelebrationProps {
   onDismiss?: () => void;
 }
 
-export function CleanCelebration(
-  { achievement, onDismiss }: CleanCelebrationProps,
-) {
+export function CleanCelebration({ achievement, onDismiss }: CleanCelebrationProps) {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
@@ -31,23 +29,14 @@ export function CleanCelebration(
       />
 
       {/* Confetti particles */}
-      <div
-        className="absolute inset-0 pointer-events-none overflow-hidden"
-        aria-hidden="true"
-      >
+      <div className="absolute inset-0 pointer-events-none overflow-hidden" aria-hidden="true">
         {Array.from({ length: 20 }).map((_, i) => (
           <span
             key={i}
             className="absolute block w-2 h-2 rounded-full animate-confetti"
             style={{
               left: `${Math.random() * 100}%`,
-              backgroundColor: [
-                "#f59e0b",
-                "#10b981",
-                "#3b82f6",
-                "#ec4899",
-                "#8b5cf6",
-              ][i % 5],
+              backgroundColor: ["#f59e0b", "#10b981", "#3b82f6", "#ec4899", "#8b5cf6"][i % 5],
               animationDelay: `${Math.random() * 0.5}s`,
               animationDuration: `${1.5 + Math.random()}s`,
             }}
@@ -68,17 +57,11 @@ export function CleanCelebration(
           <Trophy className="h-16 w-16 text-yellow-300 animate-bounce" />
           <div className="space-y-2">
             <p className="text-xl font-bold">Achievement Unlocked!</p>
-            <p className="text-lg font-semibold text-yellow-200">
-              {achievement.name}
-            </p>
+            <p className="text-lg font-semibold text-yellow-200">{achievement.name}</p>
             <p className="text-sm text-white/70">{achievement.description}</p>
           </div>
           {onDismiss && (
-            <Button
-              variant="secondary"
-              onClick={onDismiss}
-              className="mt-2"
-            >
+            <Button variant="secondary" onClick={onDismiss} className="mt-2">
               Awesome!
             </Button>
           )}

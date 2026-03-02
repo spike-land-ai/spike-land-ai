@@ -23,12 +23,7 @@ export function AuthGuard({ children, fallback }: AuthGuardProps) {
     if (fallback) {
       return <>{fallback}</>;
     }
-    return (
-      <Navigate
-        to="/login"
-        search={{ returnUrl: location.pathname }}
-      />
-    );
+    return <Navigate to="/login" search={{ returnUrl: location.pathname }} />;
   }
 
   return <>{children}</>;

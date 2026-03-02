@@ -102,21 +102,17 @@ describe("buildAgentUserPrompt", () => {
   });
 
   it("returns content blocks array when images provided", () => {
-    const result = buildAgentUserPrompt(["games", "tetris"], [
-      "https://example.com/img.png",
-    ]);
+    const result = buildAgentUserPrompt(["games", "tetris"], ["https://example.com/img.png"]);
     expect(Array.isArray(result)).toBe(true);
-    const blocks = result as Array<{ type: string; }>;
-    expect(blocks.some(b => b.type === "text")).toBe(true);
-    expect(blocks.some(b => b.type === "image")).toBe(true);
+    const blocks = result as Array<{ type: string }>;
+    expect(blocks.some((b) => b.type === "text")).toBe(true);
+    expect(blocks.some((b) => b.type === "image")).toBe(true);
   });
 
   it("includes reference image instruction text", () => {
-    const result = buildAgentUserPrompt(["tools"], [
-      "https://example.com/img.png",
-    ]);
-    const blocks = result as Array<{ type: string; text?: string; }>;
-    const lastTextBlock = blocks.filter(b => b.type === "text").pop();
+    const result = buildAgentUserPrompt(["tools"], ["https://example.com/img.png"]);
+    const blocks = result as Array<{ type: string; text?: string }>;
+    const lastTextBlock = blocks.filter((b) => b.type === "text").pop();
     expect(lastTextBlock?.text).toContain("reference image");
   });
 });

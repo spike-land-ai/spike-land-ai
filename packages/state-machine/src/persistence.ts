@@ -1,14 +1,14 @@
-import type { MachineExport } from "./types.js";
+import type { MachineDefinition, MachineExport, TransitionLogEntry } from "./types.js";
 
 /** Share a machine by creating/updating a database entry and returning a token. */
 export async function shareMachine(
   userId: string,
   instance: {
-    definition: any;
+    definition: MachineDefinition;
     currentStates: string[];
     context: Record<string, unknown>;
     history: Record<string, string[]>;
-    transitionLog: any[];
+    transitionLog: TransitionLogEntry[];
     initialContext: Record<string, unknown>;
   },
 ): Promise<string> {
@@ -66,14 +66,10 @@ export async function getSharedMachine(token: string): Promise<MachineExport> {
   }
 
   return {
-    definition: JSON.parse(
-      JSON.stringify(shared.definition),
-    ),
+    definition: JSON.parse(JSON.stringify(shared.definition)),
     currentStates: shared.currentStates,
     context: (shared.context ?? {}) as Record<string, unknown>,
     history: (shared.history ?? {}) as Record<string, string[]>,
-    transitionLog: JSON.parse(
-      JSON.stringify(shared.transitionLog ?? []),
-    ),
+    transitionLog: JSON.parse(JSON.stringify(shared.transitionLog ?? [])),
   };
 }

@@ -3,7 +3,6 @@ import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { logger as honoLogger } from "hono/logger";
 import { logger } from "@/lib/logger";
-import { mcpRoute } from "./routes/mcp.js";
 import { healthRoute } from "./routes/health.js";
 
 const app = new Hono();
@@ -24,7 +23,6 @@ app.use(
 
 // Routes
 app.route("/health", healthRoute);
-app.route("/api/mcp", mcpRoute);
 
 // Start server
 const port = parseInt(process.env.PORT || "3001", 10);

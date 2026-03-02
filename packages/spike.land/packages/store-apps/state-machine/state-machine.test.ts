@@ -7,62 +7,68 @@ import { createMockContext, createMockRegistry } from "../shared/test-utils";
 import { stateMachineTools } from "./tools";
 
 // Track machines in a Map
-const machineStore = new Map<string, {
-  definition: {
-    id: string;
-    name: string;
-    initial: string;
-    states: Record<
-      string,
-      {
-        id: string;
-        type: string;
-        parent?: string;
-        initial?: string;
-        entryActions: unknown[];
-        exitActions: unknown[];
-        historyType?: string;
-      }
-    >;
-    transitions: Array<
-      {
+const machineStore = new Map<
+  string,
+  {
+    definition: {
+      id: string;
+      name: string;
+      initial: string;
+      states: Record<
+        string,
+        {
+          id: string;
+          type: string;
+          parent?: string;
+          initial?: string;
+          entryActions: unknown[];
+          exitActions: unknown[];
+          historyType?: string;
+        }
+      >;
+      transitions: Array<{
         id: string;
         source: string;
         target: string;
         event: string;
-        guard?: { expression: string; };
+        guard?: { expression: string };
         actions: unknown[];
         internal: boolean;
-      }
-    >;
-  };
-  currentStates: string[];
-  context: Record<string, unknown>;
-}>();
+      }>;
+    };
+    currentStates: string[];
+    context: Record<string, unknown>;
+  }
+>();
 
 let nextId = 0;
 
 vi.mock("@/lib/state-machine/engine", () => ({
-  createMachine: vi.fn().mockImplementation(
-    (
-      opts: { name: string; initial: string; context: Record<string, unknown>; userId: string; },
-    ) => {
-      const id = `machine-${++nextId}`;
-      const machine = {
-        definition: {
-          id,
-          name: opts.name,
-          initial: opts.initial,
-          states: {},
-          transitions: [],
-        },
-        currentStates: opts.initial ? [opts.initial] : [],
-        context: opts.context,
-      };
-      machineStore.set(id, machine);
-      return { definition: machine.definition };
-    },
-  ),
+  createMachine: vi
+    .fn()
+    .mockImplementation(
+      (opts: {
+        name: string;
+        initial: string;
+        context: Record<string, unknown>;
+        userId: string;
+      }) => {
+        const id = `machine-${++nextId}`;
+        const machine = {
+          definition: {
+            id,
+            name: opts.name,
+            initial: opts.initial,
+            states: {},
+            transitions: [],
+          },
+          currentStates: opts.initial ? [opts.initial] : [],
+          context: opts.context,
+        };
+        machineStore.set(id, machine);
+        return { definition: machine.definition };
+      },
+    ),
   addState: vi.fn().mockImplementation(
     (
       machineId: string,
@@ -102,7 +108,7 @@ vi.mock("@/lib/state-machine/engine", () => ({
         source: string;
         target: string;
         event: string;
-        guard?: { expression: string; };
+        guard?: { expression: string };
         actions?: unknown[];
         internal?: boolean;
       },
@@ -135,7 +141,7 @@ vi.mock("@/lib/state-machine/engine", () => ({
     if (!m) throw new Error(`Machine ${machineId} not found`);
     const from = [...m.currentStates];
     const matching = m.definition.transitions.find(
-      t => t.source === m.currentStates[0] && t.event === event,
+      (t) => t.source === m.currentStates[0] && t.event === event,
     );
     if (!matching) throw new Error(`No transition for event ${event}`);
     m.currentStates = [matching.target];
@@ -206,7 +212,7 @@ describe("state-machine standalone tools", () => {
         ctx,
       );
       expect(result.isError).toBeFalsy();
-      const text = (result.content[0] as { text: string; }).text;
+      const text = (result.content[0] as { text: string }).text;
       expect(text).toContain("Machine Created");
       expect(text).toContain("test-machine");
     });
@@ -215,18 +221,14 @@ describe("state-machine standalone tools", () => {
   describe("sm_add_state", () => {
     it("adds a state to a machine", async () => {
       const ctx = createMockContext();
-      await registry.call(
-        "sm_create",
-        { name: "m1", initial_state: "idle" },
-        ctx,
-      );
+      await registry.call("sm_create", { name: "m1", initial_state: "idle" }, ctx);
       const result = await registry.call(
         "sm_add_state",
         { machine_id: "machine-1", state_id: "idle", type: "atomic" },
         ctx,
       );
       expect(result.isError).toBeFalsy();
-      const text = (result.content[0] as { text: string; }).text;
+      const text = (result.content[0] as { text: string }).text;
       expect(text).toContain("State Added");
     });
   });
@@ -235,16 +237,24 @@ describe("state-machine standalone tools", () => {
     it("adds a transition", async () => {
       const ctx = createMockContext();
       await registry.call("sm_create", { name: "m1", initial_state: "idle" }, ctx);
-      await registry.call("sm_add_state", {
-        machine_id: "machine-1",
-        state_id: "idle",
-        type: "atomic",
-      }, ctx);
-      await registry.call("sm_add_state", {
-        machine_id: "machine-1",
-        state_id: "active",
-        type: "atomic",
-      }, ctx);
+      await registry.call(
+        "sm_add_state",
+        {
+          machine_id: "machine-1",
+          state_id: "idle",
+          type: "atomic",
+        },
+        ctx,
+      );
+      await registry.call(
+        "sm_add_state",
+        {
+          machine_id: "machine-1",
+          state_id: "active",
+          type: "atomic",
+        },
+        ctx,
+      );
 
       const result = await registry.call(
         "sm_add_transition",
@@ -252,7 +262,7 @@ describe("state-machine standalone tools", () => {
         ctx,
       );
       expect(result.isError).toBeFalsy();
-      const text = (result.content[0] as { text: string; }).text;
+      const text = (result.content[0] as { text: string }).text;
       expect(text).toContain("Transition Added");
     });
   });
@@ -261,22 +271,34 @@ describe("state-machine standalone tools", () => {
     it("processes an event", async () => {
       const ctx = createMockContext();
       await registry.call("sm_create", { name: "m1", initial_state: "idle" }, ctx);
-      await registry.call("sm_add_state", {
-        machine_id: "machine-1",
-        state_id: "idle",
-        type: "atomic",
-      }, ctx);
-      await registry.call("sm_add_state", {
-        machine_id: "machine-1",
-        state_id: "active",
-        type: "atomic",
-      }, ctx);
-      await registry.call("sm_add_transition", {
-        machine_id: "machine-1",
-        source: "idle",
-        target: "active",
-        event: "START",
-      }, ctx);
+      await registry.call(
+        "sm_add_state",
+        {
+          machine_id: "machine-1",
+          state_id: "idle",
+          type: "atomic",
+        },
+        ctx,
+      );
+      await registry.call(
+        "sm_add_state",
+        {
+          machine_id: "machine-1",
+          state_id: "active",
+          type: "atomic",
+        },
+        ctx,
+      );
+      await registry.call(
+        "sm_add_transition",
+        {
+          machine_id: "machine-1",
+          source: "idle",
+          target: "active",
+          event: "START",
+        },
+        ctx,
+      );
 
       const result = await registry.call(
         "sm_send_event",
@@ -284,7 +306,7 @@ describe("state-machine standalone tools", () => {
         ctx,
       );
       expect(result.isError).toBeFalsy();
-      const text = (result.content[0] as { text: string; }).text;
+      const text = (result.content[0] as { text: string }).text;
       expect(text).toContain("Event Processed: START");
     });
   });
@@ -293,13 +315,9 @@ describe("state-machine standalone tools", () => {
     it("returns current state", async () => {
       const ctx = createMockContext();
       await registry.call("sm_create", { name: "m1", initial_state: "idle" }, ctx);
-      const result = await registry.call(
-        "sm_get_state",
-        { machine_id: "machine-1" },
-        ctx,
-      );
+      const result = await registry.call("sm_get_state", { machine_id: "machine-1" }, ctx);
       expect(result.isError).toBeFalsy();
-      const text = (result.content[0] as { text: string; }).text;
+      const text = (result.content[0] as { text: string }).text;
       expect(text).toContain("Current State");
       expect(text).toContain("idle");
     });
@@ -309,13 +327,9 @@ describe("state-machine standalone tools", () => {
     it("returns no issues for valid machine", async () => {
       const ctx = createMockContext();
       await registry.call("sm_create", { name: "m1", initial_state: "idle" }, ctx);
-      const result = await registry.call(
-        "sm_validate",
-        { machine_id: "machine-1" },
-        ctx,
-      );
+      const result = await registry.call("sm_validate", { machine_id: "machine-1" }, ctx);
       expect(result.isError).toBeFalsy();
-      const text = (result.content[0] as { text: string; }).text;
+      const text = (result.content[0] as { text: string }).text;
       expect(text).toContain("No issues found");
     });
   });
@@ -324,13 +338,9 @@ describe("state-machine standalone tools", () => {
     it("exports machine as JSON", async () => {
       const ctx = createMockContext();
       await registry.call("sm_create", { name: "m1", initial_state: "idle" }, ctx);
-      const result = await registry.call(
-        "sm_export",
-        { machine_id: "machine-1" },
-        ctx,
-      );
+      const result = await registry.call("sm_export", { machine_id: "machine-1" }, ctx);
       expect(result.isError).toBeFalsy();
-      const text = (result.content[0] as { text: string; }).text;
+      const text = (result.content[0] as { text: string }).text;
       expect(text).toContain("Machine Export");
     });
   });
@@ -339,19 +349,16 @@ describe("state-machine standalone tools", () => {
     it("lists all templates", async () => {
       const result = await registry.call("sm_list_templates", {});
       expect(result.isError).toBeFalsy();
-      const text = (result.content[0] as { text: string; }).text;
+      const text = (result.content[0] as { text: string }).text;
       expect(text).toContain("State Machine Templates");
       expect(text).toContain("auth-flow");
       expect(text).toContain("shopping-cart");
     });
 
     it("filters by category", async () => {
-      const result = await registry.call(
-        "sm_list_templates",
-        { category: "iot" },
-      );
+      const result = await registry.call("sm_list_templates", { category: "iot" });
       expect(result.isError).toBeFalsy();
-      const text = (result.content[0] as { text: string; }).text;
+      const text = (result.content[0] as { text: string }).text;
       expect(text).toContain("traffic-light");
       expect(text).toContain("elevator");
     });
@@ -366,7 +373,7 @@ describe("state-machine standalone tools", () => {
         ctx,
       );
       expect(result.isError).toBeFalsy();
-      const text = (result.content[0] as { text: string; }).text;
+      const text = (result.content[0] as { text: string }).text;
       expect(text).toContain("Machine Created from Template");
       expect(text).toContain("Authentication Flow");
     });
@@ -386,11 +393,15 @@ describe("state-machine standalone tools", () => {
     it("generates TypeScript code", async () => {
       const ctx = createMockContext();
       await registry.call("sm_create", { name: "test", initial_state: "idle" }, ctx);
-      await registry.call("sm_add_state", {
-        machine_id: "machine-1",
-        state_id: "idle",
-        type: "atomic",
-      }, ctx);
+      await registry.call(
+        "sm_add_state",
+        {
+          machine_id: "machine-1",
+          state_id: "idle",
+          type: "atomic",
+        },
+        ctx,
+      );
 
       const result = await registry.call(
         "sm_generate_code",
@@ -398,7 +409,7 @@ describe("state-machine standalone tools", () => {
         ctx,
       );
       expect(result.isError).toBeFalsy();
-      const text = (result.content[0] as { text: string; }).text;
+      const text = (result.content[0] as { text: string }).text;
       expect(text).toContain("Generated Code (typescript)");
     });
 
@@ -412,7 +423,7 @@ describe("state-machine standalone tools", () => {
         ctx,
       );
       expect(result.isError).toBeFalsy();
-      const text = (result.content[0] as { text: string; }).text;
+      const text = (result.content[0] as { text: string }).text;
       expect(text).toContain("stateDiagram-v2");
     });
   });
@@ -421,22 +432,34 @@ describe("state-machine standalone tools", () => {
     it("simulates event sequence", async () => {
       const ctx = createMockContext();
       await registry.call("sm_create", { name: "sim", initial_state: "idle" }, ctx);
-      await registry.call("sm_add_state", {
-        machine_id: "machine-1",
-        state_id: "idle",
-        type: "atomic",
-      }, ctx);
-      await registry.call("sm_add_state", {
-        machine_id: "machine-1",
-        state_id: "active",
-        type: "atomic",
-      }, ctx);
-      await registry.call("sm_add_transition", {
-        machine_id: "machine-1",
-        source: "idle",
-        target: "active",
-        event: "START",
-      }, ctx);
+      await registry.call(
+        "sm_add_state",
+        {
+          machine_id: "machine-1",
+          state_id: "idle",
+          type: "atomic",
+        },
+        ctx,
+      );
+      await registry.call(
+        "sm_add_state",
+        {
+          machine_id: "machine-1",
+          state_id: "active",
+          type: "atomic",
+        },
+        ctx,
+      );
+      await registry.call(
+        "sm_add_transition",
+        {
+          machine_id: "machine-1",
+          source: "idle",
+          target: "active",
+          event: "START",
+        },
+        ctx,
+      );
 
       const result = await registry.call(
         "sm_simulate_sequence",
@@ -444,7 +467,7 @@ describe("state-machine standalone tools", () => {
         ctx,
       );
       expect(result.isError).toBeFalsy();
-      const text = (result.content[0] as { text: string; }).text;
+      const text = (result.content[0] as { text: string }).text;
       expect(text).toContain("Simulation Complete");
       expect(text).toContain("START");
     });
@@ -455,13 +478,9 @@ describe("state-machine standalone tools", () => {
       const ctx = createMockContext();
       await registry.call("sm_create", { name: "share-test", initial_state: "idle" }, ctx);
 
-      const result = await registry.call(
-        "sm_share",
-        { machine_id: "machine-1" },
-        ctx,
-      );
+      const result = await registry.call("sm_share", { machine_id: "machine-1" }, ctx);
       expect(result.isError).toBeFalsy();
-      const text = (result.content[0] as { text: string; }).text;
+      const text = (result.content[0] as { text: string }).text;
       expect(text).toContain("Machine Shared Successfully");
       expect(text).toContain("share-token-123");
     });
@@ -469,10 +488,7 @@ describe("state-machine standalone tools", () => {
 
   describe("sm_get_shared", () => {
     it("retrieves shared machine data", async () => {
-      const result = await registry.call(
-        "sm_get_shared",
-        { token: "share-token-123" },
-      );
+      const result = await registry.call("sm_get_shared", { token: "share-token-123" });
       expect(result.isError).toBeFalsy();
     });
   });

@@ -93,11 +93,15 @@ describe("proxy route", () => {
     app.route("/", proxy);
 
     const env = createMockEnv();
-    const res = await app.request("/proxy/stripe", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({}),
-    }, env);
+    const res = await app.request(
+      "/proxy/stripe",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({}),
+      },
+      env,
+    );
 
     expect(res.status).toBe(400);
     const body = await res.json<{ error: string }>();
@@ -109,11 +113,15 @@ describe("proxy route", () => {
     app.route("/", proxy);
 
     const env = createMockEnv();
-    const res = await app.request("/proxy/stripe", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ url: "https://evil.com/steal" }),
-    }, env);
+    const res = await app.request(
+      "/proxy/stripe",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url: "https://evil.com/steal" }),
+      },
+      env,
+    );
 
     expect(res.status).toBe(400);
     const body = await res.json<{ error: string }>();
@@ -125,11 +133,15 @@ describe("proxy route", () => {
     app.route("/", proxy);
 
     const env = createMockEnv();
-    const res = await app.request("/proxy/github", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ url: "https://evil.com/steal" }),
-    }, env);
+    const res = await app.request(
+      "/proxy/github",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url: "https://evil.com/steal" }),
+      },
+      env,
+    );
 
     expect(res.status).toBe(400);
     const body = await res.json<{ error: string }>();

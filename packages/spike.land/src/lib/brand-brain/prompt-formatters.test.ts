@@ -50,10 +50,7 @@ describe("formatGuardrails", () => {
   });
 
   it("formats guardrails with emoji severity in score style", () => {
-    const result = formatGuardrails(
-      [makeGuardrail({ severity: "CRITICAL" })],
-      "score",
-    );
+    const result = formatGuardrails([makeGuardrail({ severity: "CRITICAL" })], "score");
     // CRITICAL emoji is red circle
     expect(result).toContain("\uD83D\uDD34");
   });
@@ -68,10 +65,7 @@ describe("formatGuardrails", () => {
   });
 
   it("shows description or fallback", () => {
-    const withDesc = formatGuardrails(
-      [makeGuardrail({ description: "Keep it clean" })],
-      "draft",
-    );
+    const withDesc = formatGuardrails([makeGuardrail({ description: "Keep it clean" })], "draft");
     expect(withDesc).toContain("Keep it clean");
 
     const noDesc = formatGuardrails(
@@ -83,10 +77,7 @@ describe("formatGuardrails", () => {
 
   it("joins multiple guardrails with newlines", () => {
     const result = formatGuardrails(
-      [
-        makeGuardrail({ name: "Rule A" }),
-        makeGuardrail({ name: "Rule B" }),
-      ],
+      [makeGuardrail({ name: "Rule A" }), makeGuardrail({ name: "Rule B" })],
       "rewrite",
     );
     expect(result).toContain("Rule A");
@@ -110,19 +101,13 @@ describe("formatVocabulary", () => {
   });
 
   it("formats banned terms for rewrite style", () => {
-    const result = formatVocabulary(
-      [makeVocab({ type: "BANNED", term: "cheap" })],
-      "rewrite",
-    );
+    const result = formatVocabulary([makeVocab({ type: "BANNED", term: "cheap" })], "rewrite");
     expect(result).toContain("Banned Terms (MUST replace)");
     expect(result).toContain("cheap");
   });
 
   it("formats banned terms for score style", () => {
-    const result = formatVocabulary(
-      [makeVocab({ type: "BANNED", term: "cheap" })],
-      "score",
-    );
+    const result = formatVocabulary([makeVocab({ type: "BANNED", term: "cheap" })], "score");
     expect(result).toContain("Banned Terms");
     expect(result).not.toContain("MUST replace");
   });
@@ -141,7 +126,7 @@ describe("formatVocabulary", () => {
       "rewrite",
     );
     expect(result).toContain("Required Replacements");
-    expect(result).toContain("\"cheap\" -> \"affordable\"");
+    expect(result).toContain('"cheap" -> "affordable"');
   });
 
   it("uses unicode arrow for score style", () => {

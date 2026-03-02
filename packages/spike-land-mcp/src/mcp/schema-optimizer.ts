@@ -87,7 +87,9 @@ function isRedundantDescription(propertyName: string, description: string): bool
 
 function isSchemaObject(key: string, value: unknown): value is Record<string, unknown> {
   const schemaKeys = ["items", "additionalProperties", "not", "if", "then", "else"];
-  return schemaKeys.includes(key) && typeof value === "object" && value !== null && !Array.isArray(value);
+  return (
+    schemaKeys.includes(key) && typeof value === "object" && value !== null && !Array.isArray(value)
+  );
 }
 
 function isSchemaArray(key: string, value: unknown): value is unknown[] {

@@ -19,10 +19,7 @@ interface CreateClaudeChatStreamParams {
   question: string;
   systemPrompt: string;
   maxTokens?: number;
-  onComplete?: (
-    fullAnswer: string,
-    usage: { input_tokens: number; output_tokens: number; },
-  ) => void;
+  onComplete?: (fullAnswer: string, usage: { input_tokens: number; output_tokens: number }) => void;
 }
 
 /**
@@ -31,9 +28,7 @@ interface CreateClaudeChatStreamParams {
  * Uses withClaudeClient for automatic multi-token fallback on 401 errors.
  * Client disconnections (aborted/cancelled) are handled gracefully.
  */
-export function createClaudeChatStream(
-  params: CreateClaudeChatStreamParams,
-): ReadableStream {
+export function createClaudeChatStream(params: CreateClaudeChatStreamParams): ReadableStream {
   const { question, systemPrompt, maxTokens = 512, onComplete } = params;
   let cancelled = false;
 
@@ -66,7 +61,7 @@ export function createClaudeChatStream(
       };
 
       try {
-        await withClaudeClient(async anthropic => {
+        await withClaudeClient(async (anthropic) => {
           const messageStream = anthropic.messages.stream({
             model: "claude-haiku-4-5-20251001",
             max_tokens: maxTokens,
@@ -78,10 +73,7 @@ export function createClaudeChatStream(
             for await (const event of messageStream) {
               if (cancelled) return;
 
-              if (
-                event.type === "content_block_delta"
-                && event.delta.type === "text_delta"
-              ) {
+              if (event.type === "content_block_delta" && event.delta.type === "text_delta") {
                 fullAnswer += event.delta.text;
                 const data = JSON.stringify({
                   type: "text",
@@ -113,9 +105,7 @@ export function createClaudeChatStream(
         safeClose();
       } catch (error) {
         if (cancelled || isAbortError(error)) {
-          logger.debug(
-            "[Claude stream] Client disconnected, ending gracefully",
-          );
+          logger.debug("[Claude stream] Client disconnected, ending gracefully");
           return;
         }
 

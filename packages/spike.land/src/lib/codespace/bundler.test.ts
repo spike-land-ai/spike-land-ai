@@ -5,15 +5,11 @@ import { BROWSER_DEFINE, serverFetchPlugin } from "./bundler";
 describe("bundler", () => {
   describe("BROWSER_DEFINE", () => {
     it("should set NODE_ENV to production", () => {
-      expect(BROWSER_DEFINE["process.env['NODE_ENV']"]).toBe(
-        JSON.stringify("production"),
-      );
+      expect(BROWSER_DEFINE["process.env['NODE_ENV']"]).toBe(JSON.stringify("production"));
     });
 
     it("should set platform to browser", () => {
-      expect(BROWSER_DEFINE["process.platform"]).toBe(
-        JSON.stringify("browser"),
-      );
+      expect(BROWSER_DEFINE["process.platform"]).toBe(JSON.stringify("browser"));
     });
 
     it("should set process.browser to true", () => {
@@ -56,11 +52,11 @@ describe("bundler", () => {
       const loadCbs: Array<(args: OnLoadArgs) => unknown> = [];
 
       const build = {
-        onResolve: vi.fn().mockImplementation(
-          (_opts: unknown, cb: (args: OnResolveArgs) => unknown) => {
+        onResolve: vi
+          .fn()
+          .mockImplementation((_opts: unknown, cb: (args: OnResolveArgs) => unknown) => {
             resolveCbs.push(cb);
-          },
-        ),
+          }),
         onLoad: vi.fn().mockImplementation((_opts: unknown, cb: (args: OnLoadArgs) => unknown) => {
           loadCbs.push(cb);
         }),
@@ -129,8 +125,8 @@ describe("bundler", () => {
         path: "/lucide-react?bundle=true",
       });
       expect(result).toBeDefined();
-      expect((result as { path: string; }).path).toContain("lucide-react");
-      expect((result as { namespace: string; }).namespace).toBe("http-url");
+      expect((result as { path: string }).path).toContain("lucide-react");
+      expect((result as { namespace: string }).namespace).toBe("http-url");
     });
 
     it("should resolve /@/ paths via component worker URL", async () => {
@@ -139,8 +135,8 @@ describe("bundler", () => {
         path: "/@/components/ui/button.mjs",
       });
       expect(result).toBeDefined();
-      expect((result as { path: string; }).path).toContain("/@/components/ui/button.mjs");
-      expect((result as { namespace: string; }).namespace).toBe("http-url");
+      expect((result as { path: string }).path).toContain("/@/components/ui/button.mjs");
+      expect((result as { namespace: string }).namespace).toBe("http-url");
     });
 
     it("should resolve @/ bare specifiers via component worker URL", async () => {
@@ -149,8 +145,8 @@ describe("bundler", () => {
         path: "@/components/ui/card",
       });
       expect(result).toBeDefined();
-      expect((result as { path: string; }).path).toContain("@/components/ui/card");
-      expect((result as { namespace: string; }).namespace).toBe("http-url");
+      expect((result as { path: string }).path).toContain("@/components/ui/card");
+      expect((result as { namespace: string }).namespace).toBe("http-url");
     });
 
     it("should resolve unknown bare specifiers via esm.sh CDN", async () => {
@@ -159,8 +155,8 @@ describe("bundler", () => {
         path: "some-unknown-package",
       });
       expect(result).toBeDefined();
-      expect((result as { path: string; }).path).toContain("esm.sh/some-unknown-package");
-      expect((result as { namespace: string; }).namespace).toBe("http-url");
+      expect((result as { path: string }).path).toContain("esm.sh/some-unknown-package");
+      expect((result as { namespace: string }).namespace).toBe("http-url");
     });
 
     it("should return cached content on load", async () => {
@@ -177,7 +173,7 @@ describe("bundler", () => {
       } as OnLoadArgs);
 
       expect(result).toBeDefined();
-      expect((result as { contents: string; }).contents).toBe("export default React;");
+      expect((result as { contents: string }).contents).toBe("export default React;");
     });
 
     it("should fetch and cache content on cache miss", async () => {
@@ -200,8 +196,8 @@ describe("bundler", () => {
       } as OnLoadArgs);
 
       expect(result).toBeDefined();
-      expect((result as { contents: string; }).contents).toBe("console.log('hello');");
-      expect((result as { loader: string; }).loader).toBe("js");
+      expect((result as { contents: string }).contents).toBe("console.log('hello');");
+      expect((result as { loader: string }).loader).toBe("js");
       expect(cache.has("https://esm.sh/test-pkg")).toBe(true);
 
       vi.restoreAllMocks();
@@ -221,8 +217,8 @@ describe("bundler", () => {
       } as OnLoadArgs);
 
       expect(result).toBeDefined();
-      expect((result as { contents: string; }).contents).toContain("Fetch error");
-      expect((result as { loader: string; }).loader).toBe("js");
+      expect((result as { contents: string }).contents).toContain("Fetch error");
+      expect((result as { loader: string }).loader).toBe("js");
 
       vi.restoreAllMocks();
     });
@@ -247,8 +243,8 @@ describe("bundler", () => {
       } as OnLoadArgs);
 
       expect(result).toBeDefined();
-      expect((result as { contents: string; }).contents).toContain("Failed to fetch");
-      expect((result as { contents: string; }).contents).toContain("404");
+      expect((result as { contents: string }).contents).toContain("Failed to fetch");
+      expect((result as { contents: string }).contents).toContain("404");
 
       vi.restoreAllMocks();
     });
@@ -273,14 +269,14 @@ describe("bundler", () => {
       } as OnLoadArgs);
 
       expect(result).toBeDefined();
-      expect((result as { loader: string; }).loader).toBe("css");
+      expect((result as { loader: string }).loader).toBe("css");
 
       vi.restoreAllMocks();
     });
 
     it("should detect JSON loader from path extension", async () => {
       const cache = new Map<string, string>();
-      cache.set("https://example.com/data.json", "{\"key\":\"value\"}");
+      cache.set("https://example.com/data.json", '{"key":"value"}');
       const { loadCbs } = setupPlugin(cache);
 
       const result = await loadCbs[0]!({
@@ -292,7 +288,7 @@ describe("bundler", () => {
       } as OnLoadArgs);
 
       expect(result).toBeDefined();
-      expect((result as { loader: string; }).loader).toBe("json");
+      expect((result as { loader: string }).loader).toBe("json");
     });
 
     it("should detect tsx loader from path extension", async () => {
@@ -309,7 +305,7 @@ describe("bundler", () => {
       } as OnLoadArgs);
 
       expect(result).toBeDefined();
-      expect((result as { loader: string; }).loader).toBe("tsx");
+      expect((result as { loader: string }).loader).toBe("tsx");
     });
 
     it("should detect ts loader from path extension", async () => {
@@ -326,7 +322,7 @@ describe("bundler", () => {
       } as OnLoadArgs);
 
       expect(result).toBeDefined();
-      expect((result as { loader: string; }).loader).toBe("ts");
+      expect((result as { loader: string }).loader).toBe("ts");
     });
 
     it("should detect binary loader for font content-type", async () => {
@@ -364,7 +360,7 @@ describe("bundler", () => {
       } as OnLoadArgs);
 
       expect(result).toBeDefined();
-      expect((result as { contents: string; }).contents).toContain("Failed to read");
+      expect((result as { contents: string }).contents).toContain("Failed to read");
 
       vi.restoreAllMocks();
     });
@@ -374,7 +370,7 @@ describe("bundler", () => {
       const { loadCbs } = setupPlugin(cache);
 
       // CSS file with an @import statement
-      const cssWithImport = "@import url(\"reset.css\");\nbody { color: red; }";
+      const cssWithImport = '@import url("reset.css");\nbody { color: red; }';
       const importedCss = "* { margin: 0; }";
 
       vi.spyOn(globalThis, "fetch")
@@ -398,9 +394,9 @@ describe("bundler", () => {
       } as OnLoadArgs);
 
       expect(result).toBeDefined();
-      expect((result as { loader: string; }).loader).toBe("css");
+      expect((result as { loader: string }).loader).toBe("css");
       // The processed CSS should inline the import
-      expect((result as { contents: string; }).contents).toContain("margin: 0");
+      expect((result as { contents: string }).contents).toContain("margin: 0");
 
       vi.restoreAllMocks();
     });
@@ -409,7 +405,7 @@ describe("bundler", () => {
       const cache = new Map<string, string>();
       const { loadCbs } = setupPlugin(cache);
 
-      const cssWithImport = "@import \"broken.css\";\nbody { color: blue; }";
+      const cssWithImport = '@import "broken.css";\nbody { color: blue; }';
 
       vi.spyOn(globalThis, "fetch")
         .mockResolvedValueOnce({
@@ -431,7 +427,7 @@ describe("bundler", () => {
       } as OnLoadArgs);
 
       expect(result).toBeDefined();
-      expect((result as { contents: string; }).contents).toContain("Failed to load");
+      expect((result as { contents: string }).contents).toContain("Failed to load");
 
       vi.restoreAllMocks();
     });
@@ -440,7 +436,7 @@ describe("bundler", () => {
       const cache = new Map<string, string>();
       const { loadCbs } = setupPlugin(cache);
 
-      const cssWithUrl = "body { background: url(\"bg.png\"); }";
+      const cssWithUrl = 'body { background: url("bg.png"); }';
 
       vi.spyOn(globalThis, "fetch")
         .mockResolvedValueOnce({
@@ -463,7 +459,7 @@ describe("bundler", () => {
       } as OnLoadArgs);
 
       expect(result).toBeDefined();
-      expect((result as { loader: string; }).loader).toBe("css");
+      expect((result as { loader: string }).loader).toBe("css");
 
       vi.restoreAllMocks();
     });
@@ -472,7 +468,7 @@ describe("bundler", () => {
       const cache = new Map<string, string>();
       const { loadCbs } = setupPlugin(cache);
 
-      const cssWithFont = "@font-face { src: url(\"font.woff2\"); }";
+      const cssWithFont = '@font-face { src: url("font.woff2"); }';
       const fontBuffer = new ArrayBuffer(4);
       new Uint8Array(fontBuffer).set([0, 1, 2, 3]);
 
@@ -497,7 +493,7 @@ describe("bundler", () => {
       } as OnLoadArgs);
 
       expect(result).toBeDefined();
-      const contents = (result as { contents: string; }).contents;
+      const contents = (result as { contents: string }).contents;
       expect(contents).toContain("data:font/woff2;base64,");
 
       vi.restoreAllMocks();
@@ -507,14 +503,13 @@ describe("bundler", () => {
       const cache = new Map<string, string>();
       const { loadCbs } = setupPlugin(cache);
 
-      const cssWithDataUrl = "body { background: url(\"data:image/png;base64,abc\"); }";
+      const cssWithDataUrl = 'body { background: url("data:image/png;base64,abc"); }';
 
-      vi.spyOn(globalThis, "fetch")
-        .mockResolvedValueOnce({
-          ok: true,
-          text: () => Promise.resolve(cssWithDataUrl),
-          headers: new Headers({ "content-type": "text/css" }),
-        } as unknown as Response);
+      vi.spyOn(globalThis, "fetch").mockResolvedValueOnce({
+        ok: true,
+        text: () => Promise.resolve(cssWithDataUrl),
+        headers: new Headers({ "content-type": "text/css" }),
+      } as unknown as Response);
 
       const result = await loadCbs[0]!({
         path: "https://example.com/inline.css",
@@ -526,7 +521,7 @@ describe("bundler", () => {
 
       expect(result).toBeDefined();
       // data: URL should be preserved as-is
-      const contents = (result as { contents: string; }).contents;
+      const contents = (result as { contents: string }).contents;
       expect(contents).toContain("data:image/png;base64,abc");
 
       vi.restoreAllMocks();
@@ -536,7 +531,7 @@ describe("bundler", () => {
       const cache = new Map<string, string>();
       const { loadCbs } = setupPlugin(cache);
 
-      const cssWithUrl = "body { background: url(\"missing.png\"); }";
+      const cssWithUrl = 'body { background: url("missing.png"); }';
 
       vi.spyOn(globalThis, "fetch")
         .mockResolvedValueOnce({
@@ -555,7 +550,7 @@ describe("bundler", () => {
       } as OnLoadArgs);
 
       expect(result).toBeDefined();
-      const contents = (result as { contents: string; }).contents;
+      const contents = (result as { contents: string }).contents;
       expect(contents).toContain("Failed");
 
       vi.restoreAllMocks();

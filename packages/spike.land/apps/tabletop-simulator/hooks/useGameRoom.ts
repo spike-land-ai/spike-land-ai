@@ -17,9 +17,12 @@ export function useGameRoom(roomId: string) {
   const { handleIncomingData, broadcastUpdate, sendFullState } = usePeerDataChannel(doc);
 
   // Wrap handleIncomingData to log and ignore peerId parameter
-  const onPeerData = useCallback((data: unknown) => {
-    handleIncomingData(data);
-  }, [handleIncomingData]);
+  const onPeerData = useCallback(
+    (data: unknown) => {
+      handleIncomingData(data);
+    },
+    [handleIncomingData],
+  );
 
   // Pass the data handler directly to usePeerConnection
   // This ensures the listener is attached immediately when connection opens
@@ -53,7 +56,7 @@ export function useGameRoom(roomId: string) {
     });
 
     // Clean up tracking for disconnected peers
-    sentFullStateTo.current.forEach(peerId => {
+    sentFullStateTo.current.forEach((peerId) => {
       if (!connections.has(peerId)) {
         sentFullStateTo.current.delete(peerId);
       }

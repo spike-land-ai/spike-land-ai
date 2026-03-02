@@ -65,10 +65,7 @@ export function getPeerServerConfig() {
 /**
  * Create a PeerJS configuration object
  */
-export function createPeerConfig(
-  role: "host" | "client",
-  peerId?: string,
-): PeerConfig {
+export function createPeerConfig(role: "host" | "client", peerId?: string): PeerConfig {
   return {
     peerId,
     role,

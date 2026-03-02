@@ -6,19 +6,14 @@ import { getStoreIcon } from "@/app/store/components/store-icon-map";
 import { ArrowLeft, Info } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 export function AppHeader() {
   const pathname = usePathname();
 
   // Find the current app based on the URL
-  const currentApp = STORE_APPS.find(app =>
-    app.appUrl && pathname.startsWith(app.appUrl) && app.appUrl !== "/apps"
+  const currentApp = STORE_APPS.find(
+    (app) => app.appUrl && pathname.startsWith(app.appUrl) && app.appUrl !== "/apps",
   );
 
   if (!currentApp) {
@@ -51,9 +46,7 @@ export function AppHeader() {
             </div>
             <div className="flex flex-col">
               <div className="flex items-center gap-2">
-                <h1 className="text-sm font-semibold leading-none text-white">
-                  {currentApp.name}
-                </h1>
+                <h1 className="text-sm font-semibold leading-none text-white">{currentApp.name}</h1>
                 {currentApp.isCodespaceNative && (
                   <span className="text-[8px] px-1 py-0.5 rounded bg-emerald-500/20 text-emerald-400 font-black uppercase tracking-widest border border-emerald-500/20">
                     AI Native

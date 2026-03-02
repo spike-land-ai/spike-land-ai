@@ -6,8 +6,7 @@ interface EnvironmentRegistryEntry {
   healthEndpoint: string;
 }
 
-const VERCEL_PROJECT_URL = process.env.VERCEL_PROJECT_PRODUCTION_URL
-  ?? "spike.land";
+const VERCEL_PROJECT_URL = process.env.VERCEL_PROJECT_PRODUCTION_URL ?? "spike.land";
 
 const ENVIRONMENT_REGISTRY: readonly EnvironmentRegistryEntry[] = [
   {
@@ -28,10 +27,8 @@ const ENVIRONMENT_REGISTRY: readonly EnvironmentRegistryEntry[] = [
 ] as const;
 
 /** Get the registry entry for a single environment */
-export function getEnvironmentConfig(
-  name: EnvironmentName,
-): EnvironmentRegistryEntry | undefined {
-  return ENVIRONMENT_REGISTRY.find(e => e.name === name);
+export function getEnvironmentConfig(name: EnvironmentName): EnvironmentRegistryEntry | undefined {
+  return ENVIRONMENT_REGISTRY.find((e) => e.name === name);
 }
 
 /** Get all environment registry entries */
@@ -92,7 +89,5 @@ export async function checkEnvironmentHealth(
 
 /** Check health of all registered environments in parallel */
 export async function checkAllEnvironments(): Promise<EnvironmentInfo[]> {
-  return Promise.all(
-    ENVIRONMENT_REGISTRY.map(entry => checkEnvironmentHealth(entry)),
-  );
+  return Promise.all(ENVIRONMENT_REGISTRY.map((entry) => checkEnvironmentHealth(entry)));
 }

@@ -16,10 +16,12 @@ vi.mock("@/lib/upstash/client", () => ({ redis: mockRedis }));
 vi.mock("@/lib/agents/github-issues", () => mockGithubIssues);
 vi.mock("@/lib/try-catch", () => ({
   tryCatch: (p: Promise<unknown>) =>
-    p.then(data => ({ data, error: null })).catch(error => ({
-      data: null,
-      error,
-    })),
+    p
+      .then((data) => ({ data, error: null }))
+      .catch((error) => ({
+        data: null,
+        error,
+      })),
 }));
 
 import { triggerGitHubAlert } from "./404-alert";
@@ -53,9 +55,7 @@ describe("triggerGitHubAlert", () => {
     mockRedis.get.mockResolvedValue(null);
     mockRedis.set.mockResolvedValue("OK");
     mockGithubIssues.listIssues.mockResolvedValue({
-      data: [
-        { title: "[404 Alert] Repeated 404 hits on /admin/foo", state: "open" },
-      ],
+      data: [{ title: "[404 Alert] Repeated 404 hits on /admin/foo", state: "open" }],
       error: null,
     });
 
@@ -88,8 +88,7 @@ describe("triggerGitHubAlert", () => {
       }),
     );
     // Verify body contains the URL and date
-    const callBody = mockGithubIssues.createIssue.mock.calls[0]![0]!
-      .body as string;
+    const callBody = mockGithubIssues.createIssue.mock.calls[0]![0]!.body as string;
     expect(callBody).toContain("/admin/foo");
     expect(callBody).toContain("2026-02-18");
   });
@@ -111,8 +110,6 @@ describe("triggerGitHubAlert", () => {
       created: false,
       reason: "api_error: API rate limited",
     });
-    expect(mockRedis.del).toHaveBeenCalledWith(
-      "404:alerted:2026-02-18:/admin/foo",
-    );
+    expect(mockRedis.del).toHaveBeenCalledWith("404:alerted:2026-02-18:/admin/foo");
   });
 });

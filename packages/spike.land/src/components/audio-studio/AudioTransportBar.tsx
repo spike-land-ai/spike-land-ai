@@ -66,12 +66,7 @@ export function AudioTransportBar({
           aria-label={isRecording ? "Stop recording" : "Record"}
           aria-pressed={isRecording}
         >
-          <Circle
-            className={cn(
-              "h-4 w-4",
-              isRecording && "fill-red-400 animate-pulse",
-            )}
-          />
+          <Circle className={cn("h-4 w-4", isRecording && "fill-red-400 animate-pulse")} />
         </Button>
       </div>
 

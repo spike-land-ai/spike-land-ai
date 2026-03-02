@@ -25,11 +25,11 @@ export function SkillsBar({ query }: SkillsBarProps) {
       className="overflow-hidden"
     >
       <div className="flex flex-wrap items-center gap-1.5 pt-2">
-        <span className="text-xs text-muted-foreground font-medium">
-          Skills:
-        </span>
+        <span className="text-xs text-muted-foreground font-medium">Skills:</span>
         <AnimatePresence mode="popLayout">
-          {skills.map((skill, i) => <SkillBadge key={skill.id} skill={skill} index={i} />)}
+          {skills.map((skill, i) => (
+            <SkillBadge key={skill.id} skill={skill} index={i} />
+          ))}
         </AnimatePresence>
       </div>
     </motion.div>

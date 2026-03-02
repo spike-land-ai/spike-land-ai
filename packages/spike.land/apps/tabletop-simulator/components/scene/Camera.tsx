@@ -1,7 +1,7 @@
 "use client";
 import { OrbitControls } from "@react-three/drei";
 
-export function GameCamera({ mode }: { mode: "orbit" | "interaction"; }) {
+export function GameCamera({ mode }: { mode: "orbit" | "interaction" }) {
   return (
     <OrbitControls
       makeDefault

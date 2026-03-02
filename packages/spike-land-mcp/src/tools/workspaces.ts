@@ -60,7 +60,12 @@ export function registerWorkspacesTools(
     t
       .tool("workspaces_create", "Create a new workspace and become its owner.", {
         name: z.string().min(2).max(50).describe("Workspace name (2-50 chars)."),
-        slug: z.string().min(1).max(40).optional().describe("URL-safe slug (auto-generated if omitted)."),
+        slug: z
+          .string()
+          .min(1)
+          .max(40)
+          .optional()
+          .describe("URL-safe slug (auto-generated if omitted)."),
       })
       .meta({ category: "workspaces", tier: "free" })
       .handler(async ({ input, ctx }) => {
@@ -102,10 +107,10 @@ export function registerWorkspacesTools(
         });
 
         return textResult(
-          `**Workspace Created!**\n\n`
-          + `**ID:** ${workspaceId}\n`
-          + `**Name:** ${name}\n`
-          + `**Slug:** ${finalSlug}`,
+          `**Workspace Created!**\n\n` +
+            `**ID:** ${workspaceId}\n` +
+            `**Name:** ${name}\n` +
+            `**Slug:** ${finalSlug}`,
         );
       }),
   );
@@ -141,10 +146,13 @@ export function registerWorkspacesTools(
             updatedAt: workspaces.updatedAt,
           })
           .from(workspaces)
-          .innerJoin(workspaceMembers, and(
-            eq(workspaceMembers.workspaceId, workspaces.id),
-            eq(workspaceMembers.userId, ctx.userId),
-          ))
+          .innerJoin(
+            workspaceMembers,
+            and(
+              eq(workspaceMembers.workspaceId, workspaces.id),
+              eq(workspaceMembers.userId, ctx.userId),
+            ),
+          )
           .where(and(...conditions))
           .limit(1);
 
@@ -155,14 +163,14 @@ export function registerWorkspacesTools(
           );
         }
         return textResult(
-          `**Workspace**\n\n`
-          + `**ID:** ${workspace.id}\n`
-          + `**Name:** ${workspace.name}\n`
-          + `**Slug:** ${workspace.slug}\n`
-          + `**Description:** ${workspace.description || "(none)"}\n`
-          + `**Plan:** ${workspace.plan}\n`
-          + `**Created:** ${new Date(workspace.createdAt).toISOString()}\n`
-          + `**Updated:** ${new Date(workspace.updatedAt).toISOString()}`,
+          `**Workspace**\n\n` +
+            `**ID:** ${workspace.id}\n` +
+            `**Name:** ${workspace.name}\n` +
+            `**Slug:** ${workspace.slug}\n` +
+            `**Description:** ${workspace.description || "(none)"}\n` +
+            `**Plan:** ${workspace.plan}\n` +
+            `**Created:** ${new Date(workspace.createdAt).toISOString()}\n` +
+            `**Updated:** ${new Date(workspace.updatedAt).toISOString()}`,
         );
       }),
   );
@@ -187,10 +195,7 @@ export function registerWorkspacesTools(
           );
         }
 
-        await ctx.db
-          .update(workspaces)
-          .set(data)
-          .where(eq(workspaces.id, workspace_id));
+        await ctx.db.update(workspaces).set(data).where(eq(workspaces.id, workspace_id));
 
         return textResult(
           `**Workspace Updated!** ${name || "(unchanged)"} (${newSlug || "(unchanged)"})`,

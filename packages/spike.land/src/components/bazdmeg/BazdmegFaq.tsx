@@ -32,8 +32,8 @@ export function BazdmegFaq({ onFaqExpanded }: BazdmegFaqProps) {
 
   useEffect(() => {
     fetch("/api/bazdmeg/faq")
-      .then(res => res.json())
-      .then((data: { entries: FaqEntry[]; }) => {
+      .then((res) => res.json())
+      .then((data: { entries: FaqEntry[] }) => {
         setEntries(data.entries || []);
       })
       .catch(() => {
@@ -45,15 +45,15 @@ export function BazdmegFaq({ onFaqExpanded }: BazdmegFaqProps) {
   const handleHelpful = useCallback(
     async (id: string) => {
       if (helpedIds.has(id)) return;
-      setHelpedIds(prev => new Set(prev).add(id));
+      setHelpedIds((prev) => new Set(prev).add(id));
 
       const res = await fetch(`/api/bazdmeg/faq/${id}/helpful`, {
         method: "POST",
       });
       if (res.ok) {
-        const data = (await res.json()) as { helpfulCount: number; };
-        setEntries(prev =>
-          prev.map(e => e.id === id ? { ...e, helpfulCount: data.helpfulCount } : e)
+        const data = (await res.json()) as { helpfulCount: number };
+        setEntries((prev) =>
+          prev.map((e) => (e.id === id ? { ...e, helpfulCount: data.helpfulCount } : e)),
         );
       }
     },
@@ -71,13 +71,13 @@ export function BazdmegFaq({ onFaqExpanded }: BazdmegFaqProps) {
   );
 
   // Group entries by category
-  const categories = [...new Set(entries.map(e => e.category))];
+  const categories = [...new Set(entries.map((e) => e.category))];
 
   if (loading) {
     return (
       <div className="space-y-4">
         <Skeleton className="h-8 w-48 mx-auto bg-white/10" />
-        {[0, 1, 2].map(i => (
+        {[0, 1, 2].map((i) => (
           <motion.div
             key={i}
             initial={{ opacity: 0, y: 10 }}
@@ -125,9 +125,7 @@ export function BazdmegFaq({ onFaqExpanded }: BazdmegFaqProps) {
                 <span className="flex items-center gap-3">
                   <span
                     className={`inline-block w-1.5 h-1.5 rounded-full shrink-0 transition-all duration-300 ${
-                      isOpen
-                        ? "bg-amber-400 shadow-[0_0_6px_rgba(245,158,11,0.6)]"
-                        : "bg-zinc-600"
+                      isOpen ? "bg-amber-400 shadow-[0_0_6px_rgba(245,158,11,0.6)]" : "bg-zinc-600"
                     }`}
                   />
                   {entry.question}
@@ -135,16 +133,12 @@ export function BazdmegFaq({ onFaqExpanded }: BazdmegFaqProps) {
               </AccordionTrigger>
               <AccordionContent className="px-5 pb-5">
                 <div className="pl-[18px] border-l border-amber-500/20">
-                  <p className="mb-4 leading-relaxed text-zinc-300">
-                    {entry.answer}
-                  </p>
+                  <p className="mb-4 leading-relaxed text-zinc-300">{entry.answer}</p>
                   <AnimatePresence>
                     <motion.button
                       onClick={() => handleHelpful(entry.id)}
                       disabled={helpedIds.has(entry.id)}
-                      whileHover={!helpedIds.has(entry.id)
-                        ? { scale: 1.05 }
-                        : {}}
+                      whileHover={!helpedIds.has(entry.id) ? { scale: 1.05 } : {}}
                       whileTap={!helpedIds.has(entry.id) ? { scale: 0.95 } : {}}
                       className={`inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-medium transition-all duration-200 ${
                         helpedIds.has(entry.id)
@@ -200,7 +194,7 @@ export function BazdmegFaq({ onFaqExpanded }: BazdmegFaqProps) {
       <div className="mx-auto max-w-3xl">
         <Tabs defaultValue={categories[0] ?? ""} className="w-full">
           <TabsList className="mb-8 w-full justify-start bg-white/5 rounded-xl p-1">
-            {categories.map(cat => (
+            {categories.map((cat) => (
               <TabsTrigger
                 key={cat}
                 value={cat}
@@ -210,9 +204,9 @@ export function BazdmegFaq({ onFaqExpanded }: BazdmegFaqProps) {
               </TabsTrigger>
             ))}
           </TabsList>
-          {categories.map(cat => (
+          {categories.map((cat) => (
             <TabsContent key={cat} value={cat}>
-              {renderEntries(entries.filter(e => e.category === cat))}
+              {renderEntries(entries.filter((e) => e.category === cat))}
             </TabsContent>
           ))}
         </Tabs>

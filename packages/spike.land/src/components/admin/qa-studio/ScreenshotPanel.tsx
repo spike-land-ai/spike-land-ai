@@ -75,14 +75,12 @@ export function ScreenshotPanel() {
             <Camera className="h-4 w-4 text-primary" />
             Screenshot
           </CardTitle>
-          <Button
-            size="sm"
-            onClick={handleCapture}
-            disabled={status === "loading"}
-          >
-            {status === "loading"
-              ? <Loader2 className="h-3.5 w-3.5 animate-spin mr-1.5" />
-              : <Camera className="h-3.5 w-3.5 mr-1.5" />}
+          <Button size="sm" onClick={handleCapture} disabled={status === "loading"}>
+            {status === "loading" ? (
+              <Loader2 className="h-3.5 w-3.5 animate-spin mr-1.5" />
+            ) : (
+              <Camera className="h-3.5 w-3.5 mr-1.5" />
+            )}
             Capture
           </Button>
         </div>
@@ -94,7 +92,7 @@ export function ScreenshotPanel() {
               <SelectValue placeholder="Viewport" />
             </SelectTrigger>
             <SelectContent>
-              {VIEWPORT_PRESETS.map(preset => (
+              {VIEWPORT_PRESETS.map((preset) => (
                 <SelectItem key={preset.value} value={preset.value}>
                   {preset.label}
                 </SelectItem>
@@ -108,11 +106,7 @@ export function ScreenshotPanel() {
             >
               Full page
             </label>
-            <Switch
-              id="fullpage-toggle"
-              checked={fullPage}
-              onCheckedChange={setFullPage}
-            />
+            <Switch id="fullpage-toggle" checked={fullPage} onCheckedChange={setFullPage} />
           </div>
         </div>
 

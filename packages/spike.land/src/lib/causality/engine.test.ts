@@ -29,11 +29,7 @@ describe("Causality engine", () => {
       expect(system.processOrder).toHaveLength(3);
       expect(system.clockType).toBe("lamport");
       expect(system.userId).toBe(userId);
-      expect(system.processOrder).toEqual([
-        "process-1",
-        "process-2",
-        "process-3",
-      ]);
+      expect(system.processOrder).toEqual(["process-1", "process-2", "process-3"]);
       // Verify initial Lamport clocks are at time=0
       for (const pid of system.processOrder) {
         const clock = system.processes.get(pid)!;
@@ -75,7 +71,7 @@ describe("Causality engine", () => {
           name: "bad",
           processCount: 1,
           clockType: "lamport",
-        })
+        }),
       ).toThrow("Process count must be between 2 and 7");
       expect(() =>
         createSystem({
@@ -83,7 +79,7 @@ describe("Causality engine", () => {
           name: "bad",
           processCount: 8,
           clockType: "vector",
-        })
+        }),
       ).toThrow("Process count must be between 2 and 7");
     });
   });
@@ -125,13 +121,7 @@ describe("Causality engine", () => {
       localEvent(system.id, userId, "process-1", "prepare");
 
       // Process-1 sends to process-2
-      const result = sendEvent(
-        system.id,
-        userId,
-        "process-1",
-        "process-2",
-        "msg1",
-      );
+      const result = sendEvent(system.id, userId, "process-1", "process-2", "msg1");
 
       // Send event: sender clock was 1, incremented to 2
       expect(result.sendEvent.clock.type).toBe("lamport");
@@ -148,9 +138,7 @@ describe("Causality engine", () => {
       expect(result.receiveEvent.label).toBe("receive(msg1)");
 
       // Receive event should have the send event as a causal parent
-      expect(result.receiveEvent.causalParents).toContain(
-        result.sendEvent.id,
-      );
+      expect(result.receiveEvent.causalParents).toContain(result.sendEvent.id);
     });
 
     it("should compare events with clear ordering", () => {
@@ -245,13 +233,7 @@ describe("Causality engine", () => {
       localEvent(system.id, userId, "process-2", "b1");
 
       // process-1 sends to process-2
-      const result = sendEvent(
-        system.id,
-        userId,
-        "process-1",
-        "process-2",
-        "data",
-      );
+      const result = sendEvent(system.id, userId, "process-1", "process-2", "data");
 
       // Send event increments process-1's clock: {p1:3, p2:0}
       if (result.sendEvent.clock.type === "vector") {
@@ -278,21 +260,10 @@ describe("Causality engine", () => {
       const evtA = localEvent(system.id, userId, "process-1", "first");
 
       // process-1 sends to process-2
-      const { receiveEvent } = sendEvent(
-        system.id,
-        userId,
-        "process-1",
-        "process-2",
-        "msg",
-      );
+      const { receiveEvent } = sendEvent(system.id, userId, "process-1", "process-2", "msg");
 
       // evtA should happen before the receive event
-      const result = compareEvents(
-        system.id,
-        userId,
-        evtA.id,
-        receiveEvent.id,
-      );
+      const result = compareEvents(system.id, userId, evtA.id, receiveEvent.id);
       expect(result.relation).toBe("happens_before");
       expect(result.explanation).toContain("happens before");
     });
@@ -368,9 +339,7 @@ describe("Causality engine", () => {
         processCount: 2,
         clockType: "lamport",
       });
-      expect(() => inspect(system.id, userId, "process-99")).toThrow(
-        "not found",
-      );
+      expect(() => inspect(system.id, userId, "process-99")).toThrow("not found");
     });
   });
 
@@ -397,10 +366,10 @@ describe("Causality engine", () => {
       const timeline = getTimeline(system.id, userId);
 
       // Find indices
-      const idx1 = timeline.findIndex(e => e.id === evt1.id);
-      const idxS = timeline.findIndex(e => e.id === sEvt.id);
-      const idxR = timeline.findIndex(e => e.id === rEvt.id);
-      const idx4 = timeline.findIndex(e => e.id === evt4.id);
+      const idx1 = timeline.findIndex((e) => e.id === evt1.id);
+      const idxS = timeline.findIndex((e) => e.id === sEvt.id);
+      const idxR = timeline.findIndex((e) => e.id === rEvt.id);
+      const idx4 = timeline.findIndex((e) => e.id === evt4.id);
 
       // Topological order: evt1 before send, send before receive, receive before evt4
       expect(idx1).toBeLessThan(idxS);
@@ -443,9 +412,7 @@ describe("Causality engine", () => {
         processCount: 2,
         clockType: "lamport",
       });
-      expect(() => destroySystem(system.id, "other-user")).toThrow(
-        "Access denied",
-      );
+      expect(() => destroySystem(system.id, "other-user")).toThrow("Access denied");
     });
 
     it("should deny localEvent from different userId", () => {
@@ -455,8 +422,9 @@ describe("Causality engine", () => {
         processCount: 2,
         clockType: "lamport",
       });
-      expect(() => localEvent(system.id, "other-user", "process-1", "sneaky"))
-        .toThrow("Access denied");
+      expect(() => localEvent(system.id, "other-user", "process-1", "sneaky")).toThrow(
+        "Access denied",
+      );
     });
 
     it("should deny sendEvent from different userId", () => {
@@ -479,8 +447,7 @@ describe("Causality engine", () => {
         clockType: "lamport",
       });
       const evt = localEvent(system.id, userId, "process-1", "a");
-      expect(() => compareEvents(system.id, "other-user", evt.id, evt.id))
-        .toThrow("Access denied");
+      expect(() => compareEvents(system.id, "other-user", evt.id, evt.id)).toThrow("Access denied");
     });
   });
 
@@ -507,7 +474,7 @@ describe("Causality engine", () => {
 
       const list = listSystems(userId);
       expect(list).toHaveLength(2);
-      expect(list.map(s => s.name).sort()).toEqual(["mine1", "mine2"]);
+      expect(list.map((s) => s.name).sort()).toEqual(["mine1", "mine2"]);
     });
 
     it("should include correct summary information", () => {
@@ -587,13 +554,9 @@ describe("Causality engine", () => {
 
       const evt = localEvent(system.id, userId, "process-1", "a");
 
-      expect(() => compareEvents(system.id, userId, "evt-999", evt.id)).toThrow(
-        "not found",
-      );
+      expect(() => compareEvents(system.id, userId, "evt-999", evt.id)).toThrow("not found");
 
-      expect(() => compareEvents(system.id, userId, evt.id, "evt-999")).toThrow(
-        "not found",
-      );
+      expect(() => compareEvents(system.id, userId, evt.id, "evt-999")).toThrow("not found");
     });
   });
 });

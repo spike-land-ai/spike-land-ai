@@ -39,15 +39,11 @@ describe("learnit/utils", () => {
     });
 
     it("should remove image syntax but keep alt text", () => {
-      expect(stripMarkdown("![Logo](http://example.com/logo.png)")).toBe(
-        "Logo",
-      );
+      expect(stripMarkdown("![Logo](http://example.com/logo.png)")).toBe("Logo");
     });
 
     it("should remove link syntax but keep text", () => {
-      expect(stripMarkdown("[Click here](http://example.com)")).toBe(
-        "Click here",
-      );
+      expect(stripMarkdown("[Click here](http://example.com)")).toBe("Click here");
     });
 
     it("should remove headings", () => {

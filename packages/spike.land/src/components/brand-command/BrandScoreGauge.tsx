@@ -61,9 +61,7 @@ export function BrandScoreGauge({ score, label }: BrandScoreGaugeProps) {
         </svg>
         {/* Center score number */}
         <div className="absolute inset-0 flex items-center justify-center">
-          <span className={cn("text-2xl font-bold font-mono", textColorClass)}>
-            {clampedScore}
-          </span>
+          <span className={cn("text-2xl font-bold font-mono", textColorClass)}>{clampedScore}</span>
         </div>
       </div>
       {label && <span className="text-sm text-zinc-400 text-center">{label}</span>}

@@ -7,19 +7,15 @@ export interface CodespaceResponse {
   error?: string;
   url?: string;
   /** Structured errors from esbuild when transpilation fails. */
-  structuredErrors?: Array<{ line?: number; column?: number; message: string; }>;
+  structuredErrors?: Array<{ line?: number; column?: number; message: string }>;
 }
 
 /**
  * Syncs a codespace with the testing.spike.land backend worker.
  */
-export async function syncCodespaceWithWorker(
-  codespaceId: string,
-  code: string,
-): Promise<boolean> {
+export async function syncCodespaceWithWorker(codespaceId: string, code: string): Promise<boolean> {
   try {
-    const componentUrl = process.env.SPIKE_LAND_COMPONENT_URL
-      ?? "https://testing.spike.land";
+    const componentUrl = process.env.SPIKE_LAND_COMPONENT_URL ?? "https://testing.spike.land";
     const response = await fetch(`${componentUrl}/api-v1/${codespaceId}/code`, {
       method: "PUT",
       headers: {
@@ -30,9 +26,7 @@ export async function syncCodespaceWithWorker(
 
     if (!response.ok) {
       const text = await response.text();
-      logger.warn(
-        `Failed to sync codespace ${codespaceId} with worker: ${text}`,
-      );
+      logger.warn(`Failed to sync codespace ${codespaceId} with worker: ${text}`);
       return false;
     }
 
@@ -77,7 +71,7 @@ export async function updateCodespace(
     });
 
     // PUSH to testing.spike.land as well!
-    syncCodespaceWithWorker(codespaceId, code).catch(err => {
+    syncCodespaceWithWorker(codespaceId, code).catch((err) => {
       logger.error(`Background sync failed for ${codespaceId}:`, { err });
     });
 
@@ -113,7 +107,7 @@ export function generateCodespaceId(slug: string): string {
   let hash = 0;
   for (let i = 0; i < slug.length; i++) {
     const char = slug.charCodeAt(i);
-    hash = ((hash << 5) - hash) + char;
+    hash = (hash << 5) - hash + char;
     hash = hash & hash; // Convert to 32-bit integer
   }
   const hashHex = Math.abs(hash).toString(16).padStart(8, "0").slice(0, 8);

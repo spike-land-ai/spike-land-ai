@@ -13,9 +13,10 @@ const MAX_RESPONSE_SIZE = 8192;
  * Format a text result, truncating if too long.
  */
 export function textResult(text: string): CallToolResult {
-  const truncated = text.length > MAX_RESPONSE_SIZE
-    ? text.slice(0, MAX_RESPONSE_SIZE) + "\n...(truncated, response exceeded 8KB)"
-    : text;
+  const truncated =
+    text.length > MAX_RESPONSE_SIZE
+      ? text.slice(0, MAX_RESPONSE_SIZE) + "\n...(truncated, response exceeded 8KB)"
+      : text;
   return { content: [{ type: "text", text: truncated }] };
 }
 
@@ -48,20 +49,20 @@ export function errorResult(message: string): CallToolResult {
 export async function safeToolCall(
   toolName: string,
   handler: () => Promise<CallToolResult>,
-  options?: { timeoutMs?: number; },
+  options?: { timeoutMs?: number },
 ): Promise<CallToolResult> {
   try {
     const handlerPromise = handler();
     const result = options?.timeoutMs
       ? await Promise.race([
-        handlerPromise,
-        new Promise<never>((_, reject) =>
-          setTimeout(
-            () => reject(new Error(`Tool ${toolName} timed out after ${options.timeoutMs}ms`)),
-            options.timeoutMs,
-          )
-        ),
-      ])
+          handlerPromise,
+          new Promise<never>((_, reject) =>
+            setTimeout(
+              () => reject(new Error(`Tool ${toolName} timed out after ${options.timeoutMs}ms`)),
+              options.timeoutMs,
+            ),
+          ),
+        ])
       : await handlerPromise;
 
     return result;

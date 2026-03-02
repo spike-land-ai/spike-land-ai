@@ -21,7 +21,7 @@ export interface AudienceDemographics {
   /** Gender distribution, keys are "male" | "female" | "other" */
   genderSplit: Record<string, number>;
   /** Top geographic regions by estimated share */
-  topRegions: Array<{ region: string; share: number; }>;
+  topRegions: Array<{ region: string; share: number }>;
   /** Primary language(s) of the audience */
   primaryLanguages: string[];
 }
@@ -107,16 +107,13 @@ when specific data is unavailable. Always include confidence scores.`;
  *
  * @param input - Audience data to analyse
  */
-export async function analyzeAudience(
-  input: AudienceAnalysisInput,
-): Promise<AudienceInsight> {
+export async function analyzeAudience(input: AudienceAnalysisInput): Promise<AudienceInsight> {
   const geminiAvailable = await isGeminiConfigured().catch(() => false);
 
   if (!geminiAvailable) {
-    logger.info(
-      "Gemini not configured — using heuristic audience analysis",
-      { platform: input.platform },
-    );
+    logger.info("Gemini not configured — using heuristic audience analysis", {
+      platform: input.platform,
+    });
     return buildHeuristicInsight(input);
   }
 
@@ -212,9 +209,7 @@ export async function recommendBudget(
   const dailyReachTarget = Math.ceil(audienceSize * 0.1);
   const dailyBudgetUsd = (dailyReachTarget / 1000) * cpm;
   const totalCampaignBudgetUsd = dailyBudgetUsd * durationDays;
-  const estimatedReach = Math.ceil(
-    (totalCampaignBudgetUsd / cpm) * 1000,
-  );
+  const estimatedReach = Math.ceil((totalCampaignBudgetUsd / cpm) * 1000);
 
   // Confidence based on audience size — larger audiences have more data points
   let confidence: "low" | "medium" | "high";
@@ -290,9 +285,7 @@ function buildAnalysisPrompt(input: AudienceAnalysisInput): string {
     input.engagementRate !== undefined
       ? `- Engagement rate: ${(input.engagementRate * 100).toFixed(2)}%`
       : "",
-    input.topContentTypes?.length
-      ? `- Top content types: ${input.topContentTypes.join(", ")}`
-      : "",
+    input.topContentTypes?.length ? `- Top content types: ${input.topContentTypes.join(", ")}` : "",
     input.knownDemographics
       ? `- Known demographics: ${JSON.stringify(input.knownDemographics)}`
       : "",
@@ -303,24 +296,25 @@ function buildAnalysisPrompt(input: AudienceAnalysisInput): string {
     "recommendations: string[]",
     "confidence: number between 0 and 1",
   ]
-    .filter(l => l !== undefined)
+    .filter((l) => l !== undefined)
     .join("\n");
 }
 
 function buildHeuristicInsight(input: AudienceAnalysisInput): AudienceInsight {
   const platform = input.platform.toLowerCase();
   return {
-    summary:
-      `Heuristic analysis for a ${input.platform} audience of ${input.audienceSize.toLocaleString()} based on industry benchmarks.`,
+    summary: `Heuristic analysis for a ${input.platform} audience of ${input.audienceSize.toLocaleString()} based on industry benchmarks.`,
     demographics: {
-      ageRanges: platform === "linkedin"
-        ? { "25-34": 0.33, "35-54": 0.39, "18-24": 0.17, "55+": 0.11 }
-        : platform === "tiktok"
-          ? { "18-24": 0.42, "25-34": 0.31, "13-17": 0.16, "35+": 0.11 }
-          : { "18-24": 0.29, "25-34": 0.32, "35-44": 0.21, "45+": 0.18 },
-      genderSplit: platform === "pinterest"
-        ? { female: 0.76, male: 0.17, other: 0.07 }
-        : { male: 0.51, female: 0.44, other: 0.05 },
+      ageRanges:
+        platform === "linkedin"
+          ? { "25-34": 0.33, "35-54": 0.39, "18-24": 0.17, "55+": 0.11 }
+          : platform === "tiktok"
+            ? { "18-24": 0.42, "25-34": 0.31, "13-17": 0.16, "35+": 0.11 }
+            : { "18-24": 0.29, "25-34": 0.32, "35-44": 0.21, "45+": 0.18 },
+      genderSplit:
+        platform === "pinterest"
+          ? { female: 0.76, male: 0.17, other: 0.07 }
+          : { male: 0.51, female: 0.44, other: 0.05 },
       topRegions: [
         { region: "United States", share: 0.35 },
         { region: "United Kingdom", share: 0.08 },
@@ -354,19 +348,20 @@ function mergeWithDefaults(
       ageRanges: parsed.demographics?.ageRanges ?? fallback.demographics.ageRanges,
       genderSplit: parsed.demographics?.genderSplit ?? fallback.demographics.genderSplit,
       topRegions: parsed.demographics?.topRegions ?? fallback.demographics.topRegions,
-      primaryLanguages: parsed.demographics?.primaryLanguages
-        ?? fallback.demographics.primaryLanguages,
+      primaryLanguages:
+        parsed.demographics?.primaryLanguages ?? fallback.demographics.primaryLanguages,
     },
     interests: {
       categories: parsed.interests?.categories ?? fallback.interests.categories,
-      peakEngagementWindows: parsed.interests?.peakEngagementWindows
-        ?? fallback.interests.peakEngagementWindows,
+      peakEngagementWindows:
+        parsed.interests?.peakEngagementWindows ?? fallback.interests.peakEngagementWindows,
       deviceSplit: parsed.interests?.deviceSplit ?? fallback.interests.deviceSplit,
     },
     recommendations: parsed.recommendations ?? fallback.recommendations,
-    confidence: typeof parsed.confidence === "number"
-      ? Math.min(Math.max(parsed.confidence, 0), 1)
-      : fallback.confidence,
+    confidence:
+      typeof parsed.confidence === "number"
+        ? Math.min(Math.max(parsed.confidence, 0), 1)
+        : fallback.confidence,
     analyzedAt: new Date(),
   };
 }
@@ -380,8 +375,8 @@ function buildHeuristicRationale(
 ): string {
   const goal = campaignGoal ? ` for ${campaignGoal}` : "";
   return (
-    `Based on ${platform} CPM benchmarks and an audience of ${audienceSize.toLocaleString()}, `
-    + `a daily budget of $${dailyBudgetUsd.toFixed(2)} is recommended${goal}. `
-    + `Running for ${durationDays} days should provide sufficient data to optimise targeting and creative performance.`
+    `Based on ${platform} CPM benchmarks and an audience of ${audienceSize.toLocaleString()}, ` +
+    `a daily budget of $${dailyBudgetUsd.toFixed(2)} is recommended${goal}. ` +
+    `Running for ${durationDays} days should provide sufficient data to optimise targeting and creative performance.`
   );
 }

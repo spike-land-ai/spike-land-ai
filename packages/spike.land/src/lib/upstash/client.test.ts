@@ -61,9 +61,7 @@ describe("upstash/client", () => {
       expect(id).toBeTruthy();
       expect(typeof id).toBe("string");
       // UUID v4 pattern
-      expect(id).toMatch(
-        /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i,
-      );
+      expect(id).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i);
     });
   });
 
@@ -75,18 +73,12 @@ describe("upstash/client", () => {
 
       await clientModule.enqueueMessage("app-1", "msg-123");
 
-      expect(mockRedisMethods.lpush).toHaveBeenCalledWith(
-        "app:app-1:pending_messages",
-        "msg-123",
-      );
+      expect(mockRedisMethods.lpush).toHaveBeenCalledWith("app:app-1:pending_messages", "msg-123");
       expect(mockRedisMethods.expire).toHaveBeenCalledWith(
         "app:app-1:pending_messages",
         86400, // 24 hours
       );
-      expect(mockRedisMethods.sadd).toHaveBeenCalledWith(
-        "apps:with_pending",
-        "app-1",
-      );
+      expect(mockRedisMethods.sadd).toHaveBeenCalledWith("apps:with_pending", "app-1");
     });
   });
 
@@ -99,13 +91,8 @@ describe("upstash/client", () => {
       const result = await clientModule.dequeueMessage("app-1");
 
       expect(result).toBe("msg-123");
-      expect(mockRedisMethods.rpop).toHaveBeenCalledWith(
-        "app:app-1:pending_messages",
-      );
-      expect(mockRedisMethods.srem).toHaveBeenCalledWith(
-        "apps:with_pending",
-        "app-1",
-      );
+      expect(mockRedisMethods.rpop).toHaveBeenCalledWith("app:app-1:pending_messages");
+      expect(mockRedisMethods.srem).toHaveBeenCalledWith("apps:with_pending", "app-1");
     });
 
     it("should not remove app from set when queue still has messages", async () => {
@@ -136,11 +123,7 @@ describe("upstash/client", () => {
       const result = await clientModule.getPendingMessages("app-1");
 
       expect(result).toEqual(["msg-1", "msg-2", "msg-3"]);
-      expect(mockRedisMethods.lrange).toHaveBeenCalledWith(
-        "app:app-1:pending_messages",
-        0,
-        -1,
-      );
+      expect(mockRedisMethods.lrange).toHaveBeenCalledWith("app:app-1:pending_messages", 0, -1);
     });
 
     it("should return empty array when no messages pending", async () => {
@@ -159,9 +142,7 @@ describe("upstash/client", () => {
       const result = await clientModule.getAppsWithPending();
 
       expect(result).toEqual(["app-1", "app-2"]);
-      expect(mockRedisMethods.smembers).toHaveBeenCalledWith(
-        "apps:with_pending",
-      );
+      expect(mockRedisMethods.smembers).toHaveBeenCalledWith("apps:with_pending");
     });
   });
 
@@ -172,10 +153,7 @@ describe("upstash/client", () => {
       const result = await clientModule.hasPendingMessages("app-1");
 
       expect(result).toBe(true);
-      expect(mockRedisMethods.sismember).toHaveBeenCalledWith(
-        "apps:with_pending",
-        "app-1",
-      );
+      expect(mockRedisMethods.sismember).toHaveBeenCalledWith("apps:with_pending", "app-1");
     });
 
     it("should return false when app has no pending messages", async () => {
@@ -194,9 +172,7 @@ describe("upstash/client", () => {
       const result = await clientModule.getPendingCount("app-1");
 
       expect(result).toBe(5);
-      expect(mockRedisMethods.llen).toHaveBeenCalledWith(
-        "app:app-1:pending_messages",
-      );
+      expect(mockRedisMethods.llen).toHaveBeenCalledWith("app:app-1:pending_messages");
     });
   });
 
@@ -206,11 +182,9 @@ describe("upstash/client", () => {
 
       await clientModule.setAgentWorking("app-1", true);
 
-      expect(mockRedisMethods.set).toHaveBeenCalledWith(
-        "app:app-1:agent_working",
-        "1",
-        { ex: 300 },
-      );
+      expect(mockRedisMethods.set).toHaveBeenCalledWith("app:app-1:agent_working", "1", {
+        ex: 300,
+      });
     });
 
     it("should delete working flag when false", async () => {
@@ -218,9 +192,7 @@ describe("upstash/client", () => {
 
       await clientModule.setAgentWorking("app-1", false);
 
-      expect(mockRedisMethods.del).toHaveBeenCalledWith(
-        "app:app-1:agent_working",
-      );
+      expect(mockRedisMethods.del).toHaveBeenCalledWith("app:app-1:agent_working");
     });
   });
 
@@ -249,16 +221,9 @@ describe("upstash/client", () => {
 
       await clientModule.clearPendingMessages("app-1");
 
-      expect(mockRedisMethods.del).toHaveBeenCalledWith(
-        "app:app-1:pending_messages",
-      );
-      expect(mockRedisMethods.srem).toHaveBeenCalledWith(
-        "apps:with_pending",
-        "app-1",
-      );
-      expect(mockRedisMethods.del).toHaveBeenCalledWith(
-        "app:app-1:agent_working",
-      );
+      expect(mockRedisMethods.del).toHaveBeenCalledWith("app:app-1:pending_messages");
+      expect(mockRedisMethods.srem).toHaveBeenCalledWith("apps:with_pending", "app-1");
+      expect(mockRedisMethods.del).toHaveBeenCalledWith("app:app-1:agent_working");
     });
   });
 
@@ -297,11 +262,7 @@ describe("upstash/client", () => {
 
       await clientModule.setMcpAgentActive("app-1");
 
-      expect(mockRedisMethods.set).toHaveBeenCalledWith(
-        "mcp_agent_active:app-1",
-        "1",
-        { ex: 300 },
-      );
+      expect(mockRedisMethods.set).toHaveBeenCalledWith("mcp_agent_active:app-1", "1", { ex: 300 });
     });
   });
 
@@ -336,13 +297,7 @@ describe("upstash/client", () => {
       expect(mockRedisMethods.eval).toHaveBeenCalledWith(
         expect.stringContaining("PUBLISH"),
         ["sse:app-1:events"],
-        [
-          "sse:app-1",
-          expect.stringContaining("\"type\":\"update\""),
-          "60",
-          "0",
-          "99",
-        ],
+        ["sse:app-1", expect.stringContaining('"type":"update"'), "60", "0", "99"],
       );
     });
 
@@ -443,13 +398,9 @@ describe("upstash/client", () => {
       ];
 
       mockRedisMethods.eval.mockRejectedValue(new Error("Script error"));
-      mockRedisMethods.lrange.mockResolvedValue(
-        events.map(e => JSON.stringify(e)),
-      );
+      mockRedisMethods.lrange.mockResolvedValue(events.map((e) => JSON.stringify(e)));
 
-      const consoleSpy = vi
-        .spyOn(console, "error")
-        .mockImplementation(() => {});
+      const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
 
       const result = await clientModule.getSSEEvents("app-1", 150);
 
@@ -475,9 +426,7 @@ describe("upstash/client", () => {
         },
       ]);
 
-      const consoleSpy = vi
-        .spyOn(console, "error")
-        .mockImplementation(() => {});
+      const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
 
       const result = await clientModule.getSSEEvents("app-1", 100);
 
@@ -495,9 +444,7 @@ describe("upstash/client", () => {
       const result = await clientModule.getCodeHash("app-1");
 
       expect(result).toBe("abc123hash");
-      expect(mockRedisMethods.get).toHaveBeenCalledWith(
-        "app:app-1:code_hash",
-      );
+      expect(mockRedisMethods.get).toHaveBeenCalledWith("app:app-1:code_hash");
     });
 
     it("should return null when no hash is stored", async () => {
@@ -515,11 +462,9 @@ describe("upstash/client", () => {
 
       await clientModule.setCodeHash("app-1", "abc123hash");
 
-      expect(mockRedisMethods.set).toHaveBeenCalledWith(
-        "app:app-1:code_hash",
-        "abc123hash",
-        { ex: 3600 },
-      );
+      expect(mockRedisMethods.set).toHaveBeenCalledWith("app:app-1:code_hash", "abc123hash", {
+        ex: 3600,
+      });
     });
   });
 
@@ -574,16 +519,18 @@ describe("getQueueStats", () => {
 
     const evalMock = vi.fn().mockResolvedValue(expectedStats);
 
-    (Redis as unknown as any).mockImplementation(function() {
-      return {
-        eval: evalMock,
-      };
-    });
+    (Redis as unknown as { mockImplementation: (fn: () => unknown) => void }).mockImplementation(
+      function () {
+        return {
+          eval: evalMock,
+        };
+      },
+    );
 
     const result = await clientModule.getQueueStats();
 
     expect(evalMock).toHaveBeenCalledWith(
-      expect.stringContaining("local apps = redis.call(\"SMEMBERS\", KEYS[1])"),
+      expect.stringContaining('local apps = redis.call("SMEMBERS", KEYS[1])'),
       ["apps:with_pending"],
       [],
     );
@@ -602,17 +549,20 @@ describe("getQueueStats", () => {
 
     // Fallback calls
     const smembersMock = vi.fn().mockResolvedValue(appIds);
-    const llenMock = vi.fn()
+    const llenMock = vi
+      .fn()
       .mockResolvedValueOnce(5) // app-1 has 5 messages
       .mockResolvedValueOnce(3); // app-2 has 3 messages
 
-    (Redis as unknown as any).mockImplementation(function() {
-      return {
-        eval: evalMock,
-        smembers: smembersMock,
-        llen: llenMock,
-      };
-    });
+    (Redis as unknown as { mockImplementation: (fn: () => unknown) => void }).mockImplementation(
+      function () {
+        return {
+          eval: evalMock,
+          smembers: smembersMock,
+          llen: llenMock,
+        };
+      },
+    );
 
     // Silence console.error for this test
     const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
@@ -641,13 +591,15 @@ describe("getQueueStats", () => {
     const smembersMock = vi.fn().mockResolvedValue([]);
     const llenMock = vi.fn();
 
-    (Redis as unknown as any).mockImplementation(function() {
-      return {
-        eval: evalMock,
-        smembers: smembersMock,
-        llen: llenMock,
-      };
-    });
+    (Redis as unknown as { mockImplementation: (fn: () => unknown) => void }).mockImplementation(
+      function () {
+        return {
+          eval: evalMock,
+          smembers: smembersMock,
+          llen: llenMock,
+        };
+      },
+    );
 
     // Silence console.error for this test
     const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});

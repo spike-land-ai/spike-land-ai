@@ -71,7 +71,7 @@ function formatTriggerType(triggerType: string): string {
   return triggerType
     .replace(/_/g, " ")
     .toLowerCase()
-    .replace(/\b\w/g, c => c.toUpperCase());
+    .replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
 export function CrisisAlertEmail({
@@ -121,11 +121,7 @@ export function CrisisAlertEmail({
         <Text style={alertTitleStyle}>
           {styles.emoji} {severity} SEVERITY: {title}
         </Text>
-        <Text
-          style={{ ...emailStyles.text, margin: "0", whiteSpace: "pre-line" }}
-        >
-          {message}
-        </Text>
+        <Text style={{ ...emailStyles.text, margin: "0", whiteSpace: "pre-line" }}>{message}</Text>
       </Section>
 
       <Section style={detailsBoxStyle}>
@@ -142,9 +138,7 @@ export function CrisisAlertEmail({
         <table style={{ width: "100%", borderCollapse: "collapse" }}>
           <tbody>
             <tr>
-              <td style={{ padding: "8px 0", color: "#6b7280" }}>
-                Trigger Type:
-              </td>
+              <td style={{ padding: "8px 0", color: "#6b7280" }}>Trigger Type:</td>
               <td
                 style={{
                   padding: "8px 0",
@@ -169,21 +163,15 @@ export function CrisisAlertEmail({
               </td>
             </tr>
             <tr>
-              <td style={{ padding: "8px 0", color: "#6b7280" }}>
-                Detected At:
-              </td>
+              <td style={{ padding: "8px 0", color: "#6b7280" }}>Detected At:</td>
               <td style={{ padding: "8px 0", textAlign: "right" }}>
                 {detectedAt.toLocaleString()}
               </td>
             </tr>
             {affectedAccountCount > 0 && (
               <tr>
-                <td style={{ padding: "8px 0", color: "#6b7280" }}>
-                  Affected Accounts:
-                </td>
-                <td style={{ padding: "8px 0", textAlign: "right" }}>
-                  {affectedAccountCount}
-                </td>
+                <td style={{ padding: "8px 0", color: "#6b7280" }}>Affected Accounts:</td>
+                <td style={{ padding: "8px 0", textAlign: "right" }}>{affectedAccountCount}</td>
               </tr>
             )}
           </tbody>

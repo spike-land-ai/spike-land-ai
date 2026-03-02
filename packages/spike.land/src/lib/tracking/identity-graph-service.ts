@@ -7,10 +7,7 @@ import type { IdentifierType } from "@prisma/client";
  * @param value - The value of the initial identifier.
  * @returns The newly created or existing identity.
  */
-export async function createIdentity(
-  type: IdentifierType,
-  value: string,
-) {
+export async function createIdentity(type: IdentifierType, value: string) {
   // First check if an identity with this identifier already exists
   const existing = await findIdentityByIdentifier(type, value);
   if (existing) {
@@ -40,11 +37,7 @@ export async function createIdentity(
  * @param value - The value of the new identifier.
  * @returns The updated identity.
  */
-export async function addIdentifier(
-  identityId: string,
-  type: IdentifierType,
-  value: string,
-) {
+export async function addIdentifier(identityId: string, type: IdentifierType, value: string) {
   return prisma.identity.update({
     where: {
       id: identityId,
@@ -69,10 +62,7 @@ export async function addIdentifier(
  * @param value - The value of the identifier to search for.
  * @returns The found identity or null.
  */
-export async function findIdentityByIdentifier(
-  type: IdentifierType,
-  value: string,
-) {
+export async function findIdentityByIdentifier(type: IdentifierType, value: string) {
   const identifier = await prisma.identifier.findUnique({
     where: {
       type_value: {
@@ -98,11 +88,8 @@ export async function findIdentityByIdentifier(
  * @param toIdentityId - The ID of the identity to merge into.
  * @returns The merged identity.
  */
-export async function mergeIdentities(
-  fromIdentityId: string,
-  toIdentityId: string,
-) {
-  return prisma.$transaction(async tx => {
+export async function mergeIdentities(fromIdentityId: string, toIdentityId: string) {
+  return prisma.$transaction(async (tx) => {
     // Re-assign identifiers to the target identity
     await tx.identifier.updateMany({
       where: {

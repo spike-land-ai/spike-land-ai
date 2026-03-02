@@ -57,14 +57,11 @@ function sanitizeMdxContent(content: string): string {
     // First, temporarily hide math blocks to avoid escaping their braces
     // This is a simple heuristic: hide everything between $ or $$
     const mathBlocks: string[] = [];
-    sanitized = sanitized.replace(
-      /(\$\$[\s\S]+?\$\$|\$[\s\S]+?\$)/g,
-      match => {
-        const placeholder = `__MATH_BLOCK_${mathBlocks.length}__`;
-        mathBlocks.push(match);
-        return placeholder;
-      },
-    );
+    sanitized = sanitized.replace(/(\$\$[\s\S]+?\$\$|\$[\s\S]+?\$)/g, (match) => {
+      const placeholder = `__MATH_BLOCK_${mathBlocks.length}__`;
+      mathBlocks.push(match);
+      return placeholder;
+    });
 
     // Escape `{` and `}` with their HTML entity equivalents
     sanitized = sanitized.replace(/\{/g, "&#123;");
@@ -90,15 +87,12 @@ interface LearnItContentProps {
 }
 
 export async function LearnItContent({ content }: LearnItContentProps) {
-  const [
-    { default: rehypePrettyCode },
-    { default: remarkMath },
-    { default: rehypeKatex },
-  ] = await Promise.all([
-    import("rehype-pretty-code"),
-    import("remark-math"),
-    import("rehype-katex"),
-  ]);
+  const [{ default: rehypePrettyCode }, { default: remarkMath }, { default: rehypeKatex }] =
+    await Promise.all([
+      import("rehype-pretty-code"),
+      import("remark-math"),
+      import("rehype-katex"),
+    ]);
 
   // Parse wiki-links [[topic]] to markdown links before rendering
   const { content: parsedContent } = parseWikiLinks(content);
@@ -116,15 +110,18 @@ export async function LearnItContent({ content }: LearnItContentProps) {
               remarkPlugins: [remarkGfm, remarkMath],
               rehypePlugins: [
                 rehypeKatex,
-                [rehypePrettyCode, {
-                  theme: "github-dark",
-                  keepBackground: true,
-                  onVisitLine(node: { children: unknown[]; }) {
-                    if (node.children?.length === 0) {
-                      node.children = [{ type: "text", value: " " }];
-                    }
+                [
+                  rehypePrettyCode,
+                  {
+                    theme: "github-dark",
+                    keepBackground: true,
+                    onVisitLine(node: { children: unknown[] }) {
+                      if (node.children?.length === 0) {
+                        node.children = [{ type: "text", value: " " }];
+                      }
+                    },
                   },
-                }],
+                ],
               ],
             },
           }}
@@ -144,7 +141,7 @@ export async function LearnItContent({ content }: LearnItContentProps) {
  * Fallback renderer when MDX compilation fails.
  * Renders content as plain formatted text with basic markdown structure.
  */
-function PlainMarkdownFallback({ content }: { content: string; }) {
+function PlainMarkdownFallback({ content }: { content: string }) {
   const lines = content.split("\n");
   let inCodeBlock = false;
   const elements: React.ReactNode[] = [];
@@ -200,11 +197,15 @@ function PlainMarkdownFallback({ content }: { content: string; }) {
       );
     } else if (trimmed.startsWith("- ") || trimmed.startsWith("* ")) {
       elements.push(
-        <li key={`li-${i}`} className="ml-6 list-disc">{trimmed.slice(2)}</li>,
+        <li key={`li-${i}`} className="ml-6 list-disc">
+          {trimmed.slice(2)}
+        </li>,
       );
     } else {
       elements.push(
-        <p key={`p-${i}`} className="my-2 leading-relaxed">{line}</p>,
+        <p key={`p-${i}`} className="my-2 leading-relaxed">
+          {line}
+        </p>,
       );
     }
   }

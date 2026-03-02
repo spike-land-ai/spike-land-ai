@@ -47,16 +47,12 @@ export function TicketListItem({
       <div className="flex items-start justify-between gap-2">
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-1">
-            <span className="text-xs text-zinc-500 font-mono">
-              #{ticket.number}
-            </span>
+            <span className="text-xs text-zinc-500 font-mono">#{ticket.number}</span>
             <WorkflowStatusBadge status={ticket.plan?.status ?? null} />
           </div>
-          <h3 className="text-sm font-medium text-white truncate">
-            {ticket.title}
-          </h3>
+          <h3 className="text-sm font-medium text-white truncate">{ticket.title}</h3>
           <div className="flex items-center gap-2 mt-1.5">
-            {ticket.labels.slice(0, 3).map(label => (
+            {ticket.labels.slice(0, 3).map((label) => (
               <span
                 key={label}
                 className="text-[10px] px-1.5 py-0.5 rounded bg-zinc-800 text-zinc-400 border border-zinc-700"
@@ -64,9 +60,7 @@ export function TicketListItem({
                 {label}
               </span>
             ))}
-            <span className="text-[10px] text-zinc-600 ml-auto">
-              {timeAgo}
-            </span>
+            <span className="text-[10px] text-zinc-600 ml-auto">{timeAgo}</span>
           </div>
         </div>
       </div>

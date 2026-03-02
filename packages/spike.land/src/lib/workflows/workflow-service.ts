@@ -32,7 +32,7 @@ export async function listWorkflows(
     page?: number;
     pageSize?: number;
   } = {},
-): Promise<{ workflows: WorkflowData[]; total: number; }> {
+): Promise<{ workflows: WorkflowData[]; total: number }> {
   const { status, page = 1, pageSize = 20 } = options;
   const skip = (page - 1) * pageSize;
 
@@ -119,9 +119,7 @@ export async function createWorkflow(
   if (steps.length > 0) {
     const validation = validateWorkflow(steps);
     if (!validation.valid) {
-      throw new Error(
-        `Invalid workflow: ${validation.errors.map(e => e.message).join(", ")}`,
-      );
+      throw new Error(`Invalid workflow: ${validation.errors.map((e) => e.message).join(", ")}`);
     }
   }
 
@@ -192,8 +190,7 @@ export async function updateWorkflow(
     where: { id: workflowId },
     data: {
       ...(input.name !== undefined && { name: input.name }),
-      ...(input.description !== undefined
-        && { description: input.description }),
+      ...(input.description !== undefined && { description: input.description }),
       ...(input.status !== undefined && { status: input.status }),
     },
     include: {
@@ -220,10 +217,7 @@ export async function updateWorkflow(
 /**
  * Deletes a workflow
  */
-export async function deleteWorkflow(
-  workflowId: string,
-  workspaceId: string,
-): Promise<void> {
+export async function deleteWorkflow(workflowId: string, workspaceId: string): Promise<void> {
   // Verify workflow exists and belongs to workspace
   const existing = await prisma.workflow.findFirst({
     where: { id: workflowId, workspaceId },
@@ -264,9 +258,7 @@ export async function createWorkflowVersion(
   // Validate steps
   const validation = validateWorkflow(input.steps);
   if (!validation.valid) {
-    throw new Error(
-      `Invalid workflow: ${validation.errors.map(e => e.message).join(", ")}`,
-    );
+    throw new Error(`Invalid workflow: ${validation.errors.map((e) => e.message).join(", ")}`);
   }
 
   const nextVersion = (workflow.versions[0]?.version ?? 0) + 1;
@@ -334,7 +326,7 @@ export async function publishWorkflowVersion(
   const validation = validateForPublish(steps);
   if (!validation.valid) {
     throw new Error(
-      `Cannot publish workflow: ${validation.errors.map(e => e.message).join(", ")}`,
+      `Cannot publish workflow: ${validation.errors.map((e) => e.message).join(", ")}`,
     );
   }
 
@@ -383,7 +375,7 @@ export async function getWorkflowRuns(
     page?: number;
     pageSize?: number;
   } = {},
-): Promise<{ runs: WorkflowRunData[]; total: number; }> {
+): Promise<{ runs: WorkflowRunData[]; total: number }> {
   const { status, page = 1, pageSize = 20 } = options;
   const skip = (page - 1) * pageSize;
 
@@ -456,8 +448,8 @@ export async function getWorkflowRun(
 
 // Helper function to map Prisma workflow to WorkflowData
 type WorkflowWithRelations = Workflow & {
-  versions: (WorkflowVersion & { steps: WorkflowStep[]; })[];
-  createdBy: { id: string; name: string | null; };
+  versions: (WorkflowVersion & { steps: WorkflowStep[] })[];
+  createdBy: { id: string; name: string | null };
 };
 
 function mapWorkflowToData(workflow: WorkflowWithRelations): WorkflowData {
@@ -473,7 +465,7 @@ function mapWorkflowToData(workflow: WorkflowWithRelations): WorkflowData {
 }
 
 // Helper function to map Prisma version to WorkflowVersionData
-type VersionWithSteps = WorkflowVersion & { steps: WorkflowStep[]; };
+type VersionWithSteps = WorkflowVersion & { steps: WorkflowStep[] };
 
 function mapVersionToData(version: VersionWithSteps): WorkflowVersionData {
   return {
@@ -520,7 +512,7 @@ function mapRunToData(run: RunWithLogs): WorkflowRunData {
     status: run.status,
     startedAt: run.startedAt,
     endedAt: run.endedAt,
-    logs: run.logs.map(log => {
+    logs: run.logs.map((log) => {
       const stepId = log.stepId ?? undefined;
       const stepStatus = log.stepStatus as WorkflowRunLogEntry["stepStatus"];
       const metadata = log.metadata as Record<string, unknown> | undefined;

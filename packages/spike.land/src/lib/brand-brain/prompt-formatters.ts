@@ -40,10 +40,7 @@ const vocabularyLabels: Record<GuardrailStyle, VocabularyLabels> = {
   },
 };
 
-export function formatGuardrails(
-  guardrails: BrandGuardrail[],
-  style: GuardrailStyle,
-): string {
+export function formatGuardrails(guardrails: BrandGuardrail[], style: GuardrailStyle): string {
   if (!guardrails.length) return "No specific guardrails defined.";
 
   const useEmoji = style === "score";
@@ -51,46 +48,39 @@ export function formatGuardrails(
   const fallback = useEmoji ? "\u26AA" : "-";
 
   return guardrails
-    .map(g => {
+    .map((g) => {
       const icon = severityMap[g.severity] || fallback;
       return `${icon} [${g.type}] ${g.name}: ${g.description || "No description"}`;
     })
     .join("\n");
 }
 
-export function formatVocabulary(
-  vocabulary: BrandVocabulary[],
-  style: GuardrailStyle,
-): string {
+export function formatVocabulary(vocabulary: BrandVocabulary[], style: GuardrailStyle): string {
   if (!vocabulary.length) return "No specific vocabulary rules defined.";
 
   const labels = vocabularyLabels[style];
 
   const grouped = {
-    PREFERRED: vocabulary.filter(v => v.type === "PREFERRED"),
-    BANNED: vocabulary.filter(v => v.type === "BANNED"),
-    REPLACEMENT: vocabulary.filter(v => v.type === "REPLACEMENT"),
+    PREFERRED: vocabulary.filter((v) => v.type === "PREFERRED"),
+    BANNED: vocabulary.filter((v) => v.type === "BANNED"),
+    REPLACEMENT: vocabulary.filter((v) => v.type === "REPLACEMENT"),
   };
 
   const parts: string[] = [];
 
   if (grouped.PREFERRED.length) {
-    parts.push(
-      "**Preferred Terms:** "
-        + grouped.PREFERRED.map(v => v.term).join(", "),
-    );
+    parts.push("**Preferred Terms:** " + grouped.PREFERRED.map((v) => v.term).join(", "));
   }
   if (grouped.BANNED.length) {
     parts.push(
-      `**${labels.banned}:** `
-        + grouped.BANNED.map(v => v.context ? `${v.term} (${v.context})` : v.term).join(", "),
+      `**${labels.banned}:** ` +
+        grouped.BANNED.map((v) => (v.context ? `${v.term} (${v.context})` : v.term)).join(", "),
     );
   }
   if (grouped.REPLACEMENT.length) {
     parts.push(
-      `**${labels.replacement}:** `
-        + grouped.REPLACEMENT.map(v => `"${v.term}" ${labels.arrow} "${v.replacement}"`)
-          .join(", "),
+      `**${labels.replacement}:** ` +
+        grouped.REPLACEMENT.map((v) => `"${v.term}" ${labels.arrow} "${v.replacement}"`).join(", "),
     );
   }
 

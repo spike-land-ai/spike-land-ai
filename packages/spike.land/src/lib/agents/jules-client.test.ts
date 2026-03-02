@@ -49,9 +49,7 @@ describe("jules-client", () => {
   }
 
   function mockFetchError(message: string) {
-    (globalThis.fetch as ReturnType<typeof vi.fn>).mockRejectedValue(
-      new Error(message),
-    );
+    (globalThis.fetch as ReturnType<typeof vi.fn>).mockRejectedValue(new Error(message));
   }
 
   describe("isJulesAvailable", () => {
@@ -71,8 +69,7 @@ describe("jules-client", () => {
 
       await listSources(10, "token123");
 
-      const url = (globalThis.fetch as ReturnType<typeof vi.fn>).mock
-        .calls[0]![0] as string;
+      const url = (globalThis.fetch as ReturnType<typeof vi.fn>).mock.calls[0]![0] as string;
       expect(url).toContain("pageSize=10");
       expect(url).toContain("pageToken=token123");
     });
@@ -109,17 +106,14 @@ describe("jules-client", () => {
       const result = await listSessions(5, "page1");
 
       expect(result.data).toEqual(expected);
-      const url = (globalThis.fetch as ReturnType<typeof vi.fn>).mock
-        .calls[0]![0] as string;
+      const url = (globalThis.fetch as ReturnType<typeof vi.fn>).mock.calls[0]![0] as string;
       expect(url).toContain("pageSize=5");
     });
   });
 
   describe("getSession", () => {
     it("should validate session ID", async () => {
-      await expect(getSession("../evil")).rejects.toThrow(
-        "Invalid session ID format",
-      );
+      await expect(getSession("../evil")).rejects.toThrow("Invalid session ID format");
     });
 
     it("should normalize sessions/ prefix", async () => {
@@ -127,8 +121,7 @@ describe("jules-client", () => {
 
       await getSession("abc");
 
-      const url = (globalThis.fetch as ReturnType<typeof vi.fn>).mock
-        .calls[0]![0] as string;
+      const url = (globalThis.fetch as ReturnType<typeof vi.fn>).mock.calls[0]![0] as string;
       expect(url).toContain("/sessions/abc");
     });
 
@@ -137,8 +130,7 @@ describe("jules-client", () => {
 
       await getSession("sessions/abc");
 
-      const url = (globalThis.fetch as ReturnType<typeof vi.fn>).mock
-        .calls[0]![0] as string;
+      const url = (globalThis.fetch as ReturnType<typeof vi.fn>).mock.calls[0]![0] as string;
       expect(url).toContain("/sessions/abc");
       expect(url).not.toContain("/sessions/sessions/");
     });
@@ -155,8 +147,7 @@ describe("jules-client", () => {
       const result = await createSession(request);
 
       expect(result.data).toEqual({ name: "sessions/new", state: "QUEUED" });
-      const fetchCall = (globalThis.fetch as ReturnType<typeof vi.fn>).mock
-        .calls[0]!;
+      const fetchCall = (globalThis.fetch as ReturnType<typeof vi.fn>).mock.calls[0]!;
       expect(fetchCall[1].method).toBe("POST");
       expect(fetchCall[1].body).toBe(JSON.stringify(request));
     });
@@ -164,9 +155,7 @@ describe("jules-client", () => {
 
   describe("approvePlan", () => {
     it("should validate session ID", async () => {
-      await expect(approvePlan("../bad")).rejects.toThrow(
-        "Invalid session ID format",
-      );
+      await expect(approvePlan("../bad")).rejects.toThrow("Invalid session ID format");
     });
 
     it("should POST to :approvePlan endpoint", async () => {
@@ -174,17 +163,14 @@ describe("jules-client", () => {
 
       await approvePlan("abc");
 
-      const url = (globalThis.fetch as ReturnType<typeof vi.fn>).mock
-        .calls[0]![0] as string;
+      const url = (globalThis.fetch as ReturnType<typeof vi.fn>).mock.calls[0]![0] as string;
       expect(url).toContain("/sessions/abc:approvePlan");
     });
   });
 
   describe("sendMessage", () => {
     it("should validate session ID", async () => {
-      await expect(sendMessage("foo/../bar", "hi")).rejects.toThrow(
-        "Invalid session ID format",
-      );
+      await expect(sendMessage("foo/../bar", "hi")).rejects.toThrow("Invalid session ID format");
     });
 
     it("should POST with prompt", async () => {
@@ -192,17 +178,14 @@ describe("jules-client", () => {
 
       await sendMessage("abc", "Hello");
 
-      const fetchCall = (globalThis.fetch as ReturnType<typeof vi.fn>).mock
-        .calls[0]!;
+      const fetchCall = (globalThis.fetch as ReturnType<typeof vi.fn>).mock.calls[0]!;
       expect(fetchCall[1].body).toBe(JSON.stringify({ prompt: "Hello" }));
     });
   });
 
   describe("listActivities", () => {
     it("should validate session ID", async () => {
-      await expect(listActivities("a/../../b")).rejects.toThrow(
-        "Invalid session ID format",
-      );
+      await expect(listActivities("a/../../b")).rejects.toThrow("Invalid session ID format");
     });
 
     it("should return activities with pagination", async () => {
@@ -238,10 +221,7 @@ describe("jules-client", () => {
     });
 
     it("should handle API errors", async () => {
-      mockFetchSuccess(
-        { error: { code: 404, message: "Not found", status: "NOT_FOUND" } },
-        404,
-      );
+      mockFetchSuccess({ error: { code: 404, message: "Not found", status: "NOT_FOUND" } }, 404);
 
       const result = await getSource("bad");
 
@@ -265,17 +245,13 @@ describe("jules-client", () => {
     it("should throw when API key is missing", async () => {
       vi.stubEnv("JULES_API_KEY", "");
 
-      await expect(listSources()).rejects.toThrow(
-        "JULES_API_KEY environment variable is not set",
-      );
+      await expect(listSources()).rejects.toThrow("JULES_API_KEY environment variable is not set");
     });
   });
 
   describe("utility functions", () => {
     it("buildSourceName returns correct format", () => {
-      expect(buildSourceName("owner", "repo")).toBe(
-        "sources/github/owner/repo",
-      );
+      expect(buildSourceName("owner", "repo")).toBe("sources/github/owner/repo");
     });
 
     it("extractSessionId strips prefix", () => {

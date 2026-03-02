@@ -16,9 +16,7 @@ import { getOrCreateHealth, updateHealth } from "./health-calculator";
 /**
  * Record a successful sync for an account
  */
-export async function recordSuccessfulSync(
-  accountId: string,
-): Promise<SocialAccountHealth> {
+export async function recordSuccessfulSync(accountId: string): Promise<SocialAccountHealth> {
   // Ensure health record exists
   await getOrCreateHealth(accountId);
 
@@ -61,9 +59,9 @@ export async function getSyncStatus(accountId: string): Promise<{
   const health = await getOrCreateHealth(accountId);
 
   // Consider sync healthy if last successful sync was within 24 hours
-  const syncHealthy = health.lastSuccessfulSync !== null
-    && new Date().getTime() - health.lastSuccessfulSync.getTime()
-      < 24 * 60 * 60 * 1000;
+  const syncHealthy =
+    health.lastSuccessfulSync !== null &&
+    new Date().getTime() - health.lastSuccessfulSync.getTime() < 24 * 60 * 60 * 1000;
 
   return {
     lastSuccessfulSync: health.lastSuccessfulSync,
@@ -79,9 +77,7 @@ export async function getSyncStatus(accountId: string): Promise<{
  * Reset error counters for accounts in a workspace
  * Called daily to refresh totalErrorsLast24h
  */
-export async function resetDailyErrorCounters(
-  workspaceId: string,
-): Promise<number> {
+export async function resetDailyErrorCounters(workspaceId: string): Promise<number> {
   const result = await prisma.socialAccountHealth.updateMany({
     where: {
       account: { workspaceId },
@@ -126,8 +122,8 @@ export async function getAccountsWithSyncIssues(workspaceId: string): Promise<
   });
 
   return accounts
-    .filter(account => account.health !== null)
-    .map(account => ({
+    .filter((account) => account.health !== null)
+    .map((account) => ({
       accountId: account.id,
       accountName: account.accountName,
       platform: account.platform,
@@ -140,10 +136,7 @@ export async function getAccountsWithSyncIssues(workspaceId: string): Promise<
 /**
  * Check if account needs sync based on last sync time
  */
-export async function needsSync(
-  accountId: string,
-  maxAgeHours: number = 24,
-): Promise<boolean> {
+export async function needsSync(accountId: string, maxAgeHours: number = 24): Promise<boolean> {
   const health = await prisma.socialAccountHealth.findUnique({
     where: { accountId },
   });
@@ -180,5 +173,5 @@ export async function getAccountsNeedingSync(
     select: { id: true },
   });
 
-  return accounts.map(a => a.id);
+  return accounts.map((a) => a.id);
 }

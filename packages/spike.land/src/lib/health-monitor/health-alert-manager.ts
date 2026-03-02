@@ -37,9 +37,7 @@ const DEFAULT_ALERT_THRESHOLDS = {
 /**
  * Create a health event record
  */
-export async function createHealthEvent(
-  options: CreateHealthEventOptions,
-): Promise<string> {
+export async function createHealthEvent(options: CreateHealthEventOptions): Promise<string> {
   const event = await prisma.accountHealthEvent.create({
     data: {
       accountId: options.accountId,
@@ -51,7 +49,9 @@ export async function createHealthEvent(
       ...(options.previousScore !== undefined ? { previousScore: options.previousScore } : {}),
       newScore: options.newScore,
       message: options.message,
-      ...(options.details !== undefined ? { details: options.details as Prisma.InputJsonValue } : {}),
+      ...(options.details !== undefined
+        ? { details: options.details as Prisma.InputJsonValue }
+        : {}),
     },
   });
 
@@ -132,9 +132,7 @@ export async function logRateLimitEvent(
   health: SocialAccountHealth,
   isLimited: boolean,
 ): Promise<void> {
-  const eventType: AccountHealthEventType = isLimited
-    ? "RATE_LIMIT_HIT"
-    : "RATE_LIMIT_CLEARED";
+  const eventType: AccountHealthEventType = isLimited ? "RATE_LIMIT_HIT" : "RATE_LIMIT_CLEARED";
   const severity: IssueSeverity = isLimited ? "WARNING" : "INFO";
   const message = isLimited
     ? `Rate limit hit for ${account.platform} account`
@@ -164,13 +162,12 @@ export async function logErrorEvent(
   health: SocialAccountHealth,
   error: string,
 ): Promise<void> {
-  const severity: IssueSeverity = health.consecutiveErrors
-      >= DEFAULT_ALERT_THRESHOLDS.consecutiveErrorsCritical
-    ? "CRITICAL"
-    : health.consecutiveErrors
-        >= DEFAULT_ALERT_THRESHOLDS.consecutiveErrorsWarning
-    ? "ERROR"
-    : "WARNING";
+  const severity: IssueSeverity =
+    health.consecutiveErrors >= DEFAULT_ALERT_THRESHOLDS.consecutiveErrorsCritical
+      ? "CRITICAL"
+      : health.consecutiveErrors >= DEFAULT_ALERT_THRESHOLDS.consecutiveErrorsWarning
+        ? "ERROR"
+        : "WARNING";
 
   await createHealthEvent({
     accountId: account.id,
@@ -197,9 +194,7 @@ export async function logTokenExpiryEvent(
   health: SocialAccountHealth,
   isExpired: boolean,
 ): Promise<void> {
-  const eventType: AccountHealthEventType = isExpired
-    ? "TOKEN_EXPIRED"
-    : "TOKEN_REFRESHED";
+  const eventType: AccountHealthEventType = isExpired ? "TOKEN_EXPIRED" : "TOKEN_REFRESHED";
   const severity: IssueSeverity = isExpired ? "ERROR" : "INFO";
   const message = isExpired
     ? `Token expired for ${account.platform} account`
@@ -225,7 +220,7 @@ export async function logTokenExpiryEvent(
  * Send health alert email
  */
 export async function sendHealthAlertEmail(
-  recipient: { email: string; name?: string; },
+  recipient: { email: string; name?: string },
   alert: {
     accountName: string;
     platform: string;
@@ -235,11 +230,12 @@ export async function sendHealthAlertEmail(
     dashboardUrl: string;
   },
 ): Promise<void> {
-  const severityEmoji = alert.status === "CRITICAL"
-    ? "\u{1F6A8}"
-    : alert.status === "UNHEALTHY"
-    ? "\u{26A0}\u{FE0F}"
-    : "\u{2139}\u{FE0F}";
+  const severityEmoji =
+    alert.status === "CRITICAL"
+      ? "\u{1F6A8}"
+      : alert.status === "UNHEALTHY"
+        ? "\u{26A0}\u{FE0F}"
+        : "\u{2139}\u{FE0F}";
 
   await sendEmail({
     to: recipient.email,
@@ -259,9 +255,7 @@ export async function sendHealthAlertEmail(
 /**
  * Map IssueSeverity to notification priority
  */
-function severityToPriority(
-  severity: IssueSeverity,
-): "LOW" | "MEDIUM" | "HIGH" | "URGENT" {
+function severityToPriority(severity: IssueSeverity): "LOW" | "MEDIUM" | "HIGH" | "URGENT" {
   const mapping: Record<IssueSeverity, "LOW" | "MEDIUM" | "HIGH" | "URGENT"> = {
     INFO: "LOW",
     WARNING: "MEDIUM",
@@ -310,9 +304,7 @@ async function createHealthAlertNotification(params: {
         },
       },
     });
-    logger.info(
-      `[HealthAlerts] In-app notification created for ${params.accountName}`,
-    );
+    logger.info(`[HealthAlerts] In-app notification created for ${params.accountName}`);
   } catch (error) {
     // Log but don't throw - we don't want notification failures to break alert flow
     logger.error("[HealthAlerts] Failed to create in-app notification", {
@@ -358,9 +350,7 @@ export async function sendHealthAlerts(
     },
   });
 
-  const validAdmins = admins.filter(
-    m => m.user.email !== null,
-  );
+  const validAdmins = admins.filter((m) => m.user.email !== null);
 
   if (validAdmins.length === 0) {
     return 0;
@@ -380,11 +370,8 @@ export async function sendHealthAlerts(
     const status = scoreToStatus(account.health.healthScore);
 
     // Check severity threshold
-    const severity: IssueSeverity = status === "CRITICAL"
-      ? "CRITICAL"
-      : status === "UNHEALTHY"
-      ? "ERROR"
-      : "WARNING";
+    const severity: IssueSeverity =
+      status === "CRITICAL" ? "CRITICAL" : status === "UNHEALTHY" ? "ERROR" : "WARNING";
 
     if (!shouldAlert(severity, config.minSeverity)) {
       continue;
@@ -411,8 +398,7 @@ export async function sendHealthAlerts(
             healthScore: account.health.healthScore,
             status,
             issue,
-            dashboardUrl:
-              `https://spike.land/orbit/${workspace?.slug}/accounts/health/${account.id}`,
+            dashboardUrl: `https://spike.land/orbit/${workspace?.slug}/accounts/health/${account.id}`,
           },
         );
         alertsSent++;
@@ -441,10 +427,7 @@ export async function sendHealthAlerts(
 /**
  * Check if alert should be sent based on severity threshold
  */
-function shouldAlert(
-  eventSeverity: IssueSeverity,
-  minSeverity: IssueSeverity,
-): boolean {
+function shouldAlert(eventSeverity: IssueSeverity, minSeverity: IssueSeverity): boolean {
   const severityOrder: Record<IssueSeverity, number> = {
     INFO: 0,
     WARNING: 1,
@@ -482,7 +465,7 @@ export async function getRecentHealthEvents(
     },
   });
 
-  return events.map(e => ({
+  return events.map((e) => ({
     id: e.id,
     accountId: e.accountId,
     accountName: e.account.accountName,
@@ -520,7 +503,7 @@ export async function getAccountHealthEvents(
     take: limit,
   });
 
-  return events.map(e => ({
+  return events.map((e) => ({
     id: e.id,
     eventType: e.eventType,
     severity: e.severity,

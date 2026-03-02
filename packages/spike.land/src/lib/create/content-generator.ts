@@ -1,7 +1,4 @@
-import {
-  generateStructuredResponse,
-  StructuredResponseParseError,
-} from "@/lib/ai/gemini-client";
+import { generateStructuredResponse, StructuredResponseParseError } from "@/lib/ai/gemini-client";
 import logger from "@/lib/logger";
 import { z } from "zod";
 
@@ -18,32 +15,26 @@ export {
 export type { MatchedSkill, Skill, SkillCategory } from "./prompt-builder";
 
 // Import what we need internally
-import {
-  buildSystemPrompt,
-  buildUserPrompt,
-  LUCIDE_ICONS,
-} from "./prompt-builder";
+import { buildSystemPrompt, buildUserPrompt, LUCIDE_ICONS } from "./prompt-builder";
 
 const GeneratedAppSchema = z.object({
-  plan: z.string().optional().describe(
-    "Optional 1-2 sentence architecture plan before writing code",
-  ),
+  plan: z
+    .string()
+    .optional()
+    .describe("Optional 1-2 sentence architecture plan before writing code"),
   title: z.string().describe("The name of the app"),
-  description: z.string().describe(
-    "A concise 1-sentence description of what the app does",
-  ),
-  code: z.string().describe(
-    "The complete, self-contained React component code (using Tailwind CSS)",
-  ),
-  relatedApps: z.array(z.string()).describe(
-    "List of 3-5 related app paths that user might want to try next (e.g. 'cooking/french', 'games/tic-tac-toe')",
-  ),
+  description: z.string().describe("A concise 1-sentence description of what the app does"),
+  code: z
+    .string()
+    .describe("The complete, self-contained React component code (using Tailwind CSS)"),
+  relatedApps: z
+    .array(z.string())
+    .describe(
+      "List of 3-5 related app paths that user might want to try next (e.g. 'cooking/french', 'games/tic-tac-toe')",
+    ),
 });
 
-export type GeneratedAppContent = Omit<
-  z.infer<typeof GeneratedAppSchema>,
-  "plan"
->;
+export type GeneratedAppContent = Omit<z.infer<typeof GeneratedAppSchema>, "plan">;
 
 export type GenerationResult = {
   content: GeneratedAppContent | null;
@@ -55,14 +46,15 @@ function pruneUnusedIcons(code: string): string {
   // 1. Identify Lucide icon imports
   const lucideImportRegex = /import\s*{([^}]+)}\s*from\s*["']lucide-react["'];?/g;
   let match;
-  const importsToReplace: Array<{ fullMatch: string; icons: string[]; }> = [];
+  const importsToReplace: Array<{ fullMatch: string; icons: string[] }> = [];
 
   while ((match = lucideImportRegex.exec(code)) !== null) {
     const importContent = match[1];
     if (importContent) {
-      const icons = importContent.split(",").map(i => i.trim()).filter(
-        Boolean,
-      );
+      const icons = importContent
+        .split(",")
+        .map((i) => i.trim())
+        .filter(Boolean);
       importsToReplace.push({ fullMatch: match[0], icons });
     }
   }
@@ -76,7 +68,7 @@ function pruneUnusedIcons(code: string): string {
     // We remove the import itself from the code search to avoid self-matches
     const codeWithoutCurrentImport = prunedCode.replace(fullMatch, "");
 
-    const usedIcons = icons.filter(icon => {
+    const usedIcons = icons.filter((icon) => {
       // Look for the icon name as a whole word (e.g., <Plus, Plus., Plus )
       const usageRegex = new RegExp(`\\b${icon}\\b`, "g");
       return usageRegex.test(codeWithoutCurrentImport);
@@ -111,24 +103,22 @@ function addMissingIconImports(code: string): string {
   const alreadyImported = new Set<string>();
   if (existing) {
     for (const spec of existing[2]!.split(",")) {
-      const name = spec.trim().split(/\s+as\s+/)[0]!.trim();
+      const name = spec
+        .trim()
+        .split(/\s+as\s+/)[0]!
+        .trim();
       if (name) alreadyImported.add(name);
     }
   }
 
-  const missing = [...usedIcons].filter(i => !alreadyImported.has(i)).sort();
+  const missing = [...usedIcons].filter((i) => !alreadyImported.has(i)).sort();
   if (missing.length === 0) return code;
 
   if (existing) {
     // Merge missing icons into existing import
     const original = existing[2]!.trim().replace(/,\s*$/, "");
-    const merged = original
-      ? `${original}, ${missing.join(", ")}`
-      : missing.join(", ");
-    return code.replace(
-      existing[0],
-      `import { ${merged} } from "lucide-react";`,
-    );
+    const merged = original ? `${original}, ${missing.join(", ")}` : missing.join(", ");
+    return code.replace(existing[0], `import { ${merged} } from "lucide-react";`);
   }
 
   // No existing import — insert after last import statement
@@ -164,10 +154,7 @@ export function extractCodeFromRawText(text: string): string | null {
   let code = codeMatch[1];
 
   // Remove trailing JSON artifacts (closing field patterns)
-  code = code.replace(
-    /"\s*,?\s*"(relatedApps|title|description)"\s*:[\s\S]*$/,
-    "",
-  );
+  code = code.replace(/"\s*,?\s*"(relatedApps|title|description)"\s*:[\s\S]*$/, "");
   code = code.replace(/"\s*,?\s*}\s*$/, "");
   code = code.replace(/"\s*$/, "");
 
@@ -175,7 +162,10 @@ export function extractCodeFromRawText(text: string): string | null {
   try {
     code = JSON.parse(`"${code}"`);
   } catch {
-    code = code.replace(/\\n/g, "\n").replace(/\\t/g, "\t").replace(/\\"/g, "\"")
+    code = code
+      .replace(/\\n/g, "\n")
+      .replace(/\\t/g, "\t")
+      .replace(/\\"/g, '"')
       .replace(/\\\\/g, "\\");
   }
 
@@ -194,7 +184,7 @@ export async function attemptCodeCorrection(
       error: error.slice(0, 200),
     });
 
-    const result = await generateStructuredResponse<{ code: string; }>({
+    const result = await generateStructuredResponse<{ code: string }>({
       prompt: `The following React component failed transpilation with this error:
 
 ERROR: ${error}
@@ -233,9 +223,7 @@ Fix the code so it transpiles successfully. Return JSON: { "code": "<fixed code>
   }
 }
 
-export async function generateAppContent(
-  path: string[],
-): Promise<GenerationResult> {
+export async function generateAppContent(path: string[]): Promise<GenerationResult> {
   const topic = path.join("/");
 
   try {
@@ -260,10 +248,13 @@ export async function generateAppContent(
 
     // Extract rawCode before validation so it's available even if other fields fail
     const resultObj = result as Record<string, unknown> | null;
-    const rawCode = resultObj && typeof resultObj === "object" && "code" in resultObj
-        && typeof resultObj.code === "string"
-      ? cleanCode(resultObj.code)
-      : null;
+    const rawCode =
+      resultObj &&
+      typeof resultObj === "object" &&
+      "code" in resultObj &&
+      typeof resultObj.code === "string"
+        ? cleanCode(resultObj.code)
+        : null;
 
     // Clean the code field in-place for validation
     if (result && result.code) {
@@ -280,34 +271,28 @@ export async function generateAppContent(
     }
 
     // Validation failed but we may have raw code
-    const errorMsg = parsed.error.issues.map(i => i.message).join(", ");
-    logger.warn(
-      "Generated content failed validation, attempting correction...",
-      {
-        error: errorMsg,
-      },
-    );
+    const errorMsg = parsed.error.issues.map((i) => i.message).join(", ");
+    logger.warn("Generated content failed validation, attempting correction...", {
+      error: errorMsg,
+    });
 
     if (rawCode) {
-      const correctedCode = await attemptCodeCorrection(
-        rawCode,
-        errorMsg,
-        topic,
-      );
+      const correctedCode = await attemptCodeCorrection(rawCode, errorMsg, topic);
       if (correctedCode) {
         logger.info("Correction successful, returning fixed code");
         // If we have other valid fields from the initial parse (even if partial), use them
         // verification: we know parsing failed, but maybe we can salvage title/desc if they were valid?
         // For safe fallback, we use the original result properties if they exist and are strings
-        const safeTitle = resultObj && typeof resultObj.title === "string"
-          ? resultObj.title
-          : topic.split("/").pop() || "App";
-        const safeDesc = resultObj && typeof resultObj.description === "string"
-          ? resultObj.description
-          : "Generated application";
-        const safeRelated = resultObj && Array.isArray(resultObj.relatedApps)
-          ? resultObj.relatedApps
-          : [];
+        const safeTitle =
+          resultObj && typeof resultObj.title === "string"
+            ? resultObj.title
+            : topic.split("/").pop() || "App";
+        const safeDesc =
+          resultObj && typeof resultObj.description === "string"
+            ? resultObj.description
+            : "Generated application";
+        const safeRelated =
+          resultObj && Array.isArray(resultObj.relatedApps) ? resultObj.relatedApps : [];
 
         return {
           content: {

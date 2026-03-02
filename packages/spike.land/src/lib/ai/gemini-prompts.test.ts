@@ -1,8 +1,5 @@
 import { describe, expect, it } from "vitest";
-import {
-  buildBlendEnhancementPrompt,
-  buildDynamicEnhancementPrompt,
-} from "./gemini-prompts";
+import { buildBlendEnhancementPrompt, buildDynamicEnhancementPrompt } from "./gemini-prompts";
 import { getDefaultAnalysis } from "./gemini-analysis";
 import type { AnalysisDetailedResult } from "./gemini-analysis";
 
@@ -23,27 +20,21 @@ describe("gemini-prompts", () => {
       const analysis = getDefaultAnalysis();
       analysis.imageStyle = "sketch";
       const prompt = buildDynamicEnhancementPrompt(analysis);
-      expect(prompt).toContain(
-        "Convert this sketch into a photorealistic image",
-      );
+      expect(prompt).toContain("Convert this sketch into a photorealistic image");
     });
 
     it("includes style conversion for painting", () => {
       const analysis = getDefaultAnalysis();
       analysis.imageStyle = "painting";
       const prompt = buildDynamicEnhancementPrompt(analysis);
-      expect(prompt).toContain(
-        "Convert this painting into a photorealistic photograph",
-      );
+      expect(prompt).toContain("Convert this painting into a photorealistic photograph");
     });
 
     it("includes style conversion for screenshot", () => {
       const analysis = getDefaultAnalysis();
       analysis.imageStyle = "screenshot";
       const prompt = buildDynamicEnhancementPrompt(analysis);
-      expect(prompt).toContain(
-        "Clean up this screenshot and enhance it to photographic quality",
-      );
+      expect(prompt).toContain("Clean up this screenshot and enhance it to photographic quality");
     });
 
     it("includes lighting instructions for dark images", () => {
@@ -191,9 +182,7 @@ describe("gemini-prompts", () => {
       };
 
       const prompt = buildBlendEnhancementPrompt(analysis);
-      expect(prompt).toContain(
-        "The target image is dark - ensure proper lighting",
-      );
+      expect(prompt).toContain("The target image is dark - ensure proper lighting");
       expect(prompt).toContain("Remove any noise or grain");
       expect(prompt).toContain("Ensure the final result is sharp");
       expect(prompt).toContain("Balance exposure");

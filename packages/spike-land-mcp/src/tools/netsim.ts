@@ -86,20 +86,21 @@ function getTopology(topoId: string, userId: string): NetworkTopology {
 
 // ─── Registration ────────────────────────────────────────────────────────────
 
-const LinkStateEnum = z.enum(["up", "partitioned", "slow", "lossy"])
+const LinkStateEnum = z
+  .enum(["up", "partitioned", "slow", "lossy"])
   .describe("Link state: up, partitioned, slow, or lossy.");
 
-export function registerNetsimTools(
-  registry: ToolRegistry,
-  userId: string,
-  db: DrizzleDB,
-): void {
+export function registerNetsimTools(registry: ToolRegistry, userId: string, db: DrizzleDB): void {
   registry.registerBuilt(
     freeTool(userId, db)
-      .tool("netsim_create_topology", "Create a network topology with N nodes connected in a full mesh.", {
-        name: z.string().min(1).describe("Name for the network topology."),
-        node_count: z.number().int().min(2).max(10).describe("Number of nodes (2-10)."),
-      })
+      .tool(
+        "netsim_create_topology",
+        "Create a network topology with N nodes connected in a full mesh.",
+        {
+          name: z.string().min(1).describe("Name for the network topology."),
+          node_count: z.number().int().min(2).max(10).describe("Number of nodes (2-10)."),
+        },
+      )
       .meta({ category: "netsim", tier: "free" })
       .handler(async ({ input }) => {
         const id = generateId();
@@ -114,11 +115,22 @@ export function registerNetsimTools(
         for (let i = 0; i < nodeOrder.length; i++) {
           for (let j = 0; j < nodeOrder.length; j++) {
             if (i === j) continue;
-            const from = nodeOrder[i]!, to = nodeOrder[j]!;
+            const from = nodeOrder[i]!,
+              to = nodeOrder[j]!;
             links.set(linkKey(from, to), { from, to, state: "up", latencyMs: 0, lossRate: 0 });
           }
         }
-        const topo: NetworkTopology = { id, userId, name: input.name, nodes, nodeOrder, links, messageLog: [], clock: 0, createdAt: Date.now() };
+        const topo: NetworkTopology = {
+          id,
+          userId,
+          name: input.name,
+          nodes,
+          nodeOrder,
+          links,
+          messageLog: [],
+          clock: 0,
+          createdAt: Date.now(),
+        };
         topologies.set(id, topo);
         return textResult(
           `**Network Topology Created**\n\n**ID:** ${topo.id}\n**Name:** ${topo.name}\n**Nodes:** ${topo.nodeOrder.join(", ")}\n**Links:** ${topo.links.size} (full mesh, all up)\n\nUse \`netsim_set_link_state\` to simulate partitions, latency, or packet loss.`,
@@ -189,30 +201,44 @@ export function registerNetsimTools(
             const otherNodeId = link.from === input.node_id ? link.to : link.from;
             const otherNode = topo.nodes.get(otherNodeId);
             if (otherNode && !otherNode.partitioned) {
-              link.state = "up"; link.latencyMs = 0; link.lossRate = 0;
+              link.state = "up";
+              link.latencyMs = 0;
+              link.lossRate = 0;
             }
           }
         }
-        return textResult(`**Node Healed**\n\n**Node:** ${input.node_id}\nAll links to/from this node are restored to 'up' state.`);
+        return textResult(
+          `**Node Healed**\n\n**Node:** ${input.node_id}\nAll links to/from this node are restored to 'up' state.`,
+        );
       }),
   );
 
   registry.registerBuilt(
     freeTool(userId, db)
-      .tool("netsim_send_message", "Send a message from one node to another through the simulated network.", {
-        topology_id: z.string().min(1).describe("ID of the network topology."),
-        from: z.string().min(1).describe("Sender node ID."),
-        to: z.string().min(1).describe("Receiver node ID."),
-        payload: z.string().min(1).describe("Message payload."),
-      })
+      .tool(
+        "netsim_send_message",
+        "Send a message from one node to another through the simulated network.",
+        {
+          topology_id: z.string().min(1).describe("ID of the network topology."),
+          from: z.string().min(1).describe("Sender node ID."),
+          to: z.string().min(1).describe("Receiver node ID."),
+          payload: z.string().min(1).describe("Message payload."),
+        },
+      )
       .meta({ category: "netsim", tier: "free" })
       .handler(async ({ input }) => {
         const topo = getTopology(input.topology_id, userId);
         if (!topo.nodes.has(input.from)) throw new Error(`Node ${input.from} not found`);
         if (!topo.nodes.has(input.to)) throw new Error(`Node ${input.to} not found`);
         const msg: NetworkMessage = {
-          id: `msg-${topo.messageLog.length + 1}`, from: input.from, to: input.to,
-          payload: input.payload, sentAt: topo.clock, deliveredAt: null, dropped: false, delayed: false,
+          id: `msg-${topo.messageLog.length + 1}`,
+          from: input.from,
+          to: input.to,
+          payload: input.payload,
+          sentAt: topo.clock,
+          deliveredAt: null,
+          dropped: false,
+          delayed: false,
         };
         topo.messageLog.push(msg);
         return textResult(
@@ -223,10 +249,20 @@ export function registerNetsimTools(
 
   registry.registerBuilt(
     freeTool(userId, db)
-      .tool("netsim_tick", "Advance the simulation clock by N rounds, delivering pending messages.", {
-        topology_id: z.string().min(1).describe("ID of the network topology."),
-        rounds: z.number().int().min(1).max(100).optional().describe("Number of rounds (default 1)."),
-      })
+      .tool(
+        "netsim_tick",
+        "Advance the simulation clock by N rounds, delivering pending messages.",
+        {
+          topology_id: z.string().min(1).describe("ID of the network topology."),
+          rounds: z
+            .number()
+            .int()
+            .min(1)
+            .max(100)
+            .optional()
+            .describe("Number of rounds (default 1)."),
+        },
+      )
       .meta({ category: "netsim", tier: "free" })
       .handler(async ({ input }) => {
         const topo = getTopology(input.topology_id, userId);
@@ -239,29 +275,49 @@ export function registerNetsimTools(
             if (msg.deliveredAt !== null || msg.dropped) continue;
             const key = linkKey(msg.from, msg.to);
             const link = topo.links.get(key);
-            if (!link) { msg.dropped = true; dropped.push(msg); continue; }
+            if (!link) {
+              msg.dropped = true;
+              dropped.push(msg);
+              continue;
+            }
             switch (link.state) {
-              case "up": msg.deliveredAt = topo.clock; delivered.push(msg); break;
-              case "partitioned": msg.dropped = true; dropped.push(msg); break;
+              case "up":
+                msg.deliveredAt = topo.clock;
+                delivered.push(msg);
+                break;
+              case "partitioned":
+                msg.dropped = true;
+                dropped.push(msg);
+                break;
               case "slow": {
                 const ticksNeeded = Math.max(1, Math.ceil(link.latencyMs / 100));
-                if (topo.clock - msg.sentAt >= ticksNeeded) { msg.deliveredAt = topo.clock; msg.delayed = true; delivered.push(msg); }
+                if (topo.clock - msg.sentAt >= ticksNeeded) {
+                  msg.deliveredAt = topo.clock;
+                  msg.delayed = true;
+                  delivered.push(msg);
+                }
                 break;
               }
               case "lossy": {
-                if (deterministicRandom(msg.id) < link.lossRate) { msg.dropped = true; dropped.push(msg); }
-                else { msg.deliveredAt = topo.clock; delivered.push(msg); }
+                if (deterministicRandom(msg.id) < link.lossRate) {
+                  msg.dropped = true;
+                  dropped.push(msg);
+                } else {
+                  msg.deliveredAt = topo.clock;
+                  delivered.push(msg);
+                }
                 break;
               }
             }
           }
         }
-        const pending = topo.messageLog.filter(m => m.deliveredAt === null && !m.dropped);
+        const pending = topo.messageLog.filter((m) => m.deliveredAt === null && !m.dropped);
         return textResult(
-          `**Simulation Advanced**\n\n**Delivered:** ${delivered.length} message(s)\n**Dropped:** ${dropped.length} message(s)\n**Pending:** ${pending.length} message(s)\n\n`
-          + (delivered.length > 0
-            ? `| From | To | Payload |\n|---|---|---|\n` + delivered.map(m => `| ${m.from} | ${m.to} | ${m.payload} |`).join("\n")
-            : "No messages delivered this tick."),
+          `**Simulation Advanced**\n\n**Delivered:** ${delivered.length} message(s)\n**Dropped:** ${dropped.length} message(s)\n**Pending:** ${pending.length} message(s)\n\n` +
+            (delivered.length > 0
+              ? `| From | To | Payload |\n|---|---|---|\n` +
+                delivered.map((m) => `| ${m.from} | ${m.to} | ${m.payload} |`).join("\n")
+              : "No messages delivered this tick."),
         );
       }),
   );

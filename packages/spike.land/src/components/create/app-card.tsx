@@ -20,13 +20,9 @@ export function AppCard({ title, description, slug, viewCount }: AppCardProps) {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-sm text-muted-foreground line-clamp-2 mb-4">
-            {description}
-          </p>
+          <p className="text-sm text-muted-foreground line-clamp-2 mb-4">{description}</p>
           <div className="flex items-center justify-between text-xs text-muted-foreground mt-auto">
-            <span>
-              {viewCount !== undefined ? `${viewCount} views` : "Try it"}
-            </span>
+            <span>{viewCount !== undefined ? `${viewCount} views` : "Try it"}</span>
             <ArrowRight className="w-3 h-3" />
           </div>
         </CardContent>

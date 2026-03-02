@@ -11,12 +11,7 @@ vi.mock("@/lib/try-catch", () => ({
   },
 }));
 
-import {
-  createIssue,
-  getWorkflowRuns,
-  isGitHubAvailable,
-  listIssues,
-} from "./github-issues";
+import { createIssue, getWorkflowRuns, isGitHubAvailable, listIssues } from "./github-issues";
 
 describe("github-issues", () => {
   beforeEach(() => {
@@ -83,8 +78,7 @@ describe("github-issues", () => {
       expect(issue.author).toBe("testuser");
       expect(issue.assignees).toEqual(["dev1"]);
 
-      const url = (globalThis.fetch as ReturnType<typeof vi.fn>).mock
-        .calls[0]![0] as string;
+      const url = (globalThis.fetch as ReturnType<typeof vi.fn>).mock.calls[0]![0] as string;
       expect(url).toContain("/repos/testowner/testrepo/issues");
       expect(url).toContain("state=open");
       expect(url).toContain("labels=bug");
@@ -96,8 +90,7 @@ describe("github-issues", () => {
 
       await listIssues();
 
-      const url = (globalThis.fetch as ReturnType<typeof vi.fn>).mock
-        .calls[0]![0] as string;
+      const url = (globalThis.fetch as ReturnType<typeof vi.fn>).mock.calls[0]![0] as string;
       expect(url).toContain("state=open");
       expect(url).toContain("per_page=20");
     });
@@ -109,8 +102,7 @@ describe("github-issues", () => {
 
       await listIssues();
 
-      const url = (globalThis.fetch as ReturnType<typeof vi.fn>).mock
-        .calls[0]![0] as string;
+      const url = (globalThis.fetch as ReturnType<typeof vi.fn>).mock.calls[0]![0] as string;
       expect(url).toContain("/repos/spike-land-ai/spike.land/");
     });
   });
@@ -142,8 +134,7 @@ describe("github-issues", () => {
       expect(result.data!.title).toBe("New feature");
       expect(result.data!.labels).toEqual(["feature"]);
 
-      const fetchCall = (globalThis.fetch as ReturnType<typeof vi.fn>).mock
-        .calls[0]!;
+      const fetchCall = (globalThis.fetch as ReturnType<typeof vi.fn>).mock.calls[0]!;
       expect(fetchCall[1].method).toBe("POST");
       const body = JSON.parse(fetchCall[1].body);
       expect(body.title).toBe("New feature");

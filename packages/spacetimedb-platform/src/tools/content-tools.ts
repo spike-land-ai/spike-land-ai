@@ -7,10 +7,7 @@ import { z } from "zod";
 import type { SpacetimePlatformClient } from "../client.js";
 import { errorResult, jsonResult } from "../types.js";
 
-export function registerContentTools(
-  server: McpServer,
-  client: SpacetimePlatformClient,
-): void {
+export function registerContentTools(server: McpServer, client: SpacetimePlatformClient): void {
   // ─── stdb_create_page ───
 
   server.tool(
@@ -180,7 +177,10 @@ export function registerContentTools(
     },
     async ({ pageId, blockIds }) => {
       try {
-        await client.reorderBlocks(BigInt(pageId), blockIds.map((id) => BigInt(id)));
+        await client.reorderBlocks(
+          BigInt(pageId),
+          blockIds.map((id: string) => BigInt(id)),
+        );
         return jsonResult({ reordered: true, pageId, count: blockIds.length });
       } catch (err: unknown) {
         const message = err instanceof Error ? err.message : String(err);

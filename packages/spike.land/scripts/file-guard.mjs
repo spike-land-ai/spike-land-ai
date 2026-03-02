@@ -7,13 +7,7 @@
 
 import { watch } from "chokidar";
 import { execSync } from "node:child_process";
-import {
-  appendFileSync,
-  existsSync,
-  mkdirSync,
-  readFileSync,
-  writeFileSync,
-} from "node:fs";
+import { appendFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 
 const LOG_DIR = ".dev-logs";
 const GUARD_LOG = `${LOG_DIR}/file-guard.log`;
@@ -73,24 +67,15 @@ function runGuard() {
   const files = [...pendingFiles];
   pendingFiles.clear();
 
-  log(
-    `Running file guard for ${files.length} changed file(s): ${files.join(", ")}`,
-  );
+  log(`Running file guard for ${files.length} changed file(s): ${files.join(", ")}`);
 
   try {
-    const result = execSync(
-      "yarn vitest run --changed HEAD --reporter=dot 2>&1",
-      {
-        encoding: "utf-8",
-        timeout: 120_000,
-      },
-    );
+    const result = execSync("yarn vitest run --changed HEAD --reporter=dot 2>&1", {
+      encoding: "utf-8",
+      timeout: 120_000,
+    });
     log(`PASS - all tests passed`);
-    addNotification(
-      "file_guard_pass",
-      `Tests passed for: ${files.join(", ")}`,
-      "info",
-    );
+    addNotification("file_guard_pass", `Tests passed for: ${files.join(", ")}`, "info");
   } catch (err) {
     const output = err.stdout || err.stderr || String(err);
     log(`FAIL - tests failed:\n${output.slice(0, 500)}`);
@@ -110,13 +95,13 @@ const watcher = watch("src/**/*.{ts,tsx}", {
   ignored: ["**/*.test.*", "**/*.spec.*", "**/node_modules/**"],
 });
 
-watcher.on("change", filePath => {
+watcher.on("change", (filePath) => {
   pendingFiles.add(filePath);
   clearTimeout(debounceTimer);
   debounceTimer = setTimeout(() => runGuard(), DEBOUNCE_MS);
 });
 
-watcher.on("add", filePath => {
+watcher.on("add", (filePath) => {
   pendingFiles.add(filePath);
   clearTimeout(debounceTimer);
   debounceTimer = setTimeout(() => runGuard(), DEBOUNCE_MS);

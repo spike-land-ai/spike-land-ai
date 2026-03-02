@@ -30,14 +30,7 @@ const PRODUCTION_PATTERNS = [
 ];
 
 // E2E test database patterns - these are ALLOWED
-const E2E_SAFE_PATTERNS = [
-  "e2e",
-  "test",
-  "staging",
-  "dev",
-  "local",
-  "preview",
-];
+const E2E_SAFE_PATTERNS = ["e2e", "test", "staging", "dev", "local", "preview"];
 
 interface ProtectionResult {
   safe: boolean;
@@ -57,9 +50,7 @@ interface ProtectionResult {
  * 5. E2E-safe patterns (e2e, test, dev, etc.) - ALLOWED
  * 6. Default: BLOCKED (unknown patterns are rejected for safety)
  */
-export function validateE2EDatabase(
-  connectionString: string,
-): ProtectionResult {
+export function validateE2EDatabase(connectionString: string): ProtectionResult {
   const lowercaseUrl = connectionString.toLowerCase();
 
   // Check for explicit E2E override (only for CI environments)
@@ -72,9 +63,7 @@ export function validateE2EDatabase(
         connectionString,
       };
     }
-    console.warn(
-      "⚠️  E2E_DATABASE_CONFIRMED is set - bypassing production checks",
-    );
+    console.warn("⚠️  E2E_DATABASE_CONFIRMED is set - bypassing production checks");
     return {
       safe: true,
       reason: "Explicitly confirmed via E2E_DATABASE_CONFIRMED in CI",
@@ -96,8 +85,8 @@ export function validateE2EDatabase(
 
   // Check for staging patterns FIRST (before production patterns)
   // This allows "next.spike.land" to be safe even though "spike.land" is blocked
-  const hasStagingPattern = STAGING_PATTERNS.some(pattern =>
-    lowercaseUrl.includes(pattern.toLowerCase())
+  const hasStagingPattern = STAGING_PATTERNS.some((pattern) =>
+    lowercaseUrl.includes(pattern.toLowerCase()),
   );
 
   if (hasStagingPattern) {
@@ -120,8 +109,8 @@ export function validateE2EDatabase(
   }
 
   // Check for E2E-safe patterns
-  const hasE2EPattern = E2E_SAFE_PATTERNS.some(pattern =>
-    lowercaseUrl.includes(pattern.toLowerCase())
+  const hasE2EPattern = E2E_SAFE_PATTERNS.some((pattern) =>
+    lowercaseUrl.includes(pattern.toLowerCase()),
   );
 
   if (hasE2EPattern) {
@@ -135,8 +124,9 @@ export function validateE2EDatabase(
   // If we get here, we're not sure - be safe and reject
   return {
     safe: false,
-    reason: "Connection string doesn't match any known E2E patterns. "
-      + "Use DATABASE_URL_E2E for E2E tests or add 'e2e', 'test', 'staging', 'dev' to the database name.",
+    reason:
+      "Connection string doesn't match any known E2E patterns. " +
+      "Use DATABASE_URL_E2E for E2E tests or add 'e2e', 'test', 'staging', 'dev' to the database name.",
     connectionString,
   };
 }
@@ -153,18 +143,12 @@ export function assertE2EDatabase(connectionString: string): void {
     console.error("🛑 PRODUCTION DATABASE PROTECTION TRIGGERED");
     console.error("=".repeat(70));
     console.error(`\nReason: ${result.reason}`);
-    console.error(
-      "\nThe connection string appears to be a production database.",
-    );
+    console.error("\nThe connection string appears to be a production database.");
     console.error("E2E scripts are NOT allowed to run against production.\n");
     console.error("To fix this:");
     console.error("  1. Set DATABASE_URL_E2E to point to a test database");
-    console.error(
-      "  2. Or use a database with 'e2e', 'test', 'staging', or 'dev' in the name",
-    );
-    console.error(
-      "  3. In CI, set E2E_DATABASE_CONFIRMED=true (use with caution!)\n",
-    );
+    console.error("  2. Or use a database with 'e2e', 'test', 'staging', or 'dev' in the name");
+    console.error("  3. In CI, set E2E_DATABASE_CONFIRMED=true (use with caution!)\n");
     console.error("=".repeat(70) + "\n");
 
     throw new Error(
@@ -179,13 +163,10 @@ export function assertE2EDatabase(connectionString: string): void {
  * Gets the E2E database connection string with safety checks.
  */
 export function getE2EDatabaseUrl(): string {
-  const connectionString = process.env.DATABASE_URL_E2E
-    || process.env.DATABASE_URL;
+  const connectionString = process.env.DATABASE_URL_E2E || process.env.DATABASE_URL;
 
   if (!connectionString) {
-    throw new Error(
-      "DATABASE_URL_E2E or DATABASE_URL environment variable is required",
-    );
+    throw new Error("DATABASE_URL_E2E or DATABASE_URL environment variable is required");
   }
 
   assertE2EDatabase(connectionString);

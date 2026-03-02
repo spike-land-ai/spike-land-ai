@@ -21,9 +21,7 @@ function makeExifJpeg(opts: {
   // Instead, we test the logic by mocking the module
   void opts;
   // Return a valid-looking JPEG start
-  return Buffer.from([0xff, 0xd8, 0xff, 0xe0, 0x00, 0x02, 0xff, 0xd9]).toString(
-    "base64",
-  );
+  return Buffer.from([0xff, 0xd8, 0xff, 0xe0, 0x00, 0x02, 0xff, 0xd9]).toString("base64");
 }
 
 // Since building valid EXIF data in raw bytes is complex, we mock exif-reader

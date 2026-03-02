@@ -23,7 +23,7 @@ export function ComposerImageStrip({
   return (
     <div className="flex items-center gap-2 px-3 py-2 overflow-x-auto">
       <AnimatePresence mode="popLayout">
-        {images.map(img => (
+        {images.map((img) => (
           <motion.div
             key={img.id}
             layout

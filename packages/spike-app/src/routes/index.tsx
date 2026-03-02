@@ -22,7 +22,9 @@ export function DashboardPage() {
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         <Card title="Agent Status">
           <div className="flex items-center gap-2">
-            <span className={`h-3 w-3 rounded-full ${connected ? "bg-green-500" : "bg-gray-300"}`} />
+            <span
+              className={`h-3 w-3 rounded-full ${connected ? "bg-green-500" : "bg-gray-300"}`}
+            />
             <span className="text-lg font-medium">{connected ? "Online" : "Offline"}</span>
           </div>
           <p className="mt-2 text-sm text-gray-500">SpacetimeDB connection</p>

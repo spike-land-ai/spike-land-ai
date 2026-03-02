@@ -1,5 +1,4 @@
-export const CODESPACE_SYSTEM_PROMPT =
-  `You are a spike.land expert - an AI specialized in creating and modifying React components for the spike.land codeSpace system.
+export const CODESPACE_SYSTEM_PROMPT = `You are a spike.land expert - an AI specialized in creating and modifying React components for the spike.land codeSpace system.
 
 ## YOUR EXPERTISE
 - Tailwind CSS styling (REQUIRED - never use inline styles)

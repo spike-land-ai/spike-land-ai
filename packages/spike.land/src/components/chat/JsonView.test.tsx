@@ -27,8 +27,8 @@ describe("JsonView", () => {
     render(<JsonView data={data} />);
 
     // Keys are rendered as "key"
-    expect(screen.getByText("\"user\"")).toBeDefined();
-    expect(screen.getByText("\"name\"")).toBeDefined();
+    expect(screen.getByText('"user"')).toBeDefined();
+    expect(screen.getByText('"name"')).toBeDefined();
     expect(screen.getByText("Alice")).toBeDefined();
   });
 
@@ -52,8 +52,8 @@ describe("JsonView", () => {
     };
     render(<JsonView data={data} maxExpandDepth={2} />);
 
-    expect(screen.getByText("\"a\"")).toBeDefined();
-    expect(screen.getByText("\"b\"")).toBeDefined();
+    expect(screen.getByText('"a"')).toBeDefined();
+    expect(screen.getByText('"b"')).toBeDefined();
     // "d" should not be visible as c is collapsed
     expect(screen.queryByText("deep")).toBeNull();
   });
@@ -67,26 +67,26 @@ describe("JsonView", () => {
     render(<JsonView data={data} maxExpandDepth={0} />);
 
     // Initially collapsed, root shows { 1 item }
-    expect(screen.queryByText("\"nested\"")).toBeNull();
+    expect(screen.queryByText('"nested"')).toBeNull();
 
     // Click root
-    const rootToggle = screen.getByText(content => content.includes("1 item"));
+    const rootToggle = screen.getByText((content) => content.includes("1 item"));
     const rootButton = rootToggle.closest("button");
     if (!rootButton) throw new Error("Root button not found");
     fireEvent.click(rootButton);
 
     // Now "nested" should be visible (but collapsed because depth 1 > maxExpandDepth 0)
-    expect(screen.getByText("\"nested\"")).toBeDefined();
-    expect(screen.queryByText("\"secret\"")).toBeNull();
+    expect(screen.getByText('"nested"')).toBeDefined();
+    expect(screen.queryByText('"secret"')).toBeNull();
 
     // Click "nested"
-    const nestedKey = screen.getByText("\"nested\"");
+    const nestedKey = screen.getByText('"nested"');
     const nestedButton = nestedKey.closest("button");
     if (!nestedButton) throw new Error("Nested button not found");
 
     fireEvent.click(nestedButton);
 
     // Now "secret" should be visible
-    expect(screen.getByText("\"secret\"")).toBeDefined();
+    expect(screen.getByText('"secret"')).toBeDefined();
   });
 });

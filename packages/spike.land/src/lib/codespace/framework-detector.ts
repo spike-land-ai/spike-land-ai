@@ -52,32 +52,16 @@ export async function guessEntryPoint(
       ];
       break;
     case "cra":
-      possibleEntries = [
-        "src/index.tsx",
-        "src/index.ts",
-        "src/index.jsx",
-        "src/index.js",
-      ];
+      possibleEntries = ["src/index.tsx", "src/index.ts", "src/index.jsx", "src/index.js"];
       break;
     case "next":
-      possibleEntries = [
-        "app/layout.tsx",
-        "app/page.tsx",
-        "pages/_app.tsx",
-        "pages/index.tsx",
-      ];
+      possibleEntries = ["app/layout.tsx", "app/page.tsx", "pages/_app.tsx", "pages/index.tsx"];
       break;
     case "remix":
       possibleEntries = ["app/entry.client.tsx", "app/root.tsx"];
       break;
     case "plain":
-      possibleEntries = [
-        "index.ts",
-        "index.tsx",
-        "index.js",
-        "src/index.ts",
-        "src/index.tsx",
-      ];
+      possibleEntries = ["index.ts", "index.tsx", "index.js", "src/index.ts", "src/index.tsx"];
       break;
   }
 
@@ -94,9 +78,7 @@ export async function guessEntryPoint(
   return possibleEntries[0] || "index.js";
 }
 
-export function generateEsbuildConfig(
-  framework: Framework,
-): Partial<BuildOptions> {
+export function generateEsbuildConfig(framework: Framework): Partial<BuildOptions> {
   const baseConfig: Partial<BuildOptions> = {
     bundle: true,
     format: "esm",

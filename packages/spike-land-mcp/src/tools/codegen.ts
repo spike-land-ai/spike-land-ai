@@ -58,7 +58,8 @@ function buildZeroShotPrompt(bundle: ContextBundle, role: string, format: string
     prompt += `Existing Context Files:\n`;
     for (const file of bundle.fileContents) prompt += `--- ${file.path} ---\n${file.content}\n\n`;
   }
-  if (bundle.constraints.length > 0) prompt += `Constraints:\n- ${bundle.constraints.join("\n- ")}\n\n`;
+  if (bundle.constraints.length > 0)
+    prompt += `Constraints:\n- ${bundle.constraints.join("\n- ")}\n\n`;
   return prompt;
 }
 
@@ -80,30 +81,43 @@ function parseCodeOutput(rawOutput: string): Array<{ path: string; content: stri
 
 // ─── Registration ────────────────────────────────────────────────────────────
 
-export function registerCodegenTools(
-  registry: ToolRegistry,
-  userId: string,
-  db: DrizzleDB,
-): void {
+export function registerCodegenTools(registry: ToolRegistry, userId: string, db: DrizzleDB): void {
   registry.registerBuilt(
     freeTool(userId, db)
-      .tool("codegen_create_bundle", "Create a context bundle for a zero-shot code generation call.", {
-        spec: z.string().describe("Specification for code generation."),
-        file_contents: z.array(z.object({ path: z.string(), content: z.string() })).describe("Context files."),
-        conventions: z.array(z.string()).optional().describe("Coding conventions."),
-        constraints: z.array(z.string()).optional().describe("Constraints."),
-        examples: z.array(z.object({ description: z.string(), code: z.string() })).optional().describe("Examples."),
-      })
+      .tool(
+        "codegen_create_bundle",
+        "Create a context bundle for a zero-shot code generation call.",
+        {
+          spec: z.string().describe("Specification for code generation."),
+          file_contents: z
+            .array(z.object({ path: z.string(), content: z.string() }))
+            .describe("Context files."),
+          conventions: z.array(z.string()).optional().describe("Coding conventions."),
+          constraints: z.array(z.string()).optional().describe("Constraints."),
+          examples: z
+            .array(z.object({ description: z.string(), code: z.string() }))
+            .optional()
+            .describe("Examples."),
+        },
+      )
       .meta({ category: "codegen", tier: "free" })
       .handler(async ({ input }) => {
         const id = crypto.randomUUID();
         const bundle: ContextBundle = {
-          id, userId, spec: input.spec, fileContents: input.file_contents,
-          conventions: input.conventions ?? [], constraints: input.constraints ?? [],
-          examples: input.examples ?? [], dependencyOutputs: [],
+          id,
+          userId,
+          spec: input.spec,
+          fileContents: input.file_contents,
+          conventions: input.conventions ?? [],
+          constraints: input.constraints ?? [],
+          examples: input.examples ?? [],
+          dependencyOutputs: [],
         };
         bundles.set(id, bundle);
-        return jsonResult(`Bundle ${id} created with ${input.file_contents.length} file(s)`, bundle);
+        return jsonResult(
+          `Bundle ${id} created with ${input.file_contents.length} file(s)`,
+          bundle,
+        );
       }),
   );
 
@@ -118,7 +132,11 @@ export function registerCodegenTools(
       .handler(async ({ input }) => {
         const bundle = bundles.get(input.bundle_id);
         if (!bundle) throw new Error(`Bundle ${input.bundle_id} not found`);
-        const prompt = buildZeroShotPrompt(bundle, input.role ?? "Senior React/Next.js Engineer", input.output_format ?? "Multi-file fenced blocks");
+        const prompt = buildZeroShotPrompt(
+          bundle,
+          input.role ?? "Senior React/Next.js Engineer",
+          input.output_format ?? "Multi-file fenced blocks",
+        );
         return jsonResult(`Prompt built for bundle ${input.bundle_id}`, { prompt });
       }),
   );
@@ -133,11 +151,19 @@ export function registerCodegenTools(
       .handler(async ({ input }) => {
         const resultId = crypto.randomUUID();
         const result: CodeGenResult = {
-          id: resultId, userId, bundleId: input.bundle_id,
-          provider: "google", model: input.model ?? "gemini-3.1-flash-image-preview",
-          prompt: "Mock prompt", generatedCode: "```typescript\nfilepath: test.ts\nexport const x = 1;\n```",
+          id: resultId,
+          userId,
+          bundleId: input.bundle_id,
+          provider: "google",
+          model: input.model ?? "gemini-3.1-flash-image-preview",
+          prompt: "Mock prompt",
+          generatedCode: "```typescript\nfilepath: test.ts\nexport const x = 1;\n```",
           files: [{ path: "test.ts", content: "export const x = 1;" }],
-          tokensIn: 100, tokensOut: 50, durationMs: 500, status: "success", iteration: 1,
+          tokensIn: 100,
+          tokensOut: 50,
+          durationMs: 500,
+          status: "success",
+          iteration: 1,
         };
         results.set(resultId, result);
         return jsonResult(`Code generation dispatched. Result ID: ${resultId}`, result);
@@ -184,7 +210,10 @@ export function registerCodegenTools(
         const bundle = bundles.get(result.bundleId);
         if (!bundle) throw new Error(`Bundle ${result.bundleId} not found`);
         const id = crypto.randomUUID();
-        return jsonResult(`Retry requested with feedback. New result ID: ${id}`, { id, feedback: input.feedback });
+        return jsonResult(`Retry requested with feedback. New result ID: ${id}`, {
+          id,
+          feedback: input.feedback,
+        });
       }),
   );
 
@@ -195,8 +224,13 @@ export function registerCodegenTools(
       })
       .meta({ category: "codegen", tier: "free" })
       .handler(async ({ input }) => {
-        const list = input.result_ids.map(id => results.get(id)).filter((r): r is CodeGenResult => !!r);
-        return jsonResult(`Summary of ${list.length} results`, list.map(r => ({ id: r.id, tokensIn: r.tokensIn, tokensOut: r.tokensOut })));
+        const list = input.result_ids
+          .map((id) => results.get(id))
+          .filter((r): r is CodeGenResult => !!r);
+        return jsonResult(
+          `Summary of ${list.length} results`,
+          list.map((r) => ({ id: r.id, tokensIn: r.tokensIn, tokensOut: r.tokensOut })),
+        );
       }),
   );
 }

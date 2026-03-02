@@ -41,9 +41,7 @@ describe("useDisplayMcp", () => {
 
   describe("fetchIceServers - success", () => {
     it("returns iceServers from mutation response", async () => {
-      const iceServers = [
-        { urls: "turn:turn.example.com", username: "user", credential: "pass" },
-      ];
+      const iceServers = [{ urls: "turn:turn.example.com", username: "user", credential: "pass" }];
       mockMutateAsync.mockResolvedValue({ iceServers });
 
       const { result } = renderHook(() => useDisplayMcp());

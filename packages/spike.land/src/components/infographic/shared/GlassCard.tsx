@@ -3,13 +3,7 @@ import React from "react";
 
 interface GlassCardProps extends React.HTMLAttributes<HTMLDivElement> {
   children: React.ReactNode;
-  variant?:
-    | "neutral"
-    | "claude"
-    | "openClaw"
-    | "critical"
-    | "high"
-    | "highlighted";
+  variant?: "neutral" | "claude" | "openClaw" | "critical" | "high" | "highlighted";
   hoverEffect?: boolean;
 }
 

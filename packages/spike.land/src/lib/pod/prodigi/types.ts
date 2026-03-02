@@ -65,40 +65,17 @@ interface ProdigiOrder {
 }
 
 interface ProdigiOrderStatus {
-  stage:
-    | "InProgress"
-    | "Complete"
-    | "Cancelled";
+  stage: "InProgress" | "Complete" | "Cancelled";
   issues?: ProdigiIssue[];
   details: ProdigiStatusDetails;
 }
 
 interface ProdigiStatusDetails {
-  downloadAssets:
-    | "NotStarted"
-    | "InProgress"
-    | "Complete"
-    | "Error";
-  printReadyAssetsPrepared:
-    | "NotStarted"
-    | "InProgress"
-    | "Complete"
-    | "Error";
-  allocateProductionLocation:
-    | "NotStarted"
-    | "InProgress"
-    | "Complete"
-    | "Error";
-  inProduction:
-    | "NotStarted"
-    | "InProgress"
-    | "Complete"
-    | "Error";
-  shipping:
-    | "NotStarted"
-    | "InProgress"
-    | "Complete"
-    | "Error";
+  downloadAssets: "NotStarted" | "InProgress" | "Complete" | "Error";
+  printReadyAssetsPrepared: "NotStarted" | "InProgress" | "Complete" | "Error";
+  allocateProductionLocation: "NotStarted" | "InProgress" | "Complete" | "Error";
+  inProduction: "NotStarted" | "InProgress" | "Complete" | "Error";
+  shipping: "NotStarted" | "InProgress" | "Complete" | "Error";
 }
 
 interface ProdigiIssue {
@@ -137,7 +114,7 @@ interface ProdigiShipment {
   carrier?: ProdigiCarrier;
   tracking?: ProdigiTracking;
   dispatchDate?: string;
-  items: { itemId: string; }[];
+  items: { itemId: string }[];
 }
 
 interface ProdigiCarrier {

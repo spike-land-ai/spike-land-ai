@@ -73,9 +73,7 @@ function formatGuidance(guidance: RecoveryGuidance): RecoveryGuidanceInfo {
 /**
  * Get all recovery guidance templates
  */
-export async function getAllRecoveryGuidance(): Promise<
-  RecoveryGuidanceInfo[]
-> {
+export async function getAllRecoveryGuidance(): Promise<RecoveryGuidanceInfo[]> {
   const guidance = await prisma.recoveryGuidance.findMany({
     orderBy: [{ severity: "desc" }, { issueType: "asc" }],
   });
@@ -492,9 +490,7 @@ export async function markIssueResolved(
 /**
  * Get unresolved issues for an account
  */
-export async function getUnresolvedIssues(
-  accountId: string,
-): Promise<
+export async function getUnresolvedIssues(accountId: string): Promise<
   Array<{
     id: string;
     eventType: string;
@@ -508,18 +504,13 @@ export async function getUnresolvedIssues(
       accountId,
       resolvedAt: null,
       eventType: {
-        in: [
-          "ERROR_OCCURRED",
-          "TOKEN_EXPIRED",
-          "RATE_LIMIT_HIT",
-          "STATUS_CHANGED",
-        ],
+        in: ["ERROR_OCCURRED", "TOKEN_EXPIRED", "RATE_LIMIT_HIT", "STATUS_CHANGED"],
       },
     },
     orderBy: { createdAt: "desc" },
   });
 
-  return events.map(e => ({
+  return events.map((e) => ({
     id: e.id,
     eventType: e.eventType,
     severity: e.severity,

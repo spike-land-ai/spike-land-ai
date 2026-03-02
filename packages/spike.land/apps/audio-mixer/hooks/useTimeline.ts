@@ -36,33 +36,22 @@ interface UseTimelineReturn {
   setSnapGrid: (grid: SnapGrid) => void;
 
   // Playback animation
-  startPlayheadAnimation: (
-    startTime: number,
-    audioContext?: AudioContext,
-  ) => void;
+  startPlayheadAnimation: (startTime: number, audioContext?: AudioContext) => void;
   stopPlayheadAnimation: () => void;
 
   // Scrubbing
-  scrubRef: React.MutableRefObject<
-    {
-      startX: number;
-      startTime: number;
-      lastTime: number;
-    } | null
-  >;
+  scrubRef: React.MutableRefObject<{
+    startX: number;
+    startTime: number;
+    lastTime: number;
+  } | null>;
   startScrub: (x: number, currentTime: number) => void;
   updateScrub: (x: number) => number;
   endScrub: () => void;
 }
 
-export function useTimeline(
-  options: UseTimelineOptions = {},
-): UseTimelineReturn {
-  const {
-    defaultZoom = DEFAULT_ZOOM,
-    defaultSnapEnabled = true,
-    defaultSnapGrid = 0.1,
-  } = options;
+export function useTimeline(options: UseTimelineOptions = {}): UseTimelineReturn {
+  const { defaultZoom = DEFAULT_ZOOM, defaultSnapEnabled = true, defaultSnapGrid = 0.1 } = options;
 
   const [state, setState] = useState<TimelineState>({
     zoom: defaultZoom,
@@ -74,32 +63,22 @@ export function useTimeline(
   });
 
   const animationRef = useRef<number | null>(null);
-  const animationStartRef = useRef<
-    {
-      wallTime: number;
-      contextTime: number;
-      playheadTime: number;
-      audioContext: AudioContext | null;
-    } | null
-  >(null);
-  const scrubRef = useRef<
-    {
-      startX: number;
-      startTime: number;
-      lastTime: number;
-    } | null
-  >(null);
+  const animationStartRef = useRef<{
+    wallTime: number;
+    contextTime: number;
+    playheadTime: number;
+    audioContext: AudioContext | null;
+  } | null>(null);
+  const scrubRef = useRef<{
+    startX: number;
+    startTime: number;
+    lastTime: number;
+  } | null>(null);
 
   // Conversion utilities
-  const timeToPixels = useCallback(
-    (time: number) => time * state.zoom,
-    [state.zoom],
-  );
+  const timeToPixels = useCallback((time: number) => time * state.zoom, [state.zoom]);
 
-  const pixelsToTime = useCallback(
-    (pixels: number) => pixels / state.zoom,
-    [state.zoom],
-  );
+  const pixelsToTime = useCallback((pixels: number) => pixels / state.zoom, [state.zoom]);
 
   const snapTime = useCallback(
     (time: number) => {
@@ -111,85 +90,79 @@ export function useTimeline(
 
   // State setters
   const setZoom = useCallback((zoom: number) => {
-    setState(prev => ({
+    setState((prev) => ({
       ...prev,
       zoom: Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, zoom)),
     }));
   }, []);
 
   const setScrollOffset = useCallback((offset: number) => {
-    setState(prev => ({
+    setState((prev) => ({
       ...prev,
       scrollOffset: Math.max(0, offset),
     }));
   }, []);
 
   const setPlayheadTime = useCallback((time: number) => {
-    setState(prev => ({
+    setState((prev) => ({
       ...prev,
       playheadTime: Math.max(0, time),
     }));
   }, []);
 
   const setSelectedTrackId = useCallback((id: string | null) => {
-    setState(prev => ({
+    setState((prev) => ({
       ...prev,
       selectedTrackId: id,
     }));
   }, []);
 
   const setSnapEnabled = useCallback((enabled: boolean) => {
-    setState(prev => ({
+    setState((prev) => ({
       ...prev,
       snapEnabled: enabled,
     }));
   }, []);
 
   const setSnapGrid = useCallback((grid: SnapGrid) => {
-    setState(prev => ({
+    setState((prev) => ({
       ...prev,
       snapGrid: grid,
     }));
   }, []);
 
   // Playhead animation for playback
-  const startPlayheadAnimation = useCallback(
-    (startTime: number, audioContext?: AudioContext) => {
-      // Cancel any existing animation
-      if (animationRef.current !== null) {
-        cancelAnimationFrame(animationRef.current);
-      }
+  const startPlayheadAnimation = useCallback((startTime: number, audioContext?: AudioContext) => {
+    // Cancel any existing animation
+    if (animationRef.current !== null) {
+      cancelAnimationFrame(animationRef.current);
+    }
 
-      animationStartRef.current = {
-        wallTime: performance.now(),
-        contextTime: audioContext?.currentTime ?? 0,
-        playheadTime: startTime,
-        audioContext: audioContext ?? null,
-      };
+    animationStartRef.current = {
+      wallTime: performance.now(),
+      contextTime: audioContext?.currentTime ?? 0,
+      playheadTime: startTime,
+      audioContext: audioContext ?? null,
+    };
 
-      const animate = () => {
-        if (!animationStartRef.current) return;
+    const animate = () => {
+      if (!animationStartRef.current) return;
 
-        const { audioContext: ctx, contextTime, wallTime, playheadTime } =
-          animationStartRef.current;
-        // Prefer AudioContext clock when available to stay in sync with audio
-        const elapsed = ctx
-          ? ctx.currentTime - contextTime
-          : (performance.now() - wallTime) / 1000;
-        const newTime = playheadTime + elapsed;
+      const { audioContext: ctx, contextTime, wallTime, playheadTime } = animationStartRef.current;
+      // Prefer AudioContext clock when available to stay in sync with audio
+      const elapsed = ctx ? ctx.currentTime - contextTime : (performance.now() - wallTime) / 1000;
+      const newTime = playheadTime + elapsed;
 
-        setState(prev => ({
-          ...prev,
-          playheadTime: newTime,
-        }));
-
-        animationRef.current = requestAnimationFrame(animate);
-      };
+      setState((prev) => ({
+        ...prev,
+        playheadTime: newTime,
+      }));
 
       animationRef.current = requestAnimationFrame(animate);
-    },
-    [],
-  );
+    };
+
+    animationRef.current = requestAnimationFrame(animate);
+  }, []);
 
   const stopPlayheadAnimation = useCallback(() => {
     if (animationRef.current !== null) {

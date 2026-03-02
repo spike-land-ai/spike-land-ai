@@ -12,8 +12,14 @@ import type { DrizzleDB } from "../db/index";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
-interface LamportClock { type: "lamport"; time: number }
-interface VectorClock { type: "vector"; entries: Record<string, number> }
+interface LamportClock {
+  type: "lamport";
+  time: number;
+}
+interface VectorClock {
+  type: "vector";
+  entries: Record<string, number>;
+}
 type LogicalClock = LamportClock | VectorClock;
 type CausalRelation = "happens_before" | "concurrent" | "same";
 
@@ -71,7 +77,10 @@ function getProcessClock(system: CausalSystem, processId: string): LogicalClock 
   return clock;
 }
 
-function getLatestEventForProcess(system: CausalSystem, processId: string): CausalEvent | undefined {
+function getLatestEventForProcess(
+  system: CausalSystem,
+  processId: string,
+): CausalEvent | undefined {
   for (let i = system.events.length - 1; i >= 0; i--) {
     if (system.events[i]!.processId === processId) return system.events[i]!;
   }
@@ -80,7 +89,9 @@ function getLatestEventForProcess(system: CausalSystem, processId: string): Caus
 
 function formatClock(clock: LogicalClock): string {
   if (clock.type === "lamport") return `Lamport(${clock.time})`;
-  const entries = Object.entries(clock.entries).map(([k, v]) => `${k}: ${v}`).join(", ");
+  const entries = Object.entries(clock.entries)
+    .map(([k, v]) => `${k}: ${v}`)
+    .join(", ");
   return `Vector{${entries}}`;
 }
 
@@ -92,11 +103,19 @@ function determineRelation(clockA: LogicalClock, clockB: LogicalClock): CausalRe
   }
   if (clockA.type === "vector" && clockB.type === "vector") {
     const allKeys = new Set([...Object.keys(clockA.entries), ...Object.keys(clockB.entries)]);
-    let aLeqB = true, aStrictlyLessB = false, bStrictlyLessA = false;
+    let aLeqB = true,
+      aStrictlyLessB = false,
+      bStrictlyLessA = false;
     for (const key of allKeys) {
-      const aVal = clockA.entries[key] ?? 0, bVal = clockB.entries[key] ?? 0;
-      if (aVal > bVal) { aLeqB = false; bStrictlyLessA = true; }
-      if (bVal > aVal) { aStrictlyLessB = true; }
+      const aVal = clockA.entries[key] ?? 0,
+        bVal = clockB.entries[key] ?? 0;
+      if (aVal > bVal) {
+        aLeqB = false;
+        bStrictlyLessA = true;
+      }
+      if (bVal > aVal) {
+        aStrictlyLessB = true;
+      }
     }
     if (!aStrictlyLessB && !bStrictlyLessA) return "same";
     if (aLeqB && aStrictlyLessB) return "happens_before";
@@ -105,20 +124,33 @@ function determineRelation(clockA: LogicalClock, clockB: LogicalClock): CausalRe
   throw new Error("Cannot compare clocks of different types");
 }
 
-function buildExplanation(clockA: LogicalClock, clockB: LogicalClock, relation: CausalRelation, eventIdA: string, eventIdB: string): string {
+function buildExplanation(
+  clockA: LogicalClock,
+  clockB: LogicalClock,
+  relation: CausalRelation,
+  eventIdA: string,
+  eventIdB: string,
+): string {
   if (clockA.type === "lamport" && clockB.type === "lamport") {
     switch (relation) {
-      case "happens_before": return `Lamport clock: ${eventIdA} has time ${clockA.time} < ${clockB.time} of ${eventIdB}. ${eventIdA} happens before ${eventIdB}.`;
-      case "same": return `Lamport clock: ${eventIdA} and ${eventIdB} both have time ${clockA.time}. Equal timestamps indicate potential concurrency.`;
-      case "concurrent": return `Lamport clock: ${eventIdA} has time ${clockA.time}, ${eventIdB} has time ${clockB.time}. These events are concurrent.`;
+      case "happens_before":
+        return `Lamport clock: ${eventIdA} has time ${clockA.time} < ${clockB.time} of ${eventIdB}. ${eventIdA} happens before ${eventIdB}.`;
+      case "same":
+        return `Lamport clock: ${eventIdA} and ${eventIdB} both have time ${clockA.time}. Equal timestamps indicate potential concurrency.`;
+      case "concurrent":
+        return `Lamport clock: ${eventIdA} has time ${clockA.time}, ${eventIdB} has time ${clockB.time}. These events are concurrent.`;
     }
   }
   if (clockA.type === "vector" && clockB.type === "vector") {
-    const aE = JSON.stringify(clockA.entries), bE = JSON.stringify(clockB.entries);
+    const aE = JSON.stringify(clockA.entries),
+      bE = JSON.stringify(clockB.entries);
     switch (relation) {
-      case "happens_before": return `Vector clock: ${eventIdA} ${aE} <= ${eventIdB} ${bE} with at least one strict inequality.`;
-      case "same": return `Vector clock: ${eventIdA} ${aE} and ${eventIdB} ${bE} are identical.`;
-      case "concurrent": return `Vector clock: ${eventIdA} ${aE} and ${eventIdB} ${bE} are incomparable (concurrent).`;
+      case "happens_before":
+        return `Vector clock: ${eventIdA} ${aE} <= ${eventIdB} ${bE} with at least one strict inequality.`;
+      case "same":
+        return `Vector clock: ${eventIdA} ${aE} and ${eventIdB} ${bE} are identical.`;
+      case "concurrent":
+        return `Vector clock: ${eventIdA} ${aE} and ${eventIdB} ${bE} are incomparable (concurrent).`;
     }
   }
   return "Cannot compare clocks of different types.";
@@ -152,11 +184,15 @@ export function registerCausalityTools(
 ): void {
   registry.registerBuilt(
     freeTool(userId, db)
-      .tool("causality_create_system", "Create a causal system with N processes using Lamport or Vector clocks.", {
-        name: z.string().min(1).describe("Name for the causal system."),
-        process_count: z.number().int().min(2).max(7).describe("Number of processes (2-7)."),
-        clock_type: ClockTypeEnum,
-      })
+      .tool(
+        "causality_create_system",
+        "Create a causal system with N processes using Lamport or Vector clocks.",
+        {
+          name: z.string().min(1).describe("Name for the causal system."),
+          process_count: z.number().int().min(2).max(7).describe("Number of processes (2-7)."),
+          clock_type: ClockTypeEnum,
+        },
+      )
       .meta({ category: "causality", tier: "free" })
       .handler(async ({ input }) => {
         const id = generateId();
@@ -165,13 +201,24 @@ export function registerCausalityTools(
         const processIds: string[] = [];
         for (let i = 1; i <= input.process_count; i++) processIds.push(`process-${i}`);
         for (const pid of processIds) {
-          const clock: LogicalClock = input.clock_type === "lamport"
-            ? { type: "lamport", time: 0 }
-            : { type: "vector", entries: Object.fromEntries(processIds.map(p => [p, 0])) };
+          const clock: LogicalClock =
+            input.clock_type === "lamport"
+              ? { type: "lamport", time: 0 }
+              : { type: "vector", entries: Object.fromEntries(processIds.map((p) => [p, 0])) };
           processes.set(pid, clock);
           processOrder.push(pid);
         }
-        const system: CausalSystem = { id, userId, name: input.name, clockType: input.clock_type, processes, processOrder, events: [], eventCounter: 0, createdAt: Date.now() };
+        const system: CausalSystem = {
+          id,
+          userId,
+          name: input.name,
+          clockType: input.clock_type,
+          processes,
+          processOrder,
+          events: [],
+          eventCounter: 0,
+          createdAt: Date.now(),
+        };
         systems.set(id, system);
         return textResult(
           `**Causal System Created**\n\n**ID:** ${system.id}\n**Name:** ${system.name}\n**Clock Type:** ${system.clockType}\n**Processes:** ${system.processOrder.join(", ")}\n\nUse \`causality_local_event\` or \`causality_send_event\` to create events.`,
@@ -181,11 +228,15 @@ export function registerCausalityTools(
 
   registry.registerBuilt(
     freeTool(userId, db)
-      .tool("causality_local_event", "Record a local event on a process. Increments the process's logical clock.", {
-        system_id: z.string().min(1).describe("ID of the causal system."),
-        process_id: z.string().min(1).describe("Process ID."),
-        label: z.string().min(1).describe("Label for this event."),
-      })
+      .tool(
+        "causality_local_event",
+        "Record a local event on a process. Increments the process's logical clock.",
+        {
+          system_id: z.string().min(1).describe("ID of the causal system."),
+          process_id: z.string().min(1).describe("Process ID."),
+          label: z.string().min(1).describe("Label for this event."),
+        },
+      )
       .meta({ category: "causality", tier: "free" })
       .handler(async ({ input }) => {
         const system = getSystem(input.system_id, userId);
@@ -196,9 +247,18 @@ export function registerCausalityTools(
         const latest = getLatestEventForProcess(system, input.process_id);
         if (latest) causalParents.push(latest.id);
         system.eventCounter++;
-        const evt: CausalEvent = { id: `evt-${system.eventCounter}`, processId: input.process_id, label: input.label, clock: cloneClock(clock), causalParents, timestamp: system.eventCounter };
+        const evt: CausalEvent = {
+          id: `evt-${system.eventCounter}`,
+          processId: input.process_id,
+          label: input.label,
+          clock: cloneClock(clock),
+          causalParents,
+          timestamp: system.eventCounter,
+        };
         system.events.push(evt);
-        return textResult(`**Local Event Recorded**\n\n**Event ID:** ${evt.id}\n**Process:** ${evt.processId}\n**Label:** ${evt.label}\n**Clock:** ${formatClock(evt.clock)}`);
+        return textResult(
+          `**Local Event Recorded**\n\n**Event ID:** ${evt.id}\n**Process:** ${evt.processId}\n**Label:** ${evt.label}\n**Clock:** ${formatClock(evt.clock)}`,
+        );
       }),
   );
 
@@ -217,26 +277,50 @@ export function registerCausalityTools(
         const senderClock = getProcessClock(system, input.from_process);
         getProcessClock(system, input.to_process); // validate exists
         if (senderClock.type === "lamport") senderClock.time += 1;
-        else senderClock.entries[input.from_process] = (senderClock.entries[input.from_process] ?? 0) + 1;
+        else
+          senderClock.entries[input.from_process] =
+            (senderClock.entries[input.from_process] ?? 0) + 1;
         const sendParents: string[] = [];
         const latestSender = getLatestEventForProcess(system, input.from_process);
         if (latestSender) sendParents.push(latestSender.id);
         system.eventCounter++;
-        const sendEvt: CausalEvent = { id: `evt-${system.eventCounter}`, processId: input.from_process, label: `send(${input.label})`, clock: cloneClock(senderClock), causalParents: sendParents, timestamp: system.eventCounter };
+        const sendEvt: CausalEvent = {
+          id: `evt-${system.eventCounter}`,
+          processId: input.from_process,
+          label: `send(${input.label})`,
+          clock: cloneClock(senderClock),
+          causalParents: sendParents,
+          timestamp: system.eventCounter,
+        };
         system.events.push(sendEvt);
         const receiverClock = getProcessClock(system, input.to_process);
         if (receiverClock.type === "lamport" && senderClock.type === "lamport") {
           receiverClock.time = Math.max(receiverClock.time, senderClock.time) + 1;
         } else if (receiverClock.type === "vector" && senderClock.type === "vector") {
-          const allKeys = new Set([...Object.keys(receiverClock.entries), ...Object.keys(senderClock.entries)]);
-          for (const key of allKeys) receiverClock.entries[key] = Math.max(receiverClock.entries[key] ?? 0, senderClock.entries[key] ?? 0);
-          receiverClock.entries[input.to_process] = (receiverClock.entries[input.to_process] ?? 0) + 1;
+          const allKeys = new Set([
+            ...Object.keys(receiverClock.entries),
+            ...Object.keys(senderClock.entries),
+          ]);
+          for (const key of allKeys)
+            receiverClock.entries[key] = Math.max(
+              receiverClock.entries[key] ?? 0,
+              senderClock.entries[key] ?? 0,
+            );
+          receiverClock.entries[input.to_process] =
+            (receiverClock.entries[input.to_process] ?? 0) + 1;
         }
         const receiveParents: string[] = [sendEvt.id];
         const latestReceiver = getLatestEventForProcess(system, input.to_process);
         if (latestReceiver) receiveParents.push(latestReceiver.id);
         system.eventCounter++;
-        const receiveEvt: CausalEvent = { id: `evt-${system.eventCounter}`, processId: input.to_process, label: `receive(${input.label})`, clock: cloneClock(receiverClock), causalParents: receiveParents, timestamp: system.eventCounter };
+        const receiveEvt: CausalEvent = {
+          id: `evt-${system.eventCounter}`,
+          processId: input.to_process,
+          label: `receive(${input.label})`,
+          clock: cloneClock(receiverClock),
+          causalParents: receiveParents,
+          timestamp: system.eventCounter,
+        };
         system.events.push(receiveEvt);
         return textResult(
           `**Message Send Simulated**\n\n| Event | Process | Label | Clock |\n|---|---|---|---|\n| ${sendEvt.id} | ${sendEvt.processId} | ${sendEvt.label} | ${formatClock(sendEvt.clock)} |\n| ${receiveEvt.id} | ${receiveEvt.processId} | ${receiveEvt.label} | ${formatClock(receiveEvt.clock)} |`,
@@ -254,17 +338,28 @@ export function registerCausalityTools(
       .meta({ category: "causality", tier: "free" })
       .handler(async ({ input }) => {
         const system = getSystem(input.system_id, userId);
-        const eventA = system.events.find(e => e.id === input.event_a);
-        const eventB = system.events.find(e => e.id === input.event_b);
+        const eventA = system.events.find((e) => e.id === input.event_a);
+        const eventB = system.events.find((e) => e.id === input.event_b);
         if (!eventA) throw new Error(`Event ${input.event_a} not found`);
         if (!eventB) throw new Error(`Event ${input.event_b} not found`);
         if (input.event_a === input.event_b) {
-          return textResult(`**Causal Comparison**\n\n**${input.event_a}** == **${input.event_b}**\n**Relation:** same\n\nSame event.`);
+          return textResult(
+            `**Causal Comparison**\n\n**${input.event_a}** == **${input.event_b}**\n**Relation:** same\n\nSame event.`,
+          );
         }
         const relation = determineRelation(eventA.clock, eventB.clock);
-        const symbol = relation === "happens_before" ? "->" : relation === "concurrent" ? "||" : "==";
-        const explanation = buildExplanation(eventA.clock, eventB.clock, relation, input.event_a, input.event_b);
-        return textResult(`**Causal Comparison**\n\n**${input.event_a}** ${symbol} **${input.event_b}**\n**Relation:** ${relation}\n\n${explanation}`);
+        const symbol =
+          relation === "happens_before" ? "->" : relation === "concurrent" ? "||" : "==";
+        const explanation = buildExplanation(
+          eventA.clock,
+          eventB.clock,
+          relation,
+          input.event_a,
+          input.event_b,
+        );
+        return textResult(
+          `**Causal Comparison**\n\n**${input.event_a}** ${symbol} **${input.event_b}**\n**Relation:** ${relation}\n\n${explanation}`,
+        );
       }),
   );
 
@@ -278,15 +373,25 @@ export function registerCausalityTools(
       .handler(async ({ input }) => {
         const system = getSystem(input.system_id, userId);
         const processIds = input.process_id ? [input.process_id] : system.processOrder;
-        const processRows = processIds.map(pid => {
-          const clock = getProcessClock(system, pid);
-          return `| ${pid} | ${formatClock(cloneClock(clock))} |`;
-        }).join("\n");
-        const events = input.process_id ? system.events.filter(e => e.processId === input.process_id) : [...system.events];
-        const eventRows = events.length > 0
-          ? `\n\n**Events:**\n\n| ID | Process | Label | Clock |\n|---|---|---|---|\n` + events.map(e => `| ${e.id} | ${e.processId} | ${e.label} | ${formatClock(e.clock)} |`).join("\n")
-          : "";
-        return textResult(`**Causal System: ${system.name}** (${system.clockType})\n\n| Process | Clock |\n|---|---|\n${processRows}${eventRows}`);
+        const processRows = processIds
+          .map((pid) => {
+            const clock = getProcessClock(system, pid);
+            return `| ${pid} | ${formatClock(cloneClock(clock))} |`;
+          })
+          .join("\n");
+        const events = input.process_id
+          ? system.events.filter((e) => e.processId === input.process_id)
+          : [...system.events];
+        const eventRows =
+          events.length > 0
+            ? `\n\n**Events:**\n\n| ID | Process | Label | Clock |\n|---|---|---|---|\n` +
+              events
+                .map((e) => `| ${e.id} | ${e.processId} | ${e.label} | ${formatClock(e.clock)} |`)
+                .join("\n")
+            : "";
+        return textResult(
+          `**Causal System: ${system.name}** (${system.clockType})\n\n| Process | Clock |\n|---|---|\n${processRows}${eventRows}`,
+        );
       }),
   );
 
@@ -300,8 +405,15 @@ export function registerCausalityTools(
         const system = getSystem(input.system_id, userId);
         const events = topologicalSort([...system.events]);
         if (events.length === 0) return textResult("**Timeline**\n\nNo events recorded yet.");
-        const rows = events.map((e, i) => `| ${i + 1} | ${e.id} | ${e.processId} | ${e.label} | ${formatClock(e.clock)} |`).join("\n");
-        return textResult(`**Timeline** (${events.length} events)\n\n| # | ID | Process | Label | Clock |\n|---|---|---|---|---|\n${rows}`);
+        const rows = events
+          .map(
+            (e, i) =>
+              `| ${i + 1} | ${e.id} | ${e.processId} | ${e.label} | ${formatClock(e.clock)} |`,
+          )
+          .join("\n");
+        return textResult(
+          `**Timeline** (${events.length} events)\n\n| # | ID | Process | Label | Clock |\n|---|---|---|---|---|\n${rows}`,
+        );
       }),
   );
 }

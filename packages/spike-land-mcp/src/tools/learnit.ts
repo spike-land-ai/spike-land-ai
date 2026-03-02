@@ -25,11 +25,16 @@ export function registerLearnItTools(
 
   registry.registerBuilt(
     t
-      .tool("learnit_get_topic", "Get a LearnIt wiki topic by slug. Returns title, description, and content (truncated to ~4000 chars). Increments view count.", {
-        slug: z.string().min(1).describe(
-          "Unique slug of the topic (e.g. 'javascript/closures').",
-        ),
-      })
+      .tool(
+        "learnit_get_topic",
+        "Get a LearnIt wiki topic by slug. Returns title, description, and content (truncated to ~4000 chars). Increments view count.",
+        {
+          slug: z
+            .string()
+            .min(1)
+            .describe("Unique slug of the topic (e.g. 'javascript/closures')."),
+        },
+      )
       .meta({ category: "learnit", tier: "free" })
       .handler(async ({ input }) => {
         return safeToolCall("learnit_get_topic", async () => {
@@ -51,9 +56,10 @@ export function registerLearnItTools(
             );
           }
 
-          const truncatedContent = topic.content.length > MAX_CONTENT_LENGTH
-            ? topic.content.slice(0, MAX_CONTENT_LENGTH) + "\n\n...(truncated)"
-            : topic.content;
+          const truncatedContent =
+            topic.content.length > MAX_CONTENT_LENGTH
+              ? topic.content.slice(0, MAX_CONTENT_LENGTH) + "\n\n...(truncated)"
+              : topic.content;
 
           let text = `**${topic.title}**\n\n`;
           text += `**Slug:** ${topic.slug}\n`;
@@ -75,26 +81,31 @@ export function registerLearnItTools(
 
   registry.registerBuilt(
     t
-      .tool("learnit_search_topics", "Search published LearnIt topics by title, description, or slug. Ordered by popularity (view count).", {
-        query: z.string().min(1).describe(
-          "Search query to match against topic title, description, or slug.",
-        ),
-        limit: z.number().int().min(1).max(50).optional().describe(
-          "Max results (default 10).",
-        ),
-      })
+      .tool(
+        "learnit_search_topics",
+        "Search published LearnIt topics by title, description, or slug. Ordered by popularity (view count).",
+        {
+          query: z
+            .string()
+            .min(1)
+            .describe("Search query to match against topic title, description, or slug."),
+          limit: z.number().int().min(1).max(50).optional().describe("Max results (default 10)."),
+        },
+      )
       .meta({ category: "learnit", tier: "free" })
       .handler(async ({ input }) => {
         return safeToolCall("learnit_search_topics", async () => {
           const params = new URLSearchParams({ query: input.query });
           if (input.limit !== undefined) params.set("limit", String(input.limit));
 
-          const topics = await apiRequest<Array<{
-            slug: string;
-            title: string;
-            description: string;
-            viewCount: number;
-          }>>(`/api/learnit/search?${params.toString()}`);
+          const topics = await apiRequest<
+            Array<{
+              slug: string;
+              title: string;
+              description: string;
+              viewCount: number;
+            }>
+          >(`/api/learnit/search?${params.toString()}`);
 
           if (topics.length === 0) {
             return textResult(`No topics found matching "${input.query}".`);
@@ -113,13 +124,17 @@ export function registerLearnItTools(
 
   registry.registerBuilt(
     t
-      .tool("learnit_get_relations", "Get relationships for a LearnIt topic: related topics, prerequisites, children, or parent. Filter by type or get all.", {
-        slug: z.string().min(1).describe("Slug of the topic to get relations for."),
-        type: z
-          .enum(["related", "prerequisites", "children", "parent"])
-          .optional()
-          .describe("Filter by relation type. Omit to get all types."),
-      })
+      .tool(
+        "learnit_get_relations",
+        "Get relationships for a LearnIt topic: related topics, prerequisites, children, or parent. Filter by type or get all.",
+        {
+          slug: z.string().min(1).describe("Slug of the topic to get relations for."),
+          type: z
+            .enum(["related", "prerequisites", "children", "parent"])
+            .optional()
+            .describe("Filter by relation type. Omit to get all types."),
+        },
+      )
       .meta({ category: "learnit", tier: "free" })
       .handler(async ({ input }) => {
         return safeToolCall("learnit_get_relations", async () => {
@@ -132,7 +147,9 @@ export function registerLearnItTools(
             prerequisites: Array<{ title: string; slug: string }>;
             children: Array<{ title: string; slug: string }>;
             parent: { title: string; slug: string } | null;
-          }>(`/api/learnit/topics/${encodeURIComponent(input.slug)}/relations?${params.toString()}`);
+          }>(
+            `/api/learnit/topics/${encodeURIComponent(input.slug)}/relations?${params.toString()}`,
+          );
 
           let text = `**Relations for "${result.title}" (\`${input.slug}\`)**\n\n`;
 
@@ -174,23 +191,27 @@ export function registerLearnItTools(
 
   registry.registerBuilt(
     t
-      .tool("learnit_list_popular", "List the most popular published LearnIt topics by view count.", {
-        limit: z.number().int().min(1).max(50).optional().describe(
-          "Max results (default 10).",
-        ),
-      })
+      .tool(
+        "learnit_list_popular",
+        "List the most popular published LearnIt topics by view count.",
+        {
+          limit: z.number().int().min(1).max(50).optional().describe("Max results (default 10)."),
+        },
+      )
       .meta({ category: "learnit", tier: "free" })
       .handler(async ({ input }) => {
         return safeToolCall("learnit_list_popular", async () => {
           const params = new URLSearchParams();
           if (input.limit !== undefined) params.set("limit", String(input.limit));
 
-          const topics = await apiRequest<Array<{
-            slug: string;
-            title: string;
-            description: string;
-            viewCount: number;
-          }>>(`/api/learnit/popular?${params.toString()}`);
+          const topics = await apiRequest<
+            Array<{
+              slug: string;
+              title: string;
+              description: string;
+              viewCount: number;
+            }>
+          >(`/api/learnit/popular?${params.toString()}`);
 
           if (topics.length === 0) {
             return textResult("No published topics found.");
@@ -210,9 +231,7 @@ export function registerLearnItTools(
   registry.registerBuilt(
     t
       .tool("learnit_list_recent", "List the most recently created published LearnIt topics.", {
-        limit: z.number().int().min(1).max(50).optional().describe(
-          "Max results (default 10).",
-        ),
+        limit: z.number().int().min(1).max(50).optional().describe("Max results (default 10)."),
       })
       .meta({ category: "learnit", tier: "free" })
       .handler(async ({ input }) => {
@@ -220,13 +239,15 @@ export function registerLearnItTools(
           const params = new URLSearchParams();
           if (input.limit !== undefined) params.set("limit", String(input.limit));
 
-          const topics = await apiRequest<Array<{
-            slug: string;
-            title: string;
-            description: string;
-            viewCount: number;
-            createdAt: string;
-          }>>(`/api/learnit/recent?${params.toString()}`);
+          const topics = await apiRequest<
+            Array<{
+              slug: string;
+              title: string;
+              description: string;
+              viewCount: number;
+              createdAt: string;
+            }>
+          >(`/api/learnit/recent?${params.toString()}`);
 
           if (topics.length === 0) {
             return textResult("No published topics found.");

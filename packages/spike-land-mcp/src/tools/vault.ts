@@ -79,28 +79,28 @@ async function encryptValue(userId: string, value: string): Promise<string> {
   return btoa(JSON.stringify(envelope));
 }
 
-export function registerVaultTools(
-  registry: ToolRegistry,
-  userId: string,
-  db: DrizzleDB,
-): void {
+export function registerVaultTools(registry: ToolRegistry, userId: string, db: DrizzleDB): void {
   const t = freeTool(userId, db);
 
   registry.registerBuilt(
     t
-      .tool("vault_store_secret", "Store an encrypted secret (API key, OAuth token, etc.) in the vault. "
-        + "The secret is encrypted at rest and NEVER readable in plaintext.", {
-        name: z
-          .string()
-          .min(1)
-          .max(100)
-          .regex(
-            /^[a-zA-Z][a-zA-Z0-9_]*$/,
-            "Name must start with a letter and contain only letters, numbers, and underscores",
-          )
-          .describe("Secret name (e.g. OPENAI_API_KEY)."),
-        value: z.string().min(1).max(10000).describe("The secret value to encrypt and store."),
-      })
+      .tool(
+        "vault_store_secret",
+        "Store an encrypted secret (API key, OAuth token, etc.) in the vault. " +
+          "The secret is encrypted at rest and NEVER readable in plaintext.",
+        {
+          name: z
+            .string()
+            .min(1)
+            .max(100)
+            .regex(
+              /^[a-zA-Z][a-zA-Z0-9_]*$/,
+              "Name must start with a letter and contain only letters, numbers, and underscores",
+            )
+            .describe("Secret name (e.g. OPENAI_API_KEY)."),
+          value: z.string().min(1).max(10000).describe("The secret value to encrypt and store."),
+        },
+      )
       .meta({ category: "vault", tier: "free" })
       .handler(async ({ input, ctx }) => {
         try {
@@ -111,10 +111,12 @@ export function registerVaultTools(
 
           if (count >= limit) {
             return {
-              content: [{
-                type: "text",
-                text: `Secret limit reached (${count}/${limit}). Upgrade to Premium for up to ${PREMIUM_SECRET_LIMIT} secrets.`,
-              }],
+              content: [
+                {
+                  type: "text",
+                  text: `Secret limit reached (${count}/${limit}). Upgrade to Premium for up to ${PREMIUM_SECRET_LIMIT} secrets.`,
+                },
+              ],
               isError: true,
             };
           }
@@ -126,12 +128,7 @@ export function registerVaultTools(
           const existing = await ctx.db
             .select({ id: vaultSecrets.id })
             .from(vaultSecrets)
-            .where(
-              and(
-                eq(vaultSecrets.userId, ctx.userId),
-                eq(vaultSecrets.key, input.name),
-              ),
-            )
+            .where(and(eq(vaultSecrets.userId, ctx.userId), eq(vaultSecrets.key, input.name)))
             .limit(1);
 
           let secretId: string;
@@ -155,13 +152,16 @@ export function registerVaultTools(
           }
 
           return {
-            content: [{
-              type: "text",
-              text: `**Secret Stored!**\n\n`
-                + `**ID:** ${secretId}\n`
-                + `**Name:** ${input.name}\n\n`
-                + `The secret is encrypted and cannot be read back.`,
-            }],
+            content: [
+              {
+                type: "text",
+                text:
+                  `**Secret Stored!**\n\n` +
+                  `**ID:** ${secretId}\n` +
+                  `**Name:** ${input.name}\n\n` +
+                  `The secret is encrypted and cannot be read back.`,
+              },
+            ],
           };
         } catch (error) {
           const msg = error instanceof Error ? error.message : "Unknown error";
@@ -175,7 +175,11 @@ export function registerVaultTools(
 
   registry.registerBuilt(
     t
-      .tool("vault_list_secrets", "List all secrets in the vault. Returns names only — NEVER returns secret values.", {})
+      .tool(
+        "vault_list_secrets",
+        "List all secrets in the vault. Returns names only — NEVER returns secret values.",
+        {},
+      )
       .meta({ category: "vault", tier: "free" })
       .handler(async ({ ctx }) => {
         try {
@@ -195,10 +199,12 @@ export function registerVaultTools(
 
           if (secrets.length === 0) {
             return {
-              content: [{
-                type: "text",
-                text: `**Vault (${count}/${limit} secrets)**\n\nNo secrets stored. Use \`vault_store_secret\` to add one.`,
-              }],
+              content: [
+                {
+                  type: "text",
+                  text: `**Vault (${count}/${limit} secrets)**\n\nNo secrets stored. Use \`vault_store_secret\` to add one.`,
+                },
+              ],
             };
           }
 
@@ -229,33 +235,30 @@ export function registerVaultTools(
           const secret = await ctx.db
             .select({ id: vaultSecrets.id, key: vaultSecrets.key })
             .from(vaultSecrets)
-            .where(
-              and(
-                eq(vaultSecrets.id, input.secret_id),
-                eq(vaultSecrets.userId, ctx.userId),
-              ),
-            )
+            .where(and(eq(vaultSecrets.id, input.secret_id), eq(vaultSecrets.userId, ctx.userId)))
             .limit(1);
 
           if (secret.length === 0 || !secret[0]) {
             return {
-              content: [{
-                type: "text",
-                text: `Secret not found or you don't have access.`,
-              }],
+              content: [
+                {
+                  type: "text",
+                  text: `Secret not found or you don't have access.`,
+                },
+              ],
               isError: true,
             };
           }
 
-          await ctx.db
-            .delete(vaultSecrets)
-            .where(eq(vaultSecrets.id, input.secret_id));
+          await ctx.db.delete(vaultSecrets).where(eq(vaultSecrets.id, input.secret_id));
 
           return {
-            content: [{
-              type: "text",
-              text: `**Secret Deleted!**\n\n**Name:** ${secret[0].key}\n\nThe secret has been permanently removed.`,
-            }],
+            content: [
+              {
+                type: "text",
+                text: `**Secret Deleted!**\n\n**Name:** ${secret[0].key}\n\nThe secret has been permanently removed.`,
+              },
+            ],
           };
         } catch (error) {
           const msg = error instanceof Error ? error.message : "Unknown error";

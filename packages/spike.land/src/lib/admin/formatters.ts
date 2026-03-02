@@ -40,9 +40,7 @@ export function getStatusColor(status: string): string {
 /**
  * Map a status string to shadcn Badge variant.
  */
-export function getStatusBadgeVariant(
-  status?: string,
-): "default" | "secondary" | "destructive" {
+export function getStatusBadgeVariant(status?: string): "default" | "secondary" | "destructive" {
   switch (status) {
     case "COMPLETED":
       return "default";

@@ -29,7 +29,7 @@ interface NamespacedTool {
 
 /** Matches CallToolResult from spike-cli types */
 interface CallToolResult {
-  content: Array<{ type: string; text?: string; [key: string]: unknown; }>;
+  content: Array<{ type: string; text?: string; [key: string]: unknown }>;
   isError?: boolean;
 }
 
@@ -67,18 +67,16 @@ export class InProcessToolProvider {
 
     const definitions = this.registry.getToolDefinitions();
     this.toolCache = definitions
-      .filter(d => d.enabled)
-      .map(d => ({
+      .filter((d) => d.enabled)
+      .map((d) => ({
         namespacedName: d.name,
         originalName: d.name,
         serverName: "in-process",
         description: d.description,
         inputSchema: d.inputSchema
           ? (zodToJsonSchema(
-            z.object(d.inputSchema) as unknown as Parameters<
-              typeof zodToJsonSchema
-            >[0],
-          ) as Record<string, unknown>)
+              z.object(d.inputSchema) as unknown as Parameters<typeof zodToJsonSchema>[0],
+            ) as Record<string, unknown>)
           : { type: "object", properties: {} },
       }));
 
@@ -86,10 +84,7 @@ export class InProcessToolProvider {
   }
 
   /** Call a tool by name, routing directly to the in-process handler. */
-  async callTool(
-    name: string,
-    args: Record<string, unknown>,
-  ): Promise<CallToolResult> {
+  async callTool(name: string, args: Record<string, unknown>): Promise<CallToolResult> {
     const result = await this.registry.callToolDirect(name, args);
     return { ...result, isError: result.isError ?? false };
   }

@@ -21,7 +21,7 @@ function base64UrlDecode(str: string): Uint8Array {
   const padded = str.replace(/-/g, "+").replace(/_/g, "/");
   const padLen = (4 - (padded.length % 4)) % 4;
   const binary = atob(padded + "=".repeat(padLen));
-  return Uint8Array.from(binary, c => c.charCodeAt(0));
+  return Uint8Array.from(binary, (c) => c.charCodeAt(0));
 }
 
 async function importKey(secret: string): Promise<CryptoKey> {
@@ -39,16 +39,16 @@ export async function signJwt(payload: Omit<JwtPayload, "iat">, secret: string):
   const now = Math.floor(Date.now() / 1000);
   const fullPayload = { ...payload, iat: now } as JwtPayload;
 
-  const header = base64UrlEncode(new TextEncoder().encode(JSON.stringify({ alg: "HS256", typ: "JWT" })).buffer as ArrayBuffer);
-  const body = base64UrlEncode(new TextEncoder().encode(JSON.stringify(fullPayload)).buffer as ArrayBuffer);
+  const header = base64UrlEncode(
+    new TextEncoder().encode(JSON.stringify({ alg: "HS256", typ: "JWT" })).buffer as ArrayBuffer,
+  );
+  const body = base64UrlEncode(
+    new TextEncoder().encode(JSON.stringify(fullPayload)).buffer as ArrayBuffer,
+  );
   const signingInput = `${header}.${body}`;
 
   const key = await importKey(secret);
-  const signature = await crypto.subtle.sign(
-    "HMAC",
-    key,
-    new TextEncoder().encode(signingInput),
-  );
+  const signature = await crypto.subtle.sign("HMAC", key, new TextEncoder().encode(signingInput));
 
   return `${signingInput}.${base64UrlEncode(signature)}`;
 }

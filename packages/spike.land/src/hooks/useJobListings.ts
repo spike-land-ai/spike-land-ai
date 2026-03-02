@@ -18,7 +18,7 @@ async function fetchJobs(
   const response = await fetch(`/api/career/jobs?${params.toString()}`);
   if (!response.ok) return [];
 
-  const data = (await response.json()) as { jobs: JobListing[]; };
+  const data = (await response.json()) as { jobs: JobListing[] };
   return data.jobs;
 }
 
@@ -27,12 +27,7 @@ export function useJobListings(occupationTitle: string) {
 
   const { data, isLoading } = useQuery({
     queryKey: ["job-listings", occupationTitle, location?.city],
-    queryFn: () =>
-      fetchJobs(
-        occupationTitle,
-        location?.city,
-        location?.countryCode?.toLowerCase(),
-      ),
+    queryFn: () => fetchJobs(occupationTitle, location?.city, location?.countryCode?.toLowerCase()),
     enabled: !!occupationTitle,
     staleTime: 1000 * 60 * 15, // 15 minutes
   });

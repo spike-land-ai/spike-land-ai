@@ -70,26 +70,20 @@ export function useAnalytics() {
     });
   }, []);
 
-  const trackToolInvocation = useCallback(
-    (toolName: string, durationMs?: number) => {
-      enqueueEvent("tool_use", {
-        toolName,
-        durationMs,
-        timestamp: Date.now(),
-      });
-    },
-    [],
-  );
+  const trackToolInvocation = useCallback((toolName: string, durationMs?: number) => {
+    enqueueEvent("tool_use", {
+      toolName,
+      durationMs,
+      timestamp: Date.now(),
+    });
+  }, []);
 
-  const trackCustomEvent = useCallback(
-    (eventType: string, metadata?: Record<string, unknown>) => {
-      enqueueEvent(eventType, {
-        ...metadata,
-        timestamp: Date.now(),
-      });
-    },
-    [],
-  );
+  const trackCustomEvent = useCallback((eventType: string, metadata?: Record<string, unknown>) => {
+    enqueueEvent(eventType, {
+      ...metadata,
+      timestamp: Date.now(),
+    });
+  }, []);
 
   return {
     trackPageView,

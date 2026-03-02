@@ -96,12 +96,9 @@ export function createEngagementCollector(
 
 /** Flush engagement data via sendBeacon. */
 export function flushEngagement(
-  data: Omit<EngagementData, "abVariant"> & { abVariant?: string; },
+  data: Omit<EngagementData, "abVariant"> & { abVariant?: string },
 ): void {
-  if (
-    typeof navigator === "undefined"
-    || typeof navigator.sendBeacon !== "function"
-  ) {
+  if (typeof navigator === "undefined" || typeof navigator.sendBeacon !== "function") {
     return;
   }
   navigator.sendBeacon(

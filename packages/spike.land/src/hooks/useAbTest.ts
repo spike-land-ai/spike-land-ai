@@ -29,7 +29,7 @@ export function useAbTest(testId: string, visitorId: string): UseAbTestReturn {
     }
 
     fetchVariantAssignment(testId, visitorId)
-      .then(v => {
+      .then((v) => {
         setVariant(v);
         setVariantCookie(v);
       })

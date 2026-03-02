@@ -2,12 +2,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
-import {
-  AlertCircle,
-  CreditCard,
-  Settings,
-  User,
-} from "lucide-react";
+import { AlertCircle, CreditCard, Settings, User } from "lucide-react";
 
 type ActivityType = "user" | "system" | "payment" | "error";
 
@@ -57,12 +52,10 @@ export function AdminActivityFeed({ activities }: AdminActivityFeedProps) {
   return (
     <Card className="bg-zinc-900 border-zinc-800">
       <CardHeader className="pb-3">
-        <CardTitle className="text-zinc-100 text-base">
-          Activity Feed
-        </CardTitle>
+        <CardTitle className="text-zinc-100 text-base">Activity Feed</CardTitle>
       </CardHeader>
       <CardContent className="space-y-3">
-        {activities.map(activity => (
+        {activities.map((activity) => (
           <div key={activity.id} className="flex items-start gap-3">
             <div
               className={cn(
@@ -75,9 +68,7 @@ export function AdminActivityFeed({ activities }: AdminActivityFeedProps) {
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-zinc-200 text-sm leading-snug">
-                <span className="font-semibold text-zinc-100">
-                  {activity.actor}
-                </span>{" "}
+                <span className="font-semibold text-zinc-100">{activity.actor}</span>{" "}
                 {activity.action}
                 {activity.target && (
                   <>

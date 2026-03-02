@@ -35,38 +35,38 @@ const ALL_APPS: StoreApp[] = [
 ];
 
 /** Public apps (excludes admin-only). Used by the store UI. */
-export const STORE_APPS: StoreApp[] = ALL_APPS.filter(app => !app.isAdminOnly);
+export const STORE_APPS: StoreApp[] = ALL_APPS.filter((app) => !app.isAdminOnly);
 
 /** Get an app by slug (includes admin-only apps for direct access). */
 export function getAppBySlug(slug: string): StoreApp | undefined {
-  return ALL_APPS.find(app => app.slug === slug);
+  return ALL_APPS.find((app) => app.slug === slug);
 }
 
 export function getAppsByCategory(category: string): StoreApp[] {
   if (category === "all") return STORE_APPS;
-  return STORE_APPS.filter(app => app.category === category);
+  return STORE_APPS.filter((app) => app.category === category);
 }
 
 export function getFeaturedApps(): StoreApp[] {
-  return STORE_APPS.filter(app => app.isFeatured);
+  return STORE_APPS.filter((app) => app.isFeatured);
 }
 
 export function getNewApps(): StoreApp[] {
-  return STORE_APPS.filter(app => app.isNew === true);
+  return STORE_APPS.filter((app) => app.isNew === true);
 }
 
 export function getAppsByPricing(pricing: PricingModel): StoreApp[] {
-  return STORE_APPS.filter(app => (app.pricing ?? "free") === pricing);
+  return STORE_APPS.filter((app) => (app.pricing ?? "free") === pricing);
 }
 
 export function getTopRatedApps(limit = 10): StoreApp[] {
-  return STORE_APPS.filter(app => app.rating !== undefined)
+  return STORE_APPS.filter((app) => app.rating !== undefined)
     .sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0))
     .slice(0, limit);
 }
 
 export function getMostInstalledApps(limit = 10): StoreApp[] {
-  return STORE_APPS.filter(app => app.installCount !== undefined)
+  return STORE_APPS.filter((app) => app.installCount !== undefined)
     .sort((a, b) => (b.installCount ?? 0) - (a.installCount ?? 0))
     .slice(0, limit);
 }

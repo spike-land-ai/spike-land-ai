@@ -31,36 +31,27 @@ export function UserAvatar({ className, user: propUser }: UserAvatarProps) {
     return null;
   }
 
-  const userInitials = user.name
-    ?.split(" ")
-    .map(n => n[0])
-    .join("")
-    .toUpperCase()
-    .slice(0, 2) || "U";
+  const userInitials =
+    user.name
+      ?.split(" ")
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase()
+      .slice(0, 2) || "U";
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Avatar
-          className={`cursor-pointer ${className}`}
-          data-testid="user-avatar"
-        >
-          <AvatarImage
-            src={user.image || undefined}
-            alt={user.name || "User"}
-          />
+        <Avatar className={`cursor-pointer ${className}`} data-testid="user-avatar">
+          <AvatarImage src={user.image || undefined} alt={user.name || "User"} />
           <AvatarFallback>{userInitials}</AvatarFallback>
         </Avatar>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-56">
         <DropdownMenuLabel>
           <div className="flex flex-col space-y-1">
-            <p className="text-sm font-medium leading-none">
-              {user.name || "User"}
-            </p>
-            <p className="text-xs leading-none text-muted-foreground">
-              {user.email || "No email"}
-            </p>
+            <p className="text-sm font-medium leading-none">{user.name || "User"}</p>
+            <p className="text-xs leading-none text-muted-foreground">{user.email || "No email"}</p>
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />

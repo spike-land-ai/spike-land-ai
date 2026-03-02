@@ -103,10 +103,7 @@ export interface PodProvider {
   /**
    * Get a quote for items and shipping.
    */
-  getQuote(
-    items: PodQuoteItem[],
-    address: ShippingAddress,
-  ): Promise<PodQuote>;
+  getQuote(items: PodQuoteItem[], address: ShippingAddress): Promise<PodQuote>;
 
   /**
    * Get the current status of an order.
@@ -116,7 +113,5 @@ export interface PodProvider {
   /**
    * Cancel an order if still possible.
    */
-  cancelOrder?(
-    providerOrderId: string,
-  ): Promise<{ success: boolean; error?: string; }>;
+  cancelOrder?(providerOrderId: string): Promise<{ success: boolean; error?: string }>;
 }

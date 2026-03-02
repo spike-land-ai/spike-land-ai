@@ -4,12 +4,10 @@ import { type CreatedApp, CreatedAppStatus } from "@prisma/client";
 import { filterHealthyCodespaces } from "./codespace-health";
 
 export type CreatedAppWithUser = CreatedApp & {
-  generatedBy: { name: string | null; image: string | null; } | null;
+  generatedBy: { name: string | null; image: string | null } | null;
 };
 
-export async function getCreatedApp(
-  slug: string,
-): Promise<CreatedAppWithUser | null> {
+export async function getCreatedApp(slug: string): Promise<CreatedAppWithUser | null> {
   return prisma.createdApp.findUnique({
     where: { slug },
     include: {
@@ -43,9 +41,7 @@ export async function markAsGenerating(
     });
     validUserId = user ? userId : undefined;
     if (!user) {
-      logger.warn(
-        `User ${userId} not found in database, creating app without owner`,
-      );
+      logger.warn(`User ${userId} not found in database, creating app without owner`);
     }
   }
 
@@ -105,10 +101,7 @@ export async function updateAppStatus(
     });
   } catch (error) {
     // P2025: Record not found — can happen if markAsGenerating() failed
-    if (
-      error instanceof Error
-      && error.message.includes("Record to update not found")
-    ) {
+    if (error instanceof Error && error.message.includes("Record to update not found")) {
       logger.error(`Cannot update status for non-existent app: ${slug}`);
       return null;
     }
@@ -174,9 +167,7 @@ export async function getRelatedPublishedApps(
  * Trigger a re-review of a published app.
  * Transitions to FAILED if unhealthy, marking it for removal from listings.
  */
-export async function triggerReReview(
-  app: CreatedApp,
-): Promise<{ healthy: boolean; }> {
+export async function triggerReReview(app: CreatedApp): Promise<{ healthy: boolean }> {
   if (!app.codespaceId) {
     await updateAppStatus(app.slug, CreatedAppStatus.FAILED);
     return { healthy: false };

@@ -32,7 +32,7 @@ export function TimelineRuler({ zoom, duration, onSeek }: TimelineRulerProps) {
   const markInterval = getMarkInterval(zoom);
 
   const marks = useMemo(() => {
-    const result: { time: number; isMajor: boolean; }[] = [];
+    const result: { time: number; isMajor: boolean }[] = [];
     const totalMarks = Math.ceil(duration / markInterval) + 1;
 
     for (let i = 0; i <= totalMarks; i++) {
@@ -65,9 +65,9 @@ export function TimelineRuler({ zoom, duration, onSeek }: TimelineRulerProps) {
       className="relative h-7 bg-black/40 border-b border-white/5 cursor-pointer select-none overflow-hidden"
       style={{ width: `${width}px` }}
       onClick={handleClick}
-      onKeyDown={e =>
-        e.key === "Enter"
-        && handleClick(e as unknown as React.MouseEvent<HTMLDivElement>)}
+      onKeyDown={(e) =>
+        e.key === "Enter" && handleClick(e as unknown as React.MouseEvent<HTMLDivElement>)
+      }
       role="slider"
       tabIndex={0}
       aria-label="Timeline ruler - click to seek"

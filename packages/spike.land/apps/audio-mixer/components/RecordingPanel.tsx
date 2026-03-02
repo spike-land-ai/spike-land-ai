@@ -5,11 +5,7 @@
 
 "use client";
 
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { AlertCircle, Circle, Pause, Square } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { formatTime } from "../lib/audio-engine";
@@ -44,22 +40,20 @@ export function RecordingPanel({
   useEffect(() => {
     if (permissionError) {
       if (
-        permissionError.name === "NotAllowedError"
-        || permissionError.name === "PermissionDeniedError"
+        permissionError.name === "NotAllowedError" ||
+        permissionError.name === "PermissionDeniedError"
       ) {
         setError(
           "Microphone access denied. Please allow microphone access in your browser settings (click the lock icon in the address bar).",
         );
       } else if (
-        permissionError.name === "NotFoundError"
-        || permissionError.name === "DevicesNotFoundError"
+        permissionError.name === "NotFoundError" ||
+        permissionError.name === "DevicesNotFoundError"
       ) {
-        setError(
-          "No microphone found. Please connect a microphone and try again.",
-        );
+        setError("No microphone found. Please connect a microphone and try again.");
       } else if (
-        permissionError.name === "NotReadableError"
-        || permissionError.name === "TrackStartError"
+        permissionError.name === "NotReadableError" ||
+        permissionError.name === "TrackStartError"
       ) {
         setError("Microphone is currently in use by another application.");
       } else {
@@ -68,7 +62,7 @@ export function RecordingPanel({
 
       // Temporary debug info for Chrome issues
       if (permissionError.name) {
-        setError(prev => `${prev} (${permissionError.name}: ${permissionError.message})`);
+        setError((prev) => `${prev} (${permissionError.name}: ${permissionError.message})`);
       }
     }
   }, [permissionError]);
@@ -85,9 +79,7 @@ export function RecordingPanel({
         );
       }
     } catch {
-      setError(
-        "Failed to start recording. Please check microphone permissions.",
-      );
+      setError("Failed to start recording. Please check microphone permissions.");
     } finally {
       setIsStarting(false);
     }
@@ -139,14 +131,10 @@ export function RecordingPanel({
             className="p-2 bg-yellow-600 hover:bg-yellow-700 text-white rounded transition-colors"
             aria-label={isPaused ? "Resume recording" : "Pause recording"}
           >
-            {isPaused
-              ? <Circle className="w-4 h-4 fill-current" />
-              : <Pause className="w-4 h-4" />}
+            {isPaused ? <Circle className="w-4 h-4 fill-current" /> : <Pause className="w-4 h-4" />}
           </button>
         </TooltipTrigger>
-        <TooltipContent side="bottom">
-          {isPaused ? "Resume" : "Pause"}
-        </TooltipContent>
+        <TooltipContent side="bottom">{isPaused ? "Resume" : "Pause"}</TooltipContent>
       </Tooltip>
 
       {/* Stop (save) */}

@@ -2,13 +2,7 @@
 
 import { GlassCard } from "@/components/infographic/shared/GlassCard";
 import { ScrollReveal } from "@/components/infographic/shared/ScrollReveal";
-import {
-  animate,
-  motion,
-  useInView,
-  useMotionValue,
-  useTransform,
-} from "framer-motion";
+import { animate, motion, useInView, useMotionValue, useTransform } from "framer-motion";
 import { useEffect, useRef } from "react";
 import { Cell, Pie, PieChart, ResponsiveContainer } from "recharts";
 
@@ -56,7 +50,7 @@ const EFFORT_DATA: EffortItem[] = [
   },
 ];
 
-const PIE_DATA = EFFORT_DATA.filter(d => d.percentage > 0);
+const PIE_DATA = EFFORT_DATA.filter((d) => d.percentage > 0);
 
 interface AnimatedCounterProps {
   target: number;
@@ -71,7 +65,7 @@ interface AnimatedCounterProps {
  */
 function AnimatedCounter({ target, color, inView, delay }: AnimatedCounterProps) {
   const motionValue = useMotionValue(0);
-  const rounded = useTransform(motionValue, v => Math.round(v));
+  const rounded = useTransform(motionValue, (v) => Math.round(v));
   const displayRef = useRef<HTMLSpanElement>(null);
 
   useEffect(() => {
@@ -85,7 +79,7 @@ function AnimatedCounter({ target, color, inView, delay }: AnimatedCounterProps)
   }, [inView, motionValue, target, delay]);
 
   useEffect(() => {
-    const unsubscribe = rounded.on("change", v => {
+    const unsubscribe = rounded.on("change", (v) => {
       if (displayRef.current) {
         displayRef.current.textContent = `${v}%`;
       }
@@ -94,11 +88,7 @@ function AnimatedCounter({ target, color, inView, delay }: AnimatedCounterProps)
   }, [rounded]);
 
   return (
-    <span
-      ref={displayRef}
-      className="text-sm font-mono tabular-nums"
-      style={{ color }}
-    >
+    <span ref={displayRef} className="text-sm font-mono tabular-nums" style={{ color }}>
       0%
     </span>
   );
@@ -126,20 +116,20 @@ function AnimatedBar({ item, index }: AnimatedBarProps) {
           <motion.div
             className="w-3 h-3 rounded-full flex-shrink-0"
             style={{ backgroundColor: item.color }}
-            animate={isInView
-              ? {
-                boxShadow: [
-                  `0 0 0px ${item.glow}`,
-                  `0 0 14px ${item.glow}`,
-                  `0 0 0px ${item.glow}`,
-                ],
-              }
-              : {}}
+            animate={
+              isInView
+                ? {
+                    boxShadow: [
+                      `0 0 0px ${item.glow}`,
+                      `0 0 14px ${item.glow}`,
+                      `0 0 0px ${item.glow}`,
+                    ],
+                  }
+                : {}
+            }
             transition={{ duration: 2, repeat: Infinity, delay: index * 0.3 }}
           />
-          <span className="font-semibold text-white tracking-wide text-sm">
-            {item.label}
-          </span>
+          <span className="font-semibold text-white tracking-wide text-sm">{item.label}</span>
         </div>
         <AnimatedCounter
           target={item.percentage}
@@ -181,9 +171,7 @@ function AnimatedBar({ item, index }: AnimatedBarProps) {
         </motion.div>
       </div>
 
-      <p className="text-xs text-zinc-500 leading-relaxed pl-5">
-        {item.why}
-      </p>
+      <p className="text-xs text-zinc-500 leading-relaxed pl-5">{item.why}</p>
     </motion.div>
   );
 }
@@ -202,15 +190,17 @@ function CenterLabel({ inView }: CenterLabelProps) {
     >
       <motion.span
         className="text-4xl font-black text-white leading-none"
-        animate={inView
-          ? {
-            textShadow: [
-              "0 0 0px rgba(255,255,255,0)",
-              "0 0 20px rgba(255,255,255,0.3)",
-              "0 0 0px rgba(255,255,255,0)",
-            ],
-          }
-          : {}}
+        animate={
+          inView
+            ? {
+                textShadow: [
+                  "0 0 0px rgba(255,255,255,0)",
+                  "0 0 20px rgba(255,255,255,0.3)",
+                  "0 0 0px rgba(255,255,255,0)",
+                ],
+              }
+            : {}
+        }
         transition={{
           duration: 2.2,
           delay: 1.5,
@@ -220,9 +210,7 @@ function CenterLabel({ inView }: CenterLabelProps) {
       >
         0%
       </motion.span>
-      <span className="text-xs text-zinc-500 uppercase tracking-wider mt-1">
-        Coding
-      </span>
+      <span className="text-xs text-zinc-500 uppercase tracking-wider mt-1">Coding</span>
     </motion.div>
   );
 }
@@ -260,9 +248,11 @@ export function EffortSplit() {
           <div ref={chartRef} className="relative">
             <motion.div
               initial={{ opacity: 0, scale: 0.75, rotate: -90 }}
-              animate={isChartInView
-                ? { opacity: 1, scale: 1, rotate: 0 }
-                : { opacity: 0, scale: 0.75, rotate: -90 }}
+              animate={
+                isChartInView
+                  ? { opacity: 1, scale: 1, rotate: 0 }
+                  : { opacity: 0, scale: 0.75, rotate: -90 }
+              }
               transition={{ duration: 1.1, ease: [0.25, 0.46, 0.45, 0.94] }}
             >
               <ResponsiveContainer width="100%" height={280}>
@@ -280,7 +270,9 @@ export function EffortSplit() {
                     animationDuration={1500}
                     animationEasing="ease-out"
                   >
-                    {PIE_DATA.map(entry => <Cell key={entry.label} fill={entry.color} />)}
+                    {PIE_DATA.map((entry) => (
+                      <Cell key={entry.label} fill={entry.color} />
+                    ))}
                   </Pie>
                 </PieChart>
               </ResponsiveContainer>
@@ -291,7 +283,9 @@ export function EffortSplit() {
 
           {/* Animated bars */}
           <div className="flex flex-col gap-6">
-            {EFFORT_DATA.map((item, i) => <AnimatedBar key={item.label} item={item} index={i} />)}
+            {EFFORT_DATA.map((item, i) => (
+              <AnimatedBar key={item.label} item={item} index={i} />
+            ))}
           </div>
         </div>
 

@@ -72,9 +72,7 @@ export class WorkspaceSubscriptionService {
   /**
    * Check if a workspace can add another social account
    */
-  static async canAddSocialAccount(
-    workspaceId: string,
-  ): Promise<LimitCheckResult> {
+  static async canAddSocialAccount(workspaceId: string): Promise<LimitCheckResult> {
     const workspace = await this.getWorkspaceWithCounts(workspaceId);
     if (!workspace) {
       return this.workspaceNotFoundResult();
@@ -102,9 +100,7 @@ export class WorkspaceSubscriptionService {
   /**
    * Check if a workspace can create another scheduled post
    */
-  static async canCreateScheduledPost(
-    workspaceId: string,
-  ): Promise<LimitCheckResult> {
+  static async canCreateScheduledPost(workspaceId: string): Promise<LimitCheckResult> {
     const workspace = await this.getWorkspaceWithCounts(workspaceId);
     if (!workspace) {
       return this.workspaceNotFoundResult();
@@ -162,10 +158,7 @@ export class WorkspaceSubscriptionService {
   /**
    * Check if a workspace can use AI credits
    */
-  static async canUseAiCredits(
-    workspaceId: string,
-    amount: number,
-  ): Promise<LimitCheckResult> {
+  static async canUseAiCredits(workspaceId: string, amount: number): Promise<LimitCheckResult> {
     if (amount <= 0) {
       return {
         allowed: true,
@@ -204,9 +197,7 @@ export class WorkspaceSubscriptionService {
   /**
    * Check if a workspace can add another team member
    */
-  static async canAddTeamMember(
-    workspaceId: string,
-  ): Promise<LimitCheckResult> {
+  static async canAddTeamMember(workspaceId: string): Promise<LimitCheckResult> {
     const workspace = await this.getWorkspaceWithCounts(workspaceId);
     if (!workspace) {
       return this.workspaceNotFoundResult();
@@ -243,7 +234,7 @@ export class WorkspaceSubscriptionService {
     workspaceId: string,
     amount: number,
     source?: AiCreditSource,
-  ): Promise<{ success: boolean; remaining: number; error?: string; }> {
+  ): Promise<{ success: boolean; remaining: number; error?: string }> {
     if (amount <= 0) {
       return { success: true, remaining: 0 };
     }
@@ -308,7 +299,7 @@ export class WorkspaceSubscriptionService {
    */
   static async resetMonthlyCredits(
     workspaceId: string,
-  ): Promise<{ success: boolean; error?: string; }> {
+  ): Promise<{ success: boolean; error?: string }> {
     const { error } = await tryCatch(
       prisma.workspace.update({
         where: { id: workspaceId },
@@ -330,7 +321,7 @@ export class WorkspaceSubscriptionService {
   static async upgradeTier(
     workspaceId: string,
     newTier: WorkspaceSubscriptionTier,
-  ): Promise<{ success: boolean; error?: string; }> {
+  ): Promise<{ success: boolean; error?: string }> {
     const limits = getTierLimits(newTier);
 
     const { error } = await tryCatch(
@@ -358,18 +349,16 @@ export class WorkspaceSubscriptionService {
   /**
    * Get workspace subscription info for display
    */
-  static async getSubscriptionInfo(workspaceId: string): Promise<
-    {
-      tier: WorkspaceSubscriptionTier;
-      limits: {
-        socialAccounts: { used: number; max: number; };
-        scheduledPosts: { used: number; max: number; };
-        abTests: { used: number; max: number; };
-        aiCredits: { used: number; max: number; };
-        teamMembers: { used: number; max: number; };
-      };
-    } | null
-  > {
+  static async getSubscriptionInfo(workspaceId: string): Promise<{
+    tier: WorkspaceSubscriptionTier;
+    limits: {
+      socialAccounts: { used: number; max: number };
+      scheduledPosts: { used: number; max: number };
+      abTests: { used: number; max: number };
+      aiCredits: { used: number; max: number };
+      teamMembers: { used: number; max: number };
+    };
+  } | null> {
     const workspace = await this.getWorkspaceWithCounts(workspaceId);
     if (!workspace) {
       return null;
@@ -412,7 +401,7 @@ export class WorkspaceSubscriptionService {
 
     // Find workspaces where billingCycleStart day matches today
     const { data: workspaces, error } = await tryCatch(
-      prisma.$queryRaw<{ id: string; }[]>`
+      prisma.$queryRaw<{ id: string }[]>`
         SELECT id FROM workspaces 
         WHERE "billingCycleStart" IS NOT NULL 
         AND EXTRACT(DAY FROM "billingCycleStart") = ${dayOfMonth}
@@ -424,7 +413,7 @@ export class WorkspaceSubscriptionService {
       return [];
     }
 
-    return workspaces.map(w => w.id);
+    return workspaces.map((w) => w.id);
   }
 
   // Private helper methods
@@ -463,16 +452,12 @@ export class WorkspaceSubscriptionService {
     return workspace;
   }
 
-  private static async getWorkspaceWithLimits(
-    workspaceId: string,
-  ): Promise<
-    {
-      subscriptionTier: WorkspaceSubscriptionTier;
-      maxAbTests: number;
-      monthlyAiCredits: number;
-      usedAiCredits: number;
-    } | null
-  > {
+  private static async getWorkspaceWithLimits(workspaceId: string): Promise<{
+    subscriptionTier: WorkspaceSubscriptionTier;
+    maxAbTests: number;
+    monthlyAiCredits: number;
+    usedAiCredits: number;
+  } | null> {
     const { data: workspace, error } = await tryCatch(
       prisma.workspace.findUnique({
         where: { id: workspaceId },

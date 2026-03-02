@@ -1,13 +1,7 @@
 "use client";
 
 import { useCallback, useMemo, useState } from "react";
-import {
-  AlertCircle,
-  ChevronDown,
-  ChevronUp,
-  Download,
-  Sparkles,
-} from "lucide-react";
+import { AlertCircle, ChevronDown, ChevronUp, Download, Sparkles } from "lucide-react";
 import Image from "next/image";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -31,9 +25,9 @@ const ERROR_GUIDANCE: Record<string, string> = {
   "404": "Resource not found. The requested item may have been deleted or the ID is incorrect.",
   "429": "Rate limit exceeded. Wait a moment and try again.",
   "500": "Internal server error. The server encountered an unexpected issue.",
-  "timeout": "Request timed out. The operation may take longer than expected — try again.",
-  "network": "Network error. Check your internet connection and try again.",
-  "fetch": "Failed to fetch. The server may be temporarily unavailable.",
+  timeout: "Request timed out. The operation may take longer than expected — try again.",
+  network: "Network error. Check your internet connection and try again.",
+  fetch: "Failed to fetch. The server may be temporarily unavailable.",
 };
 
 function getErrorGuidance(message: string): string | null {
@@ -56,13 +50,15 @@ export function McpResponseViewer({
         <CardTitle className="text-lg">Response</CardTitle>
       </CardHeader>
       <CardContent>
-        {isExecuting
-          ? <LoadingSkeleton />
-          : error
-          ? <ErrorDisplay message={error} />
-          : response === null || response === undefined
-          ? <EmptyState />
-          : <ResponseContent response={response} responseType={responseType} />}
+        {isExecuting ? (
+          <LoadingSkeleton />
+        ) : error ? (
+          <ErrorDisplay message={error} />
+        ) : response === null || response === undefined ? (
+          <EmptyState />
+        ) : (
+          <ResponseContent response={response} responseType={responseType} />
+        )}
       </CardContent>
     </Card>
   );
@@ -80,7 +76,7 @@ function LoadingSkeleton() {
   );
 }
 
-function ErrorDisplay({ message }: { message: string; }) {
+function ErrorDisplay({ message }: { message: string }) {
   const guidance = getErrorGuidance(message);
 
   return (
@@ -124,12 +120,7 @@ function ResponseContent({
       return (
         <div className="space-y-3">
           <div className="relative aspect-square rounded-lg overflow-hidden bg-muted">
-            <Image
-              src={url}
-              alt="Tool response image"
-              fill
-              className="object-contain"
-            />
+            <Image src={url} alt="Tool response image" fill className="object-contain" />
           </div>
           {typeof response === "object" && <JsonBlock data={response} />}
         </div>
@@ -154,9 +145,7 @@ function ResponseContent({
   return <JsonBlock data={response} />;
 }
 
-function ExportToolbar(
-  { data, format }: { data: unknown; format: "json" | "text"; },
-) {
+function ExportToolbar({ data, format }: { data: unknown; format: "json" | "text" }) {
   const text = format === "json" ? JSON.stringify(data, null, 2) : String(data);
 
   const handleDownload = useCallback(() => {
@@ -186,14 +175,15 @@ function ExportToolbar(
   );
 }
 
-function JsonBlock({ data }: { data: unknown; }) {
+function JsonBlock({ data }: { data: unknown }) {
   const formatted = useMemo(() => JSON.stringify(data, null, 2), [data]);
   const isTruncated = formatted.length > MAX_JSON_DISPLAY_BYTES;
   const [showFull, setShowFull] = useState(false);
 
-  const displayText = isTruncated && !showFull
-    ? formatted.slice(0, MAX_JSON_DISPLAY_BYTES) + "\n\n... (truncated)"
-    : formatted;
+  const displayText =
+    isTruncated && !showFull
+      ? formatted.slice(0, MAX_JSON_DISPLAY_BYTES) + "\n\n... (truncated)"
+      : formatted;
 
   return (
     <div className="relative">
@@ -206,22 +196,20 @@ function JsonBlock({ data }: { data: unknown; }) {
       {isTruncated && (
         <button
           type="button"
-          onClick={() => setShowFull(prev => !prev)}
+          onClick={() => setShowFull((prev) => !prev)}
           className="mt-2 flex items-center gap-1 text-xs text-cyan-400 hover:text-cyan-300 transition-colors"
         >
-          {showFull
-            ? (
-              <>
-                <ChevronUp className="w-3 h-3" />
-                Show less
-              </>
-            )
-            : (
-              <>
-                <ChevronDown className="w-3 h-3" />
-                Show full response ({(formatted.length / 1024).toFixed(1)} KB)
-              </>
-            )}
+          {showFull ? (
+            <>
+              <ChevronUp className="w-3 h-3" />
+              Show less
+            </>
+          ) : (
+            <>
+              <ChevronDown className="w-3 h-3" />
+              Show full response ({(formatted.length / 1024).toFixed(1)} KB)
+            </>
+          )}
         </button>
       )}
     </div>
@@ -232,9 +220,9 @@ function isImageResponse(response: unknown): boolean {
   if (typeof response !== "object" || response === null) return false;
   const r = response as Record<string, unknown>;
   return (
-    typeof r.outputImageUrl === "string"
-    || typeof r.url === "string"
-    || typeof r.image_url === "string"
+    typeof r.outputImageUrl === "string" ||
+    typeof r.url === "string" ||
+    typeof r.image_url === "string"
   );
 }
 

@@ -62,8 +62,8 @@ export function ReadAloudArticle() {
     if (!articleEl) return [];
 
     const paragraphs = Array.from(articleEl.querySelectorAll("p"))
-      .map(p => p.textContent?.trim() || "")
-      .filter(text => text.length >= 20);
+      .map((p) => p.textContent?.trim() || "")
+      .filter((text) => text.length >= 20);
 
     return paragraphs;
   }, []);
@@ -158,9 +158,7 @@ export function ReadAloudArticle() {
   }, []);
 
   const isActive = state !== "idle";
-  const progress = totalParagraphs > 0
-    ? ((currentIndex + 1) / totalParagraphs) * 100
-    : 0;
+  const progress = totalParagraphs > 0 ? ((currentIndex + 1) / totalParagraphs) * 100 : 0;
 
   return (
     <div className="flex items-center gap-3">
@@ -173,25 +171,29 @@ export function ReadAloudArticle() {
           "text-muted-foreground hover:text-foreground",
           isActive && "border-primary/50 text-primary",
         )}
-        aria-label={state === "playing"
-          ? "Pause article"
-          : state === "paused"
-          ? "Resume article"
-          : "Listen to article"}
+        aria-label={
+          state === "playing"
+            ? "Pause article"
+            : state === "paused"
+              ? "Resume article"
+              : "Listen to article"
+        }
       >
-        {state === "loading"
-          ? <Loader2 className="h-4 w-4 animate-spin" />
-          : state === "playing"
-          ? <Pause className="h-4 w-4" />
-          : <Headphones className="h-4 w-4" />}
+        {state === "loading" ? (
+          <Loader2 className="h-4 w-4 animate-spin" />
+        ) : state === "playing" ? (
+          <Pause className="h-4 w-4" />
+        ) : (
+          <Headphones className="h-4 w-4" />
+        )}
         <span>
           {state === "idle"
             ? "Listen"
             : state === "loading"
-            ? "Loading..."
-            : state === "paused"
-            ? "Paused"
-            : `${currentIndex + 1} / ${totalParagraphs}`}
+              ? "Loading..."
+              : state === "paused"
+                ? "Paused"
+                : `${currentIndex + 1} / ${totalParagraphs}`}
         </span>
       </button>
 

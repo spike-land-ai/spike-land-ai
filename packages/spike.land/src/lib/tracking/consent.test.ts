@@ -67,7 +67,7 @@ describe("consent", () => {
   describe("notifyConsentChanged()", () => {
     it("dispatches a consent-changed CustomEvent on window", () => {
       const events: Event[] = [];
-      window.addEventListener(CONSENT_CHANGED_EVENT, e => events.push(e));
+      window.addEventListener(CONSENT_CHANGED_EVENT, (e) => events.push(e));
 
       notifyConsentChanged();
 
@@ -77,7 +77,7 @@ describe("consent", () => {
 
     it("dispatches event after setting accepted consent", () => {
       const events: Event[] = [];
-      window.addEventListener(CONSENT_CHANGED_EVENT, e => events.push(e));
+      window.addEventListener(CONSENT_CHANGED_EVENT, (e) => events.push(e));
 
       localStorage.setItem(CONSENT_KEY, "accepted");
       notifyConsentChanged();
@@ -87,7 +87,7 @@ describe("consent", () => {
 
     it("can dispatch multiple events", () => {
       const events: Event[] = [];
-      window.addEventListener(CONSENT_CHANGED_EVENT, e => events.push(e));
+      window.addEventListener(CONSENT_CHANGED_EVENT, (e) => events.push(e));
 
       notifyConsentChanged();
       notifyConsentChanged();

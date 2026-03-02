@@ -29,7 +29,7 @@ describe("textResult", () => {
   it("truncates long text", () => {
     const longText = "x".repeat(9000);
     const result = textResult(longText);
-    const text = (result.content[0] as { text: string; }).text;
+    const text = (result.content[0] as { text: string }).text;
     expect(text.length).toBeLessThan(9000);
     expect(text).toContain("truncated");
   });
@@ -39,8 +39,8 @@ describe("jsonResult", () => {
   it("returns text and JSON content", () => {
     const result = jsonResult("summary", { count: 42 });
     expect(result.content).toHaveLength(2);
-    expect((result.content[0] as { text: string; }).text).toBe("summary");
-    expect((result.content[1] as { text: string; }).text).toContain("42");
+    expect((result.content[0] as { text: string }).text).toBe("summary");
+    expect((result.content[1] as { text: string }).text).toContain("42");
   });
 });
 
@@ -48,7 +48,7 @@ describe("errorResult", () => {
   it("returns error content", () => {
     const result = errorResult("something failed");
     expect(result.isError).toBe(true);
-    expect((result.content[0] as { text: string; }).text).toBe("something failed");
+    expect((result.content[0] as { text: string }).text).toBe("something failed");
   });
 });
 
@@ -56,7 +56,7 @@ describe("safeToolCall", () => {
   it("returns handler result on success", async () => {
     const result = await safeToolCall("test_tool", async () => textResult("ok"));
     expect(result.isError).toBeUndefined();
-    expect((result.content[0] as { text: string; }).text).toBe("ok");
+    expect((result.content[0] as { text: string }).text).toBe("ok");
   });
 
   it("catches errors and returns error result", async () => {
@@ -64,18 +64,18 @@ describe("safeToolCall", () => {
       throw new Error("boom");
     });
     expect(result.isError).toBe(true);
-    expect((result.content[0] as { text: string; }).text).toContain("boom");
-    expect((result.content[0] as { text: string; }).text).toContain("test_tool");
+    expect((result.content[0] as { text: string }).text).toContain("boom");
+    expect((result.content[0] as { text: string }).text).toContain("test_tool");
   });
 
   it("handles timeout", async () => {
     const result = await safeToolCall(
       "slow_tool",
-      () => new Promise(resolve => setTimeout(() => resolve(textResult("late")), 500)),
+      () => new Promise((resolve) => setTimeout(() => resolve(textResult("late")), 500)),
       { timeoutMs: 50 },
     );
     expect(result.isError).toBe(true);
-    expect((result.content[0] as { text: string; }).text).toContain("timed out");
+    expect((result.content[0] as { text: string }).text).toContain("timed out");
   });
 });
 
@@ -148,10 +148,7 @@ describe("detectCycles", () => {
   });
 
   it("detects a simple cycle", () => {
-    const tools = [
-      makeTool("a", { dependsOn: ["b"] }),
-      makeTool("b", { dependsOn: ["a"] }),
-    ];
+    const tools = [makeTool("a", { dependsOn: ["b"] }), makeTool("b", { dependsOn: ["a"] })];
     const cycles = detectCycles(tools);
     expect(cycles.length).toBeGreaterThan(0);
   });
@@ -173,10 +170,7 @@ describe("createMockContext", () => {
 });
 
 describe("createMockRegistry", () => {
-  const tools = [
-    makeTool("tool_a"),
-    makeTool("tool_b"),
-  ];
+  const tools = [makeTool("tool_a"), makeTool("tool_b")];
 
   it("lists tool names", () => {
     const reg = createMockRegistry(tools);
@@ -186,7 +180,7 @@ describe("createMockRegistry", () => {
   it("calls tools by name", async () => {
     const reg = createMockRegistry(tools);
     const result = await reg.call("tool_a", {});
-    expect((result.content[0] as { text: string; }).text).toBe("ok");
+    expect((result.content[0] as { text: string }).text).toBe("ok");
   });
 
   it("returns error for unknown tool", async () => {

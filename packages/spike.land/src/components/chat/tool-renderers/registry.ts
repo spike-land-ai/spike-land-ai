@@ -39,9 +39,7 @@ const rules: RendererRule[] = [
 /** Get the best renderer for a tool name. */
 export function getToolRenderer(toolName: string): ToolRenderer {
   // Strip namespace prefix for matching
-  const stripped = toolName.includes("__")
-    ? toolName.split("__").slice(1).join("__")
-    : toolName;
+  const stripped = toolName.includes("__") ? toolName.split("__").slice(1).join("__") : toolName;
 
   for (const rule of rules) {
     if (rule.pattern.test(stripped)) {

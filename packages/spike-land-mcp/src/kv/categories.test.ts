@@ -33,7 +33,10 @@ describe("Category persistence", () => {
 
   it("filters out non-string values", async () => {
     const kv = mockKV();
-    await kv.put("mcp:enabled-categories:user1", JSON.stringify(["valid", 123, null, "also-valid"]));
+    await kv.put(
+      "mcp:enabled-categories:user1",
+      JSON.stringify(["valid", 123, null, "also-valid"]),
+    );
     const result = await loadEnabledCategories("user1", kv);
     expect(result).toEqual(["valid", "also-valid"]);
   });

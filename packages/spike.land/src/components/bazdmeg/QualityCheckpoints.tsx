@@ -14,8 +14,7 @@ const CHECKPOINTS = [
     variant: "high" as const,
     color: "#EAB308",
     glow: "rgba(234,179,8,0.3)",
-    icon:
-      "M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2",
+    icon: "M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2",
     items: [
       {
         id: "pc1",
@@ -99,7 +98,7 @@ const CHECKPOINTS = [
   },
 ];
 
-function TimelineConnector({ index }: { index: number; }) {
+function TimelineConnector({ index }: { index: number }) {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, amount: 0.5 });
 
@@ -152,10 +151,7 @@ function CheckpointCard({
   return (
     <div ref={ref} className="relative">
       <ScrollReveal delay={index * 0.2}>
-        <GlassCard
-          variant={checkpoint.variant}
-          className="p-6 h-full flex flex-col"
-        >
+        <GlassCard variant={checkpoint.variant} className="p-6 h-full flex flex-col">
           {/* Phase badge */}
           <motion.div
             className="flex items-center gap-3 mb-4"
@@ -169,15 +165,17 @@ function CheckpointCard({
                 backgroundColor: `${checkpoint.color}15`,
                 borderColor: `${checkpoint.color}30`,
               }}
-              animate={isInView
-                ? {
-                  boxShadow: [
-                    `0 0 0px ${checkpoint.glow}`,
-                    `0 0 20px ${checkpoint.glow}`,
-                    `0 0 0px ${checkpoint.glow}`,
-                  ],
-                }
-                : {}}
+              animate={
+                isInView
+                  ? {
+                      boxShadow: [
+                        `0 0 0px ${checkpoint.glow}`,
+                        `0 0 20px ${checkpoint.glow}`,
+                        `0 0 0px ${checkpoint.glow}`,
+                      ],
+                    }
+                  : {}
+              }
               transition={{
                 duration: 2.5,
                 repeat: Infinity,
@@ -204,9 +202,7 @@ function CheckpointCard({
               >
                 Phase {checkpoint.phase}
               </span>
-              <h3 className="text-lg font-bold text-white leading-tight">
-                {checkpoint.title}
-              </h3>
+              <h3 className="text-lg font-bold text-white leading-tight">{checkpoint.title}</h3>
             </div>
           </motion.div>
 
@@ -289,10 +285,7 @@ export function QualityCheckpoints() {
             viewport={{ once: true }}
             transition={{ duration: 0.3, delay: i * 0.1 }}
           >
-            <div
-              className="w-2.5 h-2.5 rounded-full"
-              style={{ backgroundColor: cp.color }}
-            />
+            <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: cp.color }} />
             {i < CHECKPOINTS.length - 1 && <div className="w-8 h-px bg-white/10" />}
           </motion.div>
         ))}
@@ -300,11 +293,7 @@ export function QualityCheckpoints() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {CHECKPOINTS.map((checkpoint, i) => (
-          <CheckpointCard
-            key={checkpoint.title}
-            checkpoint={checkpoint}
-            index={i}
-          />
+          <CheckpointCard key={checkpoint.title} checkpoint={checkpoint} index={i} />
         ))}
       </div>
     </div>

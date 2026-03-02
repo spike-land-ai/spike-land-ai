@@ -22,9 +22,7 @@ describe("vision-prompts", () => {
   it("should export COMPARISON_PROMPT", () => {
     expect(COMPARISON_PROMPT).toBeDefined();
     expect(typeof COMPARISON_PROMPT).toBe("string");
-    expect(COMPARISON_PROMPT).toContain(
-      "Compare these BEFORE and AFTER photos",
-    );
+    expect(COMPARISON_PROMPT).toContain("Compare these BEFORE and AFTER photos");
   });
 
   it("should build a verification prompt", () => {

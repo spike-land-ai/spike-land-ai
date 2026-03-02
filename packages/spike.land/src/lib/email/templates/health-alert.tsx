@@ -152,14 +152,10 @@ export function HealthAlertEmail({
             </tr>
             <tr>
               <td style={{ padding: "8px 0", color: "#6b7280" }}>Platform:</td>
-              <td style={{ padding: "8px 0", textAlign: "right" }}>
-                {platform}
-              </td>
+              <td style={{ padding: "8px 0", textAlign: "right" }}>{platform}</td>
             </tr>
             <tr>
-              <td style={{ padding: "8px 0", color: "#6b7280" }}>
-                Health Score:
-              </td>
+              <td style={{ padding: "8px 0", color: "#6b7280" }}>Health Score:</td>
               <td
                 style={{
                   padding: "8px 0",

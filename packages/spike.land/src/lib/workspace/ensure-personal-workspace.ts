@@ -21,7 +21,7 @@ export async function ensurePersonalWorkspace(
   userName?: string | null,
 ): Promise<string | null> {
   // Use a transaction to prevent race conditions between check and create
-  const result = await prisma.$transaction(async tx => {
+  const result = await prisma.$transaction(async (tx) => {
     // Check for existing personal workspace first (idempotent)
     const existing = await tx.workspace.findFirst({
       where: {

@@ -113,10 +113,7 @@ export function getRateLimitStatus(): {
   resetIn: number;
 } {
   const now = Date.now();
-  const resetIn = Math.max(
-    0,
-    RATE_LIMIT_WINDOW_MS - (now - rateLimitState.windowStart),
-  );
+  const resetIn = Math.max(0, RATE_LIMIT_WINDOW_MS - (now - rateLimitState.windowStart));
   const remaining = Math.max(0, RATE_LIMIT_MAX - rateLimitState.count);
 
   return {
@@ -159,9 +156,7 @@ export function setRateLimitCount(count: number): void {
  * @param params Email parameters
  * @returns Result with success status and email ID or error
  */
-export async function sendEmail(
-  params: SendEmailParams,
-): Promise<SendEmailResult> {
+export async function sendEmail(params: SendEmailParams): Promise<SendEmailResult> {
   // Validate email format
   const recipients = Array.isArray(params.to) ? params.to : [params.to];
   for (const email of recipients) {
@@ -176,10 +171,7 @@ export async function sendEmail(
   // Check rate limit
   const rateLimit = checkRateLimit();
   if (!rateLimit.allowed) {
-    logger.error(
-      "[Email] Rate limit exceeded. Remaining quota:",
-      rateLimit.remaining,
-    );
+    logger.error("[Email] Rate limit exceeded. Remaining quota:", rateLimit.remaining);
     return {
       success: false,
       error: "Daily email limit exceeded. Please try again later.",
@@ -187,10 +179,9 @@ export async function sendEmail(
   }
 
   if (rateLimit.warning) {
-    logger.warn(
-      "[Email] Rate limit warning: approaching daily limit",
-      { remaining: rateLimit.remaining },
-    );
+    logger.warn("[Email] Rate limit warning: approaching daily limit", {
+      remaining: rateLimit.remaining,
+    });
   }
 
   let lastError: string | undefined;
@@ -199,8 +190,7 @@ export async function sendEmail(
   // Helper to wrap both getResend() and send() in a single promise
   const sendEmailAttempt = async () => {
     const resend = getResend();
-    const from = params.from || process.env.EMAIL_FROM
-      || "noreply@spike.land";
+    const from = params.from || process.env.EMAIL_FROM || "noreply@spike.land";
     return resend.emails.send({
       from,
       to: params.to,
@@ -211,19 +201,13 @@ export async function sendEmail(
 
   // Retry loop with exponential backoff
   for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
-    const { data: result, error: sendError } = await tryCatch(
-      sendEmailAttempt(),
-    );
+    const { data: result, error: sendError } = await tryCatch(sendEmailAttempt());
 
     if (sendError) {
-      lastError = sendError instanceof Error
-        ? sendError.message
-        : "Unknown error";
+      lastError = sendError instanceof Error ? sendError.message : "Unknown error";
 
       // Don't retry on configuration errors
-      if (
-        lastError.includes("RESEND_API_KEY") || lastError.includes("configured")
-      ) {
+      if (lastError.includes("RESEND_API_KEY") || lastError.includes("configured")) {
         return {
           success: false,
           error: lastError,
@@ -233,10 +217,9 @@ export async function sendEmail(
 
       if (attempt < MAX_RETRIES - 1) {
         const delay = INITIAL_RETRY_DELAY_MS * Math.pow(2, attempt);
-        logger.warn(
-          `[Email] Attempt ${attempt + 1} failed, retrying in ${delay}ms`,
-          { error: lastError },
-        );
+        logger.warn(`[Email] Attempt ${attempt + 1} failed, retrying in ${delay}ms`, {
+          error: lastError,
+        });
         await sleep(delay);
         retriesUsed++;
       }
@@ -248,8 +231,8 @@ export async function sendEmail(
 
       // Don't retry on validation errors
       if (
-        result.error.message?.includes("validation")
-        || result.error.message?.includes("invalid")
+        result.error.message?.includes("validation") ||
+        result.error.message?.includes("invalid")
       ) {
         return {
           success: false,
@@ -261,10 +244,9 @@ export async function sendEmail(
       // Retry on other errors
       if (attempt < MAX_RETRIES - 1) {
         const delay = INITIAL_RETRY_DELAY_MS * Math.pow(2, attempt);
-        logger.warn(
-          `[Email] Attempt ${attempt + 1} failed, retrying in ${delay}ms`,
-          { error: lastError },
-        );
+        logger.warn(`[Email] Attempt ${attempt + 1} failed, retrying in ${delay}ms`, {
+          error: lastError,
+        });
         await sleep(delay);
         retriesUsed++;
         continue;
@@ -305,9 +287,7 @@ export async function sendEmail(
  * @param params Email parameters with text content
  * @returns Result with success status and email ID or error
  */
-export async function sendTextEmail(
-  params: SendTextEmailParams,
-): Promise<SendEmailResult> {
+export async function sendTextEmail(params: SendTextEmailParams): Promise<SendEmailResult> {
   // Validate email format
   const recipients = Array.isArray(params.to) ? params.to : [params.to];
   for (const email of recipients) {
@@ -331,8 +311,7 @@ export async function sendTextEmail(
   const { data: result, error: sendError } = await tryCatch(
     (async () => {
       const resend = getResend();
-      const from = params.from || process.env.EMAIL_FROM
-        || "noreply@spike.land";
+      const from = params.from || process.env.EMAIL_FROM || "noreply@spike.land";
       return resend.emails.send({
         from,
         to: params.to,
@@ -343,9 +322,7 @@ export async function sendTextEmail(
   );
 
   if (sendError) {
-    const errorMessage = sendError instanceof Error
-      ? sendError.message
-      : "Unknown error";
+    const errorMessage = sendError instanceof Error ? sendError.message : "Unknown error";
     return {
       success: false,
       error: errorMessage,

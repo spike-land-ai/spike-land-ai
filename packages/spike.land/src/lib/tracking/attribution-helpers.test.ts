@@ -77,9 +77,7 @@ describe("calculatePositionBasedAttribution", () => {
   });
 
   it("returns [0.5, 0.5] for two sessions", () => {
-    expect(
-      calculatePositionBasedAttribution([makeSession(), makeSession()]),
-    ).toEqual([0.5, 0.5]);
+    expect(calculatePositionBasedAttribution([makeSession(), makeSession()])).toEqual([0.5, 0.5]);
   });
 
   it("distributes 40/20/40 for three sessions", () => {
@@ -114,19 +112,14 @@ describe("calculatePositionBasedAttribution", () => {
 
 describe("calculateTimeDecayAttribution", () => {
   it("returns empty for no sessions", () => {
-    expect(
-      calculateTimeDecayAttribution([], new Date()),
-    ).toEqual([]);
+    expect(calculateTimeDecayAttribution([], new Date())).toEqual([]);
   });
 
   it("returns [1] for single session", () => {
     const session = makeSession({
       sessionStart: new Date("2025-01-01"),
     });
-    const weights = calculateTimeDecayAttribution(
-      [session],
-      new Date("2025-01-01"),
-    );
+    const weights = calculateTimeDecayAttribution([session], new Date("2025-01-01"));
     expect(weights).toHaveLength(1);
     expect(weights[0]).toBeCloseTo(1, 5);
   });
@@ -138,10 +131,7 @@ describe("calculateTimeDecayAttribution", () => {
     const old = makeSession({
       sessionStart: new Date("2025-01-01"),
     });
-    const weights = calculateTimeDecayAttribution(
-      [old, recent],
-      new Date("2025-01-08"),
-    );
+    const weights = calculateTimeDecayAttribution([old, recent], new Date("2025-01-08"));
     expect(weights[1]!).toBeGreaterThan(weights[0]!);
   });
 
@@ -149,11 +139,9 @@ describe("calculateTimeDecayAttribution", () => {
     const sessions = Array.from({ length: 5 }, (_, i) =>
       makeSession({
         sessionStart: new Date(2025, 0, i + 1),
-      }));
-    const weights = calculateTimeDecayAttribution(
-      sessions,
-      new Date(2025, 0, 10),
+      }),
     );
+    const weights = calculateTimeDecayAttribution(sessions, new Date(2025, 0, 10));
     const total = weights.reduce((s, w) => s + w, 0);
     expect(total).toBeCloseTo(1, 5);
   });
@@ -161,9 +149,7 @@ describe("calculateTimeDecayAttribution", () => {
 
 describe("safeParseUrlHostname", () => {
   it("parses valid URL", async () => {
-    expect(await safeParseUrlHostname("https://google.com/search")).toBe(
-      "google.com",
-    );
+    expect(await safeParseUrlHostname("https://google.com/search")).toBe("google.com");
   });
 
   it("returns null for invalid URL", async () => {
@@ -177,47 +163,29 @@ describe("safeParseUrlHostname", () => {
 
 describe("determineSessionPlatform", () => {
   it("returns GOOGLE_ADS for gclid", async () => {
-    expect(
-      await determineSessionPlatform(makeSession({ gclid: "abc123" })),
-    ).toBe("GOOGLE_ADS");
+    expect(await determineSessionPlatform(makeSession({ gclid: "abc123" }))).toBe("GOOGLE_ADS");
   });
 
   it("returns FACEBOOK for fbclid", async () => {
-    expect(
-      await determineSessionPlatform(makeSession({ fbclid: "abc123" })),
-    ).toBe("FACEBOOK");
+    expect(await determineSessionPlatform(makeSession({ fbclid: "abc123" }))).toBe("FACEBOOK");
   });
 
   it("returns GOOGLE_ADS for google utm_source", async () => {
-    expect(
-      await determineSessionPlatform(
-        makeSession({ utmSource: "google" }),
-      ),
-    ).toBe("GOOGLE_ADS");
+    expect(await determineSessionPlatform(makeSession({ utmSource: "google" }))).toBe("GOOGLE_ADS");
   });
 
   it("returns FACEBOOK for facebook utm_source", async () => {
-    expect(
-      await determineSessionPlatform(
-        makeSession({ utmSource: "facebook" }),
-      ),
-    ).toBe("FACEBOOK");
+    expect(await determineSessionPlatform(makeSession({ utmSource: "facebook" }))).toBe("FACEBOOK");
   });
 
   it("returns FACEBOOK for instagram utm_source", async () => {
-    expect(
-      await determineSessionPlatform(
-        makeSession({ utmSource: "instagram" }),
-      ),
-    ).toBe("FACEBOOK");
+    expect(await determineSessionPlatform(makeSession({ utmSource: "instagram" }))).toBe(
+      "FACEBOOK",
+    );
   });
 
   it("returns OTHER for unknown utm_source", async () => {
-    expect(
-      await determineSessionPlatform(
-        makeSession({ utmSource: "twitter" }),
-      ),
-    ).toBe("OTHER");
+    expect(await determineSessionPlatform(makeSession({ utmSource: "twitter" }))).toBe("OTHER");
   });
 
   it("returns ORGANIC for google.com referrer", async () => {
@@ -237,11 +205,9 @@ describe("determineSessionPlatform", () => {
   });
 
   it("returns OTHER for unknown referrer", async () => {
-    expect(
-      await determineSessionPlatform(
-        makeSession({ referrer: "https://example.com" }),
-      ),
-    ).toBe("OTHER");
+    expect(await determineSessionPlatform(makeSession({ referrer: "https://example.com" }))).toBe(
+      "OTHER",
+    );
   });
 
   it("returns DIRECT for no tracking info", async () => {

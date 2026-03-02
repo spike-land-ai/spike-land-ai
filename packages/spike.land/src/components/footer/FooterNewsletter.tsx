@@ -1,13 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormMessage,
-} from "@/components/ui/form";
+import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -52,12 +46,8 @@ export function FooterNewsletter() {
 
   return (
     <div className="pt-2">
-      <h4 className="text-sm font-semibold text-white font-heading mb-3">
-        Stay in the loop
-      </h4>
-      <p className="text-sm text-muted-foreground mb-3">
-        Get platform updates and new features.
-      </p>
+      <h4 className="text-sm font-semibold text-white font-heading mb-3">Stay in the loop</h4>
+      <p className="text-sm text-muted-foreground mb-3">Get platform updates and new features.</p>
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}

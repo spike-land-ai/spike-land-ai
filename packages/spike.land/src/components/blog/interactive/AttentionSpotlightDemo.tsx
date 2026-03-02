@@ -44,9 +44,9 @@ const SAMPLE_TOKENS: readonly string[] = [
 /** Compute softmax over an array of raw scores */
 function softmax(scores: readonly number[]): number[] {
   const maxScore = Math.max(...scores);
-  const exps = scores.map(s => Math.exp(s - maxScore));
+  const exps = scores.map((s) => Math.exp(s - maxScore));
   const sum = exps.reduce((a, b) => a + b, 0);
-  return exps.map(e => e / sum);
+  return exps.map((e) => e / sum);
 }
 
 /** Generate deterministic attention weights for a query token index */
@@ -84,8 +84,8 @@ function TokenBar({
   onSelectQuery,
   shouldReduceMotion,
 }: TokenBarProps) {
-  const weightMap = new Map(attentionWeights.map(w => [w.toIdx, w.weight]));
-  const maxWeight = Math.max(...attentionWeights.map(w => w.weight));
+  const weightMap = new Map(attentionWeights.map((w) => [w.toIdx, w.weight]));
+  const maxWeight = Math.max(...attentionWeights.map((w) => w.weight));
 
   return (
     <div className="flex flex-wrap gap-1.5 justify-center">
@@ -107,12 +107,14 @@ function TokenBar({
           <motion.button
             key={token.id}
             onClick={() => onSelectQuery(idx)}
-            animate={shouldReduceMotion
-              ? {}
-              : {
-                opacity,
-                scale: isQuery ? 1.15 : 0.9 + normalizedWeight * 0.15,
-              }}
+            animate={
+              shouldReduceMotion
+                ? {}
+                : {
+                    opacity,
+                    scale: isQuery ? 1.15 : 0.9 + normalizedWeight * 0.15,
+                  }
+            }
             transition={{ duration: 0.35, ease: "easeOut" }}
             className="px-2 py-1 rounded text-[11px] font-mono font-bold border cursor-pointer transition-shadow"
             style={{
@@ -122,8 +124,8 @@ function TokenBar({
               boxShadow: isQuery
                 ? "0 0 12px rgba(245,158,11,0.5)"
                 : normalizedWeight > 0.5
-                ? `0 0 8px rgba(0,229,255,${normalizedWeight * 0.4})`
-                : "none",
+                  ? `0 0 8px rgba(0,229,255,${normalizedWeight * 0.4})`
+                  : "none",
             }}
             aria-pressed={isQuery}
             aria-label={`Token: ${token.label}${isQuery ? " (query)" : ""}`}
@@ -145,10 +147,13 @@ interface SoftmaxBarsProps {
   shouldReduceMotion: boolean;
 }
 
-function SoftmaxBars(
-  { tokens, attentionWeights, activeQueryIdx, shouldReduceMotion }: SoftmaxBarsProps,
-) {
-  const maxWeight = Math.max(...attentionWeights.map(w => w.weight));
+function SoftmaxBars({
+  tokens,
+  attentionWeights,
+  activeQueryIdx,
+  shouldReduceMotion,
+}: SoftmaxBarsProps) {
+  const maxWeight = Math.max(...attentionWeights.map((w) => w.weight));
   const sorted = [...attentionWeights].sort((a, b) => b.weight - a.weight).slice(0, 8);
 
   return (
@@ -210,8 +215,8 @@ function AttentionArcVisualizer({
 
   const tokenX = (idx: number) => (idx + 1) * tokenSpacing;
 
-  const weightMap = new Map(attentionWeights.map(w => [w.toIdx, w.weight]));
-  const maxWeight = Math.max(...attentionWeights.map(w => w.weight));
+  const weightMap = new Map(attentionWeights.map((w) => [w.toIdx, w.weight]));
+  const maxWeight = Math.max(...attentionWeights.map((w) => w.weight));
 
   const queryX = tokenX(activeQueryIdx);
 
@@ -285,8 +290,8 @@ function AttentionArcVisualizer({
                 filter: isQuery
                   ? "drop-shadow(0 0 6px rgba(245,158,11,0.8))"
                   : normalizedWeight > 0.4
-                  ? "drop-shadow(0 0 4px rgba(0,229,255,0.6))"
-                  : "none",
+                    ? "drop-shadow(0 0 4px rgba(0,229,255,0.6))"
+                    : "none",
               }}
             />
           );
@@ -307,11 +312,7 @@ function ContextWindowBar({ tokenCount, maxTokens }: ContextWindowBarProps) {
   const fillPercent = (tokenCount / maxTokens) * 100;
   const signalStrength = Math.max(0, 1 - (tokenCount / maxTokens) * 0.85);
 
-  const barColor = fillPercent < 40
-    ? "#00E5FF"
-    : fillPercent < 70
-    ? "#F59E0B"
-    : "#ef4444";
+  const barColor = fillPercent < 40 ? "#00E5FF" : fillPercent < 70 ? "#F59E0B" : "#ef4444";
 
   return (
     <div className="space-y-2">
@@ -342,8 +343,8 @@ function ContextWindowBar({ tokenCount, maxTokens }: ContextWindowBarProps) {
           {fillPercent > 70
             ? "attention diluted"
             : fillPercent > 40
-            ? "attention spreading"
-            : "focused"}
+              ? "attention spreading"
+              : "focused"}
         </span>
       </div>
     </div>
@@ -366,7 +367,7 @@ export function AttentionSpotlightDemo() {
   const startAutoCycle = useCallback(() => {
     if (intervalRef.current) clearInterval(intervalRef.current);
     intervalRef.current = setInterval(() => {
-      setActiveQueryIdx(prev => (prev + 1) % tokenCount);
+      setActiveQueryIdx((prev) => (prev + 1) % tokenCount);
     }, 1800);
   }, [tokenCount]);
 
@@ -380,7 +381,7 @@ export function AttentionSpotlightDemo() {
   }, [isAutoCycling, startAutoCycle]);
 
   useEffect(() => {
-    setActiveQueryIdx(prev => Math.min(prev, tokenCount - 1));
+    setActiveQueryIdx((prev) => Math.min(prev, tokenCount - 1));
   }, [tokenCount]);
 
   const tokens: Token[] = SAMPLE_TOKENS.slice(0, tokenCount).map((label, id) => ({ id, label }));
@@ -414,7 +415,7 @@ export function AttentionSpotlightDemo() {
               </span>
             </div>
             <button
-              onClick={() => setIsAutoCycling(v => !v)}
+              onClick={() => setIsAutoCycling((v) => !v)}
               className={`text-[10px] font-mono uppercase tracking-widest px-3 py-1 rounded border transition-all ${
                 isAutoCycling
                   ? "text-amber-400 border-amber-500/30 bg-amber-500/10"
@@ -480,7 +481,7 @@ export function AttentionSpotlightDemo() {
                 min={2}
                 max={MAX_CONTEXT_TOKENS}
                 value={tokenCount}
-                onChange={e => setTokenCount(parseInt(e.target.value, 10))}
+                onChange={(e) => setTokenCount(parseInt(e.target.value, 10))}
                 className="w-full h-5 appearance-none bg-transparent cursor-pointer z-10
                   [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:h-5
                   [&::-webkit-slider-thumb]:bg-slate-950 [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-cyan-400
@@ -502,10 +503,10 @@ export function AttentionSpotlightDemo() {
 
           {/* Explanation */}
           <p className="text-sm text-slate-400 font-mono leading-relaxed border-l-2 border-slate-800 pl-4">
-            <span className="text-white font-medium">Attention is zero-sum.</span>{" "}
-            The softmax function normalizes scores across all tokens — adding more tokens flattens
-            the distribution, diluting signal from any single position. This is the fundamental
-            limit of the context window.
+            <span className="text-white font-medium">Attention is zero-sum.</span> The softmax
+            function normalizes scores across all tokens — adding more tokens flattens the
+            distribution, diluting signal from any single position. This is the fundamental limit of
+            the context window.
           </p>
         </div>
       </div>

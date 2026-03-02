@@ -16,25 +16,22 @@ interface JsonViewProps {
  * Beautiful, interactive JSON viewer with syntax colouring.
  * Renders objects/arrays as collapsible trees; primitives inline.
  */
-export const JsonView = memo(
-  function JsonView({ data, className, maxExpandDepth = 3 }: JsonViewProps) {
-    return (
-      <div
-        className={cn(
-          "rounded-lg bg-black/30 border border-white/[0.06] p-3 overflow-x-auto text-xs font-mono leading-relaxed max-h-60 overflow-y-auto",
-          className,
-        )}
-      >
-        <JsonNode
-          value={data}
-          depth={0}
-          maxExpandDepth={maxExpandDepth}
-          isLast
-        />
-      </div>
-    );
-  },
-);
+export const JsonView = memo(function JsonView({
+  data,
+  className,
+  maxExpandDepth = 3,
+}: JsonViewProps) {
+  return (
+    <div
+      className={cn(
+        "rounded-lg bg-black/30 border border-white/[0.06] p-3 overflow-x-auto text-xs font-mono leading-relaxed max-h-60 overflow-y-auto",
+        className,
+      )}
+    >
+      <JsonNode value={data} depth={0} maxExpandDepth={maxExpandDepth} isLast />
+    </div>
+  );
+});
 
 /* ── Primitives ─────────────────────────────────────────── */
 
@@ -75,8 +72,7 @@ const JsonNode = memo(function JsonNode({
   keyName?: string | undefined;
   isLast: boolean;
 }) {
-  const isObject = value !== null && typeof value === "object"
-    && !Array.isArray(value);
+  const isObject = value !== null && typeof value === "object" && !Array.isArray(value);
   const isArray = Array.isArray(value);
   const isExpandable = isObject || isArray;
 
@@ -89,9 +85,9 @@ const JsonNode = memo(function JsonNode({
     return isArray
       ? (value as unknown[]).map((v, i) => ({ key: String(i), value: v }))
       : Object.entries(value as Record<string, unknown>).map(([k, v]) => ({
-        key: k,
-        value: v,
-      }));
+          key: k,
+          value: v,
+        }));
   }, [value, isArray, isExpandable]);
 
   const comma = isLast ? "" : ",";
@@ -102,8 +98,7 @@ const JsonNode = memo(function JsonNode({
         {keyName !== undefined && (
           <>
             <span className="text-violet-400">&quot;{keyName}&quot;</span>
-            <span className="text-zinc-600 mr-1">:</span>
-            {" "}
+            <span className="text-zinc-600 mr-1">:</span>{" "}
           </>
         )}
         {renderPrimitive(value)}
@@ -117,10 +112,7 @@ const JsonNode = memo(function JsonNode({
 
   if (!expanded) {
     return (
-      <div
-        className="flex items-center group"
-        style={{ paddingLeft: depth > 0 ? 16 : 0 }}
-      >
+      <div className="flex items-center group" style={{ paddingLeft: depth > 0 ? 16 : 0 }}>
         <button
           type="button"
           onClick={() => setExpanded(true)}
@@ -130,8 +122,7 @@ const JsonNode = memo(function JsonNode({
           {keyName !== undefined && (
             <>
               <span className="text-violet-400">&quot;{keyName}&quot;</span>
-              <span className="text-zinc-600 mr-1">:</span>
-              {" "}
+              <span className="text-zinc-600 mr-1">:</span>{" "}
             </>
           )}
           <span className="text-zinc-500">
@@ -159,8 +150,7 @@ const JsonNode = memo(function JsonNode({
           {keyName !== undefined && (
             <>
               <span className="text-violet-400">&quot;{keyName}&quot;</span>
-              <span className="text-zinc-600 mr-1">:</span>
-              {" "}
+              <span className="text-zinc-600 mr-1">:</span>{" "}
             </>
           )}
           <span className="text-zinc-500">{openBrace}</span>

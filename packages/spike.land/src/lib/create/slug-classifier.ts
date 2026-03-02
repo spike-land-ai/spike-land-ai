@@ -55,8 +55,7 @@ export const ClassificationResultSchema = z.object({
 
 export type ClassificationResult = z.infer<typeof ClassificationResultSchema>;
 
-export const CLASSIFY_SYSTEM_PROMPT =
-  `You classify user app ideas into clean URL slugs with content moderation.
+export const CLASSIFY_SYSTEM_PROMPT = `You classify user app ideas into clean URL slugs with content moderation.
 
 INPUT: Arbitrary user text describing an app they want to create.
 
@@ -117,9 +116,7 @@ function naiveFallbackSlug(rawText: string): string {
   return validateSlug(slug);
 }
 
-export async function classifyInput(
-  rawText: string,
-): Promise<ClassificationResult> {
+export async function classifyInput(rawText: string): Promise<ClassificationResult> {
   const trimmed = rawText.trim();
 
   // Pre-flight: reject empty input
@@ -182,12 +179,9 @@ export async function classifyInput(
   // Validate with Zod
   const parsed = ClassificationResultSchema.safeParse(data);
   if (!parsed.success) {
-    logger.warn(
-      "Classification response failed schema validation, using fail-closed fallback",
-      {
-        errors: parsed.error.issues,
-      },
-    );
+    logger.warn("Classification response failed schema validation, using fail-closed fallback", {
+      errors: parsed.error.issues,
+    });
     return {
       status: "unclear",
       slug: naiveFallbackSlug(trimmed),

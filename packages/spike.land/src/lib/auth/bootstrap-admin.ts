@@ -19,10 +19,7 @@ import { UserRole } from "@prisma/client";
 export async function hasAnyAdmin(): Promise<boolean> {
   const adminCount = await prisma.user.count({
     where: {
-      OR: [
-        { role: UserRole.ADMIN },
-        { role: UserRole.SUPER_ADMIN },
-      ],
+      OR: [{ role: UserRole.ADMIN }, { role: UserRole.SUPER_ADMIN }],
     },
   });
 
@@ -38,9 +35,7 @@ export async function hasAnyAdmin(): Promise<boolean> {
  */
 export async function bootstrapAdminIfNeeded(userId: string): Promise<boolean> {
   // Check if any admin already exists
-  const { data: adminExists, error: checkError } = await tryCatch(
-    hasAnyAdmin(),
-  );
+  const { data: adminExists, error: checkError } = await tryCatch(hasAnyAdmin());
 
   if (checkError) {
     logger.error("Failed to bootstrap admin", { error: checkError });

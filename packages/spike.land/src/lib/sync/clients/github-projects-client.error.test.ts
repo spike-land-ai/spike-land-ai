@@ -6,12 +6,7 @@
  * - Exported type shapes (ProjectItem, ProjectField)
  */
 
-import {
-  afterEach,
-  describe,
-  expect,
-  it,
-} from "vitest";
+import { afterEach, describe, expect, it } from "vitest";
 import {
   isGitHubProjectsAvailable,
   type ProjectField,

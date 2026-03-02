@@ -88,7 +88,7 @@ describe("careerNavigatorTools", () => {
   });
 
   it("registers tools in expected categories", () => {
-    const categories = new Set(careerNavigatorTools.map(t => t.category));
+    const categories = new Set(careerNavigatorTools.map((t) => t.category));
     expect(categories).toContain("career");
     expect(categories).toContain("career-growth");
   });
@@ -100,31 +100,23 @@ describe("careerNavigatorTools", () => {
       ctx,
     );
     expect(result.isError).toBeUndefined();
-    const text = (result.content[0] as { text: string; }).text;
+    const text = (result.content[0] as { text: string }).text;
     expect(text).toContain("Skills Assessment Results");
     expect(text).toContain("Software Developer");
   });
 
   it("career_search_occupations returns results", async () => {
-    const result = await registry.call(
-      "career_search_occupations",
-      { query: "developer" },
-      ctx,
-    );
+    const result = await registry.call("career_search_occupations", { query: "developer" }, ctx);
     expect(result.isError).toBeUndefined();
-    const text = (result.content[0] as { text: string; }).text;
+    const text = (result.content[0] as { text: string }).text;
     expect(text).toContain("Occupations Found");
     expect(text).toContain("Software Developer");
   });
 
   it("career_get_occupation returns full details", async () => {
-    const result = await registry.call(
-      "career_get_occupation",
-      { uri: "http://esco/1" },
-      ctx,
-    );
+    const result = await registry.call("career_get_occupation", { uri: "http://esco/1" }, ctx);
     expect(result.isError).toBeUndefined();
-    const text = (result.content[0] as { text: string; }).text;
+    const text = (result.content[0] as { text: string }).text;
     expect(text).toContain("Software Developer");
     expect(text).toContain("Essential Skills");
   });
@@ -136,7 +128,7 @@ describe("careerNavigatorTools", () => {
       ctx,
     );
     expect(result.isError).toBeUndefined();
-    const text = (result.content[0] as { text: string; }).text;
+    const text = (result.content[0] as { text: string }).text;
     expect(text).toContain("Salary");
     expect(text).toContain("55,000");
   });
@@ -148,7 +140,7 @@ describe("careerNavigatorTools", () => {
       ctx,
     );
     expect(result.isError).toBeUndefined();
-    const text = (result.content[0] as { text: string; }).text;
+    const text = (result.content[0] as { text: string }).text;
     expect(text).toContain("Job Listings");
     expect(text).toContain("Frontend Dev");
   });
@@ -179,7 +171,7 @@ describe("careerNavigatorTools", () => {
       ctx,
     );
     expect(result.isError).toBeUndefined();
-    const text = (result.content[0] as { text: string; }).text;
+    const text = (result.content[0] as { text: string }).text;
     expect(text).toContain("Resume Created");
     expect(text).toContain("Completeness Score");
   });
@@ -194,7 +186,7 @@ describe("careerNavigatorTools", () => {
       ctx,
     );
     expect(result.isError).toBeUndefined();
-    const text = (result.content[0] as { text: string; }).text;
+    const text = (result.content[0] as { text: string }).text;
     expect(text).toContain("Learning Path");
   });
 
@@ -205,7 +197,7 @@ describe("careerNavigatorTools", () => {
       ctx,
     );
     expect(result.isError).toBeUndefined();
-    const text = (result.content[0] as { text: string; }).text;
+    const text = (result.content[0] as { text: string }).text;
     expect(text).toContain("Interview Prep");
     expect(text).toContain("Q1.");
   });

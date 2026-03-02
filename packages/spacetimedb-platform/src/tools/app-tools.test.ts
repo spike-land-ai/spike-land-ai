@@ -33,12 +33,20 @@ describe("app-tools", () => {
   describe("stdb_create_app", () => {
     it("creates an app", async () => {
       const result = await server.call("stdb_create_app", {
-        slug: "my-app", name: "My App", description: "A test app", r2CodeKey: "apps/my-app/v1.js",
+        slug: "my-app",
+        name: "My App",
+        description: "A test app",
+        r2CodeKey: "apps/my-app/v1.js",
       });
       const parsed = JSON.parse(result.content[0].text);
       expect(parsed.created).toBe(true);
       expect(parsed.slug).toBe("my-app");
-      expect(client.createApp).toHaveBeenCalledWith("my-app", "My App", "A test app", "apps/my-app/v1.js");
+      expect(client.createApp).toHaveBeenCalledWith(
+        "my-app",
+        "My App",
+        "A test app",
+        "apps/my-app/v1.js",
+      );
     });
 
     it("returns NOT_CONNECTED when disconnected", async () => {
@@ -46,16 +54,24 @@ describe("app-tools", () => {
       const dcServer = createMockServer();
       registerAppTools(dcServer as unknown as McpServer, dcClient);
       const result = await dcServer.call("stdb_create_app", {
-        slug: "x", name: "X", description: "", r2CodeKey: "k",
+        slug: "x",
+        name: "X",
+        description: "",
+        r2CodeKey: "k",
       });
       expect(result.isError).toBe(true);
       expect(JSON.parse(result.content[0].text).error).toBe("NOT_CONNECTED");
     });
 
     it("returns REDUCER_FAILED on other errors", async () => {
-      client.createApp = vi.fn(async () => { throw new Error("Reducer panicked"); });
+      client.createApp = vi.fn(async () => {
+        throw new Error("Reducer panicked");
+      });
       const result = await server.call("stdb_create_app", {
-        slug: "x", name: "X", description: "", r2CodeKey: "k",
+        slug: "x",
+        name: "X",
+        description: "",
+        r2CodeKey: "k",
       });
       expect(result.isError).toBe(true);
       expect(JSON.parse(result.content[0].text).error).toBe("REDUCER_FAILED");
@@ -67,9 +83,15 @@ describe("app-tools", () => {
   describe("stdb_list_apps", () => {
     it("lists all apps", async () => {
       client._apps.push({
-        id: 1n, ownerIdentity: "owner-1", slug: "app-1", name: "App 1",
-        description: "First app", r2CodeKey: "k1", status: "active",
-        createdAt: 1000n, updatedAt: 1000n,
+        id: 1n,
+        ownerIdentity: "owner-1",
+        slug: "app-1",
+        name: "App 1",
+        description: "First app",
+        r2CodeKey: "k1",
+        status: "active",
+        createdAt: 1000n,
+        updatedAt: 1000n,
       });
       const result = await server.call("stdb_list_apps", {});
       const parsed = JSON.parse(result.content[0].text);
@@ -79,8 +101,28 @@ describe("app-tools", () => {
 
     it("filters by owner", async () => {
       client._apps.push(
-        { id: 1n, ownerIdentity: "o1", slug: "a1", name: "A1", description: "", r2CodeKey: "k", status: "active", createdAt: 1000n, updatedAt: 1000n },
-        { id: 2n, ownerIdentity: "o2", slug: "a2", name: "A2", description: "", r2CodeKey: "k", status: "active", createdAt: 1000n, updatedAt: 1000n },
+        {
+          id: 1n,
+          ownerIdentity: "o1",
+          slug: "a1",
+          name: "A1",
+          description: "",
+          r2CodeKey: "k",
+          status: "active",
+          createdAt: 1000n,
+          updatedAt: 1000n,
+        },
+        {
+          id: 2n,
+          ownerIdentity: "o2",
+          slug: "a2",
+          name: "A2",
+          description: "",
+          r2CodeKey: "k",
+          status: "active",
+          createdAt: 1000n,
+          updatedAt: 1000n,
+        },
       );
       const result = await server.call("stdb_list_apps", { ownerIdentity: "o1" });
       const parsed = JSON.parse(result.content[0].text);
@@ -102,9 +144,15 @@ describe("app-tools", () => {
   describe("stdb_get_app", () => {
     it("gets an existing app", async () => {
       client._apps.push({
-        id: 1n, ownerIdentity: "o1", slug: "my-app", name: "My App",
-        description: "Desc", r2CodeKey: "k", status: "active",
-        createdAt: 1000n, updatedAt: 2000n,
+        id: 1n,
+        ownerIdentity: "o1",
+        slug: "my-app",
+        name: "My App",
+        description: "Desc",
+        r2CodeKey: "k",
+        status: "active",
+        createdAt: 1000n,
+        updatedAt: 2000n,
       });
       const result = await server.call("stdb_get_app", { slug: "my-app" });
       const parsed = JSON.parse(result.content[0].text);
@@ -124,7 +172,9 @@ describe("app-tools", () => {
   describe("stdb_app_chat", () => {
     it("sends a chat message", async () => {
       const result = await server.call("stdb_app_chat", {
-        appId: "1", role: "user", content: "Hello",
+        appId: "1",
+        role: "user",
+        content: "Hello",
       });
       const parsed = JSON.parse(result.content[0].text);
       expect(parsed.sent).toBe(true);
@@ -132,9 +182,13 @@ describe("app-tools", () => {
     });
 
     it("returns REDUCER_FAILED on error", async () => {
-      client.sendAppMessage = vi.fn(async () => { throw new Error("App not found"); });
+      client.sendAppMessage = vi.fn(async () => {
+        throw new Error("App not found");
+      });
       const result = await server.call("stdb_app_chat", {
-        appId: "1", role: "user", content: "Hi",
+        appId: "1",
+        role: "user",
+        content: "Hi",
       });
       expect(result.isError).toBe(true);
       expect(JSON.parse(result.content[0].text).error).toBe("REDUCER_FAILED");
@@ -146,8 +200,12 @@ describe("app-tools", () => {
   describe("stdb_list_app_versions", () => {
     it("lists versions", async () => {
       client._appVersions.push({
-        id: 1n, appId: 10n, version: "1.0.0", codeHash: "abc123",
-        changeDescription: "Initial", createdAt: 1000n,
+        id: 1n,
+        appId: 10n,
+        version: "1.0.0",
+        codeHash: "abc123",
+        changeDescription: "Initial",
+        createdAt: 1000n,
       });
       const result = await server.call("stdb_list_app_versions", { appId: "10" });
       const parsed = JSON.parse(result.content[0].text);
@@ -169,9 +227,15 @@ describe("app-tools", () => {
   describe("stdb_update_app_status", () => {
     it("updates app status", async () => {
       client._apps.push({
-        id: 1n, ownerIdentity: "o1", slug: "app", name: "App",
-        description: "", r2CodeKey: "k", status: "active",
-        createdAt: 1000n, updatedAt: 1000n,
+        id: 1n,
+        ownerIdentity: "o1",
+        slug: "app",
+        name: "App",
+        description: "",
+        r2CodeKey: "k",
+        status: "active",
+        createdAt: 1000n,
+        updatedAt: 1000n,
       });
       const result = await server.call("stdb_update_app_status", { appId: "1", status: "paused" });
       const parsed = JSON.parse(result.content[0].text);
@@ -180,7 +244,10 @@ describe("app-tools", () => {
     });
 
     it("returns REDUCER_FAILED for missing app", async () => {
-      const result = await server.call("stdb_update_app_status", { appId: "999", status: "paused" });
+      const result = await server.call("stdb_update_app_status", {
+        appId: "999",
+        status: "paused",
+      });
       expect(result.isError).toBe(true);
       expect(JSON.parse(result.content[0].text).error).toBe("REDUCER_FAILED");
     });
@@ -191,9 +258,15 @@ describe("app-tools", () => {
   describe("stdb_delete_app", () => {
     it("deletes an app", async () => {
       client._apps.push({
-        id: 1n, ownerIdentity: "o1", slug: "app", name: "App",
-        description: "", r2CodeKey: "k", status: "active",
-        createdAt: 1000n, updatedAt: 1000n,
+        id: 1n,
+        ownerIdentity: "o1",
+        slug: "app",
+        name: "App",
+        description: "",
+        r2CodeKey: "k",
+        status: "active",
+        createdAt: 1000n,
+        updatedAt: 1000n,
       });
       const result = await server.call("stdb_delete_app", { appId: "1" });
       const parsed = JSON.parse(result.content[0].text);
@@ -212,9 +285,15 @@ describe("app-tools", () => {
   describe("stdb_restore_app", () => {
     it("restores an app", async () => {
       client._apps.push({
-        id: 1n, ownerIdentity: "o1", slug: "app", name: "App",
-        description: "", r2CodeKey: "k", status: "deleted",
-        createdAt: 1000n, updatedAt: 1000n,
+        id: 1n,
+        ownerIdentity: "o1",
+        slug: "app",
+        name: "App",
+        description: "",
+        r2CodeKey: "k",
+        status: "deleted",
+        createdAt: 1000n,
+        updatedAt: 1000n,
       });
       const result = await server.call("stdb_restore_app", { appId: "1" });
       const parsed = JSON.parse(result.content[0].text);

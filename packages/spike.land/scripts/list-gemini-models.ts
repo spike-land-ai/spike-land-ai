@@ -33,19 +33,16 @@ async function main() {
       console.log(`\nModel: ${m.name}`);
       console.log(`  Display Name: ${m.displayName || "N/A"}`);
       console.log(`  Description: ${m.description || "N/A"}`);
-      const supportedMethods = m.supportedGenerationMethods as
-        | string[]
-        | undefined;
-      console.log(
-        `  Supported Methods: ${supportedMethods?.join(", ") || "N/A"}`,
-      );
+      const supportedMethods = m.supportedGenerationMethods as string[] | undefined;
+      console.log(`  Supported Methods: ${supportedMethods?.join(", ") || "N/A"}`);
       console.log(`  Input Token Limit: ${m.inputTokenLimit || "N/A"}`);
       console.log(`  Output Token Limit: ${m.outputTokenLimit || "N/A"}`);
 
       // Check if model supports image generation
-      const supportsImages = supportedMethods?.includes("generateContent")
-        || String(m.name).includes("image")
-        || String(m.name).includes("imagen");
+      const supportsImages =
+        supportedMethods?.includes("generateContent") ||
+        String(m.name).includes("image") ||
+        String(m.name).includes("imagen");
 
       if (supportsImages) {
         console.log(`  ✨ SUPPORTS IMAGE GENERATION`);
@@ -55,19 +52,21 @@ async function main() {
     console.log("\n" + "=".repeat(80));
 
     // Filter for image-related models
-    const imageModels = models.filter(model => {
+    const imageModels = models.filter((model) => {
       const m = model as Record<string, unknown>;
       const name = String(m.name || "");
       const displayName = String(m.displayName || "");
-      return name.includes("image")
-        || name.includes("imagen")
-        || name.includes("vision")
-        || displayName.toLowerCase().includes("image");
+      return (
+        name.includes("image") ||
+        name.includes("imagen") ||
+        name.includes("vision") ||
+        displayName.toLowerCase().includes("image")
+      );
     });
 
     if (imageModels.length > 0) {
       console.log("\nImage-related models:");
-      imageModels.forEach(model => {
+      imageModels.forEach((model) => {
         const m = model as Record<string, unknown>;
         console.log(`  - ${m.name} (${m.displayName})`);
       });

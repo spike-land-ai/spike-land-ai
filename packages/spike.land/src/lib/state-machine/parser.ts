@@ -20,10 +20,7 @@ interface Parser {
 // Tokenizer helpers
 // ---------------------------------------------------------------------------
 
-function createParser(
-  expression: string,
-  context: Record<string, unknown>,
-): Parser {
+function createParser(expression: string, context: Record<string, unknown>): Parser {
   return { input: expression, pos: 0, context };
 }
 
@@ -42,9 +39,10 @@ function consume(p: Parser, expected: string): void {
   skipWhitespace(p);
   if (!p.input.startsWith(expected, p.pos)) {
     throw new Error(
-      `Guard parse error at position ${p.pos}: expected "${expected}", found "${
-        p.input.slice(p.pos, p.pos + 10)
-      }"`,
+      `Guard parse error at position ${p.pos}: expected "${expected}", found "${p.input.slice(
+        p.pos,
+        p.pos + 10,
+      )}"`,
     );
   }
   p.pos += expected.length;
@@ -119,9 +117,7 @@ function parseCompare(p: Parser): unknown {
 
 function parseAddSub(p: Parser): unknown {
   let left = parseMulDiv(p);
-  while (
-    peek(p, "+") || peek(p, "-")
-  ) {
+  while (peek(p, "+") || peek(p, "-")) {
     if (peek(p, "+")) {
       consume(p, "+");
       const right = parseMulDiv(p);
@@ -176,10 +172,10 @@ function parsePrimary(p: Parser): unknown {
   }
 
   // String literal (double-quoted)
-  if (p.pos < p.input.length && p.input[p.pos] === "\"") {
+  if (p.pos < p.input.length && p.input[p.pos] === '"') {
     p.pos++; // skip opening quote
     let str = "";
-    while (p.pos < p.input.length && p.input[p.pos] !== "\"") {
+    while (p.pos < p.input.length && p.input[p.pos] !== '"') {
       if (p.input[p.pos] === "\\") {
         p.pos++;
         if (p.pos >= p.input.length) {
@@ -219,10 +215,9 @@ function parsePrimary(p: Parser): unknown {
 
   // Number literal
   if (
-    p.pos < p.input.length
-    && (/\d/.test(p.input[p.pos]!)
-      || (p.input[p.pos] === "-" && p.pos + 1 < p.input.length
-        && /\d/.test(p.input[p.pos + 1]!)))
+    p.pos < p.input.length &&
+    (/\d/.test(p.input[p.pos]!) ||
+      (p.input[p.pos] === "-" && p.pos + 1 < p.input.length && /\d/.test(p.input[p.pos + 1]!)))
   ) {
     let numStr = "";
     if (p.input[p.pos] === "-") {
@@ -286,10 +281,7 @@ function parsePrimary(p: Parser): unknown {
  * Evaluate a guard expression string against a context object.
  * Returns true if the expression evaluates to a truthy value.
  */
-export function evaluateGuard(
-  expression: string,
-  context: Record<string, unknown>,
-): boolean {
+export function evaluateGuard(expression: string, context: Record<string, unknown>): boolean {
   return Boolean(evaluateExpression(expression, context));
 }
 
@@ -297,18 +289,15 @@ export function evaluateGuard(
  * Evaluate an arbitrary expression string against a context object.
  * Returns the raw result value (may be string, number, boolean, null, etc.).
  */
-export function evaluateExpression(
-  expression: string,
-  context: Record<string, unknown>,
-): unknown {
+export function evaluateExpression(expression: string, context: Record<string, unknown>): unknown {
   const p = createParser(expression, context);
   const result = parseExpr(p);
   skipWhitespace(p);
   if (p.pos < p.input.length) {
     throw new Error(
-      `Expression parse error: unexpected trailing content at position ${p.pos}: "${
-        p.input.slice(p.pos)
-      }"`,
+      `Expression parse error: unexpected trailing content at position ${p.pos}: "${p.input.slice(
+        p.pos,
+      )}"`,
     );
   }
   return result;

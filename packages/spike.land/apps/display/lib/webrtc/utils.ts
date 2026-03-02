@@ -31,11 +31,7 @@ export async function getUserMediaStream(
     const stream = await navigator.mediaDevices.getUserMedia(constraints);
     return stream;
   } catch (error) {
-    throw createWebRTCError(
-      "permission-denied",
-      "Failed to access media devices",
-      error as Error,
-    );
+    throw createWebRTCError("permission-denied", "Failed to access media devices", error as Error);
   }
 }
 
@@ -50,11 +46,7 @@ export async function getDisplayMediaStream(): Promise<MediaStream> {
     } as DisplayMediaStreamOptions);
     return stream;
   } catch (error) {
-    throw createWebRTCError(
-      "permission-denied",
-      "Failed to access screen sharing",
-      error as Error,
-    );
+    throw createWebRTCError("permission-denied", "Failed to access screen sharing", error as Error);
   }
 }
 
@@ -64,7 +56,7 @@ export async function getDisplayMediaStream(): Promise<MediaStream> {
 export function stopMediaStream(stream: MediaStream | null): void {
   if (!stream) return;
 
-  stream.getTracks().forEach(track => {
+  stream.getTracks().forEach((track) => {
     track.stop();
   });
 }
@@ -86,10 +78,10 @@ export function getStreamMetadata(
     isActive: stream.active,
     videoSettings: settings
       ? {
-        width: settings.width || 0,
-        height: settings.height || 0,
-        frameRate: settings.frameRate || 0,
-      }
+          width: settings.width || 0,
+          height: settings.height || 0,
+          frameRate: settings.frameRate || 0,
+        }
       : undefined,
   };
 }
@@ -99,9 +91,9 @@ export function getStreamMetadata(
  */
 export function isWebRTCSupported(): boolean {
   return !!(
-    navigator.mediaDevices
-    && typeof navigator.mediaDevices.getUserMedia === "function"
-    && window.RTCPeerConnection
+    navigator.mediaDevices &&
+    typeof navigator.mediaDevices.getUserMedia === "function" &&
+    window.RTCPeerConnection
   );
 }
 
@@ -130,9 +122,7 @@ export function generatePeerId(prefix: string = "peer"): string {
 /**
  * Validate if a peer ID is in correct format
  */
-export function isValidPeerId(
-  peerId: string | null | undefined,
-): peerId is string {
+export function isValidPeerId(peerId: string | null | undefined): peerId is string {
   if (!peerId) return false;
   // Peer IDs should be alphanumeric with hyphens/underscores
   return /^[a-zA-Z0-9-_]+$/.test(peerId);
@@ -142,8 +132,7 @@ export function isValidPeerId(
  * Create QR code data URL for a peer ID
  */
 export function createConnectionUrl(peerId: string, baseUrl?: string): string {
-  const base = baseUrl
-    || (typeof window !== "undefined" ? window.location.origin : "");
+  const base = baseUrl || (typeof window !== "undefined" ? window.location.origin : "");
   return `${base}/client?hostId=${peerId}`;
 }
 
@@ -167,7 +156,7 @@ export function calculateVideoLayout(
   containerHeight: number,
   videoWidth: number,
   videoHeight: number,
-): { width: number; height: number; } {
+): { width: number; height: number } {
   const containerRatio = containerWidth / containerHeight;
   const videoRatio = videoWidth / videoHeight;
 
@@ -190,13 +179,10 @@ export function calculateVideoLayout(
 /**
  * Monitor stream health and detect issues
  */
-export function monitorStreamHealth(
-  stream: MediaStream,
-  onInactive: () => void,
-): () => void {
+export function monitorStreamHealth(stream: MediaStream, onInactive: () => void): () => void {
   const tracks = stream.getTracks();
 
-  const handlers = tracks.map(track => {
+  const handlers = tracks.map((track) => {
     const handler = () => {
       if (!stream.active) {
         onInactive();

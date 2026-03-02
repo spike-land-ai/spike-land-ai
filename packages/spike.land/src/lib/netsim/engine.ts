@@ -173,11 +173,7 @@ export function setLinkState(
   return link;
 }
 
-export function partitionNode(
-  topoId: string,
-  userId: string,
-  nodeId: string,
-): void {
+export function partitionNode(topoId: string, userId: string, nodeId: string): void {
   const topo = getTopology(topoId, userId);
   const node = topo.nodes.get(nodeId);
   if (!node) throw new Error(`Node ${nodeId} not found`);
@@ -192,11 +188,7 @@ export function partitionNode(
   }
 }
 
-export function healNode(
-  topoId: string,
-  userId: string,
-  nodeId: string,
-): void {
+export function healNode(topoId: string, userId: string, nodeId: string): void {
   const topo = getTopology(topoId, userId);
   const node = topo.nodes.get(nodeId);
   if (!node) throw new Error(`Node ${nodeId} not found`);
@@ -245,11 +237,7 @@ export function sendMessage(
   return msg;
 }
 
-export function tick(
-  topoId: string,
-  userId: string,
-  rounds: number = 1,
-): DeliveryResult {
+export function tick(topoId: string, userId: string, rounds: number = 1): DeliveryResult {
   const topo = getTopology(topoId, userId);
 
   const delivered: NetworkMessage[] = [];
@@ -322,20 +310,15 @@ export function tick(
   }
 
   // Collect still-pending messages
-  const pending = topo.messageLog.filter(
-    m => m.deliveredAt === null && !m.dropped,
-  );
+  const pending = topo.messageLog.filter((m) => m.deliveredAt === null && !m.dropped);
 
   return { delivered, dropped, pending };
 }
 
-export function inspect(
-  topoId: string,
-  userId: string,
-): TopologyStateView {
+export function inspect(topoId: string, userId: string): TopologyStateView {
   const topo = getTopology(topoId, userId);
 
-  const nodes = topo.nodeOrder.map(nid => {
+  const nodes = topo.nodeOrder.map((nid) => {
     const node = topo.nodes.get(nid)!;
     return { id: node.id, partitioned: node.partitioned };
   });
@@ -363,10 +346,7 @@ export function inspect(
   };
 }
 
-export function getDeliveryStats(
-  topoId: string,
-  userId: string,
-): DeliveryResult {
+export function getDeliveryStats(topoId: string, userId: string): DeliveryResult {
   const topo = getTopology(topoId, userId);
 
   const delivered: NetworkMessage[] = [];

@@ -22,7 +22,7 @@ export function useAnimatedNumber(value: number, duration: number = 2) {
   }, [value, motionValue]);
 
   useEffect(() => {
-    const unsubscribe = springValue.on("change", latest => {
+    const unsubscribe = springValue.on("change", (latest) => {
       setDisplayValue(Math.round(latest));
     });
     return () => unsubscribe();

@@ -88,9 +88,7 @@ describe("auth", () => {
       const result = await authenticateMcpRequest(request);
 
       expect(result.success).toBe(false);
-      expect(result.error).toBe(
-        "Invalid Authorization header format. Expected: Bearer <api_key>",
-      );
+      expect(result.error).toBe("Invalid Authorization header format. Expected: Bearer <api_key>");
     });
 
     it("should return error when API key is empty", async () => {
@@ -167,9 +165,7 @@ describe("auth", () => {
     });
 
     it("should return error when capability token verification throws", async () => {
-      mockVerifyCapabilityToken.mockRejectedValue(
-        new Error("Cap service down"),
-      );
+      mockVerifyCapabilityToken.mockRejectedValue(new Error("Cap service down"));
 
       const request = createMockRequest({
         Authorization: "Bearer cap_broken_token",
@@ -246,9 +242,7 @@ describe("auth", () => {
     });
 
     it("should return error when OAuth token verification throws", async () => {
-      mockVerifyAccessToken.mockRejectedValue(
-        new Error("OAuth service unavailable"),
-      );
+      mockVerifyAccessToken.mockRejectedValue(new Error("OAuth service unavailable"));
 
       const request = createMockRequest({
         Authorization: "Bearer mcp_crashing_token",
@@ -277,9 +271,7 @@ describe("auth", () => {
     });
 
     it("should return error when validateApiKey throws an exception", async () => {
-      mockValidateApiKey.mockRejectedValue(
-        new Error("Database connection failed"),
-      );
+      mockValidateApiKey.mockRejectedValue(new Error("Database connection failed"));
 
       const request = createMockRequest({
         Authorization: "Bearer sk_test_validkey",
@@ -326,10 +318,7 @@ describe("auth", () => {
 
     it("should return error for invalid OAuth token in SSE", async () => {
       mockVerifyAccessToken.mockResolvedValue(null);
-      const request = createMockRequest(
-        {},
-        "http://localhost?token=mcp_invalid",
-      );
+      const request = createMockRequest({}, "http://localhost?token=mcp_invalid");
       const result = await authenticateSseRequest(request);
       expect(result.success).toBe(false);
       expect(result.error).toBe("Invalid or expired OAuth token");
@@ -337,10 +326,7 @@ describe("auth", () => {
 
     it("should return error when OAuth verification throws in SSE", async () => {
       mockVerifyAccessToken.mockRejectedValue(new Error("Down"));
-      const request = createMockRequest(
-        {},
-        "http://localhost?token=mcp_broken",
-      );
+      const request = createMockRequest({}, "http://localhost?token=mcp_broken");
       const result = await authenticateSseRequest(request);
       expect(result.success).toBe(false);
       expect(result.error).toBe("OAuth token verification failed");
@@ -363,10 +349,7 @@ describe("auth", () => {
         isValid: false,
         error: "Bad key",
       });
-      const request = createMockRequest(
-        {},
-        "http://localhost?token=sk_invalid",
-      );
+      const request = createMockRequest({}, "http://localhost?token=sk_invalid");
       const result = await authenticateSseRequest(request);
       expect(result.success).toBe(false);
       expect(result.error).toBe("Bad key");
@@ -382,20 +365,14 @@ describe("auth", () => {
 
     it("should use default error for invalid API key in SSE without message", async () => {
       mockValidateApiKey.mockResolvedValue({ isValid: false });
-      const request = createMockRequest(
-        {},
-        "http://localhost?token=sk_invalid",
-      );
+      const request = createMockRequest({}, "http://localhost?token=sk_invalid");
       const result = await authenticateSseRequest(request);
       expect(result.error).toBe("Invalid API key");
     });
 
     it("should use fallback error when SSE validateApiKey throws without message", async () => {
       mockValidateApiKey.mockRejectedValue(new Error());
-      const request = createMockRequest(
-        {},
-        "http://localhost?token=sk_broken_nomsg",
-      );
+      const request = createMockRequest({}, "http://localhost?token=sk_broken_nomsg");
       const result = await authenticateSseRequest(request);
       expect(result.success).toBe(false);
       expect(result.error).toBe("API key validation failed");
@@ -550,9 +527,7 @@ describe("auth", () => {
       const result = await authenticateMcpOrSession(request);
 
       expect(result.success).toBe(false);
-      expect(result.error).toBe(
-        "Authentication required. Provide an API key or sign in.",
-      );
+      expect(result.error).toBe("Authentication required. Provide an API key or sign in.");
     });
 
     it("should return error when session exists but has no user", async () => {
@@ -563,9 +538,7 @@ describe("auth", () => {
       const result = await authenticateMcpOrSession(request);
 
       expect(result.success).toBe(false);
-      expect(result.error).toBe(
-        "Authentication required. Provide an API key or sign in.",
-      );
+      expect(result.error).toBe("Authentication required. Provide an API key or sign in.");
     });
 
     it("should return error when session user has no id", async () => {
@@ -578,9 +551,7 @@ describe("auth", () => {
       const result = await authenticateMcpOrSession(request);
 
       expect(result.success).toBe(false);
-      expect(result.error).toBe(
-        "Authentication required. Provide an API key or sign in.",
-      );
+      expect(result.error).toBe("Authentication required. Provide an API key or sign in.");
     });
 
     it("should return error when session auth throws an exception", async () => {

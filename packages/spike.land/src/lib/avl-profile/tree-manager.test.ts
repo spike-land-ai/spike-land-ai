@@ -82,9 +82,9 @@ describe("tree-manager", () => {
       // initializeTree calls findUniqueOrThrow
       mockPrisma.avlProfileTree.findUniqueOrThrow.mockResolvedValue(newTree);
       // initializeTree calls $transaction
-      mockPrisma.$transaction.mockImplementation(async (
-        fn: (tx: typeof mockPrisma) => Promise<unknown>,
-      ) => fn(mockPrisma));
+      mockPrisma.$transaction.mockImplementation(
+        async (fn: (tx: typeof mockPrisma) => Promise<unknown>) => fn(mockPrisma),
+      );
       mockPrisma.avlProfileNode.create.mockResolvedValue({});
       mockPrisma.avlProfileTree.update.mockResolvedValue({});
       // Final findUniqueOrThrow after initializeTree
@@ -105,9 +105,9 @@ describe("tree-manager", () => {
     it("creates balanced tree from seed questions", async () => {
       const tree = { id: "tree-1", name: "test" };
       mockPrisma.avlProfileTree.findUniqueOrThrow.mockResolvedValue(tree);
-      mockPrisma.$transaction.mockImplementation(async (
-        fn: (tx: typeof mockPrisma) => Promise<unknown>,
-      ) => fn(mockPrisma));
+      mockPrisma.$transaction.mockImplementation(
+        async (fn: (tx: typeof mockPrisma) => Promise<unknown>) => fn(mockPrisma),
+      );
       mockPrisma.avlProfileNode.create.mockResolvedValue({});
       mockPrisma.avlProfileTree.update.mockResolvedValue({});
 

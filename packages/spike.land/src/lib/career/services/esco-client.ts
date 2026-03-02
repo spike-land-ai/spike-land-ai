@@ -1,10 +1,5 @@
 import { getCacheRaw, setCacheRaw } from "@/lib/cache";
-import {
-  CACHE_PREFIX,
-  CACHE_TTL,
-  DEFAULT_RESULTS_LIMIT,
-  ESCO_API_BASE,
-} from "../constants";
+import { CACHE_PREFIX, CACHE_TTL, DEFAULT_RESULTS_LIMIT, ESCO_API_BASE } from "../constants";
 import type {
   EscoOccupationDetail,
   EscoSearchResponse,
@@ -18,10 +13,7 @@ function cacheKey(...parts: string[]): string {
   return `${CACHE_PREFIX}${parts.join(":")}`;
 }
 
-async function escoFetch<T>(
-  path: string,
-  params?: Record<string, string>,
-): Promise<T> {
+async function escoFetch<T>(path: string, params?: Record<string, string>): Promise<T> {
   const url = new URL(`${ESCO_API_BASE}${path}`);
   if (params) {
     for (const [key, value] of Object.entries(params)) {
@@ -34,9 +26,7 @@ async function escoFetch<T>(
   });
 
   if (!response.ok) {
-    throw new Error(
-      `ESCO API error: ${response.status} ${response.statusText}`,
-    );
+    throw new Error(`ESCO API error: ${response.status} ${response.statusText}`);
   }
 
   return response.json() as Promise<T>;
@@ -46,17 +36,9 @@ export async function searchOccupations(
   query: string,
   limit = DEFAULT_RESULTS_LIMIT,
   offset = 0,
-): Promise<{ results: EscoSearchResult[]; total: number; }> {
-  const key = cacheKey(
-    "occupations",
-    "search",
-    query,
-    String(limit),
-    String(offset),
-  );
-  const cached = await getCacheRaw<
-    { results: EscoSearchResult[]; total: number; }
-  >(key);
+): Promise<{ results: EscoSearchResult[]; total: number }> {
+  const key = cacheKey("occupations", "search", query, String(limit), String(offset));
+  const cached = await getCacheRaw<{ results: EscoSearchResult[]; total: number }>(key);
   if (cached) return cached;
 
   const data = await escoFetch<EscoSearchResponse>("/search", {
@@ -86,23 +68,23 @@ export async function getOccupation(uri: string): Promise<Occupation> {
     language: "en",
   });
 
-  const essentialSkills: OccupationSkillRequirement[] = (
-    data._links.hasEssentialSkill ?? []
-  ).map(s => ({
-    uri: s.uri,
-    title: s.title,
-    skillType: "essential" as const,
-    importance: 1.0,
-  }));
+  const essentialSkills: OccupationSkillRequirement[] = (data._links.hasEssentialSkill ?? []).map(
+    (s) => ({
+      uri: s.uri,
+      title: s.title,
+      skillType: "essential" as const,
+      importance: 1.0,
+    }),
+  );
 
-  const optionalSkills: OccupationSkillRequirement[] = (
-    data._links.hasOptionalSkill ?? []
-  ).map(s => ({
-    uri: s.uri,
-    title: s.title,
-    skillType: "optional" as const,
-    importance: 0.5,
-  }));
+  const optionalSkills: OccupationSkillRequirement[] = (data._links.hasOptionalSkill ?? []).map(
+    (s) => ({
+      uri: s.uri,
+      title: s.title,
+      skillType: "optional" as const,
+      importance: 0.5,
+    }),
+  );
 
   const occupation: Occupation = {
     uri: data.uri,
@@ -145,7 +127,7 @@ export async function getSkillDetails(uri: string): Promise<EscoSkill> {
   const data = await escoFetch<{
     uri: string;
     title: string;
-    description: { en: { literal: string; }; };
+    description: { en: { literal: string } };
     skillType: string;
   }>("/resource/skill", {
     uri,

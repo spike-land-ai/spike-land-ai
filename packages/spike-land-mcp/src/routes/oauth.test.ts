@@ -46,7 +46,7 @@ describe("POST /oauth/device", () => {
     );
 
     expect(res.status).toBe(200);
-    const body = await res.json() as Record<string, unknown>;
+    const body = (await res.json()) as Record<string, unknown>;
     expect(body.device_code).toMatch(/^dc_[a-f0-9]+$/);
     expect(body.user_code).toMatch(/^[A-Z2-9]{4}-[A-Z2-9]{4}$/);
     expect(body.verification_uri).toContain("spike.land");
@@ -67,7 +67,7 @@ describe("POST /oauth/device", () => {
     );
 
     expect(res.status).toBe(200);
-    const body = await res.json() as { device_code: string };
+    const body = (await res.json()) as { device_code: string };
     expect(body.device_code).toMatch(/^dc_/);
   });
 
@@ -85,7 +85,7 @@ describe("POST /oauth/device", () => {
       env,
     );
 
-    const body = await res.json() as { verification_uri: string };
+    const body = (await res.json()) as { verification_uri: string };
     expect(body.verification_uri).toContain("custom.example.com");
   });
 
@@ -119,7 +119,7 @@ describe("POST /oauth/token", () => {
     );
 
     expect(res.status).toBe(400);
-    const body = await res.json() as { error: string };
+    const body = (await res.json()) as { error: string };
     expect(body.error).toBe("unsupported_grant_type");
   });
 
@@ -137,7 +137,7 @@ describe("POST /oauth/token", () => {
     );
 
     expect(res.status).toBe(400);
-    const body = await res.json() as { error: string };
+    const body = (await res.json()) as { error: string };
     expect(body.error).toBe("invalid_request");
   });
 
@@ -156,7 +156,7 @@ describe("POST /oauth/token", () => {
     );
 
     expect(res.status).toBe(400);
-    const body = await res.json() as { error: string };
+    const body = (await res.json()) as { error: string };
     expect(body.error).toBe("expired_token");
   });
 
@@ -199,7 +199,7 @@ describe("POST /oauth/token", () => {
     );
 
     expect(res.status).toBe(400);
-    const body = await res.json() as { error: string };
+    const body = (await res.json()) as { error: string };
     expect(body.error).toBe("authorization_pending");
   });
 
@@ -215,7 +215,7 @@ describe("POST /oauth/token", () => {
 
     // Falls through to unsupported_grant_type since grant_type is undefined
     expect(res.status).toBe(400);
-    const body = await res.json() as { error: string };
+    const body = (await res.json()) as { error: string };
     expect(body.error).toBe("unsupported_grant_type");
   });
 });
@@ -303,7 +303,7 @@ describe("POST /oauth/device/approve", () => {
     );
 
     expect(res.status).toBe(400);
-    const body = await res.json() as { error: string };
+    const body = (await res.json()) as { error: string };
     expect(body.error).toBeTruthy();
   });
 });

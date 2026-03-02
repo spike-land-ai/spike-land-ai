@@ -23,9 +23,7 @@ describe("hasWebGLSupport", () => {
         return null;
       }),
     };
-    vi.spyOn(document, "createElement").mockReturnValue(
-      mockCanvas as unknown as HTMLCanvasElement,
-    );
+    vi.spyOn(document, "createElement").mockReturnValue(mockCanvas as unknown as HTMLCanvasElement);
 
     expect(hasWebGLSupport()).toBe(true);
     expect(mockCanvas.getContext).toHaveBeenCalledWith("webgl2");
@@ -38,9 +36,7 @@ describe("hasWebGLSupport", () => {
         return null;
       }),
     };
-    vi.spyOn(document, "createElement").mockReturnValue(
-      mockCanvas as unknown as HTMLCanvasElement,
-    );
+    vi.spyOn(document, "createElement").mockReturnValue(mockCanvas as unknown as HTMLCanvasElement);
 
     expect(hasWebGLSupport()).toBe(true);
   });
@@ -49,9 +45,7 @@ describe("hasWebGLSupport", () => {
     const mockCanvas = {
       getContext: vi.fn(() => null),
     };
-    vi.spyOn(document, "createElement").mockReturnValue(
-      mockCanvas as unknown as HTMLCanvasElement,
-    );
+    vi.spyOn(document, "createElement").mockReturnValue(mockCanvas as unknown as HTMLCanvasElement);
 
     expect(hasWebGLSupport()).toBe(false);
   });
@@ -62,9 +56,7 @@ describe("hasWebGLSupport", () => {
         throw new Error("GPU process crashed");
       }),
     };
-    vi.spyOn(document, "createElement").mockReturnValue(
-      mockCanvas as unknown as HTMLCanvasElement,
-    );
+    vi.spyOn(document, "createElement").mockReturnValue(mockCanvas as unknown as HTMLCanvasElement);
 
     expect(hasWebGLSupport()).toBe(false);
   });
@@ -87,9 +79,7 @@ describe("hasWebGLSupport", () => {
 
 describe("isWebGLContextError", () => {
   it("returns true for WebGL context creation error", () => {
-    const error = new Error(
-      "THREE.WebGLRenderer: Error creating WebGL context.",
-    );
+    const error = new Error("THREE.WebGLRenderer: Error creating WebGL context.");
     expect(isWebGLContextError(error)).toBe(true);
   });
 

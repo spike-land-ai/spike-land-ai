@@ -54,12 +54,7 @@ describe("templates/types", () => {
   });
 
   it("should allow all valid TemplatePurpose values", () => {
-    const purposes: TemplatePurpose[] = [
-      "link-in-bio",
-      "campaign-landing",
-      "poll",
-      "contest",
-    ];
+    const purposes: TemplatePurpose[] = ["link-in-bio", "campaign-landing", "poll", "contest"];
 
     expect(purposes).toHaveLength(4);
   });
@@ -121,11 +116,7 @@ describe("campaign-landing/code", () => {
 
 describe("campaign-landing/metadata", () => {
   it("should have the correct shape and values", () => {
-    expectValidMetadata(
-      campaignLandingMetadata,
-      "campaign-landing",
-      "campaign-landing",
-    );
+    expectValidMetadata(campaignLandingMetadata, "campaign-landing", "campaign-landing");
   });
 
   it("should have a descriptive name", () => {

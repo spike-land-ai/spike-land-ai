@@ -54,9 +54,7 @@ async function main(): Promise<void> {
 
   if (!apiKey) {
     console.error("Error: NEON_API_KEY environment variable is required");
-    console.error(
-      "Get your API key from: https://console.neon.tech/app/settings/api-keys",
-    );
+    console.error("Get your API key from: https://console.neon.tech/app/settings/api-keys");
     process.exit(1);
   }
 
@@ -75,9 +73,7 @@ async function main(): Promise<void> {
     console.log("The staging database at next.spike.land will be reset");
     console.log("to match the current production database state.");
     console.log("");
-    console.log(
-      "All staging data (test users, test orders, etc.) will be LOST.",
-    );
+    console.log("All staging data (test users, test orders, etc.) will be LOST.");
     console.log("");
     console.log("To proceed, run:");
     console.log("  yarn reset:db --confirm");
@@ -92,9 +88,7 @@ async function main(): Promise<void> {
   // Extra safety: Check for forbidden patterns
   for (const pattern of FORBIDDEN_PATTERNS) {
     if (STAGING_BRANCH_NAME.toLowerCase().includes(pattern)) {
-      console.error(
-        `SAFETY ERROR: Branch name contains forbidden pattern "${pattern}"`,
-      );
+      console.error(`SAFETY ERROR: Branch name contains forbidden pattern "${pattern}"`);
       console.error("This script will NEVER reset production branches.");
       process.exit(1);
     }
@@ -117,20 +111,14 @@ async function main(): Promise<void> {
 
     if (!branchesResponse.ok) {
       const error = await branchesResponse.text();
-      throw new Error(
-        `Failed to fetch branches: ${branchesResponse.status} ${error}`,
-      );
+      throw new Error(`Failed to fetch branches: ${branchesResponse.status} ${error}`);
     }
 
     const branchesData = (await branchesResponse.json()) as NeonBranchesResponse;
-    const stagingBranch = branchesData.branches.find(
-      b => b.name === STAGING_BRANCH_NAME,
-    );
+    const stagingBranch = branchesData.branches.find((b) => b.name === STAGING_BRANCH_NAME);
 
     if (!stagingBranch) {
-      console.error(
-        `Error: Staging branch "${STAGING_BRANCH_NAME}" not found.`,
-      );
+      console.error(`Error: Staging branch "${STAGING_BRANCH_NAME}" not found.`);
       console.error("");
       console.error("Available branches:");
       for (const branch of branchesData.branches) {
@@ -164,9 +152,7 @@ async function main(): Promise<void> {
 
     if (!resetResponse.ok) {
       const error = await resetResponse.text();
-      throw new Error(
-        `Failed to reset branch: ${resetResponse.status} ${error}`,
-      );
+      throw new Error(`Failed to reset branch: ${resetResponse.status} ${error}`);
     }
 
     const resetData = (await resetResponse.json()) as NeonResetResponse;
@@ -182,9 +168,7 @@ async function main(): Promise<void> {
     console.log(`  Branch: ${resetData.branch.name}`);
     console.log(`  State: ${resetData.branch.current_state}`);
     if (resetData.operations?.length > 0) {
-      console.log(
-        `  Operations: ${resetData.operations.map(o => o.action).join(", ")}`,
-      );
+      console.log(`  Operations: ${resetData.operations.map((o) => o.action).join(", ")}`);
     }
     console.log("");
   } catch (error) {

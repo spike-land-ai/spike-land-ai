@@ -42,19 +42,19 @@ interface DynamicPageRendererProps {
  */
 export function DynamicPageRenderer({ page }: DynamicPageRendererProps) {
   const visibleBlocks = page.blocks
-    .filter(block => block.isVisible)
+    .filter((block) => block.isVisible)
     .sort((a, b) => a.sortOrder - b.sortOrder);
 
   const content = (
     <main className="min-h-screen">
-      {visibleBlocks.map(block => <BlockRenderer key={block.id} block={block} />)}
-      {page.customCss
-        ? (
-          // customCss is set by authenticated page creators via MCP tools,
-          // not by untrusted user input. Sanitization happens at the MCP layer.
-          <style dangerouslySetInnerHTML={{ __html: page.customCss }} />
-        )
-        : null}
+      {visibleBlocks.map((block) => (
+        <BlockRenderer key={block.id} block={block} />
+      ))}
+      {page.customCss ? (
+        // customCss is set by authenticated page creators via MCP tools,
+        // not by untrusted user input. Sanitization happens at the MCP layer.
+        <style dangerouslySetInnerHTML={{ __html: page.customCss }} />
+      ) : null}
     </main>
   );
 

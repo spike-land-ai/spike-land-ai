@@ -38,10 +38,7 @@ export const appIncludeOptions = {
  * This enables flexible lookups by codespaceId, slug, or database id
  * while maintaining backward compatibility with existing links.
  */
-export async function findAppByIdentifier(
-  identifier: string,
-  userId: string,
-) {
+export async function findAppByIdentifier(identifier: string, userId: string) {
   // First, try to find by codespaceId (most common case)
   let app = await prisma.app.findFirst({
     where: {
@@ -88,10 +85,7 @@ export async function findAppByIdentifier(
 /**
  * Simple app lookup without includes (for validation/existence checks)
  */
-export async function findAppByIdentifierSimple(
-  identifier: string,
-  userId: string,
-) {
+export async function findAppByIdentifierSimple(identifier: string, userId: string) {
   // First, try by codespaceId
   let app = await prisma.app.findFirst({
     where: {
@@ -134,9 +128,7 @@ export async function findAppByIdentifierSimple(
 /**
  * Check if codespace has actual content (not default placeholder)
  */
-export async function checkCodespaceHasContent(
-  codeSpace: string,
-): Promise<boolean> {
+export async function checkCodespaceHasContent(codeSpace: string): Promise<boolean> {
   const DEFAULT_CONTENT = "<div>Write your code here!</div>";
 
   try {
@@ -151,10 +143,7 @@ export async function checkCodespaceHasContent(
 /**
  * Find a CreatedApp by codespace ID that belongs to a user
  */
-export async function findCreatedAppByCodespace(
-  codespaceId: string,
-  userId: string,
-) {
+export async function findCreatedAppByCodespace(codespaceId: string, userId: string) {
   return prisma.createdApp.findFirst({
     where: {
       codespaceId,

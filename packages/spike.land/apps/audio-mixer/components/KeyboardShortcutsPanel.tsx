@@ -83,9 +83,7 @@ interface KeyboardShortcutsPanelProps {
   onClose: () => void;
 }
 
-export function KeyboardShortcutsPanel(
-  { isOpen, onClose }: KeyboardShortcutsPanelProps,
-) {
+export function KeyboardShortcutsPanel({ isOpen, onClose }: KeyboardShortcutsPanelProps) {
   if (!isOpen) return null;
 
   // Group shortcuts by category
@@ -100,14 +98,7 @@ export function KeyboardShortcutsPanel(
     {} as Record<string, ShortcutItem[]>,
   );
 
-  const categories = [
-    "Playback",
-    "Tracks",
-    "Timeline",
-    "Volume",
-    "File",
-    "General",
-  ];
+  const categories = ["Playback", "Tracks", "Timeline", "Volume", "File", "General"];
 
   return (
     <>
@@ -115,7 +106,7 @@ export function KeyboardShortcutsPanel(
       <div
         className="fixed inset-0 bg-black/50 z-40"
         onClick={onClose}
-        onKeyDown={e => e.key === "Escape" && onClose()}
+        onKeyDown={(e) => e.key === "Escape" && onClose()}
         role="button"
         tabIndex={0}
         aria-label="Close keyboard shortcuts panel"
@@ -127,9 +118,7 @@ export function KeyboardShortcutsPanel(
         <div className="flex items-center justify-between p-4 border-b border-gray-700 bg-gray-800/80">
           <div className="flex items-center gap-2">
             <Keyboard className="w-5 h-5 text-purple-400" />
-            <h2 className="text-lg font-semibold text-white">
-              Keyboard Shortcuts
-            </h2>
+            <h2 className="text-lg font-semibold text-white">Keyboard Shortcuts</h2>
           </div>
           <button
             onClick={onClose}
@@ -142,7 +131,7 @@ export function KeyboardShortcutsPanel(
 
         {/* Content */}
         <div className="flex-1 overflow-y-auto p-4 space-y-6">
-          {categories.map(category => (
+          {categories.map((category) => (
             <div key={category}>
               <h3 className="text-xs font-semibold text-purple-400 uppercase tracking-wider mb-2">
                 {category}
@@ -153,9 +142,7 @@ export function KeyboardShortcutsPanel(
                     key={index}
                     className="flex items-center justify-between py-1.5 px-2 rounded hover:bg-gray-700/50 transition-colors"
                   >
-                    <span className="text-sm text-gray-300">
-                      {shortcut.description}
-                    </span>
+                    <span className="text-sm text-gray-300">{shortcut.description}</span>
                     <div className="flex items-center gap-1">
                       {shortcut.keys.map((key, keyIndex) => (
                         <span key={keyIndex} className="flex items-center">
@@ -163,9 +150,7 @@ export function KeyboardShortcutsPanel(
                             {key}
                           </kbd>
                           {keyIndex < shortcut.keys.length - 1 && (
-                            <span className="text-gray-500 mx-0.5 text-xs">
-                              +
-                            </span>
+                            <span className="text-gray-500 mx-0.5 text-xs">+</span>
                           )}
                         </span>
                       ))}
@@ -180,15 +165,8 @@ export function KeyboardShortcutsPanel(
         {/* Footer */}
         <div className="p-3 border-t border-gray-700 bg-gray-800/80">
           <p className="text-xs text-gray-500 text-center">
-            Press{" "}
-            <kbd className="px-1 py-0.5 bg-gray-700 rounded text-gray-300">
-              ?
-            </kbd>{" "}
-            or{" "}
-            <kbd className="px-1 py-0.5 bg-gray-700 rounded text-gray-300">
-              Esc
-            </kbd>{" "}
-            to close
+            Press <kbd className="px-1 py-0.5 bg-gray-700 rounded text-gray-300">?</kbd> or{" "}
+            <kbd className="px-1 py-0.5 bg-gray-700 rounded text-gray-300">Esc</kbd> to close
           </p>
         </div>
       </div>

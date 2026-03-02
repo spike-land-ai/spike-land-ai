@@ -9,10 +9,7 @@ interface SkillProficiencySliderProps {
   onChange: (value: number) => void;
 }
 
-export function SkillProficiencySlider({
-  value,
-  onChange,
-}: SkillProficiencySliderProps) {
+export function SkillProficiencySlider({ value, onChange }: SkillProficiencySliderProps) {
   return (
     <div className="flex items-center gap-2 shrink-0 w-40">
       <Slider
@@ -23,9 +20,7 @@ export function SkillProficiencySlider({
         step={1}
         className="flex-1"
       />
-      <span className="text-xs text-zinc-400 w-20 text-right">
-        {LABELS[value]}
-      </span>
+      <span className="text-xs text-zinc-400 w-20 text-right">{LABELS[value]}</span>
     </div>
   );
 }

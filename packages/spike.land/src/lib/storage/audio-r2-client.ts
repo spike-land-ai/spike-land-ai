@@ -5,10 +5,7 @@
  */
 
 import logger from "@/lib/logger";
-import {
-  createS3ClientFromConfig,
-  getStorageConfig,
-} from "@/lib/storage/r2-client";
+import { createS3ClientFromConfig, getStorageConfig } from "@/lib/storage/r2-client";
 import { tryCatch } from "@/lib/try-catch";
 import {
   DeleteObjectCommand,
@@ -41,10 +38,7 @@ const ALLOWED_AUDIO_MIME_TYPES = [
 ];
 
 // Audio bucket checks S3_AUDIO_BUCKET_NAME first, then falls back to default
-const AUDIO_BUCKET_ENV_KEYS = [
-  "S3_AUDIO_BUCKET_NAME",
-  "CLOUDFLARE_R2_AUDIO_BUCKET_NAME",
-];
+const AUDIO_BUCKET_ENV_KEYS = ["S3_AUDIO_BUCKET_NAME", "CLOUDFLARE_R2_AUDIO_BUCKET_NAME"];
 
 function getAudioR2Client(): S3Client {
   // In development, always create fresh client to pick up env changes
@@ -85,7 +79,6 @@ export function generateAudioKey(
   return `users/${userId}/audio-projects/${projectId}/tracks/${trackId}.${format}`;
 }
 
-
 interface UploadAudioParams {
   key: string;
   buffer: Buffer;
@@ -121,21 +114,20 @@ interface AudioMetadata {
 function validateAudioFile(
   buffer: Buffer,
   contentType: string,
-): { valid: boolean; error?: string; } {
+): { valid: boolean; error?: string } {
   if (buffer.length > MAX_AUDIO_SIZE_BYTES) {
     return {
       valid: false,
-      error:
-        `File size ${buffer.length} exceeds maximum allowed size of ${MAX_AUDIO_SIZE_BYTES} bytes (500MB)`,
+      error: `File size ${buffer.length} exceeds maximum allowed size of ${MAX_AUDIO_SIZE_BYTES} bytes (500MB)`,
     };
   }
 
   if (!ALLOWED_AUDIO_MIME_TYPES.includes(contentType.toLowerCase())) {
     return {
       valid: false,
-      error: `Content type '${contentType}' is not allowed. Allowed types: ${
-        ALLOWED_AUDIO_MIME_TYPES.join(", ")
-      }`,
+      error: `Content type '${contentType}' is not allowed. Allowed types: ${ALLOWED_AUDIO_MIME_TYPES.join(
+        ", ",
+      )}`,
     };
   }
 
@@ -145,9 +137,7 @@ function validateAudioFile(
 /**
  * Upload an audio file to object storage (S3 / R2)
  */
-export async function uploadAudioToR2(
-  params: UploadAudioParams,
-): Promise<UploadAudioResult> {
+export async function uploadAudioToR2(params: UploadAudioParams): Promise<UploadAudioResult> {
   const { key, buffer, contentType, metadata } = params;
 
   // Validate before upload
@@ -190,10 +180,10 @@ export async function uploadAudioToR2(
 
   // Construct the public URL
   const publicUrl = (
-    process.env.S3_AUDIO_PUBLIC_URL
-    || process.env.CLOUDFLARE_R2_AUDIO_PUBLIC_URL
-    || process.env.S3_PUBLIC_URL
-    || process.env.CLOUDFLARE_R2_PUBLIC_URL
+    process.env.S3_AUDIO_PUBLIC_URL ||
+    process.env.CLOUDFLARE_R2_AUDIO_PUBLIC_URL ||
+    process.env.S3_PUBLIC_URL ||
+    process.env.CLOUDFLARE_R2_PUBLIC_URL
   )?.trim();
   if (!publicUrl) {
     return {
@@ -256,9 +246,7 @@ export async function downloadAudioFromR2(key: string): Promise<Buffer | null> {
 /**
  * Delete an audio file from object storage (S3 / R2)
  */
-export async function deleteAudioFromR2(
-  key: string,
-): Promise<DeleteAudioResult> {
+export async function deleteAudioFromR2(key: string): Promise<DeleteAudioResult> {
   const client = getAudioR2Client();
   const bucket = getAudioBucketName();
 
@@ -286,9 +274,7 @@ export async function deleteAudioFromR2(
 /**
  * Get metadata for an audio file
  */
-export async function getAudioMetadata(
-  key: string,
-): Promise<AudioMetadata | null> {
+export async function getAudioMetadata(key: string): Promise<AudioMetadata | null> {
   const client = getAudioR2Client();
   const bucket = getAudioBucketName();
 
@@ -322,19 +308,19 @@ export async function getAudioMetadata(
  */
 export function isAudioStorageConfigured(): boolean {
   const hasS3 = !!(
-    process.env.S3_ACCESS_KEY_ID
-    && process.env.S3_SECRET_ACCESS_KEY
-    && (process.env.S3_AUDIO_PUBLIC_URL || process.env.S3_PUBLIC_URL
-      || process.env.CLOUDFLARE_R2_AUDIO_PUBLIC_URL
-      || process.env.CLOUDFLARE_R2_PUBLIC_URL)
+    process.env.S3_ACCESS_KEY_ID &&
+    process.env.S3_SECRET_ACCESS_KEY &&
+    (process.env.S3_AUDIO_PUBLIC_URL ||
+      process.env.S3_PUBLIC_URL ||
+      process.env.CLOUDFLARE_R2_AUDIO_PUBLIC_URL ||
+      process.env.CLOUDFLARE_R2_PUBLIC_URL)
   );
   const hasR2 = !!(
-    process.env.CLOUDFLARE_ACCOUNT_ID
-    && process.env.CLOUDFLARE_R2_ACCESS_KEY_ID
-    && process.env.CLOUDFLARE_R2_SECRET_ACCESS_KEY
-    && process.env.CLOUDFLARE_R2_ENDPOINT
-    && (process.env.CLOUDFLARE_R2_AUDIO_PUBLIC_URL
-      || process.env.CLOUDFLARE_R2_PUBLIC_URL)
+    process.env.CLOUDFLARE_ACCOUNT_ID &&
+    process.env.CLOUDFLARE_R2_ACCESS_KEY_ID &&
+    process.env.CLOUDFLARE_R2_SECRET_ACCESS_KEY &&
+    process.env.CLOUDFLARE_R2_ENDPOINT &&
+    (process.env.CLOUDFLARE_R2_AUDIO_PUBLIC_URL || process.env.CLOUDFLARE_R2_PUBLIC_URL)
   );
   return hasS3 || hasR2;
 }
@@ -344,15 +330,13 @@ export function isAudioStorageConfigured(): boolean {
  */
 export function getAudioPublicUrl(key: string): string {
   const publicUrl = (
-    process.env.S3_AUDIO_PUBLIC_URL
-    || process.env.CLOUDFLARE_R2_AUDIO_PUBLIC_URL
-    || process.env.S3_PUBLIC_URL
-    || process.env.CLOUDFLARE_R2_PUBLIC_URL
+    process.env.S3_AUDIO_PUBLIC_URL ||
+    process.env.CLOUDFLARE_R2_AUDIO_PUBLIC_URL ||
+    process.env.S3_PUBLIC_URL ||
+    process.env.CLOUDFLARE_R2_PUBLIC_URL
   )?.trim();
   if (!publicUrl) {
-    throw new Error(
-      "S3_AUDIO_PUBLIC_URL (or CLOUDFLARE_R2_AUDIO_PUBLIC_URL) is not configured",
-    );
+    throw new Error("S3_AUDIO_PUBLIC_URL (or CLOUDFLARE_R2_AUDIO_PUBLIC_URL) is not configured");
   }
   return `${publicUrl}/${key}`;
 }

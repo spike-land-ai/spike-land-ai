@@ -1,12 +1,7 @@
 "use client";
 
 import { Badge } from "@/components/ui/badge";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 
 type RuleSeverity = "error" | "warning" | "info";
@@ -37,7 +32,7 @@ export function ReviewRulesPanel({ rules }: ReviewRulesPanelProps) {
         <CardTitle className="text-base text-zinc-100">Review Rules</CardTitle>
       </CardHeader>
       <CardContent className="space-y-2 p-4 pt-0">
-        {rules.map(rule => (
+        {rules.map((rule) => (
           <div
             key={rule.id}
             className={cn(
@@ -59,9 +54,7 @@ export function ReviewRulesPanel({ rules }: ReviewRulesPanelProps) {
 
             <div className="flex-1 min-w-0 space-y-1.5">
               <div className="flex items-center gap-2 flex-wrap">
-                <span className="text-sm font-medium text-zinc-200">
-                  {rule.name}
-                </span>
+                <span className="text-sm font-medium text-zinc-200">{rule.name}</span>
                 <Badge
                   variant="outline"
                   className="text-xs text-zinc-500 border-zinc-700 font-mono"
@@ -75,9 +68,7 @@ export function ReviewRulesPanel({ rules }: ReviewRulesPanelProps) {
                   {rule.severity}
                 </Badge>
               </div>
-              <p className="text-xs text-zinc-500 leading-snug">
-                {rule.description}
-              </p>
+              <p className="text-xs text-zinc-500 leading-snug">{rule.description}</p>
             </div>
 
             {/* Enabled badge */}

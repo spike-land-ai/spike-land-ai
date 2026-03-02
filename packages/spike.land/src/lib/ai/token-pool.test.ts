@@ -73,9 +73,7 @@ describe("token-pool", () => {
 
     it("falls back to next token on 401 error", async () => {
       const authError = new Error("authentication_error");
-      const op = vi.fn()
-        .mockRejectedValueOnce(authError)
-        .mockResolvedValueOnce("ok");
+      const op = vi.fn().mockRejectedValueOnce(authError).mockResolvedValueOnce("ok");
 
       const result = await withTokenFallback(op);
       expect(result).toBe("ok");
@@ -96,24 +94,18 @@ describe("token-pool", () => {
       const authError = new Error("authentication_error");
       const op = vi.fn().mockRejectedValue(authError);
 
-      await expect(withTokenFallback(op)).rejects.toThrow(
-        "authentication_error",
-      );
+      await expect(withTokenFallback(op)).rejects.toThrow("authentication_error");
       expect(op).toHaveBeenCalledTimes(3); // 3 tokens
     });
 
     it("persists last-good index to Redis on fallback success", async () => {
       const authError = new Error("401");
-      const op = vi.fn()
-        .mockRejectedValueOnce(authError)
-        .mockResolvedValueOnce("ok");
+      const op = vi.fn().mockRejectedValueOnce(authError).mockResolvedValueOnce("ok");
 
       await withTokenFallback(op);
-      expect(mockRedis.set).toHaveBeenCalledWith(
-        "ai:anthropic:last-good-token-idx",
-        1,
-        { ex: 3600 },
-      );
+      expect(mockRedis.set).toHaveBeenCalledWith("ai:anthropic:last-good-token-idx", 1, {
+        ex: 3600,
+      });
     });
 
     it("starts from Redis-stored last-good index", async () => {
@@ -129,9 +121,7 @@ describe("token-pool", () => {
       vi.stubEnv("CLAUDE_CODE_OAUTH_TOKEN_2", "");
       vi.stubEnv("CLAUDE_CODE_OAUTH_TOKEN_3", "");
 
-      await expect(withTokenFallback(vi.fn())).rejects.toThrow(
-        "No Anthropic auth tokens",
-      );
+      await expect(withTokenFallback(vi.fn())).rejects.toThrow("No Anthropic auth tokens");
     });
 
     it("skips fallback logic with single token (fast path)", async () => {
@@ -149,9 +139,7 @@ describe("token-pool", () => {
       mockRedis.set.mockRejectedValue(new Error("Redis down"));
 
       const authError = new Error("authentication_error");
-      const op = vi.fn()
-        .mockRejectedValueOnce(authError)
-        .mockResolvedValueOnce("ok");
+      const op = vi.fn().mockRejectedValueOnce(authError).mockResolvedValueOnce("ok");
 
       const result = await withTokenFallback(op);
       expect(result).toBe("ok");
@@ -165,9 +153,7 @@ describe("token-pool", () => {
 
     it("returns updated token after fallback", async () => {
       const authError = new Error("authentication_error");
-      const op = vi.fn()
-        .mockRejectedValueOnce(authError)
-        .mockResolvedValueOnce("ok");
+      const op = vi.fn().mockRejectedValueOnce(authError).mockResolvedValueOnce("ok");
 
       await withTokenFallback(op);
       expect(getPreferredToken()).toBe("token-b");

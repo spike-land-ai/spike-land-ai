@@ -53,14 +53,9 @@ function SortableTrackItem({
   onDelayChange,
   onTrimChange,
 }: SortableTrackItemProps) {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({ id });
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id,
+  });
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -141,10 +136,10 @@ export function SortableTrackList({
   function handleDragEnd(event: DragEndEvent) {
     const { active, over } = event;
     if (over && active.id !== over.id) {
-      const oldIndex = tracks.findIndex(t => t.id === active.id);
-      const newIndex = tracks.findIndex(t => t.id === over.id);
+      const oldIndex = tracks.findIndex((t) => t.id === active.id);
+      const newIndex = tracks.findIndex((t) => t.id === over.id);
       const newOrder = arrayMove(
-        tracks.map(t => t.id),
+        tracks.map((t) => t.id),
         oldIndex,
         newIndex,
       );
@@ -153,36 +148,25 @@ export function SortableTrackList({
   }
 
   return (
-    <DndContext
-      sensors={sensors}
-      collisionDetection={closestCenter}
-      onDragEnd={handleDragEnd}
-    >
-      <SortableContext
-        items={tracks.map(t => t.id)}
-        strategy={verticalListSortingStrategy}
-      >
+    <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+      <SortableContext items={tracks.map((t) => t.id)} strategy={verticalListSortingStrategy}>
         <div className="space-y-3">
-          {tracks.map(track => (
+          {tracks.map((track) => (
             <SortableTrackItem
               key={track.id}
               id={track.id}
               track={track}
               onPlay={() => onPlay(track.id)}
               onStop={() => onStop(track.id)}
-              onVolumeChange={volume => onVolumeChange(track.id, volume)}
+              onVolumeChange={(volume) => onVolumeChange(track.id, volume)}
               onMuteToggle={() => onMuteToggle(track.id)}
               onSoloToggle={() => onSoloToggle(track.id)}
               onRemove={() => onRemove(track.id)}
-              onSeek={onSeek
-                ? progress => onSeek(track.id, progress)
-                : undefined}
-              onDelayChange={onDelayChange
-                ? delay => onDelayChange(track.id, delay)
-                : undefined}
-              onTrimChange={onTrimChange
-                ? (start, end) => onTrimChange(track.id, start, end)
-                : undefined}
+              onSeek={onSeek ? (progress) => onSeek(track.id, progress) : undefined}
+              onDelayChange={onDelayChange ? (delay) => onDelayChange(track.id, delay) : undefined}
+              onTrimChange={
+                onTrimChange ? (start, end) => onTrimChange(track.id, start, end) : undefined
+              }
             />
           ))}
         </div>

@@ -51,22 +51,13 @@ export function AdminUserRow({
         </div>
       </TableCell>
       <TableCell>
-        <Badge
-          variant="outline"
-          className={cn("text-xs capitalize", planStyles[plan])}
-        >
+        <Badge variant="outline" className={cn("text-xs capitalize", planStyles[plan])}>
           {plan}
         </Badge>
       </TableCell>
-      <TableCell className="text-zinc-400 text-sm font-mono">
-        {joinedDate}
-      </TableCell>
-      <TableCell className="text-zinc-400 text-sm font-mono">
-        {lastActive}
-      </TableCell>
-      <TableCell className="text-zinc-500 text-xs font-mono">
-        {userId}
-      </TableCell>
+      <TableCell className="text-zinc-400 text-sm font-mono">{joinedDate}</TableCell>
+      <TableCell className="text-zinc-400 text-sm font-mono">{lastActive}</TableCell>
+      <TableCell className="text-zinc-500 text-xs font-mono">{userId}</TableCell>
     </TableRow>
   );
 }

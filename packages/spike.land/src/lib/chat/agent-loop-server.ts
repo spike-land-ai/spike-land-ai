@@ -4,17 +4,10 @@
  * Creates a ReadableStream of AgentSSEEvent-encoded SSE data.
  */
 
-import {
-  type AgentLoopContext,
-  ChatClient,
-  runAgentLoop,
-} from "@spike-land-ai/spike-cli";
+import { type AgentLoopContext, ChatClient, runAgentLoop } from "@spike-land-ai/spike-cli";
 import type { ServerManager } from "@spike-land-ai/spike-cli";
 import { type AgentSSEEvent, encodeSSE } from "./agent-sse-protocol";
-import {
-  type AgentPromptContext,
-  buildAgentSystemPrompt,
-} from "./agent-system-prompt";
+import { type AgentPromptContext, buildAgentSystemPrompt } from "./agent-system-prompt";
 import { getPreferredToken } from "@/lib/ai/token-pool";
 import { createFallbackBotStream } from "./fallback-bot";
 import logger from "@/lib/logger";
@@ -37,7 +30,7 @@ function getMessages(sessionId: string): Anthropic.MessageParam[] {
 export interface AgentLoopStreamOptions {
   sessionId: string;
   question: string;
-  attachments?: { type: string; data: string; }[];
+  attachments?: { type: string; data: string }[];
   manager: ServerManager;
   promptContext: AgentPromptContext;
   maxTurns?: number;
@@ -46,9 +39,7 @@ export interface AgentLoopStreamOptions {
 /**
  * Run the agentic loop and return a ReadableStream of SSE-encoded events.
  */
-export function createAgentLoopStream(
-  options: AgentLoopStreamOptions,
-): ReadableStream<Uint8Array> {
+export function createAgentLoopStream(options: AgentLoopStreamOptions): ReadableStream<Uint8Array> {
   const { sessionId, question, manager, promptContext, maxTurns = 10 } = options;
   const encoder = new TextEncoder();
   let cancelled = false;
@@ -71,8 +62,7 @@ export function createAgentLoopStream(
         try {
           authToken = getPreferredToken();
         } catch {
-          apiKey = process.env.CLAUDE_API_KEY
-            || process.env.ANTHROPIC_API_KEY;
+          apiKey = process.env.CLAUDE_API_KEY || process.env.ANTHROPIC_API_KEY;
           if (!apiKey) {
             // No AI available — use fallback bot
             logger.info("No AI tokens available, using fallback bot");
@@ -112,12 +102,7 @@ export function createAgentLoopStream(
           messages,
           maxTurns,
           onTextDelta: (text: string) => emit({ type: "text_delta", text }),
-          onToolCallStart: (
-            id: string,
-            name: string,
-            serverName: string,
-            input: unknown,
-          ) =>
+          onToolCallStart: (id: string, name: string, serverName: string, input: unknown) =>
             emit({
               type: "tool_call_start",
               id,
@@ -144,18 +129,12 @@ export function createAgentLoopStream(
         if (options.attachments?.length) {
           for (const att of options.attachments) {
             // data might be a full base64 data URL e.g. "data:image/png;base64,iVBORw0KGgo..."
-            const base64Data = att.data.includes(",")
-              ? (att.data.split(",")[1] ?? "")
-              : att.data;
+            const base64Data = att.data.includes(",") ? (att.data.split(",")[1] ?? "") : att.data;
             userMessageContent.push({
               type: "image",
               source: {
                 type: "base64",
-                media_type: att.type as
-                  | "image/jpeg"
-                  | "image/png"
-                  | "image/gif"
-                  | "image/webp",
+                media_type: att.type as "image/jpeg" | "image/png" | "image/gif" | "image/webp",
                 data: base64Data,
               },
             });
@@ -167,8 +146,8 @@ export function createAgentLoopStream(
         emit({ type: "done" });
       } catch (err) {
         const message = err instanceof Error ? err.message : String(err);
-        const isAuthFailure = message.includes("auth")
-          || message.includes("401") || message.includes("token");
+        const isAuthFailure =
+          message.includes("auth") || message.includes("401") || message.includes("token");
 
         if (isAuthFailure) {
           // Auth failure after token rotation — fall back to bot

@@ -209,9 +209,7 @@ describe("scoreToStatus", () => {
 });
 
 describe("calculateFullHealth", () => {
-  function makeHealth(
-    overrides: Partial<SocialAccountHealth> = {},
-  ): SocialAccountHealth {
+  function makeHealth(overrides: Partial<SocialAccountHealth> = {}): SocialAccountHealth {
     return {
       id: "h-1",
       accountId: "acc-1",

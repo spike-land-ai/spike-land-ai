@@ -4,15 +4,16 @@ import { DEFAULT_HEALTH_WEIGHTS, HEALTH_THRESHOLDS } from "./types";
 
 describe("DEFAULT_HEALTH_WEIGHTS", () => {
   it("weights sum to 1.0", () => {
-    const sum = DEFAULT_HEALTH_WEIGHTS.syncStatus
-      + DEFAULT_HEALTH_WEIGHTS.rateLimitUsage
-      + DEFAULT_HEALTH_WEIGHTS.errorFrequency
-      + DEFAULT_HEALTH_WEIGHTS.tokenHealth;
+    const sum =
+      DEFAULT_HEALTH_WEIGHTS.syncStatus +
+      DEFAULT_HEALTH_WEIGHTS.rateLimitUsage +
+      DEFAULT_HEALTH_WEIGHTS.errorFrequency +
+      DEFAULT_HEALTH_WEIGHTS.tokenHealth;
     expect(sum).toBeCloseTo(1.0);
   });
 
   it("syncStatus is 30%", () => {
-    expect(DEFAULT_HEALTH_WEIGHTS.syncStatus).toBeCloseTo(0.30);
+    expect(DEFAULT_HEALTH_WEIGHTS.syncStatus).toBeCloseTo(0.3);
   });
 
   it("rateLimitUsage is 25%", () => {
@@ -24,7 +25,7 @@ describe("DEFAULT_HEALTH_WEIGHTS", () => {
   });
 
   it("tokenHealth is 20%", () => {
-    expect(DEFAULT_HEALTH_WEIGHTS.tokenHealth).toBeCloseTo(0.20);
+    expect(DEFAULT_HEALTH_WEIGHTS.tokenHealth).toBeCloseTo(0.2);
   });
 
   it("all weights are positive", () => {

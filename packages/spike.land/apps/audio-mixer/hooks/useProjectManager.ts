@@ -29,25 +29,20 @@ interface UseProjectManagerReturn {
 interface UseProjectManagerDeps {
   audioStorage: {
     checkSupport: () => Promise<boolean>;
-    saveProject: (project: AudioProject) => Promise<{ success: boolean; }>;
+    saveProject: (project: AudioProject) => Promise<{ success: boolean }>;
     loadProject: (
       projectId: string,
-    ) => Promise<{ success: boolean; data?: AudioProject | undefined; }>;
+    ) => Promise<{ success: boolean; data?: AudioProject | undefined }>;
     listProjects: () => Promise<{
       success: boolean;
       data?: AudioProject[] | undefined;
     }>;
-    deleteProject: (projectId: string) => Promise<{ success: boolean; }>;
-    createProject: (
-      name: string,
-    ) => Promise<{ success: boolean; data?: AudioProject | undefined; }>;
+    deleteProject: (projectId: string) => Promise<{ success: boolean }>;
+    createProject: (name: string) => Promise<{ success: boolean; data?: AudioProject | undefined }>;
     loadTrackByPath: (
       opfsPath: string,
-    ) => Promise<{ success: boolean; data?: Uint8Array | undefined; }>;
-    saveTrackToPath: (
-      opfsPath: string,
-      data: Uint8Array,
-    ) => Promise<{ success: boolean; }>;
+    ) => Promise<{ success: boolean; data?: Uint8Array | undefined }>;
+    saveTrackToPath: (opfsPath: string, data: Uint8Array) => Promise<{ success: boolean }>;
   };
   persistenceState: {
     projectId: string;
@@ -84,9 +79,7 @@ interface UseProjectManagerDeps {
   setIsPlaying: (playing: boolean) => void;
 }
 
-export function useProjectManager(
-  deps: UseProjectManagerDeps,
-): UseProjectManagerReturn {
+export function useProjectManager(deps: UseProjectManagerDeps): UseProjectManagerReturn {
   const {
     audioStorage,
     persistenceState,
@@ -172,15 +165,13 @@ export function useProjectManager(
 
         // 7. Decode each track's audio
         const restoredTracks: Partial<AudioTrack>[] = await Promise.all(
-          targetProject.tracks.map(async savedTrack => {
+          targetProject.tracks.map(async (savedTrack) => {
             let buffer: AudioBuffer | null = null;
             let gainNode: GainNode | null = null;
 
             if (savedTrack.opfsPath) {
               try {
-                const result = await audioStorage.loadTrackByPath(
-                  savedTrack.opfsPath,
-                );
+                const result = await audioStorage.loadTrackByPath(savedTrack.opfsPath);
                 if (result.success && result.data) {
                   const arrayBuffer = result.data.buffer.slice(
                     result.data.byteOffset,
@@ -189,15 +180,10 @@ export function useProjectManager(
                   buffer = await context.decodeAudioData(arrayBuffer);
                   const nodes = createTrackNodes(context, masterGain, buffer);
                   gainNode = nodes.gainNode;
-                  gainNode.gain.value = savedTrack.muted
-                    ? 0
-                    : savedTrack.volume;
+                  gainNode.gain.value = savedTrack.muted ? 0 : savedTrack.volume;
                 }
               } catch (error) {
-                console.warn(
-                  `Failed to load audio for track ${savedTrack.name}:`,
-                  error,
-                );
+                console.warn(`Failed to load audio for track ${savedTrack.name}:`, error);
               }
             }
 
@@ -286,30 +272,24 @@ export function useProjectManager(
   );
 
   const copyTrackToCurrentProject = useCallback(
-    async (
-      sourceProjectId: string,
-      trackId: string,
-      position: number,
-    ) => {
+    async (sourceProjectId: string, trackId: string, position: number) => {
       // 1. Load source project metadata
       const loadResult = await audioStorage.loadProject(sourceProjectId);
       if (!loadResult.success || !loadResult.data) return;
 
       // 2. Find the track
-      const savedTrack = loadResult.data.tracks.find(t => t.id === trackId);
+      const savedTrack = loadResult.data.tracks.find((t) => t.id === trackId);
       if (!savedTrack?.opfsPath) return;
 
       // 3. Load audio data
-      const audioResult = await audioStorage.loadTrackByPath(
-        savedTrack.opfsPath,
-      );
+      const audioResult = await audioStorage.loadTrackByPath(savedTrack.opfsPath);
       if (!audioResult.success || !audioResult.data) return;
 
       // 4. Save to new OPFS path under current project
-      const newOpfsPath =
-        `audio-mixer/projects/${persistenceState.projectId}/tracks/${Date.now()}-${
-          savedTrack.name.replace(/\s+/g, "-")
-        }`;
+      const newOpfsPath = `audio-mixer/projects/${persistenceState.projectId}/tracks/${Date.now()}-${savedTrack.name.replace(
+        /\s+/g,
+        "-",
+      )}`;
       await audioStorage.saveTrackToPath(newOpfsPath, audioResult.data);
 
       // 5. Decode and add to current project
@@ -329,12 +309,7 @@ export function useProjectManager(
         position,
       );
     },
-    [
-      audioStorage,
-      persistenceState.projectId,
-      audioContext,
-      trackManager,
-    ],
+    [audioStorage, persistenceState.projectId, audioContext, trackManager],
   );
 
   return {

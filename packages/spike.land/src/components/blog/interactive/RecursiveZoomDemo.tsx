@@ -130,16 +130,11 @@ function LevelCard({ level, depth, currentDepth, autoPlaying }: CardProps) {
         </span>
       </div>
 
-      <h3
-        className="text-xl sm:text-2xl font-bold mb-2"
-        style={{ color: level.color }}
-      >
+      <h3 className="text-xl sm:text-2xl font-bold mb-2" style={{ color: level.color }}>
         {level.label}
       </h3>
 
-      <p className="text-sm text-slate-400 font-mono leading-relaxed flex-1">
-        {level.sublabel}
-      </p>
+      <p className="text-sm text-slate-400 font-mono leading-relaxed flex-1">{level.sublabel}</p>
 
       {depth < TOTAL - 1 && nextLevel !== undefined && (
         <div
@@ -150,10 +145,7 @@ function LevelCard({ level, depth, currentDepth, autoPlaying }: CardProps) {
           }}
         >
           <span className="text-xs font-mono text-slate-500">zooming into</span>
-          <span
-            className="text-xs font-mono font-bold"
-            style={{ color: nextLevel.color }}
-          >
+          <span className="text-xs font-mono font-bold" style={{ color: nextLevel.color }}>
             {nextLevel.label}
           </span>
           <motion.span
@@ -175,10 +167,7 @@ function LevelCard({ level, depth, currentDepth, autoPlaying }: CardProps) {
           }}
         >
           <span className="text-xs font-mono text-slate-500">loops back to</span>
-          <span
-            className="text-xs font-mono font-bold"
-            style={{ color: firstLevel.color }}
-          >
+          <span className="text-xs font-mono font-bold" style={{ color: firstLevel.color }}>
             {firstLevel.label}
           </span>
           <motion.span
@@ -212,7 +201,7 @@ export function RecursiveZoomDemo() {
     stopAuto();
     setAutoPlaying(true);
     autoIntervalRef.current = setInterval(() => {
-      setCurrentDepth(d => (d + 1) % TOTAL);
+      setCurrentDepth((d) => (d + 1) % TOTAL);
     }, 1800);
   }, [stopAuto]);
 
@@ -282,20 +271,8 @@ export function RecursiveZoomDemo() {
 
       <div className="flex flex-col sm:flex-row gap-6 p-6 sm:p-8 rounded-xl bg-slate-950/80 backdrop-blur-xl border border-slate-800 relative overflow-hidden">
         <div className="absolute top-0 right-0 p-4 opacity-10 pointer-events-none">
-          <svg
-            width="40"
-            height="40"
-            viewBox="0 0 100 100"
-            className="stroke-cyan-500"
-          >
-            <circle
-              cx="50"
-              cy="50"
-              r="40"
-              fill="none"
-              strokeWidth="2"
-              strokeDasharray="4 8"
-            />
+          <svg width="40" height="40" viewBox="0 0 100 100" className="stroke-cyan-500">
+            <circle cx="50" cy="50" r="40" fill="none" strokeWidth="2" strokeDasharray="4 8" />
             <circle cx="50" cy="50" r="20" fill="none" strokeWidth="2" />
           </svg>
         </div>
@@ -314,18 +291,20 @@ export function RecursiveZoomDemo() {
                 key={lvl.id}
                 onClick={() => goToDepth(idx)}
                 className="flex-1 min-w-[100px] py-2 px-3 text-xs font-mono rounded-md border transition-all"
-                style={currentDepth === idx && !autoPlaying
-                  ? {
-                    background: lvl.bgColor,
-                    color: lvl.color,
-                    borderColor: lvl.borderColor,
-                    boxShadow: `0 0 12px ${lvl.color}33`,
-                  }
-                  : {
-                    background: "transparent",
-                    color: "#6b7280",
-                    borderColor: "#1e293b",
-                  }}
+                style={
+                  currentDepth === idx && !autoPlaying
+                    ? {
+                        background: lvl.bgColor,
+                        color: lvl.color,
+                        borderColor: lvl.borderColor,
+                        boxShadow: `0 0 12px ${lvl.color}33`,
+                      }
+                    : {
+                        background: "transparent",
+                        color: "#6b7280",
+                        borderColor: "#1e293b",
+                      }
+                }
               >
                 {lvl.label}
               </button>

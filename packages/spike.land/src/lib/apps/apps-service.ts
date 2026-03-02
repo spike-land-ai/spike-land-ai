@@ -13,7 +13,7 @@ export async function ensureUserExists(session: {
     name?: string | null;
     image?: string | null;
   };
-}): Promise<{ success: boolean; userId: string; }> {
+}): Promise<{ success: boolean; userId: string }> {
   const { user } = session;
   const { data: existingUser, error: findError } = await tryCatch(
     prisma.user.findUnique({ where: { id: user.id }, select: { id: true } }),
@@ -46,8 +46,9 @@ export async function ensureUserExists(session: {
   );
 
   if (createError) {
-    const isUniqueViolation = (createError as { code?: string; }).code === "P2002"
-      || String(createError.message || "").includes("Unique constraint");
+    const isUniqueViolation =
+      (createError as { code?: string }).code === "P2002" ||
+      String(createError.message || "").includes("Unique constraint");
     if (user.email && isUniqueViolation) {
       const { data: userByEmail } = await tryCatch(
         prisma.user.findUnique({
@@ -64,11 +65,9 @@ export async function ensureUserExists(session: {
         return { success: true, userId: userByEmail.id };
       }
     }
-    logger.error(
-      "Error creating user",
-      createError instanceof Error ? createError : undefined,
-      { route: "/api/apps" },
-    );
+    logger.error("Error creating user", createError instanceof Error ? createError : undefined, {
+      route: "/api/apps",
+    });
     return { success: false, userId: user.id };
   }
   return { success: true, userId: newUser.id };
@@ -141,16 +140,14 @@ export function generateSlug(): string {
 export function mapMonetizationModelToEnum(
   model: string,
 ): "FREE" | "FREEMIUM" | "SUBSCRIPTION" | "ONE_TIME" | "USAGE_BASED" {
-  const mapping: Record<
-    string,
-    "FREE" | "FREEMIUM" | "SUBSCRIPTION" | "ONE_TIME" | "USAGE_BASED"
-  > = {
-    "free": "FREE",
-    "freemium": "FREEMIUM",
-    "subscription": "SUBSCRIPTION",
-    "one-time": "ONE_TIME",
-    "usage-based": "USAGE_BASED",
-  };
+  const mapping: Record<string, "FREE" | "FREEMIUM" | "SUBSCRIPTION" | "ONE_TIME" | "USAGE_BASED"> =
+    {
+      free: "FREE",
+      freemium: "FREEMIUM",
+      subscription: "SUBSCRIPTION",
+      "one-time": "ONE_TIME",
+      "usage-based": "USAGE_BASED",
+    };
   return mapping[model] || "FREE";
 }
 
@@ -193,10 +190,13 @@ export async function createAppFromPrompt(
     };
   }
 
-  const name = slug.split("-").map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
+  const name = slug
+    .split("-")
+    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+    .join(" ");
 
   const { data: result, error: createError } = await tryCatch(
-    prisma.$transaction(async tx => {
+    prisma.$transaction(async (tx) => {
       const app = await tx.app.create({
         data: {
           name,
@@ -230,8 +230,7 @@ export async function createAppFromPrompt(
         const { getTemplateById } = await import("@/lib/apps/templates");
         const template = getTemplateById(data.templateId);
         if (template) {
-          messageContent =
-            `I'd like to start with this template code:\n\n\`\`\`tsx\n${template.code}\n\`\`\`\n\n${data.prompt}`;
+          messageContent = `I'd like to start with this template code:\n\n\`\`\`tsx\n${template.code}\n\`\`\`\n\n${data.prompt}`;
         }
       }
 
@@ -252,7 +251,7 @@ export async function createAppFromPrompt(
 
         if (validImages.length > 0) {
           await tx.appAttachment.createMany({
-            data: validImages.map(img => ({
+            data: validImages.map((img) => ({
               messageId: message.id,
               imageId: img.id,
             })),
@@ -298,9 +297,7 @@ export async function createAppFromPrompt(
     return { error: "Internal server error", status: 500 };
   }
 
-  const { error: enqueueError } = await tryCatch(
-    enqueueMessage(result.app.id, result.messageId),
-  );
+  const { error: enqueueError } = await tryCatch(enqueueMessage(result.app.id, result.messageId));
   if (enqueueError) {
     logger.error(
       "[App Creation] Failed to enqueue message",
@@ -369,15 +366,13 @@ export async function getApps(userId: string, showCurated: boolean) {
   );
 
   if (fetchError) {
-    logger.error(
-      "Error fetching apps",
-      fetchError instanceof Error ? fetchError : undefined,
-      { route: "/api/apps" },
-    );
+    logger.error("Error fetching apps", fetchError instanceof Error ? fetchError : undefined, {
+      route: "/api/apps",
+    });
     return { error: "Internal server error", status: 500 };
   }
 
-  const appsWithUnread = apps.map(app => ({
+  const appsWithUnread = apps.map((app) => ({
     ...app,
     unreadCount: app.messages.length,
     messages: undefined,
@@ -396,9 +391,7 @@ export async function createLegacyApp(
     monetizationModel: string;
   },
 ) {
-  const codespaceUrl = data.codespaceId
-    ? `/api/codespace/${data.codespaceId}/embed`
-    : undefined;
+  const codespaceUrl = data.codespaceId ? `/api/codespace/${data.codespaceId}/embed` : undefined;
 
   const { data: app, error: createError } = await tryCatch(
     prisma.app.create({
@@ -433,11 +426,9 @@ export async function createLegacyApp(
   );
 
   if (createError || !app) {
-    logger.error(
-      "Error creating app",
-      createError instanceof Error ? createError : undefined,
-      { route: "/api/apps" },
-    );
+    logger.error("Error creating app", createError instanceof Error ? createError : undefined, {
+      route: "/api/apps",
+    });
     return { error: "Internal server error", status: 500 };
   }
 

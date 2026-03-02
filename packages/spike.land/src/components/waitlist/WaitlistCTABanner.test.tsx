@@ -4,7 +4,7 @@ import { describe, expect, it, vi } from "vitest";
 vi.mock("sonner", () => ({ toast: { success: vi.fn(), error: vi.fn() } }));
 
 vi.mock("./WaitlistInlineForm", () => ({
-  WaitlistInlineForm: ({ source }: { source?: string; }) => (
+  WaitlistInlineForm: ({ source }: { source?: string }) => (
     <form data-testid="waitlist-form" data-source={source}>
       <input type="email" />
       <button>Join</button>

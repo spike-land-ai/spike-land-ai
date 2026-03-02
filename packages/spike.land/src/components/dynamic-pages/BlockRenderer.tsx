@@ -17,55 +17,53 @@ interface BlockRendererProps {
 
 const blockComponents: Record<
   BlockType,
-  React.LazyExoticComponent<
-    React.ComponentType<{ content: Prisma.JsonValue; variant?: string; }>
-  >
+  React.LazyExoticComponent<React.ComponentType<{ content: Prisma.JsonValue; variant?: string }>>
 > = {
-  HERO: lazy(() => import("./blocks/HeroBlock").then(m => ({ default: m.HeroBlock }))),
+  HERO: lazy(() => import("./blocks/HeroBlock").then((m) => ({ default: m.HeroBlock }))),
   FEATURE_GRID: lazy(() =>
-    import("./blocks/FeatureGridBlock").then(m => ({
+    import("./blocks/FeatureGridBlock").then((m) => ({
       default: m.FeatureGridBlock,
-    }))
+    })),
   ),
   FEATURE_LIST: lazy(() =>
-    import("./blocks/FeatureListBlock").then(m => ({
+    import("./blocks/FeatureListBlock").then((m) => ({
       default: m.FeatureListBlock,
-    }))
+    })),
   ),
-  CTA: lazy(() => import("./blocks/CtaBlock").then(m => ({ default: m.CtaBlock }))),
-  PRICING: lazy(() => import("./blocks/PricingBlock").then(m => ({ default: m.PricingBlock }))),
+  CTA: lazy(() => import("./blocks/CtaBlock").then((m) => ({ default: m.CtaBlock }))),
+  PRICING: lazy(() => import("./blocks/PricingBlock").then((m) => ({ default: m.PricingBlock }))),
   TESTIMONIALS: lazy(() =>
-    import("./blocks/TestimonialsBlock").then(m => ({
+    import("./blocks/TestimonialsBlock").then((m) => ({
       default: m.TestimonialsBlock,
-    }))
+    })),
   ),
-  STATS: lazy(() => import("./blocks/StatsBlock").then(m => ({ default: m.StatsBlock }))),
+  STATS: lazy(() => import("./blocks/StatsBlock").then((m) => ({ default: m.StatsBlock }))),
   GALLERY: lazy(() =>
-    import("./blocks/GalleryBlock").then(m => ({
+    import("./blocks/GalleryBlock").then((m) => ({
       default: m.GalleryBlock,
-    }))
+    })),
   ),
-  FAQ: lazy(() => import("./blocks/FaqBlock").then(m => ({ default: m.FaqBlock }))),
-  FOOTER: lazy(() => import("./blocks/FooterBlock").then(m => ({ default: m.FooterBlock }))),
+  FAQ: lazy(() => import("./blocks/FaqBlock").then((m) => ({ default: m.FaqBlock }))),
+  FOOTER: lazy(() => import("./blocks/FooterBlock").then((m) => ({ default: m.FooterBlock }))),
   COMPARISON_TABLE: lazy(() =>
-    import("./blocks/ComparisonTableBlock").then(m => ({
+    import("./blocks/ComparisonTableBlock").then((m) => ({
       default: m.ComparisonTableBlock,
-    }))
+    })),
   ),
   APP_GRID: lazy(() =>
-    import("./blocks/AppGridBlock").then(m => ({
+    import("./blocks/AppGridBlock").then((m) => ({
       default: m.AppGridBlock,
-    }))
+    })),
   ),
   MARKDOWN: lazy(() =>
-    import("./blocks/MarkdownBlock").then(m => ({
+    import("./blocks/MarkdownBlock").then((m) => ({
       default: m.MarkdownBlock,
-    }))
+    })),
   ),
   CUSTOM_REACT: lazy(() =>
-    import("./blocks/CustomReactBlock").then(m => ({
+    import("./blocks/CustomReactBlock").then((m) => ({
       default: m.CustomReactBlock,
-    }))
+    })),
   ),
 };
 
@@ -73,7 +71,7 @@ function BlockSkeleton() {
   return <div className="animate-pulse bg-muted/30 rounded-lg h-32 w-full" />;
 }
 
-function UnknownBlock({ blockType }: { blockType: string; }) {
+function UnknownBlock({ blockType }: { blockType: string }) {
   return (
     <div className="border border-dashed border-muted-foreground/30 rounded-lg p-8 text-center text-muted-foreground">
       <p className="text-sm">Unknown block type: {blockType}</p>

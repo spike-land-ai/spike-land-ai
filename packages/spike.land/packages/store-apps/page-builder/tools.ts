@@ -14,9 +14,8 @@ import { safeToolCall, textResult } from "../shared/tool-helpers";
 /* ── Sanitization ─────────────────────────────────────────────────────── */
 
 function sanitizeCss(css: string): string {
-  const normalized = css.replace(
-    /\\([0-9a-fA-F]{1,6})\s?/g,
-    (_, hex: string) => String.fromCodePoint(parseInt(hex, 16)),
+  const normalized = css.replace(/\\([0-9a-fA-F]{1,6})\s?/g, (_, hex: string) =>
+    String.fromCodePoint(parseInt(hex, 16)),
   );
   return normalized
     .replace(/expression\s*\(/gi, "/* blocked */")
@@ -91,9 +90,14 @@ const ListPagesSchema = z.object({
   layout: PageLayoutEnum.optional().describe("Filter by page layout."),
   search: z.string().optional().describe("Search title and description."),
   page: z.number().int().min(1).optional().default(1).describe("Page number (default 1)."),
-  pageSize: z.number().int().min(1).max(100).optional().default(20).describe(
-    "Results per page (default 20).",
-  ),
+  pageSize: z
+    .number()
+    .int()
+    .min(1)
+    .max(100)
+    .optional()
+    .default(20)
+    .describe("Results per page (default 20)."),
 });
 
 const UpdatePageSchema = z.object({
@@ -121,16 +125,20 @@ const ClonePageSchema = z.object({
 const AddBlockSchema = z.object({
   pageId: z.string().min(1).describe("ID of the DynamicPage to add the block to."),
   blockType: z.enum(BLOCK_TYPES).describe("Type of block to add."),
-  content: z.record(z.string(), z.unknown()).describe(
-    "Block content (validated against the block type schema).",
-  ),
+  content: z
+    .record(z.string(), z.unknown())
+    .describe("Block content (validated against the block type schema)."),
   variant: z.string().optional().describe("Optional visual variant for the block."),
-  sortOrder: z.number().int().optional().describe(
-    "Position in the page. Auto-assigned if omitted.",
-  ),
-  isVisible: z.boolean().optional().default(true).describe(
-    "Whether the block is visible on the page.",
-  ),
+  sortOrder: z
+    .number()
+    .int()
+    .optional()
+    .describe("Position in the page. Auto-assigned if omitted."),
+  isVisible: z
+    .boolean()
+    .optional()
+    .default(true)
+    .describe("Whether the block is visible on the page."),
 });
 
 const UpdateBlockSchema = z.object({
@@ -146,9 +154,10 @@ const DeleteBlockSchema = z.object({
 
 const ReorderBlocksSchema = z.object({
   pageId: z.string().min(1).describe("ID of the DynamicPage."),
-  blockIds: z.array(z.string().min(1)).min(1).describe(
-    "Ordered array of block IDs defining the new sort order.",
-  ),
+  blockIds: z
+    .array(z.string().min(1))
+    .min(1)
+    .describe("Ordered array of block IDs defining the new sort order."),
 });
 
 const ListBlockTypesSchema = z.object({});
@@ -161,9 +170,11 @@ const GetBlockSchema = z.object({
 
 const GeneratePageSchema = z.object({
   prompt: z.string().min(1).describe("Description of the page to generate."),
-  slug: z.string().min(1).optional().describe(
-    "URL slug for the page (auto-generated from prompt if omitted).",
-  ),
+  slug: z
+    .string()
+    .min(1)
+    .optional()
+    .describe("URL slug for the page (auto-generated from prompt if omitted)."),
   layout: z.enum(PAGE_LAYOUTS).optional().describe("Page layout type. Defaults to LANDING."),
 });
 
@@ -178,9 +189,10 @@ const SuggestLayoutSchema = z.object({
 
 const GenerateThemeSchema = z.object({
   brandDescription: z.string().min(1).describe("Description of the brand identity."),
-  primaryColor: z.string().optional().describe(
-    "Primary brand color in hex format (e.g. '#3B82F6').",
-  ),
+  primaryColor: z
+    .string()
+    .optional()
+    .describe("Primary brand color in hex format (e.g. '#3B82F6')."),
   style: z.enum(THEME_STYLES).optional().describe("Visual style preset. Defaults to 'modern'."),
 });
 
@@ -192,9 +204,10 @@ const PopulateStoreSchema = z.object({
 
 const PageReviewSchema = z.object({
   route: z.string().describe("Page route/slug to review, e.g. /blog or /store"),
-  reviewType: z.enum(["accessibility", "content", "performance", "general"]).optional().describe(
-    "Type of review to perform",
-  ),
+  reviewType: z
+    .enum(["accessibility", "content", "performance", "general"])
+    .optional()
+    .describe("Type of review to perform"),
 });
 
 /* ── Template Schemas ──────────────────────────────────────────────────── */
@@ -213,9 +226,11 @@ const GetSeoSchema = z.object({
 const SetSeoSchema = z.object({
   page_id: z.string().min(1).describe("ID of the page to update."),
   title: z.string().max(60).optional().describe("SEO title (max 60 characters)."),
-  description: z.string().max(160).optional().describe(
-    "SEO meta description (max 160 characters).",
-  ),
+  description: z
+    .string()
+    .max(160)
+    .optional()
+    .describe("SEO meta description (max 160 characters)."),
   keywords: z.array(z.string()).optional().describe("List of SEO keywords."),
   og_image: z.string().url().optional().describe("Open Graph image URL."),
 });
@@ -233,9 +248,11 @@ function generateSlugFromPrompt(prompt: string): string {
 }
 
 function extractKeywords(prompt: string): string[] {
-  const words = prompt.toLowerCase().replace(/[^a-z0-9\s]/g, "").split(/\s+/).filter(w =>
-    w.length > 3
-  );
+  const words = prompt
+    .toLowerCase()
+    .replace(/[^a-z0-9\s]/g, "")
+    .split(/\s+/)
+    .filter((w) => w.length > 3);
   return [...new Set(words)].slice(0, 5);
 }
 
@@ -264,12 +281,12 @@ interface DynamicPageRecord {
   viewCount: number;
   createdAt: Date;
   updatedAt: Date;
-  blocks: Array<{ type: string; content: unknown; }>;
+  blocks: Array<{ type: string; content: unknown }>;
 }
 
-function extractBlockContent(blocks: Array<{ type: string; content: unknown; }>): string {
+function extractBlockContent(blocks: Array<{ type: string; content: unknown }>): string {
   return blocks
-    .map(b => {
+    .map((b) => {
       if (typeof b.content === "string") return b.content;
       if (b.content && typeof b.content === "object") return JSON.stringify(b.content);
       return "";
@@ -279,7 +296,10 @@ function extractBlockContent(blocks: Array<{ type: string; content: unknown; }>)
 
 function estimateWordCount(text: string): number {
   if (!text) return 0;
-  return text.replace(/<[^>]*>/g, " ").split(/\s+/).filter(Boolean).length;
+  return text
+    .replace(/<[^>]*>/g, " ")
+    .split(/\s+/)
+    .filter(Boolean).length;
 }
 
 function buildGeneralReview(page: DynamicPageRecord): string {
@@ -312,18 +332,20 @@ function buildContentReview(page: DynamicPageRecord): string {
   const seoDescLen = page.seoDescription?.length ?? 0;
   const content = extractBlockContent(page.blocks);
   const wordCount = estimateWordCount(content);
-  const titleStatus = titleLen < 50
-    ? `Short (${titleLen} chars) -- ideal is 50-60 chars`
-    : titleLen <= 60
-    ? `Good (${titleLen} chars)`
-    : `Long (${titleLen} chars) -- ideal is 50-60 chars`;
-  const descStatus = descLen === 0
-    ? "Missing -- add a description"
-    : descLen < 150
-    ? `Short (${descLen} chars) -- ideal is 150-160 chars`
-    : descLen <= 160
-    ? `Good (${descLen} chars)`
-    : `Long (${descLen} chars) -- ideal is 150-160 chars`;
+  const titleStatus =
+    titleLen < 50
+      ? `Short (${titleLen} chars) -- ideal is 50-60 chars`
+      : titleLen <= 60
+        ? `Good (${titleLen} chars)`
+        : `Long (${titleLen} chars) -- ideal is 50-60 chars`;
+  const descStatus =
+    descLen === 0
+      ? "Missing -- add a description"
+      : descLen < 150
+        ? `Short (${descLen} chars) -- ideal is 150-160 chars`
+        : descLen <= 160
+          ? `Good (${descLen} chars)`
+          : `Long (${descLen} chars) -- ideal is 150-160 chars`;
   return [
     `## Content Review: /${page.slug}`,
     "",
@@ -338,14 +360,14 @@ function buildContentReview(page: DynamicPageRecord): string {
     `### Content Structure`,
     `- Word count (est.): ${wordCount}`,
     `- Block count: ${page.blocks.length}`,
-    `- Block types: ${[...new Set(page.blocks.map(b => b.type))].join(", ") || "(none)"}`,
+    `- Block types: ${[...new Set(page.blocks.map((b) => b.type))].join(", ") || "(none)"}`,
   ].join("\n");
 }
 
 function buildAccessibilityReview(page: DynamicPageRecord): string {
   const content = extractBlockContent(page.blocks);
   const imgTags = content.match(/<img[^>]*>/gi) ?? [];
-  const imgsWithAlt = imgTags.filter(tag => /alt\s*=\s*"[^"]+"/i.test(tag));
+  const imgsWithAlt = imgTags.filter((tag) => /alt\s*=\s*"[^"]+"/i.test(tag));
   const imgsMissingAlt = imgTags.length - imgsWithAlt.length;
   return [
     `## Accessibility Review: /${page.slug}`,
@@ -356,15 +378,17 @@ function buildAccessibilityReview(page: DynamicPageRecord): string {
     imgsMissingAlt > 0
       ? "- **Suggestion:** Add descriptive alt text to all images"
       : imgTags.length > 0
-      ? "- All images have alt text"
-      : "",
+        ? "- All images have alt text"
+        : "",
     "",
     `### Semantic HTML Suggestions`,
     `- Ensure interactive elements have focus indicators`,
     `- Use landmark roles (nav, main, aside) for page regions`,
     `- Provide skip-to-content links for keyboard navigation`,
     page.customCss ? "- Custom CSS detected -- verify it doesn't break screen reader access" : "",
-  ].filter(Boolean).join("\n");
+  ]
+    .filter(Boolean)
+    .join("\n");
 }
 
 function buildPerformanceReview(page: DynamicPageRecord): string {
@@ -410,8 +434,8 @@ function buildStaticRouteAnalysis(route: string): string {
     "/my-apps",
     "/api",
   ];
-  const matchedPrefix = knownPrefixes.find(prefix =>
-    route === prefix || route.startsWith(prefix + "/")
+  const matchedPrefix = knownPrefixes.find(
+    (prefix) => route === prefix || route.startsWith(prefix + "/"),
   );
   return [
     `## Route Analysis: ${route}`,
@@ -612,8 +636,15 @@ export const pageBuilderTools: StandaloneToolDefinition[] = [
     tier: "free",
     inputSchema: CreatePageSchema.shape,
     handler: async (input: never, ctx: ServerContext): Promise<CallToolResult> => {
-      const { slug, title, description, layout = "LANDING", themeData, tags, customCss } =
-        input as z.infer<typeof CreatePageSchema>;
+      const {
+        slug,
+        title,
+        description,
+        layout = "LANDING",
+        themeData,
+        tags,
+        customCss,
+      } = input as z.infer<typeof CreatePageSchema>;
       return safeToolCall("pages_create", async () => {
         const { isReservedSlug } = await import("@/lib/dynamic-pages/block-schemas");
         if (isReservedSlug(slug)) {
@@ -679,20 +710,23 @@ export const pageBuilderTools: StandaloneToolDefinition[] = [
         });
         if (!page) return textResult("**Error: NOT_FOUND**\nPage not found.\n**Retryable:** false");
         return textResult(
-          `**${page.title}**\n\n**ID:** ${page.id}\n**Slug:** ${page.slug}\n**Layout:** ${page.layout}\n**Status:** ${page.status}\n`
-            + `**Description:** ${page.description ?? "(none)"}\n**Tags:** ${
+          `**${page.title}**\n\n**ID:** ${page.id}\n**Slug:** ${page.slug}\n**Layout:** ${page.layout}\n**Status:** ${page.status}\n` +
+            `**Description:** ${page.description ?? "(none)"}\n**Tags:** ${
               (page.tags ?? []).length > 0 ? (page.tags ?? []).join(", ") : "(none)"
-            }\n`
-            + `**View Count:** ${page.viewCount}\n**Published:** ${
+            }\n` +
+            `**View Count:** ${page.viewCount}\n**Published:** ${
               page.publishedAt?.toISOString() ?? "(not published)"
-            }\n`
-            + `**Created:** ${page.createdAt.toISOString()}\n**Updated:** ${page.updatedAt.toISOString()}\n**Blocks:** ${page.blocks.length}\n\n`
-            + (page.blocks.length > 0
-              ? page.blocks.map(b =>
-                `  - [${b.sortOrder}] ${b.blockType}${b.variant ? ` (${b.variant})` : ""}${
-                  b.isVisible ? "" : " [hidden]"
-                }`
-              ).join("\n")
+            }\n` +
+            `**Created:** ${page.createdAt.toISOString()}\n**Updated:** ${page.updatedAt.toISOString()}\n**Blocks:** ${page.blocks.length}\n\n` +
+            (page.blocks.length > 0
+              ? page.blocks
+                  .map(
+                    (b) =>
+                      `  - [${b.sortOrder}] ${b.blockType}${b.variant ? ` (${b.variant})` : ""}${
+                        b.isVisible ? "" : " [hidden]"
+                      }`,
+                  )
+                  .join("\n")
               : "  (no blocks)"),
         );
       });
@@ -706,18 +740,25 @@ export const pageBuilderTools: StandaloneToolDefinition[] = [
     tier: "free",
     inputSchema: ListPagesSchema.shape,
     handler: async (input: never, ctx: ServerContext): Promise<CallToolResult> => {
-      const { status, layout, search, page = 1, pageSize = 20 } = input as z.infer<
-        typeof ListPagesSchema
-      >;
+      const {
+        status,
+        layout,
+        search,
+        page = 1,
+        pageSize = 20,
+      } = input as z.infer<typeof ListPagesSchema>;
       return safeToolCall("pages_list", async () => {
         const prisma = (await import("@/lib/prisma")).default;
         const where: Prisma.DynamicPageWhereInput = { userId: ctx.userId };
         if (status) where.status = status;
         if (layout) where.layout = layout;
         if (search) {
-          where.OR = [{ title: { contains: search, mode: "insensitive" } }, {
-            description: { contains: search, mode: "insensitive" },
-          }];
+          where.OR = [
+            { title: { contains: search, mode: "insensitive" } },
+            {
+              description: { contains: search, mode: "insensitive" },
+            },
+          ];
         }
         const [pages, total] = await Promise.all([
           prisma.dynamicPage.findMany({
@@ -741,10 +782,9 @@ export const pageBuilderTools: StandaloneToolDefinition[] = [
         if (pages.length === 0) return textResult("No pages found matching the given filters.");
         let text = `**Pages (${pages.length} of ${total}):**\n\n`;
         for (const p of pages) {
-          text +=
-            `- **${p.title}** (${p.slug})\n  ID: ${p.id} | Layout: ${p.layout} | Status: ${p.status}\n  Views: ${p.viewCount} | Updated: ${p.updatedAt.toISOString()}${
-              p.publishedAt ? ` | Published: ${p.publishedAt.toISOString()}` : ""
-            }\n\n`;
+          text += `- **${p.title}** (${p.slug})\n  ID: ${p.id} | Layout: ${p.layout} | Status: ${p.status}\n  Views: ${p.viewCount} | Updated: ${p.updatedAt.toISOString()}${
+            p.publishedAt ? ` | Published: ${p.publishedAt.toISOString()}` : ""
+          }\n\n`;
         }
         text += `Page ${page} of ${Math.ceil(total / pageSize)} (${total} total)`;
         return textResult(text);
@@ -925,7 +965,7 @@ export const pageBuilderTools: StandaloneToolDefinition[] = [
             ogImageUrl: source.ogImageUrl,
             userId: ctx.userId,
             blocks: {
-              create: source.blocks.map(block => ({
+              create: source.blocks.map((block) => ({
                 blockType: block.blockType,
                 variant: block.variant,
                 content: block.content as Prisma.InputJsonValue,
@@ -1071,13 +1111,13 @@ export const pageBuilderTools: StandaloneToolDefinition[] = [
         const prisma = (await import("@/lib/prisma")).default;
         await prisma.$transaction(
           blockIds.map((id, index) =>
-            prisma.pageBlock.update({ where: { id }, data: { sortOrder: index } })
+            prisma.pageBlock.update({ where: { id }, data: { sortOrder: index } }),
           ),
         );
         return textResult(
-          `**Blocks Reordered**\n\n**Page ID:** ${pageId}\n**New Order:**\n${
-            blockIds.map((id, i) => `  ${i}: ${id}`).join("\n")
-          }`,
+          `**Blocks Reordered**\n\n**Page ID:** ${pageId}\n**New Order:**\n${blockIds
+            .map((id, i) => `  ${i}: ${id}`)
+            .join("\n")}`,
         );
       });
     },
@@ -1120,9 +1160,11 @@ export const pageBuilderTools: StandaloneToolDefinition[] = [
             block.variant ?? "none"
           }\n**Sort Order:** ${block.sortOrder}\n**Visible:** ${
             block.isVisible ? "Yes" : "No"
-          }\n**Created:** ${block.createdAt.toISOString()}\n**Updated:** ${block.updatedAt.toISOString()}\n\n**Content:**\n\`\`\`json\n${
-            JSON.stringify(block.content, null, 2)
-          }\n\`\`\``,
+          }\n**Created:** ${block.createdAt.toISOString()}\n**Updated:** ${block.updatedAt.toISOString()}\n\n**Content:**\n\`\`\`json\n${JSON.stringify(
+            block.content,
+            null,
+            2,
+          )}\n\`\`\``,
         );
       });
     },
@@ -1192,11 +1234,14 @@ export const pageBuilderTools: StandaloneToolDefinition[] = [
         const ctaContent = {
           headline: "Ready to get started?",
           description: `Start building with ${keywords[0] || "this"} today.`,
-          buttons: [{ text: "Get Started", url: "/signup", variant: "primary" as const }, {
-            text: "Learn More",
-            url: "#features",
-            variant: "outline" as const,
-          }],
+          buttons: [
+            { text: "Get Started", url: "/signup", variant: "primary" as const },
+            {
+              text: "Learn More",
+              url: "#features",
+              variant: "outline" as const,
+            },
+          ],
           variant: "centered" as const,
         };
         const page = await prisma.dynamicPage.create({
@@ -1232,8 +1277,7 @@ export const pageBuilderTools: StandaloneToolDefinition[] = [
           },
           include: { blocks: { select: { id: true, blockType: true, sortOrder: true } } },
         });
-        let text =
-          `**Page Generated**\n\n**Title:** ${page.title}\n**Slug:** ${page.slug}\n**Layout:** ${page.layout}\n**Status:** ${page.status}\n**Blocks (${page.blocks.length}):**\n`;
+        let text = `**Page Generated**\n\n**Title:** ${page.title}\n**Slug:** ${page.slug}\n**Layout:** ${page.layout}\n**Status:** ${page.status}\n**Blocks (${page.blocks.length}):**\n`;
         for (const block of page.blocks) {
           text += `  - ${block.blockType} (ID: ${block.id}, order: ${block.sortOrder})\n`;
         }
@@ -1261,9 +1305,11 @@ export const pageBuilderTools: StandaloneToolDefinition[] = [
           );
         }
         return textResult(
-          `**Block Enhancement Review**\n\n**Block ID:** ${block.id}\n**Type:** ${block.blockType}\n**Instruction:** ${instruction}\n\n**Current Content:**\n\`\`\`json\n${
-            JSON.stringify(block.content, null, 2)
-          }\n\`\`\`\n\n**Note:** This is a placeholder for future AI integration. To apply the enhancement, use the \`blocks_update\` tool with modified content based on the instruction above.`,
+          `**Block Enhancement Review**\n\n**Block ID:** ${block.id}\n**Type:** ${block.blockType}\n**Instruction:** ${instruction}\n\n**Current Content:**\n\`\`\`json\n${JSON.stringify(
+            block.content,
+            null,
+            2,
+          )}\n\`\`\`\n\n**Note:** This is a placeholder for future AI integration. To apply the enhancement, use the \`blocks_update\` tool with modified content based on the instruction above.`,
         );
       });
     },
@@ -1320,16 +1366,16 @@ export const pageBuilderTools: StandaloneToolDefinition[] = [
             rationale:
               "Comparison pages need structured tables and pricing to help decision-making.",
           };
-        } else {suggestion = {
+        } else {
+          suggestion = {
             layout: "LANDING",
             blocks: ["HERO", "FEATURE_GRID", "CTA", "FOOTER"],
             rationale: "A versatile landing layout works well for general-purpose pages.",
-          };}
-        let text =
-          `**Layout Suggestion**\n\n**Use Case:** ${useCase}\n**Recommended Layout:** ${suggestion.layout}\n**Rationale:** ${suggestion.rationale}\n\n**Recommended Blocks (${suggestion.blocks.length}):**\n`;
+          };
+        }
+        let text = `**Layout Suggestion**\n\n**Use Case:** ${useCase}\n**Recommended Layout:** ${suggestion.layout}\n**Rationale:** ${suggestion.rationale}\n\n**Recommended Blocks (${suggestion.blocks.length}):**\n`;
         for (const block of suggestion.blocks) text += `  - ${block}\n`;
-        text +=
-          `\nTo create a page with this layout, use \`page_ai_generate\` with the \`layout\` parameter set to "${suggestion.layout}".`;
+        text += `\nTo create a page with this layout, use \`page_ai_generate\` with the \`layout\` parameter set to "${suggestion.layout}".`;
         return textResult(text);
       });
     },
@@ -1386,9 +1432,10 @@ export const pageBuilderTools: StandaloneToolDefinition[] = [
           },
         };
         const settings = styleSettings[resolvedStyle] ?? styleSettings.modern;
-        const nameWords = brandDescription.split(/\s+/).slice(0, 3).map(w =>
-          w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()
-        );
+        const nameWords = brandDescription
+          .split(/\s+/)
+          .slice(0, 3)
+          .map((w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase());
         const themeName = `${nameWords.join(" ")} Theme`;
         const theme = {
           name: themeName,
@@ -1412,9 +1459,11 @@ export const pageBuilderTools: StandaloneToolDefinition[] = [
           },
         };
         return textResult(
-          `**Generated Theme**\n\n**Name:** ${theme.name}\n**Style:** ${theme.style}\n**Brand:** ${brandDescription}\n\n**Theme JSON:**\n\`\`\`json\n${
-            JSON.stringify(theme, null, 2)
-          }\n\`\`\`\n\nTo apply this theme, update the page's \`themeData\` field with the JSON above.`,
+          `**Generated Theme**\n\n**Name:** ${theme.name}\n**Style:** ${theme.style}\n**Brand:** ${brandDescription}\n\n**Theme JSON:**\n\`\`\`json\n${JSON.stringify(
+            theme,
+            null,
+            2,
+          )}\n\`\`\`\n\nTo apply this theme, update the page's \`themeData\` field with the JSON above.`,
         );
       });
     },
@@ -1561,14 +1610,14 @@ export const pageBuilderTools: StandaloneToolDefinition[] = [
           },
         });
         return textResult(
-          `**Store Populated**\n\n**Page:** ${page.title} (${pageSlug})\n**Block ID:** ${block.id}\n**Block Type:** APP_GRID\n**Sort Order:** ${block.sortOrder}\n**Categories (${categories.length}):** ${
-            categories.join(", ")
-          }\n**Apps Added:** ${sampleApps.length}\n\nApps per category:\n${
-            categories.map(cat => {
-              const count = sampleApps.filter(a => a.category === cat).length;
+          `**Store Populated**\n\n**Page:** ${page.title} (${pageSlug})\n**Block ID:** ${block.id}\n**Block Type:** APP_GRID\n**Sort Order:** ${block.sortOrder}\n**Categories (${categories.length}):** ${categories.join(
+            ", ",
+          )}\n**Apps Added:** ${sampleApps.length}\n\nApps per category:\n${categories
+            .map((cat) => {
+              const count = sampleApps.filter((a) => a.category === cat).length;
               return `  - ${cat}: ${count} apps`;
-            }).join("\n")
-          }`,
+            })
+            .join("\n")}`,
         );
       });
     },
@@ -1606,7 +1655,7 @@ export const pageBuilderTools: StandaloneToolDefinition[] = [
           viewCount: page.viewCount,
           createdAt: page.createdAt,
           updatedAt: page.updatedAt,
-          blocks: page.blocks.map((b: { blockType: string; content: unknown; }) => ({
+          blocks: page.blocks.map((b: { blockType: string; content: unknown }) => ({
             type: b.blockType,
             content: b.content,
           })),
@@ -1637,17 +1686,18 @@ export const pageBuilderTools: StandaloneToolDefinition[] = [
     handler: async (input: never, _ctx: ServerContext): Promise<CallToolResult> => {
       const { category } = input as z.infer<typeof ListTemplatesSchema>;
       return safeToolCall("pages_list_templates", async () => {
-        const results = category ? TEMPLATES.filter(t => t.category === category) : TEMPLATES;
+        const results = category ? TEMPLATES.filter((t) => t.category === category) : TEMPLATES;
         if (results.length === 0) {
           return textResult(`No templates found for category "${category}".`);
         }
         const header = category
           ? `**Page Templates — ${category} (${results.length})**\n\n`
           : `**All Page Templates (${results.length})**\n\n`;
-        const lines = results.map(t =>
-          `### ${t.name}\n- **ID:** ${t.id}\n- **Category:** ${t.category}\n- **Layout:** ${t.layout}\n- **Blocks:** ${
-            t.defaultBlocks.length > 0 ? t.defaultBlocks.join(", ") : "(none)"
-          }\n- **Description:** ${t.description}\n- **Thumbnail:** ${t.thumbnail}`
+        const lines = results.map(
+          (t) =>
+            `### ${t.name}\n- **ID:** ${t.id}\n- **Category:** ${t.category}\n- **Layout:** ${t.layout}\n- **Blocks:** ${
+              t.defaultBlocks.length > 0 ? t.defaultBlocks.join(", ") : "(none)"
+            }\n- **Description:** ${t.description}\n- **Thumbnail:** ${t.thumbnail}`,
         );
         return textResult(header + lines.join("\n\n"));
       });
@@ -1664,7 +1714,7 @@ export const pageBuilderTools: StandaloneToolDefinition[] = [
     handler: async (input: never, ctx: ServerContext): Promise<CallToolResult> => {
       const { page_id, template_id } = input as z.infer<typeof ApplyTemplateSchema>;
       return safeToolCall("pages_apply_template", async () => {
-        const template = TEMPLATES.find(t => t.id === template_id);
+        const template = TEMPLATES.find((t) => t.id === template_id);
         if (!template) {
           return textResult(
             `**Error: NOT_FOUND**\nTemplate "${template_id}" does not exist. Use \`pages_list_templates\` to browse available templates.\n**Retryable:** false`,
@@ -1735,14 +1785,12 @@ export const pageBuilderTools: StandaloneToolDefinition[] = [
           );
         }
         const analysis = analyseSeo(page);
-        const scoreLabel = analysis.score >= 80
-          ? "GOOD"
-          : analysis.score >= 50
-          ? "NEEDS_WORK"
-          : "POOR";
-        const recsText = analysis.recommendations.length > 0
-          ? analysis.recommendations.map(r => `  - ${r}`).join("\n")
-          : "  - No issues found.";
+        const scoreLabel =
+          analysis.score >= 80 ? "GOOD" : analysis.score >= 50 ? "NEEDS_WORK" : "POOR";
+        const recsText =
+          analysis.recommendations.length > 0
+            ? analysis.recommendations.map((r) => `  - ${r}`).join("\n")
+            : "  - No issues found.";
         return textResult(
           `**SEO Analysis — ${page.title}**\n\n**Page ID:** ${page.id}\n**Slug:** ${page.slug}\n**SEO Score:** ${analysis.score}/100 (${scoreLabel})\n\n**Title:** ${analysis.titleStatus}\n  Current: "${
             page.seoTitle ?? page.title
@@ -1770,8 +1818,10 @@ export const pageBuilderTools: StandaloneToolDefinition[] = [
       >;
       return safeToolCall("pages_set_seo", async () => {
         if (
-          title === undefined && description === undefined && keywords === undefined
-          && og_image === undefined
+          title === undefined &&
+          description === undefined &&
+          keywords === undefined &&
+          og_image === undefined
         ) {
           return textResult(
             "**No changes specified.** Provide at least one SEO field to update (title, description, keywords, og_image).",
@@ -1800,9 +1850,9 @@ export const pageBuilderTools: StandaloneToolDefinition[] = [
         if (keywords !== undefined) updated.push(`**Keywords:** ${keywords.join(", ")}`);
         if (og_image !== undefined) updated.push(`**OG Image:** ${og_image}`);
         return textResult(
-          `**SEO Metadata Updated**\n\n**Page:** ${page.title} (${page.slug})\n**Page ID:** ${page.id}\n\n**Changes Applied:**\n${
-            updated.map(u => `  ${u}`).join("\n")
-          }\n\nRun \`pages_get_seo\` to review the updated SEO score.`,
+          `**SEO Metadata Updated**\n\n**Page:** ${page.title} (${page.slug})\n**Page ID:** ${page.id}\n\n**Changes Applied:**\n${updated
+            .map((u) => `  ${u}`)
+            .join("\n")}\n\nRun \`pages_get_seo\` to review the updated SEO score.`,
         );
       });
     },

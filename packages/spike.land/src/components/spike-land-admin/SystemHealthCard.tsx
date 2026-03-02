@@ -32,12 +32,10 @@ export function SystemHealthCard({ services }: SystemHealthCardProps) {
   return (
     <Card className="bg-zinc-900 border-zinc-800">
       <CardHeader className="pb-3">
-        <CardTitle className="text-zinc-100 text-base">
-          System Health
-        </CardTitle>
+        <CardTitle className="text-zinc-100 text-base">System Health</CardTitle>
       </CardHeader>
       <CardContent className="space-y-2">
-        {services.map(service => (
+        {services.map((service) => (
           <div
             key={service.name}
             className="flex items-center gap-3 py-2 border-b border-zinc-800 last:border-0"
@@ -50,18 +48,12 @@ export function SystemHealthCard({ services }: SystemHealthCardProps) {
               )}
               aria-label={statusLabel[service.status]}
             />
-            <span className="flex-1 text-zinc-200 text-sm font-medium">
-              {service.name}
-            </span>
+            <span className="flex-1 text-zinc-200 text-sm font-medium">{service.name}</span>
             {service.latencyMs !== undefined && (
-              <span className="text-zinc-500 text-xs font-mono">
-                {service.latencyMs}ms
-              </span>
+              <span className="text-zinc-500 text-xs font-mono">{service.latencyMs}ms</span>
             )}
             {service.uptime && (
-              <span className="text-zinc-500 text-xs font-mono">
-                {service.uptime}
-              </span>
+              <span className="text-zinc-500 text-xs font-mono">{service.uptime}</span>
             )}
             <span
               className={cn(

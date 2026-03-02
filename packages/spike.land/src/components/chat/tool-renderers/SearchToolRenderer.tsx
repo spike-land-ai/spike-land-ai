@@ -19,10 +19,7 @@ export function SearchToolRenderer({ result, isError }: ToolRendererProps) {
     return (
       <div className="space-y-1">
         {items.map((item, i) => (
-          <div
-            key={i}
-            className="text-xs rounded bg-black/20 px-2 py-1.5 text-zinc-300"
-          >
+          <div key={i} className="text-xs rounded bg-black/20 px-2 py-1.5 text-zinc-300">
             {item.title && <span className="font-medium text-zinc-200">{item.title}</span>}
             {item.description && <p className="text-zinc-500 mt-0.5">{item.description}</p>}
             {!item.title && <span>{item.text ?? JSON.stringify(item)}</span>}

@@ -1,12 +1,6 @@
 "use client";
 
-import {
-  AnimatePresence,
-  motion,
-  useMotionValue,
-  useSpring,
-  useTransform,
-} from "framer-motion";
+import { AnimatePresence, motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 import { useState } from "react";
 import { useInViewProgress } from "./useInViewProgress";
 
@@ -184,9 +178,10 @@ function LayerCard({
 }: LayerCardProps) {
   const layerDelay = index * 0.12;
   const normalizedProgress = 1 - layerDelay * 0.7;
-  const layerProgress = normalizedProgress > 0
-    ? Math.max(0, Math.min(1, (progress - layerDelay) / normalizedProgress))
-    : 0;
+  const layerProgress =
+    normalizedProgress > 0
+      ? Math.max(0, Math.min(1, (progress - layerDelay) / normalizedProgress))
+      : 0;
 
   const stackDepth = totalLayers - 1 - index;
   const baseOffsetX = stackDepth * 3;
@@ -570,9 +565,10 @@ export function FiveLayerStackDemo() {
             {LAYERS.map((layer, index) => {
               const layerDelay = index * 0.12;
               const normalizedProgress = 1 - layerDelay * 0.7;
-              const layerProgress = normalizedProgress > 0
-                ? Math.max(0, Math.min(1, (progress - layerDelay) / normalizedProgress))
-                : 0;
+              const layerProgress =
+                normalizedProgress > 0
+                  ? Math.max(0, Math.min(1, (progress - layerDelay) / normalizedProgress))
+                  : 0;
 
               return (
                 <motion.div

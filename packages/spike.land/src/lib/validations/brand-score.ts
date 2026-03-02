@@ -20,12 +20,7 @@ export const VIOLATION_TYPES = [
   "STYLE_DEVIATION",
 ] as const;
 
-export const VIOLATION_SEVERITIES = [
-  "LOW",
-  "MEDIUM",
-  "HIGH",
-  "CRITICAL",
-] as const;
+export const VIOLATION_SEVERITIES = ["LOW", "MEDIUM", "HIGH", "CRITICAL"] as const;
 
 export const OVERALL_ASSESSMENTS = [
   "EXCELLENT", // 90-100
@@ -35,12 +30,7 @@ export const OVERALL_ASSESSMENTS = [
   "OFF_BRAND", // 0-24
 ] as const;
 
-export const SUGGESTION_CATEGORIES = [
-  "TONE",
-  "VOCABULARY",
-  "GUARDRAILS",
-  "STYLE",
-] as const;
+export const SUGGESTION_CATEGORIES = ["TONE", "VOCABULARY", "GUARDRAILS", "STYLE"] as const;
 
 export const SUGGESTION_PRIORITIES = ["HIGH", "MEDIUM", "LOW"] as const;
 
@@ -177,17 +167,18 @@ export function transformGeminiResponse(
   return {
     score: geminiResponse.score,
     overallAssessment: getOverallAssessment(geminiResponse.score),
-    violations: geminiResponse.violations.map(v => ({
+    violations: geminiResponse.violations.map((v) => ({
       type: v.type,
       severity: v.severity,
       message: v.message,
-      location: v.lineNumber || v.wordIndex || v.excerpt
-        ? {
-          lineNumber: v.lineNumber,
-          wordIndex: v.wordIndex,
-          excerpt: v.excerpt,
-        }
-        : undefined,
+      location:
+        v.lineNumber || v.wordIndex || v.excerpt
+          ? {
+              lineNumber: v.lineNumber,
+              wordIndex: v.wordIndex,
+              excerpt: v.excerpt,
+            }
+          : undefined,
       suggestion: v.suggestion,
     })),
     suggestions: geminiResponse.suggestions,
@@ -195,9 +186,7 @@ export function transformGeminiResponse(
       formalCasual: Math.round(geminiResponse.toneAnalysis.formalCasual),
       technicalSimple: Math.round(geminiResponse.toneAnalysis.technicalSimple),
       seriousPlayful: Math.round(geminiResponse.toneAnalysis.seriousPlayful),
-      reservedEnthusiastic: Math.round(
-        geminiResponse.toneAnalysis.reservedEnthusiastic,
-      ),
+      reservedEnthusiastic: Math.round(geminiResponse.toneAnalysis.reservedEnthusiastic),
       alignment: Math.round(geminiResponse.toneAnalysis.alignment),
     },
     cached,

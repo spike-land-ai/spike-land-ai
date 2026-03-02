@@ -19,18 +19,12 @@ interface GameContextValue {
 
 const GameContext = createContext<GameContextValue | null>(null);
 
-export function GameProvider(
-  { roomId, children }: { roomId: string; children: ReactNode; },
-) {
+export function GameProvider({ roomId, children }: { roomId: string; children: ReactNode }) {
   const room = useGameRoom(roomId);
   const ui = useUIStore();
   const media = useGameMedia(room.peer, room.connections);
 
-  return (
-    <GameContext.Provider value={{ ...room, ui, media }}>
-      {children}
-    </GameContext.Provider>
-  );
+  return <GameContext.Provider value={{ ...room, ui, media }}>{children}</GameContext.Provider>;
 }
 
 export function useGame() {

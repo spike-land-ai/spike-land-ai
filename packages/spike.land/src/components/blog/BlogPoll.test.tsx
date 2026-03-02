@@ -1,22 +1,8 @@
 /**
  * @vitest-environment jsdom
  */
-import {
-  afterEach,
-  beforeEach,
-  describe,
-  expect,
-  it,
-  type Mock,
-  vi,
-} from "vitest";
-import {
-  cleanup,
-  fireEvent,
-  render,
-  screen,
-  waitFor,
-} from "@testing-library/react";
+import { afterEach, beforeEach, describe, expect, it, type Mock, vi } from "vitest";
+import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { BlogPoll } from "./BlogPoll";
 
 const mockFetch = vi.fn();
@@ -43,17 +29,15 @@ describe("BlogPoll", () => {
 
     render(<BlogPoll slug="test-article" />);
     expect(
-      screen.getByText(
-        "Is A/B testing just a crude Bayesian bandit with extra steps?",
-      ),
+      screen.getByText("Is A/B testing just a crude Bayesian bandit with extra steps?"),
     ).toBeDefined();
   });
 
   it("should render Yes and No buttons", () => {
     render(<BlogPoll slug="test-article" />);
     const buttons = screen.getAllByRole("button");
-    const yesButton = buttons.find(b => b.textContent === "Yes");
-    const noButton = buttons.find(b => b.textContent === "No");
+    const yesButton = buttons.find((b) => b.textContent === "Yes");
+    const noButton = buttons.find((b) => b.textContent === "No");
     expect(yesButton).toBeDefined();
     expect(noButton).toBeDefined();
   });
@@ -76,7 +60,7 @@ describe("BlogPoll", () => {
 
     render(<BlogPoll slug="test-article" />);
     const buttons = screen.getAllByRole("button");
-    const yesButton = buttons.find(b => b.textContent === "Yes");
+    const yesButton = buttons.find((b) => b.textContent === "Yes");
     expect(yesButton).toBeDefined();
     fireEvent.click(yesButton!);
 
@@ -97,7 +81,7 @@ describe("BlogPoll", () => {
 
     render(<BlogPoll slug="test-article" />);
     const buttons = screen.getAllByRole("button");
-    const yesButton = buttons.find(b => b.textContent === "Yes") as HTMLButtonElement;
+    const yesButton = buttons.find((b) => b.textContent === "Yes") as HTMLButtonElement;
     expect(yesButton).toBeDefined();
     fireEvent.click(yesButton);
 

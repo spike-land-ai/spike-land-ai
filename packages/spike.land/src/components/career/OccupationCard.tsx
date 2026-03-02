@@ -10,10 +10,8 @@ interface OccupationCardProps {
   matchScore?: number;
 }
 
-export function OccupationCard(
-  { occupation, matchScore }: OccupationCardProps,
-) {
-  const essentialCount = occupation.skills.filter(s => s.skillType === "essential").length;
+export function OccupationCard({ occupation, matchScore }: OccupationCardProps) {
+  const essentialCount = occupation.skills.filter((s) => s.skillType === "essential").length;
 
   return (
     <Link href={`/career/${encodeURIComponent(occupation.uri)}`}>
@@ -26,11 +24,13 @@ export function OccupationCard(
             {matchScore !== undefined && (
               <Badge
                 variant="outline"
-                className={matchScore >= 70
-                  ? "border-emerald-500/30 text-emerald-400 shrink-0"
-                  : matchScore >= 40
-                  ? "border-amber-500/30 text-amber-400 shrink-0"
-                  : "border-red-500/30 text-red-400 shrink-0"}
+                className={
+                  matchScore >= 70
+                    ? "border-emerald-500/30 text-emerald-400 shrink-0"
+                    : matchScore >= 40
+                      ? "border-amber-500/30 text-amber-400 shrink-0"
+                      : "border-red-500/30 text-red-400 shrink-0"
+                }
               >
                 {matchScore}%
               </Badge>
@@ -38,9 +38,7 @@ export function OccupationCard(
           </div>
         </CardHeader>
         <CardContent>
-          <p className="text-xs text-zinc-500 line-clamp-3 mb-3">
-            {occupation.description}
-          </p>
+          <p className="text-xs text-zinc-500 line-clamp-3 mb-3">{occupation.description}</p>
           <div className="flex items-center gap-2 text-xs text-zinc-500">
             <span>{essentialCount} essential skills</span>
             {occupation.iscoGroup && (

@@ -25,11 +25,7 @@ export class ToolSearch {
   }
 
   /** Keyword search over registered tools. */
-  search(
-    tools: Map<string, TrackedToolRef>,
-    query: string,
-    limit = 10,
-  ): SearchResult[] {
+  search(tools: Map<string, TrackedToolRef>, query: string, limit = 10): SearchResult[] {
     const terms = query.toLowerCase().split(/\s+/).filter(Boolean);
     if (terms.length === 0) return [];
 
@@ -62,28 +58,24 @@ export class ToolSearch {
       });
     }
 
-    const validScores = scored.filter(s => s.score > 0);
+    const validScores = scored.filter((s) => s.score > 0);
     validScores.sort((a, b) => b.score - a.score);
-    return validScores.slice(0, limit).map(s => s.result);
+    return validScores.slice(0, limit).map((s) => s.result);
   }
 
   /** In-memory TF-IDF semantic search (no external API). */
-  searchSemantic(
-    tools: Map<string, TrackedToolRef>,
-    query: string,
-    limit = 10,
-  ): SearchResult[] {
+  searchSemantic(tools: Map<string, TrackedToolRef>, query: string, limit = 10): SearchResult[] {
     const results = this.embeddingIndex.search(query, limit);
     if (results.length === 0) return [];
 
     const suggested = suggestParameters(query);
 
     return results
-      .filter(r => {
+      .filter((r) => {
         const tracked = tools.get(r.name);
         return tracked && tracked.definition.category !== "gateway-meta";
       })
-      .map(r => {
+      .map((r) => {
         const tracked = tools.get(r.name)!;
         return {
           name: tracked.definition.name,

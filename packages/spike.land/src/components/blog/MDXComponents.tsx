@@ -16,9 +16,7 @@ import { ReadAloudParagraph } from "./ReadAloudButton";
 // Dynamic imports with SSR disabled to prevent React hooks errors during static generation
 const ImageComparisonSlider = dynamic(
   () =>
-    import("@/components/enhance/ImageComparisonSlider").then(
-      mod => mod.ImageComparisonSlider,
-    ),
+    import("@/components/enhance/ImageComparisonSlider").then((mod) => mod.ImageComparisonSlider),
   {
     ssr: false,
     loading: () => <div className="w-full aspect-square bg-muted animate-pulse rounded-lg" />,
@@ -26,7 +24,7 @@ const ImageComparisonSlider = dynamic(
 );
 
 const SplitPreview = dynamic(
-  () => import("@/components/enhance/SplitPreview").then(mod => mod.SplitPreview),
+  () => import("@/components/enhance/SplitPreview").then((mod) => mod.SplitPreview),
   {
     ssr: false,
     loading: () => <div className="w-full aspect-square bg-muted animate-pulse rounded-lg" />,
@@ -45,25 +43,13 @@ const SplitPreview = dynamic(
  * <AudioPlayer src="/audio/podcast.m4a" title="Listen to this episode" />
  * ```
  */
-function AudioPlayer({
-  src,
-  title,
-}: {
-  src: string;
-  title?: string;
-}) {
+function AudioPlayer({ src, title }: { src: string; title?: string }) {
   return (
     <div className="my-8 p-6 bg-card rounded-xl border border-border">
       {title && (
-        <h4 className="font-heading text-lg font-semibold mb-4 text-foreground">
-          {title}
-        </h4>
+        <h4 className="font-heading text-lg font-semibold mb-4 text-foreground">{title}</h4>
       )}
-      <audio
-        controls
-        className="w-full"
-        preload="metadata"
-      >
+      <audio controls className="w-full" preload="metadata">
         <source src={src} type="audio/mp4" />
         <source src={src} type="audio/x-m4a" />
         <track kind="captions" />
@@ -85,13 +71,7 @@ function AudioPlayer({
  * <YouTubeEmbed videoId="dQw4w9WgXcQ" title="Example video" />
  * ```
  */
-function YouTubeEmbed({
-  videoId,
-  title = "YouTube video",
-}: {
-  videoId: string;
-  title?: string;
-}) {
+function YouTubeEmbed({ videoId, title = "YouTube video" }: { videoId: string; title?: string }) {
   // Basic validation to prevent XSS injection into the iframe src
   const safeVideoId = videoId.replace(/[^a-zA-Z0-9_-]/g, "");
 
@@ -134,11 +114,7 @@ function Callout({
     warning: "bg-warning border-warning text-foreground",
     success: "bg-success border-success text-foreground",
   };
-  return (
-    <div className={cn("border-l-4 p-4 my-6 rounded-r-lg", styles[type])}>
-      {children}
-    </div>
-  );
+  return <div className={cn("border-l-4 p-4 my-6 rounded-r-lg", styles[type])}>{children}</div>;
 }
 
 /**
@@ -155,7 +131,7 @@ function Callout({
  * </Gallery>
  * ```
  */
-function Gallery({ children }: { children: React.ReactNode; }) {
+function Gallery({ children }: { children: React.ReactNode }) {
   return <div className="grid grid-cols-1 md:grid-cols-2 gap-6 my-8">{children}</div>;
 }
 
@@ -171,21 +147,13 @@ function Gallery({ children }: { children: React.ReactNode; }) {
  * <CTAButton href="/apps/pixel">Try Pixel Free</CTAButton>
  * ```
  */
-function CTAButton({
-  href,
-  children,
-}: {
-  href: string;
-  children: React.ReactNode;
-}) {
+function CTAButton({ href, children }: { href: string; children: React.ReactNode }) {
   return (
     <div className="my-8 flex justify-center">
-      <Button
-        asChild
-        size="lg"
-        className="shadow-glow-cyan text-white no-underline"
-      >
-        <Link href={href} className="text-white no-underline">{children}</Link>
+      <Button asChild size="lg" className="shadow-glow-cyan text-white no-underline">
+        <Link href={href} className="text-white no-underline">
+          {children}
+        </Link>
       </Button>
     </div>
   );
@@ -194,11 +162,7 @@ function CTAButton({
 /**
  * Custom link component
  */
-function CustomLink({
-  href,
-  children,
-  ...props
-}: ComponentPropsWithoutRef<"a">) {
+function CustomLink({ href, children, ...props }: ComponentPropsWithoutRef<"a">) {
   const isExternal = href?.startsWith("http");
   if (isExternal) {
     return (
@@ -230,18 +194,11 @@ function CustomLink({
 /**
  * Custom code component
  */
-function CustomCode({
-  children,
-  className,
-  ...props
-}: ComponentPropsWithoutRef<"code">) {
+function CustomCode({ children, className, ...props }: ComponentPropsWithoutRef<"code">) {
   const isInline = !className;
   if (isInline) {
     return (
-      <code
-        className="font-mono text-sm bg-muted px-1.5 py-0.5 rounded"
-        {...props}
-      >
+      <code className="font-mono text-sm bg-muted px-1.5 py-0.5 rounded" {...props}>
         {children}
       </code>
     );
@@ -256,7 +213,7 @@ function CustomCode({
 /**
  * Custom image component
  */
-function CustomImage({ src, alt }: { src?: string; alt?: string; }) {
+function CustomImage({ src, alt }: { src?: string; alt?: string }) {
   if (!src || typeof src !== "string") {
     return null;
   }
@@ -298,9 +255,7 @@ function LiveDemo({
   return (
     <div className="my-8 rounded-xl border border-border overflow-hidden">
       <div className="flex items-center justify-between px-6 py-3 bg-muted/50 border-b border-border">
-        <h4 className="font-heading text-lg font-semibold text-foreground">
-          {title}
-        </h4>
+        <h4 className="font-heading text-lg font-semibold text-foreground">{title}</h4>
         <a
           href={src}
           target="_blank"
@@ -347,14 +302,8 @@ function PDFViewer({
     <div className="my-8 rounded-xl border border-border overflow-hidden">
       {title && (
         <div className="flex items-center justify-between px-6 py-3 bg-muted/50 border-b border-border">
-          <h4 className="font-heading text-lg font-semibold text-foreground">
-            {title}
-          </h4>
-          <a
-            href={src}
-            download
-            className="text-sm text-primary hover:underline transition-colors"
-          >
+          <h4 className="font-heading text-lg font-semibold text-foreground">{title}</h4>
+          <a href={src} download className="text-sm text-primary hover:underline transition-colors">
             Download PDF
           </a>
         </div>
@@ -367,11 +316,7 @@ function PDFViewer({
       />
       {!title && (
         <div className="px-6 py-3 bg-muted/50 border-t border-border">
-          <a
-            href={src}
-            download
-            className="text-sm text-primary hover:underline transition-colors"
-          >
+          <a href={src} download className="text-sm text-primary hover:underline transition-colors">
             Download PDF
           </a>
         </div>
@@ -387,34 +332,22 @@ function PDFViewer({
 export const mdxComponents: MDXComponents = {
   // Headings with Montserrat font
   h1: ({ children, ...props }: ComponentPropsWithoutRef<"h1">) => (
-    <h1
-      className="font-heading text-4xl font-bold mt-12 mb-6 text-foreground"
-      {...props}
-    >
+    <h1 className="font-heading text-4xl font-bold mt-12 mb-6 text-foreground" {...props}>
       {children}
     </h1>
   ),
   h2: ({ children, ...props }: ComponentPropsWithoutRef<"h2">) => (
-    <h2
-      className="font-heading text-3xl font-bold mt-10 mb-4 text-foreground"
-      {...props}
-    >
+    <h2 className="font-heading text-3xl font-bold mt-10 mb-4 text-foreground" {...props}>
       {children}
     </h2>
   ),
   h3: ({ children, ...props }: ComponentPropsWithoutRef<"h3">) => (
-    <h3
-      className="font-heading text-2xl font-semibold mt-8 mb-3 text-foreground"
-      {...props}
-    >
+    <h3 className="font-heading text-2xl font-semibold mt-8 mb-3 text-foreground" {...props}>
       {children}
     </h3>
   ),
   h4: ({ children, ...props }: ComponentPropsWithoutRef<"h4">) => (
-    <h4
-      className="font-heading text-xl font-semibold mt-6 mb-2 text-foreground"
-      {...props}
-    >
+    <h4 className="font-heading text-xl font-semibold mt-6 mb-2 text-foreground" {...props}>
       {children}
     </h4>
   ),
@@ -435,18 +368,12 @@ export const mdxComponents: MDXComponents = {
 
   // Lists
   ul: ({ children, ...props }: ComponentPropsWithoutRef<"ul">) => (
-    <ul
-      className="list-disc list-inside space-y-2 mb-6 text-foreground"
-      {...props}
-    >
+    <ul className="list-disc list-inside space-y-2 mb-6 text-foreground" {...props}>
       {children}
     </ul>
   ),
   ol: ({ children, ...props }: ComponentPropsWithoutRef<"ol">) => (
-    <ol
-      className="list-decimal list-inside space-y-2 mb-6 text-foreground"
-      {...props}
-    >
+    <ol className="list-decimal list-inside space-y-2 mb-6 text-foreground" {...props}>
       {children}
     </ol>
   ),
@@ -457,10 +384,7 @@ export const mdxComponents: MDXComponents = {
   ),
 
   // Blockquotes
-  blockquote: ({
-    children,
-    ...props
-  }: ComponentPropsWithoutRef<"blockquote">) => (
+  blockquote: ({ children, ...props }: ComponentPropsWithoutRef<"blockquote">) => (
     <blockquote
       className="border-l-4 border-primary pl-4 py-2 my-6 text-muted-foreground italic flex items-center min-h-[3rem]"
       {...props}
@@ -471,10 +395,7 @@ export const mdxComponents: MDXComponents = {
 
   // Code blocks
   pre: ({ children, ...props }: ComponentPropsWithoutRef<"pre">) => (
-    <pre
-      className="bg-card rounded-lg p-4 overflow-x-auto my-6 border border-border"
-      {...props}
-    >
+    <pre className="bg-card rounded-lg p-4 overflow-x-auto my-6 border border-border" {...props}>
       {children}
     </pre>
   ),
@@ -500,10 +421,7 @@ export const mdxComponents: MDXComponents = {
   // Tables
   table: ({ children, ...props }: ComponentPropsWithoutRef<"table">) => (
     <div className="my-6 w-full overflow-x-auto">
-      <table
-        className="w-full border-collapse text-sm"
-        {...props}
-      >
+      <table className="w-full border-collapse text-sm" {...props}>
         {children}
       </table>
     </div>
@@ -519,10 +437,7 @@ export const mdxComponents: MDXComponents = {
     </tbody>
   ),
   tr: ({ children, ...props }: ComponentPropsWithoutRef<"tr">) => (
-    <tr
-      className="border-b border-border transition-colors hover:bg-muted/30"
-      {...props}
-    >
+    <tr className="border-b border-border transition-colors hover:bg-muted/30" {...props}>
       {children}
     </tr>
   ),
@@ -556,127 +471,91 @@ export const mdxComponents: MDXComponents = {
   YouTubeEmbed,
   PDFViewer,
   LiveDemo,
-  SplitScreenDemo: dynamic(
-    () => import("./interactive").then(mod => mod.SplitScreenDemo),
-    {
-      ssr: false,
-      loading: () => 
-      <div className="w-full aspect-video bg-muted animate-pulse rounded-xl my-16" />,
-    },
-  ),
+  SplitScreenDemo: dynamic(() => import("./interactive").then((mod) => mod.SplitScreenDemo), {
+    ssr: false,
+    loading: () => <div className="w-full aspect-video bg-muted animate-pulse rounded-xl my-16" />,
+  }),
   AttentionSpotlightDemo: dynamic(
-    () => import("./interactive").then(mod => mod.AttentionSpotlightDemo),
+    () => import("./interactive").then((mod) => mod.AttentionSpotlightDemo),
     {
       ssr: false,
-      loading: () => 
-      <div className="w-full aspect-video bg-muted animate-pulse rounded-xl my-16" />,
+      loading: () => (
+        <div className="w-full aspect-video bg-muted animate-pulse rounded-xl my-16" />
+      ),
     },
   ),
-  FiveLayerStackDemo: dynamic(
-    () => import("./interactive").then(mod => mod.FiveLayerStackDemo),
-    {
-      ssr: false,
-      loading: () => 
-      <div className="w-full aspect-video bg-muted animate-pulse rounded-xl my-16" />,
-    },
-  ),
-  DarwinianTreeDemo: dynamic(
-    () => import("./interactive").then(mod => mod.DarwinianTreeDemo),
-    {
-      ssr: false,
-      loading: () => 
-      <div className="w-full aspect-video bg-muted animate-pulse rounded-xl my-16" />,
-    },
-  ),
-  RecursiveZoomDemo: dynamic(
-    () => import("./interactive").then(mod => mod.RecursiveZoomDemo),
-    {
-      ssr: false,
-      loading: () => 
-      <div className="w-full aspect-video bg-muted animate-pulse rounded-xl my-16" />,
-    },
-  ),
-  ModelCascadeDemo: dynamic(
-    () => import("./interactive").then(mod => mod.ModelCascadeDemo),
-    {
-      ssr: false,
-      loading: () => 
-      <div className="w-full aspect-video bg-muted animate-pulse rounded-xl my-16" />,
-    },
-  ),
+  FiveLayerStackDemo: dynamic(() => import("./interactive").then((mod) => mod.FiveLayerStackDemo), {
+    ssr: false,
+    loading: () => <div className="w-full aspect-video bg-muted animate-pulse rounded-xl my-16" />,
+  }),
+  DarwinianTreeDemo: dynamic(() => import("./interactive").then((mod) => mod.DarwinianTreeDemo), {
+    ssr: false,
+    loading: () => <div className="w-full aspect-video bg-muted animate-pulse rounded-xl my-16" />,
+  }),
+  RecursiveZoomDemo: dynamic(() => import("./interactive").then((mod) => mod.RecursiveZoomDemo), {
+    ssr: false,
+    loading: () => <div className="w-full aspect-video bg-muted animate-pulse rounded-xl my-16" />,
+  }),
+  ModelCascadeDemo: dynamic(() => import("./interactive").then((mod) => mod.ModelCascadeDemo), {
+    ssr: false,
+    loading: () => <div className="w-full aspect-video bg-muted animate-pulse rounded-xl my-16" />,
+  }),
   BayesianConfidenceDemo: dynamic(
-    () => import("./interactive").then(mod => mod.BayesianConfidenceDemo),
+    () => import("./interactive").then((mod) => mod.BayesianConfidenceDemo),
     {
       ssr: false,
-      loading: () => 
-      <div className="w-full aspect-video bg-muted animate-pulse rounded-xl my-16" />,
+      loading: () => (
+        <div className="w-full aspect-video bg-muted animate-pulse rounded-xl my-16" />
+      ),
     },
   ),
-  MCPTerminalDemo: dynamic(
-    () => import("./interactive").then(mod => mod.MCPTerminalDemo),
-    {
-      ssr: false,
-      loading: () => 
-      <div className="w-full aspect-video bg-muted animate-pulse rounded-xl my-16" />,
-    },
-  ),
-  ScrollStoryCard: dynamic(
-    () => import("./interactive").then(mod => mod.ScrollStoryCard),
-    {
-      ssr: false,
-      loading: () => 
-      <div className="w-full aspect-video bg-muted animate-pulse rounded-xl my-16" />,
-    },
-  ),
-  MCPFlowDiagram: dynamic(
-    () => import("./interactive").then(mod => mod.MCPFlowDiagram),
-    {
-      ssr: false,
-      loading: () => 
-      <div className="w-full aspect-video bg-muted animate-pulse rounded-xl my-16" />,
-    },
-  ),
+  MCPTerminalDemo: dynamic(() => import("./interactive").then((mod) => mod.MCPTerminalDemo), {
+    ssr: false,
+    loading: () => <div className="w-full aspect-video bg-muted animate-pulse rounded-xl my-16" />,
+  }),
+  ScrollStoryCard: dynamic(() => import("./interactive").then((mod) => mod.ScrollStoryCard), {
+    ssr: false,
+    loading: () => <div className="w-full aspect-video bg-muted animate-pulse rounded-xl my-16" />,
+  }),
+  MCPFlowDiagram: dynamic(() => import("./interactive").then((mod) => mod.MCPFlowDiagram), {
+    ssr: false,
+    loading: () => <div className="w-full aspect-video bg-muted animate-pulse rounded-xl my-16" />,
+  }),
   PerspectiveCarousel: dynamic(
-    () => import("./interactive").then(mod => mod.PerspectiveCarousel),
+    () => import("./interactive").then((mod) => mod.PerspectiveCarousel),
     {
       ssr: false,
-      loading: () => 
-      <div className="w-full aspect-video bg-muted animate-pulse rounded-xl my-16" />,
+      loading: () => (
+        <div className="w-full aspect-video bg-muted animate-pulse rounded-xl my-16" />
+      ),
     },
   ),
-  SpikeCliDemo: dynamic(
-    () => import("./interactive").then(mod => mod.SpikeCliDemo),
-    {
-      ssr: false,
-      loading: () => 
-      <div className="w-full aspect-video bg-muted animate-pulse rounded-xl my-16" />,
-    },
-  ),
-  BlogPoll: dynamic(() => import("./BlogPoll").then(mod => mod.BlogPoll), {
+  SpikeCliDemo: dynamic(() => import("./interactive").then((mod) => mod.SpikeCliDemo), {
+    ssr: false,
+    loading: () => <div className="w-full aspect-video bg-muted animate-pulse rounded-xl my-16" />,
+  }),
+  BlogPoll: dynamic(() => import("./BlogPoll").then((mod) => mod.BlogPoll), {
     ssr: false,
     loading: () => <div className="w-full h-32 bg-muted animate-pulse rounded-xl my-8" />,
   }),
   PollAnalyticsDashboard: dynamic(
-    () => import("./PollAnalyticsDashboard").then(mod => mod.PollAnalyticsDashboard),
+    () => import("./PollAnalyticsDashboard").then((mod) => mod.PollAnalyticsDashboard),
     {
       ssr: false,
       loading: () => <div className="w-full h-64 bg-muted animate-pulse rounded-xl my-8" />,
     },
   ),
   PersonaLandingPreview: dynamic(
-    () => import("./PersonaLandingPreview").then(mod => mod.PersonaLandingPreview),
+    () => import("./PersonaLandingPreview").then((mod) => mod.PersonaLandingPreview),
     {
       ssr: false,
       loading: () => <div className="w-full h-48 bg-muted animate-pulse rounded-xl my-8" />,
     },
   ),
-  PersonaSwitcher: dynamic(
-    () => import("./PersonaSwitcher").then(mod => mod.PersonaSwitcher),
-    {
-      ssr: false,
-      loading: () => <div className="w-full h-24 bg-muted animate-pulse rounded-xl my-8" />,
-    },
-  ),
+  PersonaSwitcher: dynamic(() => import("./PersonaSwitcher").then((mod) => mod.PersonaSwitcher), {
+    ssr: false,
+    loading: () => <div className="w-full h-24 bg-muted animate-pulse rounded-xl my-8" />,
+  }),
 };
 
 /**
@@ -694,9 +573,7 @@ export const mdxComponents: MDXComponents = {
  * });
  * ```
  */
-export function getMDXComponents(
-  overrides: MDXComponents = {},
-): MDXComponents {
+export function getMDXComponents(overrides: MDXComponents = {}): MDXComponents {
   return {
     ...mdxComponents,
     ...overrides,

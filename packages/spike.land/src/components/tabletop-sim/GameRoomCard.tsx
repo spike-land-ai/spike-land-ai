@@ -2,12 +2,7 @@
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 
 interface Player {
@@ -25,10 +20,7 @@ interface GameRoomCardProps {
   gameType: string;
 }
 
-const statusConfig: Record<
-  GameRoomCardProps["status"],
-  { label: string; className: string; }
-> = {
+const statusConfig: Record<GameRoomCardProps["status"], { label: string; className: string }> = {
   waiting: {
     label: "Waiting",
     className: "bg-green-500/10 text-green-400 border-green-500/20",
@@ -71,12 +63,8 @@ export function GameRoomCard({
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="flex items-center gap-2 flex-wrap">
-          {players.map(player => (
-            <div
-              key={player.name}
-              className="flex items-center gap-1.5"
-              title={player.name}
-            >
+          {players.map((player) => (
+            <div key={player.name} className="flex items-center gap-1.5" title={player.name}>
               <div
                 className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold text-white shrink-0"
                 style={{ backgroundColor: player.color }}
@@ -100,9 +88,7 @@ export function GameRoomCard({
             size="sm"
             variant={isJoinDisabled ? "outline" : "default"}
             disabled={isJoinDisabled}
-            className={cn(
-              isJoinDisabled && "opacity-50 cursor-not-allowed",
-            )}
+            className={cn(isJoinDisabled && "opacity-50 cursor-not-allowed")}
           >
             {status === "finished" ? "View" : status === "in-progress" ? "Spectate" : "Join"}
           </Button>

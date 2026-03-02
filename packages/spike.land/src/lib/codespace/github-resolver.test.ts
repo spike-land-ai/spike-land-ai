@@ -15,9 +15,7 @@ describe("parseGithubUrl", () => {
   });
 
   it("parses github url with branch and path", () => {
-    const parsed = parseGithubUrl(
-      "https://github.com/vitejs/vite/tree/main/playground/react",
-    );
+    const parsed = parseGithubUrl("https://github.com/vitejs/vite/tree/main/playground/react");
     expect(parsed).toEqual({
       owner: "vitejs",
       repo: "vite",
@@ -28,9 +26,7 @@ describe("parseGithubUrl", () => {
   });
 
   it("parses github url with a specific commit", () => {
-    const parsed = parseGithubUrl(
-      "https://github.com/vitejs/vite/tree/abcd123/playground/react",
-    );
+    const parsed = parseGithubUrl("https://github.com/vitejs/vite/tree/abcd123/playground/react");
     expect(parsed).toEqual({
       owner: "vitejs",
       repo: "vite",
@@ -49,18 +45,13 @@ describe("parseGithubUrl", () => {
   });
 
   it("uses custom defaultRef", () => {
-    const parsed = parseGithubUrl(
-      "https://github.com/user/repo",
-      "develop",
-    );
+    const parsed = parseGithubUrl("https://github.com/user/repo", "develop");
     expect(parsed!.ref).toBe("develop");
     expect(parsed!.rawBaseUrl).toContain("develop");
   });
 
   it("parses URL without trailing path", () => {
-    const parsed = parseGithubUrl(
-      "https://github.com/user/repo/tree/v2.0",
-    );
+    const parsed = parseGithubUrl("https://github.com/user/repo/tree/v2.0");
     expect(parsed!.ref).toBe("v2.0");
     expect(parsed!.basePath).toBe("");
   });
@@ -68,16 +59,19 @@ describe("parseGithubUrl", () => {
 
 describe("githubResolverPlugin", () => {
   function setupPlugin(repoUrl: string, branchOrCommit?: string) {
-    const plugin = githubResolverPlugin({ repoUrl, ...(branchOrCommit !== undefined ? { branchOrCommit } : {}) });
+    const plugin = githubResolverPlugin({
+      repoUrl,
+      ...(branchOrCommit !== undefined ? { branchOrCommit } : {}),
+    });
     const resolveCbs: Array<(args: OnResolveArgs) => unknown> = [];
     const loadCbs: Array<(args: OnLoadArgs) => unknown> = [];
 
     const build = {
-      onResolve: vi.fn().mockImplementation(
-        (_opts: unknown, cb: (args: OnResolveArgs) => unknown) => {
+      onResolve: vi
+        .fn()
+        .mockImplementation((_opts: unknown, cb: (args: OnResolveArgs) => unknown) => {
           resolveCbs.push(cb);
-        },
-      ),
+        }),
       onLoad: vi.fn().mockImplementation((_opts: unknown, cb: (args: OnLoadArgs) => unknown) => {
         loadCbs.push(cb);
       }),
@@ -146,7 +140,7 @@ describe("githubResolverPlugin", () => {
     });
 
     expect(resolved).toBeDefined();
-    expect((resolved as { namespace: string; }).namespace).toBe("github-url");
+    expect((resolved as { namespace: string }).namespace).toBe("github-url");
   });
 
   it("resolves https:// URLs in github-url namespace", async () => {
@@ -204,18 +198,15 @@ describe("githubResolverPlugin", () => {
     } as OnLoadArgs);
 
     expect(result).toBeDefined();
-    expect((result as { contents: string; }).contents).toBe("export const x = 1;");
-    expect((result as { loader: string; }).loader).toBe("ts");
+    expect((result as { contents: string }).contents).toBe("export const x = 1;");
+    expect((result as { loader: string }).loader).toBe("ts");
 
     vi.restoreAllMocks();
   });
 
   it("returns cached content on subsequent load", async () => {
     const cache = new Map<string, string | Uint8Array>();
-    cache.set(
-      "https://raw.githubusercontent.com/foo/bar/main/cached.ts",
-      "cached content",
-    );
+    cache.set("https://raw.githubusercontent.com/foo/bar/main/cached.ts", "cached content");
     const plugin = githubResolverPlugin({
       repoUrl: "https://github.com/foo/bar",
       cache,
@@ -240,13 +231,14 @@ describe("githubResolverPlugin", () => {
     } as OnLoadArgs);
 
     expect(result).toBeDefined();
-    expect((result as { contents: string; }).contents).toBe("cached content");
+    expect((result as { contents: string }).contents).toBe("cached content");
   });
 
   it("tries extensions when initial fetch fails", async () => {
     const { loadCbs } = setupPlugin("https://github.com/foo/bar");
 
-    const fetchSpy = vi.spyOn(globalThis, "fetch")
+    const fetchSpy = vi
+      .spyOn(globalThis, "fetch")
       .mockResolvedValueOnce({ ok: false } as Response) // no ext
       .mockResolvedValueOnce({
         ok: true,
@@ -263,7 +255,7 @@ describe("githubResolverPlugin", () => {
     } as OnLoadArgs);
 
     expect(result).toBeDefined();
-    expect((result as { contents: string; }).contents).toBe("found with .ts ext");
+    expect((result as { contents: string }).contents).toBe("found with .ts ext");
     expect(fetchSpy).toHaveBeenCalledTimes(2);
 
     vi.restoreAllMocks();
@@ -272,8 +264,8 @@ describe("githubResolverPlugin", () => {
   it("throws when no extension resolves", async () => {
     const { loadCbs } = setupPlugin("https://github.com/foo/bar");
 
-    vi.spyOn(globalThis, "fetch").mockImplementation(
-      () => Promise.resolve({ ok: false } as Response),
+    vi.spyOn(globalThis, "fetch").mockImplementation(() =>
+      Promise.resolve({ ok: false } as Response),
     );
 
     await expect(
@@ -307,7 +299,7 @@ describe("githubResolverPlugin", () => {
     } as OnLoadArgs);
 
     expect(result).toBeDefined();
-    expect((result as { loader: string; }).loader).toBe("binary");
+    expect((result as { loader: string }).loader).toBe("binary");
 
     vi.restoreAllMocks();
   });
@@ -329,7 +321,7 @@ describe("githubResolverPlugin", () => {
     } as OnLoadArgs);
 
     expect(result).toBeDefined();
-    expect((result as { loader: string; }).loader).toBe("css");
+    expect((result as { loader: string }).loader).toBe("css");
 
     vi.restoreAllMocks();
   });
@@ -339,7 +331,7 @@ describe("githubResolverPlugin", () => {
 
     vi.spyOn(globalThis, "fetch").mockResolvedValueOnce({
       ok: true,
-      text: () => Promise.resolve("{\"key\":\"value\"}"),
+      text: () => Promise.resolve('{"key":"value"}'),
     } as unknown as Response);
 
     const result = await loadCbs[0]!({
@@ -351,7 +343,7 @@ describe("githubResolverPlugin", () => {
     } as OnLoadArgs);
 
     expect(result).toBeDefined();
-    expect((result as { loader: string; }).loader).toBe("json");
+    expect((result as { loader: string }).loader).toBe("json");
 
     vi.restoreAllMocks();
   });

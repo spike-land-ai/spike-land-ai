@@ -44,9 +44,7 @@ describe("MCP_ERROR_MESSAGES", () => {
   });
 
   it("should have policy message for content violations", () => {
-    expect(MCP_ERROR_MESSAGES[McpErrorCode.CONTENT_POLICY]).toContain(
-      "policies",
-    );
+    expect(MCP_ERROR_MESSAGES[McpErrorCode.CONTENT_POLICY]).toContain("policies");
   });
 });
 
@@ -109,11 +107,7 @@ describe("McpError", () => {
       expect(error.retryable).toBe(false);
 
       // Override a normally non-retryable error to be retryable
-      const error2 = new McpError(
-        "Special case",
-        McpErrorCode.AUTH_ERROR,
-        true,
-      );
+      const error2 = new McpError("Special case", McpErrorCode.AUTH_ERROR, true);
       expect(error2.retryable).toBe(true);
     });
 
@@ -138,42 +132,30 @@ describe("McpError", () => {
   describe("getUserMessage", () => {
     it("should return user-friendly message for error code", () => {
       const error = new McpError("Technical details", McpErrorCode.TIMEOUT);
-      expect(error.getUserMessage()).toBe(
-        MCP_ERROR_MESSAGES[McpErrorCode.TIMEOUT],
-      );
+      expect(error.getUserMessage()).toBe(MCP_ERROR_MESSAGES[McpErrorCode.TIMEOUT]);
     });
 
     it("should return correct message for RATE_LIMITED", () => {
       const error = new McpError("Too many", McpErrorCode.RATE_LIMITED);
-      expect(error.getUserMessage()).toBe(
-        MCP_ERROR_MESSAGES[McpErrorCode.RATE_LIMITED],
-      );
+      expect(error.getUserMessage()).toBe(MCP_ERROR_MESSAGES[McpErrorCode.RATE_LIMITED]);
     });
 
     it("should return correct message for AUTH_ERROR", () => {
       const error = new McpError("Auth failed", McpErrorCode.AUTH_ERROR);
-      expect(error.getUserMessage()).toBe(
-        MCP_ERROR_MESSAGES[McpErrorCode.AUTH_ERROR],
-      );
+      expect(error.getUserMessage()).toBe(MCP_ERROR_MESSAGES[McpErrorCode.AUTH_ERROR]);
     });
 
     it("should return different messages for different codes", () => {
       const timeoutError = new McpError("msg", McpErrorCode.TIMEOUT);
       const authError = new McpError("msg", McpErrorCode.AUTH_ERROR);
 
-      expect(timeoutError.getUserMessage()).not.toBe(
-        authError.getUserMessage(),
-      );
+      expect(timeoutError.getUserMessage()).not.toBe(authError.getUserMessage());
     });
   });
 
   describe("toJSON", () => {
     it("should serialize to a plain object", () => {
-      const error = new McpError(
-        "Test message",
-        McpErrorCode.RATE_LIMITED,
-        true,
-      );
+      const error = new McpError("Test message", McpErrorCode.RATE_LIMITED, true);
 
       const json = error.toJSON();
 
@@ -217,8 +199,7 @@ describe("McpError", () => {
     it("should still work if Error.captureStackTrace is not available", () => {
       const originalCapture = Error.captureStackTrace;
       // Temporarily remove captureStackTrace
-      delete (Error as { captureStackTrace?: typeof Error.captureStackTrace; })
-        .captureStackTrace;
+      delete (Error as { captureStackTrace?: typeof Error.captureStackTrace }).captureStackTrace;
       try {
         const error = new McpError("No capture", McpErrorCode.UNKNOWN);
         expect(error.message).toBe("No capture");

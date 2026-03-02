@@ -41,7 +41,7 @@ const mockGetEC2Config = vi.hoisted(() =>
     keyName: "my-key",
     securityGroupId: "sg-abc",
     subnetId: "subnet-xyz",
-  }))
+  })),
 );
 
 const mockGetInstanceStatus = vi.hoisted(() => vi.fn());
@@ -140,7 +140,8 @@ describe("provisionEC2Box", () => {
     Object.assign(process.env, CF_ENV);
 
     // Default: fetch resolves successfully for both CF calls
-    const fetchMock = vi.fn()
+    const fetchMock = vi
+      .fn()
       .mockResolvedValueOnce(makeCFCreateResponse())
       .mockResolvedValueOnce(makeCFConfigResponse());
     vi.stubGlobal("fetch", fetchMock);
@@ -282,7 +283,8 @@ describe("provisionEC2Box", () => {
       const configError = new Error("PUT timeout");
       vi.stubGlobal(
         "fetch",
-        vi.fn()
+        vi
+          .fn()
           .mockResolvedValueOnce(makeCFCreateResponse()) // create OK
           .mockRejectedValueOnce(configError), // config throws
       );
@@ -320,9 +322,7 @@ describe("provisionEC2Box", () => {
       const box = makeBox();
       await provisionEC2Box(box);
 
-      expect(mockLogger.error).toHaveBeenCalledWith(
-        expect.stringContaining("EC2 config error"),
-      );
+      expect(mockLogger.error).toHaveBeenCalledWith(expect.stringContaining("EC2 config error"));
       expect(mockPrismaBox.update).toHaveBeenCalledWith(
         expect.objectContaining({ data: { status: "ERROR" } }),
       );
@@ -392,9 +392,7 @@ describe("provisionEC2Box", () => {
       const dbError = new Error("DB write error");
 
       // First update (save instanceId) rejects; subsequent updates resolve
-      mockPrismaBox.update
-        .mockRejectedValueOnce(dbError)
-        .mockResolvedValue({});
+      mockPrismaBox.update.mockRejectedValueOnce(dbError).mockResolvedValue({});
 
       // Instance goes straight to running on first poll
       mockGetInstanceStatus.mockResolvedValue({
@@ -545,10 +543,7 @@ describe("provisionEC2Box", () => {
       expect(mockEC2Send).toHaveBeenCalledTimes(1);
 
       // generateUserData was called with the VNC secret and tunnel token
-      expect(mockGenerateUserData).toHaveBeenCalledWith(
-        "vnc-secret-value",
-        "tunnel-token-abc",
-      );
+      expect(mockGenerateUserData).toHaveBeenCalledWith("vnc-secret-value", "tunnel-token-abc");
 
       // First prisma.box.update: save instanceId + STARTING
       expect(mockPrismaBox.update).toHaveBeenNthCalledWith(
@@ -575,9 +570,7 @@ describe("provisionEC2Box", () => {
         }),
       );
 
-      expect(mockLogger.info).toHaveBeenCalledWith(
-        expect.stringContaining("is now RUNNING"),
-      );
+      expect(mockLogger.info).toHaveBeenCalledWith(expect.stringContaining("is now RUNNING"));
     });
   });
 
@@ -595,9 +588,7 @@ describe("provisionEC2Box", () => {
       });
 
       // First update (save instanceId): resolve; second update (RUNNING): reject
-      mockPrismaBox.update
-        .mockResolvedValueOnce({})
-        .mockRejectedValueOnce(updateError);
+      mockPrismaBox.update.mockResolvedValueOnce({}).mockRejectedValueOnce(updateError);
 
       const box = makeBox();
       const promise = provisionEC2Box(box);
@@ -675,9 +666,7 @@ describe("provisionEC2Box", () => {
       await vi.runAllTimersAsync();
       await promise;
 
-      expect(getRandomValuesSpy).toHaveBeenCalledWith(
-        expect.any(Uint8Array),
-      );
+      expect(getRandomValuesSpy).toHaveBeenCalledWith(expect.any(Uint8Array));
       const callArg = getRandomValuesSpy.mock.calls[0]?.[0] as Uint8Array | undefined;
       expect(callArg).toBeDefined();
       expect(callArg!).toHaveLength(32);
@@ -702,13 +691,14 @@ describe("provisionEC2Box", () => {
 
       const sendArg = mockEC2Send.mock.calls[0]?.[0] as
         | {
-          input: { TagSpecifications: Array<{ Tags: Array<{ Key: string; Value: string; }>; }>; };
-        }
+            input: { TagSpecifications: Array<{ Tags: Array<{ Key: string; Value: string }> }> };
+          }
         | undefined;
       expect(sendArg).toBeDefined();
-      const tags = sendArg!.input.TagSpecifications[0]!.Tags as Array<
-        { Key: string; Value: string; }
-      >;
+      const tags = sendArg!.input.TagSpecifications[0]!.Tags as Array<{
+        Key: string;
+        Value: string;
+      }>;
 
       expect(tags).toEqual(
         expect.arrayContaining([

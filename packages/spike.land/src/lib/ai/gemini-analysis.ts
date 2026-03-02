@@ -10,8 +10,7 @@ import { buildDynamicEnhancementPrompt } from "./gemini-prompts";
 import type { AnalysisConfig } from "./pipeline-types";
 
 // Analysis prompt schema for structured JSON output from vision model
-const ANALYSIS_PROMPT_SCHEMA =
-  `Analyze this image and provide a JSON object describing its content, technical flaws, and potential cropping needs.
+const ANALYSIS_PROMPT_SCHEMA = `Analyze this image and provide a JSON object describing its content, technical flaws, and potential cropping needs.
 The JSON MUST strictly adhere to this structure, with no additional text before or after:
 {
     "mainSubject": "brief description of image content",
@@ -142,16 +141,8 @@ export function getDefaultAnalysis(): AnalysisDetailedResult {
  * Validates the imageStyle field from analysis response.
  * @internal
  */
-function validateImageStyle(
-  style: unknown,
-): AnalysisDetailedResult["imageStyle"] {
-  const validStyles = [
-    "photograph",
-    "sketch",
-    "painting",
-    "screenshot",
-    "other",
-  ];
+function validateImageStyle(style: unknown): AnalysisDetailedResult["imageStyle"] {
+  const validStyles = ["photograph", "sketch", "painting", "screenshot", "other"];
   if (typeof style === "string" && validStyles.includes(style)) {
     return style as AnalysisDetailedResult["imageStyle"];
   }
@@ -162,9 +153,7 @@ function validateImageStyle(
  * Validates the colorCastType field from analysis response.
  * @internal
  */
-function validateColorCastType(
-  type: unknown,
-): AnalysisDetailedResult["defects"]["colorCastType"] {
+function validateColorCastType(type: unknown): AnalysisDetailedResult["defects"]["colorCastType"] {
   const validTypes = ["yellow", "blue", "green", "red", "magenta", "cyan"];
   if (typeof type === "string" && validTypes.includes(type)) {
     return type as AnalysisDetailedResult["defects"]["colorCastType"];
@@ -211,17 +200,15 @@ function parseAnalysisResponse(text: string): AnalysisDetailedResult {
       isCroppingNeeded: Boolean(parsed.cropping?.isCroppingNeeded),
       ...(parsed.cropping?.suggestedCrop
         ? {
-          suggestedCrop: {
-            x: Number(parsed.cropping.suggestedCrop.x) || 0,
-            y: Number(parsed.cropping.suggestedCrop.y) || 0,
-            width: Number(parsed.cropping.suggestedCrop.width) || 1,
-            height: Number(parsed.cropping.suggestedCrop.height) || 1,
-          },
-        }
+            suggestedCrop: {
+              x: Number(parsed.cropping.suggestedCrop.x) || 0,
+              y: Number(parsed.cropping.suggestedCrop.y) || 0,
+              width: Number(parsed.cropping.suggestedCrop.width) || 1,
+              height: Number(parsed.cropping.suggestedCrop.height) || 1,
+            },
+          }
         : {}),
-      ...(parsed.cropping?.cropReason
-        ? { cropReason: String(parsed.cropping.cropReason) }
-        : {}),
+      ...(parsed.cropping?.cropReason ? { cropReason: String(parsed.cropping.cropReason) } : {}),
     },
   };
 }
@@ -246,18 +233,20 @@ async function performVisionAnalysis(
       responseMimeType: "application/json",
       temperature,
     },
-    contents: [{
-      role: "user" as const,
-      parts: [
-        { text: ANALYSIS_PROMPT_SCHEMA },
-        {
-          inlineData: {
-            mimeType,
-            data: imageData,
+    contents: [
+      {
+        role: "user" as const,
+        parts: [
+          { text: ANALYSIS_PROMPT_SCHEMA },
+          {
+            inlineData: {
+              mimeType,
+              data: imageData,
+            },
           },
-        },
-      ],
-    }],
+        ],
+      },
+    ],
   });
 
   // Extract text response
@@ -293,13 +282,10 @@ export async function analyzeImageV2(
     };
   }
 
-  logger.info(
-    `Analyzing image with vision model`,
-    {
-      mimeType,
-      dataLength: imageData.length,
-    },
-  );
+  logger.info(`Analyzing image with vision model`, {
+    mimeType,
+    dataLength: imageData.length,
+  });
 
   const ai = await getGeminiClient();
   let structuredAnalysis: AnalysisDetailedResult;
@@ -314,9 +300,7 @@ export async function analyzeImageV2(
   );
   const timeoutPromise = new Promise<never>((_, reject) => {
     setTimeout(() => {
-      reject(
-        new Error(`Analysis timed out after ${ANALYSIS_TIMEOUT_MS / 1000}s`),
-      );
+      reject(new Error(`Analysis timed out after ${ANALYSIS_TIMEOUT_MS / 1000}s`));
     }, ANALYSIS_TIMEOUT_MS);
   });
 
@@ -325,33 +309,21 @@ export async function analyzeImageV2(
   );
 
   if (analysisError) {
-    logger.warn(
-      "Vision analysis failed, using fallback:",
-      {
-        error: analysisError instanceof Error
-          ? analysisError.message
-          : String(analysisError),
-      },
-    );
+    logger.warn("Vision analysis failed, using fallback:", {
+      error: analysisError instanceof Error ? analysisError.message : String(analysisError),
+    });
     structuredAnalysis = getDefaultAnalysis();
   } else {
     structuredAnalysis = analysisResult;
-    logger.info(
-      "Vision analysis successful:",
-      {
-        defects: structuredAnalysis.defects,
-      },
-    );
+    logger.info("Vision analysis successful:", {
+      defects: structuredAnalysis.defects,
+    });
   }
 
   // Determine quality based on defect count
-  const defectCount = Object.values(structuredAnalysis.defects)
-    .filter(v => v === true).length;
-  const quality: "low" | "medium" | "high" = defectCount >= 3
-    ? "low"
-    : defectCount >= 1
-    ? "medium"
-    : "high";
+  const defectCount = Object.values(structuredAnalysis.defects).filter((v) => v === true).length;
+  const quality: "low" | "medium" | "high" =
+    defectCount >= 3 ? "low" : defectCount >= 1 ? "medium" : "high";
 
   return {
     description: structuredAnalysis.mainSubject,
@@ -396,9 +368,7 @@ export async function analyzeImage(
   suggestedImprovements.push("color optimization", "detail enhancement");
 
   // Build enhancement prompt using dynamic prompt builder
-  const enhancementPrompt = buildDynamicEnhancementPrompt(
-    v2Result.structuredAnalysis,
-  );
+  const enhancementPrompt = buildDynamicEnhancementPrompt(v2Result.structuredAnalysis);
 
   return {
     description: v2Result.description,
@@ -423,9 +393,7 @@ export async function analyzeImageWithGemini(
   const ai = await getGeminiClient();
 
   const images = Array.isArray(imageData) ? imageData : [imageData];
-  const parts: Array<
-    { text?: string; inlineData?: { mimeType: string; data: string; }; }
-  > = [];
+  const parts: Array<{ text?: string; inlineData?: { mimeType: string; data: string } }> = [];
 
   for (const img of images) {
     parts.push({

@@ -1,11 +1,6 @@
 "use client";
 
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { AlertTriangle, FileText, Info, Lightbulb, X } from "lucide-react";
 import { ComplexityBadge } from "./ComplexityBadge";
@@ -37,7 +32,7 @@ function scoreRingColor(score: number): string {
 }
 
 interface StatRowProps {
-  icon: React.ComponentType<{ className?: string; }>;
+  icon: React.ComponentType<{ className?: string }>;
   label: string;
   value: number;
   colorClass: string;
@@ -50,9 +45,7 @@ function StatRow({ icon: Icon, label, value, colorClass }: StatRowProps) {
         <Icon className={cn("h-3.5 w-3.5", colorClass)} />
         <span className="text-sm text-zinc-400">{label}</span>
       </div>
-      <span className={cn("text-sm font-mono font-semibold", colorClass)}>
-        {value}
-      </span>
+      <span className={cn("text-sm font-mono font-semibold", colorClass)}>{value}</span>
     </div>
   );
 }
@@ -106,9 +99,7 @@ export function ReviewSummaryCard({
               />
             </svg>
             <div className="absolute inset-0 flex flex-col items-center justify-center">
-              <span className={cn("text-2xl font-bold font-mono", scoreColor(score))}>
-                {score}
-              </span>
+              <span className={cn("text-2xl font-bold font-mono", scoreColor(score))}>{score}</span>
               <span className="text-xs text-zinc-500">/ 100</span>
             </div>
           </div>
@@ -125,12 +116,7 @@ export function ReviewSummaryCard({
 
         {/* Issue breakdown */}
         <div className="border-t border-zinc-800 pt-4 space-y-0.5">
-          <StatRow
-            icon={X}
-            label="Errors"
-            value={errors}
-            colorClass="text-red-400"
-          />
+          <StatRow icon={X} label="Errors" value={errors} colorClass="text-red-400" />
           <StatRow
             icon={AlertTriangle}
             label="Warnings"

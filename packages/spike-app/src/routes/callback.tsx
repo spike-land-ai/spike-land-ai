@@ -14,8 +14,7 @@ export function CallbackPage() {
 
   // Already authenticated — redirect to origin or home
   if (auth.isAuthenticated) {
-    const returnUrl =
-      (auth.user?.state as { returnUrl?: string })?.returnUrl ?? "/";
+    const returnUrl = (auth.user?.state as { returnUrl?: string })?.returnUrl ?? "/";
     return <Navigate to={returnUrl} />;
   }
 
@@ -39,9 +38,7 @@ export function CallbackPage() {
               />
             </svg>
           </div>
-          <h1 className="text-xl font-bold text-red-600">
-            Authentication Error
-          </h1>
+          <h1 className="text-xl font-bold text-red-600">Authentication Error</h1>
           <p className="text-sm text-gray-500">{errorMsg}</p>
           <button
             onClick={() => {

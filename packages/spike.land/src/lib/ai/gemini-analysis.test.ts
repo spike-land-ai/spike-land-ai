@@ -17,7 +17,7 @@ vi.mock("./gemini-prompts", () => ({
 }));
 
 vi.mock("@/lib/try-catch", () => ({
-  tryCatch: vi.fn(async p => {
+  tryCatch: vi.fn(async (p) => {
     try {
       const data = await p;
       return { data, error: null };
@@ -34,7 +34,9 @@ describe("gemini-analysis", () => {
   beforeEach(() => {
     vi.useFakeTimers();
     vi.clearAllMocks();
-    vi.mocked(getGeminiClient).mockResolvedValue(mockAi as any);
+    vi.mocked(getGeminiClient).mockResolvedValue(
+      mockAi as unknown as Awaited<ReturnType<typeof getGeminiClient>>,
+    );
   });
 
   afterEach(() => {
@@ -80,9 +82,11 @@ describe("gemini-analysis", () => {
       };
 
       mockGenerateContent.mockResolvedValue({
-        candidates: [{
-          content: { parts: [{ text: JSON.stringify(mockJson) }] },
-        }],
+        candidates: [
+          {
+            content: { parts: [{ text: JSON.stringify(mockJson) }] },
+          },
+        ],
       });
 
       // We don't advance timers here, just await the promise since generateContent resolves immediately
@@ -103,13 +107,17 @@ describe("gemini-analysis", () => {
       };
 
       mockGenerateContent.mockResolvedValue({
-        candidates: [{
-          content: {
-            parts: [{
-              text: `\`\`\`json\n${JSON.stringify(mockJson)}\n\`\`\``,
-            }],
+        candidates: [
+          {
+            content: {
+              parts: [
+                {
+                  text: `\`\`\`json\n${JSON.stringify(mockJson)}\n\`\`\``,
+                },
+              ],
+            },
           },
-        }],
+        ],
       });
 
       const result = await analyzeImageV2("img", "image/jpeg");
@@ -123,9 +131,11 @@ describe("gemini-analysis", () => {
         defects: { colorCastType: "invalid_color" },
       };
       mockGenerateContent.mockResolvedValue({
-        candidates: [{
-          content: { parts: [{ text: JSON.stringify(mockJson) }] },
-        }],
+        candidates: [
+          {
+            content: { parts: [{ text: JSON.stringify(mockJson) }] },
+          },
+        ],
       });
 
       const result = await analyzeImageV2("img", "image/jpeg");
@@ -160,21 +170,21 @@ describe("gemini-analysis", () => {
     });
 
     it("calculates quality correctly based on defect count", async () => {
-      const createWithDefects = async (
-        isDark: boolean,
-        isBlurry: boolean,
-        hasNoise: boolean,
-      ) => {
+      const createWithDefects = async (isDark: boolean, isBlurry: boolean, hasNoise: boolean) => {
         mockGenerateContent.mockResolvedValueOnce({
-          candidates: [{
-            content: {
-              parts: [{
-                text: JSON.stringify({
-                  defects: { isDark, isBlurry, hasNoise },
-                }),
-              }],
+          candidates: [
+            {
+              content: {
+                parts: [
+                  {
+                    text: JSON.stringify({
+                      defects: { isDark, isBlurry, hasNoise },
+                    }),
+                  },
+                ],
+              },
             },
-          }],
+          ],
         });
         return await analyzeImageV2("img", "image/jpeg");
       };
@@ -211,11 +221,13 @@ describe("gemini-analysis", () => {
 
       // We'll mock generateContent so analyzeImageV2 returns this
       mockGenerateContent.mockResolvedValue({
-        candidates: [{
-          content: {
-            parts: [{ text: JSON.stringify(mockAnalysis.structuredAnalysis) }],
+        candidates: [
+          {
+            content: {
+              parts: [{ text: JSON.stringify(mockAnalysis.structuredAnalysis) }],
+            },
           },
-        }],
+        ],
       });
 
       const result = await analyzeImage("img", "image/jpeg");
@@ -246,24 +258,25 @@ describe("gemini-analysis", () => {
 
       const result = await analyzeImageWithGemini("img-data", "test prompt");
       expect(result).toBe("analysis result");
-      expect(mockGenerateContent).toHaveBeenCalledWith(expect.objectContaining({
-        contents: [{
-          role: "user",
-          parts: [
-            { inlineData: { mimeType: "image/jpeg", data: "img-data" } },
-            { text: "test prompt" },
+      expect(mockGenerateContent).toHaveBeenCalledWith(
+        expect.objectContaining({
+          contents: [
+            {
+              role: "user",
+              parts: [
+                { inlineData: { mimeType: "image/jpeg", data: "img-data" } },
+                { text: "test prompt" },
+              ],
+            },
           ],
-        }],
-      }));
+        }),
+      );
     });
 
     it("sends multiple images properly", async () => {
       mockGenerateContent.mockResolvedValue({ text: "multi analysis" });
 
-      const result = await analyzeImageWithGemini(
-        ["img1", "img2"],
-        "test prompt",
-      );
+      const result = await analyzeImageWithGemini(["img1", "img2"], "test prompt");
       expect(result).toBe("multi analysis");
       const callArg = mockGenerateContent.mock.calls[0]![0];
       const parts = callArg.contents![0].parts;

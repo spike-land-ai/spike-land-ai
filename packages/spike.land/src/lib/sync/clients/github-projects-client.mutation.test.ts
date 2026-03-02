@@ -7,18 +7,8 @@
  * - updateItemField()
  */
 
-import {
-  afterEach,
-  beforeEach,
-  describe,
-  expect,
-  it,
-  type MockedFunction,
-  vi,
-} from "vitest";
-import {
-  GitHubProjectsClient,
-} from "./github-projects-client";
+import { afterEach, beforeEach, describe, expect, it, type MockedFunction, vi } from "vitest";
+import { GitHubProjectsClient } from "./github-projects-client";
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -46,15 +36,13 @@ function mockFetchResponse(
 }
 
 /** Convenience: build a happy-path GraphQL response envelope */
-function gqlOk<T>(data: T): { data: T; errors?: never; } {
+function gqlOk<T>(data: T): { data: T; errors?: never } {
   return { data };
 }
 
 /** Convenience: build a GraphQL error envelope */
-function gqlErrors(
-  ...messages: string[]
-): { data?: never; errors: Array<{ message: string; }>; } {
-  return { errors: messages.map(message => ({ message })) };
+function gqlErrors(...messages: string[]): { data?: never; errors: Array<{ message: string }> } {
+  return { errors: messages.map((message) => ({ message })) };
 }
 
 // ---------------------------------------------------------------------------
@@ -164,23 +152,21 @@ describe("GitHubProjectsClient – createIssue", () => {
     // Verify labelIds were passed to the createIssue mutation
     const createMutationCall = fetchMock.mock.calls[2]!;
     const body = JSON.parse(createMutationCall[1]!.body as string) as {
-      variables: { labelIds?: string[]; };
+      variables: { labelIds?: string[] };
     };
     expect(body.variables.labelIds).toEqual(["lbl_bug", "lbl_p1"]);
   });
 
   it("creates an issue even when labels array is empty", async () => {
-    fetchMock
-      .mockResolvedValueOnce(mockFetchResponse(repoIdResponse))
-      .mockResolvedValueOnce(
-        mockFetchResponse(
-          gqlOk({
-            createIssue: {
-              issue: { number: 11, id: "issue_11", url: "url_11" },
-            },
-          }),
-        ),
-      );
+    fetchMock.mockResolvedValueOnce(mockFetchResponse(repoIdResponse)).mockResolvedValueOnce(
+      mockFetchResponse(
+        gqlOk({
+          createIssue: {
+            issue: { number: 11, id: "issue_11", url: "url_11" },
+          },
+        }),
+      ),
+    );
 
     const result = await client.createIssue({
       title: "No labels",
@@ -192,9 +178,7 @@ describe("GitHubProjectsClient – createIssue", () => {
   });
 
   it("returns error when getRepositoryId fails", async () => {
-    fetchMock.mockResolvedValueOnce(
-      mockFetchResponse(gqlErrors("Repository not found")),
-    );
+    fetchMock.mockResolvedValueOnce(mockFetchResponse(gqlErrors("Repository not found")));
 
     const result = await client.createIssue({ title: "T", body: "B" });
     expect(result.data).toBeNull();
@@ -241,9 +225,9 @@ describe("GitHubProjectsClient – createIssue", () => {
       labels: ["bug", "nonexistent"],
     });
     expect(result.error).toBeNull();
-    const body = JSON.parse(
-      fetchMock.mock.calls[2]![1]!.body as string,
-    ) as { variables: { labelIds?: string[]; }; };
+    const body = JSON.parse(fetchMock.mock.calls[2]![1]!.body as string) as {
+      variables: { labelIds?: string[] };
+    };
     expect(body.variables.labelIds).toEqual(["lbl_bug"]);
   });
 });
@@ -288,17 +272,15 @@ describe("GitHubProjectsClient – addItemToProject", () => {
     });
     await c.addItemToProject("ISSUE_ID");
 
-    const body = JSON.parse(
-      fetchMock.mock.calls[0]![1]!.body as string,
-    ) as { variables: { projectId: string; contentId: string; }; };
+    const body = JSON.parse(fetchMock.mock.calls[0]![1]!.body as string) as {
+      variables: { projectId: string; contentId: string };
+    };
     expect(body.variables.projectId).toBe("PROJ_SPECIFIC");
     expect(body.variables.contentId).toBe("ISSUE_ID");
   });
 
   it("returns error on GraphQL error", async () => {
-    fetchMock.mockResolvedValueOnce(
-      mockFetchResponse(gqlErrors("Content not found")),
-    );
+    fetchMock.mockResolvedValueOnce(mockFetchResponse(gqlErrors("Content not found")));
 
     const result = await client.addItemToProject("bad_id");
     expect(result.data).toBeNull();
@@ -384,14 +366,12 @@ describe("GitHubProjectsClient – updateItemField", () => {
 
     await client.updateItemField("ITEM_ID", "FIELD_ID", { text: "Hello" });
 
-    const body = JSON.parse(
-      fetchMock.mock.calls[0]![1]!.body as string,
-    ) as {
+    const body = JSON.parse(fetchMock.mock.calls[0]![1]!.body as string) as {
       variables: {
         projectId: string;
         itemId: string;
         fieldId: string;
-        value: { text: string; };
+        value: { text: string };
       };
     };
     expect(body.variables.projectId).toBe("proj_1");
@@ -401,9 +381,7 @@ describe("GitHubProjectsClient – updateItemField", () => {
   });
 
   it("returns false and error on GraphQL error", async () => {
-    fetchMock.mockResolvedValueOnce(
-      mockFetchResponse(gqlErrors("Field not found")),
-    );
+    fetchMock.mockResolvedValueOnce(mockFetchResponse(gqlErrors("Field not found")));
 
     const result = await client.updateItemField("i", "f", { text: "v" });
     expect(result.data).toBe(false);

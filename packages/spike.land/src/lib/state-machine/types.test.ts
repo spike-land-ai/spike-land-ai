@@ -25,13 +25,7 @@ import type {
 describe("state-machine types", () => {
   describe("literal union types", () => {
     it("should accept all valid StateType values", () => {
-      const values: StateType[] = [
-        "atomic",
-        "compound",
-        "parallel",
-        "final",
-        "history",
-      ];
+      const values: StateType[] = ["atomic", "compound", "parallel", "final", "history"];
       expect(values).toHaveLength(5);
       expect(values).toContain("atomic");
       expect(values).toContain("compound");

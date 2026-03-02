@@ -25,9 +25,7 @@ interface PropsTableProps {
   props: PropDef[];
 }
 
-export function PropsTable(
-  { componentName, importPath, props }: PropsTableProps,
-) {
+export function PropsTable({ componentName, importPath, props }: PropsTableProps) {
   return (
     <Card variant="default">
       <CardHeader>
@@ -52,7 +50,7 @@ export function PropsTable(
             </TableRow>
           </TableHeader>
           <TableBody>
-            {props.map(prop => (
+            {props.map((prop) => (
               <TableRow key={prop.name}>
                 <TableCell className="font-medium">
                   {prop.name}
@@ -62,15 +60,11 @@ export function PropsTable(
                     </span>
                   )}
                 </TableCell>
-                <TableCell className="text-primary font-mono text-xs">
-                  {prop.type}
-                </TableCell>
+                <TableCell className="text-primary font-mono text-xs">{prop.type}</TableCell>
                 <TableCell className="text-muted-foreground font-mono text-xs">
                   {prop.default ?? "-"}
                 </TableCell>
-                <TableCell className="text-sm text-muted-foreground">
-                  {prop.description}
-                </TableCell>
+                <TableCell className="text-sm text-muted-foreground">{prop.description}</TableCell>
               </TableRow>
             ))}
           </TableBody>

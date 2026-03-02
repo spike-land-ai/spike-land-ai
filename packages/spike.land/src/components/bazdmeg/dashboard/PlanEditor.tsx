@@ -69,9 +69,7 @@ export function PlanEditor({
     <div className="flex flex-col h-full">
       <div className="flex items-center justify-between px-3 py-2 border-b border-white/10">
         <div className="flex items-center gap-2">
-          <h3 className="text-xs font-medium text-zinc-400">
-            Implementation Plan
-          </h3>
+          <h3 className="text-xs font-medium text-zinc-400">Implementation Plan</h3>
           {hasUnsavedChanges && <span className="text-[10px] text-amber-500">Unsaved</span>}
           {isSaving && <Loader2 className="h-3 w-3 text-zinc-500 animate-spin" />}
         </div>
@@ -83,11 +81,13 @@ export function PlanEditor({
             disabled={isSaving || !hasUnsavedChanges}
             className="h-6 px-2 text-xs text-zinc-400 hover:text-white"
           >
-            {isSaving
-              ? <Loader2 className="h-3 w-3 animate-spin mr-1" />
-              : hasUnsavedChanges
-              ? <Save className="h-3 w-3 mr-1" />
-              : <Check className="h-3 w-3 mr-1" />}
+            {isSaving ? (
+              <Loader2 className="h-3 w-3 animate-spin mr-1" />
+            ) : hasUnsavedChanges ? (
+              <Save className="h-3 w-3 mr-1" />
+            ) : (
+              <Check className="h-3 w-3 mr-1" />
+            )}
             {isSaving ? "Saving" : hasUnsavedChanges ? "Save" : "Saved"}
           </Button>
         )}
@@ -104,7 +104,7 @@ export function PlanEditor({
       <div className="flex-1 p-3">
         <Textarea
           value={content}
-          onChange={e => handleChange(e.target.value)}
+          onChange={(e) => handleChange(e.target.value)}
           placeholder={`# Implementation Plan\n\n## Approach\n...\n\n## Files to Modify\n- ...\n\n## Edge Cases\n- ...\n\n## Testing Strategy\n- ...`}
           readOnly={isReadOnly}
           className="h-full min-h-[300px] resize-none bg-zinc-800/30 border-white/5 text-zinc-100 text-sm font-mono placeholder:text-zinc-700 focus:border-amber-500/30"

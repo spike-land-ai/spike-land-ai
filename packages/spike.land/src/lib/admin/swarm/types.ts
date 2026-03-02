@@ -30,12 +30,7 @@ export interface AgentTimeline {
 
 // Environment types
 export type EnvironmentName = "dev" | "preview" | "prod";
-export type EnvironmentStatus =
-  | "healthy"
-  | "degraded"
-  | "down"
-  | "deploying"
-  | "unknown";
+export type EnvironmentStatus = "healthy" | "degraded" | "down" | "deploying" | "unknown";
 
 export interface EnvironmentInfo {
   name: EnvironmentName;
@@ -68,11 +63,7 @@ export interface DashboardMetrics {
   totalCreditsUsed: number;
 }
 
-export type ServiceHealthStatus =
-  | "healthy"
-  | "degraded"
-  | "down"
-  | "unconfigured";
+export type ServiceHealthStatus = "healthy" | "degraded" | "down" | "unconfigured";
 
 export interface ServiceHealth {
   name: string;
@@ -137,12 +128,7 @@ export interface SSEEvent {
 }
 
 // Widget types
-export type WidgetId =
-  | "metrics"
-  | "environments"
-  | "agents"
-  | "alerts"
-  | "deployments";
+export type WidgetId = "metrics" | "environments" | "agents" | "alerts" | "deployments";
 
 export interface WidgetConfig {
   id: WidgetId;
@@ -176,7 +162,7 @@ export interface AnalyticsData {
     start: Date;
     end: Date;
   };
-  userGrowth: Array<{ date: string; count: number; }>;
-  mcpUsage: Array<{ tool: string; count: number; }>;
-  errorRate: Array<{ date: string; rate: number; }>;
+  userGrowth: Array<{ date: string; count: number }>;
+  mcpUsage: Array<{ tool: string; count: number }>;
+  errorRate: Array<{ date: string; rate: number }>;
 }

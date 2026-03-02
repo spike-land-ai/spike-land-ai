@@ -4,7 +4,7 @@ import userEvent from "@testing-library/user-event";
 import { ToolCallCard } from "@/components/chat/ToolCallCard";
 import type { AgentContentBlock } from "@/hooks/useAgentChat";
 
-type ToolCallBlock = Extract<AgentContentBlock, { type: "tool_call"; }>;
+type ToolCallBlock = Extract<AgentContentBlock, { type: "tool_call" }>;
 
 const baseBlock: ToolCallBlock = {
   type: "tool_call",

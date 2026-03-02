@@ -70,11 +70,11 @@ describe("model-registry", () => {
     it("should return models for a given provider", () => {
       const anthropicModels = getModelsForProvider("anthropic");
       expect(anthropicModels.length).toBeGreaterThan(0);
-      anthropicModels.forEach(m => expect(m.provider).toBe("anthropic"));
+      anthropicModels.forEach((m) => expect(m.provider).toBe("anthropic"));
 
       const googleModels = getModelsForProvider("google");
       expect(googleModels.length).toBeGreaterThan(0);
-      googleModels.forEach(m => expect(m.provider).toBe("google"));
+      googleModels.forEach((m) => expect(m.provider).toBe("google"));
     });
 
     it("should return empty array for unknown provider", () => {
@@ -87,15 +87,15 @@ describe("model-registry", () => {
     it("should return models with the specified capability", () => {
       const visionModels = getModelsByCapability("vision");
       expect(visionModels.length).toBeGreaterThan(0);
-      visionModels.forEach(m => expect(m.capabilities).toContain("vision"));
+      visionModels.forEach((m) => expect(m.capabilities).toContain("vision"));
 
       const chatModels = getModelsByCapability("chat");
       expect(chatModels.length).toBeGreaterThan(0);
-      chatModels.forEach(m => expect(m.capabilities).toContain("chat"));
+      chatModels.forEach((m) => expect(m.capabilities).toContain("chat"));
 
       const imageModels = getModelsByCapability("image-gen");
       expect(imageModels.length).toBeGreaterThan(0);
-      imageModels.forEach(m => expect(m.capabilities).toContain("image-gen"));
+      imageModels.forEach((m) => expect(m.capabilities).toContain("image-gen"));
     });
 
     it("should return empty array for unmapped capability", () => {

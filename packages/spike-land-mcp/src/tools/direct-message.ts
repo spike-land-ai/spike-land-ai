@@ -21,9 +21,11 @@ export function registerDirectMessageTools(
     freeTool(userId, db)
       .tool("dm_send", "Send a private message to a user (defaults to site owner Zoltan).", {
         content: z.string().min(1).describe("Body of the message."),
-        toEmail: z.string().email().optional().describe(
-          "Recipient email address. Defaults to site owner (zoltan@spike.land).",
-        ),
+        toEmail: z
+          .string()
+          .email()
+          .optional()
+          .describe("Recipient email address. Defaults to site owner (zoltan@spike.land)."),
       })
       .meta({ category: "direct-message", tier: "free" })
       .handler(async ({ input, ctx }) => {
@@ -54,10 +56,10 @@ export function registerDirectMessageTools(
         });
 
         return textResult(
-          `**Message Sent**\n\n`
-          + `**ID:** ${id}\n`
-          + `**To:** ${targetUser.name || targetUser.email}\n`
-          + `**Content:** ${content.substring(0, 100)}${content.length > 100 ? "..." : ""}`,
+          `**Message Sent**\n\n` +
+            `**ID:** ${id}\n` +
+            `**To:** ${targetUser.name || targetUser.email}\n` +
+            `**Content:** ${content.substring(0, 100)}${content.length > 100 ? "..." : ""}`,
         );
       }),
   );
@@ -65,12 +67,8 @@ export function registerDirectMessageTools(
   registry.registerBuilt(
     freeTool(userId, db)
       .tool("dm_list", "List direct messages for the current user.", {
-        unreadOnly: z.boolean().optional().describe(
-          "When true, only return unread messages.",
-        ),
-        limit: z.number().optional().describe(
-          "Maximum number of messages to return (default 20).",
-        ),
+        unreadOnly: z.boolean().optional().describe("When true, only return unread messages."),
+        limit: z.number().optional().describe("Maximum number of messages to return (default 20)."),
       })
       .meta({ category: "direct-message", tier: "free" })
       .handler(async ({ input, ctx }) => {
@@ -87,10 +85,7 @@ export function registerDirectMessageTools(
           .from(directMessages)
           .where(
             unreadOnly
-              ? and(
-                eq(directMessages.recipientId, ctx.userId),
-                isNull(directMessages.readAt),
-              )
+              ? and(eq(directMessages.recipientId, ctx.userId), isNull(directMessages.readAt))
               : eq(directMessages.recipientId, ctx.userId),
           )
           .orderBy(desc(directMessages.createdAt))
@@ -99,16 +94,12 @@ export function registerDirectMessageTools(
         const messages = await query;
 
         if (messages.length === 0) {
-          return textResult(
-            unreadOnly ? "No unread messages." : "No messages found.",
-          );
+          return textResult(unreadOnly ? "No unread messages." : "No messages found.");
         }
 
         let text = `**Direct Messages (${messages.length}):**\n\n`;
         for (const msg of messages) {
-          const preview = msg.content.length > 80
-            ? msg.content.slice(0, 80) + "..."
-            : msg.content;
+          const preview = msg.content.length > 80 ? msg.content.slice(0, 80) + "..." : msg.content;
           const readStatus = msg.readAt ? "Read" : "Unread";
           const date = new Date(msg.createdAt).toISOString().split("T")[0];
           text += `- [${readStatus}] (${date})\n`;
@@ -123,9 +114,7 @@ export function registerDirectMessageTools(
   registry.registerBuilt(
     freeTool(userId, db)
       .tool("dm_mark_read", "Mark a direct message as read.", {
-        messageId: z.string().min(1).describe(
-          "ID of the direct message to mark as read.",
-        ),
+        messageId: z.string().min(1).describe("ID of the direct message to mark as read."),
       })
       .meta({ category: "direct-message", tier: "free" })
       .handler(async ({ input, ctx }) => {
@@ -134,12 +123,7 @@ export function registerDirectMessageTools(
         await ctx.db
           .update(directMessages)
           .set({ readAt: Date.now() })
-          .where(
-            and(
-              eq(directMessages.id, messageId),
-              eq(directMessages.recipientId, ctx.userId),
-            ),
-          );
+          .where(and(eq(directMessages.id, messageId), eq(directMessages.recipientId, ctx.userId)));
 
         return textResult(`**Message marked as read.** (ID: ${messageId})`);
       }),

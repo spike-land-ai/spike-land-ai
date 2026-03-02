@@ -13,18 +13,18 @@ import { textResult } from "./tool-helpers";
 import type { DrizzleDB } from "../db/index";
 import { users, workspaceMembers, workspaces } from "../db/schema";
 
-export function registerAuthTools(
-  registry: ToolRegistry,
-  userId: string,
-  db: DrizzleDB,
-): void {
+export function registerAuthTools(registry: ToolRegistry, userId: string, db: DrizzleDB): void {
   const t = freeTool(userId, db);
 
   registry.registerBuilt(
     t
-      .tool("auth_check_session", "Validate the current user's authentication session and return user info.", {
-        session_token: z.string().optional().describe("Optional session token to validate."),
-      })
+      .tool(
+        "auth_check_session",
+        "Validate the current user's authentication session and return user info.",
+        {
+          session_token: z.string().optional().describe("Optional session token to validate."),
+        },
+      )
       .meta({ category: "auth", tier: "free" })
       .handler(async ({ ctx }) => {
         const result = await ctx.db
@@ -46,20 +46,27 @@ export function registerAuthTools(
           );
         }
         return textResult(
-          `**Session Valid**\n\n`
-          + `**User:** ${user.name || "unnamed"}\n`
-          + `**Email:** ${user.email}\n`
-          + `**Role:** ${user.role}\n`
-          + `**Member since:** ${new Date(user.createdAt).toISOString()}`,
+          `**Session Valid**\n\n` +
+            `**User:** ${user.name || "unnamed"}\n` +
+            `**Email:** ${user.email}\n` +
+            `**Role:** ${user.role}\n` +
+            `**Member since:** ${new Date(user.createdAt).toISOString()}`,
         );
       }),
   );
 
   registry.registerBuilt(
     t
-      .tool("auth_check_route_access", "Check if the current user has access to a specific route based on their role.", {
-        path: z.string().min(1).describe("Route path to check access for (e.g., /admin, /dashboard)."),
-      })
+      .tool(
+        "auth_check_route_access",
+        "Check if the current user has access to a specific route based on their role.",
+        {
+          path: z
+            .string()
+            .min(1)
+            .describe("Route path to check access for (e.g., /admin, /dashboard)."),
+        },
+      )
       .meta({ category: "auth", tier: "free" })
       .handler(async ({ input, ctx }) => {
         const result = await ctx.db
@@ -70,9 +77,7 @@ export function registerAuthTools(
 
         const user = result[0];
         if (!user) {
-          return textResult(
-            "**Access: DENIED**\nUser not authenticated.\n**Retryable:** false",
-          );
+          return textResult("**Access: DENIED**\nUser not authenticated.\n**Retryable:** false");
         }
         const adminRoutes = [
           "/admin",
@@ -82,23 +87,31 @@ export function registerAuthTools(
           "/admin/jobs",
           "/admin/photos",
         ];
-        const isAdminRoute = adminRoutes.some(r => input.path.startsWith(r));
+        const isAdminRoute = adminRoutes.some((r) => input.path.startsWith(r));
         const hasAccess = !isAdminRoute || user.role === "admin";
         return textResult(
-          `**Route Access Check**\n\n`
-          + `**Path:** ${input.path}\n`
-          + `**Role:** ${user.role}\n`
-          + `**Access:** ${hasAccess ? "GRANTED" : "DENIED"}\n`
-          + `**Requires Admin:** ${isAdminRoute}`,
+          `**Route Access Check**\n\n` +
+            `**Path:** ${input.path}\n` +
+            `**Role:** ${user.role}\n` +
+            `**Access:** ${hasAccess ? "GRANTED" : "DENIED"}\n` +
+            `**Requires Admin:** ${isAdminRoute}`,
         );
       }),
   );
 
   registry.registerBuilt(
     t
-      .tool("auth_get_profile", "Get the current user's full profile with optional workspace memberships.", {
-        include_workspaces: z.boolean().optional().default(false).describe("Include workspace memberships."),
-      })
+      .tool(
+        "auth_get_profile",
+        "Get the current user's full profile with optional workspace memberships.",
+        {
+          include_workspaces: z
+            .boolean()
+            .optional()
+            .default(false)
+            .describe("Include workspace memberships."),
+        },
+      )
       .meta({ category: "auth", tier: "free" })
       .handler(async ({ input, ctx }) => {
         const result = await ctx.db
@@ -116,9 +129,7 @@ export function registerAuthTools(
 
         const user = result[0];
         if (!user) {
-          return textResult(
-            "**Error: NOT_FOUND**\nUser not found.\n**Retryable:** false",
-          );
+          return textResult("**Error: NOT_FOUND**\nUser not found.\n**Retryable:** false");
         }
 
         let text = `**User Profile**\n\n`;

@@ -118,10 +118,7 @@ describe("optimizeSchema", () => {
   it("handles allOf/anyOf/oneOf arrays", () => {
     const schema = {
       type: "object",
-      anyOf: [
-        { type: "string" },
-        { type: "number" },
-      ],
+      anyOf: [{ type: "string" }, { type: "number" }],
     };
 
     const result = optimizeSchema(schema) as Record<string, unknown>;

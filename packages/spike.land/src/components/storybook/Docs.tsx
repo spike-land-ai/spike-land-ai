@@ -2,15 +2,7 @@
 
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
-import {
-  Check,
-  ChevronDown,
-  ChevronUp,
-  Clipboard,
-  Info,
-  ShieldCheck,
-  X,
-} from "lucide-react";
+import { Check, ChevronDown, ChevronUp, Clipboard, Info, ShieldCheck, X } from "lucide-react";
 import type React from "react";
 import { useState } from "react";
 
@@ -33,17 +25,12 @@ export function PageHeader({
             {title}
           </h1>
           {badge && (
-            <Badge
-              variant="secondary"
-              className="text-xs font-mono px-2 py-0.5 self-center"
-            >
+            <Badge variant="secondary" className="text-xs font-mono px-2 py-0.5 self-center">
               {badge}
             </Badge>
           )}
         </div>
-        <p className="text-xl text-muted-foreground/90 max-w-3xl leading-relaxed">
-          {description}
-        </p>
+        <p className="text-xl text-muted-foreground/90 max-w-3xl leading-relaxed">{description}</p>
       </div>
       {usage && (
         <div className="p-5 rounded-xl border border-primary/20 bg-primary/5 text-primary-text text-base flex gap-4 items-start shadow-sm">
@@ -55,13 +42,7 @@ export function PageHeader({
   );
 }
 
-export function UsageGuide({
-  dos,
-  donts,
-}: {
-  dos: string[];
-  donts?: string[];
-}) {
+export function UsageGuide({ dos, donts }: { dos: string[]; donts?: string[] }) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 my-10">
       <div className="space-y-4 p-6 rounded-2xl bg-success/5 border border-success/20 overflow-hidden relative">
@@ -76,10 +57,7 @@ export function UsageGuide({
         </div>
         <ul className="space-y-3 relative z-10">
           {dos.map((item, i) => (
-            <li
-              key={i}
-              className="text-sm text-foreground/90 flex gap-3 items-start"
-            >
+            <li key={i} className="text-sm text-foreground/90 flex gap-3 items-start">
               <Check className="h-4 w-4 text-success shrink-0 mt-0.5" />
               <span className="leading-snug">{item}</span>
             </li>
@@ -95,16 +73,11 @@ export function UsageGuide({
             <div className="p-1 rounded-full bg-destructive/10 border border-destructive/20">
               <X className="h-4 w-4" strokeWidth={3} />
             </div>
-            <h3 className="font-bold uppercase tracking-wider text-xs">
-              Don't
-            </h3>
+            <h3 className="font-bold uppercase tracking-wider text-xs">Don't</h3>
           </div>
           <ul className="space-y-3 relative z-10">
             {donts.map((item, i) => (
-              <li
-                key={i}
-                className="text-sm text-foreground/90 flex gap-3 items-start"
-              >
+              <li key={i} className="text-sm text-foreground/90 flex gap-3 items-start">
                 <X className="h-4 w-4 text-destructive shrink-0 mt-0.5" />
                 <span className="leading-snug">{item}</span>
               </li>
@@ -116,11 +89,7 @@ export function UsageGuide({
   );
 }
 
-export function AccessibilityPanel({
-  notes,
-}: {
-  notes: string[];
-}) {
+export function AccessibilityPanel({ notes }: { notes: string[] }) {
   return (
     <div className="my-10 p-6 rounded-2xl bg-gradient-to-br from-white/5 to-white/0 border border-white/10 space-y-4 relative overflow-hidden">
       <div className="flex items-center gap-2 text-primary">
@@ -176,9 +145,7 @@ export function ComponentSample({
           {title}
         </h3>
         {description && (
-          <p className="text-sm text-muted-foreground leading-relaxed">
-            {description}
-          </p>
+          <p className="text-sm text-muted-foreground leading-relaxed">{description}</p>
         )}
       </div>
       {importPath && (
@@ -194,30 +161,26 @@ export function ComponentSample({
             backgroundSize: "16px 16px",
           }}
         />
-        <div className="relative z-10 w-full flex justify-center">
-          {children}
-        </div>
+        <div className="relative z-10 w-full flex justify-center">{children}</div>
       </div>
       {code && (
         <div className="space-y-2">
           <button
             type="button"
-            onClick={() => setShowCode(prev => !prev)}
+            onClick={() => setShowCode((prev) => !prev)}
             className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors duration-200"
           >
-            {showCode
-              ? (
-                <>
-                  <ChevronUp className="h-3.5 w-3.5" />
-                  Hide Code
-                </>
-              )
-              : (
-                <>
-                  <ChevronDown className="h-3.5 w-3.5" />
-                  View Code
-                </>
-              )}
+            {showCode ? (
+              <>
+                <ChevronUp className="h-3.5 w-3.5" />
+                Hide Code
+              </>
+            ) : (
+              <>
+                <ChevronDown className="h-3.5 w-3.5" />
+                View Code
+              </>
+            )}
           </button>
           {showCode && (
             <div className="relative bg-[#0a0a1a] border border-white/10 rounded-xl p-4">
@@ -227,9 +190,11 @@ export function ComponentSample({
                 className="absolute top-3 right-3 p-1.5 rounded-md bg-white/5 hover:bg-white/10 border border-white/10 text-[#e2e8f0] transition-colors duration-200"
                 aria-label="Copy code"
               >
-                {copied
-                  ? <Check className="h-3.5 w-3.5 text-green-400" />
-                  : <Clipboard className="h-3.5 w-3.5" />}
+                {copied ? (
+                  <Check className="h-3.5 w-3.5 text-green-400" />
+                ) : (
+                  <Clipboard className="h-3.5 w-3.5" />
+                )}
               </button>
               <pre className="font-mono text-sm text-[#e2e8f0] overflow-x-auto pr-10 whitespace-pre-wrap">
                 <code>{code}</code>

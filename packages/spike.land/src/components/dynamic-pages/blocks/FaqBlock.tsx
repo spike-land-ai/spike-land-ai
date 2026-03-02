@@ -17,13 +17,9 @@ export function FaqBlock({ content }: FaqBlockProps) {
   return (
     <section className="w-full py-16 px-6 md:px-12 lg:px-24">
       <div className="max-w-3xl mx-auto">
-        {data.sectionTitle
-          ? (
-            <h2 className="text-3xl font-bold text-center mb-12">
-              {data.sectionTitle}
-            </h2>
-          )
-          : null}
+        {data.sectionTitle ? (
+          <h2 className="text-3xl font-bold text-center mb-12">{data.sectionTitle}</h2>
+        ) : null}
         <div className="space-y-2">
           {data.items.map((item, index) => (
             <details
@@ -39,11 +35,7 @@ export function FaqBlock({ content }: FaqBlockProps) {
                   stroke="currentColor"
                   strokeWidth={2}
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M19 9l-7 7-7-7"
-                  />
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
                 </svg>
               </summary>
               <div className="px-6 pb-4 text-sm text-muted-foreground leading-relaxed">

@@ -29,18 +29,16 @@ describe("workspace", () => {
     });
 
     it("should return null when session has no user id", async () => {
-      mockAuth.mockResolvedValue(
-        { user: {} } as ReturnType<typeof auth> extends Promise<infer T> ? T : never,
-      );
+      mockAuth.mockResolvedValue({ user: {} } as ReturnType<typeof auth> extends Promise<infer T>
+        ? T
+        : never);
       expect(await getPersonalWorkspaceId()).toBeNull();
     });
 
     it("should return workspace id when found", async () => {
-      mockAuth.mockResolvedValue(
-        {
-          user: { id: "user-1" },
-        } as ReturnType<typeof auth> extends Promise<infer T> ? T : never,
-      );
+      mockAuth.mockResolvedValue({
+        user: { id: "user-1" },
+      } as ReturnType<typeof auth> extends Promise<infer T> ? T : never);
       mockPrisma.workspace.findFirst.mockResolvedValue({ id: "ws-personal" });
 
       const result = await getPersonalWorkspaceId();
@@ -56,11 +54,9 @@ describe("workspace", () => {
     });
 
     it("should return null when no personal workspace exists", async () => {
-      mockAuth.mockResolvedValue(
-        {
-          user: { id: "user-1" },
-        } as ReturnType<typeof auth> extends Promise<infer T> ? T : never,
-      );
+      mockAuth.mockResolvedValue({
+        user: { id: "user-1" },
+      } as ReturnType<typeof auth> extends Promise<infer T> ? T : never);
       mockPrisma.workspace.findFirst.mockResolvedValue(null);
 
       expect(await getPersonalWorkspaceId()).toBeNull();

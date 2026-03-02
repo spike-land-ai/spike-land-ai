@@ -3,20 +3,17 @@ import { describe, expect, it } from "vitest";
 import { PERSONAS } from "./personas";
 import { getPersonaTopics } from "./persona-topics";
 
-const ALL_PERSONA_SLUGS = PERSONAS.map(p => p.slug);
+const ALL_PERSONA_SLUGS = PERSONAS.map((p) => p.slug);
 
 describe("getPersonaTopics", () => {
-  it.each(ALL_PERSONA_SLUGS)(
-    "returns a non-empty array for persona '%s'",
-    slug => {
-      const topics = getPersonaTopics(slug);
-      expect(topics.length).toBeGreaterThan(0);
-      for (const topic of topics) {
-        expect(typeof topic).toBe("string");
-        expect(topic.length).toBeGreaterThan(0);
-      }
-    },
-  );
+  it.each(ALL_PERSONA_SLUGS)("returns a non-empty array for persona '%s'", (slug) => {
+    const topics = getPersonaTopics(slug);
+    expect(topics.length).toBeGreaterThan(0);
+    for (const topic of topics) {
+      expect(typeof topic).toBe("string");
+      expect(topic.length).toBeGreaterThan(0);
+    }
+  });
 
   it("returns an empty array for an unknown persona slug", () => {
     expect(getPersonaTopics("unknown-persona")).toEqual([]);

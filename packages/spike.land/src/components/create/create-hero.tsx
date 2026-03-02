@@ -31,10 +31,8 @@ const STARTER_IDEAS = [
   "Number Guessing Game",
 ] as const;
 
-export function CreateHero({ prompt }: { prompt?: string; }) {
-  const [initialPrompt, setInitialPrompt] = useState<string | undefined>(
-    prompt,
-  );
+export function CreateHero({ prompt }: { prompt?: string }) {
+  const [initialPrompt, setInitialPrompt] = useState<string | undefined>(prompt);
 
   const handleChipClick = useCallback((idea: string) => {
     // Force a re-render even when the same chip is clicked twice by toggling
@@ -51,9 +49,7 @@ export function CreateHero({ prompt }: { prompt?: string; }) {
     <section className="text-center space-y-6 pt-8">
       <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-sm text-cyan-400">
         <Sparkles className="w-4 h-4" />
-        <span className="font-semibold tracking-widest uppercase text-[10px]">
-          AI App Builder
-        </span>
+        <span className="font-semibold tracking-widest uppercase text-[10px]">AI App Builder</span>
       </div>
 
       <h1 className="text-5xl sm:text-7xl md:text-8xl font-bold text-white tracking-tighter">
@@ -74,7 +70,7 @@ export function CreateHero({ prompt }: { prompt?: string; }) {
 
       {/* Starter idea chips */}
       <div className="flex flex-wrap justify-center gap-2 max-w-2xl mx-auto">
-        {STARTER_IDEAS.map(idea => (
+        {STARTER_IDEAS.map((idea) => (
           <button
             key={idea}
             type="button"

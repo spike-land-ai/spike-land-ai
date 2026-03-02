@@ -6,8 +6,8 @@ import { createDeviceCode, approveDeviceCode, exchangeDeviceCode } from "../auth
 export const oauthRoute = new Hono<{ Bindings: Env }>();
 
 // POST /oauth/device — initiate device authorization
-oauthRoute.post("/device", async c => {
-  const body = await c.req.json().catch(() => ({})) as Record<string, unknown>;
+oauthRoute.post("/device", async (c) => {
+  const body = (await c.req.json().catch(() => ({}))) as Record<string, unknown>;
   const clientId = typeof body.client_id === "string" ? body.client_id : undefined;
   const scope = typeof body.scope === "string" ? body.scope : "mcp";
 
@@ -27,8 +27,8 @@ oauthRoute.post("/device", async c => {
 });
 
 // POST /oauth/token — poll for access token (device grant)
-oauthRoute.post("/token", async c => {
-  const body = await c.req.json().catch(() => ({})) as Record<string, unknown>;
+oauthRoute.post("/token", async (c) => {
+  const body = (await c.req.json().catch(() => ({}))) as Record<string, unknown>;
 
   if (body.grant_type !== "urn:ietf:params:oauth:grant-type:device_code") {
     return c.json({ error: "unsupported_grant_type" }, 400);
@@ -55,13 +55,13 @@ oauthRoute.post("/token", async c => {
 
 // POST /oauth/device/approve — called by Next.js spike.land after user approves
 // Protected by MCP_INTERNAL_SECRET header
-oauthRoute.post("/device/approve", async c => {
+oauthRoute.post("/device/approve", async (c) => {
   const secret = c.req.header("X-Internal-Secret");
   if (secret !== c.env.MCP_INTERNAL_SECRET) {
     return c.json({ error: "Unauthorized" }, 401);
   }
 
-  const body = await c.req.json().catch(() => ({})) as Record<string, unknown>;
+  const body = (await c.req.json().catch(() => ({}))) as Record<string, unknown>;
   const userCode = typeof body.user_code === "string" ? body.user_code : null;
   const userId = typeof body.user_id === "string" ? body.user_id : null;
 

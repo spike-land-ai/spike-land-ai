@@ -4,9 +4,7 @@ import React from "react";
 
 // Use vi.hoisted so mock fn is available inside vi.mock factory
 const { mockSessionProvider } = vi.hoisted(() => ({
-  mockSessionProvider: vi.fn(
-    ({ children }: { children: React.ReactNode }) => <>{children}</>,
-  ),
+  mockSessionProvider: vi.fn(({ children }: { children: React.ReactNode }) => <>{children}</>),
 }));
 
 vi.mock("@/lib/auth/client", () => ({
@@ -25,9 +23,9 @@ describe("SessionProvider", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     // Re-set implementation after clearAllMocks
-    mockSessionProvider.mockImplementation(
-      ({ children }: { children: React.ReactNode }) => <>{children}</>,
-    );
+    mockSessionProvider.mockImplementation(({ children }: { children: React.ReactNode }) => (
+      <>{children}</>
+    ));
   });
 
   it("renders children", () => {

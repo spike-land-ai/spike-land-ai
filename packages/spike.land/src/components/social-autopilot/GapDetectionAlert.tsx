@@ -10,7 +10,7 @@ interface GapDetectionAlertProps {
   platform: string;
 }
 
-function CalendarIcon({ className }: { className?: string; }) {
+function CalendarIcon({ className }: { className?: string }) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -43,9 +43,7 @@ export function GapDetectionAlert({
     <Card
       className={cn(
         "border transition-colors",
-        isUrgent
-          ? "bg-amber-500/5 border-amber-500/30"
-          : "bg-yellow-500/5 border-yellow-500/20",
+        isUrgent ? "bg-amber-500/5 border-amber-500/30" : "bg-yellow-500/5 border-yellow-500/20",
       )}
     >
       <CardContent className="pt-4 pb-4">
@@ -53,9 +51,7 @@ export function GapDetectionAlert({
           <div
             className={cn(
               "p-2 rounded-lg shrink-0",
-              isUrgent
-                ? "bg-amber-500/15 text-amber-400"
-                : "bg-yellow-500/10 text-yellow-400",
+              isUrgent ? "bg-amber-500/15 text-amber-400" : "bg-yellow-500/10 text-yellow-400",
             )}
           >
             <CalendarIcon className="w-4 h-4" />
@@ -70,16 +66,13 @@ export function GapDetectionAlert({
               {gapDays}-day posting gap detected on <span className="capitalize">{platform}</span>
             </p>
             <p className="text-xs text-zinc-400">
-              Last post was on{" "}
-              <span className="text-zinc-300 font-medium">{lastPostDate}</span>. Consistent posting
-              improves reach and engagement.
+              Last post was on <span className="text-zinc-300 font-medium">{lastPostDate}</span>.
+              Consistent posting improves reach and engagement.
             </p>
             <div
               className={cn(
                 "inline-flex items-center gap-1.5 mt-1 px-2 py-0.5 rounded-full text-xs font-medium",
-                isUrgent
-                  ? "bg-amber-500/15 text-amber-300"
-                  : "bg-yellow-500/10 text-yellow-300",
+                isUrgent ? "bg-amber-500/15 text-amber-300" : "bg-yellow-500/10 text-yellow-300",
               )}
             >
               <span>Suggested post time:</span>

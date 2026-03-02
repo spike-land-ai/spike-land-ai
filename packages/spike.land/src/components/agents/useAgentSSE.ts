@@ -29,9 +29,7 @@ interface UseAgentSSEReturn {
   reconnect: () => void;
 }
 
-export function useAgentSSE(
-  options: UseAgentSSEOptions = {},
-): UseAgentSSEReturn {
+export function useAgentSSE(options: UseAgentSSEOptions = {}): UseAgentSSEReturn {
   const { onEvent, onConnect, onDisconnect, onError, enabled = true } = options;
 
   const [isConnected, setIsConnected] = useState(false);
@@ -77,10 +75,7 @@ export function useAgentSSE(
       onDisconnect?.();
 
       // Reconnect with exponential backoff
-      const delay = Math.min(
-        1000 * Math.pow(2, reconnectAttempts.current),
-        30000,
-      );
+      const delay = Math.min(1000 * Math.pow(2, reconnectAttempts.current), 30000);
       reconnectAttempts.current++;
 
       reconnectTimeoutRef.current = setTimeout(() => {

@@ -20,7 +20,7 @@ vi.mock("@/lib/prisma", () => ({
     appAttachment: { createMany: vi.fn() },
     workspace: { findFirst: vi.fn() },
     workspaceApp: { create: vi.fn() },
-    $transaction: vi.fn(fn => fn(prisma)),
+    $transaction: vi.fn((fn) => fn(prisma)),
   },
 }));
 
@@ -59,16 +59,18 @@ describe("apps-service", () => {
 
   describe("ensureUserExists", () => {
     it("returns existing user id if found", async () => {
-      vi.mocked(prisma.user.findUnique).mockResolvedValue(
-        { id: "user-1" } as any,
-      );
+      vi.mocked(prisma.user.findUnique).mockResolvedValue({ id: "user-1" } as unknown as Awaited<
+        ReturnType<typeof prisma.user.findUnique>
+      >);
       const result = await ensureUserExists({ user: { id: "user-1" } });
       expect(result).toEqual({ success: true, userId: "user-1" });
     });
 
     it("creates new user if not found", async () => {
       vi.mocked(prisma.user.findUnique).mockResolvedValue(null);
-      vi.mocked(prisma.user.create).mockResolvedValue({ id: "user-1" } as any);
+      vi.mocked(prisma.user.create).mockResolvedValue({ id: "user-1" } as unknown as Awaited<
+        ReturnType<typeof prisma.user.create>
+      >);
       const result = await ensureUserExists({
         user: { id: "user-1", email: "test@test.com" },
       });
@@ -82,26 +84,31 @@ describe("apps-service", () => {
       vi.mocked(prisma.app.findMany).mockResolvedValue([]);
       const result = await getApps("user-1", true);
       expect(result.status).toBe(200);
-      expect(prisma.app.findMany).toHaveBeenCalledWith(expect.objectContaining({
-        where: expect.objectContaining({ isCurated: true }),
-      }));
+      expect(prisma.app.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: expect.objectContaining({ isCurated: true }),
+        }),
+      );
     });
 
     it("fetches user apps", async () => {
       vi.mocked(prisma.app.findMany).mockResolvedValue([]);
       const result = await getApps("user-1", false);
       expect(result.status).toBe(200);
-      expect(prisma.app.findMany).toHaveBeenCalledWith(expect.objectContaining({
-        where: expect.objectContaining({ userId: "user-1" }),
-      }));
+      expect(prisma.app.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: expect.objectContaining({ userId: "user-1" }),
+        }),
+      );
     });
   });
 
   describe("createAppFromPrompt", () => {
     it("handles duplicate app name", async () => {
-      vi.mocked(prisma.app.findFirst).mockResolvedValue(
-        { userId: "user-1", deletedAt: null } as any,
-      );
+      vi.mocked(prisma.app.findFirst).mockResolvedValue({
+        userId: "user-1",
+        deletedAt: null,
+      } as unknown as Awaited<ReturnType<typeof prisma.app.findFirst>>);
       const result = await createAppFromPrompt("user-1", { prompt: "test" });
       expect(result.status).toBe(409);
       expect(result.error).toContain("already have an app with this name");
@@ -109,12 +116,13 @@ describe("apps-service", () => {
 
     it("creates app successfully", async () => {
       vi.mocked(prisma.app.findFirst).mockResolvedValue(null);
-      vi.mocked(prisma.app.create).mockResolvedValue(
-        { id: "app-1", name: "Test" } as any,
-      );
-      vi.mocked(prisma.appMessage.create).mockResolvedValue(
-        { id: "msg-1" } as any,
-      );
+      vi.mocked(prisma.app.create).mockResolvedValue({
+        id: "app-1",
+        name: "Test",
+      } as unknown as Awaited<ReturnType<typeof prisma.app.create>>);
+      vi.mocked(prisma.appMessage.create).mockResolvedValue({ id: "msg-1" } as unknown as Awaited<
+        ReturnType<typeof prisma.appMessage.create>
+      >);
       const result = await createAppFromPrompt("user-1", { prompt: "test" });
       expect(result.status).toBe(201);
       expect(result.data).toBeDefined();

@@ -36,12 +36,10 @@ export interface TemplateDefinition {
     event: string;
     guard_expression?: string;
     delay_expression?: string;
-    actions?: Array<
-      {
-        type: "assign" | "log" | "raise" | "custom";
-        params: Record<string, unknown>;
-      }
-    >;
+    actions?: Array<{
+      type: "assign" | "log" | "raise" | "custom";
+      params: Record<string, unknown>;
+    }>;
   }>;
   context?: Record<string, unknown>;
   initialState?: string;
@@ -53,17 +51,14 @@ interface TemplateLibraryProps {
   onSelectTemplate: (template: TemplateDefinition) => void;
 }
 
-export function TemplateLibrary(
-  { isOpen, onClose, onSelectTemplate }: TemplateLibraryProps,
-) {
+export function TemplateLibrary({ isOpen, onClose, onSelectTemplate }: TemplateLibraryProps) {
   const [loading, setLoading] = useState<string | null>(null);
   const [activeCategory, setActiveCategory] = useState<TemplateCategory>("All");
 
   if (!isOpen) return null;
 
-  const filtered = activeCategory === "All"
-    ? TEMPLATES
-    : TEMPLATES.filter(t => t.category === activeCategory);
+  const filtered =
+    activeCategory === "All" ? TEMPLATES : TEMPLATES.filter((t) => t.category === activeCategory);
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
@@ -73,7 +68,7 @@ export function TemplateLibrary(
         tabIndex={0}
         className="absolute inset-0 bg-black/60 backdrop-blur-sm"
         onClick={onClose}
-        onKeyDown={e => {
+        onKeyDown={(e) => {
           if (e.key === "Escape" || e.key === "Enter") onClose();
         }}
         aria-label="Close template library"
@@ -110,10 +105,9 @@ export function TemplateLibrary(
 
         {/* Category tabs */}
         <div className="flex gap-1.5 px-6 py-3 border-b border-zinc-800/50 bg-zinc-900/30 overflow-x-auto flex-shrink-0 custom-scrollbar">
-          {CATEGORIES.map(cat => {
-            const count = cat === "All"
-              ? TEMPLATES.length
-              : TEMPLATES.filter(t => t.category === cat).length;
+          {CATEGORIES.map((cat) => {
+            const count =
+              cat === "All" ? TEMPLATES.length : TEMPLATES.filter((t) => t.category === cat).length;
             return (
               <button
                 key={cat}
@@ -142,7 +136,7 @@ export function TemplateLibrary(
         {/* Templates grid */}
         <div className="p-6 overflow-y-auto flex-1 bg-zinc-950/20">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {filtered.map(template => (
+            {filtered.map((template) => (
               <button
                 key={template.name}
                 onClick={async () => {
@@ -162,8 +156,7 @@ export function TemplateLibrary(
                 <div
                   className="absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
                   style={{
-                    background:
-                      `radial-gradient(circle at right bottom, ${template.color}15, transparent 70%)`,
+                    background: `radial-gradient(circle at right bottom, ${template.color}15, transparent 70%)`,
                   }}
                 />
 

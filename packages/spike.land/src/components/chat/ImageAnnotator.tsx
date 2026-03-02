@@ -10,9 +10,7 @@ interface ImageAnnotatorProps {
   onCancel: () => void;
 }
 
-export function ImageAnnotator(
-  { initialImage, onSave, onCancel }: ImageAnnotatorProps,
-) {
+export function ImageAnnotator({ initialImage, onSave, onCancel }: ImageAnnotatorProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   // Cache the canvas bounding rect to avoid layout thrashing on every mousemove
@@ -63,11 +61,7 @@ export function ImageAnnotator(
   }, [initialImage]);
 
   const startDrawing = useCallback(
-    (
-      e:
-        | React.MouseEvent<HTMLCanvasElement>
-        | React.TouchEvent<HTMLCanvasElement>,
-    ) => {
+    (e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>) => {
       if (!context || !canvasRef.current) return;
 
       // Prevent scrolling when touching canvas
@@ -81,10 +75,10 @@ export function ImageAnnotator(
 
       const isTouch = "touches" in e;
       const clientX = isTouch
-        ? (e as React.TouchEvent<HTMLCanvasElement>).touches[0]?.clientX ?? 0
+        ? ((e as React.TouchEvent<HTMLCanvasElement>).touches[0]?.clientX ?? 0)
         : (e as React.MouseEvent<HTMLCanvasElement>).clientX;
       const clientY = isTouch
-        ? (e as React.TouchEvent<HTMLCanvasElement>).touches[0]?.clientY ?? 0
+        ? ((e as React.TouchEvent<HTMLCanvasElement>).touches[0]?.clientY ?? 0)
         : (e as React.MouseEvent<HTMLCanvasElement>).clientY;
 
       const x = clientX - rect.left;
@@ -98,11 +92,7 @@ export function ImageAnnotator(
   );
 
   const draw = useCallback(
-    (
-      e:
-        | React.MouseEvent<HTMLCanvasElement>
-        | React.TouchEvent<HTMLCanvasElement>,
-    ) => {
+    (e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>) => {
       if (!isDrawing || !context || !canvasRef.current) return;
 
       if (e.type.startsWith("touch")) {
@@ -114,10 +104,10 @@ export function ImageAnnotator(
 
       const isTouch = "touches" in e;
       const clientX = isTouch
-        ? (e as React.TouchEvent<HTMLCanvasElement>).touches[0]?.clientX ?? 0
+        ? ((e as React.TouchEvent<HTMLCanvasElement>).touches[0]?.clientX ?? 0)
         : (e as React.MouseEvent<HTMLCanvasElement>).clientX;
       const clientY = isTouch
-        ? (e as React.TouchEvent<HTMLCanvasElement>).touches[0]?.clientY ?? 0
+        ? ((e as React.TouchEvent<HTMLCanvasElement>).touches[0]?.clientY ?? 0)
         : (e as React.MouseEvent<HTMLCanvasElement>).clientY;
 
       const x = clientX - rect.left;
@@ -166,10 +156,7 @@ export function ImageAnnotator(
         >
           <X className="mr-2 h-4 w-4" /> Cancel
         </Button>
-        <Button
-          onClick={handleSave}
-          className="bg-amber-500 hover:bg-amber-600 text-black"
-        >
+        <Button onClick={handleSave} className="bg-amber-500 hover:bg-amber-600 text-black">
           <Check className="mr-2 h-4 w-4" /> Use Screenshot
         </Button>
       </div>

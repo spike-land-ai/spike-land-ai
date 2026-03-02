@@ -10,11 +10,7 @@ import {
   getPlatformLimit,
 } from "@/lib/validations/brand-rewrite";
 import type { ToneAnalysis } from "@/lib/validations/brand-score";
-import type {
-  BrandGuardrail,
-  BrandProfile,
-  BrandVocabulary,
-} from "@/types/brand-brain";
+import type { BrandGuardrail, BrandProfile, BrandVocabulary } from "@/types/brand-brain";
 import { diffWords } from "diff";
 import { formatGuardrails, formatVocabulary } from "./prompt-formatters";
 
@@ -132,10 +128,7 @@ Return the rewritten content as JSON. Ensure the rewritten content is <= ${limit
 /**
  * Compute diff hunks between original and rewritten content.
  */
-export function computeDiffHunks(
-  original: string,
-  rewritten: string,
-): DiffHunk[] {
+export function computeDiffHunks(original: string, rewritten: string): DiffHunk[] {
   const diff = diffWords(original, rewritten);
 
   return diff.map((part, index) => ({
@@ -157,9 +150,7 @@ export function computeDiffHunks(
  * @returns Rewrite result with rewritten content and diff
  * @throws Error if rewriting fails
  */
-export async function rewriteContent(
-  params: RewriteContentParams,
-): Promise<RewriteResult> {
+export async function rewriteContent(params: RewriteContentParams): Promise<RewriteResult> {
   const systemPrompt = buildBrandRewritingSystemPrompt(params);
   const userPrompt = buildUserPrompt(params.content, params.platform);
   const characterLimit = getPlatformLimit(params.platform);
@@ -195,18 +186,16 @@ export async function rewriteContent(
   // Ensure content doesn't exceed limit (truncate if needed)
   let rewrittenContent = validatedResponse.rewrittenContent;
   if (rewrittenContent.length > characterLimit) {
-    logger.warn(
-      `[BRAND_REWRITE] Content exceeds limit, truncating`,
-      {
-        length: rewrittenContent.length,
-        limit: characterLimit,
-      },
-    );
+    logger.warn(`[BRAND_REWRITE] Content exceeds limit, truncating`, {
+      length: rewrittenContent.length,
+      limit: characterLimit,
+    });
     // Try to truncate at a sentence or word boundary
     rewrittenContent = rewrittenContent.slice(0, characterLimit - 3).trimEnd();
     if (
-      !rewrittenContent.endsWith(".") && !rewrittenContent.endsWith("!")
-      && !rewrittenContent.endsWith("?")
+      !rewrittenContent.endsWith(".") &&
+      !rewrittenContent.endsWith("!") &&
+      !rewrittenContent.endsWith("?")
     ) {
       rewrittenContent += "...";
     }
@@ -220,9 +209,7 @@ export async function rewriteContent(
     formalCasual: Math.round(validatedResponse.toneAnalysis.formalCasual),
     technicalSimple: Math.round(validatedResponse.toneAnalysis.technicalSimple),
     seriousPlayful: Math.round(validatedResponse.toneAnalysis.seriousPlayful),
-    reservedEnthusiastic: Math.round(
-      validatedResponse.toneAnalysis.reservedEnthusiastic,
-    ),
+    reservedEnthusiastic: Math.round(validatedResponse.toneAnalysis.reservedEnthusiastic),
     alignment: Math.round(validatedResponse.toneAnalysis.alignment),
   };
 

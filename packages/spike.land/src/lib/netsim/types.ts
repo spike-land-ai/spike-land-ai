@@ -58,7 +58,7 @@ export interface TopologySummary {
 export interface TopologyStateView {
   id: string;
   name: string;
-  nodes: Array<{ id: string; partitioned: boolean; }>;
+  nodes: Array<{ id: string; partitioned: boolean }>;
   links: Array<{
     from: string;
     to: string;

@@ -108,7 +108,7 @@ describe("beUniqTools", () => {
   });
 
   it("registers tools in expected categories", () => {
-    const categories = new Set(beUniqTools.map(t => t.category));
+    const categories = new Set(beUniqTools.map((t) => t.category));
     expect(categories).toContain("avl-profile");
     expect(categories).toContain("avl-social");
   });
@@ -116,7 +116,7 @@ describe("beUniqTools", () => {
   it("profile_start begins profiling", async () => {
     const result = await registry.call("profile_start", {}, ctx);
     expect(result.isError).toBeUndefined();
-    const text = (result.content[0] as { text: string; }).text;
+    const text = (result.content[0] as { text: string }).text;
     expect(text).toContain("Profiling Started");
     expect(text).toContain("Do you prefer mornings?");
   });
@@ -124,7 +124,7 @@ describe("beUniqTools", () => {
   it("profile_continue returns existing profile", async () => {
     const result = await registry.call("profile_continue", {}, ctx);
     expect(result.isError).toBeUndefined();
-    const text = (result.content[0] as { text: string; }).text;
+    const text = (result.content[0] as { text: string }).text;
     expect(text).toContain("Already Profiled");
   });
 
@@ -135,7 +135,7 @@ describe("beUniqTools", () => {
       ctx,
     );
     expect(result.isError).toBeUndefined();
-    const text = (result.content[0] as { text: string; }).text;
+    const text = (result.content[0] as { text: string }).text;
     expect(text).toContain("Profile Assigned");
     expect(text).toContain("morning-person");
   });
@@ -143,7 +143,7 @@ describe("beUniqTools", () => {
   it("profile_get returns user profile", async () => {
     const result = await registry.call("profile_get", {}, ctx);
     expect(result.isError).toBeUndefined();
-    const text = (result.content[0] as { text: string; }).text;
+    const text = (result.content[0] as { text: string }).text;
     expect(text).toContain("User Profile");
     expect(text).toContain("morning-person");
   });
@@ -151,7 +151,7 @@ describe("beUniqTools", () => {
   it("profile_tree_stats returns tree statistics", async () => {
     const result = await registry.call("profile_tree_stats", {}, ctx);
     expect(result.isError).toBeUndefined();
-    const text = (result.content[0] as { text: string; }).text;
+    const text = (result.content[0] as { text: string }).text;
     expect(text).toContain("AVL Profile Tree");
     expect(text).toContain("15");
   });
@@ -159,7 +159,7 @@ describe("beUniqTools", () => {
   it("profile_generate_question generates a question", async () => {
     const result = await registry.call("profile_generate_question", {}, ctx);
     expect(result.isError).toBeUndefined();
-    const text = (result.content[0] as { text: string; }).text;
+    const text = (result.content[0] as { text: string }).text;
     expect(text).toContain("Generated Question");
     expect(text).toContain("outdoor activities");
   });
@@ -167,26 +167,22 @@ describe("beUniqTools", () => {
   it("profile_reset removes the profile", async () => {
     const result = await registry.call("profile_reset", {}, ctx);
     expect(result.isError).toBeUndefined();
-    const text = (result.content[0] as { text: string; }).text;
+    const text = (result.content[0] as { text: string }).text;
     expect(text).toContain("Profile Reset");
   });
 
   it("profile_get_leaderboard returns rankings", async () => {
     const result = await registry.call("profile_get_leaderboard", {}, ctx);
     expect(result.isError).toBeUndefined();
-    const text = (result.content[0] as { text: string; }).text;
+    const text = (result.content[0] as { text: string }).text;
     expect(text).toContain("beUniq Leaderboard");
     expect(text).toContain("Alice");
   });
 
   it("profile_share_result returns text format", async () => {
-    const result = await registry.call(
-      "profile_share_result",
-      { format: "text" },
-      ctx,
-    );
+    const result = await registry.call("profile_share_result", { format: "text" }, ctx);
     expect(result.isError).toBeUndefined();
-    const text = (result.content[0] as { text: string; }).text;
+    const text = (result.content[0] as { text: string }).text;
     expect(text).toContain("Share Your Result");
     expect(text).toContain("spike.land/beuniq");
   });
@@ -194,7 +190,7 @@ describe("beUniqTools", () => {
   it("profile_get_insights returns personality data", async () => {
     const result = await registry.call("profile_get_insights", {}, ctx);
     expect(result.isError).toBeUndefined();
-    const text = (result.content[0] as { text: string; }).text;
+    const text = (result.content[0] as { text: string }).text;
     expect(text).toContain("Personality Insights");
     expect(text).toContain("Dominant Traits");
   });

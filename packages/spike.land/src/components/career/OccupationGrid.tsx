@@ -36,7 +36,7 @@ export function OccupationGrid() {
       {occupations.length > 0 && (
         <>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-            {occupations.map(occupation => (
+            {occupations.map((occupation) => (
               <OccupationCard key={occupation.uri} occupation={occupation} />
             ))}
           </div>

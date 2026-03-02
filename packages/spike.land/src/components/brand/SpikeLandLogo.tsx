@@ -40,11 +40,7 @@ export function SpikeLandLogo({
 
   const wordmark = (
     <span
-      className={cn(
-        "font-heading font-bold tracking-tight lowercase",
-        text,
-        "text-foreground",
-      )}
+      className={cn("font-heading font-bold tracking-tight lowercase", text, "text-foreground")}
     >
       spike.land
     </span>

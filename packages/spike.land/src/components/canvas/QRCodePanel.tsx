@@ -1,13 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { buildCanvasUrl } from "@/lib/canvas";
 import { Copy, ExternalLink } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
@@ -26,11 +20,7 @@ const DEFAULT_SETTINGS: CanvasSettings = {
   interval: 10,
 };
 
-export function QRCodePanel({
-  albumId,
-  shareToken,
-  albumName,
-}: QRCodePanelProps) {
+export function QRCodePanel({ albumId, shareToken, albumName }: QRCodePanelProps) {
   const [settings, setSettings] = useState<CanvasSettings>(DEFAULT_SETTINGS);
   const [copied, setCopied] = useState(false);
 
@@ -70,10 +60,7 @@ export function QRCodePanel({
 
       <CardContent className="space-y-4">
         <div className="flex justify-center">
-          <div
-            className="rounded-lg bg-white p-2"
-            data-testid="qr-code-container"
-          >
+          <div className="rounded-lg bg-white p-2" data-testid="qr-code-container">
             <QRCodeSVG
               value={canvasUrl}
               size={160}

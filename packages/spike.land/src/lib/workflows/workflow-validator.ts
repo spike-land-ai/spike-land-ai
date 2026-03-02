@@ -11,9 +11,7 @@ const VALID_STEP_TYPES: WorkflowStepType[] = ["TRIGGER", "ACTION", "CONDITION"];
 /**
  * Validates a workflow's steps for correctness and detects cycles.
  */
-export function validateWorkflow(
-  steps: WorkflowStepData[],
-): WorkflowValidationResult {
+export function validateWorkflow(steps: WorkflowStepData[]): WorkflowValidationResult {
   const errors: WorkflowValidationError[] = [];
   const warnings: WorkflowValidationWarning[] = [];
 
@@ -35,7 +33,7 @@ export function validateWorkflow(
   warnings.push(...orphanWarnings);
 
   // Check for missing trigger
-  const hasTrigger = steps.some(s => s.type === "TRIGGER");
+  const hasTrigger = steps.some((s) => s.type === "TRIGGER");
   if (!hasTrigger && steps.length > 0) {
     warnings.push({
       code: "NO_TRIGGER",
@@ -75,10 +73,7 @@ function validateStep(
     });
   }
 
-  if (
-    step.sequence !== undefined
-    && (typeof step.sequence !== "number" || step.sequence < 0)
-  ) {
+  if (step.sequence !== undefined && (typeof step.sequence !== "number" || step.sequence < 0)) {
     errors.push({
       code: "INVALID_SEQUENCE",
       message: "Step sequence must be a non-negative number",
@@ -105,10 +100,7 @@ function validateStep(
   }
 
   // Warn if condition step has no branches
-  if (
-    step.type === "CONDITION"
-    && (!step.childSteps || step.childSteps.length === 0)
-  ) {
+  if (step.type === "CONDITION" && (!step.childSteps || step.childSteps.length === 0)) {
     warnings.push({
       code: "CONDITION_NO_BRANCHES",
       message: "Condition step has no branches defined",
@@ -185,9 +177,7 @@ function detectCycles(steps: WorkflowStepData[]): WorkflowValidationError[] {
 /**
  * Checks for missing dependency references
  */
-function checkMissingDependencies(
-  steps: WorkflowStepData[],
-): WorkflowValidationError[] {
+function checkMissingDependencies(steps: WorkflowStepData[]): WorkflowValidationError[] {
   const errors: WorkflowValidationError[] = [];
   const stepIds = collectAllStepIds(steps);
 
@@ -229,16 +219,14 @@ function checkMissingDependencies(
 /**
  * Checks for orphan steps that won't be executed
  */
-function checkOrphanSteps(
-  steps: WorkflowStepData[],
-): WorkflowValidationWarning[] {
+function checkOrphanSteps(steps: WorkflowStepData[]): WorkflowValidationWarning[] {
   const warnings: WorkflowValidationWarning[] = [];
   const reachable = new Set<string>();
   const allStepIds = collectAllStepIds(steps);
 
   // Start from triggers
-  const triggers = steps.filter(s => s.type === "TRIGGER");
-  const toVisit = triggers.map(t => t.id).filter((id): id is string => !!id);
+  const triggers = steps.filter((s) => s.type === "TRIGGER");
+  const toVisit = triggers.map((t) => t.id).filter((id): id is string => !!id);
 
   // BFS to find all reachable steps
   while (toVisit.length > 0) {
@@ -272,9 +260,7 @@ function checkOrphanSteps(
 /**
  * Builds a map of step ID to step data
  */
-function buildStepMap(
-  steps: WorkflowStepData[],
-): Map<string, WorkflowStepData> {
+function buildStepMap(steps: WorkflowStepData[]): Map<string, WorkflowStepData> {
   const map = new Map<string, WorkflowStepData>();
 
   function addToMap(step: WorkflowStepData): void {
@@ -322,10 +308,7 @@ function collectAllStepIds(steps: WorkflowStepData[]): Set<string> {
 /**
  * Finds steps that depend on a given step
  */
-function findDependentSteps(
-  steps: WorkflowStepData[],
-  stepId: string,
-): WorkflowStepData[] {
+function findDependentSteps(steps: WorkflowStepData[], stepId: string): WorkflowStepData[] {
   const dependents: WorkflowStepData[] = [];
 
   function check(step: WorkflowStepData): void {
@@ -349,9 +332,7 @@ function findDependentSteps(
 /**
  * Validates that a workflow can be published
  */
-export function validateForPublish(
-  steps: WorkflowStepData[],
-): WorkflowValidationResult {
+export function validateForPublish(steps: WorkflowStepData[]): WorkflowValidationResult {
   const baseResult = validateWorkflow(steps);
 
   // Add publish-specific checks
@@ -363,7 +344,7 @@ export function validateForPublish(
     baseResult.valid = false;
   }
 
-  const hasTrigger = steps.some(s => s.type === "TRIGGER");
+  const hasTrigger = steps.some((s) => s.type === "TRIGGER");
   if (!hasTrigger) {
     baseResult.errors.push({
       code: "NO_TRIGGER_FOR_PUBLISH",
@@ -372,7 +353,7 @@ export function validateForPublish(
     baseResult.valid = false;
   }
 
-  const hasAction = steps.some(s => s.type === "ACTION");
+  const hasAction = steps.some((s) => s.type === "ACTION");
   if (!hasAction) {
     baseResult.errors.push({
       code: "NO_ACTION_FOR_PUBLISH",

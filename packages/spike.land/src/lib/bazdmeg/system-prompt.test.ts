@@ -50,8 +50,6 @@ describe("BAZDMEG_SYSTEM_PROMPT", () => {
 
   it("includes the responsibility framework", () => {
     expect(BAZDMEG_SYSTEM_PROMPT).toContain("Can you explain every line");
-    expect(BAZDMEG_SYSTEM_PROMPT).toContain(
-      "Can you debug this at 3am",
-    );
+    expect(BAZDMEG_SYSTEM_PROMPT).toContain("Can you debug this at 3am");
   });
 });

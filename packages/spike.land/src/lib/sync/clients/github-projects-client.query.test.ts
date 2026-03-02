@@ -13,19 +13,8 @@
  * - Large dataset scenarios
  */
 
-import {
-  afterEach,
-  beforeEach,
-  describe,
-  expect,
-  it,
-  type MockedFunction,
-  vi,
-} from "vitest";
-import {
-  GitHubProjectsClient,
-  type ProjectField,
-} from "./github-projects-client";
+import { afterEach, beforeEach, describe, expect, it, type MockedFunction, vi } from "vitest";
+import { GitHubProjectsClient, type ProjectField } from "./github-projects-client";
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -53,15 +42,13 @@ function mockFetchResponse(
 }
 
 /** Convenience: build a happy-path GraphQL response envelope */
-function gqlOk<T>(data: T): { data: T; errors?: never; } {
+function gqlOk<T>(data: T): { data: T; errors?: never } {
   return { data };
 }
 
 /** Convenience: build a GraphQL error envelope */
-function gqlErrors(
-  ...messages: string[]
-): { data?: never; errors: Array<{ message: string; }>; } {
-  return { errors: messages.map(message => ({ message })) };
+function gqlErrors(...messages: string[]): { data?: never; errors: Array<{ message: string }> } {
+  return { errors: messages.map((message) => ({ message })) };
 }
 
 // ---------------------------------------------------------------------------
@@ -75,7 +62,7 @@ function makeRawNode(overrides: {
   number?: number;
   url?: string;
   labels?: string[];
-  fieldValues?: Array<{ text?: string; name?: string; date?: string; field?: { name: string; }; }>;
+  fieldValues?: Array<{ text?: string; name?: string; date?: string; field?: { name: string } }>;
   createdAt?: string;
   updatedAt?: string;
 }) {
@@ -88,14 +75,10 @@ function makeRawNode(overrides: {
       body: overrides.body ?? "Body text",
       number: overrides.number,
       url: overrides.url,
-      labels: overrides.labels
-        ? { nodes: overrides.labels.map(name => ({ name })) }
-        : undefined,
+      labels: overrides.labels ? { nodes: overrides.labels.map((name) => ({ name })) } : undefined,
     },
     fieldValues: {
-      nodes: overrides.fieldValues ?? [
-        { name: "In Progress", field: { name: "Status" } },
-      ],
+      nodes: overrides.fieldValues ?? [{ name: "In Progress", field: { name: "Status" } }],
     },
   };
 }
@@ -370,16 +353,14 @@ describe("GitHubProjectsClient – listItems", () => {
 
     await client.listItems({ first: 10, after: "cursor_xyz" });
 
-    const body = JSON.parse(
-      vi.mocked(fetchMock).mock.calls[0]![1]!.body as string,
-    ) as { query: string; };
-    expect(body.query).toContain("after: \"cursor_xyz\"");
+    const body = JSON.parse(vi.mocked(fetchMock).mock.calls[0]![1]!.body as string) as {
+      query: string;
+    };
+    expect(body.query).toContain('after: "cursor_xyz"');
   });
 
   it("returns error when GraphQL returns errors array", async () => {
-    fetchMock.mockResolvedValueOnce(
-      mockFetchResponse(gqlErrors("Not authorized")),
-    );
+    fetchMock.mockResolvedValueOnce(mockFetchResponse(gqlErrors("Not authorized")));
 
     const result = await client.listItems();
     expect(result.data).toBeNull();
@@ -589,9 +570,7 @@ describe("GitHubProjectsClient – listAllItems", () => {
           }),
         ),
       )
-      .mockResolvedValueOnce(
-        mockFetchResponse(gqlErrors("Server error on page 2")),
-      );
+      .mockResolvedValueOnce(mockFetchResponse(gqlErrors("Server error on page 2")));
 
     const result = await client.listAllItems();
     expect(result.error).toBe("Server error on page 2");
@@ -601,9 +580,7 @@ describe("GitHubProjectsClient – listAllItems", () => {
   });
 
   it("returns null data (not empty array) when first page fails", async () => {
-    fetchMock.mockResolvedValueOnce(
-      mockFetchResponse(gqlErrors("Auth failure")),
-    );
+    fetchMock.mockResolvedValueOnce(mockFetchResponse(gqlErrors("Auth failure")));
 
     const result = await client.listAllItems();
     expect(result.error).toBe("Auth failure");
@@ -693,12 +670,12 @@ describe("GitHubProjectsClient – getProjectFields", () => {
     const fields = result.data as ProjectField[];
     expect(fields).toHaveLength(3);
 
-    const titleField = fields.find(f => f.name === "Title")!;
+    const titleField = fields.find((f) => f.name === "Title")!;
     expect(titleField.id).toBe("f_title");
     expect(titleField.dataType).toBe("TEXT");
     expect(titleField.options).toBeUndefined();
 
-    const statusField = fields.find(f => f.name === "Status")!;
+    const statusField = fields.find((f) => f.name === "Status")!;
     expect(statusField.options).toEqual([
       { id: "opt_todo", name: "Todo" },
       { id: "opt_done", name: "Done" },
@@ -706,9 +683,7 @@ describe("GitHubProjectsClient – getProjectFields", () => {
   });
 
   it("returns error on GraphQL error", async () => {
-    fetchMock.mockResolvedValueOnce(
-      mockFetchResponse(gqlErrors("Project not found")),
-    );
+    fetchMock.mockResolvedValueOnce(mockFetchResponse(gqlErrors("Project not found")));
 
     const result = await client.getProjectFields();
     expect(result.data).toBeNull();
@@ -806,7 +781,9 @@ describe("GitHubProjectsClient – getPRStatus", () => {
             issue: {
               timelineItems: {
                 nodes: [
-                  {/* no subject field – not a ConnectedEvent with a PR */},
+                  {
+                    /* no subject field – not a ConnectedEvent with a PR */
+                  },
                 ],
               },
             },
@@ -855,9 +832,7 @@ describe("GitHubProjectsClient – getPRStatus", () => {
                       mergedAt: null,
                       reviewDecision: null,
                       commits: {
-                        nodes: [
-                          { commit: { statusCheckRollup: null } },
-                        ],
+                        nodes: [{ commit: { statusCheckRollup: null } }],
                       },
                     },
                   },
@@ -914,18 +889,16 @@ describe("GitHubProjectsClient – getPRStatus", () => {
     );
 
     await client.getPRStatus(42);
-    const body = JSON.parse(
-      fetchMock.mock.calls[0]![1]!.body as string,
-    ) as { variables: { owner: string; repo: string; number: number; }; };
+    const body = JSON.parse(fetchMock.mock.calls[0]![1]!.body as string) as {
+      variables: { owner: string; repo: string; number: number };
+    };
     expect(body.variables.owner).toBe("acme");
     expect(body.variables.repo).toBe("app");
     expect(body.variables.number).toBe(42);
   });
 
   it("returns error on GraphQL error", async () => {
-    fetchMock.mockResolvedValueOnce(
-      mockFetchResponse(gqlErrors("Issue not found")),
-    );
+    fetchMock.mockResolvedValueOnce(mockFetchResponse(gqlErrors("Issue not found")));
 
     const result = await client.getPRStatus(999);
     expect(result.data).toBeNull();
@@ -957,7 +930,7 @@ describe("GitHubProjectsClient – status field mapping", () => {
       text?: string;
       name?: string;
       date?: string;
-      field?: { name: string; };
+      field?: { name: string };
     }>,
   ) {
     return mockFetchResponse(
@@ -995,9 +968,7 @@ describe("GitHubProjectsClient – status field mapping", () => {
 
   it("falls back to name when text is absent", async () => {
     fetchMock.mockResolvedValueOnce(
-      singleItemResponse([
-        { name: "In Progress", field: { name: "Status" } },
-      ]),
+      singleItemResponse([{ name: "In Progress", field: { name: "Status" } }]),
     );
 
     const result = await client.listItems();
@@ -1006,9 +977,7 @@ describe("GitHubProjectsClient – status field mapping", () => {
 
   it("falls back to date when text and name are absent", async () => {
     fetchMock.mockResolvedValueOnce(
-      singleItemResponse([
-        { date: "2025-01-15", field: { name: "DueDate" } },
-      ]),
+      singleItemResponse([{ date: "2025-01-15", field: { name: "DueDate" } }]),
     );
 
     const result = await client.listItems();
@@ -1017,9 +986,7 @@ describe("GitHubProjectsClient – status field mapping", () => {
 
   it("skips field values without a field name", async () => {
     fetchMock.mockResolvedValueOnce(
-      singleItemResponse([
-        { text: "orphan value" /* no field property */ },
-      ]),
+      singleItemResponse([{ text: "orphan value" /* no field property */ }]),
     );
 
     const result = await client.listItems();
@@ -1029,9 +996,7 @@ describe("GitHubProjectsClient – status field mapping", () => {
 
   it("sets status to empty string when no Status field present", async () => {
     fetchMock.mockResolvedValueOnce(
-      singleItemResponse([
-        { text: "Sprint 1", field: { name: "Iteration" } },
-      ]),
+      singleItemResponse([{ text: "Sprint 1", field: { name: "Iteration" } }]),
     );
 
     const result = await client.listItems();
@@ -1045,9 +1010,8 @@ describe("GitHubProjectsClient – status field mapping", () => {
 
 describe("GitHubProjectsClient – large dataset scenarios", () => {
   it("handles 100 items per page correctly", async () => {
-    const nodes = Array.from(
-      { length: 100 },
-      (_, i) => makeRawNode({ id: `item_${i}`, title: `Issue ${i}` }),
+    const nodes = Array.from({ length: 100 }, (_, i) =>
+      makeRawNode({ id: `item_${i}`, title: `Issue ${i}` }),
     );
 
     vi.stubGlobal(

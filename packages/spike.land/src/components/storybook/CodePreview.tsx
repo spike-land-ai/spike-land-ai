@@ -8,15 +8,10 @@ interface CodePreviewProps {
   code: string;
   language?: string;
   title?: string;
-  tabs?: { label: string; code: string; }[];
+  tabs?: { label: string; code: string }[];
 }
 
-export function CodePreview({
-  code,
-  language = "tsx",
-  title,
-  tabs,
-}: CodePreviewProps) {
+export function CodePreview({ code, language = "tsx", title, tabs }: CodePreviewProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [copied, setCopied] = useState(false);
   const [activeTab, setActiveTab] = useState(0);
@@ -54,7 +49,7 @@ export function CodePreview({
           )}
         </div>
         <button
-          onClick={() => setIsExpanded(v => !v)}
+          onClick={() => setIsExpanded((v) => !v)}
           aria-expanded={isExpanded}
           aria-controls="code-preview-content"
           className="font-mono text-xs text-white/40 hover:text-white/70 transition-colors"
@@ -73,17 +68,14 @@ export function CodePreview({
               "text-white/40 hover:text-white/80 hover:bg-white/10",
             )}
           >
-            {copied
-              ? <Check className="w-4 h-4 text-green-400" />
-              : <Clipboard className="w-4 h-4" />}
+            {copied ? (
+              <Check className="w-4 h-4 text-green-400" />
+            ) : (
+              <Clipboard className="w-4 h-4" />
+            )}
           </button>
           <pre className="overflow-x-auto p-4 pr-12">
-            <code
-              className={cn(
-                "font-mono text-sm text-[#e2e8f0]",
-                `language-${language}`,
-              )}
-            >
+            <code className={cn("font-mono text-sm text-[#e2e8f0]", `language-${language}`)}>
               {activeCode}
             </code>
           </pre>

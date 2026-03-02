@@ -8,9 +8,7 @@ interface OccupationFiltersProps {
   onQueryChange: (query: string) => void;
 }
 
-export function OccupationFilters(
-  { query, onQueryChange }: OccupationFiltersProps,
-) {
+export function OccupationFilters({ query, onQueryChange }: OccupationFiltersProps) {
   return (
     <div className="flex items-center gap-3">
       <div className="relative flex-1 max-w-md">
@@ -18,7 +16,7 @@ export function OccupationFilters(
         <Input
           placeholder="Search occupations..."
           value={query}
-          onChange={e => onQueryChange(e.target.value)}
+          onChange={(e) => onQueryChange(e.target.value)}
           className="pl-9 bg-zinc-800 border-white/[0.06]"
         />
       </div>

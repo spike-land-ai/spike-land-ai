@@ -11,11 +11,13 @@ vi.mock("./gemini-client", () => ({
 }));
 
 vi.mock("@/lib/try-catch", () => ({
-  tryCatch: vi.fn(p =>
-    p.then((data: any) => ({ data, error: null })).catch((error: any) => ({
-      data: null,
-      error,
-    }))
+  tryCatch: vi.fn((p) =>
+    p
+      .then((data: unknown) => ({ data, error: null }))
+      .catch((error: unknown) => ({
+        data: null,
+        error,
+      })),
   ),
 }));
 
@@ -25,7 +27,9 @@ describe("gemini-chat", () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    vi.mocked(getGeminiClient).mockResolvedValue(mockAi as any);
+    vi.mocked(getGeminiClient).mockResolvedValue(
+      mockAi as unknown as Awaited<ReturnType<typeof getGeminiClient>>,
+    );
   });
 
   describe("generateAgentResponse", () => {
@@ -37,12 +41,14 @@ describe("gemini-chat", () => {
       });
 
       expect(res).toBe("Hello user");
-      expect(mockGenerateContent).toHaveBeenCalledWith(expect.objectContaining({
-        contents: [{ role: "user", parts: [{ text: "Hi" }] }],
-        config: expect.objectContaining({
-          systemInstruction: expect.stringContaining("helpful AI assistant"),
+      expect(mockGenerateContent).toHaveBeenCalledWith(
+        expect.objectContaining({
+          contents: [{ role: "user", parts: [{ text: "Hi" }] }],
+          config: expect.objectContaining({
+            systemInstruction: expect.stringContaining("helpful AI assistant"),
+          }),
         }),
-      }));
+      );
     });
 
     it("uses provided system prompt", async () => {
@@ -53,11 +59,13 @@ describe("gemini-chat", () => {
         systemPrompt: "Custom prompt",
       });
 
-      expect(mockGenerateContent).toHaveBeenCalledWith(expect.objectContaining({
-        config: expect.objectContaining({
-          systemInstruction: "Custom prompt",
+      expect(mockGenerateContent).toHaveBeenCalledWith(
+        expect.objectContaining({
+          config: expect.objectContaining({
+            systemInstruction: "Custom prompt",
+          }),
         }),
-      }));
+      );
     });
 
     it("throws if generation fails", async () => {
@@ -78,27 +86,29 @@ describe("gemini-chat", () => {
 
   describe("generateStructuredResponse", () => {
     it("parses valid JSON response", async () => {
-      mockGenerateContent.mockResolvedValue({ text: "{\"key\": \"value\"}" });
+      mockGenerateContent.mockResolvedValue({ text: '{"key": "value"}' });
 
-      const res = await generateStructuredResponse<{ key: string; }>({
+      const res = await generateStructuredResponse<{ key: string }>({
         prompt: "Give me JSON",
       });
 
       expect(res.key).toBe("value");
-      expect(mockGenerateContent).toHaveBeenCalledWith(expect.objectContaining({
-        contents: [{ role: "user", parts: [{ text: "Give me JSON" }] }],
-        config: expect.objectContaining({
-          responseMimeType: "application/json",
+      expect(mockGenerateContent).toHaveBeenCalledWith(
+        expect.objectContaining({
+          contents: [{ role: "user", parts: [{ text: "Give me JSON" }] }],
+          config: expect.objectContaining({
+            responseMimeType: "application/json",
+          }),
         }),
-      }));
+      );
     });
 
     it("strips markdown blocks from JSON", async () => {
       mockGenerateContent.mockResolvedValue({
-        text: "```json\n{\"key\": \"value2\"}\n```",
+        text: '```json\n{"key": "value2"}\n```',
       });
 
-      const res = await generateStructuredResponse<{ key: string; }>({
+      const res = await generateStructuredResponse<{ key: string }>({
         prompt: "JSON",
       });
 
@@ -107,10 +117,10 @@ describe("gemini-chat", () => {
 
     it("strips generic markdown blocks", async () => {
       mockGenerateContent.mockResolvedValue({
-        text: "```\n{\"key\": \"value3\"}\n```",
+        text: '```\n{"key": "value3"}\n```',
       });
 
-      const res = await generateStructuredResponse<{ key: string; }>({
+      const res = await generateStructuredResponse<{ key: string }>({
         prompt: "JSON",
       });
 
@@ -118,7 +128,7 @@ describe("gemini-chat", () => {
     });
 
     it("passes thinking budget and schema", async () => {
-      mockGenerateContent.mockResolvedValue({ text: "{\"ok\": true}" });
+      mockGenerateContent.mockResolvedValue({ text: '{"ok": true}' });
 
       await generateStructuredResponse({
         prompt: "test",
@@ -126,33 +136,38 @@ describe("gemini-chat", () => {
         responseJsonSchema: { type: "object" },
       });
 
-      expect(mockGenerateContent).toHaveBeenCalledWith(expect.objectContaining({
-        config: expect.objectContaining({
-          thinkingConfig: { thinkingBudget: 100 },
-          responseJsonSchema: { type: "object" },
+      expect(mockGenerateContent).toHaveBeenCalledWith(
+        expect.objectContaining({
+          config: expect.objectContaining({
+            thinkingConfig: { thinkingBudget: 100 },
+            responseJsonSchema: { type: "object" },
+          }),
         }),
-      }));
+      );
     });
 
     it("throws StructuredResponseParseError on invalid JSON", async () => {
       mockGenerateContent.mockResolvedValue({ text: "invalid json" });
 
-      await expect(generateStructuredResponse({ prompt: "test" })).rejects
-        .toThrow(StructuredResponseParseError);
+      await expect(generateStructuredResponse({ prompt: "test" })).rejects.toThrow(
+        StructuredResponseParseError,
+      );
     });
 
     it("throws on generation failure", async () => {
       mockGenerateContent.mockRejectedValue(new Error("Generation failed"));
 
-      await expect(generateStructuredResponse({ prompt: "test" })).rejects
-        .toThrow("Failed to generate structured response: Generation failed");
+      await expect(generateStructuredResponse({ prompt: "test" })).rejects.toThrow(
+        "Failed to generate structured response: Generation failed",
+      );
     });
 
     it("throws on empty text", async () => {
       mockGenerateContent.mockResolvedValue({ text: "" });
 
-      await expect(generateStructuredResponse({ prompt: "test" })).rejects
-        .toThrow("No response text received");
+      await expect(generateStructuredResponse({ prompt: "test" })).rejects.toThrow(
+        "No response text received",
+      );
     });
   });
 

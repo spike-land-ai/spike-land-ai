@@ -41,10 +41,7 @@ export interface SplitPrompt {
  * - `dynamicSuffix` (learning notes) → NOT cached, changes per request
  * - `full` — concatenated version for backwards compatibility
  */
-export function buildAgentSystemPrompt(
-  topic: string,
-  notes: LearningNote[],
-): SplitPrompt {
+export function buildAgentSystemPrompt(topic: string, notes: LearningNote[]): SplitPrompt {
   // Stable prefix: layers 1, 3, 5 (identity + core + output spec)
   const coreWithSkills = buildSkillSystemPrompt(topic);
   const stablePrefix = `${AGENT_IDENTITY}\n\n${coreWithSkills}\n\n${OUTPUT_SPEC}`;
@@ -87,8 +84,7 @@ export function buildAgentUserPrompt(
 
   blocks.push({
     type: "text",
-    text:
-      "The user has attached the above reference image(s). Use them as visual inspiration for the app's design, layout, color scheme, or content as appropriate.",
+    text: "The user has attached the above reference image(s). Use them as visual inspiration for the app's design, layout, color scheme, or content as appropriate.",
   });
 
   return blocks;
@@ -115,10 +111,7 @@ Your ONLY job is to fix transpilation errors in React components. Do NOT redesig
  * Uses a lightweight prompt focused on debugging — no full skill catalogue.
  * Returns split blocks for cache optimization.
  */
-export function buildFixSystemPrompt(
-  _topic: string,
-  notes: LearningNote[],
-): SplitPrompt {
+export function buildFixSystemPrompt(_topic: string, notes: LearningNote[]): SplitPrompt {
   const noteBlock = formatNotes(notes);
   const stablePrefix = `${FIX_CORE_PROMPT}\n\n${FIX_OUTPUT_SPEC}`;
 
@@ -143,26 +136,23 @@ export interface StructuredErrorContext {
 export function buildFixUserPrompt(
   code: string,
   error: string,
-  previousErrors: Array<{ error: string; iteration: number; }>,
+  previousErrors: Array<{ error: string; iteration: number }>,
   structuredError?: StructuredErrorContext,
 ): string {
-  const historyBlock = previousErrors.length > 0
-    ? `\n\nPrevious errors in this session:\n${
-      previousErrors
-        .map(e => `- Attempt ${e.iteration + 1}: ${e.error.slice(0, 200)}`)
-        .join("\n")
-    }`
-    : "";
+  const historyBlock =
+    previousErrors.length > 0
+      ? `\n\nPrevious errors in this session:\n${previousErrors
+          .map((e) => `- Attempt ${e.iteration + 1}: ${e.error.slice(0, 200)}`)
+          .join("\n")}`
+      : "";
 
   // Add structured error context when available for more precise fixing
   const structuredBlock = structuredError
     ? `\nERROR TYPE: ${structuredError.type}${
-      structuredError.library ? `\nLIBRARY: ${structuredError.library}` : ""
-    }${structuredError.lineNumber ? `\nLINE: ${structuredError.lineNumber}` : ""}${
-      structuredError.suggestion
-        ? `\nSUGGESTION: ${structuredError.suggestion}`
-        : ""
-    }\n`
+        structuredError.library ? `\nLIBRARY: ${structuredError.library}` : ""
+      }${structuredError.lineNumber ? `\nLINE: ${structuredError.lineNumber}` : ""}${
+        structuredError.suggestion ? `\nSUGGESTION: ${structuredError.suggestion}` : ""
+      }\n`
     : "";
 
   return `The following React component failed transpilation. Fix it.
@@ -208,15 +198,14 @@ function formatNotes(notes: LearningNote[]): string {
   return `## Lessons Learned (from previous generations)
 Apply these lessons to avoid known issues:
 
-${selected.map(n => `- **${n.trigger}**: ${n.lesson}`).join("\n")}`;
+${selected.map((n) => `- **${n.trigger}**: ${n.lesson}`).join("\n")}`;
 }
 
 /**
  * System prompt for extracting learning notes from error/fix pairs.
  * Used with Claude Haiku for cost efficiency.
  */
-export const NOTE_EXTRACTION_PROMPT =
-  `You extract structured learning notes from code errors and their fixes.
+export const NOTE_EXTRACTION_PROMPT = `You extract structured learning notes from code errors and their fixes.
 Given an error and the code that caused it (plus optionally the fix), produce a JSON object:
 
 {

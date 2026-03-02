@@ -40,10 +40,7 @@ const NodePalette = () => {
   ) => {
     event.dataTransfer.setData("application/reactflow/type", nodeType);
     if (actionType) {
-      event.dataTransfer.setData(
-        "application/reactflow/actionType",
-        actionType,
-      );
+      event.dataTransfer.setData("application/reactflow/actionType", actionType);
     }
     event.dataTransfer.effectAllowed = "move";
   };
@@ -59,7 +56,7 @@ const NodePalette = () => {
             key={index}
             className="flex cursor-move items-center gap-2 rounded-md border bg-card p-3 hover:bg-accent hover:text-accent-foreground"
             draggable
-            onDragStart={event => onDragStart(event, item.type, item.actionType)}
+            onDragStart={(event) => onDragStart(event, item.type, item.actionType)}
           >
             {item.icon}
             <span className="text-sm font-medium">{item.label}</span>

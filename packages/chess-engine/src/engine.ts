@@ -9,12 +9,13 @@ export function createGame(fen?: string): Chess {
 
 export function makeMove(
   game: Chess,
-  move: { from: string; to: string; promotion?: string | undefined; },
+  move: { from: string; to: string; promotion?: string | undefined },
 ): MoveResult {
   try {
-    const moveArg = move.promotion !== undefined
-      ? { from: move.from, to: move.to, promotion: move.promotion }
-      : { from: move.from, to: move.to };
+    const moveArg =
+      move.promotion !== undefined
+        ? { from: move.from, to: move.to, promotion: move.promotion }
+        : { from: move.from, to: move.to };
     const result = game.move(moveArg);
     return {
       success: true,
@@ -66,12 +67,9 @@ export function getGameState(game: Chess): GameState {
   };
 }
 
-export function getLegalMovesForSquare(
-  game: Chess,
-  square: string,
-): LegalMove[] {
+export function getLegalMovesForSquare(game: Chess, square: string): LegalMove[] {
   const moves = game.moves({ verbose: true, square: square as Square });
-  return moves.map(m => ({
+  return moves.map((m) => ({
     from: m.from,
     to: m.to,
     san: m.san,
@@ -81,7 +79,7 @@ export function getLegalMovesForSquare(
 
 export function getAllLegalMoves(game: Chess): LegalMove[] {
   const moves = game.moves({ verbose: true });
-  return moves.map(m => ({
+  return moves.map((m) => ({
     from: m.from,
     to: m.to,
     san: m.san,
@@ -93,12 +91,12 @@ export function isValidFen(fen: string): boolean {
   return validateFen(fen).ok;
 }
 
-export function getBoard(
-  game: Chess,
-): (({ type: string; color: ChessColor; } | null)[])[] {
-  return game.board().map(row =>
-    row.map(cell => cell ? { type: cell.type, color: cell.color as ChessColor } : null)
-  );
+export function getBoard(game: Chess): ({ type: string; color: ChessColor } | null)[][] {
+  return game
+    .board()
+    .map((row) =>
+      row.map((cell) => (cell ? { type: cell.type, color: cell.color as ChessColor } : null)),
+    );
 }
 
 export function loadPgn(pgn: string): Chess {

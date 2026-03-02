@@ -3,7 +3,7 @@
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 
-const STATUS_CONFIG: Record<string, { label: string; className: string; }> = {
+const STATUS_CONFIG: Record<string, { label: string; className: string }> = {
   UNPLANNED: {
     label: "Unplanned",
     className: "bg-zinc-700/50 text-zinc-300 border-zinc-600",
@@ -62,11 +62,7 @@ export function WorkflowStatusBadge({
   return (
     <Badge
       variant="outline"
-      className={cn(
-        "text-[10px] font-medium border",
-        config.className,
-        className,
-      )}
+      className={cn("text-[10px] font-medium border", config.className, className)}
     >
       {config.label}
     </Badge>

@@ -29,7 +29,7 @@ const CREATE_RESPONSE =
 
 export function isBot(userAgent: string | null): boolean {
   if (!userAgent) return false;
-  return BOT_USER_AGENT_PATTERNS.some(pattern => pattern.test(userAgent));
+  return BOT_USER_AGENT_PATTERNS.some((pattern) => pattern.test(userAgent));
 }
 
 export function getScriptedResponse(route: string): string {

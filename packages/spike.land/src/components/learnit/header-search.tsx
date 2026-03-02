@@ -9,10 +9,7 @@ export function HeaderSearch() {
 
   if (isExpanded) {
     return (
-      <div
-        className="flex items-center gap-2 w-64"
-        data-testid="header-search-expanded"
-      >
+      <div className="flex items-center gap-2 w-64" data-testid="header-search-expanded">
         <LearnItSearch compact />
         <button
           onClick={() => setIsExpanded(false)}

@@ -3,10 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Keyboard, Loader2, Play } from "lucide-react";
 
-import type {
-  McpToolDef,
-  McpToolParam,
-} from "@/components/mcp/mcp-tool-registry";
+import type { McpToolDef, McpToolParam } from "@/components/mcp/mcp-tool-registry";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -63,7 +60,7 @@ export function McpToolForm({ tool, onSubmit, isExecuting }: McpToolFormProps) {
   const formRef = useRef<HTMLFormElement>(null);
 
   const [values, setValues] = useState<Record<string, unknown>>(() =>
-    buildInitialValues(tool.params)
+    buildInitialValues(tool.params),
   );
 
   // Restore persisted form values (or example payload) on mount
@@ -82,7 +79,7 @@ export function McpToolForm({ tool, onSubmit, isExecuting }: McpToolFormProps) {
   }, [tool.name, tool.params, tool.example, loadValues]);
 
   const updateValue = useCallback((name: string, value: unknown) => {
-    setValues(prev => {
+    setValues((prev) => {
       const next = { ...prev, [name]: value };
       return next;
     });
@@ -123,8 +120,7 @@ export function McpToolForm({ tool, onSubmit, isExecuting }: McpToolFormProps) {
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, [isExecuting]);
 
-  const isMac = typeof navigator !== "undefined"
-    && /Mac/.test(navigator.userAgent);
+  const isMac = typeof navigator !== "undefined" && /Mac/.test(navigator.userAgent);
   const shortcutLabel = isMac ? "\u2318\u21A9" : "Ctrl+\u21A9";
 
   return (
@@ -141,34 +137,30 @@ export function McpToolForm({ tool, onSubmit, isExecuting }: McpToolFormProps) {
       <CardContent>
         <form ref={formRef} onSubmit={handleSubmit} className="space-y-4">
           {tool.params.length === 0 && (
-            <p className="text-sm text-muted-foreground">
-              This tool takes no parameters.
-            </p>
+            <p className="text-sm text-muted-foreground">This tool takes no parameters.</p>
           )}
 
-          {tool.params.map(param => (
+          {tool.params.map((param) => (
             <FieldRenderer
               key={param.name}
               param={param}
               value={values[param.name]}
-              onChange={val => updateValue(param.name, val)}
+              onChange={(val) => updateValue(param.name, val)}
             />
           ))}
 
           <Button type="submit" disabled={isExecuting} className="w-full">
-            {isExecuting
-              ? (
-                <>
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                  Executing...
-                </>
-              )
-              : (
-                <>
-                  <Play className="h-4 w-4" />
-                  Execute
-                </>
-              )}
+            {isExecuting ? (
+              <>
+                <Loader2 className="h-4 w-4 animate-spin" />
+                Executing...
+              </>
+            ) : (
+              <>
+                <Play className="h-4 w-4" />
+                Execute
+              </>
+            )}
           </Button>
         </form>
       </CardContent>
@@ -194,66 +186,53 @@ function FieldRenderer({
         {param.required && <span className="text-destructive ml-1">*</span>}
       </Label>
 
-      {param.type === "boolean"
-        ? (
-          <div className="flex items-center gap-3">
-            <Switch
-              id={id}
-              checked={value === true}
-              onCheckedChange={checked => onChange(checked)}
-            />
-            <span className="text-sm text-muted-foreground">
-              {param.description}
-            </span>
-          </div>
-        )
-        : param.type === "enum" && param.enumValues
-        ? (
-          <Select
-            value={String(value ?? "")}
-            onValueChange={val => onChange(val)}
-          >
-            <SelectTrigger id={id}>
-              <SelectValue placeholder={`Select ${param.name}`} />
-            </SelectTrigger>
-            <SelectContent>
-              {param.enumValues.map(val => (
-                <SelectItem key={val} value={val}>
-                  {val}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        )
-        : param.type === "number"
-        ? (
-          <Input
+      {param.type === "boolean" ? (
+        <div className="flex items-center gap-3">
+          <Switch
             id={id}
-            type="number"
-            value={String(value ?? "")}
-            onChange={e => onChange(e.target.value)}
-            placeholder={param.placeholder}
+            checked={value === true}
+            onCheckedChange={(checked) => onChange(checked)}
           />
-        )
-        : shouldUseTextarea(param.name)
-        ? (
-          <Textarea
-            id={id}
-            value={String(value ?? "")}
-            onChange={e => onChange(e.target.value)}
-            placeholder={param.placeholder}
-            rows={4}
-          />
-        )
-        : (
-          <Input
-            id={id}
-            type="text"
-            value={String(value ?? "")}
-            onChange={e => onChange(e.target.value)}
-            placeholder={param.placeholder}
-          />
-        )}
+          <span className="text-sm text-muted-foreground">{param.description}</span>
+        </div>
+      ) : param.type === "enum" && param.enumValues ? (
+        <Select value={String(value ?? "")} onValueChange={(val) => onChange(val)}>
+          <SelectTrigger id={id}>
+            <SelectValue placeholder={`Select ${param.name}`} />
+          </SelectTrigger>
+          <SelectContent>
+            {param.enumValues.map((val) => (
+              <SelectItem key={val} value={val}>
+                {val}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      ) : param.type === "number" ? (
+        <Input
+          id={id}
+          type="number"
+          value={String(value ?? "")}
+          onChange={(e) => onChange(e.target.value)}
+          placeholder={param.placeholder}
+        />
+      ) : shouldUseTextarea(param.name) ? (
+        <Textarea
+          id={id}
+          value={String(value ?? "")}
+          onChange={(e) => onChange(e.target.value)}
+          placeholder={param.placeholder}
+          rows={4}
+        />
+      ) : (
+        <Input
+          id={id}
+          type="text"
+          value={String(value ?? "")}
+          onChange={(e) => onChange(e.target.value)}
+          placeholder={param.placeholder}
+        />
+      )}
 
       {param.type !== "boolean" && (
         <p className="text-xs text-muted-foreground">{param.description}</p>

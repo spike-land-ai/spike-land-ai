@@ -25,14 +25,12 @@ function formatCount(n: number): string {
  * Client component that displays total page views and unique visitors
  * for a given URL path. Fetches stats from /api/content/stats.
  */
-export function ContentViewStats(
-  { path, compact = false }: ContentViewStatsProps,
-) {
+export function ContentViewStats({ path, compact = false }: ContentViewStatsProps) {
   const [stats, setStats] = useState<ViewStats | null>(null);
 
   useEffect(() => {
     fetch(`/api/content/stats?path=${encodeURIComponent(path)}`)
-      .then(r => r.json())
+      .then((r) => r.json())
       .then((data: ViewStats) => setStats(data))
       .catch(() => {
         /* silently fail — stats are non-critical */
@@ -59,9 +57,7 @@ export function ContentViewStats(
       </div>
       <div className="flex items-center gap-1 px-2 py-1 bg-muted/30 rounded-full">
         <Users className="h-3 w-3" aria-hidden="true" />
-        <span className="tabular-nums">
-          {formatCount(stats.uniqueVisitors)}
-        </span>
+        <span className="tabular-nums">{formatCount(stats.uniqueVisitors)}</span>
         {!compact && <span className="hidden sm:inline">visitors</span>}
       </div>
     </div>

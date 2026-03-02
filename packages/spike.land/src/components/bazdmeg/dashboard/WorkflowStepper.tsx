@@ -26,7 +26,7 @@ const STATUS_ORDER: Record<string, number> = {
   FAILED: -1,
 };
 
-export function WorkflowStepper({ status }: { status: string; }) {
+export function WorkflowStepper({ status }: { status: string }) {
   const currentIndex = STATUS_ORDER[status] ?? 0;
   const isFailed = status === "FAILED";
 
@@ -35,8 +35,7 @@ export function WorkflowStepper({ status }: { status: string; }) {
       {STEPS.map((step, i) => {
         const isCompleted = !isFailed && currentIndex > i;
         const isCurrent = !isFailed && currentIndex === i;
-        const isActive = isCurrent
-          && ["PLANNING", "JULES_WORKING"].includes(status);
+        const isActive = isCurrent && ["PLANNING", "JULES_WORKING"].includes(status);
 
         return (
           <div key={step.key} className="flex items-center gap-1">
@@ -44,22 +43,21 @@ export function WorkflowStepper({ status }: { status: string; }) {
               className={cn(
                 "flex items-center justify-center h-5 w-5 rounded-full transition-all duration-300",
                 isCompleted && "bg-green-500/20 text-green-400",
-                isCurrent && !isActive
-                  && "bg-amber-500/20 text-amber-400 ring-1 ring-amber-500/50",
-                isActive
-                  && "bg-amber-500/20 text-amber-400 ring-1 ring-amber-500/50",
+                isCurrent && !isActive && "bg-amber-500/20 text-amber-400 ring-1 ring-amber-500/50",
+                isActive && "bg-amber-500/20 text-amber-400 ring-1 ring-amber-500/50",
                 isFailed && i === currentIndex && "bg-red-500/20 text-red-400",
-                !isCompleted && !isCurrent && !isFailed
-                  && "bg-zinc-800 text-zinc-600",
+                !isCompleted && !isCurrent && !isFailed && "bg-zinc-800 text-zinc-600",
               )}
             >
-              {isCompleted
-                ? <Check className="h-3 w-3" />
-                : isActive
-                ? <Loader2 className="h-3 w-3 animate-spin" />
-                : isFailed && i === currentIndex
-                ? <X className="h-3 w-3" />
-                : <Circle className="h-2 w-2" />}
+              {isCompleted ? (
+                <Check className="h-3 w-3" />
+              ) : isActive ? (
+                <Loader2 className="h-3 w-3 animate-spin" />
+              ) : isFailed && i === currentIndex ? (
+                <X className="h-3 w-3" />
+              ) : (
+                <Circle className="h-2 w-2" />
+              )}
             </div>
             {i < STEPS.length - 1 && (
               <div

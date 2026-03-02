@@ -7,11 +7,10 @@ import { ArrowRight, Check, Copy, Terminal } from "lucide-react";
 import { motion } from "framer-motion";
 import { useState } from "react";
 
-const toolCategories = MCP_CATEGORIES
-  .filter(c => c.toolCount > 0)
+const toolCategories = MCP_CATEGORIES.filter((c) => c.toolCount > 0)
   .sort((a, b) => b.toolCount - a.toolCount)
   .slice(0, 8)
-  .map(c => ({ name: c.name, toolCount: c.toolCount }));
+  .map((c) => ({ name: c.name, toolCount: c.toolCount }));
 
 const MCP_JSON_CONTENT = `{
   "mcpServers": {
@@ -58,19 +57,17 @@ function CopyButton() {
       className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium text-zinc-400 hover:text-white hover:bg-zinc-800 transition-all duration-200 border border-transparent hover:border-zinc-700"
       aria-label={copied ? "Copied to clipboard" : "Copy to clipboard"}
     >
-      {copied
-        ? (
-          <>
-            <Check className="w-3.5 h-3.5 text-emerald-400" />
-            <span className="text-emerald-400">Copied!</span>
-          </>
-        )
-        : (
-          <>
-            <Copy className="w-3.5 h-3.5" />
-            <span>Copy</span>
-          </>
-        )}
+      {copied ? (
+        <>
+          <Check className="w-3.5 h-3.5 text-emerald-400" />
+          <span className="text-emerald-400">Copied!</span>
+        </>
+      ) : (
+        <>
+          <Copy className="w-3.5 h-3.5" />
+          <span>Copy</span>
+        </>
+      )}
     </button>
   );
 }
@@ -156,17 +153,64 @@ export function McpShowcaseSection() {
               </div>
               <pre className="relative p-8 text-sm md:text-[15px] font-mono leading-relaxed overflow-x-auto selection:bg-cyan-500/30 z-10">
                 <code className="text-blue-100 drop-shadow-sm">
-                  <span className="text-zinc-500">{'{'}</span><br/>
-                  {"  "}<span className="text-pink-400 font-semibold">"mcpServers"</span><span className="text-zinc-500">: {'{'}</span><br/>
-                  {"    "}<span className="text-cyan-300">"spike-land"</span><span className="text-zinc-500">: {'{'} </span><span className="text-pink-400">"url"</span><span className="text-zinc-500">: </span><span className="text-emerald-300">"https://spike.land/api/mcp/sse"</span><span className="text-zinc-500"> {'}'}</span>,<br/>
-                  {"    "}<span className="text-cyan-300">"vitest"</span><span className="text-zinc-500">: {'{'} </span><span className="text-pink-400">"command"</span><span className="text-zinc-500">: </span><span className="text-emerald-300">"npx"</span><span className="text-zinc-500">, </span><span className="text-pink-400">"args"</span><span className="text-zinc-500">: [</span><span className="text-emerald-300">"@anthropic-ai/vitest-mcp"</span><span className="text-zinc-500">] {'}'}</span><br/>
-                  {"  "}<span className="text-zinc-500">{'}'}</span>,<br/>
-                  {"  "}<span className="text-pink-400 font-semibold">"toolsets"</span><span className="text-zinc-500">: {'{'}</span><br/>
-                  {"    "}<span className="text-cyan-300">"chess"</span><span className="text-zinc-500">: {'{'} </span><span className="text-pink-400">"servers"</span><span className="text-zinc-500">: [</span><span className="text-emerald-300">"spike-land"</span><span className="text-zinc-500">], </span><span className="text-pink-400">"description"</span><span className="text-zinc-500">: </span><span className="text-emerald-300">"Chess tools"</span><span className="text-zinc-500"> {'}'}</span>,<br/>
-                  {"    "}<span className="text-cyan-300">"testing"</span><span className="text-zinc-500">: {'{'} </span><span className="text-pink-400">"servers"</span><span className="text-zinc-500">: [</span><span className="text-emerald-300">"vitest"</span><span className="text-zinc-500">] {'}'}</span><br/>
-                  {"  "}<span className="text-zinc-500">{'}'}</span>,<br/>
-                  {"  "}<span className="text-pink-400 font-semibold">"lazyLoading"</span><span className="text-zinc-500">: </span><span className="text-purple-400">true</span><br/>
-                  <span className="text-zinc-500">{'}'}</span>
+                  <span className="text-zinc-500">{"{"}</span>
+                  <br />
+                  {"  "}
+                  <span className="text-pink-400 font-semibold">"mcpServers"</span>
+                  <span className="text-zinc-500">: {"{"}</span>
+                  <br />
+                  {"    "}
+                  <span className="text-cyan-300">"spike-land"</span>
+                  <span className="text-zinc-500">: {"{"} </span>
+                  <span className="text-pink-400">"url"</span>
+                  <span className="text-zinc-500">: </span>
+                  <span className="text-emerald-300">"https://spike.land/api/mcp/sse"</span>
+                  <span className="text-zinc-500"> {"}"}</span>,<br />
+                  {"    "}
+                  <span className="text-cyan-300">"vitest"</span>
+                  <span className="text-zinc-500">: {"{"} </span>
+                  <span className="text-pink-400">"command"</span>
+                  <span className="text-zinc-500">: </span>
+                  <span className="text-emerald-300">"npx"</span>
+                  <span className="text-zinc-500">, </span>
+                  <span className="text-pink-400">"args"</span>
+                  <span className="text-zinc-500">: [</span>
+                  <span className="text-emerald-300">"@anthropic-ai/vitest-mcp"</span>
+                  <span className="text-zinc-500">] {"}"}</span>
+                  <br />
+                  {"  "}
+                  <span className="text-zinc-500">{"}"}</span>,<br />
+                  {"  "}
+                  <span className="text-pink-400 font-semibold">"toolsets"</span>
+                  <span className="text-zinc-500">: {"{"}</span>
+                  <br />
+                  {"    "}
+                  <span className="text-cyan-300">"chess"</span>
+                  <span className="text-zinc-500">: {"{"} </span>
+                  <span className="text-pink-400">"servers"</span>
+                  <span className="text-zinc-500">: [</span>
+                  <span className="text-emerald-300">"spike-land"</span>
+                  <span className="text-zinc-500">], </span>
+                  <span className="text-pink-400">"description"</span>
+                  <span className="text-zinc-500">: </span>
+                  <span className="text-emerald-300">"Chess tools"</span>
+                  <span className="text-zinc-500"> {"}"}</span>,<br />
+                  {"    "}
+                  <span className="text-cyan-300">"testing"</span>
+                  <span className="text-zinc-500">: {"{"} </span>
+                  <span className="text-pink-400">"servers"</span>
+                  <span className="text-zinc-500">: [</span>
+                  <span className="text-emerald-300">"vitest"</span>
+                  <span className="text-zinc-500">] {"}"}</span>
+                  <br />
+                  {"  "}
+                  <span className="text-zinc-500">{"}"}</span>,<br />
+                  {"  "}
+                  <span className="text-pink-400 font-semibold">"lazyLoading"</span>
+                  <span className="text-zinc-500">: </span>
+                  <span className="text-purple-400">true</span>
+                  <br />
+                  <span className="text-zinc-500">{"}"}</span>
                 </code>
               </pre>
             </div>
@@ -180,7 +224,7 @@ export function McpShowcaseSection() {
             viewport={{ once: true }}
             className="grid grid-cols-2 gap-5 content-center order-1 lg:order-2"
           >
-            {toolCategories.map(cat => (
+            {toolCategories.map((cat) => (
               <motion.div
                 key={cat.name}
                 variants={itemVariants}

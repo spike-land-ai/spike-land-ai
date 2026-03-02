@@ -24,9 +24,11 @@ export function registerStoreAppsTools(
       .tool("store_app_rate", "Rate a store app (1-5 stars) and optionally write a review body.", {
         appSlug: z.string().min(1).describe("The app slug to rate"),
         rating: z.number().int().min(1).max(5).describe("Rating from 1 to 5"),
-        body: z.string().optional().nullable().describe(
-          "Optional review text. Pass null or omit to clear.",
-        ),
+        body: z
+          .string()
+          .optional()
+          .nullable()
+          .describe("Optional review text. Pass null or omit to clear."),
       })
       .meta({ category: "store", tier: "free" })
       .handler(async ({ input }) => {
@@ -45,9 +47,9 @@ export function registerStoreAppsTools(
           });
 
           return textResult(
-            `Rated "${result.appName}" ${input.rating}/5 stars. New average: ${
-              result.avg.toFixed(1)
-            } (${result.count} ratings).`,
+            `Rated "${result.appName}" ${input.rating}/5 stars. New average: ${result.avg.toFixed(
+              1,
+            )} (${result.count} ratings).`,
           );
         });
       }),
@@ -58,9 +60,14 @@ export function registerStoreAppsTools(
     t
       .tool("store_app_reviews", "List reviews for a store app as markdown.", {
         appSlug: z.string().min(1).describe("The app slug"),
-        limit: z.number().int().min(1).max(50).optional().default(10).describe(
-          "Max reviews to return (default 10)",
-        ),
+        limit: z
+          .number()
+          .int()
+          .min(1)
+          .max(50)
+          .optional()
+          .default(10)
+          .describe("Max reviews to return (default 10)"),
       })
       .meta({ category: "store", tier: "free" })
       .handler(async ({ input }) => {
@@ -78,7 +85,10 @@ export function registerStoreAppsTools(
           }
 
           const md = result.reviews
-            .map(r => `**${r.rating}/5** — ${r.body}\n*${new Date(r.createdAt).toLocaleDateString()}*`)
+            .map(
+              (r) =>
+                `**${r.rating}/5** — ${r.body}\n*${new Date(r.createdAt).toLocaleDateString()}*`,
+            )
             .join("\n\n---\n\n");
           return textResult(`## Reviews for ${result.appName}\n\n${md}`);
         });
@@ -127,10 +137,11 @@ export function registerStoreAppsTools(
       .meta({ category: "store", tier: "free" })
       .handler(async () => {
         return safeToolCall("store_wishlist_get", async () => {
-          const apps = await apiRequest<Array<{ name: string; slug: string }>>("/api/store/wishlist");
+          const apps =
+            await apiRequest<Array<{ name: string; slug: string }>>("/api/store/wishlist");
 
           if (apps.length === 0) return textResult("Your wishlist is empty.");
-          const list = apps.map(a => `- **${a.name}** (/apps/store/${a.slug})`).join("\n");
+          const list = apps.map((a) => `- **${a.name}** (/apps/store/${a.slug})`).join("\n");
           return textResult(`## Your Wishlist\n\n${list}`);
         });
       }),
@@ -139,25 +150,36 @@ export function registerStoreAppsTools(
   // store_recommendations_get
   registry.registerBuilt(
     t
-      .tool("store_recommendations_get", "Get app recommendations based on a given app slug using tag overlap scoring.", {
-        appSlug: z.string().min(1).describe("The app to get recommendations for"),
-        limit: z.number().int().min(1).max(8).optional().default(4).describe(
-          "Number of recommendations (default 4, max 8)",
-        ),
-      })
+      .tool(
+        "store_recommendations_get",
+        "Get app recommendations based on a given app slug using tag overlap scoring.",
+        {
+          appSlug: z.string().min(1).describe("The app to get recommendations for"),
+          limit: z
+            .number()
+            .int()
+            .min(1)
+            .max(8)
+            .optional()
+            .default(4)
+            .describe("Number of recommendations (default 4, max 8)"),
+        },
+      )
       .meta({ category: "store", tier: "free" })
       .handler(async ({ input }) => {
         return safeToolCall("store_recommendations_get", async () => {
           const params = new URLSearchParams({ appSlug: input.appSlug });
           if (input.limit !== undefined) params.set("limit", String(input.limit));
 
-          const recs = await apiRequest<Array<{ name: string; tagline: string }>>(`/api/store/recommendations?${params.toString()}`);
+          const recs = await apiRequest<Array<{ name: string; tagline: string }>>(
+            `/api/store/recommendations?${params.toString()}`,
+          );
 
           if (recs.length === 0) {
             return textResult(`No recommendations found for "${input.appSlug}".`);
           }
 
-          const list = recs.map(a => `- **${a.name}** — ${a.tagline}`).join("\n");
+          const list = recs.map((a) => `- **${a.name}** — ${a.tagline}`).join("\n");
           return textResult(`## Recommended for "${input.appSlug}"\n\n${list}`);
         });
       }),
@@ -166,24 +188,35 @@ export function registerStoreAppsTools(
   // store_app_personalized
   registry.registerBuilt(
     t
-      .tool("store_app_personalized", "Get personalized app recommendations for the current user based on install history.", {
-        limit: z.number().int().min(1).max(20).optional().default(8).describe(
-          "Max apps to return (default 8, max 20)",
-        ),
-      })
+      .tool(
+        "store_app_personalized",
+        "Get personalized app recommendations for the current user based on install history.",
+        {
+          limit: z
+            .number()
+            .int()
+            .min(1)
+            .max(20)
+            .optional()
+            .default(8)
+            .describe("Max apps to return (default 8, max 20)"),
+        },
+      )
       .meta({ category: "store", tier: "free" })
       .handler(async ({ input }) => {
         return safeToolCall("store_app_personalized", async () => {
           const params = new URLSearchParams();
           if (input.limit !== undefined) params.set("limit", String(input.limit));
 
-          const apps = await apiRequest<Array<{ name: string; tagline: string }>>(`/api/store/personalized?${params.toString()}`);
+          const apps = await apiRequest<Array<{ name: string; tagline: string }>>(
+            `/api/store/personalized?${params.toString()}`,
+          );
 
           if (apps.length === 0) {
             return textResult("No personalized recommendations available.");
           }
 
-          const list = apps.map(a => `- **${a.name}** — ${a.tagline}`).join("\n");
+          const list = apps.map((a) => `- **${a.name}** — ${a.tagline}`).join("\n");
           return textResult(`## Personalized Recommendations\n\n${list}`);
         });
       }),
@@ -192,7 +225,11 @@ export function registerStoreAppsTools(
   // store_stats
   registry.registerBuilt(
     t
-      .tool("store_stats", "Get store statistics: total apps, tools, categories, and platform install counts.", {})
+      .tool(
+        "store_stats",
+        "Get store statistics: total apps, tools, categories, and platform install counts.",
+        {},
+      )
       .meta({ category: "store", tier: "free" })
       .handler(async () => {
         return safeToolCall("store_stats", async () => {
@@ -205,12 +242,12 @@ export function registerStoreAppsTools(
           }>("/api/store/stats");
 
           return textResult(
-            `## Store Stats\n\n`
-            + `- **Apps**: ${stats.appCount}\n`
-            + `- **Tools**: ${stats.toolCount}\n`
-            + `- **Categories**: ${stats.categoryCount}\n`
-            + `- **Developers**: ${stats.developerCount}\n`
-            + `- **Installs**: ${stats.totalInstalls}`,
+            `## Store Stats\n\n` +
+              `- **Apps**: ${stats.appCount}\n` +
+              `- **Tools**: ${stats.toolCount}\n` +
+              `- **Categories**: ${stats.categoryCount}\n` +
+              `- **Developers**: ${stats.developerCount}\n` +
+              `- **Installs**: ${stats.totalInstalls}`,
           );
         });
       }),

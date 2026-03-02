@@ -75,8 +75,7 @@ export class McpError extends Error {
  */
 export function textResult(text: string): CallToolResult {
   const MAX = 8_192;
-  const truncated =
-    text.length > MAX ? text.slice(0, MAX) + "\n...(truncated)" : text;
+  const truncated = text.length > MAX ? text.slice(0, MAX) + "\n...(truncated)" : text;
   return { content: [{ type: "text", text: truncated }] };
 }
 
@@ -100,11 +99,7 @@ export function jsonResult(data: unknown): CallToolResult {
  * **Retryable:** false
  * ```
  */
-export function errorResult(
-  code: string,
-  message: string,
-  retryable = false,
-): CallToolResult {
+export function errorResult(code: string, message: string, retryable = false): CallToolResult {
   return {
     content: [
       {
@@ -226,22 +221,21 @@ export interface ZodToolOptions {
  * });
  * ```
  */
-export function createZodTool(
-  server: McpServer,
-  options: ZodToolOptions,
-): void {
+export function createZodTool(server: McpServer, options: ZodToolOptions): void {
   const { name, description, schema, handler } = options;
 
   // server.tool() is overloaded; cast through unknown to satisfy tsc while
   // keeping the runtime call identical to all existing packages.
-  (server as unknown as {
-    tool: (
-      name: string,
-      description: string,
-      schema: Record<string, unknown>,
-      handler: (args: Record<string, unknown>) => Promise<CallToolResult>,
-    ) => void;
-  }).tool(name, description, schema, async (args) => {
+  (
+    server as unknown as {
+      tool: (
+        name: string,
+        description: string,
+        schema: Record<string, unknown>,
+        handler: (args: Record<string, unknown>) => Promise<CallToolResult>,
+      ) => void;
+    }
+  ).tool(name, description, schema, async (args) => {
     try {
       return await handler(args);
     } catch (err: unknown) {
@@ -346,7 +340,10 @@ export interface ToolRegistry {
  * ```
  */
 export interface MockRegistry extends ToolRegistry {
-  handlers: Map<string, (args: Record<string, unknown>) => Promise<CallToolResult> | CallToolResult>;
+  handlers: Map<
+    string,
+    (args: Record<string, unknown>) => Promise<CallToolResult> | CallToolResult
+  >;
   call: (name: string, args?: Record<string, unknown>) => Promise<CallToolResult>;
 }
 

@@ -40,14 +40,11 @@ describe("logger.ts sanitization", () => {
   });
 
   it("sanitizes arrays recursively", () => {
-    const input = [
-      "test@example.com",
-      { accessToken: "foo" },
-    ];
+    const input = ["test@example.com", { accessToken: "foo" }];
 
     const sanitized = sanitizeLogData(input) as unknown[];
     expect(sanitized[0]).toBe("[REDACTED]");
-    expect((sanitized[1] as any).accessToken).toBe("[REDACTED]");
+    expect((sanitized[1] as Record<string, unknown>).accessToken).toBe("[REDACTED]");
   });
 
   it("sanitizes Error objects", () => {

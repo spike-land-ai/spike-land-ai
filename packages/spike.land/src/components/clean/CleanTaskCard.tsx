@@ -18,10 +18,7 @@ const CATEGORY_COLORS: Record<string, string> = {
   OTHER: "border-l-gray-400",
 };
 
-const DIFFICULTY_VARIANT: Record<
-  string,
-  "default" | "secondary" | "warning" | "destructive"
-> = {
+const DIFFICULTY_VARIANT: Record<string, "default" | "secondary" | "warning" | "destructive"> = {
   QUICK: "secondary",
   EASY: "default",
   MEDIUM: "warning",
@@ -35,9 +32,7 @@ interface CleanTaskCardProps {
   isActive: boolean;
 }
 
-export function CleanTaskCard(
-  { task, onComplete, onSkip, isActive }: CleanTaskCardProps,
-) {
+export function CleanTaskCard({ task, onComplete, onSkip, isActive }: CleanTaskCardProps) {
   const isDone = task.status === "COMPLETED";
   const isSkipped = task.status === "SKIPPED";
 
@@ -53,21 +48,14 @@ export function CleanTaskCard(
     >
       <CardContent className="flex items-center gap-4 p-4">
         <div className="flex-1 space-y-1">
-          <p
-            className={cn(
-              "font-medium",
-              isDone && "line-through text-muted-foreground",
-            )}
-          >
+          <p className={cn("font-medium", isDone && "line-through text-muted-foreground")}>
             {task.description}
           </p>
           <div className="flex items-center gap-2">
             <Badge variant={DIFFICULTY_VARIANT[task.difficulty] ?? "default"}>
               {task.difficulty}
             </Badge>
-            <span className="text-xs text-muted-foreground">
-              {task.pointsValue} pts
-            </span>
+            <span className="text-xs text-muted-foreground">{task.pointsValue} pts</span>
           </div>
         </div>
         {isActive && task.status === "PENDING" && (

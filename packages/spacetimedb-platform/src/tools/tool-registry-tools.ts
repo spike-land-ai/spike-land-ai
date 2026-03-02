@@ -82,21 +82,16 @@ export function registerToolRegistryTools(
 
   // ─── stdb_list_tool_categories ───
 
-  server.tool(
-    "stdb_list_tool_categories",
-    "List all tool categories",
-    {},
-    async () => {
-      try {
-        const categories = client.listCategories();
-        return jsonResult({ count: categories.length, categories });
-      } catch (err: unknown) {
-        const message = err instanceof Error ? err.message : String(err);
-        if (message.includes("Not connected")) return errorResult("NOT_CONNECTED", message, false);
-        return errorResult("QUERY_FAILED", message, false);
-      }
-    },
-  );
+  server.tool("stdb_list_tool_categories", "List all tool categories", {}, async () => {
+    try {
+      const categories = client.listCategories();
+      return jsonResult({ count: categories.length, categories });
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err);
+      if (message.includes("Not connected")) return errorResult("NOT_CONNECTED", message, false);
+      return errorResult("QUERY_FAILED", message, false);
+    }
+  });
 
   // ─── stdb_tool_usage_stats ───
 

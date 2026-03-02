@@ -31,9 +31,7 @@ export function AdminStatsBar({ stats }: AdminStatsBarProps) {
               <span>{stat.label}</span>
             </div>
             <div className="flex items-end justify-between gap-2">
-              <span className="text-2xl font-bold font-mono text-zinc-100">
-                {stat.value}
-              </span>
+              <span className="text-2xl font-bold font-mono text-zinc-100">{stat.value}</span>
               {stat.delta && (
                 <span
                   className={cn(

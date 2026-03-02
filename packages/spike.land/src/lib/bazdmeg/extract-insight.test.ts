@@ -39,8 +39,7 @@ describe("extractAndSaveInsight", () => {
       content: [
         {
           type: "text",
-          text:
-            "{\"insight\": \"Testing is crucial for AI code\", \"tags\": [\"testing\", \"quality\"], \"skip\": false}",
+          text: '{"insight": "Testing is crucial for AI code", "tags": ["testing", "quality"], "skip": false}',
         },
       ],
     });
@@ -66,7 +65,7 @@ describe("extractAndSaveInsight", () => {
       content: [
         {
           type: "text",
-          text: "{\"insight\": \"Existing insight\", \"tags\": [\"tag\"], \"skip\": false}",
+          text: '{"insight": "Existing insight", "tags": ["tag"], "skip": false}',
         },
       ],
     });
@@ -90,7 +89,7 @@ describe("extractAndSaveInsight", () => {
       content: [
         {
           type: "text",
-          text: "{\"insight\": \"Known insight\", \"tags\": [], \"skip\": false}",
+          text: '{"insight": "Known insight", "tags": [], "skip": false}',
         },
       ],
     });
@@ -110,7 +109,7 @@ describe("extractAndSaveInsight", () => {
       content: [
         {
           type: "text",
-          text: "{\"insight\": \"\", \"tags\": [], \"skip\": true}",
+          text: '{"insight": "", "tags": [], "skip": true}',
         },
       ],
     });
@@ -124,9 +123,7 @@ describe("extractAndSaveInsight", () => {
   it("does not throw on AI client error", async () => {
     mockCreate.mockRejectedValue(new Error("API rate limited"));
 
-    await expect(
-      extractAndSaveInsight({ question: "Q", answer: "A" }),
-    ).resolves.toBeUndefined();
+    await expect(extractAndSaveInsight({ question: "Q", answer: "A" })).resolves.toBeUndefined();
   });
 
   it("does not throw on invalid JSON response", async () => {
@@ -134,9 +131,7 @@ describe("extractAndSaveInsight", () => {
       content: [{ type: "text", text: "Not valid JSON at all" }],
     });
 
-    await expect(
-      extractAndSaveInsight({ question: "Q", answer: "A" }),
-    ).resolves.toBeUndefined();
+    await expect(extractAndSaveInsight({ question: "Q", answer: "A" })).resolves.toBeUndefined();
   });
 
   it("truncates sourceQuestion to 500 chars", async () => {
@@ -145,7 +140,7 @@ describe("extractAndSaveInsight", () => {
       content: [
         {
           type: "text",
-          text: "{\"insight\": \"Good insight\", \"tags\": [\"test\"], \"skip\": false}",
+          text: '{"insight": "Good insight", "tags": ["test"], "skip": false}',
         },
       ],
     });

@@ -76,11 +76,8 @@ function getNode(cluster: BftCluster, nodeId: string): BftNode {
   return node;
 }
 
-function getRound(
-  cluster: BftCluster,
-  roundSeq: number,
-): ConsensusRound {
-  const round = cluster.rounds.find(r => r.sequenceNumber === roundSeq);
+function getRound(cluster: BftCluster, roundSeq: number): ConsensusRound {
+  const round = cluster.rounds.find((r) => r.sequenceNumber === roundSeq);
   if (!round) throw new Error(`Round ${roundSeq} not found`);
   return round;
 }
@@ -91,9 +88,7 @@ function getRound(
 
 export function createCluster(opts: CreateClusterOptions): BftCluster {
   if (opts.nodeCount < 4) {
-    throw new Error(
-      "Node count must be at least 4 (need 3f+1 for BFT)",
-    );
+    throw new Error("Node count must be at least 4 (need 3f+1 for BFT)");
   }
 
   const id = generateId();
@@ -169,7 +164,7 @@ export function setBehavior(
   userId: string,
   nodeId: string,
   behavior: NodeBehavior,
-): { node: BftNode; warning: string | null; } {
+): { node: BftNode; warning: string | null } {
   const cluster = getCluster(clusterId, userId);
   const node = getNode(cluster, nodeId);
 
@@ -188,18 +183,15 @@ export function setBehavior(
   let warning: string | null = null;
 
   if (honestCount < requiredHonest) {
-    warning = `Warning: only ${honestCount} honest nodes remain, but ${requiredHonest} are needed `
-      + `for safety (f=${f}, n=${cluster.nodeOrder.length}). Consensus may fail.`;
+    warning =
+      `Warning: only ${honestCount} honest nodes remain, but ${requiredHonest} are needed ` +
+      `for safety (f=${f}, n=${cluster.nodeOrder.length}). Consensus may fail.`;
   }
 
   return { node, warning };
 }
 
-export function propose(
-  clusterId: string,
-  userId: string,
-  value: string,
-): ConsensusRound {
+export function propose(clusterId: string, userId: string, value: string): ConsensusRound {
   const cluster = getCluster(clusterId, userId);
 
   cluster.currentSequence++;
@@ -258,9 +250,7 @@ export function runPreparePhase(
   const round = getRound(cluster, roundSeq);
 
   if (round.phase !== "pre_prepare") {
-    throw new Error(
-      `Round ${roundSeq} is in phase "${round.phase}", expected "pre_prepare"`,
-    );
+    throw new Error(`Round ${roundSeq} is in phase "${round.phase}", expected "pre_prepare"`);
   }
 
   const prepareMessages: PbftMessage[] = [];
@@ -327,9 +317,7 @@ export function runCommitPhase(
   const round = getRound(cluster, roundSeq);
 
   if (round.phase !== "prepare") {
-    throw new Error(
-      `Round ${roundSeq} is in phase "${round.phase}", expected "prepare"`,
-    );
+    throw new Error(`Round ${roundSeq} is in phase "${round.phase}", expected "prepare"`);
   }
 
   const n = cluster.nodeOrder.length;
@@ -346,7 +334,7 @@ export function runCommitPhase(
 
     // Count how many prepare messages match the proposed value
     const matchingPrepares = node.prepareMessages.filter(
-      m => m.value === round.proposedValue,
+      (m) => m.value === round.proposedValue,
     ).length;
 
     if (node.behavior === "equivocating") {
@@ -403,9 +391,7 @@ export function checkConsensus(
   const round = getRound(cluster, roundSeq);
 
   if (round.phase !== "commit") {
-    throw new Error(
-      `Round ${roundSeq} is in phase "${round.phase}", expected "commit"`,
-    );
+    throw new Error(`Round ${roundSeq} is in phase "${round.phase}", expected "commit"`);
   }
 
   const n = cluster.nodeOrder.length;
@@ -413,12 +399,12 @@ export function checkConsensus(
 
   // Count prepare messages that match the proposed value
   const prepareCount = round.messages.filter(
-    m => m.type === "prepare" && m.value === round.proposedValue,
+    (m) => m.type === "prepare" && m.value === round.proposedValue,
   ).length;
 
   // Count commit messages that match the proposed value
   const commitCount = round.messages.filter(
-    m => m.type === "commit" && m.value === round.proposedValue,
+    (m) => m.type === "commit" && m.value === round.proposedValue,
   ).length;
 
   const decided = commitCount >= q;
@@ -431,7 +417,7 @@ export function checkConsensus(
     // Update all honest nodes that have enough matching commits
     for (const node of cluster.nodes.values()) {
       const nodeMatchingCommits = node.commitMessages.filter(
-        m => m.value === round.proposedValue,
+        (m) => m.value === round.proposedValue,
       ).length;
 
       if (nodeMatchingCommits >= q && node.behavior === "honest") {
@@ -451,11 +437,7 @@ export function checkConsensus(
   };
 }
 
-export function runFullRound(
-  clusterId: string,
-  userId: string,
-  value: string,
-): ConsensusResult {
+export function runFullRound(clusterId: string, userId: string, value: string): ConsensusResult {
   const cluster = getCluster(clusterId, userId);
 
   propose(cluster.id, userId, value);
@@ -465,15 +447,12 @@ export function runFullRound(
   return checkConsensus(cluster.id, userId, seqNum);
 }
 
-export function inspect(
-  clusterId: string,
-  userId: string,
-): ClusterStateView {
+export function inspect(clusterId: string, userId: string): ClusterStateView {
   const cluster = getCluster(clusterId, userId);
   const n = cluster.nodeOrder.length;
   const f = maxFaults(n);
 
-  const nodes = cluster.nodeOrder.map(nodeId => {
+  const nodes = cluster.nodeOrder.map((nodeId) => {
     const node = cluster.nodes.get(nodeId)!;
     return {
       id: node.id,
@@ -483,9 +462,8 @@ export function inspect(
     };
   });
 
-  const currentRound = cluster.rounds.length > 0
-    ? cluster.rounds[cluster.rounds.length - 1]!
-    : null;
+  const currentRound =
+    cluster.rounds.length > 0 ? cluster.rounds[cluster.rounds.length - 1]! : null;
 
   return {
     id: cluster.id,
@@ -497,10 +475,7 @@ export function inspect(
   };
 }
 
-export function checkSafety(
-  clusterId: string,
-  userId: string,
-): SafetyCheckResult {
+export function checkSafety(clusterId: string, userId: string): SafetyCheckResult {
   const cluster = getCluster(clusterId, userId);
   const issues: string[] = [];
   const n = cluster.nodeOrder.length;
@@ -521,7 +496,7 @@ export function checkSafety(
   }
 
   // Check 2: No two honest nodes should have decided different values
-  const honestDecisions: Array<{ nodeId: string; value: string; }> = [];
+  const honestDecisions: Array<{ nodeId: string; value: string }> = [];
   for (const node of cluster.nodes.values()) {
     if (node.behavior === "honest" && node.decidedValue !== null) {
       honestDecisions.push({ nodeId: node.id, value: node.decidedValue });

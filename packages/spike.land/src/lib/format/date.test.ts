@@ -1,10 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import {
-  formatDate,
-  formatDateShort,
-  formatDuration,
-  formatRelativeTime,
-} from "./date";
+import { formatDate, formatDateShort, formatDuration, formatRelativeTime } from "./date";
 
 describe("formatDate", () => {
   it("should format a date string with full date and time", () => {
@@ -43,40 +38,26 @@ describe("formatDateShort", () => {
 describe("formatDuration", () => {
   it("should return 'In progress' when no end date", () => {
     expect(formatDuration("2024-06-15T14:30:00Z")).toBe("In progress");
-    expect(formatDuration("2024-06-15T14:30:00Z", undefined)).toBe(
-      "In progress",
-    );
+    expect(formatDuration("2024-06-15T14:30:00Z", undefined)).toBe("In progress");
   });
 
   it("should format seconds-only duration", () => {
-    const result = formatDuration(
-      "2024-06-15T14:30:00Z",
-      "2024-06-15T14:30:45Z",
-    );
+    const result = formatDuration("2024-06-15T14:30:00Z", "2024-06-15T14:30:45Z");
     expect(result).toBe("45s");
   });
 
   it("should format minutes and seconds duration", () => {
-    const result = formatDuration(
-      "2024-06-15T14:30:00Z",
-      "2024-06-15T14:32:15Z",
-    );
+    const result = formatDuration("2024-06-15T14:30:00Z", "2024-06-15T14:32:15Z");
     expect(result).toBe("2m 15s");
   });
 
   it("should handle zero-second duration", () => {
-    const result = formatDuration(
-      "2024-06-15T14:30:00Z",
-      "2024-06-15T14:30:00Z",
-    );
+    const result = formatDuration("2024-06-15T14:30:00Z", "2024-06-15T14:30:00Z");
     expect(result).toBe("0s");
   });
 
   it("should handle exact minute boundary", () => {
-    const result = formatDuration(
-      "2024-06-15T14:30:00Z",
-      "2024-06-15T14:31:00Z",
-    );
+    const result = formatDuration("2024-06-15T14:30:00Z", "2024-06-15T14:31:00Z");
     expect(result).toBe("1m 0s");
   });
 });

@@ -11,7 +11,7 @@ export interface GatewayTransport {
   request<T = Record<string, unknown>>(
     method: string,
     params?: unknown,
-    opts?: { expectFinal?: boolean; },
+    opts?: { expectFinal?: boolean },
   ): Promise<T>;
 }
 
@@ -29,23 +29,18 @@ type CliResponse = {
 function runCli(
   bin: string,
   args: string[],
-  opts: { timeout?: number; maxBuffer?: number; },
-): Promise<{ stdout: string; stderr: string; }> {
+  opts: { timeout?: number; maxBuffer?: number },
+): Promise<{ stdout: string; stderr: string }> {
   return new Promise((resolve, reject) => {
-    execFile(
-      bin,
-      args,
-      { ...opts, encoding: "utf8" },
-      (error, stdout, stderr) => {
-        if (error) {
-          const enriched = error as Error & { stderr?: string; };
-          enriched.stderr = stderr;
-          reject(enriched);
-          return;
-        }
-        resolve({ stdout: stdout ?? "", stderr: stderr ?? "" });
-      },
-    );
+    execFile(bin, args, { ...opts, encoding: "utf8" }, (error, stdout, stderr) => {
+      if (error) {
+        const enriched = error as Error & { stderr?: string };
+        enriched.stderr = stderr;
+        reject(enriched);
+        return;
+      }
+      resolve({ stdout: stdout ?? "", stderr: stderr ?? "" });
+    });
   });
 }
 
@@ -59,12 +54,10 @@ export class CliGatewayTransport implements GatewayTransport {
   async request<T = Record<string, unknown>>(
     method: string,
     params?: unknown,
-    _opts?: { expectFinal?: boolean; },
+    _opts?: { expectFinal?: boolean },
   ): Promise<T> {
     if (method !== "chat.send") {
-      throw new Error(
-        `CliGatewayTransport only supports chat.send, got: ${method}`,
-      );
+      throw new Error(`CliGatewayTransport only supports chat.send, got: ${method}`);
     }
 
     const { sessionKey, message } = (params ?? {}) as {
@@ -76,16 +69,7 @@ export class CliGatewayTransport implements GatewayTransport {
       throw new Error("message is required for chat.send");
     }
 
-    const args = [
-      "agent",
-      "--agent",
-      "main",
-      "--message",
-      message,
-      "--json",
-      "--timeout",
-      "30",
-    ];
+    const args = ["agent", "--agent", "main", "--message", message, "--json", "--timeout", "30"];
 
     if (sessionKey) {
       args.push("--session-id", sessionKey);
@@ -107,18 +91,14 @@ export class CliGatewayTransport implements GatewayTransport {
       if (execErr.code === "ENOENT") {
         throw new Error(`openclaw CLI not found at: ${this.cliBin}`);
       }
-      throw new Error(
-        `openclaw CLI failed: ${execErr.stderr || execErr.message || String(err)}`,
-      );
+      throw new Error(`openclaw CLI failed: ${execErr.stderr || execErr.message || String(err)}`);
     }
 
     let parsed: CliResponse;
     try {
       parsed = JSON.parse(stdout) as CliResponse;
     } catch {
-      throw new Error(
-        `Invalid JSON from openclaw CLI: ${stdout.slice(0, 200)}`,
-      );
+      throw new Error(`Invalid JSON from openclaw CLI: ${stdout.slice(0, 200)}`);
     }
 
     if (parsed.error) {
@@ -141,9 +121,7 @@ export function isGatewayConfigured(): boolean {
 
 export function createGatewayTransport(): CliGatewayTransport {
   if (!process.env.OPENCLAW_GATEWAY_URL) {
-    throw new Error(
-      "Missing required environment variable: OPENCLAW_GATEWAY_URL",
-    );
+    throw new Error("Missing required environment variable: OPENCLAW_GATEWAY_URL");
   }
 
   return new CliGatewayTransport();

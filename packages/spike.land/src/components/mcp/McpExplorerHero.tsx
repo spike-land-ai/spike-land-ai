@@ -3,10 +3,7 @@
 import { Search } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Fuse from "fuse.js";
-import {
-  MCP_TOOLS,
-  SUPER_CATEGORY_COUNT,
-} from "@/components/mcp/mcp-tool-registry";
+import { MCP_TOOLS, SUPER_CATEGORY_COUNT } from "@/components/mcp/mcp-tool-registry";
 import { STORE_APPS } from "@/app/store/data/store-apps";
 import type { McpToolDef } from "@/components/mcp/mcp-tool-registry";
 
@@ -35,9 +32,7 @@ const fuse = new Fuse(MCP_TOOLS, {
   minMatchCharLength: 2,
 });
 
-export function McpExplorerHero(
-  { onSearch, searchValue, onToolSelect }: McpExplorerHeroProps,
-) {
+export function McpExplorerHero({ onSearch, searchValue, onToolSelect }: McpExplorerHeroProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const [showSuggestions, setShowSuggestions] = useState(false);
@@ -52,13 +47,13 @@ export function McpExplorerHero(
   useEffect(() => {
     function handleKeyDown(e: KeyboardEvent) {
       if (
-        e.key === "/"
-        && !e.ctrlKey
-        && !e.metaKey
-        && !e.altKey
-        && document.activeElement?.tagName !== "INPUT"
-        && document.activeElement?.tagName !== "TEXTAREA"
-        && !(document.activeElement as HTMLElement)?.isContentEditable
+        e.key === "/" &&
+        !e.ctrlKey &&
+        !e.metaKey &&
+        !e.altKey &&
+        document.activeElement?.tagName !== "INPUT" &&
+        document.activeElement?.tagName !== "TEXTAREA" &&
+        !(document.activeElement as HTMLElement)?.isContentEditable
       ) {
         e.preventDefault();
         inputRef.current?.focus();
@@ -72,9 +67,9 @@ export function McpExplorerHero(
   useEffect(() => {
     function handleClick(e: MouseEvent) {
       if (
-        dropdownRef.current
-        && !dropdownRef.current.contains(e.target as Node)
-        && !inputRef.current?.contains(e.target as Node)
+        dropdownRef.current &&
+        !dropdownRef.current.contains(e.target as Node) &&
+        !inputRef.current?.contains(e.target as Node)
       ) {
         setShowSuggestions(false);
       }
@@ -111,10 +106,10 @@ export function McpExplorerHero(
 
       if (e.key === "ArrowDown") {
         e.preventDefault();
-        setHighlightedIdx(prev => (prev < suggestions.length - 1 ? prev + 1 : 0));
+        setHighlightedIdx((prev) => (prev < suggestions.length - 1 ? prev + 1 : 0));
       } else if (e.key === "ArrowUp") {
         e.preventDefault();
-        setHighlightedIdx(prev => (prev > 0 ? prev - 1 : suggestions.length - 1));
+        setHighlightedIdx((prev) => (prev > 0 ? prev - 1 : suggestions.length - 1));
       } else if (e.key === "Enter" && highlightedIdx >= 0) {
         e.preventDefault();
         const selected = suggestions[highlightedIdx];
@@ -136,9 +131,7 @@ export function McpExplorerHero(
       <div className="relative max-w-3xl mx-auto">
         {/* Badge */}
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs text-cyan-400 mb-6 backdrop-blur-xl">
-          <span className="font-semibold uppercase tracking-wider">
-            MCP Explorer
-          </span>
+          <span className="font-semibold uppercase tracking-wider">MCP Explorer</span>
         </div>
 
         {/* Headline */}
@@ -168,9 +161,7 @@ export function McpExplorerHero(
             aria-label="Search MCP tools"
             aria-expanded={showSuggestions && suggestions.length > 0}
             aria-controls="search-suggestions"
-            aria-activedescendant={highlightedIdx >= 0
-              ? `suggestion-${highlightedIdx}`
-              : undefined}
+            aria-activedescendant={highlightedIdx >= 0 ? `suggestion-${highlightedIdx}` : undefined}
             role="combobox"
             aria-autocomplete="list"
             className="w-full pl-12 pr-16 py-4 rounded-2xl bg-white/[0.04] border border-white/[0.08] text-white placeholder:text-zinc-600 focus:outline-none focus:border-cyan-500/50 focus:bg-white/[0.06] transition-all text-base focus:ring-2 focus:ring-cyan-500/20"
@@ -203,16 +194,10 @@ export function McpExplorerHero(
                   }`}
                 >
                   <div className="flex-1 min-w-0">
-                    <p className="font-mono text-sm truncate">
-                      {result.item.name}
-                    </p>
-                    <p className="text-xs text-zinc-500 truncate">
-                      {result.item.description}
-                    </p>
+                    <p className="font-mono text-sm truncate">{result.item.name}</p>
+                    <p className="text-xs text-zinc-500 truncate">{result.item.description}</p>
                   </div>
-                  <span className="text-[10px] text-zinc-600 shrink-0">
-                    {result.item.category}
-                  </span>
+                  <span className="text-[10px] text-zinc-600 shrink-0">{result.item.category}</span>
                 </button>
               ))}
             </div>
@@ -221,7 +206,7 @@ export function McpExplorerHero(
 
         {/* Stats pills */}
         <div className="flex flex-wrap justify-center gap-3">
-          {stats.map(stat => (
+          {stats.map((stat) => (
             <div
               key={stat.label}
               className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/[0.03] border border-white/[0.06] text-sm"

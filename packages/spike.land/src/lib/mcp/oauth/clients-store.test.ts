@@ -93,7 +93,7 @@ describe("clients-store", () => {
       // Capture the actual secret generated at runtime
       let capturedSecretHash: string | null = null;
       mockPrisma.oAuthClient.create.mockImplementation(
-        (args: { data: { clientSecretHash: string | null; }; }) => {
+        (args: { data: { clientSecretHash: string | null } }) => {
           capturedSecretHash = args.data.clientSecretHash;
           return Promise.resolve({
             clientId: "gen-client-id",
@@ -119,19 +119,17 @@ describe("clients-store", () => {
       // A hash was stored
       expect(capturedSecretHash).toMatch(/^[a-f0-9]{64}$/);
       // The response includes a client_secret
-      const response = result as { client_secret?: string; };
+      const response = result as { client_secret?: string };
       expect(response.client_secret).toBeDefined();
       expect(typeof response.client_secret).toBe("string");
       // Verify the hash matches the secret
-      const recomputedHash = createHash("sha256")
-        .update(response.client_secret!)
-        .digest("hex");
+      const recomputedHash = createHash("sha256").update(response.client_secret!).digest("hex");
       expect(recomputedHash).toBe(capturedSecretHash);
     });
 
     it("should generate client_secret for client_secret_basic auth method", async () => {
       mockPrisma.oAuthClient.create.mockImplementation(
-        (args: { data: { clientSecretHash: string | null; }; }) => {
+        (args: { data: { clientSecretHash: string | null } }) => {
           return Promise.resolve({
             clientId: "gen-client-id",
             clientName: "Basic Client",
@@ -153,7 +151,7 @@ describe("clients-store", () => {
       );
 
       expect(result).not.toHaveProperty("error");
-      const response = result as { client_secret?: string; };
+      const response = result as { client_secret?: string };
       expect(response.client_secret).toBeDefined();
       expect(typeof response.client_secret).toBe("string");
       // The stored hash should be a SHA-256 hex
@@ -196,10 +194,7 @@ describe("clients-store", () => {
     });
 
     it("should return error when redirect_uris is empty for non-device-flow", async () => {
-      const result = await registerClient(
-        { client_name: "Test", redirect_uris: [] },
-        "127.0.0.7",
-      );
+      const result = await registerClient({ client_name: "Test", redirect_uris: [] }, "127.0.0.7");
 
       expect(result).toEqual({
         error: "At least one redirect_uri is required",
@@ -362,10 +357,7 @@ describe("clients-store", () => {
         tokenEndpointAuthMethod: "none",
       });
 
-      await registerClient(
-        { ...validRequest, token_endpoint_auth_method: "none" },
-        "127.0.0.20",
-      );
+      await registerClient({ ...validRequest, token_endpoint_auth_method: "none" }, "127.0.0.20");
 
       expect(mockPrisma.oAuthClient.create).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -459,7 +451,7 @@ describe("clients-store", () => {
         {
           client_name: "test",
           redirect_uris: ["not-a-url"],
-        } as any,
+        } as unknown as Parameters<typeof registerClient>[0],
         "127.0.0.1",
       );
       expect(result).toHaveProperty("error");

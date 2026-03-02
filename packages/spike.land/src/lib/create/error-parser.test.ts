@@ -1,38 +1,26 @@
 import { describe, expect, it } from "vitest";
 
-import {
-  categorizeErrorForNote,
-  isUnrecoverableError,
-  parseTranspileError,
-} from "./error-parser";
+import { categorizeErrorForNote, isUnrecoverableError, parseTranspileError } from "./error-parser";
 
 describe("parseTranspileError", () => {
   it("detects import errors", () => {
-    const result = parseTranspileError(
-      "Cannot find module 'nonexistent-lib'",
-    );
+    const result = parseTranspileError("Cannot find module 'nonexistent-lib'");
     expect(result.type).toBe("import");
     expect(result.library).toBe("nonexistent-lib");
   });
 
   it("detects Module not found errors", () => {
-    const result = parseTranspileError(
-      "Module not found: 'some-module'",
-    );
+    const result = parseTranspileError("Module not found: 'some-module'");
     expect(result.type).toBe("import");
   });
 
   it("detects type errors", () => {
-    const result = parseTranspileError(
-      "Type 'string' is not assignable to type 'number'",
-    );
+    const result = parseTranspileError("Type 'string' is not assignable to type 'number'");
     expect(result.type).toBe("type");
   });
 
   it("detects Property does not exist", () => {
-    const result = parseTranspileError(
-      "Property 'foo' does not exist on type 'Bar'",
-    );
+    const result = parseTranspileError("Property 'foo' does not exist on type 'Bar'");
     expect(result.type).toBe("type");
   });
 
@@ -63,16 +51,12 @@ describe("parseTranspileError", () => {
   });
 
   it("extracts component name from JSX context", () => {
-    const result = parseTranspileError(
-      "Unexpected token in <Header> component",
-    );
+    const result = parseTranspileError("Unexpected token in <Header> component");
     expect(result.component).toBe("Header");
   });
 
   it("extracts suggestions", () => {
-    const result = parseTranspileError(
-      "Error: unknown prop. Did you mean 'className'?",
-    );
+    const result = parseTranspileError("Error: unknown prop. Did you mean 'className'?");
     expect(result.suggestion).toBe("'className'?");
   });
 
@@ -88,9 +72,7 @@ describe("parseTranspileError", () => {
   });
 
   it("classifies import of unknown CDN lib as environmental", () => {
-    const result = parseTranspileError(
-      "Cannot find module 'totally-unknown-lib'",
-    );
+    const result = parseTranspileError("Cannot find module 'totally-unknown-lib'");
     expect(result.severity).toBe("environmental");
     expect(result.fixStrategy).toBe("regenerate");
   });
@@ -102,9 +84,7 @@ describe("parseTranspileError", () => {
   });
 
   it("classifies internal import as fixable", () => {
-    const result = parseTranspileError(
-      "Cannot find module '@/components/ui/button'",
-    );
+    const result = parseTranspileError("Cannot find module '@/components/ui/button'");
     expect(result.severity).toBe("fixable");
     expect(result.fixStrategy).toBe("patch");
   });
@@ -118,27 +98,19 @@ describe("parseTranspileError", () => {
 
 describe("isUnrecoverableError", () => {
   it("returns true for environmental errors", () => {
-    const error = parseTranspileError(
-      "Cannot find module 'unknown-thing'",
-    );
+    const error = parseTranspileError("Cannot find module 'unknown-thing'");
     expect(isUnrecoverableError(error, [])).toBe(true);
   });
 
   it("returns true for 2+ identical consecutive errors", () => {
     const error = parseTranspileError("some error");
-    const previousErrors = [
-      { error: "same message" },
-      { error: "same message" },
-    ];
+    const previousErrors = [{ error: "same message" }, { error: "same message" }];
     expect(isUnrecoverableError(error, previousErrors)).toBe(true);
   });
 
   it("returns false for different consecutive errors", () => {
     const error = parseTranspileError("some error");
-    const previousErrors = [
-      { error: "first error" },
-      { error: "second error" },
-    ];
+    const previousErrors = [{ error: "first error" }, { error: "second error" }];
     expect(isUnrecoverableError(error, previousErrors)).toBe(false);
   });
 
@@ -150,9 +122,7 @@ describe("isUnrecoverableError", () => {
 
 describe("categorizeErrorForNote", () => {
   it("categorizes import errors", () => {
-    const error = parseTranspileError(
-      "Cannot find module 'recharts'",
-    );
+    const error = parseTranspileError("Cannot find module 'recharts'");
     const note = categorizeErrorForNote(error);
     expect(note.triggerType).toBe("library");
     expect(note.tags).toContain("imports");
@@ -160,9 +130,7 @@ describe("categorizeErrorForNote", () => {
   });
 
   it("categorizes type errors", () => {
-    const error = parseTranspileError(
-      "Type 'string' is not assignable to type 'number'",
-    );
+    const error = parseTranspileError("Type 'string' is not assignable to type 'number'");
     const note = categorizeErrorForNote(error);
     expect(note.triggerType).toBe("pattern");
     expect(note.tags).toContain("types");

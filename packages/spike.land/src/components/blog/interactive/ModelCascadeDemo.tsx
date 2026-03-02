@@ -74,18 +74,13 @@ const TIER_CONFIG: Record<ModelTier, TierConfig> = {
     glow: "rgba(14,165,233,0.3)",
     costLabel: "$",
     speedLabel: "20x",
-    taskExamples: [
-      "Fix syntax error",
-      "Format code",
-      "Rename variable",
-      "Add type annotation",
-    ],
+    taskExamples: ["Fix syntax error", "Format code", "Rename variable", "Add type annotation"],
     qualityBars: 3,
     speedBars: 5,
   },
 };
 
-const TASK_POOL: { label: string; complexity: TaskComplexity; tier: ModelTier; }[] = [
+const TASK_POOL: { label: string; complexity: TaskComplexity; tier: ModelTier }[] = [
   { label: "Arch design", complexity: "complex", tier: "opus" },
   { label: "Security audit", complexity: "complex", tier: "opus" },
   { label: "Edge case plan", complexity: "complex", tier: "opus" },
@@ -147,7 +142,7 @@ interface TierCardProps {
 function TierCard({ tier, active, filterId, tasks, now }: TierCardProps) {
   const cfg = TIER_CONFIG[tier];
   const y = TIER_Y[tier];
-  const tierTasks = tasks.filter(t => t.assignedTo === tier);
+  const tierTasks = tasks.filter((t) => t.assignedTo === tier);
 
   return (
     <g>
@@ -274,15 +269,14 @@ function TierCard({ tier, active, filterId, tasks, now }: TierCardProps) {
       )}
 
       {/* Animated task pills */}
-      {tierTasks.map(task => {
+      {tierTasks.map((task) => {
         const elapsed = now - task.spawnedAt;
         const tProgress = Math.min(elapsed / TASK_LIFETIME_MS, 1);
         const startX = CARD_X - 10;
         const endX = CARD_X + 50 + task.lane * 80;
         const taskX = startX + (endX - startX) * Math.min(tProgress * 2, 1);
-        const taskOpacity = tProgress > 0.7
-          ? 1 - (tProgress - 0.7) / 0.3
-          : Math.min(tProgress * 5, 1);
+        const taskOpacity =
+          tProgress > 0.7 ? 1 - (tProgress - 0.7) / 0.3 : Math.min(tProgress * 5, 1);
         return (
           <g key={task.id} opacity={taskOpacity}>
             <rect
@@ -345,10 +339,8 @@ export function ModelCascadeDemo() {
             spawnedAt: Date.now(),
             lane: Math.floor(Math.random() * MAX_LANES),
           };
-          setTasks(prev => {
-            const pruned = prev.filter(
-              t => Date.now() - t.spawnedAt < TASK_LIFETIME_MS + 200,
-            );
+          setTasks((prev) => {
+            const pruned = prev.filter((t) => Date.now() - t.spawnedAt < TASK_LIFETIME_MS + 200);
             return [...pruned, newTask];
           });
         }
@@ -441,11 +433,11 @@ export function ModelCascadeDemo() {
               </g>
 
               {/* Routing lines */}
-              {MODEL_ORDER.map(tier => {
+              {MODEL_ORDER.map((tier) => {
                 const cfg = TIER_CONFIG[tier];
                 const y = TIER_Y[tier];
                 const isActive = tier === activeTier;
-                const recentTask = tasks.filter(t => t.assignedTo === tier).at(-1);
+                const recentTask = tasks.filter((t) => t.assignedTo === tier).at(-1);
                 const taskProgress = recentTask
                   ? Math.min((now - recentTask.spawnedAt) / 600, 1)
                   : 0;
@@ -478,7 +470,7 @@ export function ModelCascadeDemo() {
               })}
 
               {/* Tier cards */}
-              {MODEL_ORDER.map(tier => (
+              {MODEL_ORDER.map((tier) => (
                 <TierCard
                   key={tier}
                   tier={tier}
@@ -521,9 +513,7 @@ export function ModelCascadeDemo() {
               >
                 {displayedConfig.label}
               </p>
-              <p className="text-[10px] text-slate-500 font-mono mb-3">
-                {displayedConfig.tagline}
-              </p>
+              <p className="text-[10px] text-slate-500 font-mono mb-3">{displayedConfig.tagline}</p>
 
               <div className="flex flex-col gap-2 text-[10px] font-mono">
                 <div className="flex items-center justify-between">
@@ -544,10 +534,7 @@ export function ModelCascadeDemo() {
                 </div>
                 <div className="flex items-center justify-between mt-1">
                   <span className="text-slate-500 uppercase tracking-wider">Cost</span>
-                  <span
-                    className="text-sm font-bold"
-                    style={{ color: displayedConfig.color }}
-                  >
+                  <span className="text-sm font-bold" style={{ color: displayedConfig.color }}>
                     {displayedConfig.costLabel}
                   </span>
                 </div>
@@ -564,7 +551,7 @@ export function ModelCascadeDemo() {
                 Task examples
               </p>
               <div className="flex flex-col gap-1">
-                {displayedConfig.taskExamples.map(ex => (
+                {displayedConfig.taskExamples.map((ex) => (
                   <div key={ex} className="flex items-center gap-2">
                     <span
                       className="w-1 h-1 rounded-full flex-shrink-0"
@@ -592,7 +579,7 @@ export function ModelCascadeDemo() {
         </div>
 
         <div className="flex flex-col sm:flex-row gap-3">
-          {MODEL_ORDER.map(tier => {
+          {MODEL_ORDER.map((tier) => {
             const cfg = TIER_CONFIG[tier];
             const isActive = activeTier === tier;
             return (

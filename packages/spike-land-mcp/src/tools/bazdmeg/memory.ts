@@ -24,28 +24,34 @@ export function registerBazdmegMemoryTools(
   // bazdmeg_memory_search
   registry.registerBuilt(
     t
-      .tool("bazdmeg_memory_search", "Search BAZDMEG knowledge base insights by keyword. Searches insight text and tags, returns matches sorted by confidence.", {
-        query: z.string().describe("Keyword to search in insights and tags"),
-        limit: z
-          .number()
-          .int()
-          .min(1)
-          .max(50)
-          .optional()
-          .describe("Max results to return (default 10)"),
-      })
+      .tool(
+        "bazdmeg_memory_search",
+        "Search BAZDMEG knowledge base insights by keyword. Searches insight text and tags, returns matches sorted by confidence.",
+        {
+          query: z.string().describe("Keyword to search in insights and tags"),
+          limit: z
+            .number()
+            .int()
+            .min(1)
+            .max(50)
+            .optional()
+            .describe("Max results to return (default 10)"),
+        },
+      )
       .meta({ category: "bazdmeg", tier: "free" })
       .handler(async ({ input }) => {
         return safeToolCall("bazdmeg_memory_search", async () => {
           const params = new URLSearchParams({ query: input.query });
           if (input.limit !== undefined) params.set("limit", String(input.limit));
 
-          const memories = await apiRequest<Array<{
-            insight: string;
-            tags: string[];
-            sourceQuestion: string;
-            confidence: number;
-          }>>(`/api/bazdmeg/memory/search?${params.toString()}`);
+          const memories = await apiRequest<
+            Array<{
+              insight: string;
+              tags: string[];
+              sourceQuestion: string;
+              confidence: number;
+            }>
+          >(`/api/bazdmeg/memory/search?${params.toString()}`);
 
           if (memories.length === 0) {
             return textResult(`No BAZDMEG insights found for "${input.query}".`);
@@ -58,9 +64,9 @@ export function registerBazdmegMemoryTools(
           for (const m of memories) {
             const tags = m.tags.length > 0 ? ` [${m.tags.join(", ")}]` : "";
             text += `- **${m.insight}**${tags}\n`;
-            text += `  _Source: "${m.sourceQuestion.slice(0, 100)}"_ | Confidence: ${
-              m.confidence.toFixed(2)
-            }\n\n`;
+            text += `  _Source: "${m.sourceQuestion.slice(0, 100)}"_ | Confidence: ${m.confidence.toFixed(
+              2,
+            )}\n\n`;
           }
 
           return textResult(text);
@@ -71,27 +77,33 @@ export function registerBazdmegMemoryTools(
   // bazdmeg_memory_list
   registry.registerBuilt(
     t
-      .tool("bazdmeg_memory_list", "List recent BAZDMEG knowledge base insights, sorted by most recent first.", {
-        limit: z
-          .number()
-          .int()
-          .min(1)
-          .max(100)
-          .optional()
-          .describe("Max results to return (default 20)"),
-      })
+      .tool(
+        "bazdmeg_memory_list",
+        "List recent BAZDMEG knowledge base insights, sorted by most recent first.",
+        {
+          limit: z
+            .number()
+            .int()
+            .min(1)
+            .max(100)
+            .optional()
+            .describe("Max results to return (default 20)"),
+        },
+      )
       .meta({ category: "bazdmeg", tier: "free" })
       .handler(async ({ input }) => {
         return safeToolCall("bazdmeg_memory_list", async () => {
           const params = new URLSearchParams();
           if (input.limit !== undefined) params.set("limit", String(input.limit));
 
-          const memories = await apiRequest<Array<{
-            insight: string;
-            tags: string[];
-            confidence: number;
-            createdAt: string;
-          }>>(`/api/bazdmeg/memory?${params.toString()}`);
+          const memories = await apiRequest<
+            Array<{
+              insight: string;
+              tags: string[];
+              confidence: number;
+              createdAt: string;
+            }>
+          >(`/api/bazdmeg/memory?${params.toString()}`);
 
           if (memories.length === 0) {
             return textResult("No BAZDMEG insights saved yet.");

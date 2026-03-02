@@ -49,22 +49,10 @@ function generateEventId(system: CausalSystem): string {
 // Clock factories and utilities
 // ---------------------------------------------------------------------------
 
-function createInitialClock(
-  clockType: "lamport",
-  _processIds: string[],
-): LamportClock;
-function createInitialClock(
-  clockType: "vector",
-  processIds: string[],
-): VectorClock;
-function createInitialClock(
-  clockType: "lamport" | "vector",
-  processIds: string[],
-): LogicalClock;
-function createInitialClock(
-  clockType: "lamport" | "vector",
-  processIds: string[],
-): LogicalClock {
+function createInitialClock(clockType: "lamport", _processIds: string[]): LamportClock;
+function createInitialClock(clockType: "vector", processIds: string[]): VectorClock;
+function createInitialClock(clockType: "lamport" | "vector", processIds: string[]): LogicalClock;
+function createInitialClock(clockType: "lamport" | "vector", processIds: string[]): LogicalClock {
   if (clockType === "lamport") {
     return { type: "lamport", time: 0 };
   }
@@ -93,10 +81,7 @@ function getSystem(systemId: string, userId: string): CausalSystem {
   return system;
 }
 
-function getProcessClock(
-  system: CausalSystem,
-  processId: string,
-): LogicalClock {
+function getProcessClock(system: CausalSystem, processId: string): LogicalClock {
   const clock = system.processes.get(processId);
   if (!clock) throw new Error(`Process ${processId} not found`);
   return clock;
@@ -126,10 +111,7 @@ function incrementVector(clock: VectorClock, processId: string): void {
   clock.entries[processId] = (clock.entries[processId] ?? 0) + 1;
 }
 
-function mergeLamportClocks(
-  local: LamportClock,
-  received: LamportClock,
-): void {
+function mergeLamportClocks(local: LamportClock, received: LamportClock): void {
   local.time = Math.max(local.time, received.time) + 1;
 }
 
@@ -138,15 +120,9 @@ function mergeVectorClocks(
   received: VectorClock,
   localProcessId: string,
 ): void {
-  const allKeys = new Set([
-    ...Object.keys(local.entries),
-    ...Object.keys(received.entries),
-  ]);
+  const allKeys = new Set([...Object.keys(local.entries), ...Object.keys(received.entries)]);
   for (const key of allKeys) {
-    local.entries[key] = Math.max(
-      local.entries[key] ?? 0,
-      received.entries[key] ?? 0,
-    );
+    local.entries[key] = Math.max(local.entries[key] ?? 0, received.entries[key] ?? 0);
   }
   // Increment the receiver's own entry
   local.entries[localProcessId] = (local.entries[localProcessId] ?? 0) + 1;
@@ -156,10 +132,7 @@ function mergeVectorClocks(
 // Causal comparison
 // ---------------------------------------------------------------------------
 
-function compareLamport(
-  a: LamportClock,
-  b: LamportClock,
-): CausalRelation {
+function compareLamport(a: LamportClock, b: LamportClock): CausalRelation {
   if (a.time === b.time) return "same";
   if (a.time < b.time) return "happens_before";
   // Lamport clocks only give partial ordering: if a.time > b.time,
@@ -171,19 +144,13 @@ function compareLamport(
   return "concurrent";
 }
 
-function determineRelation(
-  clockA: LogicalClock,
-  clockB: LogicalClock,
-): CausalRelation {
+function determineRelation(clockA: LogicalClock, clockB: LogicalClock): CausalRelation {
   if (clockA.type === "lamport" && clockB.type === "lamport") {
     return compareLamport(clockA, clockB);
   }
   if (clockA.type === "vector" && clockB.type === "vector") {
     // Full directional comparison
-    const allKeys = new Set([
-      ...Object.keys(clockA.entries),
-      ...Object.keys(clockB.entries),
-    ]);
+    const allKeys = new Set([...Object.keys(clockA.entries), ...Object.keys(clockB.entries)]);
 
     let aLeqB = true;
     let bLeqA = true;
@@ -260,18 +227,18 @@ function buildExplanation(
     switch (relation) {
       case "happens_before":
         return (
-          `Lamport clock: ${eventIdA} has time ${clockA.time} < ${clockB.time} of ${eventIdB}. `
-          + `${eventIdA} happens before ${eventIdB}.`
+          `Lamport clock: ${eventIdA} has time ${clockA.time} < ${clockB.time} of ${eventIdB}. ` +
+          `${eventIdA} happens before ${eventIdB}.`
         );
       case "same":
         return (
-          `Lamport clock: ${eventIdA} and ${eventIdB} both have time ${clockA.time}. `
-          + `With Lamport clocks, equal timestamps indicate potential concurrency.`
+          `Lamport clock: ${eventIdA} and ${eventIdB} both have time ${clockA.time}. ` +
+          `With Lamport clocks, equal timestamps indicate potential concurrency.`
         );
       case "concurrent":
         return (
-          `Lamport clock: ${eventIdA} has time ${clockA.time}, ${eventIdB} has time ${clockB.time}. `
-          + `Lamport timestamps alone cannot determine a causal relationship; these events are concurrent.`
+          `Lamport clock: ${eventIdA} has time ${clockA.time}, ${eventIdB} has time ${clockB.time}. ` +
+          `Lamport timestamps alone cannot determine a causal relationship; these events are concurrent.`
         );
     }
   }
@@ -283,18 +250,18 @@ function buildExplanation(
     switch (relation) {
       case "happens_before":
         return (
-          `Vector clock: ${eventIdA} ${aEntries} <= ${eventIdB} ${bEntries} with at least one strict inequality. `
-          + `${eventIdA} happens before ${eventIdB}.`
+          `Vector clock: ${eventIdA} ${aEntries} <= ${eventIdB} ${bEntries} with at least one strict inequality. ` +
+          `${eventIdA} happens before ${eventIdB}.`
         );
       case "same":
         return (
-          `Vector clock: ${eventIdA} ${aEntries} and ${eventIdB} ${bEntries} are identical. `
-          + `These represent the same causal point.`
+          `Vector clock: ${eventIdA} ${aEntries} and ${eventIdB} ${bEntries} are identical. ` +
+          `These represent the same causal point.`
         );
       case "concurrent":
         return (
-          `Vector clock: ${eventIdA} ${aEntries} and ${eventIdB} ${bEntries} are incomparable. `
-          + `Neither dominates the other, so these events are concurrent.`
+          `Vector clock: ${eventIdA} ${aEntries} and ${eventIdB} ${bEntries} are incomparable. ` +
+          `Neither dominates the other, so these events are concurrent.`
         );
     }
   }
@@ -405,7 +372,7 @@ export function sendEvent(
   fromProcessId: string,
   toProcessId: string,
   label: string,
-): { sendEvent: CausalEvent; receiveEvent: CausalEvent; } {
+): { sendEvent: CausalEvent; receiveEvent: CausalEvent } {
   const system = getSystem(systemId, userId);
 
   if (fromProcessId === toProcessId) {
@@ -447,9 +414,7 @@ export function sendEvent(
 
   if (receiverClock.type === "lamport" && senderClock.type === "lamport") {
     mergeLamportClocks(receiverClock, senderClock);
-  } else if (
-    receiverClock.type === "vector" && senderClock.type === "vector"
-  ) {
+  } else if (receiverClock.type === "vector" && senderClock.type === "vector") {
     mergeVectorClocks(receiverClock, senderClock, toProcessId);
   }
 
@@ -484,8 +449,8 @@ export function compareEvents(
 ): CausalQueryResult {
   const system = getSystem(systemId, userId);
 
-  const eventA = system.events.find(e => e.id === eventIdA);
-  const eventB = system.events.find(e => e.id === eventIdB);
+  const eventA = system.events.find((e) => e.id === eventIdA);
+  const eventB = system.events.find((e) => e.id === eventIdB);
 
   if (!eventA) throw new Error(`Event ${eventIdA} not found`);
   if (!eventB) throw new Error(`Event ${eventIdB} not found`);
@@ -500,13 +465,7 @@ export function compareEvents(
   }
 
   const relation = determineRelation(eventA.clock, eventB.clock);
-  const explanation = buildExplanation(
-    eventA.clock,
-    eventB.clock,
-    relation,
-    eventIdA,
-    eventIdB,
-  );
+  const explanation = buildExplanation(eventA.clock, eventB.clock, relation, eventIdA, eventIdB);
 
   return {
     eventA: eventIdA,
@@ -516,23 +475,17 @@ export function compareEvents(
   };
 }
 
-export function inspect(
-  systemId: string,
-  userId: string,
-  processId?: string,
-): SystemStateView {
+export function inspect(systemId: string, userId: string, processId?: string): SystemStateView {
   const system = getSystem(systemId, userId);
 
   const processIds = processId ? [processId] : system.processOrder;
-  const processes: Array<{ id: string; clock: LogicalClock; }> = processIds.map(
-    pid => {
-      const clock = getProcessClock(system, pid);
-      return { id: pid, clock: cloneClock(clock) };
-    },
-  );
+  const processes: Array<{ id: string; clock: LogicalClock }> = processIds.map((pid) => {
+    const clock = getProcessClock(system, pid);
+    return { id: pid, clock: cloneClock(clock) };
+  });
 
   const events = processId
-    ? system.events.filter(e => e.processId === processId)
+    ? system.events.filter((e) => e.processId === processId)
     : [...system.events];
 
   return {
@@ -544,10 +497,7 @@ export function inspect(
   };
 }
 
-export function getTimeline(
-  systemId: string,
-  userId: string,
-): CausalEvent[] {
+export function getTimeline(systemId: string, userId: string): CausalEvent[] {
   const system = getSystem(systemId, userId);
   return topologicalSort([...system.events]);
 }

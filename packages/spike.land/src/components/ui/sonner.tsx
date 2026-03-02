@@ -18,8 +18,7 @@ const Toaster = ({ ...props }: ToasterProps) => {
             "group-[.toaster]:border-l-4 group-[.toaster]:border-l-green-500 group-[.toaster]:bg-green-500/10",
           error:
             "group-[.toaster]:border-l-4 group-[.toaster]:border-l-destructive group-[.toaster]:bg-destructive/10",
-          info:
-            "group-[.toaster]:border-l-4 group-[.toaster]:border-l-primary group-[.toaster]:bg-primary/10",
+          info: "group-[.toaster]:border-l-4 group-[.toaster]:border-l-primary group-[.toaster]:bg-primary/10",
           warning:
             "group-[.toaster]:border-l-4 group-[.toaster]:border-l-yellow-500 group-[.toaster]:bg-yellow-500/10",
         },

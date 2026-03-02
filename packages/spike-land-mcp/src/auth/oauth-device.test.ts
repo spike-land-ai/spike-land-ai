@@ -51,9 +51,7 @@ describe("createDeviceCode", () => {
   });
 
   it("generates unique device codes on successive calls", async () => {
-    const db = createDb(
-      createMockD1(() => ({ results: [], success: true, meta: {} })),
-    );
+    const db = createDb(createMockD1(() => ({ results: [], success: true, meta: {} })));
 
     const result1 = await createDeviceCode(db, {});
     const result2 = await createDeviceCode(db, {});
@@ -65,15 +63,14 @@ describe("createDeviceCode", () => {
   it("userCode format excludes ambiguous characters (0, O, I, 1)", () => {
     // Run multiple times to check statistically
     const codes: string[] = [];
-    const db = createDb(
-      createMockD1(() => ({ results: [], success: true, meta: {} })),
-    );
+    const db = createDb(createMockD1(() => ({ results: [], success: true, meta: {} })));
 
     // We can check the format regex: no 0, O, I, 1 in the character set
     // The chars are: ABCDEFGHJKLMNPQRSTUVWXYZ23456789
-    const validPattern = /^[ABCDEFGHJKLMNPQRSTUVWXYZ23456789]{4}-[ABCDEFGHJKLMNPQRSTUVWXYZ23456789]{4}$/;
+    const validPattern =
+      /^[ABCDEFGHJKLMNPQRSTUVWXYZ23456789]{4}-[ABCDEFGHJKLMNPQRSTUVWXYZ23456789]{4}$/;
 
-    return createDeviceCode(db, {}).then(result => {
+    return createDeviceCode(db, {}).then((result) => {
       expect(result.userCode).toMatch(validPattern);
       codes.push(result.userCode);
       expect(result.userCode).not.toMatch(/[01IO]/);
@@ -85,9 +82,7 @@ describe("createDeviceCode", () => {
 
 describe("approveDeviceCode", () => {
   it("returns ok:false for expired or missing user code", async () => {
-    const db = createDb(
-      createMockD1(() => ({ results: [], success: true, meta: {} })),
-    );
+    const db = createDb(createMockD1(() => ({ results: [], success: true, meta: {} })));
 
     const result = await approveDeviceCode(db, "XXXX-XXXX", "user-1");
     expect(result.ok).toBe(false);
@@ -134,9 +129,7 @@ describe("approveDeviceCode", () => {
   });
 
   it("includes an error description when code is not found", async () => {
-    const db = createDb(
-      createMockD1(() => ({ results: [], success: true, meta: {} })),
-    );
+    const db = createDb(createMockD1(() => ({ results: [], success: true, meta: {} })));
 
     const result = await approveDeviceCode(db, "FAKE-CODE", "user-1");
     expect(result.ok).toBe(false);
@@ -148,9 +141,7 @@ describe("approveDeviceCode", () => {
 
 describe("exchangeDeviceCode", () => {
   it("returns error object when device code is expired or missing", async () => {
-    const db = createDb(
-      createMockD1(() => ({ results: [], success: true, meta: {} })),
-    );
+    const db = createDb(createMockD1(() => ({ results: [], success: true, meta: {} })));
 
     const result = await exchangeDeviceCode(db, "dc_nonexistent");
     expect("error" in result).toBe(true);
@@ -202,9 +193,7 @@ describe("exchangeDeviceCode", () => {
   // into oauthAccessTokens table). The function structure is covered by the
   // other two test cases above.
   it("returns error for empty device code string", async () => {
-    const db = createDb(
-      createMockD1(() => ({ results: [], success: true, meta: {} })),
-    );
+    const db = createDb(createMockD1(() => ({ results: [], success: true, meta: {} })));
 
     const result = await exchangeDeviceCode(db, "");
     expect("error" in result).toBe(true);

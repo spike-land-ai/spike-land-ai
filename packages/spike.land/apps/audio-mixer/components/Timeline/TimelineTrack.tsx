@@ -67,16 +67,14 @@ function drawStaticWaveform(
 
   const startRatio = Math.max(0, trimStart) / duration;
   const endRatio = (trimEnd > 0 ? trimEnd : duration) / duration;
-  const visibleDataLength = Math.floor(
-    waveformData.length * (endRatio - startRatio),
-  );
+  const visibleDataLength = Math.floor(waveformData.length * (endRatio - startRatio));
   const dataOffset = Math.floor(waveformData.length * startRatio);
 
   const barCount = Math.min(visibleDataLength, Math.floor(width / 3));
   if (barCount === 0) return null;
 
   const step = visibleDataLength / barCount;
-  const barWidth = Math.max(1, (width / barCount) - 1);
+  const barWidth = Math.max(1, width / barCount - 1);
   const rgb = COLOR_MAP[trackColor] || "0, 229, 255";
 
   for (let i = 0; i < barCount; i++) {
@@ -156,17 +154,13 @@ export function TimelineTrack({
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const waveformCacheRef = useRef<ImageData | null>(null);
   const [dragMode, setDragMode] = useState<DragMode>(null);
-  const [isHoveringHandle, setIsHoveringHandle] = useState<
-    "start" | "end" | null
-  >(null);
+  const [isHoveringHandle, setIsHoveringHandle] = useState<"start" | "end" | null>(null);
 
   // Calculate dimensions
   const effectiveTrimStart = track.trimStart;
   const effectiveTrimEnd = track.trimEnd > 0 ? track.trimEnd : track.duration;
 
-  const silenceBefore = effectiveTrimStart < 0
-    ? Math.abs(effectiveTrimStart)
-    : 0;
+  const silenceBefore = effectiveTrimStart < 0 ? Math.abs(effectiveTrimStart) : 0;
   const actualAudioStart = Math.max(0, effectiveTrimStart);
   const actualAudioDuration = effectiveTrimEnd - actualAudioStart;
 
@@ -178,8 +172,8 @@ export function TimelineTrack({
   const relativeTime = playheadTime - trackPosition - silenceBefore;
   const progress = Math.max(0, Math.min(1, relativeTime / actualAudioDuration));
 
-  const colorIndex = Math.abs(track.id.split("").reduce((a, b) => a + b.charCodeAt(0), 0))
-    % TRACK_COLORS.length;
+  const colorIndex =
+    Math.abs(track.id.split("").reduce((a, b) => a + b.charCodeAt(0), 0)) % TRACK_COLORS.length;
   const trackColor = TRACK_COLORS[colorIndex] ?? "bg-blue-600";
 
   // Static effect: re-draw & cache waveform only when shape changes
@@ -215,12 +209,7 @@ export function TimelineTrack({
     const cached = waveformCacheRef.current;
     if (!canvas || !cached) return;
 
-    drawProgressOverlay(
-      canvas,
-      cached,
-      track.isPlaying ? progress : 0,
-      trackColor,
-    );
+    drawProgressOverlay(canvas, cached, track.isPlaying ? progress : 0, trackColor);
   }, [progress, track.isPlaying, trackColor]);
 
   const handleMouseDown = useCallback(
@@ -264,10 +253,7 @@ export function TimelineTrack({
           const newTrimEnd = savedTrimEnd + deltaTime;
           const minTrimEnd = Math.max(0, savedTrimStart) + 0.1;
           const maxTrimEnd = track.duration;
-          const clampedTrimEnd = Math.max(
-            minTrimEnd,
-            Math.min(maxTrimEnd, newTrimEnd),
-          );
+          const clampedTrimEnd = Math.max(minTrimEnd, Math.min(maxTrimEnd, newTrimEnd));
           const snappedTrimEnd = snapTime(clampedTrimEnd);
           onTrimChange(savedTrimStart, snappedTrimEnd);
         }
@@ -306,20 +292,18 @@ export function TimelineTrack({
   return (
     <div
       className={`absolute rounded-xl transition-all duration-300 ${
-        isSelected
-          ? "glass-edge shadow-glow-cyan-sm z-30"
-          : "hover:shadow-lg z-20"
+        isSelected ? "glass-edge shadow-glow-cyan-sm z-30" : "hover:shadow-lg z-20"
       } ${track.muted ? "opacity-40 grayscale-[0.5]" : "opacity-100"}`}
       style={{
         left: `${trackLeft}px`,
         width: `${Math.max(trackWidth, 24)}px`,
         height: `${TRACK_HEIGHT}px`,
       }}
-      onClick={e => {
+      onClick={(e) => {
         e.stopPropagation();
         onSelect();
       }}
-      onKeyDown={e => {
+      onKeyDown={(e) => {
         if (e.key === "Enter" || e.key === " ") {
           e.stopPropagation();
           onSelect();
@@ -341,7 +325,7 @@ export function TimelineTrack({
           className={`absolute left-0 top-0 bottom-0 w-3 cursor-ew-resize z-40 group ${
             dragMode === "trim-start" ? "bg-white/20" : ""
           }`}
-          onMouseDown={e => handleMouseDown(e, "trim-start")}
+          onMouseDown={(e) => handleMouseDown(e, "trim-start")}
           onMouseEnter={() => setIsHoveringHandle("start")}
           onMouseLeave={() => setIsHoveringHandle(null)}
           role="slider"
@@ -372,7 +356,7 @@ export function TimelineTrack({
           className={`absolute right-0 top-0 bottom-0 w-3 cursor-ew-resize z-40 group ${
             dragMode === "trim-end" ? "bg-white/20" : ""
           }`}
-          onMouseDown={e => handleMouseDown(e, "trim-end")}
+          onMouseDown={(e) => handleMouseDown(e, "trim-end")}
           onMouseEnter={() => setIsHoveringHandle("end")}
           onMouseLeave={() => setIsHoveringHandle(null)}
           role="slider"
@@ -419,7 +403,7 @@ export function TimelineTrack({
           left: `${silenceWidth}px`,
           right: 0,
         }}
-        onMouseDown={e => handleMouseDown(e, "move")}
+        onMouseDown={(e) => handleMouseDown(e, "move")}
         role="button"
         tabIndex={0}
         aria-label={`Move track ${track.name}`}

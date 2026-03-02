@@ -14,7 +14,7 @@ interface QRSession {
  * Generate a QR auth token and store its hash in Redis.
  * Returns the raw token (for QR code) and its SHA-256 hash (for polling).
  */
-export async function initiateQRAuth(): Promise<{ token: string; hash: string; }> {
+export async function initiateQRAuth(): Promise<{ token: string; hash: string }> {
   const token = randomBytes(32).toString("base64url");
   const hash = createHash("sha256").update(token).digest("hex");
 
@@ -40,7 +40,7 @@ export async function pollQRAuth(hash: string): Promise<QRSession | null> {
 export async function approveQRAuth(
   token: string,
   userId: string,
-): Promise<{ hash: string; oneTimeCode: string; } | null> {
+): Promise<{ hash: string; oneTimeCode: string } | null> {
   const hash = createHash("sha256").update(token).digest("hex");
   const data = await redis.get<string>(`qr_auth:${hash}`);
   if (!data) return null;

@@ -4,10 +4,7 @@
  * Used by codespace API routes to convert raw source code into browser-ready JavaScript.
  */
 
-export async function transpileCode(
-  code: string,
-  _origin = "https://spike.land",
-): Promise<string> {
+export async function transpileCode(code: string, _origin = "https://spike.land"): Promise<string> {
   const { ensureEsbuildReady } = await import("./esbuild-init");
   await ensureEsbuildReady();
   const { transform } = await import("@spike-land-ai/esbuild-wasm");
@@ -71,16 +68,14 @@ export async function transpileCodeWorkerDom(
  */
 export function parseTranspileErrors(
   errorMessage: string,
-): Array<{ line?: number; column?: number; message: string; }> {
-  const errors: Array<{ line?: number; column?: number; message: string; }> = [];
+): Array<{ line?: number; column?: number; message: string }> {
+  const errors: Array<{ line?: number; column?: number; message: string }> = [];
   const lines = errorMessage.split("\n");
 
   for (const line of lines) {
     if (/^\d+ error\(s\)/.test(line.trim())) continue;
 
-    const lineColMatch = line.match(
-      /:(\d+):(\d+):\s*(error|warning)?:?\s*(.+)/i,
-    );
+    const lineColMatch = line.match(/:(\d+):(\d+):\s*(error|warning)?:?\s*(.+)/i);
     if (lineColMatch) {
       errors.push({
         line: parseInt(lineColMatch[1]!, 10),
@@ -100,7 +95,7 @@ export function parseTranspileErrors(
     }
 
     const trimmed = line.trim();
-    if (trimmed && !errors.some(e => e.message === trimmed)) {
+    if (trimmed && !errors.some((e) => e.message === trimmed)) {
       errors.push({ message: trimmed });
     }
   }

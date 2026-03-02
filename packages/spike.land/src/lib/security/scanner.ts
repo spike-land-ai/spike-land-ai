@@ -1,7 +1,7 @@
 import type { PerformanceFinding, SecurityFinding } from "./types";
 
 export function scanForVulnerabilities(
-  files: Array<{ path: string; content: string; }>,
+  files: Array<{ path: string; content: string }>,
 ): SecurityFinding[] {
   const findings: SecurityFinding[] = [];
   const patterns = [
@@ -40,9 +40,7 @@ export function scanForVulnerabilities(
   return findings;
 }
 
-export function scanForSecrets(
-  files: Array<{ path: string; content: string; }>,
-): SecurityFinding[] {
+export function scanForSecrets(files: Array<{ path: string; content: string }>): SecurityFinding[] {
   const findings: SecurityFinding[] = [];
   const patterns = [
     {
@@ -67,15 +65,12 @@ export function scanForSecrets(
 }
 
 export function auditPerformance(
-  files: Array<{ path: string; content: string; }>,
+  files: Array<{ path: string; content: string }>,
 ): PerformanceFinding[] {
   const findings: PerformanceFinding[] = [];
 
   for (const file of files) {
-    if (
-      file.content.includes("useMemo") === false
-      && file.content.includes("map(")
-    ) {
+    if (file.content.includes("useMemo") === false && file.content.includes("map(")) {
       findings.push({
         path: file.path,
         type: "render-cycle",

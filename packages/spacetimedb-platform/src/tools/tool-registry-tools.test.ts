@@ -30,8 +30,22 @@ describe("tool-registry-tools", () => {
   describe("stdb_search_tools", () => {
     it("searches by query", async () => {
       client._tools.push(
-        { name: "code_review", description: "Review code", category: "dev", inputSchema: "{}", enabled: true, createdAt: 1000n },
-        { name: "image_gen", description: "Generate images", category: "media", inputSchema: "{}", enabled: true, createdAt: 1000n },
+        {
+          name: "code_review",
+          description: "Review code",
+          category: "dev",
+          inputSchema: "{}",
+          enabled: true,
+          createdAt: 1000n,
+        },
+        {
+          name: "image_gen",
+          description: "Generate images",
+          category: "media",
+          inputSchema: "{}",
+          enabled: true,
+          createdAt: 1000n,
+        },
       );
       const result = await server.call("stdb_search_tools", { query: "review" });
       const parsed = JSON.parse(result.content[0].text);
@@ -41,8 +55,22 @@ describe("tool-registry-tools", () => {
 
     it("filters by category", async () => {
       client._tools.push(
-        { name: "t1", description: "D1", category: "dev", inputSchema: "{}", enabled: true, createdAt: 1000n },
-        { name: "t2", description: "D2", category: "media", inputSchema: "{}", enabled: true, createdAt: 1000n },
+        {
+          name: "t1",
+          description: "D1",
+          category: "dev",
+          inputSchema: "{}",
+          enabled: true,
+          createdAt: 1000n,
+        },
+        {
+          name: "t2",
+          description: "D2",
+          category: "media",
+          inputSchema: "{}",
+          enabled: true,
+          createdAt: 1000n,
+        },
       );
       const result = await server.call("stdb_search_tools", { category: "media" });
       const parsed = JSON.parse(result.content[0].text);
@@ -51,9 +79,14 @@ describe("tool-registry-tools", () => {
     });
 
     it("returns all tools with no filters", async () => {
-      client._tools.push(
-        { name: "t1", description: "D1", category: "dev", inputSchema: "{}", enabled: true, createdAt: 1000n },
-      );
+      client._tools.push({
+        name: "t1",
+        description: "D1",
+        category: "dev",
+        inputSchema: "{}",
+        enabled: true,
+        createdAt: 1000n,
+      });
       const result = await server.call("stdb_search_tools", {});
       const parsed = JSON.parse(result.content[0].text);
       expect(parsed.count).toBe(1);
@@ -72,7 +105,14 @@ describe("tool-registry-tools", () => {
 
   describe("stdb_enable_tool", () => {
     it("enables a tool", async () => {
-      client._tools.push({ name: "my_tool", description: "D", category: "c", inputSchema: "{}", enabled: false, createdAt: 1000n });
+      client._tools.push({
+        name: "my_tool",
+        description: "D",
+        category: "c",
+        inputSchema: "{}",
+        enabled: false,
+        createdAt: 1000n,
+      });
       const result = await server.call("stdb_enable_tool", { name: "my_tool" });
       const parsed = JSON.parse(result.content[0].text);
       expect(parsed.enabled).toBe(true);
@@ -101,7 +141,9 @@ describe("tool-registry-tools", () => {
     });
 
     it("returns REDUCER_FAILED on error", async () => {
-      client.disableTool = vi.fn(async () => { throw new Error("Reducer panicked"); });
+      client.disableTool = vi.fn(async () => {
+        throw new Error("Reducer panicked");
+      });
       const result = await server.call("stdb_disable_tool", { name: "x" });
       expect(result.isError).toBe(true);
       expect(JSON.parse(result.content[0].text).error).toBe("REDUCER_FAILED");
@@ -113,9 +155,30 @@ describe("tool-registry-tools", () => {
   describe("stdb_list_tool_categories", () => {
     it("lists categories", async () => {
       client._tools.push(
-        { name: "t1", description: "D", category: "dev", inputSchema: "{}", enabled: true, createdAt: 1000n },
-        { name: "t2", description: "D", category: "media", inputSchema: "{}", enabled: true, createdAt: 1000n },
-        { name: "t3", description: "D", category: "dev", inputSchema: "{}", enabled: true, createdAt: 1000n },
+        {
+          name: "t1",
+          description: "D",
+          category: "dev",
+          inputSchema: "{}",
+          enabled: true,
+          createdAt: 1000n,
+        },
+        {
+          name: "t2",
+          description: "D",
+          category: "media",
+          inputSchema: "{}",
+          enabled: true,
+          createdAt: 1000n,
+        },
+        {
+          name: "t3",
+          description: "D",
+          category: "dev",
+          inputSchema: "{}",
+          enabled: true,
+          createdAt: 1000n,
+        },
       );
       const result = await server.call("stdb_list_tool_categories", {});
       const parsed = JSON.parse(result.content[0].text);
@@ -138,8 +201,22 @@ describe("tool-registry-tools", () => {
   describe("stdb_tool_usage_stats", () => {
     it("gets all stats", async () => {
       client._toolUsages.push(
-        { id: 1n, toolName: "t1", userIdentity: "u1", durationMs: 100, success: true, timestamp: 1000n },
-        { id: 2n, toolName: "t2", userIdentity: "u1", durationMs: 200, success: false, timestamp: 2000n },
+        {
+          id: 1n,
+          toolName: "t1",
+          userIdentity: "u1",
+          durationMs: 100,
+          success: true,
+          timestamp: 1000n,
+        },
+        {
+          id: 2n,
+          toolName: "t2",
+          userIdentity: "u1",
+          durationMs: 200,
+          success: false,
+          timestamp: 2000n,
+        },
       );
       const result = await server.call("stdb_tool_usage_stats", {});
       const parsed = JSON.parse(result.content[0].text);
@@ -148,8 +225,22 @@ describe("tool-registry-tools", () => {
 
     it("filters by tool name", async () => {
       client._toolUsages.push(
-        { id: 1n, toolName: "t1", userIdentity: "u1", durationMs: 100, success: true, timestamp: 1000n },
-        { id: 2n, toolName: "t2", userIdentity: "u1", durationMs: 200, success: false, timestamp: 2000n },
+        {
+          id: 1n,
+          toolName: "t1",
+          userIdentity: "u1",
+          durationMs: 100,
+          success: true,
+          timestamp: 1000n,
+        },
+        {
+          id: 2n,
+          toolName: "t2",
+          userIdentity: "u1",
+          durationMs: 200,
+          success: false,
+          timestamp: 2000n,
+        },
       );
       const result = await server.call("stdb_tool_usage_stats", { toolName: "t1" });
       const parsed = JSON.parse(result.content[0].text);

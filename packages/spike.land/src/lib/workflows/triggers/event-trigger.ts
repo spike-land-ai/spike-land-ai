@@ -122,9 +122,8 @@ export async function createEventSubscription(
     throw new Error(`Subscription for ${input.eventType} already exists`);
   }
 
-  const filterConfigValue = input.filterConfig != null
-    ? input.filterConfig as Prisma.InputJsonValue
-    : undefined;
+  const filterConfigValue =
+    input.filterConfig != null ? (input.filterConfig as Prisma.InputJsonValue) : undefined;
   const subscription = await prisma.workflowEventSubscription.create({
     data: {
       workflowId,
@@ -163,9 +162,8 @@ export async function updateEventSubscription(
     throw new Error("Subscription not found");
   }
 
-  const updateFilterConfig = input.filterConfig != null
-    ? input.filterConfig as Prisma.InputJsonValue
-    : undefined;
+  const updateFilterConfig =
+    input.filterConfig != null ? (input.filterConfig as Prisma.InputJsonValue) : undefined;
   const subscription = await prisma.workflowEventSubscription.update({
     where: { id: subscriptionId },
     data: {
@@ -237,9 +235,7 @@ export async function getWorkflowEventSubscriptions(
 /**
  * Find all subscriptions that should be triggered by an event
  */
-export async function findMatchingSubscriptions(
-  event: WorkflowEvent,
-): Promise<
+export async function findMatchingSubscriptions(event: WorkflowEvent): Promise<
   Array<{
     subscriptionId: string;
     workflowId: string;
@@ -267,8 +263,8 @@ export async function findMatchingSubscriptions(
 
   // Filter by filter config
   return subscriptions
-    .filter(sub => matchesFilter(event, sub.filterConfig as Record<string, unknown> | null))
-    .map(sub => ({
+    .filter((sub) => matchesFilter(event, sub.filterConfig as Record<string, unknown> | null))
+    .map((sub) => ({
       subscriptionId: sub.id,
       workflowId: sub.workflowId,
       workspaceId: sub.workflow.workspaceId,
@@ -291,11 +287,7 @@ const eventBusSubscriptions = new Map<string, string[]>();
 export async function registerWorkflowEventSubscriptions(
   workflowId: string,
   workspaceId: string,
-  executor: (
-    workflowId: string,
-    event: WorkflowEvent,
-    subscriptionId: string,
-  ) => Promise<void>,
+  executor: (workflowId: string, event: WorkflowEvent, subscriptionId: string) => Promise<void>,
 ): Promise<void> {
   // First unregister any existing subscriptions
   unregisterWorkflowEventSubscriptions(workflowId);
@@ -315,12 +307,7 @@ export async function registerWorkflowEventSubscriptions(
       subscription.eventType,
       async (event: WorkflowEvent) => {
         // Check filter
-        if (
-          !matchesFilter(
-            event,
-            subscription.filterConfig as Record<string, unknown> | null,
-          )
-        ) {
+        if (!matchesFilter(event, subscription.filterConfig as Record<string, unknown> | null)) {
           return;
         }
 
@@ -355,11 +342,7 @@ export function unregisterWorkflowEventSubscriptions(workflowId: string): void {
  * This should be called at application startup.
  */
 export async function initializeEventSubscriptions(
-  executor: (
-    workflowId: string,
-    event: WorkflowEvent,
-    subscriptionId: string,
-  ) => Promise<void>,
+  executor: (workflowId: string, event: WorkflowEvent, subscriptionId: string) => Promise<void>,
 ): Promise<void> {
   // Get all active workflows with event subscriptions
   const workflows = await prisma.workflow.findMany({
@@ -378,11 +361,7 @@ export async function initializeEventSubscriptions(
   });
 
   for (const workflow of workflows) {
-    await registerWorkflowEventSubscriptions(
-      workflow.id,
-      workflow.workspaceId,
-      executor,
-    );
+    await registerWorkflowEventSubscriptions(workflow.id, workflow.workspaceId, executor);
   }
 }
 
@@ -397,9 +376,10 @@ function mapSubscriptionToData(subscription: {
   filterConfig: unknown;
   isActive: boolean;
 }): WorkflowEventSubscriptionData {
-  const filterConfig = subscription.filterConfig != null
-    ? subscription.filterConfig as Record<string, unknown>
-    : undefined;
+  const filterConfig =
+    subscription.filterConfig != null
+      ? (subscription.filterConfig as Record<string, unknown>)
+      : undefined;
   return {
     id: subscription.id,
     workflowId: subscription.workflowId,

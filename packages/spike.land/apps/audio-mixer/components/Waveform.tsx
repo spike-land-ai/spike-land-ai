@@ -64,36 +64,42 @@ export function Waveform({
     drawWaveform(canvas, data, progress, options);
   }, [data, progress, width, height, barColor, progressColor]);
 
-  const calculatePosition = useCallback((clientX: number): number => {
-    const container = containerRef.current;
-    if (!container) return 0;
-    const rect = container.getBoundingClientRect();
-    const x = clientX - rect.left;
-    return Math.max(0, Math.min(1, x / width));
-  }, [width]);
+  const calculatePosition = useCallback(
+    (clientX: number): number => {
+      const container = containerRef.current;
+      if (!container) return 0;
+      const rect = container.getBoundingClientRect();
+      const x = clientX - rect.left;
+      return Math.max(0, Math.min(1, x / width));
+    },
+    [width],
+  );
 
-  const handleMouseMove = useCallback((e: MouseEvent) => {
-    const pos = calculatePosition(e.clientX);
+  const handleMouseMove = useCallback(
+    (e: MouseEvent) => {
+      const pos = calculatePosition(e.clientX);
 
-    if (isDraggingStart && onTrimStartChange) {
-      // Ensure start doesn't go past end - 1%
-      const maxStart = (trimEnd || 1) - 0.01;
-      onTrimStartChange(Math.min(pos, maxStart));
-    }
-    if (isDraggingEnd && onTrimEndChange) {
-      // Ensure end doesn't go before start + 1%
-      const minEnd = (trimStart || 0) + 0.01;
-      onTrimEndChange(Math.max(pos, minEnd));
-    }
-  }, [
-    isDraggingStart,
-    isDraggingEnd,
-    trimStart,
-    trimEnd,
-    onTrimStartChange,
-    onTrimEndChange,
-    calculatePosition,
-  ]);
+      if (isDraggingStart && onTrimStartChange) {
+        // Ensure start doesn't go past end - 1%
+        const maxStart = (trimEnd || 1) - 0.01;
+        onTrimStartChange(Math.min(pos, maxStart));
+      }
+      if (isDraggingEnd && onTrimEndChange) {
+        // Ensure end doesn't go before start + 1%
+        const minEnd = (trimStart || 0) + 0.01;
+        onTrimEndChange(Math.max(pos, minEnd));
+      }
+    },
+    [
+      isDraggingStart,
+      isDraggingEnd,
+      trimStart,
+      trimEnd,
+      onTrimStartChange,
+      onTrimEndChange,
+      calculatePosition,
+    ],
+  );
 
   const handleMouseUp = useCallback(() => {
     setIsDraggingStart(false);

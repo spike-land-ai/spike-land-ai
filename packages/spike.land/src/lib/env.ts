@@ -17,9 +17,7 @@ const serverEnvSchema = z.object({
   // === Core (required) ===
   DATABASE_URL: z.string().min(1, "DATABASE_URL is required"),
   AUTH_SECRET: z.string().min(1, "AUTH_SECRET is required"),
-  NODE_ENV: z
-    .enum(["development", "production", "test"])
-    .default("development"),
+  NODE_ENV: z.enum(["development", "production", "test"]).default("development"),
 
   // === Redis / Rate Limiting ===
   UPSTASH_REDIS_REST_URL: z.string().optional(),
@@ -85,7 +83,7 @@ export function validateServerEnv(): ServerEnv {
 
   if (!result.success) {
     const formatted = result.error.issues
-      .map(issue => `  - ${issue.path.join(".")}: ${issue.message}`)
+      .map((issue) => `  - ${issue.path.join(".")}: ${issue.message}`)
       .join("\n");
 
     throw new Error(
@@ -108,9 +106,7 @@ export function validateClientEnv(): ClientEnv {
   const result = clientEnvSchema.safeParse(clientVars);
 
   if (!result.success) {
-    throw new Error(
-      `❌ Invalid client environment variables:\n${result.error.message}`,
-    );
+    throw new Error(`❌ Invalid client environment variables:\n${result.error.message}`);
   }
 
   return result.data;

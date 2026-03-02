@@ -35,10 +35,10 @@ export async function selectByElo(count: number): Promise<AgentReviewerElo[]> {
   if (agents.length <= count) return agents;
 
   // Softmax selection
-  const maxElo = Math.max(...agents.map(a => a.elo));
-  const weights = agents.map(a => Math.exp((a.elo - maxElo) / SOFTMAX_TEMPERATURE));
+  const maxElo = Math.max(...agents.map((a) => a.elo));
+  const weights = agents.map((a) => Math.exp((a.elo - maxElo) / SOFTMAX_TEMPERATURE));
   const totalWeight = weights.reduce((sum, w) => sum + w, 0);
-  const probs = weights.map(w => w / totalWeight);
+  const probs = weights.map((w) => w / totalWeight);
 
   const selected: AgentReviewerElo[] = [];
   const usedIndices = new Set<number>();
@@ -76,7 +76,7 @@ export async function selectByElo(count: number): Promise<AgentReviewerElo[]> {
 export async function settleReviewElo(
   reviewId: string,
   transpileSucceeded: boolean,
-): Promise<{ eloChange: number; newElo: number; }> {
+): Promise<{ eloChange: number; newElo: number }> {
   const review = await prisma.routeReview.findUniqueOrThrow({
     where: { id: reviewId },
   });
@@ -115,10 +115,14 @@ export async function settleReviewElo(
         ...(isLoss ? { losses: { increment: 1 } } : {}),
         ...(outcome === 0.5 ? { draws: { increment: 1 } } : {}),
         streak: isWin
-          ? agent.streak > 0 ? agent.streak + 1 : 1
+          ? agent.streak > 0
+            ? agent.streak + 1
+            : 1
           : isLoss
-          ? agent.streak < 0 ? agent.streak - 1 : -1
-          : 0,
+            ? agent.streak < 0
+              ? agent.streak - 1
+              : -1
+            : 0,
         bestElo: Math.max(newElo, agent.bestElo),
         totalReviews: { increment: 1 },
       },
@@ -128,9 +132,7 @@ export async function settleReviewElo(
   return { eloChange, newElo };
 }
 
-async function seedDefaultAgents(
-  count: number,
-): Promise<AgentReviewerElo[]> {
+async function seedDefaultAgents(count: number): Promise<AgentReviewerElo[]> {
   const agents: AgentReviewerElo[] = [];
   for (let i = 0; i < Math.max(count, 4); i++) {
     const agentId = `reviewer-${String(i + 1).padStart(2, "0")}`;

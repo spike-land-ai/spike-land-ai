@@ -7,7 +7,7 @@ vi.mock("./gemini-client", () => ({
 }));
 
 vi.mock("@/lib/try-catch", () => ({
-  tryCatch: vi.fn(async p => {
+  tryCatch: vi.fn(async (p) => {
     try {
       const data = await p;
       return { data, error: null };
@@ -24,7 +24,9 @@ describe("gemini-asset-library", () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    vi.mocked(getGeminiClient).mockResolvedValue(mockAi as any);
+    vi.mocked(getGeminiClient).mockResolvedValue(
+      mockAi as unknown as Awaited<ReturnType<typeof getGeminiClient>>,
+    );
   });
 
   it("parses valid JSON response successfully", async () => {
@@ -138,7 +140,7 @@ describe("gemini-asset-library", () => {
     expect(result.analysisDetails.detectedObjects).toBeUndefined();
   });
 
-  it("handles invalid imageStyle by falling back to \"other\"", async () => {
+  it('handles invalid imageStyle by falling back to "other"', async () => {
     const mockJson = {
       analysisDetails: {
         imageStyle: "unsupported_style",
@@ -155,21 +157,24 @@ describe("gemini-asset-library", () => {
   it("throws error if API call fails", async () => {
     mockGenerateContent.mockRejectedValue(new Error("API failure"));
 
-    await expect(analyzeAssetForLibrary(mockBuffer, "image/jpeg"))
-      .rejects.toThrow("Asset analysis failed: API failure");
+    await expect(analyzeAssetForLibrary(mockBuffer, "image/jpeg")).rejects.toThrow(
+      "Asset analysis failed: API failure",
+    );
   });
 
   it("throws error if empty text response is returned", async () => {
     mockGenerateContent.mockResolvedValue({ text: "" });
 
-    await expect(analyzeAssetForLibrary(mockBuffer, "image/jpeg"))
-      .rejects.toThrow("No analysis response from Gemini");
+    await expect(analyzeAssetForLibrary(mockBuffer, "image/jpeg")).rejects.toThrow(
+      "No analysis response from Gemini",
+    );
   });
 
   it("throws error if JSON parsing fails", async () => {
     mockGenerateContent.mockResolvedValue({ text: "{ invalid json" });
 
-    await expect(analyzeAssetForLibrary(mockBuffer, "image/jpeg"))
-      .rejects.toThrow("Failed to parse asset analysis JSON");
+    await expect(analyzeAssetForLibrary(mockBuffer, "image/jpeg")).rejects.toThrow(
+      "Failed to parse asset analysis JSON",
+    );
   });
 });

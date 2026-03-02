@@ -3,8 +3,7 @@ import { tryCatch } from "@/lib/try-catch";
 import { IMPORT_MAP } from "./html-template";
 import { ESM_CDN, ESM_DEPS_PARAM } from "./constants";
 
-const COMPONENT_URL = process.env.SPIKE_LAND_COMPONENT_URL
-  ?? "https://testing.spike.land";
+const COMPONENT_URL = process.env.SPIKE_LAND_COMPONENT_URL ?? "https://testing.spike.land";
 
 export const BROWSER_DEFINE: Record<string, string> = {
   "process.env['NODE_ENV']": JSON.stringify("production"),
@@ -66,32 +65,17 @@ async function processCSS(
       continue;
     }
 
-    const { data: response, error: fetchErr } = await tryCatch(
-      fetch(absoluteUrl),
-    );
+    const { data: response, error: fetchErr } = await tryCatch(fetch(absoluteUrl));
     if (fetchErr || !response || !response.ok) {
-      processedCss = processedCss.replace(
-        match[0],
-        `/* Failed to load: ${absoluteUrl} */`,
-      );
+      processedCss = processedCss.replace(match[0], `/* Failed to load: ${absoluteUrl} */`);
       continue;
     }
-    const { data: importedCSS, error: textErr } = await tryCatch(
-      response.text(),
-    );
+    const { data: importedCSS, error: textErr } = await tryCatch(response.text());
     if (textErr || importedCSS === null) {
-      processedCss = processedCss.replace(
-        match[0],
-        `/* Failed to read: ${absoluteUrl} */`,
-      );
+      processedCss = processedCss.replace(match[0], `/* Failed to read: ${absoluteUrl} */`);
       continue;
     }
-    const processed = await processCSS(
-      importedCSS,
-      absoluteUrl,
-      cache,
-      depth + 1,
-    );
+    const processed = await processCSS(importedCSS, absoluteUrl, cache, depth + 1);
     cache.set(absoluteUrl, processed);
     processedCss = processedCss.replace(match[0], processed);
   }
@@ -113,9 +97,7 @@ async function processCSS(
         continue;
       }
 
-      const { data: response, error: fetchErr } = await tryCatch(
-        fetch(absoluteUrl),
-      );
+      const { data: response, error: fetchErr } = await tryCatch(fetch(absoluteUrl));
       if (fetchErr || !response || !response.ok) {
         css = css.replace(fullMatch, `url("/* Failed: ${absoluteUrl} */")`);
         continue;
@@ -125,14 +107,9 @@ async function processCSS(
       let newUrlValue: string;
 
       if (contentType.includes("font/")) {
-        const { data: buffer, error: bufErr } = await tryCatch(
-          response.arrayBuffer(),
-        );
+        const { data: buffer, error: bufErr } = await tryCatch(response.arrayBuffer());
         if (bufErr || !buffer) {
-          css = css.replace(
-            fullMatch,
-            `url("/* Failed font: ${absoluteUrl} */")`,
-          );
+          css = css.replace(fullMatch, `url("/* Failed font: ${absoluteUrl} */")`);
           continue;
         }
         const fontType = contentType.split("/").pop();
@@ -157,7 +134,7 @@ export function serverFetchPlugin(cache: Map<string, string>): Plugin {
     name: "server-fetch",
     setup(build) {
       // Resolve bare specifiers using import map
-      build.onResolve({ filter: /.*/ }, args => {
+      build.onResolve({ filter: /.*/ }, (args) => {
         // Already an HTTP URL — keep in http-url namespace
         if (/^https?:\/\//.test(args.path)) {
           return { path: args.path, namespace: "http-url" };
@@ -199,8 +176,7 @@ export function serverFetchPlugin(cache: Map<string, string>): Plugin {
 
         // Unknown bare specifier — resolve via esm.sh CDN with bundle
         if (!args.path.startsWith(".")) {
-          const cdnUrl =
-            `${ESM_CDN}/${args.path}?bundle=true&external=react,react-dom,react-is&${ESM_DEPS_PARAM}`;
+          const cdnUrl = `${ESM_CDN}/${args.path}?bundle=true&external=react,react-dom,react-is&${ESM_DEPS_PARAM}`;
           return { path: cdnUrl, namespace: "http-url" };
         }
 
@@ -208,16 +184,14 @@ export function serverFetchPlugin(cache: Map<string, string>): Plugin {
       });
 
       // Load HTTP URLs by fetching them
-      build.onLoad({ filter: /.*/, namespace: "http-url" }, async args => {
+      build.onLoad({ filter: /.*/, namespace: "http-url" }, async (args) => {
         if (cache.has(args.path)) {
           const cached = cache.get(args.path)!;
           const loader = guessLoader(args.path, "");
           return { contents: cached, loader };
         }
 
-        const { data: response, error: fetchErr } = await tryCatch(
-          fetch(args.path),
-        );
+        const { data: response, error: fetchErr } = await tryCatch(fetch(args.path));
         if (fetchErr || !response) {
           return {
             contents: `/* Fetch error for ${args.path}: ${fetchErr} */`,
@@ -231,9 +205,7 @@ export function serverFetchPlugin(cache: Map<string, string>): Plugin {
           };
         }
 
-        const { data: contents, error: textErr } = await tryCatch(
-          response.text(),
-        );
+        const { data: contents, error: textErr } = await tryCatch(response.text());
         if (textErr || contents === null) {
           return {
             contents: `/* Failed to read ${args.path}: ${textErr} */`,
@@ -260,9 +232,9 @@ export function serverFetchPlugin(cache: Map<string, string>): Plugin {
 function guessLoader(path: string, contentType: string): Loader {
   if (contentType.includes("text/css") || path.endsWith(".css")) return "css";
   if (
-    contentType.includes("application/javascript")
-    || path.endsWith(".js")
-    || path.endsWith(".mjs")
+    contentType.includes("application/javascript") ||
+    path.endsWith(".js") ||
+    path.endsWith(".mjs")
   ) {
     return "js";
   }
@@ -281,7 +253,7 @@ export async function bundleCodespace(session: {
   html?: string;
   css?: string;
   codeSpace: string;
-}): Promise<{ js: string; css: string; }> {
+}): Promise<{ js: string; css: string }> {
   // Rewrite `export { X as default }` to a render bootstrap using synchronous import
   // (IIFE bundles cannot use top-level await, and react-dom/client will be inlined by the plugin)
   let code = session.transpiled || "";

@@ -3,15 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Slider } from "@/components/ui/slider";
-import {
-  Mic,
-  Play,
-  Square,
-  Trash2,
-  Upload,
-  Volume2,
-  VolumeX,
-} from "lucide-react";
+import { Mic, Play, Square, Trash2, Upload, Volume2, VolumeX } from "lucide-react";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 
 interface Track {
@@ -47,16 +39,13 @@ export default function MusicCreatorPage() {
       if (recordingTimerRef.current) {
         clearInterval(recordingTimerRef.current);
       }
-      if (
-        mediaRecorderRef.current
-        && mediaRecorderRef.current.state === "recording"
-      ) {
+      if (mediaRecorderRef.current && mediaRecorderRef.current.state === "recording") {
         mediaRecorderRef.current.stop();
-        mediaRecorderRef.current.stream.getTracks().forEach(track => track.stop());
+        mediaRecorderRef.current.stream.getTracks().forEach((track) => track.stop());
       }
 
       // Cleanup tracks
-      tracksRef.current.forEach(track => {
+      tracksRef.current.forEach((track) => {
         track.audioElement.pause();
         URL.revokeObjectURL(track.url);
       });
@@ -78,7 +67,7 @@ export default function MusicCreatorPage() {
       audioElement: audio,
     };
 
-    setTracks(prev => [...prev, newTrack]);
+    setTracks((prev) => [...prev, newTrack]);
   }, []);
 
   // Handle file upload
@@ -96,17 +85,17 @@ export default function MusicCreatorPage() {
 
   // Playback Logic
   const playAll = useCallback(() => {
-    tracksRef.current.forEach(track => {
+    tracksRef.current.forEach((track) => {
       track.audioElement.currentTime = 0; // Simple start from beginning
       if (!track.isMuted) {
-        track.audioElement.play().catch(e => console.error("Play error", e));
+        track.audioElement.play().catch((e) => console.error("Play error", e));
       }
     });
     setIsPlaying(true);
   }, []);
 
   const stopAll = useCallback(() => {
-    tracksRef.current.forEach(track => {
+    tracksRef.current.forEach((track) => {
       track.audioElement.pause();
       track.audioElement.currentTime = 0;
     });
@@ -121,7 +110,7 @@ export default function MusicCreatorPage() {
       mediaRecorderRef.current = mediaRecorder;
       chunksRef.current = [];
 
-      mediaRecorder.ondataavailable = e => {
+      mediaRecorder.ondataavailable = (e) => {
         if (e.data.size > 0) {
           chunksRef.current.push(e.data);
         }
@@ -132,7 +121,7 @@ export default function MusicCreatorPage() {
         addTrack(`Recording ${new Date().toLocaleTimeString()}`, blob);
 
         // Stop all tracks in the stream
-        stream.getTracks().forEach(track => track.stop());
+        stream.getTracks().forEach((track) => track.stop());
       };
 
       mediaRecorder.start();
@@ -147,7 +136,7 @@ export default function MusicCreatorPage() {
       }
 
       recordingTimerRef.current = setInterval(() => {
-        setRecordingTime(prev => prev + 1);
+        setRecordingTime((prev) => prev + 1);
       }, 1000);
     } catch (err) {
       console.error("Error accessing microphone:", err);
@@ -181,31 +170,31 @@ export default function MusicCreatorPage() {
 
   // Track Controls
   const toggleMute = useCallback((id: string) => {
-    const track = tracksRef.current.find(t => t.id === id);
+    const track = tracksRef.current.find((t) => t.id === id);
     if (track) {
       track.audioElement.muted = !track.isMuted;
     }
 
-    setTracks(prev => prev.map(t => t.id === id ? { ...t, isMuted: !t.isMuted } : t));
+    setTracks((prev) => prev.map((t) => (t.id === id ? { ...t, isMuted: !t.isMuted } : t)));
   }, []);
 
   const setVolume = useCallback((id: string, volume: number) => {
-    const track = tracksRef.current.find(t => t.id === id);
+    const track = tracksRef.current.find((t) => t.id === id);
     if (track) {
       track.audioElement.volume = volume;
     }
 
-    setTracks(prev => prev.map(t => t.id === id ? { ...t, volume } : t));
+    setTracks((prev) => prev.map((t) => (t.id === id ? { ...t, volume } : t)));
   }, []);
 
   const removeTrack = useCallback((id: string) => {
-    const trackToRemove = tracksRef.current.find(t => t.id === id);
+    const trackToRemove = tracksRef.current.find((t) => t.id === id);
     if (trackToRemove) {
       trackToRemove.audioElement.pause();
       URL.revokeObjectURL(trackToRemove.url);
     }
 
-    setTracks(prev => prev.filter(t => t.id !== id));
+    setTracks((prev) => prev.filter((t) => t.id !== id));
   }, []);
 
   // Update loop for progress bar (optional, kept simple for now)
@@ -230,17 +219,17 @@ export default function MusicCreatorPage() {
                   onClick={togglePlay}
                   variant={isPlaying ? "destructive" : "default"}
                   className={`flex-1 sm:flex-none font-bold h-12 px-8 transition-all ${
-                    !isPlaying
-                    && "bg-emerald-600 hover:bg-emerald-500 text-white shadow-lg shadow-emerald-600/20"
+                    !isPlaying &&
+                    "bg-emerald-600 hover:bg-emerald-500 text-white shadow-lg shadow-emerald-600/20"
                   }`}
                   aria-label={isPlaying ? "Stop" : "Play"}
                 >
-                  {isPlaying
-                    ? <Square className="fill-current h-5 w-5" />
-                    : <Play className="fill-current h-5 w-5" />}
-                  <span className="ml-2">
-                    {isPlaying ? "Stop" : "Play All"}
-                  </span>
+                  {isPlaying ? (
+                    <Square className="fill-current h-5 w-5" />
+                  ) : (
+                    <Play className="fill-current h-5 w-5" />
+                  )}
+                  <span className="ml-2">{isPlaying ? "Stop" : "Play All"}</span>
                 </Button>
 
                 <Button
@@ -254,12 +243,8 @@ export default function MusicCreatorPage() {
                   }`}
                   aria-label={isRecording ? "Stop Recording" : "Record"}
                 >
-                  <Mic
-                    className={isRecording ? "fill-current h-5 w-5" : "h-5 w-5"}
-                  />
-                  <span className="ml-2">
-                    {isRecording ? `${recordingTime}s` : "Record"}
-                  </span>
+                  <Mic className={isRecording ? "fill-current h-5 w-5" : "h-5 w-5"} />
+                  <span className="ml-2">{isRecording ? `${recordingTime}s` : "Record"}</span>
                 </Button>
               </div>
 
@@ -303,7 +288,7 @@ export default function MusicCreatorPage() {
               </div>
             )}
 
-            {tracks.map(track => (
+            {tracks.map((track) => (
               <Card
                 key={track.id}
                 className="bg-white/[0.03] border-white/5 hover:bg-white/[0.05] transition-colors group"
@@ -314,10 +299,7 @@ export default function MusicCreatorPage() {
                   </div>
 
                   <div className="flex-1 min-w-0 text-center sm:text-left">
-                    <h3
-                      className="font-bold text-sm truncate"
-                      title={track.name}
-                    >
+                    <h3 className="font-bold text-sm truncate" title={track.name}>
                       {track.name}
                     </h3>
                     <p className="text-[10px] uppercase tracking-wider text-zinc-500 font-black mt-0.5">
@@ -333,7 +315,7 @@ export default function MusicCreatorPage() {
                         value={[track.volume]}
                         max={1}
                         step={0.01}
-                        onValueChange={vals => setVolume(track.id, vals[0] ?? 1)}
+                        onValueChange={(vals) => setVolume(track.id, vals[0] ?? 1)}
                         className="w-full"
                         aria-label={`Volume for ${track.name}`}
                       />
@@ -351,9 +333,11 @@ export default function MusicCreatorPage() {
                         onClick={() => toggleMute(track.id)}
                         aria-label={track.isMuted ? "Unmute" : "Mute"}
                       >
-                        {track.isMuted
-                          ? <VolumeX className="h-4 w-4" />
-                          : <Volume2 className="h-4 w-4" />}
+                        {track.isMuted ? (
+                          <VolumeX className="h-4 w-4" />
+                        ) : (
+                          <Volume2 className="h-4 w-4" />
+                        )}
                       </Button>
 
                       <Button

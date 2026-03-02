@@ -46,19 +46,13 @@ function getOrCreateStore<T extends TableRow>(
   return tableStores.get(key) as TableStore<T>;
 }
 
-export function useTable<T extends TableRow>(
-  tableName: string,
-  filter?: (row: T) => boolean,
-): T[] {
+export function useTable<T extends TableRow>(tableName: string, filter?: (row: T) => boolean): T[] {
   const filterRef = useRef(filter);
   filterRef.current = filter;
 
   const store = getOrCreateStore<T>(tableName, filter);
 
-  const subscribe = useCallback(
-    (listener: () => void) => store.subscribe(listener),
-    [store],
-  );
+  const subscribe = useCallback((listener: () => void) => store.subscribe(listener), [store]);
 
   const getSnapshot = useCallback(() => store.getSnapshot(), [store]);
 

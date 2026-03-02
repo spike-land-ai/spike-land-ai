@@ -51,7 +51,7 @@ export function tokenize(text: string): string[] {
   return text
     .toLowerCase()
     .split(/[^a-z0-9]+/)
-    .filter(t => t.length > 1);
+    .filter((t) => t.length > 1);
 }
 
 // ── Synonym Expansion ──────────────────────────────────────────────
@@ -131,10 +131,7 @@ export function buildQueryVector(query: string): Map<string, number> {
 
 // ── Cosine Similarity (sparse) ─────────────────────────────────────
 
-export function cosineSimilarity(
-  a: Map<string, number>,
-  b: Map<string, number>,
-): number {
+export function cosineSimilarity(a: Map<string, number>, b: Map<string, number>): number {
   let dot = 0;
   // Iterate over the smaller map for efficiency
   const [smaller, larger] = a.size <= b.size ? [a, b] : [b, a];
@@ -174,15 +171,11 @@ export class ToolEmbeddingIndex {
     return this.index.size;
   }
 
-  search(
-    query: string,
-    limit = 10,
-    threshold = 0.01,
-  ): Array<{ name: string; score: number; }> {
+  search(query: string, limit = 10, threshold = 0.01): Array<{ name: string; score: number }> {
     const queryVec = buildQueryVector(query);
     if (queryVec.size === 0) return [];
 
-    const results: Array<{ name: string; score: number; }> = [];
+    const results: Array<{ name: string; score: number }> = [];
 
     for (const entry of this.index.values()) {
       const score = cosineSimilarity(queryVec, entry.vector);
@@ -265,9 +258,7 @@ export function suggestParameters(query: string): Record<string, string> {
   }
 
   // "called/named <name>" → name
-  const namedMatch = lower.match(
-    /\b(?:called|named)\s+["']?([a-z0-9_-]+)["']?/,
-  );
+  const namedMatch = lower.match(/\b(?:called|named)\s+["']?([a-z0-9_-]+)["']?/);
   if (namedMatch?.[1]) {
     params.name = namedMatch[1];
   }

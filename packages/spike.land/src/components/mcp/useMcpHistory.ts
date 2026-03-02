@@ -67,7 +67,7 @@ if (typeof window !== "undefined") {
 
 export function useFavorites() {
   const favorites = useSyncExternalStore(
-    cb => {
+    (cb) => {
       favListeners.add(cb);
       return () => favListeners.delete(cb);
     },
@@ -79,16 +79,13 @@ export function useFavorites() {
     const current = readFavorites();
     const idx = current.indexOf(toolName);
     if (idx >= 0) {
-      writeFavorites(current.filter(n => n !== toolName));
+      writeFavorites(current.filter((n) => n !== toolName));
     } else {
       writeFavorites([...current, toolName]);
     }
   }, []);
 
-  const isFavorite = useCallback(
-    (toolName: string) => favorites.includes(toolName),
-    [favorites],
-  );
+  const isFavorite = useCallback((toolName: string) => favorites.includes(toolName), [favorites]);
 
   return { favorites, toggleFavorite, isFavorite } as const;
 }
@@ -97,7 +94,7 @@ export function useFavorites() {
 
 export function useRecentTools() {
   const recent = useSyncExternalStore(
-    cb => {
+    (cb) => {
       recentListeners.add(cb);
       return () => recentListeners.delete(cb);
     },
@@ -107,7 +104,7 @@ export function useRecentTools() {
 
   const addRecent = useCallback((toolName: string) => {
     const current = readRecent();
-    const filtered = current.filter(n => n !== toolName);
+    const filtered = current.filter((n) => n !== toolName);
     const updated = [toolName, ...filtered].slice(0, MAX_RECENT);
     writeRecent(updated);
   }, []);

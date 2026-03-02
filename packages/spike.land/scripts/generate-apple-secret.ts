@@ -38,8 +38,8 @@ function createPrompt(): readline.Interface {
 }
 
 function prompt(rl: readline.Interface, question: string): Promise<string> {
-  return new Promise(resolve => {
-    rl.question(question, answer => {
+  return new Promise((resolve) => {
+    rl.question(question, (answer) => {
       resolve(answer.trim());
     });
   });
@@ -64,18 +64,14 @@ async function getCredentials(): Promise<AppleCredentials> {
   }
 
   if (!/^[A-Z0-9]{10}$/.test(teamId)) {
-    console.error(
-      "\n❌ Error: Team ID must be exactly 10 alphanumeric characters",
-    );
+    console.error("\n❌ Error: Team ID must be exactly 10 alphanumeric characters");
     process.exit(1);
   }
 
   // Client ID (Services ID)
   let clientId = process.env.AUTH_APPLE_ID || "";
   if (!clientId) {
-    console.log(
-      "\nServices ID: The identifier you created for web Sign in with Apple",
-    );
+    console.log("\nServices ID: The identifier you created for web Sign in with Apple");
     console.log("Example: com.spike.land.web\n");
     clientId = await prompt(rl, "Enter your Services ID (AUTH_APPLE_ID): ");
   } else {
@@ -90,9 +86,7 @@ async function getCredentials(): Promise<AppleCredentials> {
   // Key ID (use bracket notation for env vars not in type definitions)
   let keyId = process.env.APPLE_KEY_ID || "";
   if (!keyId) {
-    console.log(
-      "\nKey ID: Shown when you create/view a key in Apple Developer portal",
-    );
+    console.log("\nKey ID: Shown when you create/view a key in Apple Developer portal");
     console.log("Example: ABC123DEFG\n");
     keyId = await prompt(rl, "Enter your Key ID (10 chars): ");
   } else {
@@ -100,9 +94,7 @@ async function getCredentials(): Promise<AppleCredentials> {
   }
 
   if (!/^[A-Z0-9]{10}$/.test(keyId)) {
-    console.error(
-      "\n❌ Error: Key ID must be exactly 10 alphanumeric characters",
-    );
+    console.error("\n❌ Error: Key ID must be exactly 10 alphanumeric characters");
     process.exit(1);
   }
 
@@ -122,17 +114,12 @@ async function getCredentials(): Promise<AppleCredentials> {
   }
 
   if (!privateKey) {
-    console.log(
-      "\nPrivate Key: The .p8 file you downloaded from Apple Developer portal",
-    );
+    console.log("\nPrivate Key: The .p8 file you downloaded from Apple Developer portal");
     console.log("You can either:");
     console.log("  1. Provide the path to your .p8 file");
     console.log("  2. Paste the key content directly\n");
 
-    const keyInput = await prompt(
-      rl,
-      "Enter path to .p8 file or paste key content:\n",
-    );
+    const keyInput = await prompt(rl, "Enter path to .p8 file or paste key content:\n");
 
     if (keyInput.includes("-----BEGIN PRIVATE KEY-----")) {
       privateKey = keyInput;
@@ -148,9 +135,7 @@ async function getCredentials(): Promise<AppleCredentials> {
   }
 
   if (!privateKey.includes("-----BEGIN PRIVATE KEY-----")) {
-    console.error(
-      "\n❌ Error: Invalid private key format. Must be a PEM-formatted PKCS8 key.",
-    );
+    console.error("\n❌ Error: Invalid private key format. Must be a PEM-formatted PKCS8 key.");
     process.exit(1);
   }
 
@@ -159,9 +144,7 @@ async function getCredentials(): Promise<AppleCredentials> {
   return { teamId, clientId, keyId, privateKey };
 }
 
-async function generateClientSecret(
-  credentials: AppleCredentials,
-): Promise<string> {
+async function generateClientSecret(credentials: AppleCredentials): Promise<string> {
   const { teamId, clientId, keyId, privateKey } = credentials;
 
   // Import the private key
@@ -201,9 +184,7 @@ async function main(): Promise<void> {
     console.log("\nAUTH_APPLE_SECRET=");
     console.log(clientSecret);
     console.log("\n" + "─".repeat(50));
-    console.log(
-      `\n⏰ This secret expires on: ${expirationDate.toISOString().split("T")[0]}`,
-    );
+    console.log(`\n⏰ This secret expires on: ${expirationDate.toISOString().split("T")[0]}`);
     console.log("   Set a calendar reminder to regenerate before this date!\n");
     console.log("📋 Next steps:");
     console.log("   1. Copy the secret above");

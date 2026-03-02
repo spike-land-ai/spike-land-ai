@@ -22,9 +22,7 @@ vi.mock("@/lib/logger", () => ({
 import { createGeminiChatStream } from "./gemini-chat-stream";
 
 /** Helper: collect all SSE events from a ReadableStream */
-async function collectEvents(
-  stream: ReadableStream,
-): Promise<Array<Record<string, unknown>>> {
+async function collectEvents(stream: ReadableStream): Promise<Array<Record<string, unknown>>> {
   const reader = stream.getReader();
   const decoder = new TextDecoder();
   const events: Array<Record<string, unknown>> = [];
@@ -49,11 +47,9 @@ async function collectEvents(
 }
 
 /** Create an async generator that yields Gemini-style chunks */
-async function* makeChunks(
-  texts: string[],
-): AsyncGenerator<{
+async function* makeChunks(texts: string[]): AsyncGenerator<{
   candidates: Array<{
-    content: { parts: Array<{ text: string; }>; };
+    content: { parts: Array<{ text: string }> };
   }>;
 }> {
   for (const text of texts) {
@@ -73,9 +69,7 @@ describe("createGeminiChatStream", () => {
   });
 
   it("streams text chunks and emits done event", async () => {
-    mockGenerateContentStream.mockResolvedValue(
-      makeChunks(["Hello", " world", "!"]),
-    );
+    mockGenerateContentStream.mockResolvedValue(makeChunks(["Hello", " world", "!"]));
 
     const stream = createGeminiChatStream({
       question: "Hi",
@@ -95,9 +89,7 @@ describe("createGeminiChatStream", () => {
   });
 
   it("calls onComplete with the full concatenated answer", async () => {
-    mockGenerateContentStream.mockResolvedValue(
-      makeChunks(["abc", "def"]),
-    );
+    mockGenerateContentStream.mockResolvedValue(makeChunks(["abc", "def"]));
 
     const onComplete = vi.fn();
 
@@ -113,9 +105,7 @@ describe("createGeminiChatStream", () => {
   });
 
   it("emits a friendly error on failure, not the raw message", async () => {
-    mockGenerateContentStream.mockRejectedValue(
-      new Error("GEMINI_API_KEY invalid"),
-    );
+    mockGenerateContentStream.mockRejectedValue(new Error("GEMINI_API_KEY invalid"));
 
     const stream = createGeminiChatStream({
       question: "test",
@@ -187,6 +177,6 @@ describe("createGeminiChatStream", () => {
 
     // Should not throw
     const events = await collectEvents(stream);
-    expect(events.some(e => e.type === "done")).toBe(true);
+    expect(events.some((e) => e.type === "done")).toBe(true);
   });
 });

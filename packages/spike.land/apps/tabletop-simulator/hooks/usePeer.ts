@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { isE2EMode } from "../lib/e2e-utils";
 
 // Store peer instances globally to survive React Strict Mode double-mount
-const peerCache = new Map<string, { peer: Peer; refCount: number; }>();
+const peerCache = new Map<string, { peer: Peer; refCount: number }>();
 
 export function usePeer() {
   const [peer, setPeer] = useState<Peer | null>(null);
@@ -22,8 +22,7 @@ export function usePeer() {
     }
 
     // Generate a stable cache key for this component instance
-    const cacheKey = cacheKeyRef.current
-      ?? Math.random().toString(36).substr(2, 9);
+    const cacheKey = cacheKeyRef.current ?? Math.random().toString(36).substr(2, 9);
     cacheKeyRef.current = cacheKey;
 
     // Check if we already have a peer for this key (Strict Mode re-mount)
@@ -50,12 +49,12 @@ export function usePeer() {
 
     peerCache.set(cacheKey, { peer: newPeer, refCount: 1 });
 
-    newPeer.on("open", openId => {
+    newPeer.on("open", (openId) => {
       setPeer(newPeer);
       setPeerId(openId);
     });
 
-    newPeer.on("error", err => {
+    newPeer.on("error", (err) => {
       console.error("[P2P] Peer error:", err);
     });
 

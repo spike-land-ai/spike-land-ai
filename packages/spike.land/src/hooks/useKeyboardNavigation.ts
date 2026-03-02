@@ -36,9 +36,7 @@ export interface UseKeyboardNavigationOptions {
  *
  * @param options - Configuration options with callbacks and enabled state
  */
-export function useKeyboardNavigation(
-  options: UseKeyboardNavigationOptions,
-): void {
+export function useKeyboardNavigation(options: UseKeyboardNavigationOptions): void {
   const {
     onSpacebar,
     onLeftArrow,
@@ -58,11 +56,7 @@ export function useKeyboardNavigation(
     (event: KeyboardEvent) => {
       // Ignore key events when typing in input elements
       const target = event.target as HTMLElement;
-      if (
-        target.tagName === "INPUT"
-        || target.tagName === "TEXTAREA"
-        || target.isContentEditable
-      ) {
+      if (target.tagName === "INPUT" || target.tagName === "TEXTAREA" || target.isContentEditable) {
         return;
       }
 
@@ -105,15 +99,7 @@ export function useKeyboardNavigation(
           break;
       }
     },
-    [
-      onSpacebar,
-      onLeftArrow,
-      onRightArrow,
-      onUpArrow,
-      onDownArrow,
-      onBKeyDown,
-      onEscape,
-    ],
+    [onSpacebar, onLeftArrow, onRightArrow, onUpArrow, onDownArrow, onBKeyDown, onEscape],
   );
 
   const handleKeyUp = useCallback(

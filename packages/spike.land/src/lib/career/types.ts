@@ -97,21 +97,21 @@ export interface EscoSearchResult {
   uri: string;
   title: string;
   className: string;
-  _links: { self: { href: string; }; };
+  _links: { self: { href: string } };
 }
 
 export interface EscoOccupationDetail {
   uri: string;
   title: string;
-  description: { en: { literal: string; }; };
+  description: { en: { literal: string } };
   code: string;
   _links: {
-    hasEssentialSkill: Array<{ uri: string; title: string; skillType: string; }>;
-    hasOptionalSkill: Array<{ uri: string; title: string; skillType: string; }>;
-    iscoGroup: Array<{ uri: string; title: string; }>;
-    broaderOccupation?: Array<{ uri: string; title: string; }>;
+    hasEssentialSkill: Array<{ uri: string; title: string; skillType: string }>;
+    hasOptionalSkill: Array<{ uri: string; title: string; skillType: string }>;
+    iscoGroup: Array<{ uri: string; title: string }>;
+    broaderOccupation?: Array<{ uri: string; title: string }>;
   };
-  alternativeLabel?: { en: string[]; };
+  alternativeLabel?: { en: string[] };
 }
 
 // Adzuna API response types
@@ -124,12 +124,12 @@ export interface AdzunaSearchResponse {
 export interface AdzunaJob {
   id: string;
   title: string;
-  company: { display_name: string; };
-  location: { display_name: string; };
+  company: { display_name: string };
+  location: { display_name: string };
   salary_min: number | null;
   salary_max: number | null;
   description: string;
   redirect_url: string;
   created: string;
-  category: { label: string; };
+  category: { label: string };
 }

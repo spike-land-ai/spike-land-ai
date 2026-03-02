@@ -20,9 +20,27 @@ interface CodingSession {
   status: "planning" | "coding" | "reviewing" | "merging" | "completed" | "failed";
   planId?: string;
   roles: Array<{ role: string; agentId?: string; status: string }>;
-  events: Array<{ id: string; timestamp: string; type: string; message: string; role?: string; subtaskId?: string }>;
-  config: { maxIterations: number; timeoutMs: number; autoDispatch: boolean; requireReview: boolean };
-  metrics: { totalTokensIn: number; totalTokensOut: number; codeGenCalls: number; passRate: number; iterations: number };
+  events: Array<{
+    id: string;
+    timestamp: string;
+    type: string;
+    message: string;
+    role?: string;
+    subtaskId?: string;
+  }>;
+  config: {
+    maxIterations: number;
+    timeoutMs: number;
+    autoDispatch: boolean;
+    requireReview: boolean;
+  };
+  metrics: {
+    totalTokensIn: number;
+    totalTokensOut: number;
+    codeGenCalls: number;
+    passRate: number;
+    iterations: number;
+  };
   createdAt: string;
   completedAt?: string;
 }
@@ -37,46 +55,76 @@ export function clearSessions(): void {
 
 // ─── Registration ────────────────────────────────────────────────────────────
 
-const SessionStatusEnum = z.enum(["planning", "coding", "reviewing", "merging", "completed", "failed"]);
-
-const RoleEnum = z.enum([
-  "planner", "coder", "reviewer", "tester", "architect", "security_analyst",
-  "devops", "tech_lead", "documenter", "qa_engineer", "product_manager",
-  "ux_designer", "data_engineer", "performance_engineer", "integration_tester", "release_manager",
+const SessionStatusEnum = z.enum([
+  "planning",
+  "coding",
+  "reviewing",
+  "merging",
+  "completed",
+  "failed",
 ]);
 
-export function registerSessionTools(
-  registry: ToolRegistry,
-  userId: string,
-  db: DrizzleDB,
-): void {
+const RoleEnum = z.enum([
+  "planner",
+  "coder",
+  "reviewer",
+  "tester",
+  "architect",
+  "security_analyst",
+  "devops",
+  "tech_lead",
+  "documenter",
+  "qa_engineer",
+  "product_manager",
+  "ux_designer",
+  "data_engineer",
+  "performance_engineer",
+  "integration_tester",
+  "release_manager",
+]);
+
+export function registerSessionTools(registry: ToolRegistry, userId: string, db: DrizzleDB): void {
   registry.registerBuilt(
     freeTool(userId, db)
       .tool("session_create", "Create a new distributed coding session.", {
         name: z.string().describe("Session name."),
         description: z.string().describe("Session description."),
         plan_id: z.string().optional().describe("Optional orchestrator plan ID."),
-        config: z.object({
-          maxIterations: z.number().optional(),
-          timeoutMs: z.number().optional(),
-          autoDispatch: z.boolean().optional(),
-          requireReview: z.boolean().optional(),
-        }).optional().describe("Session configuration."),
+        config: z
+          .object({
+            maxIterations: z.number().optional(),
+            timeoutMs: z.number().optional(),
+            autoDispatch: z.boolean().optional(),
+            requireReview: z.boolean().optional(),
+          })
+          .optional()
+          .describe("Session configuration."),
       })
       .meta({ category: "session", tier: "free" })
       .handler(async ({ input }) => {
         const id = crypto.randomUUID();
         const session: CodingSession = {
-          id, userId, name: input.name, description: input.description, status: "planning",
+          id,
+          userId,
+          name: input.name,
+          description: input.description,
+          status: "planning",
           ...(input.plan_id !== undefined ? { planId: input.plan_id } : {}),
-          roles: [], events: [],
+          roles: [],
+          events: [],
           config: {
             maxIterations: input.config?.maxIterations ?? 5,
             timeoutMs: input.config?.timeoutMs ?? 300000,
             autoDispatch: input.config?.autoDispatch ?? false,
             requireReview: input.config?.requireReview ?? true,
           },
-          metrics: { totalTokensIn: 0, totalTokensOut: 0, codeGenCalls: 0, passRate: 0, iterations: 0 },
+          metrics: {
+            totalTokensIn: 0,
+            totalTokensOut: 0,
+            codeGenCalls: 0,
+            passRate: 0,
+            iterations: 0,
+          },
           createdAt: new Date().toISOString(),
         };
         sessions.set(id, session);
@@ -107,7 +155,7 @@ export function registerSessionTools(
       .handler(async ({ input }) => {
         const limit = input.limit ?? 10;
         let list = Array.from(sessions.values());
-        if (input.status) list = list.filter(s => s.status === input.status);
+        if (input.status) list = list.filter((s) => s.status === input.status);
         list = list.sort((x, y) => y.createdAt.localeCompare(x.createdAt)).slice(0, limit);
         return jsonResult(`Found ${list.length} session(s)`, list);
       }),
@@ -125,10 +173,13 @@ export function registerSessionTools(
         const session = sessions.get(input.session_id);
         if (!session) throw new Error(`Session ${input.session_id} not found`);
         const agentId = input.agent_id || "agent-" + crypto.randomUUID().substring(0, 5);
-        const existing = session.roles.find(r => r.role === input.role);
+        const existing = session.roles.find((r) => r.role === input.role);
         if (existing) existing.agentId = agentId;
         else session.roles.push({ role: input.role, agentId, status: "idle" });
-        return jsonResult(`Role ${input.role} assigned/updated in session ${input.session_id}`, session.roles);
+        return jsonResult(
+          `Role ${input.role} assigned/updated in session ${input.session_id}`,
+          session.roles,
+        );
       }),
   );
 
@@ -146,8 +197,10 @@ export function registerSessionTools(
         const session = sessions.get(input.session_id);
         if (!session) throw new Error(`Session ${input.session_id} not found`);
         const event = {
-          id: crypto.randomUUID(), timestamp: new Date().toISOString(),
-          type: input.type, message: input.message,
+          id: crypto.randomUUID(),
+          timestamp: new Date().toISOString(),
+          type: input.type,
+          message: input.message,
           ...(input.agent_id !== undefined ? { role: input.agent_id } : {}),
           ...(input.subtask_id !== undefined ? { subtaskId: input.subtask_id } : {}),
         };
@@ -167,7 +220,9 @@ export function registerSessionTools(
         const session = sessions.get(input.session_id);
         if (!session) throw new Error(`Session ${input.session_id} not found`);
         session.status = input.status;
-        return jsonResult(`Session ${input.session_id} status updated to ${input.status}`, { status: session.status });
+        return jsonResult(`Session ${input.session_id} status updated to ${input.status}`, {
+          status: session.status,
+        });
       }),
   );
 
@@ -196,31 +251,55 @@ export function registerSessionTools(
         if (!session) throw new Error(`Session ${input.session_id} not found`);
         session.status = "completed";
         session.completedAt = new Date().toISOString();
-        session.events.push({ id: "close", timestamp: session.completedAt, type: "session_closed", message: input.summary });
+        session.events.push({
+          id: "close",
+          timestamp: session.completedAt,
+          type: "session_closed",
+          message: input.summary,
+        });
         return jsonResult(`Session ${input.session_id} closed`, session);
       }),
   );
 
   registry.registerBuilt(
     freeTool(userId, db)
-      .tool("session_dispatch_task", "Dispatch a subtask to a specific agent role in the session.", {
-        session_id: z.string().describe("Session ID."),
-        role: z.string().describe("Target agent role."),
-        task: z.string().describe("Task description."),
-        context: z.array(z.string()).optional().describe("Context files or references."),
-        priority: z.enum(["low", "normal", "high", "critical"]).optional().describe("Priority level."),
-      })
+      .tool(
+        "session_dispatch_task",
+        "Dispatch a subtask to a specific agent role in the session.",
+        {
+          session_id: z.string().describe("Session ID."),
+          role: z.string().describe("Target agent role."),
+          task: z.string().describe("Task description."),
+          context: z.array(z.string()).optional().describe("Context files or references."),
+          priority: z
+            .enum(["low", "normal", "high", "critical"])
+            .optional()
+            .describe("Priority level."),
+        },
+      )
       .meta({ category: "session", tier: "free" })
       .handler(async ({ input }) => {
         const session = sessions.get(input.session_id);
         if (!session) throw new Error(`Session ${input.session_id} not found`);
-        const roleEntry = session.roles.find(r => r.role === input.role);
-        if (!roleEntry) throw new Error(`Role ${input.role} not assigned in session ${input.session_id}`);
+        const roleEntry = session.roles.find((r) => r.role === input.role);
+        if (!roleEntry)
+          throw new Error(`Role ${input.role} not assigned in session ${input.session_id}`);
         const taskId = crypto.randomUUID();
         roleEntry.status = "busy";
-        session.events.push({ id: taskId, timestamp: new Date().toISOString(), type: "task_dispatched", message: input.task, role: input.role, subtaskId: taskId });
+        session.events.push({
+          id: taskId,
+          timestamp: new Date().toISOString(),
+          type: "task_dispatched",
+          message: input.task,
+          role: input.role,
+          subtaskId: taskId,
+        });
         return jsonResult(`Task dispatched to ${input.role} in session ${input.session_id}`, {
-          taskId, role: input.role, task: input.task, priority: input.priority ?? "normal", context: input.context ?? [],
+          taskId,
+          role: input.role,
+          task: input.task,
+          priority: input.priority ?? "normal",
+          context: input.context ?? [],
         });
       }),
   );

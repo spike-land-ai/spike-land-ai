@@ -1,9 +1,5 @@
 import { describe, expect, it } from "vitest";
-import {
-  buildPaginationMeta,
-  paginateArray,
-  parsePaginationParams,
-} from "./filters";
+import { buildPaginationMeta, paginateArray, parsePaginationParams } from "./filters";
 
 describe("parsePaginationParams", () => {
   it("returns defaults when no params provided", () => {

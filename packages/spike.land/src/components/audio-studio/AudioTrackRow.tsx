@@ -20,11 +20,7 @@ interface AudioTrackRowProps {
   onSoloToggle: (id: string) => void;
 }
 
-export function AudioTrackRow({
-  track,
-  onMuteToggle,
-  onSoloToggle,
-}: AudioTrackRowProps) {
+export function AudioTrackRow({ track, onMuteToggle, onSoloToggle }: AudioTrackRowProps) {
   const effectiveVolume = track.isMuted ? 0 : track.volume;
 
   return (
@@ -36,9 +32,7 @@ export function AudioTrackRow({
       />
 
       <div className="w-28 shrink-0">
-        <span className="text-sm font-medium text-zinc-100 truncate block">
-          {track.name}
-        </span>
+        <span className="text-sm font-medium text-zinc-100 truncate block">{track.name}</span>
         <span className="text-xs text-zinc-500">{track.volume}%</span>
       </div>
 

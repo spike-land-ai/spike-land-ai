@@ -119,7 +119,7 @@ describe("useCleanSweep", () => {
     it("shows streakLoading as true during initial fetch", async () => {
       let resolveStreak!: (v: unknown) => void;
       fetchMock.mockReturnValueOnce(
-        new Promise(res => {
+        new Promise((res) => {
           resolveStreak = res;
         }),
       );
@@ -188,7 +188,7 @@ describe("useCleanSweep", () => {
         expect(fetchMock).toHaveBeenCalledTimes(3);
       });
 
-      const urls = fetchMock.mock.calls.map(call => call[0] as string);
+      const urls = fetchMock.mock.calls.map((call) => call[0] as string);
       expect(urls).toContain("/api/clean/streaks");
       expect(urls).toContain("/api/clean/sessions?limit=5");
       expect(urls).toContain("/api/clean/achievements");
@@ -273,8 +273,8 @@ describe("useCleanSweep", () => {
       });
 
       // Just verify the POST was made with correct body
-      const postCall = fetchMock.mock.calls.find(call =>
-        call[0] === "/api/clean/sessions" && (call[1] as RequestInit)?.method === "POST"
+      const postCall = fetchMock.mock.calls.find(
+        (call) => call[0] === "/api/clean/sessions" && (call[1] as RequestInit)?.method === "POST",
       );
       expect(postCall).toBeDefined();
       expect(JSON.parse((postCall![1] as RequestInit).body as string)).toEqual({
@@ -366,8 +366,8 @@ describe("useCleanSweep", () => {
         await result.current.completeTask("task-1");
       });
 
-      const completeCall = fetchMock.mock.calls.find(call =>
-        (call[0] as string).includes("/tasks/task-1/complete")
+      const completeCall = fetchMock.mock.calls.find((call) =>
+        (call[0] as string).includes("/tasks/task-1/complete"),
       );
       expect(completeCall).toBeDefined();
       expect((completeCall![1] as RequestInit).method).toBe("POST");
@@ -458,8 +458,8 @@ describe("useCleanSweep", () => {
         await result.current.skipTask("task-1", "back pain");
       });
 
-      const skipCall = fetchMock.mock.calls.find(call =>
-        (call[0] as string).includes("/tasks/task-1/skip")
+      const skipCall = fetchMock.mock.calls.find((call) =>
+        (call[0] as string).includes("/tasks/task-1/skip"),
       );
       expect(skipCall).toBeDefined();
       expect(JSON.parse((skipCall![1] as RequestInit).body as string)).toEqual({
@@ -502,7 +502,7 @@ describe("useCleanSweep", () => {
 
       const requeuedSession = {
         ...session,
-        tasks: session.tasks.map(t => ({ ...t, status: "PENDING" as const })),
+        tasks: session.tasks.map((t) => ({ ...t, status: "PENDING" as const })),
       };
       mockFetchSuccess(requeuedSession);
       await act(async () => {
@@ -590,7 +590,7 @@ describe("useCleanSweep", () => {
     it("loading is true when streakLoading is true", async () => {
       let resolveStreak!: (v: Response) => void;
       fetchMock.mockReturnValueOnce(
-        new Promise<Response>(res => {
+        new Promise<Response>((res) => {
           resolveStreak = res;
         }),
       );
@@ -652,7 +652,7 @@ describe("useCleanSweep", () => {
       // Queue a second refreshStreak before the first completes
       let resolveExtra!: (v: unknown) => void;
       fetchMock.mockReturnValueOnce(
-        new Promise(res => {
+        new Promise((res) => {
           resolveExtra = res;
         }),
       );
@@ -666,8 +666,9 @@ describe("useCleanSweep", () => {
 
       await waitFor(() => expect(result.current.streakLoading).toBe(false));
       // Should not have made more than the initial 3 + 1 refresh calls
-      expect(fetchMock.mock.calls.filter(call => call[0] === "/api/clean/streaks").length)
-        .toBeLessThanOrEqual(2);
+      expect(
+        fetchMock.mock.calls.filter((call) => call[0] === "/api/clean/streaks").length,
+      ).toBeLessThanOrEqual(2);
     });
   });
 });

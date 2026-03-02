@@ -11,10 +11,11 @@ export function npmResolverPlugin(options: NpmResolverOptions = {}): Plugin {
   return {
     name: "npm-resolver",
     setup(build) {
-      build.onResolve({ filter: /.*/ }, args => {
+      build.onResolve({ filter: /.*/ }, (args) => {
         if (
-          args.path.startsWith(".") || args.path.startsWith("/")
-          || args.path.startsWith("https://")
+          args.path.startsWith(".") ||
+          args.path.startsWith("/") ||
+          args.path.startsWith("https://")
         ) {
           return undefined;
         }
@@ -31,12 +32,12 @@ export function npmResolverPlugin(options: NpmResolverOptions = {}): Plugin {
       });
 
       // Handle esm.sh protocol for relative imports or further resolutions if mode=bundle
-      build.onResolve({ filter: /^https:\/\/esm\.sh\/.*/ }, args => {
+      build.onResolve({ filter: /^https:\/\/esm\.sh\/.*/ }, (args) => {
         return { path: args.path, namespace: "npm-url" };
       });
 
       // Relative inner imports from an npm module in bundle mode
-      build.onResolve({ filter: /.*/, namespace: "npm-url" }, args => {
+      build.onResolve({ filter: /.*/, namespace: "npm-url" }, (args) => {
         if (args.path.startsWith(".")) {
           return {
             path: new URL(args.path, args.importer).href,
@@ -46,7 +47,7 @@ export function npmResolverPlugin(options: NpmResolverOptions = {}): Plugin {
         return undefined;
       });
 
-      build.onLoad({ filter: /.*/, namespace: "npm-url" }, async args => {
+      build.onLoad({ filter: /.*/, namespace: "npm-url" }, async (args) => {
         if (cache.has(args.path)) {
           return { contents: cache.get(args.path), loader: "js" };
         }
@@ -54,9 +55,7 @@ export function npmResolverPlugin(options: NpmResolverOptions = {}): Plugin {
         if (error || !response || !response.ok) {
           throw new Error(`Failed to fetch npm package: ${args.path}`);
         }
-        const { data: contents, error: textError } = await tryCatch(
-          response.text(),
-        );
+        const { data: contents, error: textError } = await tryCatch(response.text());
         if (textError || contents === null) {
           throw new Error(`Failed to read npm package text: ${args.path}`);
         }

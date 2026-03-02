@@ -31,9 +31,7 @@ if (!migrationName) {
 // the argument boundary. Max length of 64 chars prevents unreasonably long names.
 // OWASP A03: Injection — validate all inputs before constructing OS commands.
 if (!/^[a-z][a-z0-9_]*$/.test(migrationName) || migrationName.length > 64) {
-  console.error(
-    "Error: Migration name must be snake_case (e.g., add_user_preferences)",
-  );
+  console.error("Error: Migration name must be snake_case (e.g., add_user_preferences)");
   console.error("  - Start with a lowercase letter");
   console.error("  - Only lowercase letters, numbers, and underscores");
   console.error("  - Maximum 64 characters");

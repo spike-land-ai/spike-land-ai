@@ -11,7 +11,9 @@ export function JobListingsPanel({ jobs, isLoading }: JobListingsPanelProps) {
   if (isLoading) {
     return (
       <div className="space-y-3">
-        {Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-24 bg-zinc-800" />)}
+        {Array.from({ length: 3 }).map((_, i) => (
+          <Skeleton key={i} className="h-24 bg-zinc-800" />
+        ))}
       </div>
     );
   }
@@ -27,7 +29,9 @@ export function JobListingsPanel({ jobs, isLoading }: JobListingsPanelProps) {
   return (
     <div className="space-y-3">
       <p className="text-sm text-zinc-400">{jobs.length} listings found</p>
-      {jobs.map(job => <JobListingCard key={job.id} job={job} />)}
+      {jobs.map((job) => (
+        <JobListingCard key={job.id} job={job} />
+      ))}
     </div>
   );
 }

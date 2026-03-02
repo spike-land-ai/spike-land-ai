@@ -1,11 +1,7 @@
 {
   "compilerOptions": {
     "target": "ES2022",
-    "lib": [
-      "DOM",
-      "DOM.Iterable",
-      "ES2022"
-    ],
+    "lib": ["DOM", "DOM.Iterable", "ES2022"],
     "allowJs": false,
     "skipLibCheck": true,
     "strict": true,
@@ -34,46 +30,22 @@
     "noImplicitOverride": true,
     "exactOptionalPropertyTypes": true,
     "noUncheckedSideEffectImports": true,
-    "plugins": [
-      {
-        "name": "next"
-      }
-    ],
     "paths": {
-      "@/*": [
-        "./src/*"
-      ],
-      "@apps/*": [
-        "./apps/*"
-      ],
-      "@store-apps/*": [
-        "./packages/store-apps/*"
-      ],
-      "@prisma/client": [
-        "./src/generated/prisma"
-      ],
-      "@prisma/client/*": [
-        "./src/generated/prisma/*"
-      ],
-      "@spike-land-ai/chess-engine": [
-        "../chess-engine/src/index.ts"
-      ],
+      "@/*": ["./src/*"],
+      "@apps/*": ["./apps/*"],
+      "@store-apps/*": ["./packages/store-apps/*"],
+      "@prisma/client": ["./src/generated/prisma"],
+      "@prisma/client/*": ["./src/generated/prisma/*"],
+      "@spike-land-ai/chess-engine": ["../chess-engine/src/index.ts"]
     },
-    "types": [
-      "@testing-library/jest-dom/vitest",
-      "vitest/globals"
-    ]
+    "types": ["@testing-library/jest-dom/vitest", "vitest/globals"]
   },
   "include": [
-    "next-env.d.ts",
     "**/*.ts",
-    "**/*.tsx",
-    ".next/types/**/*.ts",
-    ".next/dev/types/**/*.ts"
+    "**/*.tsx"
   ],
   "exclude": [
     "node_modules",
-    ".next",
     "packages",
     "hono-api",
     "shell",

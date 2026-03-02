@@ -71,17 +71,11 @@ function getSandboxOrError(sandboxId: string): SandboxState | CallToolResult {
   return sandbox;
 }
 
-function isSandboxState(
-  value: SandboxState | CallToolResult,
-): value is SandboxState {
+function isSandboxState(value: SandboxState | CallToolResult): value is SandboxState {
   return "id" in value && "files" in value;
 }
 
-export function registerSandboxTools(
-  registry: ToolRegistry,
-  userId: string,
-  db: DrizzleDB,
-): void {
+export function registerSandboxTools(registry: ToolRegistry, userId: string, db: DrizzleDB): void {
   const t = freeTool(userId, db);
 
   // sandbox_create
@@ -91,11 +85,7 @@ export function registerSandboxTools(
         "sandbox_create",
         "Create an ephemeral sandbox environment for code execution. Returns a sandbox ID for subsequent operations.",
         {
-          name: z
-            .string()
-            .max(100)
-            .optional()
-            .describe("Sandbox name (auto-generated if omitted)"),
+          name: z.string().max(100).optional().describe("Sandbox name (auto-generated if omitted)"),
           language: z
             .enum(["typescript", "javascript", "python"])
             .optional()
@@ -195,14 +185,10 @@ export function registerSandboxTools(
   // sandbox_read_file
   registry.registerBuilt(
     t
-      .tool(
-        "sandbox_read_file",
-        "Read a file from the sandbox virtual filesystem.",
-        {
-          sandbox_id: z.string().min(1).describe("The sandbox ID"),
-          file_path: z.string().min(1).describe("Path of the file to read"),
-        },
-      )
+      .tool("sandbox_read_file", "Read a file from the sandbox virtual filesystem.", {
+        sandbox_id: z.string().min(1).describe("The sandbox ID"),
+        file_path: z.string().min(1).describe("Path of the file to read"),
+      })
       .meta({ category: "orchestration", tier: "free" })
       .handler(async ({ input }) => {
         const { sandbox_id, file_path } = input;
@@ -225,24 +211,18 @@ export function registerSandboxTools(
           };
         }
 
-        return textResult(
-          `**File: ${file_path}**\n\n\`\`\`\n${content}\n\`\`\``,
-        );
+        return textResult(`**File: ${file_path}**\n\n\`\`\`\n${content}\n\`\`\``);
       }),
   );
 
   // sandbox_write_file
   registry.registerBuilt(
     t
-      .tool(
-        "sandbox_write_file",
-        "Write a file to the sandbox virtual filesystem.",
-        {
-          sandbox_id: z.string().min(1).describe("The sandbox ID"),
-          file_path: z.string().min(1).describe("Path of the file to write"),
-          content: z.string().describe("File content to write"),
-        },
-      )
+      .tool("sandbox_write_file", "Write a file to the sandbox virtual filesystem.", {
+        sandbox_id: z.string().min(1).describe("The sandbox ID"),
+        file_path: z.string().min(1).describe("Path of the file to write"),
+        content: z.string().describe("File content to write"),
+      })
       .meta({ category: "orchestration", tier: "free" })
       .handler(async ({ input }) => {
         const { sandbox_id, file_path, content } = input;
@@ -268,10 +248,7 @@ export function registerSandboxTools(
             isError: true,
           };
         }
-        if (
-          sandbox.files.size >= MAX_FILE_COUNT &&
-          !sandbox.files.has(file_path)
-        ) {
+        if (sandbox.files.size >= MAX_FILE_COUNT && !sandbox.files.has(file_path)) {
           return {
             content: [
               {

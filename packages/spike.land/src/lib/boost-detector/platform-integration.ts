@@ -93,9 +93,7 @@ async function createFacebookCampaign(
   }
 }
 
-async function syncFacebookMetrics(
-  _externalCampaignId: string,
-): Promise<CampaignMetrics> {
+async function syncFacebookMetrics(_externalCampaignId: string): Promise<CampaignMetrics> {
   // Get Facebook marketing account
   const account = await prisma.marketingAccount.findFirst({
     where: {
@@ -180,9 +178,7 @@ async function createGoogleAdsCampaign(
   }
 }
 
-async function syncGoogleAdsMetrics(
-  _externalCampaignId: string,
-): Promise<CampaignMetrics> {
+async function syncGoogleAdsMetrics(_externalCampaignId: string): Promise<CampaignMetrics> {
   // Get Google Ads marketing account
   const account = await prisma.marketingAccount.findFirst({
     where: {

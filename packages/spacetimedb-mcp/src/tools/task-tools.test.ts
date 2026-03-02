@@ -76,8 +76,26 @@ describe("task-tools", () => {
   describe("stdb_list_tasks", () => {
     it("lists all tasks", async () => {
       client._tasks.push(
-        { id: BigInt(1), description: "Task A", assignedTo: undefined, status: "pending", priority: 10, context: "", createdBy: "a", createdAt: BigInt(100) },
-        { id: BigInt(2), description: "Task B", assignedTo: "agent-1", status: "in_progress", priority: 20, context: "{}", createdBy: "b", createdAt: BigInt(200) },
+        {
+          id: BigInt(1),
+          description: "Task A",
+          assignedTo: undefined,
+          status: "pending",
+          priority: 10,
+          context: "",
+          createdBy: "a",
+          createdAt: BigInt(100),
+        },
+        {
+          id: BigInt(2),
+          description: "Task B",
+          assignedTo: "agent-1",
+          status: "in_progress",
+          priority: 20,
+          context: "{}",
+          createdBy: "b",
+          createdAt: BigInt(200),
+        },
       );
 
       const result = await server.call("stdb_list_tasks", {});
@@ -90,8 +108,26 @@ describe("task-tools", () => {
 
     it("filters by status", async () => {
       client._tasks.push(
-        { id: BigInt(1), description: "Pending", assignedTo: undefined, status: "pending", priority: 10, context: "", createdBy: "a", createdAt: BigInt(100) },
-        { id: BigInt(2), description: "Done", assignedTo: "a", status: "completed", priority: 20, context: "", createdBy: "a", createdAt: BigInt(200) },
+        {
+          id: BigInt(1),
+          description: "Pending",
+          assignedTo: undefined,
+          status: "pending",
+          priority: 10,
+          context: "",
+          createdBy: "a",
+          createdAt: BigInt(100),
+        },
+        {
+          id: BigInt(2),
+          description: "Done",
+          assignedTo: "a",
+          status: "completed",
+          priority: 20,
+          context: "",
+          createdBy: "a",
+          createdAt: BigInt(200),
+        },
       );
 
       const result = await server.call("stdb_list_tasks", { status: "pending" });
@@ -115,8 +151,14 @@ describe("task-tools", () => {
   describe("stdb_claim_task", () => {
     it("claims a task", async () => {
       client._tasks.push({
-        id: BigInt(1), description: "Task", assignedTo: undefined,
-        status: "pending", priority: 10, context: "", createdBy: "a", createdAt: BigInt(100),
+        id: BigInt(1),
+        description: "Task",
+        assignedTo: undefined,
+        status: "pending",
+        priority: 10,
+        context: "",
+        createdBy: "a",
+        createdAt: BigInt(100),
       });
 
       const result = await server.call("stdb_claim_task", { taskId: "1" });
@@ -150,8 +192,14 @@ describe("task-tools", () => {
   describe("stdb_complete_task", () => {
     it("completes a task", async () => {
       client._tasks.push({
-        id: BigInt(5), description: "Task", assignedTo: "mock-identity-abc123",
-        status: "in_progress", priority: 10, context: "", createdBy: "a", createdAt: BigInt(100),
+        id: BigInt(5),
+        description: "Task",
+        assignedTo: "mock-identity-abc123",
+        status: "in_progress",
+        priority: 10,
+        context: "",
+        createdBy: "a",
+        createdAt: BigInt(100),
       });
 
       const result = await server.call("stdb_complete_task", { taskId: "5" });
@@ -184,7 +232,9 @@ describe("task-tools", () => {
 
   describe("stdb_create_task error paths", () => {
     it("returns REDUCER_FAILED on non-connection errors", async () => {
-      client.createTask = vi.fn(async () => { throw new Error("Reducer panicked"); });
+      client.createTask = vi.fn(async () => {
+        throw new Error("Reducer panicked");
+      });
       const result = await server.call("stdb_create_task", {
         description: "fail",
         priority: 10,
@@ -196,7 +246,9 @@ describe("task-tools", () => {
     });
 
     it("handles non-Error thrown values", async () => {
-      client.createTask = vi.fn(async () => { throw 42; });
+      client.createTask = vi.fn(async () => {
+        throw 42;
+      });
       const result = await server.call("stdb_create_task", {
         description: "fail",
         priority: 10,
@@ -210,7 +262,9 @@ describe("task-tools", () => {
 
   describe("stdb_list_tasks error paths", () => {
     it("returns QUERY_FAILED on non-connection errors", async () => {
-      client.listTasks = vi.fn(() => { throw new Error("DB error"); });
+      client.listTasks = vi.fn(() => {
+        throw new Error("DB error");
+      });
       const result = await server.call("stdb_list_tasks", {});
       expect(result.isError).toBe(true);
       const parsed = JSON.parse(result.content[0].text);
@@ -218,7 +272,9 @@ describe("task-tools", () => {
     });
 
     it("handles non-Error thrown values", async () => {
-      client.listTasks = vi.fn(() => { throw "oops"; });
+      client.listTasks = vi.fn(() => {
+        throw "oops";
+      });
       const result = await server.call("stdb_list_tasks", {});
       expect(result.isError).toBe(true);
       const parsed = JSON.parse(result.content[0].text);
@@ -228,7 +284,9 @@ describe("task-tools", () => {
 
   describe("stdb_claim_task error paths", () => {
     it("handles non-Error thrown values", async () => {
-      client.claimTask = vi.fn(async () => { throw "string error"; });
+      client.claimTask = vi.fn(async () => {
+        throw "string error";
+      });
       const result = await server.call("stdb_claim_task", { taskId: "1" });
       expect(result.isError).toBe(true);
       const parsed = JSON.parse(result.content[0].text);
@@ -238,7 +296,9 @@ describe("task-tools", () => {
 
   describe("stdb_complete_task error paths", () => {
     it("handles non-Error thrown values", async () => {
-      client.completeTask = vi.fn(async () => { throw 42; });
+      client.completeTask = vi.fn(async () => {
+        throw 42;
+      });
       const result = await server.call("stdb_complete_task", { taskId: "1" });
       expect(result.isError).toBe(true);
       const parsed = JSON.parse(result.content[0].text);

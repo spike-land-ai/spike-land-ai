@@ -5,16 +5,16 @@ import { createOrUpdateContent } from "./content-service";
 import { parseWikiLinks } from "./wiki-links";
 
 export type StreamEvent =
-  | { type: "agent"; name: string; model: string; }
-  | { type: "chunk"; content: string; }
+  | { type: "agent"; name: string; model: string }
+  | { type: "chunk"; content: string }
   | {
-    type: "complete";
-    content: string;
-    title: string;
-    description: string;
-    agent?: string;
-  }
-  | { type: "error"; message: string; };
+      type: "complete";
+      content: string;
+      title: string;
+      description: string;
+      agent?: string;
+    }
+  | { type: "error"; message: string };
 
 export function buildLearnItPrompt(topic: string): string {
   return `You are an expert technical educator creating a high-quality, interactive learning wiki called LearnIt.
@@ -73,10 +73,7 @@ export async function* agentGenerateLearnIt(
 
   try {
     for await (const event of messageStream) {
-      if (
-        event.type === "content_block_delta"
-        && event.delta.type === "text_delta"
-      ) {
+      if (event.type === "content_block_delta" && event.delta.type === "text_delta") {
         const text = event.delta.text;
         fullContent += text;
 
@@ -107,9 +104,7 @@ export async function* agentGenerateLearnIt(
       }
     }
   } catch (streamError) {
-    const msg = streamError instanceof Error
-      ? streamError.message
-      : String(streamError);
+    const msg = streamError instanceof Error ? streamError.message : String(streamError);
     if (/aborted|cancel|ECONNRESET/i.test(msg)) {
       logger.warn("[LearnIt] Client disconnected during stream", { slug });
       yield { type: "error", message: "Client disconnected" };

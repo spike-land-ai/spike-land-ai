@@ -3,10 +3,7 @@
     "spike": {
       "type": "stdio",
       "command": "npx",
-      "args": [
-        "@spike-land-ai/spike-cli",
-        "serve"
-      ],
+      "args": ["@spike-land-ai/spike-cli", "serve"],
       "env": {
         "MCP_API_KEY": "${MCP_API_KEY}",
         "SPIKE_PROD_API_KEY": "${SPIKE_PROD_API_KEY}",

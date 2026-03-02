@@ -79,7 +79,7 @@ export function BlogCard({ post }: BlogCardProps) {
             {/* Tags */}
             {frontmatter.tags.length > 0 && (
               <div className="flex flex-wrap gap-1">
-                {frontmatter.tags.slice(0, 3).map(tag => (
+                {frontmatter.tags.slice(0, 3).map((tag) => (
                   <span
                     key={tag}
                     className="text-[10px] font-semibold tracking-wider uppercase bg-primary/5 text-primary/70 px-2 py-1 rounded-full border border-primary/10 transition-colors group-hover:bg-primary/10 group-hover:text-primary"

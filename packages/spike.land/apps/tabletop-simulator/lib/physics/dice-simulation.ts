@@ -2,14 +2,11 @@ import { DeterministicRandom } from "./deterministic-random";
 
 export interface DiceSimulationResult {
   result: number;
-  impulse: { x: number; y: number; z: number; };
-  torque: { x: number; y: number; z: number; };
+  impulse: { x: number; y: number; z: number };
+  torque: { x: number; y: number; z: number };
 }
 
-export function simulateDiceRoll(
-  seed: number,
-  _dieType: string = "d6",
-): DiceSimulationResult {
+export function simulateDiceRoll(seed: number, _dieType: string = "d6"): DiceSimulationResult {
   const rng = new DeterministicRandom(seed);
 
   const impulse = {

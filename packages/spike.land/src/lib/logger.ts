@@ -43,9 +43,7 @@ export function sanitizeLogData(data: unknown): unknown {
       message: sanitizeLogData(data.message),
       // Only include stack in development or if specifically requested,
       // but scrub it if we do include it.
-      stack: process.env.NODE_ENV === "development"
-        ? sanitizeLogData(data.stack)
-        : undefined,
+      stack: process.env.NODE_ENV === "development" ? sanitizeLogData(data.stack) : undefined,
     };
   }
 
@@ -74,44 +72,52 @@ export type LogContext = Record<string, unknown>;
 export const logger = {
   info: (message: string, context?: LogContext) => {
     const sanitizedContext = sanitizeLogData(context);
-    console.warn(JSON.stringify({
-      level: "info",
-      timestamp: new Date().toISOString(),
-      message: sanitizeLogData(message),
-      context: sanitizedContext,
-    }));
+    console.warn(
+      JSON.stringify({
+        level: "info",
+        timestamp: new Date().toISOString(),
+        message: sanitizeLogData(message),
+        context: sanitizedContext,
+      }),
+    );
   },
 
   warn: (message: string, context?: LogContext) => {
     const sanitizedContext = sanitizeLogData(context);
-    console.warn(JSON.stringify({
-      level: "warn",
-      timestamp: new Date().toISOString(),
-      message: sanitizeLogData(message),
-      context: sanitizedContext,
-    }));
+    console.warn(
+      JSON.stringify({
+        level: "warn",
+        timestamp: new Date().toISOString(),
+        message: sanitizeLogData(message),
+        context: sanitizedContext,
+      }),
+    );
   },
 
   error: (message: string, error?: unknown, context?: LogContext) => {
     const sanitizedError = sanitizeLogData(error);
     const sanitizedContext = sanitizeLogData(context);
-    console.error(JSON.stringify({
-      level: "error",
-      timestamp: new Date().toISOString(),
-      message: sanitizeLogData(message),
-      error: sanitizedError,
-      context: sanitizedContext,
-    }));
+    console.error(
+      JSON.stringify({
+        level: "error",
+        timestamp: new Date().toISOString(),
+        message: sanitizeLogData(message),
+        error: sanitizedError,
+        context: sanitizedContext,
+      }),
+    );
   },
 
   debug: (message: string, context?: LogContext) => {
     const sanitizedContext = sanitizeLogData(context);
-    console.debug(JSON.stringify({
-      level: "debug",
-      timestamp: new Date().toISOString(),
-      message: sanitizeLogData(message),
-      context: sanitizedContext,
-    }));
+    console.debug(
+      JSON.stringify({
+        level: "debug",
+        timestamp: new Date().toISOString(),
+        message: sanitizeLogData(message),
+        context: sanitizedContext,
+      }),
+    );
   },
 };
 

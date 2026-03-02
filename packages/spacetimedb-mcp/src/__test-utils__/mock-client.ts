@@ -5,12 +5,7 @@
 
 import { vi } from "vitest";
 import type { SpacetimeClient } from "../client.js";
-import type {
-  Agent,
-  AgentMessage,
-  ConnectionState,
-  Task,
-} from "../types.js";
+import type { Agent, AgentMessage, ConnectionState, Task } from "../types.js";
 
 export interface MockClientOptions {
   /** Start in connected state */
@@ -54,8 +49,12 @@ export function createMockClient(options: MockClientOptions = {}): SpacetimeClie
     _agents: agents,
     _messages: messages,
     _tasks: tasks,
-    get _nextMessageId() { return nextMessageId; },
-    get _nextTaskId() { return nextTaskId; },
+    get _nextMessageId() {
+      return nextMessageId;
+    },
+    get _nextTaskId() {
+      return nextTaskId;
+    },
 
     getState: vi.fn(() => ({ ...state })),
 

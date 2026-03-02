@@ -89,8 +89,7 @@ export function PipelineSelector({
 
   // Get display name for current selection
   const selectedPipeline = value ? getPipelineById(value) : null;
-  const displayValue = selectedPipeline?.name
-    || (value ? "Unknown pipeline" : null);
+  const displayValue = selectedPipeline?.name || (value ? "Unknown pipeline" : null);
 
   if (isLoading) {
     return (
@@ -117,14 +116,12 @@ export function PipelineSelector({
       <div className="space-y-2">
         <Select
           value={value || "none"}
-          onValueChange={v => onChange(v === "none" ? null : v)}
+          onValueChange={(v) => onChange(v === "none" ? null : v)}
           disabled={disabled}
         >
           <SelectTrigger>
             <SelectValue placeholder={placeholder}>
-              {value === null || value === "none"
-                ? "System Default"
-                : displayValue}
+              {value === null || value === "none" ? "System Default" : displayValue}
             </SelectValue>
           </SelectTrigger>
           <SelectContent>
@@ -144,7 +141,7 @@ export function PipelineSelector({
                 <SelectSeparator />
                 <SelectGroup>
                   <SelectLabel>System Defaults</SelectLabel>
-                  {groupedPipelines.systemDefaults.map(pipeline => (
+                  {groupedPipelines.systemDefaults.map((pipeline) => (
                     <PipelineOption key={pipeline.id} pipeline={pipeline} />
                   ))}
                 </SelectGroup>
@@ -157,7 +154,7 @@ export function PipelineSelector({
                 <SelectSeparator />
                 <SelectGroup>
                   <SelectLabel>My Pipelines</SelectLabel>
-                  {groupedPipelines.myPipelines.map(pipeline => (
+                  {groupedPipelines.myPipelines.map((pipeline) => (
                     <PipelineOption key={pipeline.id} pipeline={pipeline} />
                   ))}
                 </SelectGroup>
@@ -170,7 +167,7 @@ export function PipelineSelector({
                 <SelectSeparator />
                 <SelectGroup>
                   <SelectLabel>Public Pipelines</SelectLabel>
-                  {groupedPipelines.publicPipelines.map(pipeline => (
+                  {groupedPipelines.publicPipelines.map((pipeline) => (
                     <PipelineOption key={pipeline.id} pipeline={pipeline} />
                   ))}
                 </SelectGroup>
@@ -218,7 +215,7 @@ export function PipelineSelector({
 /**
  * Individual pipeline option in the dropdown
  */
-function PipelineOption({ pipeline }: { pipeline: Pipeline; }) {
+function PipelineOption({ pipeline }: { pipeline: Pipeline }) {
   return (
     <SelectItem value={pipeline.id}>
       <div className="flex items-center gap-2">

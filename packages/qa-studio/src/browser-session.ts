@@ -13,7 +13,7 @@ type PlaywrightBrowser = {
 };
 
 type PlaywrightPage = {
-  goto: (url: string, opts?: { waitUntil?: string; }) => Promise<unknown>;
+  goto: (url: string, opts?: { waitUntil?: string }) => Promise<unknown>;
   title: () => Promise<string>;
   url: () => string;
   screenshot: (opts?: {
@@ -21,33 +21,29 @@ type PlaywrightPage = {
     encoding?: "base64" | "binary";
     type?: "png" | "jpeg";
   }) => Promise<string | Buffer>;
-  evaluate: (
-    fn: string | ((...args: unknown[]) => unknown),
-  ) => Promise<unknown>;
-  setViewportSize: (size: { width: number; height: number; }) => Promise<void>;
+  evaluate: (fn: string | ((...args: unknown[]) => unknown)) => Promise<unknown>;
+  setViewportSize: (size: { width: number; height: number }) => Promise<void>;
   close: () => Promise<void>;
   isClosed: () => boolean;
   locator: (selector: string) => {
-    screenshot: (opts?: { encoding?: "base64"; }) => Promise<string | Buffer>;
+    screenshot: (opts?: { encoding?: "base64" }) => Promise<string | Buffer>;
   };
 };
 
 interface ConsoleMessage {
   type: () => string;
   text: () => string;
-  location: () => { url: string; lineNumber: number; };
+  location: () => { url: string; lineNumber: number };
 }
 
 interface PageRequest {
   url: () => string;
   method: () => string;
   resourceType: () => string;
-  response: () => Promise<
-    {
-      status: () => number;
-      headers: () => Record<string, string>;
-    } | null
-  >;
+  response: () => Promise<{
+    status: () => number;
+    headers: () => Record<string, string>;
+  } | null>;
 }
 
 export interface BrowserTab {
@@ -58,9 +54,7 @@ export interface BrowserTab {
 
 interface TabEntry {
   page: PlaywrightPage;
-  consoleMessages: Array<
-    { type: string; text: string; url: string; line: number; }
-  >;
+  consoleMessages: Array<{ type: string; text: string; url: string; line: number }>;
   networkRequests: Array<{
     url: string;
     method: string;
@@ -133,7 +127,7 @@ function setupPageListeners(page: PlaywrightPage, entry: TabEntry): void {
 
   p.on("requestfinished", (req: unknown) => {
     const r = req as PageRequest;
-    void r.response().then(res => {
+    void r.response().then((res) => {
       entry.networkRequests.push({
         url: r.url(),
         method: r.method(),

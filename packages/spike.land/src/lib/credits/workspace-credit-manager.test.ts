@@ -488,9 +488,7 @@ describe("WorkspaceCreditManager.consumeCredits — audit log", () => {
   it("returns success even when audit log DB write fails (non-blocking)", async () => {
     mockPrisma.workspace.findFirst.mockResolvedValue({ id: WORKSPACE_ID });
     mockConsumeAiCredits.mockResolvedValue({ success: true, remaining: 200 });
-    mockPrisma.workspaceAuditLog.create.mockRejectedValue(
-      new Error("Audit table locked"),
-    );
+    mockPrisma.workspaceAuditLog.create.mockRejectedValue(new Error("Audit table locked"));
 
     const result = await WorkspaceCreditManager.consumeCredits({
       userId: USER_ID,

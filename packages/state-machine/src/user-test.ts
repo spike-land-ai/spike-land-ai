@@ -45,7 +45,12 @@ async function runUserTest() {
   addState(mId, { id: "idle", type: "atomic", parent: "diagnostics" });
   addState(mId, { id: "running", type: "atomic", parent: "diagnostics" });
 
-  addState(mId, { id: "lights", type: "compound", parent: "maintenance", initial: "flashing_yellow" });
+  addState(mId, {
+    id: "lights",
+    type: "compound",
+    parent: "maintenance",
+    initial: "flashing_yellow",
+  });
   addState(mId, { id: "flashing_yellow", type: "atomic", parent: "lights" });
 
   // 5. Add Transitions

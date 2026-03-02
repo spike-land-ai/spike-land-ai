@@ -20,7 +20,7 @@ describe("getMatchedSkills", () => {
 
   it("does not return duplicate skills", () => {
     const skills = getMatchedSkills("react react react component");
-    const ids = skills.map(s => s.id);
+    const ids = skills.map((s) => s.id);
     const uniqueIds = new Set(ids);
     expect(ids.length).toBe(uniqueIds.size);
   });

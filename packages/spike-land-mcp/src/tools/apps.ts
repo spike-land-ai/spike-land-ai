@@ -25,16 +25,14 @@ export function registerAppsTools(
     t
       .tool(
         "apps_create",
-        "Create a new app from a text prompt. This is the STARTING POINT for new apps. "
-          + "The AI will generate code based on your prompt.",
+        "Create a new app from a text prompt. This is the STARTING POINT for new apps. " +
+          "The AI will generate code based on your prompt.",
         {
           prompt: z
             .string()
             .min(1)
             .max(5000)
-            .describe(
-              "What the app should do. Be specific about features, layout, and behavior.",
-            ),
+            .describe("What the app should do. Be specific about features, layout, and behavior."),
           codespace_id: z
             .string()
             .min(1)
@@ -47,10 +45,7 @@ export function registerAppsTools(
             .max(5)
             .optional()
             .describe("Image IDs to attach as references."),
-          template_id: z
-            .string()
-            .optional()
-            .describe("Start from a template."),
+          template_id: z.string().optional().describe("Start from a template."),
         },
       )
       .meta({ category: "apps", tier: "free" })
@@ -72,14 +67,14 @@ export function registerAppsTools(
         }>("/api/apps", { method: "POST", body: JSON.stringify(body) });
 
         return textResult(
-          `**App Created!**\n\n`
-            + `**Name:** ${app.name}\n`
-            + `**ID:** ${app.id}\n`
-            + `**Slug:** ${app.slug}\n`
-            + `**Status:** ${app.status}\n`
-            + `**Codespace:** ${app.codespaceId}\n\n`
-            + `The AI is now generating your app. Use \`apps_get\` to check progress, `
-            + `or \`apps_chat\` to send follow-up instructions.`,
+          `**App Created!**\n\n` +
+            `**Name:** ${app.name}\n` +
+            `**ID:** ${app.id}\n` +
+            `**Slug:** ${app.slug}\n` +
+            `**Status:** ${app.status}\n` +
+            `**Codespace:** ${app.codespaceId}\n\n` +
+            `The AI is now generating your app. Use \`apps_get\` to check progress, ` +
+            `or \`apps_chat\` to send follow-up instructions.`,
         );
       }),
   );
@@ -88,8 +83,8 @@ export function registerAppsTools(
     t
       .tool(
         "apps_list",
-        "List your apps. Call this FIRST to see what exists before making changes. "
-          + "Returns app IDs needed for all other apps_* tools.",
+        "List your apps. Call this FIRST to see what exists before making changes. " +
+          "Returns app IDs needed for all other apps_* tools.",
         {
           status: z
             .enum([
@@ -162,10 +157,7 @@ export function registerAppsTools(
         "apps_get",
         "Get full app details including current code and status. Read before editing.",
         {
-          app_id: z
-            .string()
-            .min(1)
-            .describe("App identifier: codespace ID, slug, or database ID."),
+          app_id: z.string().min(1).describe("App identifier: codespace ID, slug, or database ID."),
         },
       )
       .meta({ category: "apps", tier: "free" })
@@ -226,15 +218,8 @@ export function registerAppsTools(
         "apps_chat",
         "Send a message to iterate on an existing app. PREFERRED over direct code edits.",
         {
-          app_id: z
-            .string()
-            .min(1)
-            .describe("App identifier: codespace ID, slug, or database ID."),
-          message: z
-            .string()
-            .min(1)
-            .max(10000)
-            .describe("Your message to iterate on the app."),
+          app_id: z.string().min(1).describe("App identifier: codespace ID, slug, or database ID."),
+          message: z.string().min(1).max(10000).describe("Your message to iterate on the app."),
           image_ids: z
             .array(z.string())
             .max(5)
@@ -263,11 +248,11 @@ export function registerAppsTools(
         });
 
         return textResult(
-          `**Message Sent!**\n\n`
-            + `**Message ID:** ${result.id}\n`
-            + `**Status:** The AI is processing your request.\n\n`
-            + `Use \`apps_get\` to check when the agent finishes, `
-            + `or \`apps_get_messages\` to see the conversation.`,
+          `**Message Sent!**\n\n` +
+            `**Message ID:** ${result.id}\n` +
+            `**Status:** The AI is processing your request.\n\n` +
+            `Use \`apps_get\` to check when the agent finishes, ` +
+            `or \`apps_get_messages\` to see the conversation.`,
         );
       }),
   );
@@ -279,10 +264,7 @@ export function registerAppsTools(
         "Get chat history for an app. Shows the conversation between user and AI agent.",
         {
           app_id: z.string().min(1).describe("App identifier."),
-          cursor: z
-            .string()
-            .optional()
-            .describe("Cursor for pagination. Omit for most recent."),
+          cursor: z.string().optional().describe("Cursor for pagination. Omit for most recent."),
           limit: z
             .number()
             .int()
@@ -308,9 +290,7 @@ export function registerAppsTools(
             createdAt: string;
             codeVersionHash?: string;
           }>
-        >(
-          `/api/apps/${encodeURIComponent(app_id)}/messages?${params.toString()}`,
-        );
+        >(`/api/apps/${encodeURIComponent(app_id)}/messages?${params.toString()}`);
 
         if (!Array.isArray(messages) || messages.length === 0) {
           return textResult(
@@ -322,9 +302,7 @@ export function registerAppsTools(
         for (const msg of messages) {
           const role = msg.role === "USER" ? "You" : "Agent";
           const preview =
-            msg.content.length > 300
-              ? msg.content.slice(0, 300) + "..."
-              : msg.content;
+            msg.content.length > 300 ? msg.content.slice(0, 300) + "..." : msg.content;
           text += `**${role}** (${msg.createdAt}):\n${preview}\n`;
           if (msg.codeVersionHash) {
             text += `_Code version: ${msg.codeVersionHash}_\n`;
@@ -338,59 +316,44 @@ export function registerAppsTools(
 
   registry.registerBuilt(
     t
-      .tool(
-        "apps_set_status",
-        "Change app status. WARNING: ARCHIVED stops the live app.",
-        {
-          app_id: z.string().min(1).describe("App identifier."),
-          status: z
-            .enum(["ARCHIVED", "PROMPTING"])
-            .describe(
-              "ARCHIVED stops the live app. PROMPTING resets to draft state.",
-            ),
-        },
-      )
+      .tool("apps_set_status", "Change app status. WARNING: ARCHIVED stops the live app.", {
+        app_id: z.string().min(1).describe("App identifier."),
+        status: z
+          .enum(["ARCHIVED", "PROMPTING"])
+          .describe("ARCHIVED stops the live app. PROMPTING resets to draft state."),
+      })
       .meta({ category: "apps", tier: "free" })
       .handler(async ({ input }) => {
         const { app_id, status } = input;
 
-        await apiRequest<{ success: boolean }>(
-          `/api/apps/${encodeURIComponent(app_id)}/status`,
-          { method: "PATCH", body: JSON.stringify({ status }) },
-        );
+        await apiRequest<{ success: boolean }>(`/api/apps/${encodeURIComponent(app_id)}/status`, {
+          method: "PATCH",
+          body: JSON.stringify({ status }),
+        });
 
         return textResult(
-          `**Status Updated!**\n\nApp \`${app_id}\` is now **${status}**.`
-            + (status === "ARCHIVED"
-              ? `\n\nThe app has been removed from your active list.`
-              : ""),
+          `**Status Updated!**\n\nApp \`${app_id}\` is now **${status}**.` +
+            (status === "ARCHIVED" ? `\n\nThe app has been removed from your active list.` : ""),
         );
       }),
   );
 
   registry.registerBuilt(
     t
-      .tool(
-        "apps_bin",
-        "Soft-delete app to recycle bin. Recoverable for 30 days.",
-        {
-          app_id: z.string().min(1).describe("App identifier."),
-        },
-      )
+      .tool("apps_bin", "Soft-delete app to recycle bin. Recoverable for 30 days.", {
+        app_id: z.string().min(1).describe("App identifier."),
+      })
       .meta({ category: "apps", tier: "free" })
       .handler(async ({ input }) => {
         const { app_id } = input;
 
-        await apiRequest(
-          `/api/apps/${encodeURIComponent(app_id)}/bin`,
-          { method: "POST" },
-        );
+        await apiRequest(`/api/apps/${encodeURIComponent(app_id)}/bin`, { method: "POST" });
 
         return textResult(
-          `**Moved to Bin!**\n\n`
-            + `App \`${app_id}\` is now in the recycle bin.\n`
-            + `It will be permanently deleted after 30 days.\n`
-            + `Use \`apps_restore\` to recover it.`,
+          `**Moved to Bin!**\n\n` +
+            `App \`${app_id}\` is now in the recycle bin.\n` +
+            `It will be permanently deleted after 30 days.\n` +
+            `Use \`apps_restore\` to recover it.`,
         );
       }),
   );
@@ -404,15 +367,12 @@ export function registerAppsTools(
       .handler(async ({ input }) => {
         const { app_id } = input;
 
-        await apiRequest(
-          `/api/apps/${encodeURIComponent(app_id)}/bin/restore`,
-          { method: "POST" },
-        );
+        await apiRequest(`/api/apps/${encodeURIComponent(app_id)}/bin/restore`, { method: "POST" });
 
         return textResult(
-          `**Restored!**\n\n`
-            + `App \`${app_id}\` has been restored from the bin.\n`
-            + `Use \`apps_get\` to see its current state.`,
+          `**Restored!**\n\n` +
+            `App \`${app_id}\` has been restored from the bin.\n` +
+            `Use \`apps_get\` to see its current state.`,
         );
       }),
   );
@@ -423,13 +383,8 @@ export function registerAppsTools(
         "apps_delete_permanent",
         "PERMANENTLY delete an app. CANNOT be undone. Must be in the bin first.",
         {
-          app_id: z
-            .string()
-            .min(1)
-            .describe("App identifier. Must already be in the bin."),
-          confirm: z
-            .boolean()
-            .describe("Must be true. This action CANNOT be undone."),
+          app_id: z.string().min(1).describe("App identifier. Must already be in the bin."),
+          confirm: z.boolean().describe("Must be true. This action CANNOT be undone."),
         },
       )
       .meta({ category: "apps", tier: "free" })
@@ -438,15 +393,12 @@ export function registerAppsTools(
 
         if (!confirm) {
           return textResult(
-            `**Safety Check Failed**\n\n`
-              + `You must set confirm=true to permanently delete an app.`,
+            `**Safety Check Failed**\n\n` +
+              `You must set confirm=true to permanently delete an app.`,
           );
         }
 
-        await apiRequest(
-          `/api/apps/${encodeURIComponent(app_id)}/permanent`,
-          { method: "DELETE" },
-        );
+        await apiRequest(`/api/apps/${encodeURIComponent(app_id)}/permanent`, { method: "DELETE" });
 
         return textResult(
           `**Permanently Deleted!**\n\nApp \`${app_id}\` has been permanently deleted. This cannot be undone.`,
@@ -456,21 +408,17 @@ export function registerAppsTools(
 
   registry.registerBuilt(
     t
-      .tool(
-        "apps_list_versions",
-        "List code versions for an app.",
-        {
-          app_id: z.string().min(1).describe("App identifier."),
-          limit: z
-            .number()
-            .int()
-            .min(1)
-            .max(50)
-            .optional()
-            .default(10)
-            .describe("Max versions. Default: 10."),
-        },
-      )
+      .tool("apps_list_versions", "List code versions for an app.", {
+        app_id: z.string().min(1).describe("App identifier."),
+        limit: z
+          .number()
+          .int()
+          .min(1)
+          .max(50)
+          .optional()
+          .default(10)
+          .describe("Max versions. Default: 10."),
+      })
       .meta({ category: "apps", tier: "free" })
       .handler(async ({ input }) => {
         const { app_id, limit } = input;
@@ -484,14 +432,10 @@ export function registerAppsTools(
             description: string | null;
             createdAt: string;
           }>
-        >(
-          `/api/apps/${encodeURIComponent(app_id)}/versions?${params.toString()}`,
-        );
+        >(`/api/apps/${encodeURIComponent(app_id)}/versions?${params.toString()}`);
 
         if (!Array.isArray(versions) || versions.length === 0) {
-          return textResult(
-            `**Versions for ${app_id}**\n\nNo code versions yet.`,
-          );
+          return textResult(`**Versions for ${app_id}**\n\nNo code versions yet.`);
         }
 
         let text = `**Versions for ${app_id}** (${versions.length})\n\n`;
@@ -507,20 +451,10 @@ export function registerAppsTools(
 
   registry.registerBuilt(
     t
-      .tool(
-        "apps_batch_status",
-        "Set status on multiple apps at once.",
-        {
-          app_ids: z
-            .array(z.string().min(1))
-            .min(1)
-            .max(20)
-            .describe("List of app identifiers."),
-          status: z
-            .enum(["ARCHIVED", "PROMPTING"])
-            .describe("Target status for all apps."),
-        },
-      )
+      .tool("apps_batch_status", "Set status on multiple apps at once.", {
+        app_ids: z.array(z.string().min(1)).min(1).max(20).describe("List of app identifiers."),
+        status: z.enum(["ARCHIVED", "PROMPTING"]).describe("Target status for all apps."),
+      })
       .meta({ category: "apps", tier: "free" })
       .handler(async ({ input }) => {
         const { app_ids, status } = input;
@@ -533,14 +467,13 @@ export function registerAppsTools(
 
         for (const id of app_ids) {
           try {
-            await apiRequest(
-              `/api/apps/${encodeURIComponent(id)}/status`,
-              { method: "PATCH", body: JSON.stringify({ status }) },
-            );
+            await apiRequest(`/api/apps/${encodeURIComponent(id)}/status`, {
+              method: "PATCH",
+              body: JSON.stringify({ status }),
+            });
             results.push({ id, success: true });
           } catch (error) {
-            const msg =
-              error instanceof Error ? error.message : "Unknown error";
+            const msg = error instanceof Error ? error.message : "Unknown error";
             results.push({ id, success: false, error: msg });
           }
         }
@@ -576,10 +509,7 @@ export function registerAppsTools(
       .handler(async ({ input }) => {
         const { app_id } = input;
 
-        await apiRequest(
-          `/api/apps/${encodeURIComponent(app_id)}/messages`,
-          { method: "DELETE" },
-        );
+        await apiRequest(`/api/apps/${encodeURIComponent(app_id)}/messages`, { method: "DELETE" });
 
         return textResult(
           `**Chat Cleared!**\n\nAll messages for app \`${app_id}\` have been deleted.`,
@@ -589,32 +519,23 @@ export function registerAppsTools(
 
   registry.registerBuilt(
     t
-      .tool(
-        "apps_upload_images",
-        "Get instructions for uploading images to an app.",
-        {
-          app_id: z.string().min(1).describe("App identifier."),
-          image_count: z
-            .number()
-            .int()
-            .min(1)
-            .max(5)
-            .describe("Number of images to upload (max 5)."),
-        },
-      )
+      .tool("apps_upload_images", "Get instructions for uploading images to an app.", {
+        app_id: z.string().min(1).describe("App identifier."),
+        image_count: z.number().int().min(1).max(5).describe("Number of images to upload (max 5)."),
+      })
       .meta({ category: "apps", tier: "free" })
       .handler(async ({ input }) => {
         const { app_id, image_count } = input;
 
         return textResult(
-          `**Image Upload Instructions**\n\n`
-            + `**App:** \`${app_id}\`\n`
-            + `**Count:** ${image_count}\n\n`
-            + `POST to \`/api/apps/${app_id}/images\` with a multipart form:\n`
-            + `- Field name: \`images\`\n`
-            + `- Max per request: 5 images\n`
-            + `- Accepted types: image/*\n\n`
-            + `The response includes image IDs to use with \`apps_chat\`.`,
+          `**Image Upload Instructions**\n\n` +
+            `**App:** \`${app_id}\`\n` +
+            `**Count:** ${image_count}\n\n` +
+            `POST to \`/api/apps/${app_id}/images\` with a multipart form:\n` +
+            `- Field name: \`images\`\n` +
+            `- Max per request: 5 images\n` +
+            `- Accepted types: image/*\n\n` +
+            `The response includes image IDs to use with \`apps_chat\`.`,
         );
       }),
   );
@@ -665,8 +586,7 @@ export function registerAppsTools(
           "knit",
           "leap",
         ];
-        const pick = (arr: string[]) =>
-          arr[Math.floor(Math.random() * arr.length)]!;
+        const pick = (arr: string[]) => arr[Math.floor(Math.random() * arr.length)]!;
         const suffix = Math.random().toString(36).substring(2, 6);
         const id = `${pick(adjectives)}.${pick(nouns)}.${pick(verbs)}.${suffix}`;
 

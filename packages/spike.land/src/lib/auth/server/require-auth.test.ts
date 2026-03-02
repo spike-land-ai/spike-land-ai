@@ -60,7 +60,7 @@ describe("requireAuth", () => {
     mockGetSession.mockResolvedValue(fakeSession);
     const result = await requireAuth();
     expect(result).not.toBeInstanceOf(NextResponse);
-    const { session, userId } = result as { session: typeof fakeSession; userId: string; };
+    const { session, userId } = result as { session: typeof fakeSession; userId: string };
     expect(session).toEqual(fakeSession);
     expect(userId).toBe("user_abc");
   });
@@ -78,7 +78,7 @@ describe("requireAuth", () => {
     };
     mockGetSession.mockResolvedValue(fakeSession);
     const result = await requireAuth();
-    const { userId } = result as { session: typeof fakeSession; userId: string; };
+    const { userId } = result as { session: typeof fakeSession; userId: string };
     expect(userId).toBe("user_xyz789");
   });
 });

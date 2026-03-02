@@ -31,9 +31,7 @@ interface DowngradeResult {
 export function useDowngrade() {
   const [isScheduling, setIsScheduling] = useState(false);
   const [isCanceling, setIsCanceling] = useState(false);
-  const [scheduledDowngrade, setScheduledDowngrade] = useState<
-    ScheduledDowngrade | null
-  >(null);
+  const [scheduledDowngrade, setScheduledDowngrade] = useState<ScheduledDowngrade | null>(null);
   const [error, setError] = useState<Error | null>(null);
 
   /**
@@ -56,9 +54,7 @@ export function useDowngrade() {
       );
 
       if (fetchError) {
-        const err = fetchError instanceof Error
-          ? fetchError
-          : new Error("Network error");
+        const err = fetchError instanceof Error ? fetchError : new Error("Network error");
         setError(err);
         setIsScheduling(false);
         return { success: false, error: err.message };
@@ -76,9 +72,7 @@ export function useDowngrade() {
       );
 
       if (jsonError) {
-        const err = jsonError instanceof Error
-          ? jsonError
-          : new Error("Failed to parse response");
+        const err = jsonError instanceof Error ? jsonError : new Error("Failed to parse response");
         setError(err);
         setIsScheduling(false);
         return { success: false, error: err.message };
@@ -91,9 +85,7 @@ export function useDowngrade() {
         return { success: false, error: errorMessage };
       }
 
-      const effectiveDate = data.effectiveDate
-        ? new Date(data.effectiveDate)
-        : undefined;
+      const effectiveDate = data.effectiveDate ? new Date(data.effectiveDate) : undefined;
 
       if (effectiveDate) {
         setScheduledDowngrade({
@@ -126,9 +118,7 @@ export function useDowngrade() {
     );
 
     if (fetchError) {
-      const err = fetchError instanceof Error
-        ? fetchError
-        : new Error("Network error");
+      const err = fetchError instanceof Error ? fetchError : new Error("Network error");
       setError(err);
       setIsCanceling(false);
       return { success: false, error: err.message };
@@ -146,9 +136,7 @@ export function useDowngrade() {
     );
 
     if (jsonError) {
-      const err = jsonError instanceof Error
-        ? jsonError
-        : new Error("Failed to parse response");
+      const err = jsonError instanceof Error ? jsonError : new Error("Failed to parse response");
       setError(err);
       setIsCanceling(false);
       return { success: false, error: err.message };

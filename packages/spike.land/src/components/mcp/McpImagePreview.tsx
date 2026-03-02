@@ -24,13 +24,7 @@ export function McpImagePreview({ url, onDismiss }: McpImagePreviewProps) {
         Image Preview
       </div>
       <div className="relative aspect-video rounded-lg overflow-hidden bg-black/20 max-w-md">
-        <Image
-          src={url}
-          alt="Tool response image"
-          fill
-          className="object-contain"
-          unoptimized
-        />
+        <Image src={url} alt="Tool response image" fill className="object-contain" unoptimized />
       </div>
     </div>
   );

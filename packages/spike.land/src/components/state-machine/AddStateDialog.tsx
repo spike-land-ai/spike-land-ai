@@ -6,12 +6,7 @@ import * as z from "zod";
 import { Plus } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import {
   Form,
   FormControl,
@@ -30,10 +25,13 @@ import {
 } from "@/components/ui/select";
 
 const formSchema = z.object({
-  stateId: z.string().min(1, "State ID is required").refine(
-    val => /^[a-zA-Z0-9_-]+$/.test(val),
-    "State ID must be alphanumeric and cannot contain spaces",
-  ),
+  stateId: z
+    .string()
+    .min(1, "State ID is required")
+    .refine(
+      (val) => /^[a-zA-Z0-9_-]+$/.test(val),
+      "State ID must be alphanumeric and cannot contain spaces",
+    ),
   type: z.enum(["atomic", "compound", "parallel", "final"]),
   parent: z.string().optional(),
 });
@@ -49,9 +47,7 @@ interface AddStateDialogProps {
   onClose: () => void;
 }
 
-export function AddStateDialog(
-  { isOpen, existingStates, onSubmit, onClose }: AddStateDialogProps,
-) {
+export function AddStateDialog({ isOpen, existingStates, onSubmit, onClose }: AddStateDialogProps) {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -62,18 +58,14 @@ export function AddStateDialog(
   });
 
   const handleSubmit = (values: z.infer<typeof formSchema>) => {
-    onSubmit(
-      values.stateId,
-      values.type,
-      values.parent === "none" ? undefined : values.parent,
-    );
+    onSubmit(values.stateId, values.type, values.parent === "none" ? undefined : values.parent);
     form.reset();
   };
 
   return (
     <Dialog
       open={isOpen}
-      onOpenChange={open => {
+      onOpenChange={(open) => {
         if (!open) {
           onClose();
           form.reset();
@@ -82,24 +74,17 @@ export function AddStateDialog(
     >
       <DialogContent className="sm:max-w-md bg-[hsl(240,6%,9%)] border border-[hsl(240,4%,18%)] rounded-2xl shadow-2xl overflow-hidden p-0 gap-0">
         <DialogHeader className="px-6 py-4 border-b border-[hsl(240,4%,16%)]">
-          <DialogTitle className="text-base font-semibold text-white">
-            Add State
-          </DialogTitle>
+          <DialogTitle className="text-base font-semibold text-white">Add State</DialogTitle>
         </DialogHeader>
         <div className="p-6">
           <Form {...form}>
-            <form
-              onSubmit={form.handleSubmit(handleSubmit)}
-              className="space-y-4"
-            >
+            <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
               <FormField
                 control={form.control}
                 name="stateId"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-xs font-medium text-gray-400">
-                      State ID
-                    </FormLabel>
+                    <FormLabel className="text-xs font-medium text-gray-400">State ID</FormLabel>
                     <FormControl>
                       <Input
                         placeholder="e.g. loading"
@@ -117,13 +102,8 @@ export function AddStateDialog(
                 name="type"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-xs font-medium text-gray-400">
-                      Type
-                    </FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
+                    <FormLabel className="text-xs font-medium text-gray-400">Type</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
                         <SelectTrigger className="bg-[hsl(240,6%,6%)] border-[hsl(240,4%,16%)] text-gray-200 focus:ring-purple-500/30">
                           <SelectValue placeholder="Select type" />
@@ -150,10 +130,7 @@ export function AddStateDialog(
                       <FormLabel className="text-xs font-medium text-gray-400">
                         Parent (optional)
                       </FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        defaultValue={field.value || "none"}
-                      >
+                      <Select onValueChange={field.onChange} defaultValue={field.value || "none"}>
                         <FormControl>
                           <SelectTrigger className="bg-[hsl(240,6%,6%)] border-[hsl(240,4%,16%)] text-gray-200 focus:ring-purple-500/30">
                             <SelectValue placeholder="Select parent" />
@@ -161,7 +138,7 @@ export function AddStateDialog(
                         </FormControl>
                         <SelectContent className="max-h-[200px]">
                           <SelectItem value="none">None (top-level)</SelectItem>
-                          {existingStates.map(id => (
+                          {existingStates.map((id) => (
                             <SelectItem key={id} value={id}>
                               {id}
                             </SelectItem>

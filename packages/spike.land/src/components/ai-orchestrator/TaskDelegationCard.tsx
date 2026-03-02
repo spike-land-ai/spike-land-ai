@@ -1,12 +1,7 @@
 "use client";
 
 import { Badge } from "@/components/ui/badge";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { ArrowRight } from "lucide-react";
 
@@ -63,25 +58,18 @@ export function TaskDelegationCard({
     <Card className="bg-zinc-900 border-zinc-800 hover:border-zinc-700 transition-colors h-full">
       <CardHeader className="pb-2">
         <div className="flex items-center gap-2 flex-wrap mb-1">
-          <Badge
-            variant="outline"
-            className={cn("text-xs capitalize", priorityClass[priority])}
-          >
+          <Badge variant="outline" className={cn("text-xs capitalize", priorityClass[priority])}>
             {priority}
           </Badge>
           <Badge
             variant="outline"
             className={cn("text-xs capitalize ml-auto", statusClass[status])}
           >
-            <span
-              className={cn("h-1.5 w-1.5 rounded-full mr-1.5", statusDot[status])}
-            />
+            <span className={cn("h-1.5 w-1.5 rounded-full mr-1.5", statusDot[status])} />
             {status}
           </Badge>
         </div>
-        <CardTitle className="text-base text-zinc-100 leading-tight">
-          {taskTitle}
-        </CardTitle>
+        <CardTitle className="text-base text-zinc-100 leading-tight">{taskTitle}</CardTitle>
         <p className="text-xs text-zinc-600 font-mono">{taskId}</p>
       </CardHeader>
       <CardContent className="space-y-3">

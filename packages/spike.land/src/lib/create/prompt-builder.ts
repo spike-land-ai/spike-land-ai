@@ -11,8 +11,7 @@ export { extractKeywords, matchesAny } from "./keyword-utils";
 
 // --- Agent Identity (Layer 1 — stable across all generations, cacheable) ---
 
-export const AGENT_IDENTITY =
-  `You are an expert React developer and the core generation engine for spike.land's app creator.
+export const AGENT_IDENTITY = `You are an expert React developer and the core generation engine for spike.land's app creator.
 Your job is to generate complete, self-contained React components that transpile and run correctly on the first attempt.
 You learn from your mistakes — pay close attention to the lessons learned section below.`;
 
@@ -106,8 +105,7 @@ export const LUCIDE_ICONS = new Set([
 
 // --- Lean Core Prompt (always included) ---
 
-const CORE_PROMPT =
-  `You are an expert React developer building polished, production-quality micro-apps.
+const CORE_PROMPT = `You are an expert React developer building polished, production-quality micro-apps.
 
 ## RUNTIME ENVIRONMENT
 - React 19 with JSX runtime
@@ -265,7 +263,7 @@ const CATEGORY_TRIGGERS: Record<SkillCategory, string[]> = {
     "reporting",
     "trending",
   ],
-  "game": [
+  game: [
     "game",
     "games",
     "gaming",
@@ -284,7 +282,7 @@ const CATEGORY_TRIGGERS: Record<SkillCategory, string[]> = {
     "maze",
     "arcade",
   ],
-  "form": [
+  form: [
     "form",
     "forms",
     "survey",
@@ -297,7 +295,7 @@ const CATEGORY_TRIGGERS: Record<SkillCategory, string[]> = {
     "converter",
     "registration",
   ],
-  "dnd": [
+  dnd: [
     "kanban",
     "board",
     "boards",
@@ -316,7 +314,7 @@ const CATEGORY_TRIGGERS: Record<SkillCategory, string[]> = {
     "builder",
     "rank",
   ],
-  "drawing": [
+  drawing: [
     "draw",
     "drawing",
     "paint",
@@ -330,7 +328,7 @@ const CATEGORY_TRIGGERS: Record<SkillCategory, string[]> = {
     "signature",
     "diagram",
   ],
-  "content": [
+  content: [
     "blog",
     "blogging",
     "story",
@@ -348,7 +346,7 @@ const CATEGORY_TRIGGERS: Record<SkillCategory, string[]> = {
     "portfolio",
     "gallery",
   ],
-  "audio": [
+  audio: [
     "music",
     "musical",
     "audio",
@@ -365,14 +363,7 @@ const CATEGORY_TRIGGERS: Record<SkillCategory, string[]> = {
     "melody",
     "guitar",
   ],
-  "url-params": [
-    "dashboard",
-    "tracker",
-    "monitor",
-    "analytics",
-    "config",
-    "settings",
-  ],
+  "url-params": ["dashboard", "tracker", "monitor", "analytics", "config", "settings"],
 };
 
 // --- Skills Definitions ---
@@ -387,7 +378,7 @@ const SKILLS: Skill[] = [
     categoryLabel: "3D RENDERING",
     triggers: CATEGORY_TRIGGERS["3d"],
     promptContent:
-      "- three (Three.js — import THREE from \"three\")\n- Performance: Use requestAnimationFrame, dispose geometries/materials on unmount",
+      '- three (Three.js — import THREE from "three")\n- Performance: Use requestAnimationFrame, dispose geometries/materials on unmount',
     description: "3D scene rendering with Three.js",
   },
   {
@@ -442,7 +433,7 @@ const SKILLS: Skill[] = [
     category: "game",
     categoryLabel: "GAME DEVELOPMENT",
     triggers: CATEGORY_TRIGGERS.game,
-    promptContent: "- Sound effects: use howler — import { Howl } from \"howler\"",
+    promptContent: '- Sound effects: use howler — import { Howl } from "howler"',
     description: "Game sound effects with Howler.js",
   },
   // Form
@@ -623,7 +614,7 @@ export function buildSystemPrompt(topic: string): string {
   for (const category of categoryOrder) {
     const skills = categorySkills.get(category)!;
     const header = `\n## ${skills[0]!.categoryLabel}`;
-    const lines = skills.map(s => s.promptContent).join("\n");
+    const lines = skills.map((s) => s.promptContent).join("\n");
     sections.push(header + "\n" + lines);
   }
 
@@ -635,10 +626,7 @@ export const SYSTEM_PROMPT = buildSystemPrompt("general");
 
 export function buildUserPrompt(topic: string): string {
   const keywords = extractKeywords(topic);
-  const includeUrlParams = matchesAny(
-    keywords,
-    CATEGORY_TRIGGERS["url-params"],
-  );
+  const includeUrlParams = matchesAny(keywords, CATEGORY_TRIGGERS["url-params"]);
 
   const urlParamInstruction = includeUrlParams
     ? `\n\nIMPORTANT: The component must read URL search params (via new URLSearchParams(window.location.search)) as initial/default values. When state changes, sync back to URL with window.history.replaceState so the URL is always shareable. Provide sensible defaults when no params are present.`

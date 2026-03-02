@@ -85,9 +85,9 @@ describe("personalization", () => {
 
       const result = await getPersonalizedApps("user-1");
       expect(result).toHaveLength(2);
-      expect(result.find(app => app.id === "app1")).toBeUndefined();
-      expect(result.find(app => app.id === "app2")).toBeDefined();
-      expect(result.find(app => app.id === "app3")).toBeDefined();
+      expect(result.find((app) => app.id === "app1")).toBeUndefined();
+      expect(result.find((app) => app.id === "app2")).toBeDefined();
+      expect(result.find((app) => app.id === "app3")).toBeDefined();
     });
 
     it("keeps developer apps for developers", async () => {
@@ -99,7 +99,7 @@ describe("personalization", () => {
 
       const result = await getPersonalizedApps("user-1");
       expect(result).toHaveLength(3);
-      expect(result.find(app => app.id === "app1")).toBeDefined();
+      expect(result.find((app) => app.id === "app1")).toBeDefined();
     });
   });
 
@@ -164,7 +164,7 @@ describe("personalization", () => {
       const result = deriveTagsFromAnswerPath(path);
       expect(result).toEqual(["api", "developer", "technical"]);
       // No duplicates
-      expect(result.filter(t => t === "developer")).toHaveLength(1);
+      expect(result.filter((t) => t === "developer")).toHaveLength(1);
     });
   });
 

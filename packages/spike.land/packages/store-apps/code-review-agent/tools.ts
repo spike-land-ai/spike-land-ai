@@ -195,7 +195,7 @@ function runSecurityScan(
   const vulns: SecurityVulnerability[] = [];
   const patterns = thorough
     ? SECURITY_PATTERNS
-    : SECURITY_PATTERNS.filter(p => p.severity === "critical" || p.severity === "high");
+    : SECURITY_PATTERNS.filter((p) => p.severity === "critical" || p.severity === "high");
   for (const { pattern, severity, cwe, description, fix } of patterns) {
     lines.forEach((line, idx) => {
       if (pattern.test(line)) {
@@ -216,12 +216,14 @@ function runConventionCheck(content: string, filePath: string): ConventionIssue[
   const lines = content.split("\n");
   const issues: ConventionIssue[] = [];
   for (const { rule, pattern, severity, message } of CONVENTION_CHECKS) {
-    if (lines.some(line => pattern.test(line))) issues.push({ rule, message, severity });
+    if (lines.some((line) => pattern.test(line))) issues.push({ rule, message, severity });
   }
   const fileName = filePath.split("/").pop() ?? "";
   if (
-    (filePath.endsWith(".tsx") || filePath.endsWith(".jsx")) && /^[a-z]/.test(fileName)
-    && !fileName.startsWith("_") && !fileName.includes(".")
+    (filePath.endsWith(".tsx") || filePath.endsWith(".jsx")) &&
+    /^[a-z]/.test(fileName) &&
+    !fileName.startsWith("_") &&
+    !fileName.includes(".")
   ) {
     issues.push({
       rule: "component-naming",
@@ -235,9 +237,12 @@ function runConventionCheck(content: string, filePath: string): ConventionIssue[
 /* ── Schemas ────────────────────────────────────────────────────── */
 
 const GetDiffSchema = z.object({
-  pr_number: z.number().int().min(1).optional().describe(
-    "Pull request number to fetch the diff for.",
-  ),
+  pr_number: z
+    .number()
+    .int()
+    .min(1)
+    .optional()
+    .describe("Pull request number to fetch the diff for."),
   branch: z.string().optional().describe("Branch name to diff against the default branch."),
   file_filter: z.string().optional().describe("Glob pattern to filter files."),
 });
@@ -268,17 +273,19 @@ export const codeReviewAgentTools: StandaloneToolDefinition[] = [
     tier: "workspace",
     inputSchema: z.object({
       name: z.string(),
-      rules: z.array(z.object({
-        id: z.string(),
-        name: z.string(),
-        description: z.string(),
-        pattern: z.string(),
-        severity: z.enum(["info", "warning", "error"]),
-        message: z.string(),
-      })),
+      rules: z.array(
+        z.object({
+          id: z.string(),
+          name: z.string(),
+          description: z.string(),
+          pattern: z.string(),
+          severity: z.enum(["info", "warning", "error"]),
+          message: z.string(),
+        }),
+      ),
     }).shape,
     handler: async (args: never, _ctx: ServerContext): Promise<CallToolResult> => {
-      const a = args as { name: string; rules: ConventionSet["rules"]; };
+      const a = args as { name: string; rules: ConventionSet["rules"] };
       return safeToolCall("review_create_conventions", async () => {
         const id = Math.random().toString(36).substring(2, 11);
         const set: ConventionSet = { id, name: a.name, rules: a.rules };
@@ -298,7 +305,7 @@ export const codeReviewAgentTools: StandaloneToolDefinition[] = [
     }).shape,
     handler: async (args: never, _ctx: ServerContext): Promise<CallToolResult> => {
       const a = args as {
-        files: Array<{ path: string; content: string; }>;
+        files: Array<{ path: string; content: string }>;
         convention_set_id?: string;
       };
       return safeToolCall("review_code", async () => {
@@ -331,7 +338,7 @@ export const codeReviewAgentTools: StandaloneToolDefinition[] = [
       files: z.array(z.object({ path: z.string(), content: z.string() })),
     }).shape,
     handler: async (args: never, _ctx: ServerContext): Promise<CallToolResult> => {
-      const a = args as { files: Array<{ path: string; content: string; }>; };
+      const a = args as { files: Array<{ path: string; content: string }> };
       return safeToolCall("review_analyze_complexity", async () => {
         const { analyzeComplexity } = await import("@/lib/review/engine");
         const allFindings: ReviewFinding[] = [];
@@ -353,7 +360,7 @@ export const codeReviewAgentTools: StandaloneToolDefinition[] = [
     tier: "workspace",
     inputSchema: z.object({ report_id: z.string() }).shape,
     handler: async (args: never, _ctx: ServerContext): Promise<CallToolResult> => {
-      const a = args as { report_id: string; };
+      const a = args as { report_id: string };
       return safeToolCall("review_get_report", async () => {
         const report = reports.get(a.report_id);
         if (!report) throw new Error(`Report ${a.report_id} not found`);
@@ -393,7 +400,7 @@ export const codeReviewAgentTools: StandaloneToolDefinition[] = [
     tier: "workspace",
     inputSchema: z.object({ report_id: z.string() }).shape,
     handler: async (args: never, _ctx: ServerContext): Promise<CallToolResult> => {
-      const a = args as { report_id: string; };
+      const a = args as { report_id: string };
       return safeToolCall("review_estimate_effort", async () => {
         const report = reports.get(a.report_id);
         if (!report) throw new Error(`Report ${a.report_id} not found`);
@@ -412,7 +419,7 @@ export const codeReviewAgentTools: StandaloneToolDefinition[] = [
     tier: "workspace",
     inputSchema: z.object({ convention_id: z.string() }).shape,
     handler: async (args: never, _ctx: ServerContext): Promise<CallToolResult> => {
-      const a = args as { convention_id: string; };
+      const a = args as { convention_id: string };
       return safeToolCall("review_get_conventions", async () => {
         const set = conventionSets.get(a.convention_id);
         if (!set) throw new Error(`Convention set ${a.convention_id} not found`);
@@ -427,7 +434,7 @@ export const codeReviewAgentTools: StandaloneToolDefinition[] = [
     tier: "workspace",
     inputSchema: z.object({ project_type: z.string().optional().default("nextjs") }).shape,
     handler: async (args: never, _ctx: ServerContext): Promise<CallToolResult> => {
-      const a = args as { project_type: string; };
+      const a = args as { project_type: string };
       return safeToolCall("review_project_rules", async () => {
         const { getBuiltInRules } = await import("@/lib/review/engine");
         const rules = getBuiltInRules(a.project_type);
@@ -445,7 +452,11 @@ export const codeReviewAgentTools: StandaloneToolDefinition[] = [
     alwaysEnabled: true,
     inputSchema: GetDiffSchema.shape,
     handler: async (
-      { pr_number, branch, file_filter }: {
+      {
+        pr_number,
+        branch,
+        file_filter,
+      }: {
         pr_number?: number;
         branch?: string;
         file_filter?: string;
@@ -464,16 +475,15 @@ export const codeReviewAgentTools: StandaloneToolDefinition[] = [
           { path: "src/components/Button.tsx", additions: 5, deletions: 0, isKeyFile: false },
         ];
         const filtered = file_filter
-          ? rawFiles.filter(f => matchesGlob(f.path, file_filter))
+          ? rawFiles.filter((f) => matchesGlob(f.path, file_filter))
           : rawFiles;
         if (filtered.length === 0) {
           return textResult(`No files match filter '${file_filter}' in ${label}.`);
         }
         const totalAdditions = filtered.reduce((s, f) => s + f.additions, 0);
         const totalDeletions = filtered.reduce((s, f) => s + f.deletions, 0);
-        const keyFiles = filtered.filter(f => f.isKeyFile).map(f => f.path);
-        let text =
-          `**Diff for ${label}**\n\nTotal: +${totalAdditions} / -${totalDeletions} across ${filtered.length} file(s)\n`;
+        const keyFiles = filtered.filter((f) => f.isKeyFile).map((f) => f.path);
+        let text = `**Diff for ${label}**\n\nTotal: +${totalAdditions} / -${totalDeletions} across ${filtered.length} file(s)\n`;
         if (keyFiles.length > 0) text += `Key files: ${keyFiles.join(", ")}\n`;
         text += "\n**Changed files:**\n\n";
         for (const f of filtered) {
@@ -490,7 +500,11 @@ export const codeReviewAgentTools: StandaloneToolDefinition[] = [
     alwaysEnabled: true,
     inputSchema: SuggestFixSchema.shape,
     handler: async (
-      { file_path, line_number, issue_description }: {
+      {
+        file_path,
+        line_number,
+        issue_description,
+      }: {
         file_path: string;
         line_number: number;
         issue_description: string;
@@ -502,8 +516,7 @@ export const codeReviewAgentTools: StandaloneToolDefinition[] = [
         let beforeCode: string, afterCode: string, explanation: string, confidence: number;
         if (issueLower.includes("any")) {
           beforeCode = `const data: any = response.json();`;
-          afterCode =
-            `const data: unknown = await response.json();\n// Validate with Zod or a type guard before use.`;
+          afterCode = `const data: unknown = await response.json();\n// Validate with Zod or a type guard before use.`;
           explanation =
             "Replace 'any' with 'unknown' and validate the value before accessing its properties.";
           confidence = 0.92;
@@ -519,23 +532,21 @@ export const codeReviewAgentTools: StandaloneToolDefinition[] = [
           confidence = 0.98;
         } else if (issueLower.includes("password") || issueLower.includes("secret")) {
           beforeCode = `const apiKey = "sk-live-abc123";`;
-          afterCode =
-            `const apiKey = process.env["API_KEY"];\nif (!apiKey) throw new Error("API_KEY is not configured.");`;
+          afterCode = `const apiKey = process.env["API_KEY"];\nif (!apiKey) throw new Error("API_KEY is not configured.");`;
           explanation =
             "Move secrets to environment variables. Never hardcode credentials in source.";
           confidence = 0.99;
         } else {
           beforeCode = `// Original code at ${file_path}:${line_number}`;
           afterCode = `// Refactored code addressing: ${issue_description}`;
-          explanation =
-            `Issue identified at ${file_path}:${line_number}. Apply minimal change for: ${issue_description}`;
+          explanation = `Issue identified at ${file_path}:${line_number}. Apply minimal change for: ${issue_description}`;
           confidence = 0.6;
         }
         return textResult(
-          `**Fix suggestion for ${file_path}:${line_number}**\n\nIssue: ${issue_description}\nConfidence: ${
-            Math.round(confidence * 100)
-          }%\n\n`
-            + `**Before:**\n\`\`\`\n${beforeCode}\n\`\`\`\n\n**After:**\n\`\`\`\n${afterCode}\n\`\`\`\n\n**Explanation:** ${explanation}`,
+          `**Fix suggestion for ${file_path}:${line_number}**\n\nIssue: ${issue_description}\nConfidence: ${Math.round(
+            confidence * 100,
+          )}%\n\n` +
+            `**Before:**\n\`\`\`\n${beforeCode}\n\`\`\`\n\n**After:**\n\`\`\`\n${afterCode}\n\`\`\`\n\n**Explanation:** ${explanation}`,
         );
       }),
   },
@@ -548,7 +559,7 @@ export const codeReviewAgentTools: StandaloneToolDefinition[] = [
     alwaysEnabled: true,
     inputSchema: CheckConventionsSchema.shape,
     handler: async (
-      { file_paths }: { file_paths: string[]; },
+      { file_paths }: { file_paths: string[] },
       _ctx: ServerContext,
     ): Promise<CallToolResult> =>
       safeToolCall("review_check_conventions", async () => {
@@ -586,13 +597,13 @@ export const codeReviewAgentTools: StandaloneToolDefinition[] = [
     alwaysEnabled: true,
     inputSchema: SecurityScanSchema.shape,
     handler: async (
-      { file_paths, scan_type = "quick" }: { file_paths: string[]; scan_type?: string; },
+      { file_paths, scan_type = "quick" }: { file_paths: string[]; scan_type?: string },
       _ctx: ServerContext,
     ): Promise<CallToolResult> =>
       safeToolCall("review_security_scan", async () => {
         const { readFile } = await import("fs/promises");
         const allVulns: SecurityVulnerability[] = [];
-        const fileResults: Array<{ path: string; vulnCount: number; skipped: boolean; }> = [];
+        const fileResults: Array<{ path: string; vulnCount: number; skipped: boolean }> = [];
         for (const filePath of file_paths) {
           let content: string;
           try {
@@ -605,15 +616,13 @@ export const codeReviewAgentTools: StandaloneToolDefinition[] = [
           allVulns.push(...vulns);
           fileResults.push({ path: filePath, vulnCount: vulns.length, skipped: false });
         }
-        const criticalCount = allVulns.filter(v => v.severity === "critical").length;
-        const highCount = allVulns.filter(v => v.severity === "high").length;
-        const mediumCount = allVulns.filter(v => v.severity === "medium").length;
-        const lowCount = allVulns.filter(v => v.severity === "low").length;
-        let text =
-          `**Security Scan (${scan_type}) — ${file_paths.length} file(s)**\n\nFindings: ${allVulns.length} total`;
+        const criticalCount = allVulns.filter((v) => v.severity === "critical").length;
+        const highCount = allVulns.filter((v) => v.severity === "high").length;
+        const mediumCount = allVulns.filter((v) => v.severity === "medium").length;
+        const lowCount = allVulns.filter((v) => v.severity === "low").length;
+        let text = `**Security Scan (${scan_type}) — ${file_paths.length} file(s)**\n\nFindings: ${allVulns.length} total`;
         if (allVulns.length > 0) {
-          text +=
-            ` (${criticalCount} critical, ${highCount} high, ${mediumCount} medium, ${lowCount} low)`;
+          text += ` (${criticalCount} critical, ${highCount} high, ${mediumCount} medium, ${lowCount} low)`;
         }
         text += "\n\n";
         for (const fr of fileResults) {
@@ -624,8 +633,7 @@ export const codeReviewAgentTools: StandaloneToolDefinition[] = [
         if (allVulns.length > 0) {
           text += "\n**Vulnerability Details:**\n\n";
           for (const v of allVulns) {
-            text +=
-              `### [${v.severity.toUpperCase()}] ${v.cwe}\nLocation: ${v.location}\nDescription: ${v.description}\nFix: ${v.fixSuggestion}\n\n`;
+            text += `### [${v.severity.toUpperCase()}] ${v.cwe}\nLocation: ${v.location}\nDescription: ${v.description}\nFix: ${v.fixSuggestion}\n\n`;
           }
         }
         return textResult(text);

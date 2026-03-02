@@ -15,12 +15,7 @@ export function DefaultToolRenderer({ result, isError }: ToolRendererProps) {
   const parsed = tryParseJson(result);
 
   if (parsed !== undefined) {
-    return (
-      <JsonView
-        data={parsed}
-        className={isError ? "border-red-500/20 bg-red-500/5" : ""}
-      />
-    );
+    return <JsonView data={parsed} className={isError ? "border-red-500/20 bg-red-500/5" : ""} />;
   }
   if (isError) {
     return (

@@ -30,23 +30,16 @@ export function UniquenessScoreDisplay({
         </Badge>
 
         <div
-          className={cn(
-            "space-y-1 transition-all duration-700",
-            isRevealing && "animate-pulse",
-          )}
+          className={cn("space-y-1 transition-all duration-700", isRevealing && "animate-pulse")}
         >
-          <p className="text-sm text-zinc-500 uppercase tracking-widest font-mono">
-            You are
-          </p>
+          <p className="text-sm text-zinc-500 uppercase tracking-widest font-mono">You are</p>
           <p className="text-5xl md:text-6xl font-bold text-zinc-100 font-mono leading-none">
             1 in {formattedScore}
           </p>
           <p className="text-sm text-zinc-500">people</p>
         </div>
 
-        <p className="text-zinc-400 text-sm max-w-xs leading-relaxed">
-          {description}
-        </p>
+        <p className="text-zinc-400 text-sm max-w-xs leading-relaxed">{description}</p>
 
         <div className="w-full h-px bg-zinc-800 mt-2" />
 

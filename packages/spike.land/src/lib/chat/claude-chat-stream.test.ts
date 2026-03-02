@@ -7,7 +7,7 @@ const mockFinalMessage = vi.hoisted(() => vi.fn());
 vi.mock("@/lib/ai/claude-client", () => ({
   withClaudeClient: vi.fn(
     async (
-      operation: (anthropic: { messages: { stream: typeof mockStream; }; }) => Promise<void>,
+      operation: (anthropic: { messages: { stream: typeof mockStream } }) => Promise<void>,
     ) => {
       const fakeAnthropic = {
         messages: {
@@ -45,11 +45,11 @@ async function collectStream(stream: ReadableStream): Promise<string> {
 
 /** Create an async iterable of events for the mock stream. */
 function createMockMessageStream(
-  events: Array<{ type: string; delta?: { type: string; text?: string; }; }>,
+  events: Array<{ type: string; delta?: { type: string; text?: string } }>,
   finalUsage = { input_tokens: 10, output_tokens: 20 },
 ) {
   return {
-    [Symbol.asyncIterator]: async function*() {
+    [Symbol.asyncIterator]: async function* () {
       for (const event of events) {
         yield event;
       }
@@ -79,10 +79,10 @@ describe("createClaudeChatStream", () => {
 
     const output = await collectStream(stream);
 
-    expect(output).toContain("\"type\":\"text\"");
-    expect(output).toContain("\"text\":\"Hello\"");
-    expect(output).toContain("\"text\":\" world\"");
-    expect(output).toContain("\"type\":\"done\"");
+    expect(output).toContain('"type":"text"');
+    expect(output).toContain('"text":"Hello"');
+    expect(output).toContain('"text":" world"');
+    expect(output).toContain('"type":"done"');
   });
 
   it("ignores non-text-delta events", async () => {
@@ -100,15 +100,13 @@ describe("createClaudeChatStream", () => {
     });
 
     const output = await collectStream(stream);
-    const dataLines = output.split("\n").filter(l => l.startsWith("data:"));
+    const dataLines = output.split("\n").filter((l) => l.startsWith("data:"));
     // One text event + one done event
     expect(dataLines).toHaveLength(2);
   });
 
   it("calls onComplete with full answer and usage", async () => {
-    const events = [
-      { type: "content_block_delta", delta: { type: "text_delta", text: "Answer" } },
-    ];
+    const events = [{ type: "content_block_delta", delta: { type: "text_delta", text: "Answer" } }];
     const usage = { input_tokens: 5, output_tokens: 15 };
     mockStream.mockReturnValue(createMockMessageStream(events, usage));
 
@@ -135,9 +133,7 @@ describe("createClaudeChatStream", () => {
 
     await collectStream(stream);
 
-    expect(mockStream).toHaveBeenCalledWith(
-      expect.objectContaining({ max_tokens: 1024 }),
-    );
+    expect(mockStream).toHaveBeenCalledWith(expect.objectContaining({ max_tokens: 1024 }));
   });
 
   it("uses 512 as default maxTokens", async () => {
@@ -150,9 +146,7 @@ describe("createClaudeChatStream", () => {
 
     await collectStream(stream);
 
-    expect(mockStream).toHaveBeenCalledWith(
-      expect.objectContaining({ max_tokens: 512 }),
-    );
+    expect(mockStream).toHaveBeenCalledWith(expect.objectContaining({ max_tokens: 512 }));
   });
 
   it("emits error event on non-abort failure", async () => {
@@ -166,20 +160,20 @@ describe("createClaudeChatStream", () => {
 
     const output = await collectStream(stream);
 
-    expect(output).toContain("\"type\":\"error\"");
+    expect(output).toContain('"type":"error"');
     expect(output).toContain("trouble right now");
   });
 
   it("handles cancel gracefully", async () => {
     // Use a stream that yields indefinitely
     const infiniteStream = {
-      [Symbol.asyncIterator]: async function*() {
+      [Symbol.asyncIterator]: async function* () {
         yield {
           type: "content_block_delta",
           delta: { type: "text_delta", text: "chunk" },
         };
         // Wait long enough for cancel to fire
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        await new Promise((resolve) => setTimeout(resolve, 1000));
       },
       finalMessage: mockFinalMessage.mockResolvedValue({
         usage: { input_tokens: 0, output_tokens: 0 },

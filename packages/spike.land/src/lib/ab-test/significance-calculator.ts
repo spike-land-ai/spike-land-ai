@@ -35,7 +35,7 @@ export function calculateSignificance(
   }
 
   // Calculate conversion rates
-  const variantsWithRates = variants.map(v => ({
+  const variantsWithRates = variants.map((v) => ({
     ...v,
     conversionRate: v.impressions > 0 ? v.clicks / v.impressions : 0,
   }));
@@ -52,7 +52,7 @@ export function calculateSignificance(
       isSignificant: false,
       confidenceLevel: 0,
       winnerVariantId: null,
-      metrics: variantsWithRates.map(v => ({
+      metrics: variantsWithRates.map((v) => ({
         variantId: v.id,
         conversionRate: v.conversionRate,
         sampleSize: v.impressions,
@@ -63,14 +63,14 @@ export function calculateSignificance(
   }
 
   // Check minimum sample size (at least 100 impressions per variant)
-  const hasEnoughData = variants.every(v => v.impressions >= 100);
+  const hasEnoughData = variants.every((v) => v.impressions >= 100);
 
   if (!hasEnoughData) {
     return {
       isSignificant: false,
       confidenceLevel: 0,
       winnerVariantId: null,
-      metrics: variantsWithRates.map(v => ({
+      metrics: variantsWithRates.map((v) => ({
         variantId: v.id,
         conversionRate: v.conversionRate,
         sampleSize: v.impressions,
@@ -106,7 +106,7 @@ export function calculateSignificance(
     isSignificant,
     confidenceLevel: 1 - pValue,
     winnerVariantId: isSignificant ? winner.id : null,
-    metrics: variantsWithRates.map(v => ({
+    metrics: variantsWithRates.map((v) => ({
       variantId: v.id,
       conversionRate: v.conversionRate,
       sampleSize: v.impressions,
@@ -148,8 +148,7 @@ function erf(x: number): number {
 
   // Abramowitz and Stegun formula
   const t = 1.0 / (1.0 + p * absX);
-  const y = 1.0
-    - ((((a5 * t + a4) * t + a3) * t + a2) * t + a1) * t * Math.exp(-absX * absX);
+  const y = 1.0 - ((((a5 * t + a4) * t + a3) * t + a2) * t + a1) * t * Math.exp(-absX * absX);
 
   return sign * y;
 }

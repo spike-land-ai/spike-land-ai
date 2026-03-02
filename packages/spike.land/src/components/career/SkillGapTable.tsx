@@ -22,37 +22,29 @@ export function SkillGapTable({ gaps }: SkillGapTableProps) {
         <TableHeader>
           <TableRow className="border-white/[0.06]">
             <TableHead className="text-zinc-400">Skill</TableHead>
-            <TableHead className="text-zinc-400 text-center">
-              Required
-            </TableHead>
+            <TableHead className="text-zinc-400 text-center">Required</TableHead>
             <TableHead className="text-zinc-400 text-center">Yours</TableHead>
             <TableHead className="text-zinc-400 text-center">Gap</TableHead>
             <TableHead className="text-zinc-400">Priority</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          {sorted.map(gap => (
+          {sorted.map((gap) => (
             <TableRow key={gap.skill.uri} className="border-white/[0.04]">
-              <TableCell className="text-white text-sm">
-                {gap.skill.title}
-              </TableCell>
-              <TableCell className="text-center text-zinc-400">
-                {gap.requiredLevel}
-              </TableCell>
-              <TableCell className="text-center text-zinc-400">
-                {gap.userProficiency}
-              </TableCell>
-              <TableCell className="text-center text-zinc-400">
-                {gap.gap}
-              </TableCell>
+              <TableCell className="text-white text-sm">{gap.skill.title}</TableCell>
+              <TableCell className="text-center text-zinc-400">{gap.requiredLevel}</TableCell>
+              <TableCell className="text-center text-zinc-400">{gap.userProficiency}</TableCell>
+              <TableCell className="text-center text-zinc-400">{gap.gap}</TableCell>
               <TableCell>
                 <Badge
                   variant="outline"
-                  className={gap.priority === "high"
-                    ? "border-red-500/30 text-red-400"
-                    : gap.priority === "medium"
-                    ? "border-amber-500/30 text-amber-400"
-                    : "border-zinc-500/30 text-zinc-400"}
+                  className={
+                    gap.priority === "high"
+                      ? "border-red-500/30 text-red-400"
+                      : gap.priority === "medium"
+                        ? "border-amber-500/30 text-amber-400"
+                        : "border-zinc-500/30 text-zinc-400"
+                  }
                 >
                   {gap.priority}
                 </Badge>

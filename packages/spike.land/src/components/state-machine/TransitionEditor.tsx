@@ -2,11 +2,7 @@
 
 import { useState } from "react";
 import { ChevronDown, Trash2, Zap } from "lucide-react";
-import type {
-  ActionType,
-  StateNode,
-  Transition,
-} from "@/lib/state-machine/types";
+import type { ActionType, StateNode, Transition } from "@/lib/state-machine/types";
 
 interface TransitionEditorProps {
   states: Record<string, StateNode>;
@@ -18,7 +14,7 @@ interface TransitionEditorProps {
     event: string,
     options?: {
       guard_expression?: string;
-      actions?: Array<{ type: ActionType; params: Record<string, unknown>; }>;
+      actions?: Array<{ type: ActionType; params: Record<string, unknown> }>;
       internal?: boolean;
     },
   ) => Promise<boolean>;
@@ -43,7 +39,7 @@ export function TransitionEditor({
 
   const stateIds = Object.keys(states);
   const selectedTransition = selectedTransitionId
-    ? transitions.find(t => t.id === selectedTransitionId)
+    ? transitions.find((t) => t.id === selectedTransitionId)
     : null;
 
   const handleAdd = async () => {
@@ -54,12 +50,7 @@ export function TransitionEditor({
     if (guard.trim()) options.guard_expression = guard.trim();
     if (internal) options.internal = true;
 
-    const success = await onAddTransition(
-      source,
-      target,
-      event.trim(),
-      options,
-    );
+    const success = await onAddTransition(source, target, event.trim(), options);
     if (success) {
       setEvent("");
       setGuard("");
@@ -81,12 +72,12 @@ export function TransitionEditor({
             <div className="relative">
               <select
                 value={source}
-                onChange={e => setSource(e.target.value)}
+                onChange={(e) => setSource(e.target.value)}
                 className="w-full px-3 py-2.5 bg-zinc-950 border border-zinc-800 rounded-lg text-sm text-zinc-200 appearance-none cursor-pointer focus:outline-none focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/50 transition-all shadow-sm"
                 id="transition-source-select"
               >
                 <option value="">Source...</option>
-                {stateIds.map(id => (
+                {stateIds.map((id) => (
                   <option key={id} value={id}>
                     {id}
                   </option>
@@ -98,12 +89,12 @@ export function TransitionEditor({
             <div className="relative">
               <select
                 value={target}
-                onChange={e => setTarget(e.target.value)}
+                onChange={(e) => setTarget(e.target.value)}
                 className="w-full px-3 py-2.5 bg-zinc-950 border border-zinc-800 rounded-lg text-sm text-zinc-200 appearance-none cursor-pointer focus:outline-none focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/50 transition-all shadow-sm"
                 id="transition-target-select"
               >
                 <option value="">Target...</option>
-                {stateIds.map(id => (
+                {stateIds.map((id) => (
                   <option key={id} value={id}>
                     {id}
                   </option>
@@ -116,17 +107,17 @@ export function TransitionEditor({
           <input
             type="text"
             value={event}
-            onChange={e => setEvent(e.target.value)}
+            onChange={(e) => setEvent(e.target.value)}
             placeholder='Event name (e.g. "SUBMIT")'
             className="w-full px-3 py-2.5 bg-zinc-950 border border-zinc-800 rounded-lg text-sm text-zinc-200 placeholder-zinc-600 focus:outline-none focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/50 transition-all shadow-sm"
-            onKeyDown={e => e.key === "Enter" && handleAdd()}
+            onKeyDown={(e) => e.key === "Enter" && handleAdd()}
             id="transition-event-input"
           />
 
           <input
             type="text"
             value={guard}
-            onChange={e => setGuard(e.target.value)}
+            onChange={(e) => setGuard(e.target.value)}
             placeholder='Guard condition (e.g. "context.count > 0")'
             className="w-full px-3 py-2.5 bg-zinc-950 border border-zinc-800 rounded-lg text-sm text-zinc-200 placeholder-zinc-600 focus:outline-none focus:border-amber-500/50 focus:ring-1 focus:ring-amber-500/50 transition-all font-mono text-xs shadow-sm"
             id="transition-guard-input"
@@ -136,7 +127,7 @@ export function TransitionEditor({
             <input
               type="checkbox"
               checked={internal}
-              onChange={e => setInternal(e.target.checked)}
+              onChange={(e) => setInternal(e.target.checked)}
               className="rounded border-zinc-700 bg-zinc-950 text-indigo-500 focus:ring-indigo-500/30 w-4 h-4"
             />
             Internal transition (no exit/re-enter)
@@ -230,9 +221,7 @@ export function TransitionEditor({
                     key={i}
                     className="px-2.5 py-1.5 rounded-md bg-zinc-950/50 border border-zinc-800/80 text-zinc-400 font-mono text-[10px] break-all shadow-sm"
                   >
-                    <span className="text-purple-400 font-semibold mr-1">
-                      {a.type}:
-                    </span>
+                    <span className="text-purple-400 font-semibold mr-1">{a.type}:</span>
                     {JSON.stringify(a.params)}
                   </div>
                 ))}
@@ -248,7 +237,7 @@ export function TransitionEditor({
           All Transitions ({transitions.length})
         </h4>
         <div className="space-y-1 max-h-[250px] overflow-y-auto custom-scrollbar pr-1">
-          {transitions.map(t => (
+          {transitions.map((t) => (
             <button
               key={t.id}
               onClick={() => onSelectTransition(t.id === selectedTransitionId ? null : t.id)}

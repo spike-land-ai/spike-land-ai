@@ -13,20 +13,11 @@ interface CleanVerificationViewProps {
   onSkip: () => void;
 }
 
-export function CleanVerificationView({
-  task,
-  onCapture,
-  onSkip,
-}: CleanVerificationViewProps) {
+export function CleanVerificationView({ task, onCapture, onSkip }: CleanVerificationViewProps) {
   const [showCamera, setShowCamera] = useState(false);
 
   if (showCamera) {
-    return (
-      <CleanCamera
-        onCapture={onCapture}
-        onCancel={() => setShowCamera(false)}
-      />
-    );
+    return <CleanCamera onCapture={onCapture} onCancel={() => setShowCamera(false)} />;
   }
 
   return (

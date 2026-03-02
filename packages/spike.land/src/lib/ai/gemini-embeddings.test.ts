@@ -12,7 +12,9 @@ describe("gemini-embeddings", () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    vi.mocked(getGeminiClient).mockResolvedValue(mockAi as any);
+    vi.mocked(getGeminiClient).mockResolvedValue(
+      mockAi as unknown as Awaited<ReturnType<typeof getGeminiClient>>,
+    );
   });
 
   describe("embedText", () => {

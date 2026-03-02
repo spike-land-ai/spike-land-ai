@@ -3,21 +3,13 @@ import { parseTranspileErrors } from "./transpile";
 
 describe("parseTranspileErrors", () => {
   it("should parse line:col:error format", () => {
-    const errors = parseTranspileErrors(
-      "<stdin>:5:10: error: Expected \";\" but found \"}\"",
-    );
-    expect(errors).toEqual([
-      { line: 5, column: 10, message: "Expected \";\" but found \"}\"" },
-    ]);
+    const errors = parseTranspileErrors('<stdin>:5:10: error: Expected ";" but found "}"');
+    expect(errors).toEqual([{ line: 5, column: 10, message: 'Expected ";" but found "}"' }]);
   });
 
   it("should parse warning format", () => {
-    const errors = parseTranspileErrors(
-      "<stdin>:3:1: warning: Unused variable x",
-    );
-    expect(errors).toEqual([
-      { line: 3, column: 1, message: "Unused variable x" },
-    ]);
+    const errors = parseTranspileErrors("<stdin>:3:1: warning: Unused variable x");
+    expect(errors).toEqual([{ line: 3, column: 1, message: "Unused variable x" }]);
   });
 
   it("should parse line N format", () => {

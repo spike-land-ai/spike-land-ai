@@ -17,8 +17,7 @@ export function FileToolRenderer({ result, isError }: ToolRendererProps) {
   // Try to detect file path in the first line
   const lines = result.split("\n");
   const firstLine = lines[0]?.trim() ?? "";
-  const looksLikePath = /^[\/~.].*\.\w+/.test(firstLine)
-    || firstLine.startsWith("File:");
+  const looksLikePath = /^[\/~.].*\.\w+/.test(firstLine) || firstLine.startsWith("File:");
   const filePath = looksLikePath ? firstLine.replace(/^File:\s*/, "") : null;
   const content = looksLikePath ? lines.slice(1).join("\n").trim() : result;
 

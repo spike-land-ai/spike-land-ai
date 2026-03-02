@@ -59,10 +59,7 @@ describe("hasAnyAdmin", () => {
     expect(mockPrismaUserCount).toHaveBeenCalledWith(
       expect.objectContaining({
         where: expect.objectContaining({
-          OR: expect.arrayContaining([
-            { role: "ADMIN" },
-            { role: "SUPER_ADMIN" },
-          ]),
+          OR: expect.arrayContaining([{ role: "ADMIN" }, { role: "SUPER_ADMIN" }]),
         }),
       }),
     );

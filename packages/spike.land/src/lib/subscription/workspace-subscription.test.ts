@@ -22,25 +22,24 @@ vi.mock("@/lib/logger", () => ({
   default: mockLogger,
 }));
 
-import {
-  type AiCreditSource,
-  WorkspaceSubscriptionService,
-} from "./workspace-subscription";
+import { type AiCreditSource, WorkspaceSubscriptionService } from "./workspace-subscription";
 
 const WORKSPACE_ID = "ws-test-123";
 
-function makeWorkspaceWithCounts(overrides: {
-  subscriptionTier?: "FREE" | "PRO" | "BUSINESS";
-  maxSocialAccounts?: number;
-  maxScheduledPosts?: number;
-  maxAbTests?: number;
-  monthlyAiCredits?: number;
-  usedAiCredits?: number;
-  maxTeamMembers?: number;
-  socialAccounts?: number;
-  scheduledPosts?: number;
-  members?: number;
-} = {}) {
+function makeWorkspaceWithCounts(
+  overrides: {
+    subscriptionTier?: "FREE" | "PRO" | "BUSINESS";
+    maxSocialAccounts?: number;
+    maxScheduledPosts?: number;
+    maxAbTests?: number;
+    monthlyAiCredits?: number;
+    usedAiCredits?: number;
+    maxTeamMembers?: number;
+    socialAccounts?: number;
+    scheduledPosts?: number;
+    members?: number;
+  } = {},
+) {
   return {
     id: WORKSPACE_ID,
     subscriptionTier: overrides.subscriptionTier ?? "FREE",

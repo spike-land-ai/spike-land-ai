@@ -4,7 +4,10 @@ import { getGeminiClient } from "./gemini-client";
 import { getCache } from "@/lib/cache";
 
 export class StructuredResponseParseError extends Error {
-  constructor(message: string, public readonly rawText: string) {
+  constructor(
+    message: string,
+    public readonly rawText: string,
+  ) {
     super(message);
     this.name = "StructuredResponseParseError";
   }
@@ -27,20 +30,17 @@ export interface GenerateAgentResponseParams {
  * @returns The generated text response
  * @throws Error if API key is not configured or generation fails
  */
-export async function generateAgentResponse(
-  params: GenerateAgentResponseParams,
-): Promise<string> {
+export async function generateAgentResponse(params: GenerateAgentResponseParams): Promise<string> {
   const ai = await getGeminiClient();
 
-  const defaultSystemPrompt =
-    `You are a helpful AI assistant running in a cloud development environment (Box).
+  const defaultSystemPrompt = `You are a helpful AI assistant running in a cloud development environment (Box).
 You help users with coding, debugging, system administration, and general questions.
 Be concise, helpful, and provide practical solutions.`;
 
   const systemPrompt = params.systemPrompt || defaultSystemPrompt;
 
   // Convert messages to Gemini format
-  const contents = params.messages.map(msg => ({
+  const contents = params.messages.map((msg) => ({
     role: msg.role === "user" ? "user" : "model",
     parts: [{ text: msg.content }],
   }));
@@ -166,12 +166,9 @@ export async function generateStructuredResponse<T>(
     );
 
     if (parseError) {
-      logger.error(
-        "[GEMINI_STRUCTURED] Failed to parse JSON response:",
-        {
-          response: jsonText.slice(0, 500),
-        },
-      );
+      logger.error("[GEMINI_STRUCTURED] Failed to parse JSON response:", {
+        response: jsonText.slice(0, 500),
+      });
       throw new StructuredResponseParseError(
         `Failed to parse structured response: ${
           parseError instanceof Error ? parseError.message : "Invalid JSON"

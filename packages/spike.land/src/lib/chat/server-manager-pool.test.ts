@@ -1,36 +1,37 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-const {
-  mockConnectAll,
-  mockCloseAll,
-  mockDiscoverConfig,
-  MockInProcessToolProvider,
-} = vi.hoisted(() => {
-  const mockConnectAll = vi.fn().mockResolvedValue(undefined);
-  const mockCloseAll = vi.fn().mockResolvedValue(undefined);
-  const mockDiscoverConfig = vi.fn().mockResolvedValue({ servers: {} });
+const { mockConnectAll, mockCloseAll, mockDiscoverConfig, MockInProcessToolProvider } = vi.hoisted(
+  () => {
+    const mockConnectAll = vi.fn().mockResolvedValue(undefined);
+    const mockCloseAll = vi.fn().mockResolvedValue(undefined);
+    const mockDiscoverConfig = vi.fn().mockResolvedValue({ servers: {} });
 
-  class MockInProcessToolProvider {
-    static instances: MockInProcessToolProvider[] = [];
-    userId: string;
-    getAllTools = vi.fn().mockReturnValue([]);
-    callTool = vi.fn().mockResolvedValue({ content: [] });
-    closeAll = vi.fn().mockResolvedValue(undefined);
-    connectAll = vi.fn().mockResolvedValue(undefined);
-    getServerNames = vi.fn().mockReturnValue(["in-process"]);
+    class MockInProcessToolProvider {
+      static instances: MockInProcessToolProvider[] = [];
+      userId: string;
+      getAllTools = vi.fn().mockReturnValue([]);
+      callTool = vi.fn().mockResolvedValue({ content: [] });
+      closeAll = vi.fn().mockResolvedValue(undefined);
+      connectAll = vi.fn().mockResolvedValue(undefined);
+      getServerNames = vi.fn().mockReturnValue(["in-process"]);
 
-    constructor(userId: string) {
-      this.userId = userId;
-      MockInProcessToolProvider.instances.push(this);
+      constructor(userId: string) {
+        this.userId = userId;
+        MockInProcessToolProvider.instances.push(this);
+      }
+
+      static async create(userId: string) {
+        return new MockInProcessToolProvider(userId);
+      }
+
+      static reset() {
+        MockInProcessToolProvider.instances = [];
+      }
     }
 
-    static reset() {
-      MockInProcessToolProvider.instances = [];
-    }
-  }
-
-  return { mockConnectAll, mockCloseAll, mockDiscoverConfig, MockInProcessToolProvider };
-});
+    return { mockConnectAll, mockCloseAll, mockDiscoverConfig, MockInProcessToolProvider };
+  },
+);
 
 vi.mock("@spike-land-ai/spike-cli", () => {
   class FakeServerManager {
@@ -54,12 +55,9 @@ vi.mock("./in-process-tool-provider", () => ({
 }));
 
 // Import AFTER mocks
-const {
-  getServerManager,
-  removeServerManager,
-  closeAllManagers,
-  poolSize,
-} = await import("./server-manager-pool");
+const { getServerManager, removeServerManager, closeAllManagers, poolSize } = await import(
+  "./server-manager-pool"
+);
 
 describe("server-manager-pool", () => {
   beforeEach(() => {
@@ -145,9 +143,7 @@ describe("server-manager-pool", () => {
 
   describe("external fallback", () => {
     it("falls back to InProcessToolProvider when external multiplexer fails", async () => {
-      mockDiscoverConfig.mockRejectedValueOnce(
-        new Error("Cannot find .mcp.json"),
-      );
+      mockDiscoverConfig.mockRejectedValueOnce(new Error("Cannot find .mcp.json"));
 
       const manager = await getServerManager("fallback-user");
       expect(manager).toBeDefined();
@@ -157,9 +153,7 @@ describe("server-manager-pool", () => {
     });
 
     it("falls back to InProcessToolProvider when connectAll fails", async () => {
-      mockConnectAll.mockRejectedValueOnce(
-        new Error("Connection refused"),
-      );
+      mockConnectAll.mockRejectedValueOnce(new Error("Connection refused"));
 
       const manager = await getServerManager("conn-fail-user");
       expect(manager).toBeDefined();

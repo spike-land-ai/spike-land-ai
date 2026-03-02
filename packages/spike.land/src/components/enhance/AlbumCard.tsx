@@ -60,9 +60,7 @@ function getGridClassName(imageCount: number, index: number): string {
   return "";
 }
 
-export function AlbumCard(
-  { album, onClick, isDropTarget = false }: AlbumCardProps,
-) {
+export function AlbumCard({ album, onClick, isDropTarget = false }: AlbumCardProps) {
   const handleClick = () => {
     onClick?.();
   };
@@ -90,33 +88,28 @@ export function AlbumCard(
           isDropTarget && "ring-2 ring-primary",
         )}
       >
-        {album.previewImages.length > 0
-          ? (
-            <div className="grid grid-cols-2 gap-0.5 h-full">
-              {album.previewImages.slice(0, 4).map((img, idx) => (
-                <div
-                  key={img.id}
-                  className={cn(
-                    "relative",
-                    getGridClassName(album.previewImages.length, idx),
-                  )}
-                >
-                  <Image
-                    src={img.url}
-                    alt={img.name || "Album image"}
-                    fill
-                    className="object-cover"
-                    sizes="(max-width: 640px) 50vw, (max-width: 1024px) 25vw, 17vw"
-                  />
-                </div>
-              ))}
-            </div>
-          )
-          : (
-            <div className="flex h-full items-center justify-center">
-              <Images className="h-12 w-12 text-muted-foreground/50" />
-            </div>
-          )}
+        {album.previewImages.length > 0 ? (
+          <div className="grid grid-cols-2 gap-0.5 h-full">
+            {album.previewImages.slice(0, 4).map((img, idx) => (
+              <div
+                key={img.id}
+                className={cn("relative", getGridClassName(album.previewImages.length, idx))}
+              >
+                <Image
+                  src={img.url}
+                  alt={img.name || "Album image"}
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 640px) 50vw, (max-width: 1024px) 25vw, 17vw"
+                />
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="flex h-full items-center justify-center">
+            <Images className="h-12 w-12 text-muted-foreground/50" />
+          </div>
+        )}
 
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
 

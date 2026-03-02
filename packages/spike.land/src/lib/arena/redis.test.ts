@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 
-const { mockRedisSet, mockRedisGet, mockRedisDel, mockPublishSSEEvent, mockGetSSEEvents } = vi
-  .hoisted(() => ({
+const { mockRedisSet, mockRedisGet, mockRedisDel, mockPublishSSEEvent, mockGetSSEEvents } =
+  vi.hoisted(() => ({
     mockRedisSet: vi.fn(),
     mockRedisGet: vi.fn(),
     mockRedisDel: vi.fn(),
@@ -61,11 +61,9 @@ describe("setSubmissionState", () => {
   it("calls redis.set with correct key, value, and 300s TTL", async () => {
     mockRedisSet.mockResolvedValue("OK");
     await setSubmissionState("sub-1", "processing");
-    expect(mockRedisSet).toHaveBeenCalledWith(
-      "arena:submission:sub-1:state",
-      "processing",
-      { ex: 300 },
-    );
+    expect(mockRedisSet).toHaveBeenCalledWith("arena:submission:sub-1:state", "processing", {
+      ex: 300,
+    });
   });
 });
 
@@ -95,11 +93,7 @@ describe("setSubmissionWorking", () => {
   it("sets '1' with 300s TTL when isWorking=true", async () => {
     mockRedisSet.mockResolvedValue("OK");
     await setSubmissionWorking("sub-1", true);
-    expect(mockRedisSet).toHaveBeenCalledWith(
-      "arena:submission:sub-1:working",
-      "1",
-      { ex: 300 },
-    );
+    expect(mockRedisSet).toHaveBeenCalledWith("arena:submission:sub-1:working", "1", { ex: 300 });
   });
 
   it("deletes the key when isWorking=false", async () => {
@@ -166,11 +160,9 @@ describe("cacheLeaderboard / getCachedLeaderboard", () => {
     mockRedisSet.mockResolvedValue("OK");
     const data = [{ id: 1, score: 100 }];
     await cacheLeaderboard(data);
-    expect(mockRedisSet).toHaveBeenCalledWith(
-      "arena:leaderboard:top50",
-      JSON.stringify(data),
-      { ex: 60 },
-    );
+    expect(mockRedisSet).toHaveBeenCalledWith("arena:leaderboard:top50", JSON.stringify(data), {
+      ex: 60,
+    });
   });
 
   it("getCachedLeaderboard returns null when cache is empty", async () => {
@@ -204,11 +196,9 @@ describe("cacheChallengeList / getCachedChallengeList", () => {
     mockRedisSet.mockResolvedValue("OK");
     const data = ["challenge-1"];
     await cacheChallengeList(data);
-    expect(mockRedisSet).toHaveBeenCalledWith(
-      "arena:challenges:open",
-      JSON.stringify(data),
-      { ex: 30 },
-    );
+    expect(mockRedisSet).toHaveBeenCalledWith("arena:challenges:open", JSON.stringify(data), {
+      ex: 30,
+    });
   });
 
   it("getCachedChallengeList returns null when cache is empty", async () => {

@@ -1,8 +1,5 @@
 import type { APIError } from "@anthropic-ai/sdk";
-import type {
-  ContentBlockParam,
-  TextBlock,
-} from "@anthropic-ai/sdk/resources/messages.js";
+import type { ContentBlockParam, TextBlock } from "@anthropic-ai/sdk/resources/messages.js";
 import { getClaudeClient, resetClaudeClient } from "@/lib/ai/claude-client";
 import { generateAgentResponse } from "@/lib/ai/gemini-client";
 
@@ -88,11 +85,7 @@ export async function callClaude(params: {
   } = params;
 
   // Build system content blocks with split caching
-  const systemBlocks = buildSystemBlocks(
-    systemPrompt,
-    stablePrefix,
-    dynamicSuffix,
-  );
+  const systemBlocks = buildSystemBlocks(systemPrompt, stablePrefix, dynamicSuffix);
 
   let lastError: unknown;
   let authRetried = false;
@@ -114,14 +107,11 @@ export async function callClaude(params: {
 
         const text = response.content
           .filter((block): block is TextBlock => block.type === "text")
-          .map(block => block.text)
+          .map((block) => block.text)
           .join("");
 
         const { usage } = response;
-        const usageRecord = usage as unknown as Record<
-          string,
-          number | undefined
-        >;
+        const usageRecord = usage as unknown as Record<string, number | undefined>;
 
         return {
           text,
@@ -138,9 +128,7 @@ export async function callClaude(params: {
         if (isAuthError(error) && !authRetried) {
           authRetried = true;
           resetClaudeClient();
-          logger.warn(
-            "Claude 401 — resetting client and retrying with fresh token",
-          );
+          logger.warn("Claude 401 — resetting client and retrying with fresh token");
           break; // break inner loop, outer loop will re-acquire client
         }
 
@@ -157,19 +145,18 @@ export async function callClaude(params: {
               // Construct the prompt for Gemini
               const userText = Array.isArray(userPrompt)
                 ? userPrompt
-                  .filter((block): block is { type: "text"; text: string; } =>
-                    "type" in block && block.type === "text"
-                  )
-                  .map(b => b.text)
-                  .join("\n")
+                    .filter(
+                      (block): block is { type: "text"; text: string } =>
+                        "type" in block && block.type === "text",
+                    )
+                    .map((b) => b.text)
+                    .join("\n")
                 : (userPrompt as string);
 
               // Construct system prompt from parts
-              const systemText = [
-                stablePrefix,
-                systemPrompt,
-                dynamicSuffix,
-              ].filter(Boolean).join("\n\n");
+              const systemText = [stablePrefix, systemPrompt, dynamicSuffix]
+                .filter(Boolean)
+                .join("\n\n");
 
               const geminiText = await generateAgentResponse({
                 messages: [{ role: "user", content: userText }],
@@ -186,9 +173,7 @@ export async function callClaude(params: {
               };
             } catch (geminiError) {
               logger.error("Gemini fallback also failed", {
-                error: geminiError instanceof Error
-                  ? geminiError.message
-                  : String(geminiError),
+                error: geminiError instanceof Error ? geminiError.message : String(geminiError),
                 originalError: error,
               });
               throw error;
@@ -211,7 +196,7 @@ export async function callClaude(params: {
           },
         );
 
-        await new Promise(resolve => setTimeout(resolve, delay));
+        await new Promise((resolve) => setTimeout(resolve, delay));
       }
     }
 
@@ -227,14 +212,10 @@ function buildSystemBlocks(
   systemPrompt: string,
   stablePrefix?: string,
   dynamicSuffix?: string,
-): Array<
-  { type: "text"; text: string; cache_control?: { type: "ephemeral"; }; }
-> {
+): Array<{ type: "text"; text: string; cache_control?: { type: "ephemeral" } }> {
   // If split blocks are provided, use them for better cache hit rates
   if (stablePrefix) {
-    const blocks: Array<
-      { type: "text"; text: string; cache_control?: { type: "ephemeral"; }; }
-    > = [
+    const blocks: Array<{ type: "text"; text: string; cache_control?: { type: "ephemeral" } }> = [
       {
         type: "text",
         text: stablePrefix,
@@ -263,9 +244,7 @@ function buildSystemBlocks(
  */
 export function extractCodeFromResponse(text: string): string | null {
   // Try to extract from ```tsx or ```jsx fences
-  const fenceMatch = text.match(
-    /```(?:tsx|jsx|typescript|javascript)?\n([\s\S]*?)```/,
-  );
+  const fenceMatch = text.match(/```(?:tsx|jsx|typescript|javascript)?\n([\s\S]*?)```/);
   if (fenceMatch?.[1]) {
     return fenceMatch[1].trim();
   }
@@ -282,10 +261,7 @@ export function extractCodeFromResponse(text: string): string | null {
   const codeMatch = text.match(/"code"\s*:\s*"([\s\S]+)/);
   if (codeMatch?.[1]) {
     let code = codeMatch[1];
-    code = code.replace(
-      /"\s*,?\s*"(relatedApps|title|description)"\s*:[\s\S]*$/,
-      "",
-    );
+    code = code.replace(/"\s*,?\s*"(relatedApps|title|description)"\s*:[\s\S]*$/, "");
     code = code.replace(/"\s*,?\s*}\s*$/, "");
     code = code.replace(/"\s*$/, "");
     try {
@@ -294,7 +270,7 @@ export function extractCodeFromResponse(text: string): string | null {
       code = code
         .replace(/\\n/g, "\n")
         .replace(/\\t/g, "\t")
-        .replace(/\\"/g, "\"")
+        .replace(/\\"/g, '"')
         .replace(/\\\\/g, "\\");
     }
     return code.trim() || null;
@@ -329,14 +305,9 @@ export interface ParsedGeneration {
  *
  * Returns null if the response doesn't contain a tsx/jsx fence with `export default`.
  */
-export function parseMarkdownResponse(
-  text: string,
-  slug: string,
-): ParsedGeneration | null {
+export function parseMarkdownResponse(text: string, slug: string): ParsedGeneration | null {
   // Extract code from tsx/jsx fence
-  const fenceMatch = text.match(
-    /```(?:tsx|jsx)\n([\s\S]*?)```/,
-  );
+  const fenceMatch = text.match(/```(?:tsx|jsx)\n([\s\S]*?)```/);
   if (!fenceMatch?.[1]) return null;
 
   const code = fenceMatch[1].trim();
@@ -349,12 +320,14 @@ export function parseMarkdownResponse(
   const descMatch = beforeFence.match(/^DESCRIPTION:\s*(.+)$/m);
   const relatedMatch = beforeFence.match(/^RELATED:\s*(.+)$/m);
 
-  const title = titleMatch?.[1]?.trim()
-    || slug.split("/").pop()?.replace(/-/g, " ")
-    || "Generated App";
+  const title =
+    titleMatch?.[1]?.trim() || slug.split("/").pop()?.replace(/-/g, " ") || "Generated App";
   const description = descMatch?.[1]?.trim() || "Generated application";
   const relatedApps = relatedMatch
-    ? relatedMatch[1]!.split(",").map(s => s.trim()).filter(Boolean)
+    ? relatedMatch[1]!
+        .split(",")
+        .map((s) => s.trim())
+        .filter(Boolean)
     : [];
 
   return { title, description, code, relatedApps };
@@ -369,10 +342,7 @@ export function parseMarkdownResponse(
  * 3. Embedded JSON block within surrounding text
  * 4. extractCodeFromResponse fallback (fences, partial JSON, raw code)
  */
-export function parseGenerationResponse(
-  text: string,
-  slug: string,
-): ParsedGeneration | null {
+export function parseGenerationResponse(text: string, slug: string): ParsedGeneration | null {
   // 1. Try markdown format first (new preferred format)
   const markdown = parseMarkdownResponse(text, slug);
   if (markdown) return markdown;
@@ -399,8 +369,7 @@ export function parseGenerationResponse(
       const json = JSON.parse(jsonMatch[0]);
       if (json.code) {
         return {
-          title: json.title || slug.split("/").pop()?.replace(/-/g, " ")
-            || "Generated App",
+          title: json.title || slug.split("/").pop()?.replace(/-/g, " ") || "Generated App",
           description: json.description || "Generated application",
           code: json.code,
           relatedApps: Array.isArray(json.relatedApps) ? json.relatedApps : [],

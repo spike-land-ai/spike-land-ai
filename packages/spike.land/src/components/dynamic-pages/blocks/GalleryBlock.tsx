@@ -29,13 +29,9 @@ export function GalleryBlock({ content }: GalleryBlockProps) {
   return (
     <section className="w-full py-16 px-6 md:px-12 lg:px-24">
       <div className="max-w-6xl mx-auto">
-        {data.sectionTitle
-          ? (
-            <h2 className="text-3xl font-bold text-center mb-12">
-              {data.sectionTitle}
-            </h2>
-          )
-          : null}
+        {data.sectionTitle ? (
+          <h2 className="text-3xl font-bold text-center mb-12">{data.sectionTitle}</h2>
+        ) : null}
         <div className={`grid ${gridClass} gap-4`}>
           {data.images.map((image, index) => (
             <figure key={`${image.src}-${index}`} className="group">
@@ -49,13 +45,11 @@ export function GalleryBlock({ content }: GalleryBlockProps) {
                   unoptimized
                 />
               </div>
-              {image.caption
-                ? (
-                  <figcaption className="mt-2 text-sm text-muted-foreground text-center">
-                    {image.caption}
-                  </figcaption>
-                )
-                : null}
+              {image.caption ? (
+                <figcaption className="mt-2 text-sm text-muted-foreground text-center">
+                  {image.caption}
+                </figcaption>
+              ) : null}
             </figure>
           ))}
         </div>

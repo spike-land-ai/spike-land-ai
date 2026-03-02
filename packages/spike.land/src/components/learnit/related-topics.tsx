@@ -8,9 +8,7 @@ interface RelatedTopicsProps {
   className?: string;
 }
 
-export async function RelatedTopics(
-  { topicId, className }: RelatedTopicsProps,
-) {
+export async function RelatedTopics({ topicId, className }: RelatedTopicsProps) {
   const relatedTopics = await getRelatedTopics(topicId, 5);
 
   if (relatedTopics.length === 0) {
@@ -21,7 +19,7 @@ export async function RelatedTopics(
     <div className={cn("rounded-lg border bg-card p-6", className)}>
       <h3 className="text-lg font-semibold mb-4">Related Topics</h3>
       <ul className="space-y-3">
-        {relatedTopics.map(topic => (
+        {relatedTopics.map((topic) => (
           <li key={topic.id}>
             <Link
               href={`/learnit/${topic.slug}`}

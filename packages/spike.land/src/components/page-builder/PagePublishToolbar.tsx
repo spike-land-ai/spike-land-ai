@@ -14,10 +14,7 @@ interface PagePublishToolbarProps {
   className?: string;
 }
 
-const statusConfig: Record<
-  PublishStatus,
-  { label: string; badgeClass: string; }
-> = {
+const statusConfig: Record<PublishStatus, { label: string; badgeClass: string }> = {
   draft: {
     label: "Draft",
     badgeClass: "bg-yellow-500/10 text-yellow-400 border-yellow-500/30 hover:bg-yellow-500/20",
@@ -48,10 +45,7 @@ export function PagePublishToolbar({
       )}
     >
       <div className="flex items-center gap-3">
-        <Badge
-          variant="outline"
-          className={cn("text-xs font-medium", config.badgeClass)}
-        >
+        <Badge variant="outline" className={cn("text-xs font-medium", config.badgeClass)}>
           {config.label}
         </Badge>
         {lastSaved && (

@@ -7,17 +7,14 @@ export type Platform =
   | "other";
 
 export function detectPlatform(userAgent?: string): Platform {
-  const ua = userAgent
-    ?? (typeof navigator !== "undefined" ? navigator.userAgent : "");
+  const ua = userAgent ?? (typeof navigator !== "undefined" ? navigator.userAgent : "");
 
   // Only use ontouchend heuristic for iPad detection when using real navigator UA
   const hasTouchHeuristic = !userAgent && "ontouchend" in globalThis;
-  const isIOS = /iPad|iPhone|iPod/.test(ua)
-    || (/Macintosh/.test(ua) && hasTouchHeuristic);
+  const isIOS = /iPad|iPhone|iPod/.test(ua) || (/Macintosh/.test(ua) && hasTouchHeuristic);
   const isAndroid = /Android/i.test(ua);
   const isFirefox = /Firefox/i.test(ua);
-  const isSafari = /Safari/i.test(ua) && !/Chrome/i.test(ua)
-    && !/Chromium/i.test(ua);
+  const isSafari = /Safari/i.test(ua) && !/Chrome/i.test(ua) && !/Chromium/i.test(ua);
   const isChrome = /Chrome/i.test(ua) && !/Edg/i.test(ua);
 
   if (isIOS && isSafari) return "ios-safari";

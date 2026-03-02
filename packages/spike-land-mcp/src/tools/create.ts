@@ -25,20 +25,14 @@ export function registerCreateTools(
     t
       .tool(
         "create_search_apps",
-        "Search published /create apps by title, description, or slug. "
-          + "Results are ordered by popularity.",
+        "Search published /create apps by title, description, or slug. " +
+          "Results are ordered by popularity.",
         {
           query: z
             .string()
             .min(1)
             .describe("Search query to match against app title, description, or slug."),
-          limit: z
-            .number()
-            .int()
-            .min(1)
-            .max(50)
-            .optional()
-            .describe("Max results (default 10)."),
+          limit: z.number().int().min(1).max(50).optional().describe("Max results (default 10)."),
         },
       )
       .meta({ category: "create", tier: "free" })
@@ -74,8 +68,8 @@ export function registerCreateTools(
         } catch (error) {
           const msg = error instanceof Error ? error.message : "Unknown error";
           return textResult(
-            `**Error searching apps:** ${msg}\n\n`
-              + `You can browse apps directly at ${SPIKE_LAND_BASE_URL}/create`,
+            `**Error searching apps:** ${msg}\n\n` +
+              `You can browse apps directly at ${SPIKE_LAND_BASE_URL}/create`,
           );
         }
       }),
@@ -83,13 +77,9 @@ export function registerCreateTools(
 
   registry.registerBuilt(
     t
-      .tool(
-        "create_get_app",
-        "Get full details for a specific /create app by its slug.",
-        {
-          slug: z.string().min(1).describe("Unique slug of the created app."),
-        },
-      )
+      .tool("create_get_app", "Get full details for a specific /create app by its slug.", {
+        slug: z.string().min(1).describe("Unique slug of the created app."),
+      })
       .meta({ category: "create", tier: "free" })
       .handler(async ({ input }) => {
         const { slug } = input;
@@ -139,14 +129,10 @@ export function registerCreateTools(
     t
       .tool(
         "create_classify_idea",
-        "Classify an app idea into a URL slug and category. "
-          + "Delegates to the spike.land classification API.",
+        "Classify an app idea into a URL slug and category. " +
+          "Delegates to the spike.land classification API.",
         {
-          text: z
-            .string()
-            .min(1)
-            .max(2000)
-            .describe("App idea text to classify."),
+          text: z.string().min(1).max(2000).describe("App idea text to classify."),
         },
       )
       .meta({ category: "create", tier: "free" })
@@ -174,8 +160,8 @@ export function registerCreateTools(
         } catch (error) {
           const msg = error instanceof Error ? error.message : "Unknown error";
           return textResult(
-            `**Classification unavailable:** ${msg}\n\n`
-              + `The slug classifier requires the spike.land API. Try again later.`,
+            `**Classification unavailable:** ${msg}\n\n` +
+              `The slug classifier requires the spike.land API. Try again later.`,
           );
         }
       }),
@@ -187,10 +173,7 @@ export function registerCreateTools(
         "create_check_health",
         "Check if a codespace is healthy (has real, non-default content).",
         {
-          codespace_id: z
-            .string()
-            .min(1)
-            .describe("Codespace ID to check health for."),
+          codespace_id: z.string().min(1).describe("Codespace ID to check health for."),
         },
       )
       .meta({ category: "create", tier: "free" })
@@ -201,15 +184,15 @@ export function registerCreateTools(
           );
 
           return textResult(
-            `**Codespace Health Check**\n\n`
-              + `**ID:** ${input.codespace_id}\n`
-              + `**Healthy:** ${result.healthy}`,
+            `**Codespace Health Check**\n\n` +
+              `**ID:** ${input.codespace_id}\n` +
+              `**Healthy:** ${result.healthy}`,
           );
         } catch (error) {
           const msg = error instanceof Error ? error.message : "Unknown error";
           return textResult(
-            `**Health check unavailable:** ${msg}\n\n`
-              + `Health checks require the spike.land API.`,
+            `**Health check unavailable:** ${msg}\n\n` +
+              `Health checks require the spike.land API.`,
           );
         }
       }),
@@ -217,19 +200,9 @@ export function registerCreateTools(
 
   registry.registerBuilt(
     t
-      .tool(
-        "create_list_top_apps",
-        "List the most popular published /create apps by view count.",
-        {
-          limit: z
-            .number()
-            .int()
-            .min(1)
-            .max(50)
-            .optional()
-            .describe("Max results (default 10)."),
-        },
-      )
+      .tool("create_list_top_apps", "List the most popular published /create apps by view count.", {
+        limit: z.number().int().min(1).max(50).optional().describe("Max results (default 10)."),
+      })
       .meta({ category: "create", tier: "free" })
       .handler(async ({ input }) => {
         const { limit = 10 } = input;
@@ -263,8 +236,8 @@ export function registerCreateTools(
         } catch (error) {
           const msg = error instanceof Error ? error.message : "Unknown error";
           return textResult(
-            `**Error listing top apps:** ${msg}\n\n`
-              + `Browse apps at ${SPIKE_LAND_BASE_URL}/create`,
+            `**Error listing top apps:** ${msg}\n\n` +
+              `Browse apps at ${SPIKE_LAND_BASE_URL}/create`,
           );
         }
       }),
@@ -272,19 +245,9 @@ export function registerCreateTools(
 
   registry.registerBuilt(
     t
-      .tool(
-        "create_list_recent_apps",
-        "List the most recently generated published /create apps.",
-        {
-          limit: z
-            .number()
-            .int()
-            .min(1)
-            .max(50)
-            .optional()
-            .describe("Max results (default 10)."),
-        },
-      )
+      .tool("create_list_recent_apps", "List the most recently generated published /create apps.", {
+        limit: z.number().int().min(1).max(50).optional().describe("Max results (default 10)."),
+      })
       .meta({ category: "create", tier: "free" })
       .handler(async ({ input }) => {
         const { limit = 10 } = input;
@@ -320,8 +283,8 @@ export function registerCreateTools(
         } catch (error) {
           const msg = error instanceof Error ? error.message : "Unknown error";
           return textResult(
-            `**Error listing recent apps:** ${msg}\n\n`
-              + `Browse apps at ${SPIKE_LAND_BASE_URL}/create`,
+            `**Error listing recent apps:** ${msg}\n\n` +
+              `Browse apps at ${SPIKE_LAND_BASE_URL}/create`,
           );
         }
       }),
@@ -329,13 +292,9 @@ export function registerCreateTools(
 
   registry.registerBuilt(
     t
-      .tool(
-        "create_get_app_status",
-        "Quick status check for a /create app.",
-        {
-          slug: z.string().min(1).describe("Unique slug of the created app."),
-        },
-      )
+      .tool("create_get_app_status", "Quick status check for a /create app.", {
+        slug: z.string().min(1).describe("Unique slug of the created app."),
+      })
       .meta({ category: "create", tier: "free" })
       .handler(async ({ input }) => {
         const { slug } = input;
@@ -349,11 +308,11 @@ export function registerCreateTools(
           }>(`/api/create/${encodeURIComponent(slug)}/status`);
 
           return textResult(
-            `**App Status**\n\n`
-              + `**Title:** ${app.title}\n`
-              + `**Slug:** ${app.slug}\n`
-              + `**Status:** ${app.status}\n`
-              + `**URL:** ${app.codespaceUrl}`,
+            `**App Status**\n\n` +
+              `**Title:** ${app.title}\n` +
+              `**Slug:** ${app.slug}\n` +
+              `**Status:** ${app.status}\n` +
+              `**URL:** ${app.codespaceUrl}`,
           );
         } catch (error) {
           const msg = error instanceof Error ? error.message : "Unknown error";

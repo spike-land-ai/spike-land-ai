@@ -135,13 +135,9 @@ export const ERROR_MESSAGES: Record<ErrorCode, ErrorMessage> = {
 /**
  * Detect error code from error message or status
  */
-export function detectErrorCode(
-  error: Error | string,
-  statusCode?: number,
-): ErrorCode {
-  const errorMessage = typeof error === "string"
-    ? error.toLowerCase()
-    : error.message.toLowerCase();
+export function detectErrorCode(error: Error | string, statusCode?: number): ErrorCode {
+  const errorMessage =
+    typeof error === "string" ? error.toLowerCase() : error.message.toLowerCase();
 
   // Check status code first
   if (statusCode) {
@@ -155,10 +151,10 @@ export function detectErrorCode(
 
   // Check error message patterns
   if (
-    errorMessage.includes("network")
-    || errorMessage.includes("fetch failed")
-    || errorMessage.includes("enotfound")
-    || errorMessage.includes("econnrefused")
+    errorMessage.includes("network") ||
+    errorMessage.includes("fetch failed") ||
+    errorMessage.includes("enotfound") ||
+    errorMessage.includes("econnrefused")
   ) {
     return "NETWORK_ERROR";
   }
@@ -167,30 +163,19 @@ export function detectErrorCode(
     return "TIMEOUT";
   }
 
-  if (
-    errorMessage.includes("rate limit")
-    || errorMessage.includes("too many requests")
-  ) {
+  if (errorMessage.includes("rate limit") || errorMessage.includes("too many requests")) {
     return "RATE_LIMIT";
   }
 
-  if (
-    errorMessage.includes("insufficient")
-    || errorMessage.includes("not enough tokens")
-  ) {
+  if (errorMessage.includes("insufficient") || errorMessage.includes("not enough tokens")) {
     return "INSUFFICIENT_TOKENS";
   }
 
-  if (
-    errorMessage.includes("unauthorized")
-    || errorMessage.includes("unauthenticated")
-  ) {
+  if (errorMessage.includes("unauthorized") || errorMessage.includes("unauthenticated")) {
     return "UNAUTHORIZED";
   }
 
-  if (
-    errorMessage.includes("forbidden") || errorMessage.includes("access denied")
-  ) {
+  if (errorMessage.includes("forbidden") || errorMessage.includes("access denied")) {
     return "FORBIDDEN";
   }
 
@@ -198,53 +183,35 @@ export function detectErrorCode(
     return "NOT_FOUND";
   }
 
-  if (
-    errorMessage.includes("file too large")
-    || errorMessage.includes("exceeds maximum")
-  ) {
+  if (errorMessage.includes("file too large") || errorMessage.includes("exceeds maximum")) {
     return "FILE_TOO_LARGE";
   }
 
-  if (
-    errorMessage.includes("unsupported")
-    || errorMessage.includes("invalid file type")
-  ) {
+  if (errorMessage.includes("unsupported") || errorMessage.includes("invalid file type")) {
     return "UNSUPPORTED_FILE_TYPE";
   }
 
-  if (
-    errorMessage.includes("invalid")
-    || errorMessage.includes("validation failed")
-  ) {
+  if (errorMessage.includes("invalid") || errorMessage.includes("validation failed")) {
     return "INVALID_INPUT";
   }
 
-  if (
-    errorMessage.includes("upload failed")
-    || errorMessage.includes("upload error")
-  ) {
+  if (errorMessage.includes("upload failed") || errorMessage.includes("upload error")) {
     return "UPLOAD_FAILED";
   }
 
-  if (
-    errorMessage.includes("download failed")
-    || errorMessage.includes("failed to download")
-  ) {
+  if (errorMessage.includes("download failed") || errorMessage.includes("failed to download")) {
     return "DOWNLOAD_FAILED";
   }
 
   if (
-    errorMessage.includes("database")
-    || errorMessage.includes("prisma")
-    || errorMessage.includes("transaction")
+    errorMessage.includes("database") ||
+    errorMessage.includes("prisma") ||
+    errorMessage.includes("transaction")
   ) {
     return "DATABASE_ERROR";
   }
 
-  if (
-    errorMessage.includes("enhancement failed")
-    || errorMessage.includes("processing failed")
-  ) {
+  if (errorMessage.includes("enhancement failed") || errorMessage.includes("processing failed")) {
     return "PROCESSING_FAILED";
   }
 
@@ -254,10 +221,7 @@ export function detectErrorCode(
 /**
  * Get user-friendly error message from error
  */
-export function getUserFriendlyError(
-  error: Error | string,
-  statusCode?: number,
-): ErrorMessage {
+export function getUserFriendlyError(error: Error | string, statusCode?: number): ErrorMessage {
   const errorCode = detectErrorCode(error, statusCode);
   return ERROR_MESSAGES[errorCode];
 }
@@ -265,10 +229,7 @@ export function getUserFriendlyError(
 /**
  * Check if an error is retryable
  */
-export function isRetryableError(
-  error: Error | string,
-  statusCode?: number,
-): boolean {
+export function isRetryableError(error: Error | string, statusCode?: number): boolean {
   const errorCode = detectErrorCode(error, statusCode);
   return ERROR_MESSAGES[errorCode].retryable;
 }

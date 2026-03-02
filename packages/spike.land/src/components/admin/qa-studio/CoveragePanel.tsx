@@ -6,26 +6,14 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible";
-import {
-  BarChart3,
-  ChevronDown,
-  ChevronRight,
-  Loader2,
-  Play,
-} from "lucide-react";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { BarChart3, ChevronDown, ChevronRight, Loader2, Play } from "lucide-react";
 import { qaCoverage } from "@/lib/qa-studio/actions";
 import { type QaCoverageResult } from "@/lib/qa-studio/types";
 
 type PanelStatus = "idle" | "loading" | "success" | "error";
 
-function getCoverageVariant(
-  value: number | undefined,
-): "success" | "warning" | "destructive" {
+function getCoverageVariant(value: number | undefined): "success" | "warning" | "destructive" {
   if (value === undefined) return "destructive";
   if (value >= 80) return "success";
   if (value >= 60) return "warning";
@@ -71,9 +59,7 @@ export function CoveragePanel() {
       setResult(data);
       setStatus("success");
     } catch (err: unknown) {
-      const message = err instanceof Error
-        ? err.message
-        : "Coverage analysis failed";
+      const message = err instanceof Error ? err.message : "Coverage analysis failed";
       setError(message);
       setStatus("error");
     }
@@ -103,7 +89,7 @@ export function CoveragePanel() {
         <div className="flex items-center gap-2">
           <Input
             value={target}
-            onChange={e => setTarget(e.target.value)}
+            onChange={(e) => setTarget(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder="src/lib/utils.ts"
             className="text-xs font-mono h-8 bg-black/20 border-border/30 flex-1"
@@ -115,9 +101,11 @@ export function CoveragePanel() {
             disabled={status === "loading" || !target.trim()}
             className="h-8 shrink-0"
           >
-            {status === "loading"
-              ? <Loader2 className="h-3.5 w-3.5 animate-spin mr-1.5" />
-              : <Play className="h-3.5 w-3.5 mr-1.5" />}
+            {status === "loading" ? (
+              <Loader2 className="h-3.5 w-3.5 animate-spin mr-1.5" />
+            ) : (
+              <Play className="h-3.5 w-3.5 mr-1.5" />
+            )}
             Analyze
           </Button>
         </div>
@@ -140,10 +128,7 @@ export function CoveragePanel() {
         {status === "success" && result && (
           <div className="space-y-4">
             <div className="text-xs text-muted-foreground">
-              Target:{" "}
-              <span className="font-mono text-foreground/80">
-                {result.target}
-              </span>
+              Target: <span className="font-mono text-foreground/80">{result.target}</span>
             </div>
 
             {/* Coverage bars */}
@@ -162,9 +147,11 @@ export function CoveragePanel() {
                   size="sm"
                   className="h-7 w-full justify-start text-xs text-muted-foreground hover:text-foreground"
                 >
-                  {rawOpen
-                    ? <ChevronDown className="h-3 w-3 mr-1.5" />
-                    : <ChevronRight className="h-3 w-3 mr-1.5" />}
+                  {rawOpen ? (
+                    <ChevronDown className="h-3 w-3 mr-1.5" />
+                  ) : (
+                    <ChevronRight className="h-3 w-3 mr-1.5" />
+                  )}
                   Raw output
                 </Button>
               </CollapsibleTrigger>

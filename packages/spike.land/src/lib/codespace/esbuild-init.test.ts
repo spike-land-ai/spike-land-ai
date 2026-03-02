@@ -37,9 +37,7 @@ describe("esbuild-init", () => {
   });
 
   it("should handle already-initialized error gracefully", async () => {
-    mockInitialize.mockRejectedValue(
-      new Error("Cannot call \"initialize\" more than once"),
-    );
+    mockInitialize.mockRejectedValue(new Error('Cannot call "initialize" more than once'));
     await expect(ensureEsbuildReady()).resolves.toBeUndefined();
   });
 
@@ -91,7 +89,7 @@ describe("esbuild-init", () => {
         "bin",
         "esbuild",
       );
-      vi.mocked(fs.existsSync).mockImplementation(p => p === nmPath);
+      vi.mocked(fs.existsSync).mockImplementation((p) => p === nmPath);
 
       expect(resolveEsbuildBinary()).toBe(nmPath);
     });
@@ -119,7 +117,7 @@ describe("esbuild-init", () => {
         "bin",
         "esbuild",
       );
-      vi.mocked(fs.existsSync).mockImplementation(p => p === expected);
+      vi.mocked(fs.existsSync).mockImplementation((p) => p === expected);
       mockInitialize.mockResolvedValue(undefined);
 
       await ensureEsbuildReady();

@@ -4,7 +4,7 @@ import { applyPattern, extractTestableUnits, generateTestCode } from "./engine";
 describe("testgen engine", () => {
   it("should generate test code", () => {
     const code = generateTestCode("Test feature X", "vitest");
-    expect(code).toContain("describe(\"Generated tests\"");
+    expect(code).toContain('describe("Generated tests"');
     expect(code).toContain("Test feature X");
   });
 

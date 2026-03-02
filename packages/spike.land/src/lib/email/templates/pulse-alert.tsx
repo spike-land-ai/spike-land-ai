@@ -98,19 +98,19 @@ export function PulseAlertEmail({
 
   const alertStyle = isCritical
     ? {
-      backgroundColor: "#fef2f2",
-      border: "2px solid #dc2626",
-      borderRadius: "8px",
-      padding: "24px",
-      margin: "24px 0",
-    }
+        backgroundColor: "#fef2f2",
+        border: "2px solid #dc2626",
+        borderRadius: "8px",
+        padding: "24px",
+        margin: "24px 0",
+      }
     : {
-      backgroundColor: "#fffbeb",
-      border: "2px solid #f59e0b",
-      borderRadius: "8px",
-      padding: "24px",
-      margin: "24px 0",
-    };
+        backgroundColor: "#fffbeb",
+        border: "2px solid #f59e0b",
+        borderRadius: "8px",
+        padding: "24px",
+        margin: "24px 0",
+      };
 
   const alertTitleStyle = {
     color: isCritical ? "#dc2626" : "#d97706",
@@ -128,9 +128,9 @@ export function PulseAlertEmail({
 
   return (
     <BaseEmail
-      preview={`${severity.charAt(0).toUpperCase() + severity.slice(1)} alert: ${
-        getMetricName(metricType)
-      } ${direction} detected for ${accountName}`}
+      preview={`${severity.charAt(0).toUpperCase() + severity.slice(1)} alert: ${getMetricName(
+        metricType,
+      )} ${direction} detected for ${accountName}`}
       heading="Pulse AI Agent Alert"
       {...(unsubscribeUrl !== undefined ? { unsubscribeUrl } : {})}
     >
@@ -169,9 +169,7 @@ export function PulseAlertEmail({
         <table style={{ width: "100%", borderCollapse: "collapse" }}>
           <tbody>
             <tr>
-              <td style={{ padding: "8px 0", color: "#6b7280" }}>
-                Current Value:
-              </td>
+              <td style={{ padding: "8px 0", color: "#6b7280" }}>Current Value:</td>
               <td
                 style={{
                   padding: "8px 0",
@@ -183,9 +181,7 @@ export function PulseAlertEmail({
               </td>
             </tr>
             <tr>
-              <td style={{ padding: "8px 0", color: "#6b7280" }}>
-                Expected Value:
-              </td>
+              <td style={{ padding: "8px 0", color: "#6b7280" }}>Expected Value:</td>
               <td style={{ padding: "8px 0", textAlign: "right" }}>
                 {formatNumber(expectedValue)}
               </td>
@@ -208,21 +204,17 @@ export function PulseAlertEmail({
       </Section>
 
       <Text style={emailStyles.text}>
-        {isSpike
-          ? (
-            <>
-              This represents a <strong>significant increase</strong>{" "}
-              compared to your 7-day average. This could indicate viral content, successful
-              campaigns, or organic growth spurts.
-            </>
-          )
-          : (
-            <>
-              This represents a <strong>significant decrease</strong>{" "}
-              compared to your 7-day average. This may warrant investigation to understand the cause
-              and take appropriate action.
-            </>
-          )}
+        {isSpike ? (
+          <>
+            This represents a <strong>significant increase</strong> compared to your 7-day average.
+            This could indicate viral content, successful campaigns, or organic growth spurts.
+          </>
+        ) : (
+          <>
+            This represents a <strong>significant decrease</strong> compared to your 7-day average.
+            This may warrant investigation to understand the cause and take appropriate action.
+          </>
+        )}
       </Text>
 
       {dashboardUrl && (

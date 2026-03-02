@@ -267,22 +267,17 @@ describe("avl-rotations", () => {
       };
 
       mockPrisma.avlProfileNode.findUnique.mockImplementation(
-        ({ where }: { where: { id: string; }; }) => Promise.resolve(nodes[where.id] ?? null),
+        ({ where }: { where: { id: string } }) => Promise.resolve(nodes[where.id] ?? null),
       );
       mockPrisma.avlProfileNode.findUniqueOrThrow.mockImplementation(
-        ({ where }: { where: { id: string; }; }) => {
+        ({ where }: { where: { id: string } }) => {
           const node = nodes[where.id];
           if (!node) return Promise.reject(new Error("Not found"));
           return Promise.resolve(node);
         },
       );
       mockPrisma.avlProfileNode.update.mockImplementation(
-        (
-          { where, data }: {
-            where: { id: string; };
-            data: Record<string, unknown>;
-          },
-        ) => {
+        ({ where, data }: { where: { id: string }; data: Record<string, unknown> }) => {
           const node = nodes[where.id];
           if (node) {
             Object.assign(node, data);
@@ -337,22 +332,17 @@ describe("avl-rotations", () => {
       };
 
       mockPrisma.avlProfileNode.findUnique.mockImplementation(
-        ({ where }: { where: { id: string; }; }) => Promise.resolve(nodes[where.id] ?? null),
+        ({ where }: { where: { id: string } }) => Promise.resolve(nodes[where.id] ?? null),
       );
       mockPrisma.avlProfileNode.findUniqueOrThrow.mockImplementation(
-        ({ where }: { where: { id: string; }; }) => {
+        ({ where }: { where: { id: string } }) => {
           const node = nodes[where.id];
           if (!node) return Promise.reject(new Error("Not found"));
           return Promise.resolve(node);
         },
       );
       mockPrisma.avlProfileNode.update.mockImplementation(
-        (
-          { where, data }: {
-            where: { id: string; };
-            data: Record<string, unknown>;
-          },
-        ) => {
+        ({ where, data }: { where: { id: string }; data: Record<string, unknown> }) => {
           const node = nodes[where.id];
           if (node) {
             Object.assign(node, data);

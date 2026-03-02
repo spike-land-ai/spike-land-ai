@@ -32,15 +32,13 @@ beforeEach(() => {
 describe("runAutoReview", () => {
   it("passes when all checks succeed", async () => {
     mockTranspile.mockResolvedValue("transpiled code");
-    mockGetSession.mockResolvedValue(
-      {
-        code: "const x = 1; export default function App() { return <div>hello</div>; }",
-        transpiled:
-          "var x = 1; export default function App() { return React.createElement('div', null, 'hello'); }",
-        html: "",
-        css: "",
-      } as ReturnType<typeof getSession> extends Promise<infer T> ? T : never,
-    );
+    mockGetSession.mockResolvedValue({
+      code: "const x = 1; export default function App() { return <div>hello</div>; }",
+      transpiled:
+        "var x = 1; export default function App() { return React.createElement('div', null, 'hello'); }",
+      html: "",
+      css: "",
+    } as ReturnType<typeof getSession> extends Promise<infer T> ? T : never);
     mockHealthy.mockResolvedValue(true);
 
     const result = await runAutoReview("test-codespace", "const x = 1;");
@@ -54,15 +52,12 @@ describe("runAutoReview", () => {
 
   it("fails when transpile fails", async () => {
     mockTranspile.mockRejectedValue(new Error("Syntax error"));
-    mockGetSession.mockResolvedValue(
-      {
-        code: "bad code",
-        transpiled:
-          "var x = 1; export default function App() { return React.createElement('div'); }",
-        html: "",
-        css: "",
-      } as ReturnType<typeof getSession> extends Promise<infer T> ? T : never,
-    );
+    mockGetSession.mockResolvedValue({
+      code: "bad code",
+      transpiled: "var x = 1; export default function App() { return React.createElement('div'); }",
+      html: "",
+      css: "",
+    } as ReturnType<typeof getSession> extends Promise<infer T> ? T : never);
     mockHealthy.mockResolvedValue(true);
 
     const result = await runAutoReview("test-codespace", "bad code");
@@ -74,15 +69,12 @@ describe("runAutoReview", () => {
 
   it("fails when health check fails", async () => {
     mockTranspile.mockResolvedValue("transpiled");
-    mockGetSession.mockResolvedValue(
-      {
-        code: "good code",
-        transpiled:
-          "var x = 1; export default function App() { return React.createElement('div'); }",
-        html: "",
-        css: "",
-      } as ReturnType<typeof getSession> extends Promise<infer T> ? T : never,
-    );
+    mockGetSession.mockResolvedValue({
+      code: "good code",
+      transpiled: "var x = 1; export default function App() { return React.createElement('div'); }",
+      html: "",
+      css: "",
+    } as ReturnType<typeof getSession> extends Promise<infer T> ? T : never);
     mockHealthy.mockResolvedValue(false);
 
     const result = await runAutoReview("test-codespace", "good code");
@@ -93,14 +85,12 @@ describe("runAutoReview", () => {
 
   it("fails when bundle check finds no transpiled output", async () => {
     mockTranspile.mockResolvedValue("transpiled");
-    mockGetSession.mockResolvedValue(
-      {
-        code: "good code",
-        transpiled: "",
-        html: "",
-        css: "",
-      } as ReturnType<typeof getSession> extends Promise<infer T> ? T : never,
-    );
+    mockGetSession.mockResolvedValue({
+      code: "good code",
+      transpiled: "",
+      html: "",
+      css: "",
+    } as ReturnType<typeof getSession> extends Promise<infer T> ? T : never);
     mockHealthy.mockResolvedValue(true);
 
     const result = await runAutoReview("test-codespace", "good code");
@@ -111,15 +101,12 @@ describe("runAutoReview", () => {
 
   it("calculates score as fraction of passing checks", async () => {
     mockTranspile.mockResolvedValue("transpiled");
-    mockGetSession.mockResolvedValue(
-      {
-        code: "good code",
-        transpiled:
-          "var x = 1; export default function App() { return React.createElement('div'); }",
-        html: "",
-        css: "",
-      } as ReturnType<typeof getSession> extends Promise<infer T> ? T : never,
-    );
+    mockGetSession.mockResolvedValue({
+      code: "good code",
+      transpiled: "var x = 1; export default function App() { return React.createElement('div'); }",
+      html: "",
+      css: "",
+    } as ReturnType<typeof getSession> extends Promise<infer T> ? T : never);
     mockHealthy.mockResolvedValue(false);
 
     const result = await runAutoReview("test-codespace", "good code");
@@ -130,15 +117,12 @@ describe("runAutoReview", () => {
 
   it("fetches code from session when not provided", async () => {
     const sessionCode = "const y = 2; export default function App() { return <div/>; }";
-    mockGetSession.mockResolvedValue(
-      {
-        code: sessionCode,
-        transpiled:
-          "var y = 2; export default function App() { return React.createElement('div'); }",
-        html: "",
-        css: "",
-      } as ReturnType<typeof getSession> extends Promise<infer T> ? T : never,
-    );
+    mockGetSession.mockResolvedValue({
+      code: sessionCode,
+      transpiled: "var y = 2; export default function App() { return React.createElement('div'); }",
+      html: "",
+      css: "",
+    } as ReturnType<typeof getSession> extends Promise<infer T> ? T : never);
     mockTranspile.mockResolvedValue("transpiled");
     mockHealthy.mockResolvedValue(true);
 

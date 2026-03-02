@@ -40,7 +40,9 @@ interface SdkBuilder {
   withUri(u: string): SdkBuilder;
   withModuleName(m: string): SdkBuilder;
   withToken(t: string): SdkBuilder;
-  onConnect(cb: (conn: SdkConnection, identity: { toHexString(): string }, tok: string) => void): SdkBuilder;
+  onConnect(
+    cb: (conn: SdkConnection, identity: { toHexString(): string }, tok: string) => void,
+  ): SdkBuilder;
   onConnectError(cb: (conn: unknown, err: Error) => void): SdkBuilder;
   build(): void;
 }
@@ -88,7 +90,10 @@ export function createLivePlatformClient(): SpacetimePlatformClient {
     return connection;
   }
 
-  function getTable(conn: SdkConnection, name: string): { iter: () => Iterable<Record<string, unknown>> } {
+  function getTable(
+    conn: SdkConnection,
+    name: string,
+  ): { iter: () => Iterable<Record<string, unknown>> } {
     const table = conn.db[name];
     if (!table) throw new Error(`Table "${name}" not found in subscription`);
     return table;
@@ -110,12 +115,12 @@ export function createLivePlatformClient(): SpacetimePlatformClient {
         throw new Error("Already connected. Disconnect first.");
       }
 
-      const sdk: SdkModule = await (Function("return import('spacetimedb')")() as Promise<SdkModule>);
+      const sdk: SdkModule = await (Function(
+        "return import('spacetimedb')",
+      )() as Promise<SdkModule>);
 
       return new Promise<ConnectionState>((resolve, reject) => {
-        let builder = sdk.DbConnection.builder()
-          .withUri(uri)
-          .withModuleName(moduleName);
+        let builder = sdk.DbConnection.builder().withUri(uri).withModuleName(moduleName);
 
         if (token) {
           builder = builder.withToken(token);
@@ -132,7 +137,8 @@ export function createLivePlatformClient(): SpacetimePlatformClient {
               token: tok,
             };
 
-            conn.subscriptionBuilder()
+            conn
+              .subscriptionBuilder()
               .onApplied(() => {
                 resolve({ ...state });
               })
@@ -403,7 +409,12 @@ export function createLivePlatformClient(): SpacetimePlatformClient {
       callReducer(conn, "restoreApp", appId);
     },
 
-    async createAppVersion(appId: bigint, version: string, codeHash: string, changeDescription: string) {
+    async createAppVersion(
+      appId: bigint,
+      version: string,
+      codeHash: string,
+      changeDescription: string,
+    ) {
       const conn = requireConnection();
       callReducer(conn, "createAppVersion", appId, version, codeHash, changeDescription);
     },
@@ -623,12 +634,21 @@ export function createLivePlatformClient(): SpacetimePlatformClient {
 
     // ─── Analytics ───
 
-    async recordEvent(source: string, eventType: string, metadataJson: string, userIdentity?: string) {
+    async recordEvent(
+      source: string,
+      eventType: string,
+      metadataJson: string,
+      userIdentity?: string,
+    ) {
       const conn = requireConnection();
       callReducer(conn, "recordEvent", source, eventType, metadataJson, userIdentity);
     },
 
-    queryEvents(filters: { source?: string; eventType?: string; userIdentity?: string }): PlatformEvent[] {
+    queryEvents(filters: {
+      source?: string;
+      eventType?: string;
+      userIdentity?: string;
+    }): PlatformEvent[] {
       const conn = requireConnection();
       const events: PlatformEvent[] = [];
       for (const row of getTable(conn, "platform_event").iter()) {

@@ -19,9 +19,8 @@ import {
 async function ensureAdmin() {
   const session = await auth();
   if (
-    !session?.user
-    || (session.user.role !== UserRole.ADMIN
-      && session.user.role !== UserRole.SUPER_ADMIN)
+    !session?.user ||
+    (session.user.role !== UserRole.ADMIN && session.user.role !== UserRole.SUPER_ADMIN)
   ) {
     throw new Error("Unauthorized");
   }
@@ -73,16 +72,12 @@ export async function qaScreenshot(opts?: {
       });
     }
   } catch (err: unknown) {
-    throw new Error(
-      `Screenshot failed: ${err instanceof Error ? err.message : String(err)}`,
-    );
+    throw new Error(`Screenshot failed: ${err instanceof Error ? err.message : String(err)}`);
   }
 
   // Playwright may return a Buffer (Uint8Array) instead of a plain string.
   // Next.js server actions can only serialize plain objects, so ensure it's a string.
-  const base64 = typeof raw === "string"
-    ? raw
-    : Buffer.from(raw).toString("base64");
+  const base64 = typeof raw === "string" ? raw : Buffer.from(raw).toString("base64");
 
   return {
     base64,
@@ -102,18 +97,15 @@ export async function qaAccessibility(
   if (!tab || !tab.page) return NO_TAB_ERROR;
 
   const std = standard ?? "wcag2aa";
-  const violations: Array<{ issue: string; impact: string; }> = [];
+  const violations: Array<{ issue: string; impact: string }> = [];
 
   // Use page.evaluate to inspect accessibility attributes directly,
   // since page.accessibility.snapshot() was removed in newer Playwright.
   const auditResult = (await tab.page.evaluate(() => {
-    const issues: Array<{ issue: string; impact: string; }> = [];
+    const issues: Array<{ issue: string; impact: string }> = [];
     const images = document.querySelectorAll("img");
-    images.forEach(img => {
-      if (
-        !img.alt && !img.getAttribute("aria-label")
-        && !img.getAttribute("aria-labelledby")
-      ) {
+    images.forEach((img) => {
+      if (!img.alt && !img.getAttribute("aria-label") && !img.getAttribute("aria-labelledby")) {
         issues.push({
           issue: `Image missing alt text: ${img.src.slice(-40)}`,
           impact: "serious",
@@ -121,9 +113,8 @@ export async function qaAccessibility(
       }
     });
     const links = document.querySelectorAll("a");
-    links.forEach(link => {
-      const name = link.textContent?.trim()
-        || link.getAttribute("aria-label") || "";
+    links.forEach((link) => {
+      const name = link.textContent?.trim() || link.getAttribute("aria-label") || "";
       if (!name) {
         issues.push({
           issue: `Link missing accessible name: ${link.href.slice(-40)}`,
@@ -132,9 +123,8 @@ export async function qaAccessibility(
       }
     });
     const buttons = document.querySelectorAll("button");
-    buttons.forEach(btn => {
-      const name = btn.textContent?.trim() || btn.getAttribute("aria-label")
-        || "";
+    buttons.forEach((btn) => {
+      const name = btn.textContent?.trim() || btn.getAttribute("aria-label") || "";
       if (!name) {
         issues.push({
           issue: "Button missing accessible name",
@@ -143,13 +133,11 @@ export async function qaAccessibility(
       }
     });
     const inputs = document.querySelectorAll("input, textarea, select");
-    inputs.forEach(input => {
+    inputs.forEach((input) => {
       const id = input.id;
-      const hasLabel = id
-        ? !!document.querySelector(`label[for="${id}"]`)
-        : false;
-      const hasAriaLabel = !!input.getAttribute("aria-label")
-        || !!input.getAttribute("aria-labelledby");
+      const hasLabel = id ? !!document.querySelector(`label[for="${id}"]`) : false;
+      const hasAriaLabel =
+        !!input.getAttribute("aria-label") || !!input.getAttribute("aria-labelledby");
       if (!hasLabel && !hasAriaLabel) {
         issues.push({
           issue: `Form field missing label: ${input.tagName.toLowerCase()}[type=${
@@ -167,9 +155,7 @@ export async function qaAccessibility(
       });
     }
     // Check heading hierarchy
-    const headings = Array.from(
-      document.querySelectorAll("h1, h2, h3, h4, h5, h6"),
-    );
+    const headings = Array.from(document.querySelectorAll("h1, h2, h3, h4, h5, h6"));
     let lastLevel = 0;
     for (const h of headings) {
       const level = parseInt(h.tagName[1]!);
@@ -182,19 +168,15 @@ export async function qaAccessibility(
       lastLevel = level;
     }
     return issues;
-  })) as Array<{ issue: string; impact: string; }>;
+  })) as Array<{ issue: string; impact: string }>;
 
   violations.push(...auditResult);
 
-  const score = violations.length === 0
-    ? 100
-    : Math.max(0, 100 - violations.length * 15);
+  const score = violations.length === 0 ? 100 : Math.max(0, 100 - violations.length * 15);
   return { score, violations, standard: std };
 }
 
-export async function qaConsole(
-  level?: string,
-): Promise<QaConsoleMessage[] | QaActionError> {
+export async function qaConsole(level?: string): Promise<QaConsoleMessage[] | QaActionError> {
   await ensureAdmin();
   ensureDev();
 
@@ -206,17 +188,13 @@ export async function qaConsole(
   const minLevel = level ?? "info";
   const minIndex = levelOrder.indexOf(minLevel);
 
-  return tab.entry.consoleMessages.filter(msg => {
-    const msgIndex = levelOrder.indexOf(
-      msg.type === "warn" ? "warning" : msg.type,
-    );
+  return tab.entry.consoleMessages.filter((msg) => {
+    const msgIndex = levelOrder.indexOf(msg.type === "warn" ? "warning" : msg.type);
     return msgIndex >= 0 && msgIndex <= minIndex;
   });
 }
 
-export async function qaNetwork(
-  includeStatic?: boolean,
-): Promise<QaNetworkResult | QaActionError> {
+export async function qaNetwork(includeStatic?: boolean): Promise<QaNetworkResult | QaActionError> {
   await ensureAdmin();
   ensureDev();
 
@@ -227,14 +205,11 @@ export async function qaNetwork(
   const staticTypes = new Set(["image", "font", "stylesheet", "media"]);
   let requests = tab.entry.networkRequests;
   if (!includeStatic) {
-    requests = requests.filter(r => !staticTypes.has(r.resourceType));
+    requests = requests.filter((r) => !staticTypes.has(r.resourceType));
   }
 
-  const totalSize = requests.reduce(
-    (sum, r) => sum + parseInt(r.contentLength || "0", 10),
-    0,
-  );
-  const errorCount = requests.filter(r => r.status >= 400).length;
+  const totalSize = requests.reduce((sum, r) => sum + parseInt(r.contentLength || "0", 10), 0);
+  const errorCount = requests.filter((r) => r.status >= 400).length;
   return { requests, totalSize, errorCount };
 }
 
@@ -250,7 +225,7 @@ export async function qaViewport(opts: {
   const tab = getActiveTab();
   if (!tab) return NO_TAB_ERROR;
 
-  const PRESETS: Record<string, { width: number; height: number; }> = {
+  const PRESETS: Record<string, { width: number; height: number }> = {
     mobile: { width: 375, height: 812 },
     tablet: { width: 768, height: 1024 },
     desktop: { width: 1440, height: 900 },
@@ -274,9 +249,7 @@ export async function qaViewport(opts: {
   return { width, height, preset: opts.preset ?? "custom" };
 }
 
-export async function qaEvaluate(
-  expression: string,
-): Promise<QaEvaluateResult | QaActionError> {
+export async function qaEvaluate(expression: string): Promise<QaEvaluateResult | QaActionError> {
   await ensureAdmin();
   ensureDev();
 
@@ -285,16 +258,11 @@ export async function qaEvaluate(
   if (!tab) return NO_TAB_ERROR;
 
   const result = await tab.page.evaluate(expression);
-  const output = typeof result === "string"
-    ? result
-    : JSON.stringify(result, null, 2);
+  const output = typeof result === "string" ? result : JSON.stringify(result, null, 2);
   return { output: output ?? "undefined", expression };
 }
 
-export async function qaTabs(
-  action: string,
-  index?: number,
-): Promise<QaTabInfo[]> {
+export async function qaTabs(action: string, index?: number): Promise<QaTabInfo[]> {
   await ensureAdmin();
   ensureDev();
 
@@ -319,59 +287,42 @@ export async function qaTabs(
   }
 }
 
-export async function qaTestRun(
-  target: string,
-  reporter?: string,
-): Promise<QaTestResult> {
+export async function qaTestRun(target: string, reporter?: string): Promise<QaTestResult> {
   await ensureAdmin();
   ensureDev();
 
   const { execFileSync } = await import("node:child_process");
-  const isValid = /^[a-zA-Z0-9._/\-]+$/.test(target) && target.length <= 200
-    && !target.includes("..");
+  const isValid =
+    /^[a-zA-Z0-9._/\-]+$/.test(target) && target.length <= 200 && !target.includes("..");
   if (!isValid) throw new Error("Invalid path");
 
   const rep = reporter ?? "verbose";
   try {
-    const output = execFileSync("yarn", [
-      "vitest",
-      "run",
-      target,
-      `--reporter=${rep}`,
-    ], {
+    const output = execFileSync("yarn", ["vitest", "run", target, `--reporter=${rep}`], {
       encoding: "utf-8",
       timeout: 120_000,
       stdio: ["pipe", "pipe", "pipe"],
     });
     return { passed: true, output: output.slice(-3000), target };
   } catch (err: unknown) {
-    const output = (err as { stdout?: string; }).stdout ?? String(err);
+    const output = (err as { stdout?: string }).stdout ?? String(err);
     return { passed: false, output: output.slice(-3000), target };
   }
 }
 
-export async function qaCoverage(
-  target: string,
-  format?: string,
-): Promise<QaCoverageResult> {
+export async function qaCoverage(target: string, format?: string): Promise<QaCoverageResult> {
   await ensureAdmin();
   ensureDev();
 
   const { execFileSync } = await import("node:child_process");
-  const isValid = /^[a-zA-Z0-9._/\-]+$/.test(target) && target.length <= 200
-    && !target.includes("..");
+  const isValid =
+    /^[a-zA-Z0-9._/\-]+$/.test(target) && target.length <= 200 && !target.includes("..");
   if (!isValid) throw new Error("Invalid path");
 
   try {
     const output = execFileSync(
       "yarn",
-      [
-        "vitest",
-        "run",
-        target,
-        "--coverage",
-        "--coverage.reporter=json-summary",
-      ],
+      ["vitest", "run", target, "--coverage", "--coverage.reporter=json-summary"],
       { encoding: "utf-8", timeout: 120_000, stdio: ["pipe", "pipe", "pipe"] },
     );
 
@@ -392,7 +343,7 @@ export async function qaCoverage(
 
     return { target, raw: output.slice(-3000) };
   } catch (err: unknown) {
-    const output = (err as { stdout?: string; }).stdout ?? String(err);
+    const output = (err as { stdout?: string }).stdout ?? String(err);
     return {
       target,
       raw: `Error: ${format ?? "summary"}\n${output.slice(-3000)}`,

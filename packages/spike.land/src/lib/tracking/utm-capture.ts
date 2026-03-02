@@ -100,7 +100,7 @@ export async function getUTMFromCookies(): Promise<UTMParams | null> {
   }
 
   // Validate that at least one UTM param exists
-  const hasValidParam = UTM_PARAM_KEYS.some(key => params[key]);
+  const hasValidParam = UTM_PARAM_KEYS.some((key) => params[key]);
   return hasValidParam ? params : null;
 }
 
@@ -122,7 +122,7 @@ export async function getUTMFromCookies(): Promise<UTMParams | null> {
  */
 export async function storeUTMParams(params: UTMParams): Promise<void> {
   // Check for any valid parameters
-  const hasValidParam = UTM_PARAM_KEYS.some(key => params[key]);
+  const hasValidParam = UTM_PARAM_KEYS.some((key) => params[key]);
   if (!hasValidParam) {
     return;
   }
@@ -196,10 +196,10 @@ export function getPlatformFromUTM(
       return "GOOGLE_ADS";
     }
     if (
-      source.includes("facebook")
-      || source.includes("fb")
-      || source.includes("instagram")
-      || source.includes("meta")
+      source.includes("facebook") ||
+      source.includes("fb") ||
+      source.includes("instagram") ||
+      source.includes("meta")
     ) {
       return "FACEBOOK";
     }

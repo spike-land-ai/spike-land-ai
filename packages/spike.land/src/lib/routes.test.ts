@@ -34,9 +34,7 @@ describe("ROUTES", () => {
   });
 
   it("mixDetail generates path with from param", () => {
-    expect(ROUTES.mixDetail("job-1", "/gallery")).toBe(
-      "/apps/pixel/mix/job-1?from=%2Fgallery",
-    );
+    expect(ROUTES.mixDetail("job-1", "/gallery")).toBe("/apps/pixel/mix/job-1?from=%2Fgallery");
   });
 });
 

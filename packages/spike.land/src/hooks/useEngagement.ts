@@ -1,10 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef } from "react";
-import {
-  createEngagementCollector,
-  flushEngagement,
-} from "@/lib/tracking/engagement";
+import { createEngagementCollector, flushEngagement } from "@/lib/tracking/engagement";
 
 interface UseEngagementOptions {
   visitorId: string;
@@ -23,9 +20,7 @@ export function useEngagement({
   abVariant,
   sectionIds,
 }: UseEngagementOptions): void {
-  const collectorRef = useRef(
-    createEngagementCollector(visitorId, page, abVariant),
-  );
+  const collectorRef = useRef(createEngagementCollector(visitorId, page, abVariant));
   const startTimeRef = useRef(Date.now());
 
   const flush = useCallback(() => {
@@ -46,8 +41,7 @@ export function useEngagement({
   // Track scroll depth
   useEffect(() => {
     const handleScroll = () => {
-      const scrollHeight = document.documentElement.scrollHeight
-        - window.innerHeight;
+      const scrollHeight = document.documentElement.scrollHeight - window.innerHeight;
       if (scrollHeight <= 0) return;
       const depth = Math.round((window.scrollY / scrollHeight) * 100);
       collectorRef.current.updateScrollDepth(depth);
@@ -60,7 +54,7 @@ export function useEngagement({
   // Track section visibility
   useEffect(() => {
     const observer = new IntersectionObserver(
-      entries => {
+      (entries) => {
         for (const entry of entries) {
           if (entry.isIntersecting) {
             collectorRef.current.addSection(entry.target.id);
@@ -98,18 +92,12 @@ export function useEngagement({
 
   // Listen for custom engagement events
   useEffect(() => {
-    const handler = (e: CustomEvent<{ type: string; value?: string; }>) => {
+    const handler = (e: CustomEvent<{ type: string; value?: string }>) => {
       collectorRef.current.handleEvent(e.detail.type, e.detail.value);
     };
 
-    window.addEventListener(
-      "bazdmeg:engagement" as string,
-      handler as EventListener,
-    );
+    window.addEventListener("bazdmeg:engagement" as string, handler as EventListener);
     return () =>
-      window.removeEventListener(
-        "bazdmeg:engagement" as string,
-        handler as EventListener,
-      );
+      window.removeEventListener("bazdmeg:engagement" as string, handler as EventListener);
   }, []);
 }

@@ -9,19 +9,17 @@
 
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
-import { createLiveClient } from "./client.js";
-import { registerAgentTools } from "./tools/agent-tools.js";
-import { registerTaskTools } from "./tools/task-tools.js";
+import { createLiveSpacetimeMcpClient } from "./client.js";
+import { registerSwarmTools } from "./tools/swarm-tools.js";
 
 const server = new McpServer({
   name: "spacetimedb-mcp",
   version: "0.1.0",
 });
 
-const client = createLiveClient();
+const client = createLiveSpacetimeMcpClient();
 
-registerAgentTools(server, client);
-registerTaskTools(server, client);
+registerSwarmTools(server, client);
 
 const transport = new StdioServerTransport();
 await server.connect(transport);

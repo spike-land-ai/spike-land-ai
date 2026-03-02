@@ -8,14 +8,14 @@ import type { Card as CardType, Suit } from "../../types/card";
 interface CardProps {
   card: CardType;
   isOwner: boolean;
-  onMove: (id: string, pos: { x: number; y: number; z: number; }) => void;
+  onMove: (id: string, pos: { x: number; y: number; z: number }) => void;
   onFlip: (id: string) => void;
   onGrab?: ((id: string) => void) | undefined;
   onRelease?: ((id: string) => void) | undefined;
 }
 
 // Suit info lookup table (static, no function call needed)
-const SUIT_INFO: Record<Suit, { symbol: string; color: string; }> = {
+const SUIT_INFO: Record<Suit, { symbol: string; color: string }> = {
   hearts: { symbol: "♥", color: "#e53935" },
   diamonds: { symbol: "♦", color: "#e53935" },
   clubs: { symbol: "♣", color: "#212121" },
@@ -23,9 +23,15 @@ const SUIT_INFO: Record<Suit, { symbol: string; color: string; }> = {
 };
 
 // Memoized card face component to reduce re-renders
-const CardFace = memo(function CardFace(
-  { rank, suit, color }: { rank: string; suit: string; color: string; },
-) {
+const CardFace = memo(function CardFace({
+  rank,
+  suit,
+  color,
+}: {
+  rank: string;
+  suit: string;
+  color: string;
+}) {
   return (
     <div
       style={{
@@ -95,9 +101,13 @@ const CardBack = memo(function CardBack() {
 });
 
 // Memoized nameplate component for grabbed objects
-const GrabbedNameplate = memo(function GrabbedNameplate(
-  { playerName, playerColor }: { playerName: string; playerColor: string; },
-) {
+const GrabbedNameplate = memo(function GrabbedNameplate({
+  playerName,
+  playerColor,
+}: {
+  playerName: string;
+  playerColor: string;
+}) {
   return (
     <div
       style={{
@@ -124,9 +134,7 @@ const GrabbedNameplate = memo(function GrabbedNameplate(
   );
 });
 
-export function Card(
-  { card, isOwner, onMove, onFlip, onGrab, onRelease }: CardProps,
-) {
+export function Card({ card, isOwner, onMove, onFlip, onGrab, onRelease }: CardProps) {
   // Animate position and rotation with optimized config
   const { position, rotation } = useSpring({
     position: [card.position.x, card.position.y, card.position.z],
@@ -143,24 +151,30 @@ export function Card(
   const grabberColor = card.grabbedBy?.playerColor ?? "#3B82F6";
 
   // Memoize static Html props to prevent re-creation
-  const htmlProps = useMemo(() => ({
-    position: [0, 0, 0.03] as [number, number, number],
-    center: true,
-    distanceFactor: 8,
-    style: { pointerEvents: "none" as const },
-    occlude: false,
-    transform: true,
-  }), []);
+  const htmlProps = useMemo(
+    () => ({
+      position: [0, 0, 0.03] as [number, number, number],
+      center: true,
+      distanceFactor: 8,
+      style: { pointerEvents: "none" as const },
+      occlude: false,
+      transform: true,
+    }),
+    [],
+  );
 
   // Nameplate Html props - positioned above the card
-  const nameplateProps = useMemo(() => ({
-    position: [0, 2.5, 0] as [number, number, number],
-    center: true,
-    distanceFactor: 10,
-    style: { pointerEvents: "none" as const },
-    occlude: false,
-    transform: true,
-  }), []);
+  const nameplateProps = useMemo(
+    () => ({
+      position: [0, 2.5, 0] as [number, number, number],
+      center: true,
+      distanceFactor: 10,
+      style: { pointerEvents: "none" as const },
+      occlude: false,
+      transform: true,
+    }),
+    [],
+  );
 
   return (
     <animated.group
@@ -174,22 +188,10 @@ export function Card(
         {/* Thinner card geometry */}
         <boxGeometry args={[2.5, 3.5, 0.01]} />
         {/* Card sides - pure white cardboard look */}
-        <meshStandardMaterial
-          attach="material-0"
-          color={isGrabbed ? grabberColor : "#f5f5f5"}
-        />
-        <meshStandardMaterial
-          attach="material-1"
-          color={isGrabbed ? grabberColor : "#f5f5f5"}
-        />
-        <meshStandardMaterial
-          attach="material-2"
-          color={isGrabbed ? grabberColor : "#f5f5f5"}
-        />
-        <meshStandardMaterial
-          attach="material-3"
-          color={isGrabbed ? grabberColor : "#f5f5f5"}
-        />
+        <meshStandardMaterial attach="material-0" color={isGrabbed ? grabberColor : "#f5f5f5"} />
+        <meshStandardMaterial attach="material-1" color={isGrabbed ? grabberColor : "#f5f5f5"} />
+        <meshStandardMaterial attach="material-2" color={isGrabbed ? grabberColor : "#f5f5f5"} />
+        <meshStandardMaterial attach="material-3" color={isGrabbed ? grabberColor : "#f5f5f5"} />
         {/* Front face - slightly warm white paper */}
         <meshStandardMaterial
           attach="material-4"
@@ -211,11 +213,7 @@ export function Card(
       {/* Card face label - only show if face up or owner */}
       {showFace && (
         <Html {...htmlProps}>
-          <CardFace
-            rank={card.rank}
-            suit={suitInfo.symbol}
-            color={suitInfo.color}
-          />
+          <CardFace rank={card.rank} suit={suitInfo.symbol} color={suitInfo.color} />
         </Html>
       )}
 

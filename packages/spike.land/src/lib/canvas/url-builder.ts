@@ -7,19 +7,15 @@ export function buildCanvasUrl(
   settings: Partial<CanvasSettings>,
   baseUrl?: string,
 ): string {
-  const base = baseUrl
-    || (typeof window !== "undefined"
-      ? window.location.origin
-      : "http://localhost");
+  const base =
+    baseUrl || (typeof window !== "undefined" ? window.location.origin : "http://localhost");
   const url = new URL(`/canvas/${albumId}`, base);
 
   if (shareToken) {
     url.searchParams.set("token", shareToken);
   }
 
-  if (
-    settings.rotation !== undefined && settings.rotation !== DEFAULT_ROTATION
-  ) {
+  if (settings.rotation !== undefined && settings.rotation !== DEFAULT_ROTATION) {
     url.searchParams.set("rotation", settings.rotation.toString());
   }
 
@@ -27,9 +23,7 @@ export function buildCanvasUrl(
     url.searchParams.set("order", settings.order);
   }
 
-  if (
-    settings.interval !== undefined && settings.interval !== DEFAULT_INTERVAL
-  ) {
+  if (settings.interval !== undefined && settings.interval !== DEFAULT_INTERVAL) {
     url.searchParams.set("interval", settings.interval.toString());
   }
 

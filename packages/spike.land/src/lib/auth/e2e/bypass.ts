@@ -16,11 +16,11 @@ import { logger } from "@/lib/errors/structured-logger";
  */
 export function isE2EBypassAllowed(): boolean {
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || "";
-  const isStagingDomain = appUrl === "https://next.spike.land"
-    || appUrl.includes("localhost");
-  const isProduction = process.env.NODE_ENV === "production"
-    && process.env.APP_ENV === "production"
-    && !isStagingDomain;
+  const isStagingDomain = appUrl === "https://next.spike.land" || appUrl.includes("localhost");
+  const isProduction =
+    process.env.NODE_ENV === "production" &&
+    process.env.APP_ENV === "production" &&
+    !isStagingDomain;
   return !isProduction;
 }
 
@@ -46,17 +46,10 @@ export function validateBypassHeader(headerValue: string | null): boolean {
 /**
  * Log E2E bypass attempt for security monitoring.
  */
-export function logBypassAttempt(
-  method: "env" | "header",
-  success: boolean,
-): void {
+export function logBypassAttempt(method: "env" | "header", success: boolean): void {
   if (success) {
     logger.debug(`[Auth] E2E bypass via ${method}`, { route: "/api/auth" });
   } else {
-    logger.error(
-      `[Auth] E2E bypass FAILED via ${method}`,
-      undefined,
-      { route: "/api/auth" },
-    );
+    logger.error(`[Auth] E2E bypass FAILED via ${method}`, undefined, { route: "/api/auth" });
   }
 }

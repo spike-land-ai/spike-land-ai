@@ -20,10 +20,7 @@ mcpRoute.post("/", async (c) => {
   const db = c.var.db;
 
   // Rate limit by userId (120 req/60s)
-  const { isLimited, resetAt } = await checkRateLimit(
-    `mcp-rpc:${userId}`,
-    c.env.KV,
-  );
+  const { isLimited, resetAt } = await checkRateLimit(`mcp-rpc:${userId}`, c.env.KV);
   if (isLimited) {
     return c.json(
       {
@@ -60,10 +57,7 @@ mcpRoute.post("/", async (c) => {
   // Normalize Accept header for MCP spec compliance
   const headers = new Headers(c.req.raw.headers);
   const accept = headers.get("Accept") ?? "";
-  if (
-    !accept.includes("application/json")
-    || !accept.includes("text/event-stream")
-  ) {
+  if (!accept.includes("application/json") || !accept.includes("text/event-stream")) {
     headers.set("Accept", "application/json, text/event-stream");
   }
 

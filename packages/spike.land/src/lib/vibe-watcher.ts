@@ -29,11 +29,7 @@ const appIdCache = new Map<string, string | null>();
 /**
  * Push code to our codespace API route
  */
-async function pushCode(
-  codespaceId: string,
-  code: string,
-  run = true,
-): Promise<void> {
+async function pushCode(codespaceId: string, code: string, run = true): Promise<void> {
   const url = `${BASE_URL}/api/codespace/${codespaceId}/code`;
 
   const response = await fetch(url, {
@@ -44,9 +40,7 @@ async function pushCode(
 
   if (!response.ok) {
     const errorText = await response.text();
-    throw new Error(
-      `Failed to push code: HTTP ${response.status} - ${errorText}`,
-    );
+    throw new Error(`Failed to push code: HTTP ${response.status} - ${errorText}`);
   }
 }
 
@@ -67,7 +61,7 @@ async function pullCode(codespaceId: string): Promise<string> {
 
   const session = (await response.json()) as {
     code?: string;
-    cSess?: { code?: string; };
+    cSess?: { code?: string };
   };
   return session.code || session.cSess?.code || "";
 }
@@ -119,7 +113,7 @@ export function startVibeWatcher(): void {
 
   watcher.on("change", handleFileChange);
   watcher.on("add", handleFileChange);
-  watcher.on("error", error => {
+  watcher.on("error", (error) => {
     logger.error("Vibe watcher error", { error });
   });
 }
@@ -252,9 +246,7 @@ export async function ensureLocalFile(codespaceId: string): Promise<string> {
     "utf-8",
   );
 
-  logger.info(
-    `Downloaded ${codespaceId} -> ${filePath} (${code.length} bytes)`,
-  );
+  logger.info(`Downloaded ${codespaceId} -> ${filePath} (${code.length} bytes)`);
 
   return filePath;
 }

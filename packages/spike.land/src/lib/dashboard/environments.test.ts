@@ -41,7 +41,7 @@ describe("dashboard/environments", () => {
     it("should return all 3 environment configs", () => {
       const configs = getAllEnvironmentConfigs();
       expect(configs).toHaveLength(3);
-      const names = configs.map(c => c.name);
+      const names = configs.map((c) => c.name);
       expect(names).toContain("dev");
       expect(names).toContain("preview");
       expect(names).toContain("prod");

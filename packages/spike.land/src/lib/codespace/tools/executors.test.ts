@@ -41,7 +41,7 @@ const {
 function makeSession(overrides: Partial<ICodeSession> = {}): ICodeSession {
   return {
     codeSpace: "test-cs",
-    code: "const hello = \"world\";\nconst foo = \"bar\";\nexport default () => <div>Hello</div>;",
+    code: 'const hello = "world";\nconst foo = "bar";\nexport default () => <div>Hello</div>;',
     transpiled: "var hello = 'world';",
     html: "<div>Hello</div>",
     css: ".test { color: red; }",
@@ -106,20 +106,12 @@ describe("MCP Tool Executors", () => {
       const session = makeSession();
       const newCode = "const updated = true;";
 
-      const result = await executeUpdateCode(
-        session,
-        "test-cs",
-        newCode,
-        "https://spike.land",
-      );
+      const result = await executeUpdateCode(session, "test-cs", newCode, "https://spike.land");
 
       expect(result.success).toBe(true);
       expect(result.codeSpace).toBe("test-cs");
       expect(result.requiresTranspilation).toBe(false);
-      expect(mockTranspileCode).toHaveBeenCalledWith(
-        newCode,
-        "https://spike.land",
-      );
+      expect(mockTranspileCode).toHaveBeenCalledWith(newCode, "https://spike.land");
       expect(mockUpsertSession).toHaveBeenCalledWith(
         expect.objectContaining({
           code: newCode,
@@ -154,12 +146,7 @@ describe("MCP Tool Executors", () => {
 
       const edits = [{ startLine: 2, endLine: 2, newContent: "modified" }];
 
-      const result = await executeEditCode(
-        session,
-        "test-cs",
-        edits,
-        "https://spike.land",
-      );
+      const result = await executeEditCode(session, "test-cs", edits, "https://spike.land");
 
       expect(result.success).toBe(true);
       expect(result.linesChanged).toBe(1);
@@ -174,7 +161,7 @@ describe("MCP Tool Executors", () => {
   describe("executeSearchAndReplace", () => {
     it("should replace literal string matches", async () => {
       const session = makeSession({
-        code: "const color = \"red\";",
+        code: 'const color = "red";',
       });
 
       const result = await executeSearchAndReplace(
@@ -313,8 +300,7 @@ describe("MCP Tool Executors", () => {
     it("should throw on invalid regex", () => {
       const session = makeSession();
 
-      expect(() => executeFindLines(session, "test-cs", "[invalid", true))
-        .toThrow("Invalid regex");
+      expect(() => executeFindLines(session, "test-cs", "[invalid", true)).toThrow("Invalid regex");
     });
   });
 });

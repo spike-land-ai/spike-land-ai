@@ -39,33 +39,25 @@ export function registerChatTools(
 ): void {
   registry.registerBuilt(
     freeTool(userId, db)
-      .tool(
-        "chat_send_message",
-        "Send a message to Claude and get a non-streaming AI response.",
-        {
-          message: z.string().min(1).describe("The message to send to the AI."),
-          model: z
-            .enum(["opus", "sonnet", "haiku"])
-            .optional()
-            .default("sonnet")
-            .describe("Claude model to use."),
-          system_prompt: z
-            .string()
-            .optional()
-            .describe("Optional system prompt for the conversation."),
-        },
-      )
+      .tool("chat_send_message", "Send a message to Claude and get a non-streaming AI response.", {
+        message: z.string().min(1).describe("The message to send to the AI."),
+        model: z
+          .enum(["opus", "sonnet", "haiku"])
+          .optional()
+          .default("sonnet")
+          .describe("Claude model to use."),
+        system_prompt: z
+          .string()
+          .optional()
+          .describe("Optional system prompt for the conversation."),
+      })
       .meta({ category: "chat", tier: "free" })
       .handler(async ({ input }) => {
         const { message, model = "sonnet", system_prompt } = input;
         return safeToolCall("chat_send_message", async () => {
           const apiKey = env.ANTHROPIC_API_KEY;
           if (!apiKey) {
-            throw new McpError(
-              "ANTHROPIC_API_KEY not configured.",
-              McpErrorCode.AUTH_ERROR,
-              false,
-            );
+            throw new McpError("ANTHROPIC_API_KEY not configured.", McpErrorCode.AUTH_ERROR, false);
           }
 
           const resolvedModel = MODEL_MAP[model] ?? MODEL_MAP.sonnet!;

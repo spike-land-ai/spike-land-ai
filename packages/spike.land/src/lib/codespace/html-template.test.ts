@@ -69,7 +69,7 @@ describe("buildEmbedHtml", () => {
       css: "",
       codeSpace: "test",
     });
-    expect(html).toContain("\"react\"");
+    expect(html).toContain('"react"');
     expect(html).not.toContain("// IMPORTMAP");
   });
 
@@ -102,29 +102,29 @@ describe("buildEmbedHtml", () => {
       codeSpace: "test",
     });
     expect(html).toContain("createRoot");
-    expect(html).toContain("getElementById(\"embed\")");
+    expect(html).toContain('getElementById("embed")');
     expect(html).not.toContain("export { App as default }");
   });
 
   it("should sanitize script tags in HTML content", () => {
     const html = buildEmbedHtml({
       transpiled: "",
-      html: "<script>alert(\"xss\")</script>",
+      html: '<script>alert("xss")</script>',
       css: "",
       codeSpace: "test",
     });
-    expect(html).not.toContain("<script>alert(\"xss\")</script>");
+    expect(html).not.toContain('<script>alert("xss")</script>');
     expect(html).toContain("&lt;script");
   });
 
   it("should sanitize closing script tags in transpiled code", () => {
     const html = buildEmbedHtml({
-      transpiled: "const s = \"</script>\";",
+      transpiled: 'const s = "</script>";',
       html: "",
       css: "",
       codeSpace: "test",
     });
-    expect(html).not.toContain("</script>\"");
+    expect(html).not.toContain('</script>"');
   });
 
   it("should handle empty transpiled code", () => {
@@ -139,7 +139,7 @@ describe("buildEmbedHtml", () => {
 
   it("should rewrite bare CDN imports to absolute URLs", () => {
     const html = buildEmbedHtml({
-      transpiled: "import x from \"/some-pkg?bundle=true\";\nexport { App as default };",
+      transpiled: 'import x from "/some-pkg?bundle=true";\nexport { App as default };',
       html: "",
       css: "",
       codeSpace: "test",

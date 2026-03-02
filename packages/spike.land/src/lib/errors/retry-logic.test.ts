@@ -1,9 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import {
-  createRetryWrapper,
-  retryBatch,
-  retryWithBackoff,
-} from "./retry-logic";
+import { createRetryWrapper, retryBatch, retryWithBackoff } from "./retry-logic";
 
 // Mock sleep to avoid real delays
 vi.mock("@/lib/utils", () => ({
@@ -159,14 +155,10 @@ describe("createRetryWrapper", () => {
 
 describe("retryBatch", () => {
   it("should run all operations in parallel", async () => {
-    const results = await retryBatch([
-      async () => "a",
-      async () => "b",
-      async () => "c",
-    ]);
+    const results = await retryBatch([async () => "a", async () => "b", async () => "c"]);
     expect(results).toHaveLength(3);
-    expect(results.every(r => r.success)).toBe(true);
-    expect(results.map(r => r.data)).toEqual(["a", "b", "c"]);
+    expect(results.every((r) => r.success)).toBe(true);
+    expect(results.map((r) => r.data)).toEqual(["a", "b", "c"]);
   });
 
   it("should return individual failures", async () => {

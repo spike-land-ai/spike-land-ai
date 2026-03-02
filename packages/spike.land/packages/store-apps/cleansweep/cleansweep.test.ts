@@ -100,9 +100,11 @@ vi.mock("@/lib/prisma", () => ({
         message: null,
         enabled: true,
       }),
-      findMany: vi.fn().mockResolvedValue([
-        { id: "rem-1", time: "09:00", days: ["MON", "WED", "FRI"], message: null, enabled: true },
-      ]),
+      findMany: vi
+        .fn()
+        .mockResolvedValue([
+          { id: "rem-1", time: "09:00", days: ["MON", "WED", "FRI"], message: null, enabled: true },
+        ]),
       findFirst: vi.fn().mockResolvedValue({
         id: "rem-1",
         userId: "test-user-id",
@@ -142,11 +144,13 @@ vi.mock("@/lib/clean/photo-validation", () => ({
 vi.mock("@/lib/clean/gamification", () => ({
   POINTS: { QUICK: 5, EASY: 10, MEDIUM: 20, EFFORT: 40 },
   BONUSES: { VERIFICATION_PHOTO: 15 },
-  ACHIEVEMENTS: [{
-    type: "FIRST_SESSION",
-    name: "First Steps",
-    description: "Complete your first session",
-  }],
+  ACHIEVEMENTS: [
+    {
+      type: "FIRST_SESSION",
+      name: "First Steps",
+      description: "Complete your first session",
+    },
+  ],
   calculateSessionPoints: vi.fn().mockReturnValue({
     base: 30,
     streakBonus: 5,
@@ -159,9 +163,11 @@ vi.mock("@/lib/clean/gamification", () => ({
   isConsecutiveDay: vi.fn().mockReturnValue(true),
   isSameDay: vi.fn().mockReturnValue(false),
   pointsToNextLevel: vi.fn().mockReturnValue({ progress: 0.6, next: 300 }),
-  checkNewAchievements: vi.fn().mockReturnValue([
-    { type: "FIRST_SESSION", name: "First Steps", description: "Complete your first session" },
-  ]),
+  checkNewAchievements: vi
+    .fn()
+    .mockReturnValue([
+      { type: "FIRST_SESSION", name: "First Steps", description: "Complete your first session" },
+    ]),
 }));
 
 vi.mock("@/lib/clean/encouragement", () => ({
@@ -212,7 +218,7 @@ describe("cleansweepTools", () => {
   });
 
   it("registers tools in expected categories", () => {
-    const categories = new Set(cleansweepTools.map(t => t.category));
+    const categories = new Set(cleansweepTools.map((t) => t.category));
     expect(categories).toContain("clean-photo");
     expect(categories).toContain("clean-scanner");
     expect(categories).toContain("clean-tasks");
@@ -223,59 +229,43 @@ describe("cleansweepTools", () => {
   });
 
   it("clean_photo_analyze returns photo analysis", async () => {
-    const result = await registry.call(
-      "clean_photo_analyze",
-      { photo_base64: "dGVzdA==" },
-      ctx,
-    );
+    const result = await registry.call("clean_photo_analyze", { photo_base64: "dGVzdA==" }, ctx);
     expect(result.isError).toBeUndefined();
-    const text = (result.content[0] as { text: string; }).text;
+    const text = (result.content[0] as { text: string }).text;
     expect(text).toContain("Photo Analysis");
     expect(text).toContain("Valid:");
   });
 
   it("clean_photo_analyze has enables dependency", () => {
-    const tool = cleansweepTools.find(t => t.name === "clean_photo_analyze");
+    const tool = cleansweepTools.find((t) => t.name === "clean_photo_analyze");
     expect(tool?.dependencies?.enables).toContain("clean_scan_room");
   });
 
   it("clean_tasks_start_session creates a session", async () => {
-    const result = await registry.call(
-      "clean_tasks_start_session",
-      { room_label: "kitchen" },
-      ctx,
-    );
+    const result = await registry.call("clean_tasks_start_session", { room_label: "kitchen" }, ctx);
     expect(result.isError).toBeUndefined();
-    const text = (result.content[0] as { text: string; }).text;
+    const text = (result.content[0] as { text: string }).text;
     expect(text).toContain("Session started");
   });
 
   it("clean_tasks_get_current returns next pending task", async () => {
-    const result = await registry.call(
-      "clean_tasks_get_current",
-      { session_id: "session-1" },
-      ctx,
-    );
+    const result = await registry.call("clean_tasks_get_current", { session_id: "session-1" }, ctx);
     expect(result.isError).toBeUndefined();
-    const text = (result.content[0] as { text: string; }).text;
+    const text = (result.content[0] as { text: string }).text;
     expect(text).toContain("Current Task");
   });
 
   it("clean_tasks_complete marks task as done", async () => {
-    const result = await registry.call(
-      "clean_tasks_complete",
-      { task_id: "t2" },
-      ctx,
-    );
+    const result = await registry.call("clean_tasks_complete", { task_id: "t2" }, ctx);
     expect(result.isError).toBeUndefined();
-    const text = (result.content[0] as { text: string; }).text;
+    const text = (result.content[0] as { text: string }).text;
     expect(text).toContain("Task completed");
   });
 
   it("clean_streaks_get returns streak info", async () => {
     const result = await registry.call("clean_streaks_get", {}, ctx);
     expect(result.isError).toBeUndefined();
-    const text = (result.content[0] as { text: string; }).text;
+    const text = (result.content[0] as { text: string }).text;
     expect(text).toContain("Cleaning Streak");
     expect(text).toContain("3 day(s)");
   });
@@ -287,7 +277,7 @@ describe("cleansweepTools", () => {
       ctx,
     );
     expect(result.isError).toBeUndefined();
-    const text = (result.content[0] as { text: string; }).text;
+    const text = (result.content[0] as { text: string }).text;
     expect(text).toContain("Reminder created");
   });
 
@@ -298,7 +288,7 @@ describe("cleansweepTools", () => {
       ctx,
     );
     expect(result.isError).toBeUndefined();
-    const text = (result.content[0] as { text: string; }).text;
+    const text = (result.content[0] as { text: string }).text;
     expect(text).toContain("Let's do this!");
   });
 
@@ -309,7 +299,7 @@ describe("cleansweepTools", () => {
       ctx,
     );
     expect(result.isError).toBeUndefined();
-    const text = (result.content[0] as { text: string; }).text;
+    const text = (result.content[0] as { text: string }).text;
     expect(text).toContain("First Steps");
     expect(text).toContain("You did it!");
   });
@@ -321,7 +311,7 @@ describe("cleansweepTools", () => {
       ctx,
     );
     expect(result.isError).toBeUndefined();
-    const text = (result.content[0] as { text: string; }).text;
+    const text = (result.content[0] as { text: string }).text;
     expect(text).toContain("Room Analysis");
     expect(text).toContain("kitchen");
   });

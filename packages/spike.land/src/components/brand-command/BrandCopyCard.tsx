@@ -14,7 +14,7 @@ interface BrandCopyCardProps {
   characterCount: number;
 }
 
-const toneConfig: Record<Tone, { label: string; badgeClass: string; }> = {
+const toneConfig: Record<Tone, { label: string; badgeClass: string }> = {
   professional: {
     label: "Professional",
     badgeClass: "bg-blue-500/10 text-blue-400 border-blue-500/20",
@@ -45,24 +45,17 @@ export function BrandCopyCard({
     <Card className="bg-zinc-900 border-zinc-800 h-full">
       <CardHeader className="pb-2">
         <div className="flex items-center justify-between gap-2 flex-wrap">
-          <Badge
-            variant="outline"
-            className={cn("text-xs", config.badgeClass)}
-          >
+          <Badge variant="outline" className={cn("text-xs", config.badgeClass)}>
             {config.label}
           </Badge>
           <span className="text-xs text-zinc-500">{platform}</span>
         </div>
-        <p className="text-base font-semibold text-zinc-100 mt-2 leading-snug">
-          {headline}
-        </p>
+        <p className="text-base font-semibold text-zinc-100 mt-2 leading-snug">{headline}</p>
       </CardHeader>
       <CardContent className="space-y-3">
         <p className="text-sm text-zinc-400 leading-relaxed">{body}</p>
         <div className="flex items-center justify-end">
-          <span className="text-xs text-zinc-600 font-mono">
-            {characterCount} chars
-          </span>
+          <span className="text-xs text-zinc-600 font-mono">{characterCount} chars</span>
         </div>
       </CardContent>
     </Card>

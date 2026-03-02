@@ -26,12 +26,7 @@ vi.mock("./elo-tracker", () => ({
   getOrCreateAgentElo: mockGetOrCreateAgentElo,
 }));
 
-import {
-  reviewCode,
-  reviewPlan,
-  runReviewConsensus,
-  selectReviewers,
-} from "./reviewer";
+import { reviewCode, reviewPlan, runReviewConsensus, selectReviewers } from "./reviewer";
 
 describe("reviewer", () => {
   beforeEach(() => {
@@ -62,7 +57,7 @@ describe("reviewer", () => {
 
     it("parses APPROVED response", async () => {
       mockCallClaude.mockResolvedValue({
-        text: "{\"decision\": \"APPROVED\", \"feedback\": \"Looks good\", \"score\": 0.9}",
+        text: '{"decision": "APPROVED", "feedback": "Looks good", "score": 0.9}',
         inputTokens: 100,
         outputTokens: 50,
         cacheReadTokens: 0,
@@ -82,7 +77,7 @@ describe("reviewer", () => {
 
     it("parses REJECTED response", async () => {
       mockCallClaude.mockResolvedValue({
-        text: "{\"decision\": \"REJECTED\", \"feedback\": \"Too vague\", \"score\": 0.3}",
+        text: '{"decision": "REJECTED", "feedback": "Too vague", "score": 0.3}',
         inputTokens: 100,
         outputTokens: 50,
         cacheReadTokens: 0,
@@ -117,7 +112,7 @@ describe("reviewer", () => {
 
     it("reviews code and returns decision", async () => {
       mockCallClaude.mockResolvedValue({
-        text: "{\"decision\": \"APPROVED\", \"feedback\": \"Clean code\", \"score\": 0.85}",
+        text: '{"decision": "APPROVED", "feedback": "Clean code", "score": 0.85}',
         inputTokens: 200,
         outputTokens: 50,
         cacheReadTokens: 0,
@@ -171,9 +166,7 @@ describe("reviewer", () => {
         return {
           reviewerAgentId: `r-0${callCount}`,
           phase: "PLAN_REVIEW" as const,
-          decision: callCount === 1
-            ? ("APPROVED" as const)
-            : ("REJECTED" as const),
+          decision: callCount === 1 ? ("APPROVED" as const) : ("REJECTED" as const),
           feedback: callCount === 1 ? "OK" : "Bad",
           score: callCount === 1 ? 0.9 : 0.2,
           eloAtReview: 1200,

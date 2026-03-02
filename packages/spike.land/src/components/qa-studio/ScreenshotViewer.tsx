@@ -29,19 +29,14 @@ const deviceStyles: Record<DeviceType, string> = {
 export function ScreenshotViewer({ screenshots }: ScreenshotViewerProps) {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-      {screenshots.map(screenshot => (
+      {screenshots.map((screenshot) => (
         <Card key={screenshot.id} className="bg-zinc-900 border-zinc-800">
           <CardContent className="pt-4 space-y-3">
             <div className="flex items-center justify-between gap-2">
-              <span className="text-sm text-zinc-100 font-medium truncate">
-                {screenshot.label}
-              </span>
+              <span className="text-sm text-zinc-100 font-medium truncate">{screenshot.label}</span>
               <Badge
                 variant="outline"
-                className={cn(
-                  "text-xs shrink-0 capitalize",
-                  deviceStyles[screenshot.device],
-                )}
+                className={cn("text-xs shrink-0 capitalize", deviceStyles[screenshot.device])}
               >
                 {screenshot.device}
               </Badge>
@@ -50,22 +45,18 @@ export function ScreenshotViewer({ screenshots }: ScreenshotViewerProps) {
               className="relative rounded-md bg-zinc-800 border border-zinc-700 overflow-hidden w-full"
               style={{ aspectRatio: `${screenshot.width} / ${screenshot.height}` }}
             >
-              {screenshot.url
-                ? (
-                  <NextImage
-                    src={screenshot.url}
-                    alt={screenshot.label}
-                    fill
-                    className="object-cover"
-                  />
-                )
-                : (
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <span className="text-xs text-zinc-600 font-mono">
-                      No preview
-                    </span>
-                  </div>
-                )}
+              {screenshot.url ? (
+                <NextImage
+                  src={screenshot.url}
+                  alt={screenshot.label}
+                  fill
+                  className="object-cover"
+                />
+              ) : (
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <span className="text-xs text-zinc-600 font-mono">No preview</span>
+                </div>
+              )}
             </div>
             <p className="text-xs text-zinc-500 font-mono">
               {screenshot.width} x {screenshot.height}

@@ -29,25 +29,27 @@ function makeNetworkError(message: string): ReturnType<typeof vi.fn> {
 }
 
 /** Build a minimal GoogleAdsClient with env vars already set */
-function makeClient(opts?: { accessToken?: string; customerId?: string; }): GoogleAdsClient {
+function makeClient(opts?: { accessToken?: string; customerId?: string }): GoogleAdsClient {
   return new GoogleAdsClient(opts);
 }
 
 // Google Ads search stream returns an array of result objects
-function searchStreamResponse(results: unknown[]): { results: unknown[]; } {
+function searchStreamResponse(results: unknown[]): { results: unknown[] } {
   return { results };
 }
 
-function makeGoogleAdsCampaign(overrides: Partial<{
-  id: string;
-  name: string;
-  status: string;
-  advertisingChannelType: string;
-  startDate: string;
-  endDate: string;
-  resourceName: string;
-  campaignBudget: string;
-}> = {}): Record<string, unknown> {
+function makeGoogleAdsCampaign(
+  overrides: Partial<{
+    id: string;
+    name: string;
+    status: string;
+    advertisingChannelType: string;
+    startDate: string;
+    endDate: string;
+    resourceName: string;
+    campaignBudget: string;
+  }> = {},
+): Record<string, unknown> {
   return {
     resourceName: "customers/1234/campaigns/111",
     id: "111",
@@ -213,9 +215,9 @@ describe("GoogleAdsClient – exchangeCodeForTokens", () => {
     vi.stubGlobal("fetch", makeNetworkError("Connection refused"));
 
     const client = makeClient();
-    await expect(
-      client.exchangeCodeForTokens("code", "https://example.com/cb"),
-    ).rejects.toThrow("Failed to exchange code");
+    await expect(client.exchangeCodeForTokens("code", "https://example.com/cb")).rejects.toThrow(
+      "Failed to exchange code",
+    );
   });
 
   it("throws when JSON parsing fails", async () => {
@@ -226,9 +228,9 @@ describe("GoogleAdsClient – exchangeCodeForTokens", () => {
     vi.stubGlobal("fetch", mockFetch);
 
     const client = makeClient();
-    await expect(
-      client.exchangeCodeForTokens("code", "https://example.com/cb"),
-    ).rejects.toThrow("Failed to parse token response");
+    await expect(client.exchangeCodeForTokens("code", "https://example.com/cb")).rejects.toThrow(
+      "Failed to parse token response",
+    );
   });
 
   it("uses statusText when error_description absent", async () => {
@@ -240,9 +242,9 @@ describe("GoogleAdsClient – exchangeCodeForTokens", () => {
     vi.stubGlobal("fetch", mockFetch);
 
     const client = makeClient();
-    await expect(
-      client.exchangeCodeForTokens("code", "https://example.com/cb"),
-    ).rejects.toThrow("Unauthorized");
+    await expect(client.exchangeCodeForTokens("code", "https://example.com/cb")).rejects.toThrow(
+      "Unauthorized",
+    );
   });
 });
 
@@ -274,18 +276,14 @@ describe("GoogleAdsClient – refreshAccessToken", () => {
     vi.stubGlobal("fetch", mockFetch);
 
     const client = makeClient();
-    await expect(client.refreshAccessToken("bad-token")).rejects.toThrow(
-      "Failed to refresh token",
-    );
+    await expect(client.refreshAccessToken("bad-token")).rejects.toThrow("Failed to refresh token");
   });
 
   it("throws on network failure", async () => {
     vi.stubGlobal("fetch", makeNetworkError("Network error"));
 
     const client = makeClient();
-    await expect(client.refreshAccessToken("tok")).rejects.toThrow(
-      "Failed to refresh token",
-    );
+    await expect(client.refreshAccessToken("tok")).rejects.toThrow("Failed to refresh token");
   });
 
   it("throws when JSON parsing fails", async () => {
@@ -374,9 +372,7 @@ describe("GoogleAdsClient – request (auth guard)", () => {
 
     // We need to also set up the search stream, but since no access token
     // the error should fire before fetch is called.
-    await expect(client.listCampaigns("1234567890")).rejects.toThrow(
-      "Access token not set",
-    );
+    await expect(client.listCampaigns("1234567890")).rejects.toThrow("Access token not set");
   });
 
   it("throws when developer token is missing", async () => {
@@ -409,7 +405,8 @@ describe("GoogleAdsClient – request (auth guard)", () => {
     const currency = searchStreamResponse([{ customer: { currencyCode: "USD" } }]);
     const campaigns = searchStreamResponse([]);
 
-    const mockFetch = vi.fn()
+    const mockFetch = vi
+      .fn()
       .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve(currency) })
       .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve(campaigns) });
 
@@ -432,9 +429,7 @@ describe("GoogleAdsClient – ID validation", () => {
   it("throws on invalid account ID format", async () => {
     const client = makeClient({ accessToken: "tok" });
 
-    await expect(client.listCampaigns("not-an-id!")).rejects.toThrow(
-      "Invalid Account ID format",
-    );
+    await expect(client.listCampaigns("not-an-id!")).rejects.toThrow("Invalid Account ID format");
   });
 
   it("throws on invalid campaign ID format", async () => {
@@ -449,7 +444,8 @@ describe("GoogleAdsClient – ID validation", () => {
     // Valid format: digits and dashes only, starts and ends with digit
     const searchCurrency = searchStreamResponse([{ customer: { currencyCode: "USD" } }]);
     const searchCampaigns = searchStreamResponse([]);
-    const mockFetch = vi.fn()
+    const mockFetch = vi
+      .fn()
       .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve(searchCurrency) })
       .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve(searchCampaigns) });
 
@@ -475,7 +471,8 @@ describe("GoogleAdsClient – getAccounts", () => {
       { customer: { id: "222", descriptiveName: "Account B", currencyCode: "EUR" } },
     ]);
 
-    const mockFetch = vi.fn()
+    const mockFetch = vi
+      .fn()
       // GET /customers:listAccessibleCustomers
       .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve(customerListResponse) })
       // POST searchStream for customer 111
@@ -508,7 +505,8 @@ describe("GoogleAdsClient – getAccounts", () => {
       { customer: { id: "111", descriptiveName: "Account A", currencyCode: "USD" } },
     ]);
 
-    const mockFetch = vi.fn()
+    const mockFetch = vi
+      .fn()
       .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve(customerListResponse) })
       // 111 succeeds
       .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve(customerInfoOk) })
@@ -558,7 +556,8 @@ describe("GoogleAdsClient – listCampaigns", () => {
       },
     ]);
 
-    const mockFetch = vi.fn()
+    const mockFetch = vi
+      .fn()
       .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve(currencyResponse) })
       .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve(campaignResults) });
 
@@ -585,7 +584,8 @@ describe("GoogleAdsClient – listCampaigns", () => {
     ]);
     const emptyCampaigns = searchStreamResponse([]);
 
-    const mockFetch = vi.fn()
+    const mockFetch = vi
+      .fn()
       .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve(currencyResponse) })
       .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve(emptyCampaigns) })
       // Second listCampaigns call — currency should be cached
@@ -613,7 +613,8 @@ describe("GoogleAdsClient – listCampaigns", () => {
       },
     ]);
 
-    const mockFetch = vi.fn()
+    const mockFetch = vi
+      .fn()
       .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve(currencyResponse) })
       .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve(campaignResults) });
 
@@ -636,7 +637,8 @@ describe("GoogleAdsClient – listCampaigns", () => {
       },
     ]);
 
-    const mockFetch = vi.fn()
+    const mockFetch = vi
+      .fn()
       .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve(currencyResponse) })
       .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve(campaignResults) });
 
@@ -649,7 +651,7 @@ describe("GoogleAdsClient – listCampaigns", () => {
   });
 
   it("maps advertising channel types to objectives correctly", async () => {
-    const channels: Array<{ channelType: string; expected: string; }> = [
+    const channels: Array<{ channelType: string; expected: string }> = [
       { channelType: "SEARCH", expected: "TRAFFIC" },
       { channelType: "DISPLAY", expected: "AWARENESS" },
       { channelType: "SHOPPING", expected: "SALES" },
@@ -675,7 +677,8 @@ describe("GoogleAdsClient – listCampaigns", () => {
         },
       ]);
 
-      const mockFetch = vi.fn()
+      const mockFetch = vi
+        .fn()
         .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve(currencyResponse) })
         .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve(campaignResults) });
 
@@ -704,7 +707,8 @@ describe("GoogleAdsClient – getCampaign", () => {
       },
     ]);
 
-    const mockFetch = vi.fn()
+    const mockFetch = vi
+      .fn()
       .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve(currencyResponse) })
       .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve(campaignResults) });
 
@@ -724,7 +728,8 @@ describe("GoogleAdsClient – getCampaign", () => {
     ]);
     const emptyResult = searchStreamResponse([]);
 
-    const mockFetch = vi.fn()
+    const mockFetch = vi
+      .fn()
       .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve(currencyResponse) })
       .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve(emptyResult) });
 
@@ -737,7 +742,8 @@ describe("GoogleAdsClient – getCampaign", () => {
   });
 
   it("returns null on API error (error from query)", async () => {
-    const mockFetch = vi.fn()
+    const mockFetch = vi
+      .fn()
       // currency fetch succeeds
       .mockResolvedValueOnce({
         ok: true,
@@ -772,7 +778,8 @@ describe("GoogleAdsClient – getCampaign", () => {
       },
     ]);
 
-    const mockFetch = vi.fn()
+    const mockFetch = vi
+      .fn()
       .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve(currencyResponse) })
       .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve(campaignResults) });
 
@@ -799,7 +806,8 @@ describe("GoogleAdsClient – getCampaign", () => {
       },
     ]);
 
-    const mockFetch = vi.fn()
+    const mockFetch = vi
+      .fn()
       .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve(currencyResponse) })
       .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve(campaignResults) });
 
@@ -829,7 +837,8 @@ describe("GoogleAdsClient – getCampaign", () => {
       { campaign: campaignWithoutDates, campaignBudget: { amountMicros: "0" } },
     ]);
 
-    const mockFetch = vi.fn()
+    const mockFetch = vi
+      .fn()
       .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve(currencyResponse) })
       .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve(campaignResults) });
 
@@ -866,7 +875,8 @@ describe("GoogleAdsClient – getCampaignMetrics", () => {
       },
     ]);
 
-    const mockFetch = vi.fn()
+    const mockFetch = vi
+      .fn()
       .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve(currencyResponse) })
       .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve(metricsResponse) });
 
@@ -900,7 +910,8 @@ describe("GoogleAdsClient – getCampaignMetrics", () => {
     ]);
     const emptyMetrics = searchStreamResponse([]);
 
-    const mockFetch = vi.fn()
+    const mockFetch = vi
+      .fn()
       .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve(currencyResponse) })
       .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve(emptyMetrics) });
 
@@ -926,7 +937,8 @@ describe("GoogleAdsClient – getCampaignMetrics", () => {
     ]);
     const emptyMetrics = searchStreamResponse([]);
 
-    const mockFetch = vi.fn()
+    const mockFetch = vi
+      .fn()
       .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve(currencyResponse) })
       .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve(emptyMetrics) });
 
@@ -962,7 +974,8 @@ describe("GoogleAdsClient – getCampaignMetrics", () => {
     ]);
     const emptyMetrics = searchStreamResponse([]);
 
-    const mockFetch = vi.fn()
+    const mockFetch = vi
+      .fn()
       .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve(currencyResponse) })
       .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve(emptyMetrics) });
 
@@ -978,7 +991,7 @@ describe("GoogleAdsClient – getCampaignMetrics", () => {
 
     // The second call is the metrics search stream
     const [, metricsCallOptions] = mockFetch.mock.calls[1] as [string, RequestInit];
-    const body = JSON.parse(metricsCallOptions?.body as string) as { query: string; };
+    const body = JSON.parse(metricsCallOptions?.body as string) as { query: string };
     expect(body.query).toContain("20240315");
     expect(body.query).toContain("20240331");
   });
@@ -1005,7 +1018,8 @@ describe("GoogleAdsClient – currency caching", () => {
 
     // The currency and campaigns are fetched in parallel via Promise.all
     // Both of the fetch calls happen, but we mock the first to fail
-    const mockFetch = vi.fn()
+    const mockFetch = vi
+      .fn()
       .mockResolvedValueOnce(failedCurrency)
       .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve(campaignResults) });
 

@@ -7,9 +7,12 @@ interface ThemeCardProps {
   glass?: boolean;
 }
 
-export function ThemeCard(
-  { children, className, hoverEffect = false, glass = false }: ThemeCardProps,
-) {
+export function ThemeCard({
+  children,
+  className,
+  hoverEffect = false,
+  glass = false,
+}: ThemeCardProps) {
   return (
     <div
       className={cn(

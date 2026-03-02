@@ -13,9 +13,7 @@ describe("useTable", () => {
   });
 
   it("updates when a custom event is dispatched", () => {
-    const { result } = renderHook(() =>
-      useTable<{ id: string; name: string }>("Users"),
-    );
+    const { result } = renderHook(() => useTable<{ id: string; name: string }>("Users"));
 
     expect(result.current).toEqual([]);
 
@@ -37,10 +35,7 @@ describe("useTable", () => {
 
   it("applies filter when provided", () => {
     const { result } = renderHook(() =>
-      useTable<{ id: string; active: boolean }>(
-        "FilteredTable",
-        (row) => row.active,
-      ),
+      useTable<{ id: string; active: boolean }>("FilteredTable", (row) => row.active),
     );
 
     act(() => {
@@ -60,12 +55,8 @@ describe("useTable", () => {
   });
 
   it("multiple hooks on same table share updates", () => {
-    const { result: r1 } = renderHook(() =>
-      useTable<{ id: string }>("SharedTable"),
-    );
-    const { result: r2 } = renderHook(() =>
-      useTable<{ id: string }>("SharedTable"),
-    );
+    const { result: r1 } = renderHook(() => useTable<{ id: string }>("SharedTable"));
+    const { result: r2 } = renderHook(() => useTable<{ id: string }>("SharedTable"));
 
     act(() => {
       window.dispatchEvent(
@@ -83,18 +74,14 @@ describe("useTable", () => {
     const { result } = renderHook(() => useTable("EmptyTable"));
 
     act(() => {
-      window.dispatchEvent(
-        new CustomEvent("stdb:table:EmptyTable", { detail: [] }),
-      );
+      window.dispatchEvent(new CustomEvent("stdb:table:EmptyTable", { detail: [] }));
     });
 
     expect(result.current).toEqual([]);
   });
 
   it("replaces previous data on new event", () => {
-    const { result } = renderHook(() =>
-      useTable<{ id: string }>("ReplaceTable"),
-    );
+    const { result } = renderHook(() => useTable<{ id: string }>("ReplaceTable"));
 
     act(() => {
       window.dispatchEvent(

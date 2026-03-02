@@ -17,9 +17,7 @@ describe("LivePreview", () => {
 
   it("displays the URL in toolbar", () => {
     render(<LivePreview appId="my-app" />);
-    expect(
-      screen.getByText("https://edge.spike.land/live/my-app"),
-    ).toBeInTheDocument();
+    expect(screen.getByText("https://edge.spike.land/live/my-app")).toBeInTheDocument();
   });
 
   it("iframe has sandbox attributes", () => {

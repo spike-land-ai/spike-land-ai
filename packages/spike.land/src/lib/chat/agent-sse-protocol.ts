@@ -5,22 +5,22 @@
  */
 
 export type AgentSSEEvent =
-  | { type: "text_delta"; text: string; }
+  | { type: "text_delta"; text: string }
   | {
-    type: "tool_call_start";
-    id: string;
-    name: string;
-    serverName: string;
-    input: Record<string, unknown>;
-  }
-  | { type: "tool_call_end"; id: string; result: string; isError: boolean; }
-  | { type: "turn_start"; turn: number; maxTurns: number; }
-  | { type: "turn_end"; }
+      type: "tool_call_start";
+      id: string;
+      name: string;
+      serverName: string;
+      input: Record<string, unknown>;
+    }
+  | { type: "tool_call_end"; id: string; result: string; isError: boolean }
+  | { type: "turn_start"; turn: number; maxTurns: number }
+  | { type: "turn_end" }
   | {
-    type: "done";
-    usage?: { input_tokens: number; output_tokens: number; };
-  }
-  | { type: "error"; message: string; };
+      type: "done";
+      usage?: { input_tokens: number; output_tokens: number };
+    }
+  | { type: "error"; message: string };
 
 /** Encode an event as an SSE `data:` line. */
 export function encodeSSE(event: AgentSSEEvent): string {

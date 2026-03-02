@@ -5,10 +5,7 @@ export class FeatureFlagService {
    * Check if a feature is enabled for a specific workspace or user.
    * Checks specific enables first, then percentage rollout.
    */
-  static async isFeatureEnabled(
-    featureName: string,
-    entityId?: string,
-  ): Promise<boolean> {
+  static async isFeatureEnabled(featureName: string, entityId?: string): Promise<boolean> {
     const flag = await prisma.featureFlag.findUnique({
       where: { name: featureName },
     });
@@ -41,7 +38,7 @@ export class FeatureFlagService {
     let hash = 0;
     for (let i = 0; i < str.length; i++) {
       const char = str.charCodeAt(i);
-      hash = ((hash << 5) - hash) + char;
+      hash = (hash << 5) - hash + char;
       hash = hash & hash; // Convert to 32bit integer
     }
     return Math.abs(hash);

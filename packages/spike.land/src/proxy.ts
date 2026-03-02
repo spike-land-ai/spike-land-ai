@@ -27,10 +27,7 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 const ONBOARDED_COOKIE = "spike-onboarded";
-const SESSION_COOKIES = [
-  "better-auth.session_token",
-  "__Secure-better-auth.session_token",
-];
+const SESSION_COOKIES = ["better-auth.session_token", "__Secure-better-auth.session_token"];
 
 /**
  * Known route prefixes that should NOT be rewritten to /g/<path>.
@@ -59,12 +56,7 @@ export function shouldRewriteToGenerate(pathname: string): boolean {
  * List of path patterns that require authentication
  * Paths are matched using startsWith for path prefixes
  */
-const PROTECTED_PATHS = [
-  "/settings",
-  "/profile",
-  "/enhance",
-  "/admin",
-] as const;
+const PROTECTED_PATHS = ["/settings", "/profile", "/enhance", "/admin"] as const;
 
 /**
  * List of path patterns that are always public
@@ -87,14 +79,12 @@ const PUBLIC_PATHS = [
  */
 export function isProtectedPath(pathname: string): boolean {
   // First check if path is explicitly public
-  if (
-    PUBLIC_PATHS.some(path => pathname === path || pathname.startsWith(path + "/"))
-  ) {
+  if (PUBLIC_PATHS.some((path) => pathname === path || pathname.startsWith(path + "/"))) {
     return false;
   }
 
   // Check if path matches any protected patterns
-  return PROTECTED_PATHS.some(path => pathname === path || pathname.startsWith(path + "/"));
+  return PROTECTED_PATHS.some((path) => pathname === path || pathname.startsWith(path + "/"));
 }
 
 /**
@@ -132,14 +122,14 @@ export async function proxy(request: NextRequest) {
   // --- Deployment skew protection ---
   // When a client from a stale deployment calls a server action, return 409
   // to trigger a hard reload (prevents "Failed to find Server Action" errors).
-  const DEPLOYMENT_ID = process.env.NEXT_DEPLOYMENT_ID
-    || process.env.VERCEL_DEPLOYMENT_ID
-    || process.env.VERCEL_GIT_COMMIT_SHA
-    || "";
+  const DEPLOYMENT_ID =
+    process.env.NEXT_DEPLOYMENT_ID ||
+    process.env.VERCEL_DEPLOYMENT_ID ||
+    process.env.VERCEL_GIT_COMMIT_SHA ||
+    "";
   const DEPLOYMENT_COOKIE = "__deployment_id";
 
-  const isServerAction = request.method === "POST"
-    && request.headers.has("next-action");
+  const isServerAction = request.method === "POST" && request.headers.has("next-action");
 
   if (isServerAction && DEPLOYMENT_ID) {
     const clientDeploymentId = request.cookies.get(DEPLOYMENT_COOKIE)?.value;
@@ -156,10 +146,7 @@ export async function proxy(request: NextRequest) {
   // clients) cause Next.js to call request.formData() looking for server action
   // IDs, which throws "Failed to parse body as FormData" when the body isn't
   // valid FormData. Using 303 See Other converts POST to GET per HTTP spec.
-  if (
-    request.method === "POST"
-    && (pathname === "/auth/signin" || pathname === "/auth/error")
-  ) {
+  if (request.method === "POST" && (pathname === "/auth/signin" || pathname === "/auth/error")) {
     const url = request.nextUrl.clone();
     return NextResponse.redirect(url, 303);
   }
@@ -193,7 +180,7 @@ export async function proxy(request: NextRequest) {
   // Redirect authenticated but un-onboarded users from home to /onboarding.
   // Uses a lightweight cookie check (no DB hit).
   if (pathname === "/") {
-    const hasSession = SESSION_COOKIES.some(name => request.cookies.has(name));
+    const hasSession = SESSION_COOKIES.some((name) => request.cookies.has(name));
     const isOnboarded = request.cookies.has(ONBOARDED_COOKIE);
     if (hasSession && !isOnboarded) {
       return NextResponse.redirect(new URL("/onboarding", request.url));
@@ -206,13 +193,9 @@ export async function proxy(request: NextRequest) {
       const roundNum = parseInt(profileRound, 10);
       if (!isNaN(roundNum) && roundNum >= 0) {
         // Set a flag cookie to avoid redirect loops
-        const lastRedirectRound = request.cookies.get(
-          "spike-last-redirect-round",
-        )?.value;
+        const lastRedirectRound = request.cookies.get("spike-last-redirect-round")?.value;
         if (lastRedirectRound !== profileRound) {
-          const response = NextResponse.redirect(
-            new URL("/onboarding", request.url),
-          );
+          const response = NextResponse.redirect(new URL("/onboarding", request.url));
           response.cookies.set("spike-last-redirect-round", profileRound, {
             path: "/",
             maxAge: 60 * 60 * 24 * 365,
@@ -226,8 +209,8 @@ export async function proxy(request: NextRequest) {
 
   // Embed routes serve self-contained HTML with inline scripts and esm.sh
   // imports. They set their own CSP — don't override it from middleware.
-  const isEmbedRoute = /^\/api\/codespace\/[^/]+\/(embed|bundle|version\/\d+\/(embed|bundle))$/
-    .test(pathname);
+  const isEmbedRoute =
+    /^\/api\/codespace\/[^/]+\/(embed|bundle|version\/\d+\/(embed|bundle))$/.test(pathname);
 
   // Generate CSP Nonce and Header
   const nonce = generateNonce();
@@ -246,7 +229,9 @@ export async function proxy(request: NextRequest) {
     base-uri 'self';
     form-action 'self';
     ${process.env.NODE_ENV === "production" ? "upgrade-insecure-requests;" : ""}
-  `.replace(/\s{2,}/g, " ").trim();
+  `
+    .replace(/\s{2,}/g, " ")
+    .trim();
 
   const requestHeaders = new Headers(request.headers);
   requestHeaders.set(CSP_NONCE_HEADER, nonce);
@@ -254,10 +239,7 @@ export async function proxy(request: NextRequest) {
     requestHeaders.set("Content-Security-Policy", cspHeader);
     // Next.js 13+ requires this specific header format to detect CSP from middleware
     // and apply the nonce to its dynamically generated inline scripts
-    requestHeaders.set(
-      "x-middleware-request-content-security-policy",
-      cspHeader,
-    );
+    requestHeaders.set("x-middleware-request-content-security-policy", cspHeader);
   }
 
   // Helper to apply headers to response
@@ -290,11 +272,13 @@ export async function proxy(request: NextRequest) {
 
   // Skip proxy for non-protected paths
   if (!isProtectedPath(pathname)) {
-    return applyHeaders(NextResponse.next({
-      request: {
-        headers: requestHeaders,
-      },
-    }));
+    return applyHeaders(
+      NextResponse.next({
+        request: {
+          headers: requestHeaders,
+        },
+      }),
+    );
   }
 
   // Check for E2E test bypass header with secret validation
@@ -303,25 +287,25 @@ export async function proxy(request: NextRequest) {
   // SECURITY: Only enabled in non-production environments
   const e2eBypassHeader = request.headers.get("x-e2e-auth-bypass");
   // Sanitize the secret to handle any trailing whitespace/newlines from environment
-  const e2eBypassSecret = process.env.E2E_BYPASS_SECRET?.trim().replace(
-    /[\r\n]/g,
-    "",
-  );
+  const e2eBypassSecret = process.env.E2E_BYPASS_SECRET?.trim().replace(/[\r\n]/g, "");
 
   // Only allow E2E bypass in non-production environments
   // This prevents accidental bypass in production even if the secret leaks
   // Staging (next.spike.land) is allowed to use E2E bypass for smoke tests
   // Use environment variable for domain check to prevent Host header injection
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || "";
-  const isStagingDomain = appUrl === "https://next.spike.land"
-    || appUrl.includes("localhost");
-  const isProduction = process.env.NODE_ENV === "production"
-    && process.env.APP_ENV === "production"
-    && !isStagingDomain;
+  const isStagingDomain = appUrl === "https://next.spike.land" || appUrl.includes("localhost");
+  const isProduction =
+    process.env.NODE_ENV === "production" &&
+    process.env.APP_ENV === "production" &&
+    !isStagingDomain;
 
   // Check for E2E bypass via header (primary method)
-  const hasValidHeader = !isProduction && e2eBypassSecret && e2eBypassHeader
-    && secureCompare(e2eBypassHeader, e2eBypassSecret);
+  const hasValidHeader =
+    !isProduction &&
+    e2eBypassSecret &&
+    e2eBypassHeader &&
+    secureCompare(e2eBypassHeader, e2eBypassSecret);
 
   // Check for E2E bypass via cookies (fallback method)
   // This handles cases where the header is sent but cookies are already set
@@ -329,15 +313,15 @@ export async function proxy(request: NextRequest) {
   const e2eRoleCookie = request.cookies.get("e2e-user-role")?.value;
   const e2eSecretCookie = request.cookies.get("e2e-bypass-secret")?.value;
 
-  const hasValidCookie = !isProduction
-    && e2eBypassSecret
-    && e2eSecretCookie
-    && secureCompare(e2eSecretCookie, e2eBypassSecret)
-    && e2eRoleCookie !== undefined;
+  const hasValidCookie =
+    !isProduction &&
+    e2eBypassSecret &&
+    e2eSecretCookie &&
+    secureCompare(e2eSecretCookie, e2eBypassSecret) &&
+    e2eRoleCookie !== undefined;
 
   // SECURITY: Never allow E2E bypass on admin routes
-  const isAdminRoute = pathname.startsWith("/admin")
-    || pathname.startsWith("/api/admin");
+  const isAdminRoute = pathname.startsWith("/admin") || pathname.startsWith("/api/admin");
 
   if ((hasValidHeader || hasValidCookie) && !isAdminRoute) {
     // Determine which method succeeded for logging
@@ -353,11 +337,13 @@ export async function proxy(request: NextRequest) {
         APP_ENV: process.env.APP_ENV,
       },
     });
-    return applyHeaders(NextResponse.next({
-      request: {
-        headers: requestHeaders,
-      },
-    }));
+    return applyHeaders(
+      NextResponse.next({
+        request: {
+          headers: requestHeaders,
+        },
+      }),
+    );
   }
 
   // Check authentication status
@@ -377,11 +363,13 @@ export async function proxy(request: NextRequest) {
   }
 
   // User is authenticated, allow access
-  return applyHeaders(NextResponse.next({
-    request: {
-      headers: requestHeaders,
-    },
-  }));
+  return applyHeaders(
+    NextResponse.next({
+      request: {
+        headers: requestHeaders,
+      },
+    }),
+  );
 }
 
 /**

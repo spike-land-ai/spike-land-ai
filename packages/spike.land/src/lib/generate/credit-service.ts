@@ -6,7 +6,7 @@ const DEFAULT_GENERATION_COST = 36;
 export async function checkCredits(
   userId: string,
   cost = DEFAULT_GENERATION_COST,
-): Promise<{ hasCredits: boolean; balance: number; }> {
+): Promise<{ hasCredits: boolean; balance: number }> {
   const user = await prisma.user.findUnique({
     where: { id: userId },
     select: { id: true },

@@ -57,10 +57,7 @@ interface HeroTransform {
  * element.style.setProperty('--hero-scale', `${transform.scaleX}`);
  * ```
  */
-export function calculateHeroTransform(
-  fromRect: DOMRect,
-  toRect?: DOMRect,
-): HeroTransform {
+export function calculateHeroTransform(fromRect: DOMRect, toRect?: DOMRect): HeroTransform {
   // Default to viewport dimensions if toRect is not provided
   const targetRect = toRect ?? {
     x: 0,
@@ -103,20 +100,11 @@ export const HERO_TRANSFORM_CSS_VARS = {
  * @param element - The DOM element to apply properties to
  * @param transform - The calculated transform values
  */
-export function applyHeroTransformStyles(
-  element: HTMLElement,
-  transform: HeroTransform,
-): void {
+export function applyHeroTransformStyles(element: HTMLElement, transform: HeroTransform): void {
   element.style.setProperty(HERO_TRANSFORM_CSS_VARS.x, `${transform.x}px`);
   element.style.setProperty(HERO_TRANSFORM_CSS_VARS.y, `${transform.y}px`);
-  element.style.setProperty(
-    HERO_TRANSFORM_CSS_VARS.scaleX,
-    `${transform.scaleX}`,
-  );
-  element.style.setProperty(
-    HERO_TRANSFORM_CSS_VARS.scaleY,
-    `${transform.scaleY}`,
-  );
+  element.style.setProperty(HERO_TRANSFORM_CSS_VARS.scaleX, `${transform.scaleX}`);
+  element.style.setProperty(HERO_TRANSFORM_CSS_VARS.scaleY, `${transform.scaleY}`);
   // Use uniform scale (average of X and Y) for simpler animations
   element.style.setProperty(
     HERO_TRANSFORM_CSS_VARS.scale,

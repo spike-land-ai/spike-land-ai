@@ -8,11 +8,7 @@
  */
 
 // Error source types
-type ErrorSource =
-  | "console"
-  | "uncaught-exception"
-  | "unhandled-rejection"
-  | "error-boundary";
+type ErrorSource = "console" | "uncaught-exception" | "unhandled-rejection" | "error-boundary";
 
 interface CapturedError {
   message: string;
@@ -132,10 +128,10 @@ function parseStackTrace(stack?: string): {
     if (!line) continue;
     // Skip internal browser/framework lines
     if (
-      line.includes("console-capture")
-      || line.includes("structured-logger")
-      || line.includes("node_modules")
-      || line.includes("<anonymous>")
+      line.includes("console-capture") ||
+      line.includes("structured-logger") ||
+      line.includes("node_modules") ||
+      line.includes("<anonymous>")
     ) {
       continue;
     }
@@ -156,10 +152,7 @@ function parseStackTrace(stack?: string): {
 /**
  * Create error from console.error arguments
  */
-function createErrorFromConsoleArgs(
-  args: unknown[],
-  source: ErrorSource,
-): CapturedError {
+function createErrorFromConsoleArgs(args: unknown[], source: ErrorSource): CapturedError {
   const firstArg = args[0];
   let message: string;
   let stack: string | undefined;
@@ -171,7 +164,7 @@ function createErrorFromConsoleArgs(
     errorType = firstArg.name;
   } else {
     message = args
-      .map(arg => (typeof arg === "object" ? JSON.stringify(arg) : String(arg)))
+      .map((arg) => (typeof arg === "object" ? JSON.stringify(arg) : String(arg)))
       .join(" ");
     stack = new Error().stack;
     errorType = "ConsoleError";
@@ -230,11 +223,9 @@ export function initializeConsoleCapture(): void {
   });
 
   // Listen for unhandled promise rejections
-  window.addEventListener("unhandledrejection", event => {
+  window.addEventListener("unhandledrejection", (event) => {
     const reason = event.reason;
-    const location = parseStackTrace(
-      reason instanceof Error ? reason.stack : undefined,
-    );
+    const location = parseStackTrace(reason instanceof Error ? reason.stack : undefined);
 
     const rejectionStack = reason instanceof Error ? reason.stack : undefined;
     const capturedError: CapturedError = {
@@ -269,10 +260,7 @@ export function initializeConsoleCapture(): void {
 /**
  * Report error from error boundary
  */
-export function reportErrorBoundary(
-  error: Error,
-  componentStack?: string,
-): void {
+export function reportErrorBoundary(error: Error, componentStack?: string): void {
   const location = parseStackTrace(error.stack);
 
   const capturedError: CapturedError = {

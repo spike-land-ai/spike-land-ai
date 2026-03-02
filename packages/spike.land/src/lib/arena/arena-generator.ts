@@ -8,22 +8,12 @@
 
 import { callClaude, extractCodeFromResponse } from "@/lib/create/agent-client";
 import { updateCodespace } from "@/lib/create/codespace-service";
-import {
-  buildFixSystemPrompt,
-  buildFixUserPrompt,
-} from "@/lib/create/agent-prompts";
-import {
-  isUnrecoverableError,
-  parseTranspileError,
-} from "@/lib/create/error-parser";
+import { buildFixSystemPrompt, buildFixUserPrompt } from "@/lib/create/agent-prompts";
+import { isUnrecoverableError, parseTranspileError } from "@/lib/create/error-parser";
 import { cleanCode } from "@/lib/create/content-generator";
 import prisma from "@/lib/prisma";
 import logger from "@/lib/logger";
-import {
-  publishArenaEvent,
-  setSubmissionState,
-  setSubmissionWorking,
-} from "./redis";
+import { publishArenaEvent, setSubmissionState, setSubmissionWorking } from "./redis";
 
 const MAX_ITERATIONS = 3;
 const GEN_MAX_TOKENS = 32768;
@@ -33,9 +23,7 @@ const FIX_MAX_TOKENS = 32768;
  * Run the arena generation pipeline for a submission.
  * Updates ArenaSubmission status at each phase and publishes SSE events.
  */
-export async function arenaGenerateFromPrompt(
-  submissionId: string,
-): Promise<void> {
+export async function arenaGenerateFromPrompt(submissionId: string): Promise<void> {
   const submission = await prisma.arenaSubmission.findUniqueOrThrow({
     where: { id: submissionId },
     select: {
@@ -48,14 +36,13 @@ export async function arenaGenerateFromPrompt(
   });
 
   const codespaceId = `arena-${submissionId.slice(0, 12)}`;
-  const componentUrl = process.env.SPIKE_LAND_COMPONENT_URL
-    ?? "https://testing.spike.land";
+  const componentUrl = process.env.SPIKE_LAND_COMPONENT_URL ?? "https://testing.spike.land";
   const codespaceUrl = `${componentUrl}/live/${codespaceId}/`;
   const startTime = Date.now();
   let totalInputTokens = 0;
   let totalOutputTokens = 0;
   let totalCachedTokens = 0;
-  const errors: Array<{ error: string; iteration: number; fixed: boolean; }> = [];
+  const errors: Array<{ error: string; iteration: number; fixed: boolean }> = [];
 
   try {
     await setSubmissionWorking(submissionId, true);
@@ -67,8 +54,9 @@ export async function arenaGenerateFromPrompt(
       data: { phase: "GENERATING", message: "Generating code from prompt..." },
     });
 
-    const systemPrompt = submission.systemPrompt
-      || `You are an expert React developer. Generate a complete, working React component based on the user's prompt. The component must use a default export. Use only React and standard CSS (inline styles or CSS-in-JS). Do not use external libraries unless specified. The code must be a single file that compiles with esbuild.\n\nChallenge: ${submission.challenge.title}\nCategory: ${submission.challenge.category}`;
+    const systemPrompt =
+      submission.systemPrompt ||
+      `You are an expert React developer. Generate a complete, working React component based on the user's prompt. The component must use a default export. Use only React and standard CSS (inline styles or CSS-in-JS). Do not use external libraries unless specified. The code must be a single file that compiles with esbuild.\n\nChallenge: ${submission.challenge.title}\nCategory: ${submission.challenge.category}`;
 
     const genResponse = await callClaude({
       systemPrompt,
@@ -203,10 +191,14 @@ export async function arenaGenerateFromPrompt(
   } catch (error) {
     const rawMessage = error instanceof Error ? error.message : "Unknown error";
     // Sanitize: strip tokens/credentials from error messages
-    const message = rawMessage.replace(/Bearer\s+\S+/gi, "Bearer [REDACTED]")
+    const message = rawMessage
+      .replace(/Bearer\s+\S+/gi, "Bearer [REDACTED]")
       .replace(/sk-[a-zA-Z0-9_-]+/g, "[REDACTED]");
-    const isAuth = error && typeof error === "object" && "status" in error
-      && (error as { status: number; }).status === 401;
+    const isAuth =
+      error &&
+      typeof error === "object" &&
+      "status" in error &&
+      (error as { status: number }).status === 401;
     const errorType = isAuth ? "auth_error" : "generation_error";
 
     logger.error("Arena generation failed", {
@@ -225,9 +217,7 @@ export async function arenaGenerateFromPrompt(
         outputTokens: totalOutputTokens,
         cachedTokens: totalCachedTokens,
         totalDurationMs: Date.now() - startTime,
-        errors: JSON.parse(
-          JSON.stringify([{ error: message, iteration: 0, fixed: false }]),
-        ),
+        errors: JSON.parse(JSON.stringify([{ error: message, iteration: 0, fixed: false }])),
       },
     });
 

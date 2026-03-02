@@ -92,9 +92,10 @@ function FeaturedCard({
       const data: unknown = await res.json();
 
       if (!res.ok) {
-        const msg = typeof data === "object" && data !== null && "error" in data
-          ? String((data as Record<string, unknown>).error)
-          : `HTTP ${res.status}`;
+        const msg =
+          typeof data === "object" && data !== null && "error" in data
+            ? String((data as Record<string, unknown>).error)
+            : `HTTP ${res.status}`;
         setState({ response: null, error: msg, isExecuting: false });
         return;
       }
@@ -117,11 +118,11 @@ function FeaturedCard({
       resultString = state.response;
     } else if (typeof state.response === "object" && state.response !== null) {
       const resObj = state.response as {
-        result?: { content?: { type?: string; text?: string; }[]; };
-        content?: { type?: string; text?: string; }[];
+        result?: { content?: { type?: string; text?: string }[] };
+        content?: { type?: string; text?: string }[];
       };
       const contentArray = resObj.content || resObj.result?.content;
-      const textContent = contentArray?.find(c => c.type === "text")?.text;
+      const textContent = contentArray?.find((c) => c.type === "text")?.text;
       if (typeof textContent === "string") {
         resultString = textContent;
       } else {
@@ -133,12 +134,8 @@ function FeaturedCard({
   return (
     <div className="group rounded-2xl border border-white/[0.06] bg-white/[0.02] p-5 hover:bg-white/[0.03] hover:border-white/[0.10] transition-all flex flex-col gap-3">
       <div>
-        <p className="font-mono text-sm text-white font-semibold">
-          {tool.name}
-        </p>
-        <p className="text-xs text-zinc-500 mt-0.5 line-clamp-1">
-          {tool.description}
-        </p>
+        <p className="font-mono text-sm text-white font-semibold">{tool.name}</p>
+        <p className="text-xs text-zinc-500 mt-0.5 line-clamp-1">{tool.description}</p>
       </div>
 
       <div className="rounded-xl bg-zinc-900 border border-white/[0.04] px-3 py-2">
@@ -147,9 +144,7 @@ function FeaturedCard({
       </div>
 
       {state.error && (
-        <p className="text-xs text-red-400 bg-red-500/10 rounded-lg px-3 py-2">
-          {state.error}
-        </p>
+        <p className="text-xs text-red-400 bg-red-500/10 rounded-lg px-3 py-2">{state.error}</p>
       )}
 
       {state.response !== null && (
@@ -165,19 +160,17 @@ function FeaturedCard({
           disabled={state.isExecuting}
           className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-xs font-medium hover:bg-cyan-500/20 disabled:opacity-50 transition-all"
         >
-          {state.isExecuting
-            ? (
-              <>
-                <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                Running...
-              </>
-            )
-            : (
-              <>
-                <Play className="w-3.5 h-3.5" />
-                Quick Run
-              </>
-            )}
+          {state.isExecuting ? (
+            <>
+              <Loader2 className="w-3.5 h-3.5 animate-spin" />
+              Running...
+            </>
+          ) : (
+            <>
+              <Play className="w-3.5 h-3.5" />
+              Quick Run
+            </>
+          )}
         </button>
         <button
           type="button"
@@ -192,12 +185,12 @@ function FeaturedCard({
 }
 
 export function McpFeaturedTools({ onTryIt }: McpFeaturedToolsProps) {
-  const toolMap = new Map(MCP_TOOLS.map(t => [t.name, t]));
+  const toolMap = new Map(MCP_TOOLS.map((t) => [t.name, t]));
 
-  const featured = FEATURED_DEFS.map(def => ({
+  const featured = FEATURED_DEFS.map((def) => ({
     def,
     tool: toolMap.get(def.name),
-  })).filter((item): item is { def: FeaturedDef; tool: McpToolDef; } => item.tool !== undefined);
+  })).filter((item): item is { def: FeaturedDef; tool: McpToolDef } => item.tool !== undefined);
 
   if (featured.length === 0) return null;
 
@@ -207,19 +200,12 @@ export function McpFeaturedTools({ onTryIt }: McpFeaturedToolsProps) {
         <div className="flex items-center gap-2 mb-6">
           <Sparkles className="w-5 h-5 text-cyan-400" />
           <h2 className="text-xl font-black text-white">Start Here</h2>
-          <span className="text-zinc-600 text-sm">
-            — popular tools with one-click examples
-          </span>
+          <span className="text-zinc-600 text-sm">— popular tools with one-click examples</span>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
           {featured.map(({ def, tool }) => (
-            <FeaturedCard
-              key={tool.name}
-              tool={tool}
-              def={def}
-              onTryIt={onTryIt}
-            />
+            <FeaturedCard key={tool.name} tool={tool} def={def} onTryIt={onTryIt} />
           ))}
         </div>
       </div>

@@ -41,9 +41,11 @@ export function ControlsPanel({
               ? "bg-cyan-500/80 backdrop-blur-md border-cyan-400/50 text-white shadow-cyan-500/30"
               : "bg-black/60 backdrop-blur-md border-white/10 text-white/80 hover:bg-black/80"
           }`}
-          title={isInteractionMode
-            ? "Switch to Camera Mode (Move View)"
-            : "Switch to Interact Mode (Grab Objects)"}
+          title={
+            isInteractionMode
+              ? "Switch to Camera Mode (Move View)"
+              : "Switch to Interact Mode (Grab Objects)"
+          }
         >
           <span className="text-2xl">{isInteractionMode ? "✋" : "📷"}</span>
         </button>
@@ -54,9 +56,7 @@ export function ControlsPanel({
           className="w-12 h-12 bg-black/60 backdrop-blur-md border border-white/10 rounded-full text-white font-bold shadow-lg hover:bg-red-900/50 hover:border-red-500/50 active:scale-95 transition-all duration-200 flex items-center justify-center group"
           title="Roll a D6"
         >
-          <span className="text-xl group-hover:scale-110 transition-transform">
-            🎲
-          </span>
+          <span className="text-xl group-hover:scale-110 transition-transform">🎲</span>
         </button>
 
         {/* Video toggle */}

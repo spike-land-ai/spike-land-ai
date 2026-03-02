@@ -52,10 +52,10 @@ interface ErrorWithResponse extends Error {
  */
 function hasCodeProperty(error: unknown): error is ErrorWithCode {
   return (
-    error instanceof Error
-    && "code" in error
-    && (typeof (error as ErrorWithCode).code === "string"
-      || typeof (error as ErrorWithCode).code === "number")
+    error instanceof Error &&
+    "code" in error &&
+    (typeof (error as ErrorWithCode).code === "string" ||
+      typeof (error as ErrorWithCode).code === "number")
   );
 }
 
@@ -63,10 +63,7 @@ function hasCodeProperty(error: unknown): error is ErrorWithCode {
  * Type guard to check if an error has status properties.
  */
 function hasStatusProperty(error: unknown): error is ErrorWithStatus {
-  return (
-    error instanceof Error
-    && ("status" in error || "statusCode" in error)
-  );
+  return error instanceof Error && ("status" in error || "statusCode" in error);
 }
 
 /**
@@ -74,9 +71,9 @@ function hasStatusProperty(error: unknown): error is ErrorWithStatus {
  */
 function hasResponseProperty(error: unknown): error is ErrorWithResponse {
   return (
-    error instanceof Error
-    && "response" in error
-    && typeof (error as ErrorWithResponse).response === "object"
+    error instanceof Error &&
+    "response" in error &&
+    typeof (error as ErrorWithResponse).response === "object"
   );
 }
 
@@ -276,13 +273,7 @@ const MESSAGE_PATTERNS: Array<{
   },
   // R2/Storage patterns
   {
-    patterns: [
-      /r2.*upload/i,
-      /upload.*r2/i,
-      /storage.*error/i,
-      /upload.*failed/i,
-      /s3.*error/i,
-    ],
+    patterns: [/r2.*upload/i, /upload.*r2/i, /storage.*error/i, /upload.*failed/i, /s3.*error/i],
     code: McpErrorCode.R2_UPLOAD_ERROR,
   },
 ];
@@ -406,15 +397,8 @@ export function classifyError(error: unknown): ClassifiedError {
 export function toMcpError(error: unknown): McpError {
   const classified = classifyError(error);
 
-  const originalMessage = error instanceof Error
-    ? error.message
-    : String(error);
+  const originalMessage = error instanceof Error ? error.message : String(error);
   const originalError = error instanceof Error ? error : undefined;
 
-  return new McpError(
-    originalMessage,
-    classified.code,
-    classified.retryable,
-    originalError,
-  );
+  return new McpError(originalMessage, classified.code, classified.retryable, originalError);
 }

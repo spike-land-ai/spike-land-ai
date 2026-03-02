@@ -6,12 +6,7 @@
  * actions, history states, and final states.
  */
 
-export type StateType =
-  | "atomic"
-  | "compound"
-  | "parallel"
-  | "final"
-  | "history";
+export type StateType = "atomic" | "compound" | "parallel" | "final" | "history";
 export type HistoryType = "shallow" | "deep";
 export type ActionType = "assign" | "log" | "raise" | "custom";
 
@@ -48,11 +43,7 @@ export interface CustomAction extends BaseAction {
   };
 }
 
-export type Action =
-  | AssignAction
-  | LogAction
-  | RaiseAction
-  | CustomAction;
+export type Action = AssignAction | LogAction | RaiseAction | CustomAction;
 
 export interface Guard {
   /** Safe expression string evaluated by recursive-descent parser. e.g. "context.count > 0 && context.active == true" */

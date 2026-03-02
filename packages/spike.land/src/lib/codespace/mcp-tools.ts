@@ -107,9 +107,7 @@ export async function handleMcpRequest(
             content: [
               {
                 type: "text",
-                text: typeof result === "string"
-                  ? result
-                  : JSON.stringify(result, null, 2),
+                text: typeof result === "string" ? result : JSON.stringify(result, null, 2),
               },
             ],
           },
@@ -161,9 +159,7 @@ async function executeTool(
 
   const session = await getOrCreateSession(effectiveCodeSpace);
 
-  logger.info(
-    `[MCP] Tool '${toolName}' executing for codeSpace: ${effectiveCodeSpace}`,
-  );
+  logger.info(`[MCP] Tool '${toolName}' executing for codeSpace: ${effectiveCodeSpace}`);
 
   switch (toolName) {
     case "read_code":
@@ -179,50 +175,29 @@ async function executeTool(
       if (!args.code || typeof args.code !== "string") {
         throw new Error("Code parameter is required and must be a string");
       }
-      return executeUpdateCode(
-        session,
-        effectiveCodeSpace,
-        args.code,
-        origin,
-      );
+      return executeUpdateCode(session, effectiveCodeSpace, args.code, origin);
     }
 
     case "edit_code": {
       if (!args.edits || !Array.isArray(args.edits)) {
         throw new Error("Edits parameter is required and must be an array");
       }
-      return executeEditCode(
-        session,
-        effectiveCodeSpace,
-        args.edits as LineEdit[],
-        origin,
-      );
+      return executeEditCode(session, effectiveCodeSpace, args.edits as LineEdit[], origin);
     }
 
     case "find_lines": {
       if (!args.pattern || typeof args.pattern !== "string") {
-        throw new Error(
-          "Pattern parameter is required and must be a string",
-        );
+        throw new Error("Pattern parameter is required and must be a string");
       }
-      return executeFindLines(
-        session,
-        effectiveCodeSpace,
-        args.pattern,
-        args.isRegex === true,
-      );
+      return executeFindLines(session, effectiveCodeSpace, args.pattern, args.isRegex === true);
     }
 
     case "search_and_replace": {
       if (!args.search || typeof args.search !== "string") {
-        throw new Error(
-          "Search parameter is required and must be a string",
-        );
+        throw new Error("Search parameter is required and must be a string");
       }
       if (typeof args.replace !== "string") {
-        throw new Error(
-          "Replace parameter is required and must be a string",
-        );
+        throw new Error("Replace parameter is required and must be a string");
       }
       return executeSearchAndReplace(
         session,

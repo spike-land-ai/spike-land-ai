@@ -14,24 +14,39 @@ import { textResult } from "./tool-helpers";
 import type { DrizzleDB } from "../db/index";
 import { workspaces, workspaceMembers, subscriptions } from "../db/schema";
 
-export function registerBillingTools(
-  registry: ToolRegistry,
-  userId: string,
-  db: DrizzleDB,
-): void {
+export function registerBillingTools(registry: ToolRegistry, userId: string, db: DrizzleDB): void {
   const t = freeTool(userId, db);
 
   registry.registerBuilt(
     t
-      .tool("billing_create_checkout", "Create a Stripe checkout session for purchasing tokens, subscribing to a plan, or upgrading workspace tier.", {
-        type: z.enum(["tokens", "subscription", "workspace_tier"]).describe(
-          "Checkout type: tokens (one-time), subscription (recurring), or workspace_tier (workspace upgrade).",
-        ),
-        workspace_id: z.string().min(1).describe("Workspace ID to associate the checkout with."),
-        price_id: z.string().optional().describe("Stripe Price ID (e.g. price_xxx). Required for subscription and workspace_tier types."),
-        success_url: z.string().url().optional().describe("URL to redirect to after successful checkout."),
-        cancel_url: z.string().url().optional().describe("URL to redirect to if the user cancels checkout."),
-      })
+      .tool(
+        "billing_create_checkout",
+        "Create a Stripe checkout session for purchasing tokens, subscribing to a plan, or upgrading workspace tier.",
+        {
+          type: z
+            .enum(["tokens", "subscription", "workspace_tier"])
+            .describe(
+              "Checkout type: tokens (one-time), subscription (recurring), or workspace_tier (workspace upgrade).",
+            ),
+          workspace_id: z.string().min(1).describe("Workspace ID to associate the checkout with."),
+          price_id: z
+            .string()
+            .optional()
+            .describe(
+              "Stripe Price ID (e.g. price_xxx). Required for subscription and workspace_tier types.",
+            ),
+          success_url: z
+            .string()
+            .url()
+            .optional()
+            .describe("URL to redirect to after successful checkout."),
+          cancel_url: z
+            .string()
+            .url()
+            .optional()
+            .describe("URL to redirect to if the user cancels checkout."),
+        },
+      )
       .meta({ category: "billing", tier: "free" })
       .handler(async () => {
         return textResult(
@@ -42,7 +57,11 @@ export function registerBillingTools(
 
   registry.registerBuilt(
     t
-      .tool("billing_status", "Get current billing status: subscription tier and plan info across all workspaces.", {})
+      .tool(
+        "billing_status",
+        "Get current billing status: subscription tier and plan info across all workspaces.",
+        {},
+      )
       .meta({ category: "billing", tier: "free" })
       .handler(async ({ ctx }) => {
         // Get user's subscription

@@ -1,10 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import {
-  clientEnvSchema,
-  serverEnvSchema,
-  validateClientEnv,
-  validateServerEnv,
-} from "./env";
+import { clientEnvSchema, serverEnvSchema, validateClientEnv, validateServerEnv } from "./env";
 
 describe("env validation", () => {
   it("accepts valid required env vars", () => {

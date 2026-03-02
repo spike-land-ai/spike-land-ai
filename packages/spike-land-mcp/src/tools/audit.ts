@@ -12,34 +12,31 @@ import { freeTool, textResult } from "../procedures/index";
 import { auditLogs } from "../db/schema";
 import type { DrizzleDB } from "../db/index";
 
-export function registerAuditTools(
-  registry: ToolRegistry,
-  userId: string,
-  db: DrizzleDB,
-): void {
+export function registerAuditTools(registry: ToolRegistry, userId: string, db: DrizzleDB): void {
   registry.registerBuilt(
     freeTool(userId, db)
-      .tool("audit_query_logs", "Query audit logs with optional filters for action and resource type.", {
-        action: z.string().optional().describe("Filter by action type."),
-        resource_type: z.string().optional().describe("Filter by resource type."),
-        days: z.number().optional().default(7).describe(
-          "Number of days to look back (default 7).",
-        ),
-        limit: z.number().optional().default(50).describe(
-          "Max records to return (default 50).",
-        ),
-      })
+      .tool(
+        "audit_query_logs",
+        "Query audit logs with optional filters for action and resource type.",
+        {
+          action: z.string().optional().describe("Filter by action type."),
+          resource_type: z.string().optional().describe("Filter by resource type."),
+          days: z
+            .number()
+            .optional()
+            .default(7)
+            .describe("Number of days to look back (default 7)."),
+          limit: z.number().optional().default(50).describe("Max records to return (default 50)."),
+        },
+      )
       .meta({ category: "audit", tier: "free" })
       .handler(async ({ input, ctx }) => {
         const { action, resource_type, days, limit } = input;
 
-        const sinceTs = Date.now() - (days * 24 * 60 * 60 * 1000);
+        const sinceTs = Date.now() - days * 24 * 60 * 60 * 1000;
 
         // Build conditions
-        const conditions = [
-          eq(auditLogs.userId, ctx.userId),
-          gt(auditLogs.createdAt, sinceTs),
-        ];
+        const conditions = [eq(auditLogs.userId, ctx.userId), gt(auditLogs.createdAt, sinceTs)];
         if (action) conditions.push(eq(auditLogs.action, action));
         if (resource_type) conditions.push(eq(auditLogs.resourceType, resource_type));
 
@@ -51,17 +48,14 @@ export function registerAuditTools(
           .limit(limit);
 
         if (logs.length === 0) {
-          return textResult(
-            "**No audit logs found** matching the given filters.",
-          );
+          return textResult("**No audit logs found** matching the given filters.");
         }
 
-        const lines = logs.map(log =>
-          `- [${new Date(log.createdAt).toISOString()}] **${log.action}** on ${log.resourceType ?? "unknown"} (${log.resourceId ?? "n/a"})`,
+        const lines = logs.map(
+          (log) =>
+            `- [${new Date(log.createdAt).toISOString()}] **${log.action}** on ${log.resourceType ?? "unknown"} (${log.resourceId ?? "n/a"})`,
         );
-        return textResult(
-          `**Audit Logs (${logs.length})**\n\n${lines.join("\n")}`,
-        );
+        return textResult(`**Audit Logs (${logs.length})**\n\n${lines.join("\n")}`);
       }),
   );
 
@@ -95,9 +89,10 @@ export function registerAuditTools(
           actionCounts.set(log.action, (actionCounts.get(log.action) ?? 0) + 1);
         }
 
-        let text = `**Audit Export Summary**\n\n`
-          + `**Date Range:** ${from_date} to ${to_date}\n`
-          + `**Total Records:** ${logs.length}\n\n`;
+        let text =
+          `**Audit Export Summary**\n\n` +
+          `**Date Range:** ${from_date} to ${to_date}\n` +
+          `**Total Records:** ${logs.length}\n\n`;
 
         if (actionCounts.size > 0) {
           text += `**By Action:**\n`;
@@ -134,10 +129,10 @@ export function registerAuditTools(
         });
 
         return textResult(
-          `**Audit log created.**\n\n`
-          + `**ID:** ${id}\n`
-          + `**Action:** ${action}\n`
-          + `**Resource:** ${resource_type ?? "n/a"} / ${resource_id ?? "n/a"}`,
+          `**Audit log created.**\n\n` +
+            `**ID:** ${id}\n` +
+            `**Action:** ${action}\n` +
+            `**Resource:** ${resource_type ?? "n/a"} / ${resource_id ?? "n/a"}`,
         );
       }),
   );

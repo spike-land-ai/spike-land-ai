@@ -28,11 +28,21 @@ export function registerMarketplaceTools(
     t
       .tool(
         "marketplace_search",
-        "Search the tool marketplace for community-published tools. "
-          + "Returns tools matching the query with install counts and author info.",
+        "Search the tool marketplace for community-published tools. " +
+          "Returns tools matching the query with install counts and author info.",
         {
-          query: z.string().min(1).max(200).describe("Search query to find tools by name or description."),
-          limit: z.number().min(1).max(50).optional().default(10).describe("Maximum number of results to return (1–50)."),
+          query: z
+            .string()
+            .min(1)
+            .max(200)
+            .describe("Search query to find tools by name or description."),
+          limit: z
+            .number()
+            .min(1)
+            .max(50)
+            .optional()
+            .default(10)
+            .describe("Maximum number of results to return (1–50)."),
         },
       )
       .meta({ category: "marketplace", tier: "free" })
@@ -82,8 +92,7 @@ export function registerMarketplaceTools(
     t
       .tool(
         "marketplace_install",
-        "Install a published tool from the marketplace. "
-          + "Increments the tool's install count.",
+        "Install a published tool from the marketplace. " + "Increments the tool's install count.",
         {
           tool_id: z.string().min(1).describe("The unique ID of the marketplace tool."),
         },
@@ -95,12 +104,7 @@ export function registerMarketplaceTools(
         const rows = await ctx.db
           .select({ id: registeredTools.id, name: registeredTools.name })
           .from(registeredTools)
-          .where(
-            and(
-              eq(registeredTools.id, tool_id),
-              eq(registeredTools.status, "published"),
-            ),
-          )
+          .where(and(eq(registeredTools.id, tool_id), eq(registeredTools.status, "published")))
           .limit(1);
 
         const tool = rows[0];
@@ -117,23 +121,19 @@ export function registerMarketplaceTools(
           .where(eq(registeredTools.id, tool_id));
 
         return textResult(
-          `**Tool Installed!**\n\n`
-            + `**Name:** ${tool.name}\n`
-            + `**ID:** ${tool_id}\n\n`
-            + `The tool is now available in your workspace.`,
+          `**Tool Installed!**\n\n` +
+            `**Name:** ${tool.name}\n` +
+            `**ID:** ${tool_id}\n\n` +
+            `The tool is now available in your workspace.`,
         );
       }),
   );
 
   registry.registerBuilt(
     t
-      .tool(
-        "marketplace_uninstall",
-        "Uninstall a previously installed marketplace tool.",
-        {
-          tool_id: z.string().min(1).describe("The unique ID of the marketplace tool."),
-        },
-      )
+      .tool("marketplace_uninstall", "Uninstall a previously installed marketplace tool.", {
+        tool_id: z.string().min(1).describe("The unique ID of the marketplace tool."),
+      })
       .meta({ category: "marketplace", tier: "free" })
       .handler(async ({ input, ctx }) => {
         const { tool_id } = input;
@@ -158,9 +158,9 @@ export function registerMarketplaceTools(
           .where(eq(registeredTools.id, tool_id));
 
         return textResult(
-          `**Tool Uninstalled!**\n\n`
-            + `**Name:** ${tool.name}\n\n`
-            + `The tool has been removed from your workspace.`,
+          `**Tool Uninstalled!**\n\n` +
+            `**Name:** ${tool.name}\n\n` +
+            `The tool has been removed from your workspace.`,
         );
       }),
   );
@@ -169,8 +169,7 @@ export function registerMarketplaceTools(
     t
       .tool(
         "marketplace_my_earnings",
-        "View your token earnings from published marketplace tools. "
-          + "Shows per-tool breakdown.",
+        "View your token earnings from published marketplace tools. " + "Shows per-tool breakdown.",
         {},
       )
       .meta({ category: "marketplace", tier: "free" })
@@ -183,18 +182,15 @@ export function registerMarketplaceTools(
           })
           .from(registeredTools)
           .where(
-            and(
-              eq(registeredTools.userId, ctx.userId),
-              eq(registeredTools.status, "published"),
-            ),
+            and(eq(registeredTools.userId, ctx.userId), eq(registeredTools.status, "published")),
           )
           .orderBy(desc(registeredTools.installCount));
 
         if (tools.length === 0) {
           return textResult(
-            "**Marketplace Earnings**\n\n"
-              + "You have no published tools. Publish a tool to start earning tokens from installs.\n\n"
-              + "Use `register_tool` to create a tool, then `publish_tool` to make it available.",
+            "**Marketplace Earnings**\n\n" +
+              "You have no published tools. Publish a tool to start earning tokens from installs.\n\n" +
+              "Use `register_tool` to create a tool, then `publish_tool` to make it available.",
           );
         }
 
@@ -214,8 +210,7 @@ export function registerMarketplaceTools(
           text += `  Installs: ${tool.installCount}\n\n`;
         }
 
-        text +=
-          "\n_Full earnings tracking (token ledger) is available on spike.land._";
+        text += "\n_Full earnings tracking (token ledger) is available on spike.land._";
 
         return textResult(text);
       }),

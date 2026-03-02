@@ -26,9 +26,7 @@ export function JulesActivityFeed({
     <div className="flex flex-col h-full">
       <div className="flex items-center justify-between px-3 py-2 border-b border-white/10">
         <div className="flex items-center gap-2">
-          <h3 className="text-xs font-medium text-zinc-400">
-            Jules Activity
-          </h3>
+          <h3 className="text-xs font-medium text-zinc-400">Jules Activity</h3>
           {isPolling && <Loader2 className="h-3 w-3 text-cyan-400 animate-spin" />}
           {sessionState && (
             <span className="text-[10px] px-1.5 py-0.5 rounded bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">
@@ -66,14 +64,9 @@ export function JulesActivityFeed({
             </p>
           )}
           {activities.map((activity, i) => (
-            <div
-              key={i}
-              className="p-2 rounded-md bg-zinc-800/30 border border-white/5"
-            >
+            <div key={i} className="p-2 rounded-md bg-zinc-800/30 border border-white/5">
               {activity.type && (
-                <span className="text-[10px] text-cyan-400 font-medium">
-                  {activity.type}
-                </span>
+                <span className="text-[10px] text-cyan-400 font-medium">{activity.type}</span>
               )}
               {activity.content && (
                 <p className="text-xs text-zinc-300 mt-0.5 whitespace-pre-wrap">

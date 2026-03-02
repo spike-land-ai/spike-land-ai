@@ -73,7 +73,7 @@ describe("checkRateLimit", () => {
     expect(limited.isLimited).toBe(true);
 
     // Wait for window to expire
-    await new Promise(resolve => setTimeout(resolve, 150));
+    await new Promise((resolve) => setTimeout(resolve, 150));
 
     // Should be allowed again (window expired, counter resets)
     const result = await checkRateLimit("test-key", kv, maxRequests, windowMs);

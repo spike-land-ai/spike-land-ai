@@ -39,7 +39,7 @@ export function search(query: string, limit = 20): DocsSearchEntry[] {
   if (!searchInstance || !query.trim()) return [];
 
   const results = searchInstance.search(query).slice(0, limit);
-  return results.map(r => ({
+  return results.map((r) => ({
     id: r.id as string,
     type: r.type as DocsSearchEntry["type"],
     title: r.title as string,
@@ -48,5 +48,3 @@ export function search(query: string, limit = 20): DocsSearchEntry[] {
     href: r.href as string,
   }));
 }
-
-

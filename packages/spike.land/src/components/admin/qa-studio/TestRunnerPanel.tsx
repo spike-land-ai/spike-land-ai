@@ -63,7 +63,7 @@ export function TestRunnerPanel() {
         <div className="flex items-center gap-2">
           <Input
             value={target}
-            onChange={e => setTarget(e.target.value)}
+            onChange={(e) => setTarget(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder="src/lib/utils.test.ts"
             className="text-xs font-mono h-8 bg-black/20 border-border/30 flex-1"
@@ -75,9 +75,11 @@ export function TestRunnerPanel() {
             disabled={status === "loading" || !target.trim()}
             className="h-8 shrink-0"
           >
-            {status === "loading"
-              ? <Loader2 className="h-3.5 w-3.5 animate-spin mr-1.5" />
-              : <Play className="h-3.5 w-3.5 mr-1.5" />}
+            {status === "loading" ? (
+              <Loader2 className="h-3.5 w-3.5 animate-spin mr-1.5" />
+            ) : (
+              <Play className="h-3.5 w-3.5 mr-1.5" />
+            )}
             Run Tests
           </Button>
         </div>
@@ -101,9 +103,7 @@ export function TestRunnerPanel() {
           <div className="space-y-2">
             <div className="flex items-center gap-2 text-xs text-muted-foreground">
               <span>Target:</span>
-              <span className="font-mono text-foreground/80">
-                {result.target}
-              </span>
+              <span className="font-mono text-foreground/80">{result.target}</span>
             </div>
             <ScrollArea className="h-[300px]">
               <pre className="rounded-lg border border-border/30 bg-black/20 p-3 text-xs font-mono text-foreground/80 whitespace-pre-wrap break-all">

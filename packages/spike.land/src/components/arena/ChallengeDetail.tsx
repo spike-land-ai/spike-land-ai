@@ -18,10 +18,10 @@ interface Submission {
   reviewScore: number | null;
   eloChange: number | null;
   totalDurationMs: number | null;
-  errors: Array<{ error: string; iteration: number; fixed: boolean; }>;
+  errors: Array<{ error: string; iteration: number; fixed: boolean }>;
   createdAt: string;
-  user: { id: string; name: string | null; image: string | null; };
-  _count: { reviews: number; };
+  user: { id: string; name: string | null; image: string | null };
+  _count: { reviews: number };
 }
 
 interface Challenge {
@@ -32,8 +32,8 @@ interface Challenge {
   difficulty: string;
   status: string;
   closesAt: string | null;
-  createdBy: { name: string | null; image: string | null; };
-  _count: { submissions: number; };
+  createdBy: { name: string | null; image: string | null };
+  _count: { submissions: number };
   submissions: Submission[];
 }
 
@@ -44,19 +44,19 @@ const difficultyColor: Record<string, string> = {
   EXPERT: "bg-red-500/10 text-red-400 border-red-500/20",
 };
 
-export function ChallengeDetail({ challengeId }: { challengeId: string; }) {
+export function ChallengeDetail({ challengeId }: { challengeId: string }) {
   const [challenge, setChallenge] = useState<Challenge | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     fetch(`/api/connect/challenges/${challengeId}`)
-      .then(r => {
+      .then((r) => {
         if (!r.ok) throw new Error("Not found");
         return r.json();
       })
       .then(setChallenge)
-      .catch(e => setError(e.message))
+      .catch((e) => setError(e.message))
       .finally(() => setLoading(false));
   }, [challengeId]);
 
@@ -82,19 +82,13 @@ export function ChallengeDetail({ challengeId }: { challengeId: string; }) {
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-4xl">
-      <Link
-        href="/connect"
-        className="text-sm text-zinc-500 hover:text-zinc-400 mb-4 inline-block"
-      >
+      <Link href="/connect" className="text-sm text-zinc-500 hover:text-zinc-400 mb-4 inline-block">
         &larr; Back to Arena
       </Link>
 
       <div className="mb-8">
         <div className="flex items-center gap-3 mb-3">
-          <Badge
-            variant="outline"
-            className="text-xs text-zinc-400 border-zinc-700"
-          >
+          <Badge variant="outline" className="text-xs text-zinc-400 border-zinc-700">
             {challenge.category}
           </Badge>
           <Badge
@@ -114,15 +108,10 @@ export function ChallengeDetail({ challengeId }: { challengeId: string; }) {
             {challenge.status.toLowerCase()}
           </Badge>
         </div>
-        <h1 className="text-3xl font-bold text-zinc-100 mb-3">
-          {challenge.title}
-        </h1>
-        <p className="text-zinc-400 whitespace-pre-wrap">
-          {challenge.description}
-        </p>
+        <h1 className="text-3xl font-bold text-zinc-100 mb-3">{challenge.title}</h1>
+        <p className="text-zinc-400 whitespace-pre-wrap">{challenge.description}</p>
         <div className="mt-4 text-sm text-zinc-500">
-          Created by {challenge.createdBy.name || "Unknown"} &middot; {challenge._count.submissions}
-          {" "}
+          Created by {challenge.createdBy.name || "Unknown"} &middot; {challenge._count.submissions}{" "}
           submissions
         </div>
       </div>
@@ -130,45 +119,37 @@ export function ChallengeDetail({ challengeId }: { challengeId: string; }) {
       {challenge.status === "OPEN" && (
         <div className="mb-8">
           <Link href={`/connect/${challengeId}/submit`}>
-            <Button className="bg-blue-600 hover:bg-blue-700 text-white">
-              Submit a Prompt
-            </Button>
+            <Button className="bg-blue-600 hover:bg-blue-700 text-white">Submit a Prompt</Button>
           </Link>
         </div>
       )}
 
       <div>
-        <h2 className="text-xl font-semibold text-zinc-200 mb-4">
-          Submissions
-        </h2>
-        {challenge.submissions.length === 0
-          ? (
-            <p className="text-zinc-500">
-              No submissions yet. Be the first!
-            </p>
-          )
-          : (
-            <div className="space-y-3">
-              {challenge.submissions.map(s => (
-                <SubmissionCard
-                  key={s.id}
-                  id={s.id}
-                  status={s.status}
-                  codespaceUrl={s.codespaceUrl}
-                  reviewScore={s.reviewScore}
-                  eloChange={s.eloChange}
-                  iterations={s.iterations}
-                  inputTokens={s.inputTokens}
-                  outputTokens={s.outputTokens}
-                  totalDurationMs={s.totalDurationMs}
-                  userName={s.user.name}
-                  userImage={s.user.image}
-                  reviewCount={s._count.reviews}
-                  errors={s.errors}
-                />
-              ))}
-            </div>
-          )}
+        <h2 className="text-xl font-semibold text-zinc-200 mb-4">Submissions</h2>
+        {challenge.submissions.length === 0 ? (
+          <p className="text-zinc-500">No submissions yet. Be the first!</p>
+        ) : (
+          <div className="space-y-3">
+            {challenge.submissions.map((s) => (
+              <SubmissionCard
+                key={s.id}
+                id={s.id}
+                status={s.status}
+                codespaceUrl={s.codespaceUrl}
+                reviewScore={s.reviewScore}
+                eloChange={s.eloChange}
+                iterations={s.iterations}
+                inputTokens={s.inputTokens}
+                outputTokens={s.outputTokens}
+                totalDurationMs={s.totalDurationMs}
+                userName={s.user.name}
+                userImage={s.user.image}
+                reviewCount={s._count.reviews}
+                errors={s.errors}
+              />
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

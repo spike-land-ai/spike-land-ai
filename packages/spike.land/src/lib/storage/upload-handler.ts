@@ -102,9 +102,7 @@ export async function processAndUploadImage(
 
   if (uploadError) {
     logger.error("Error uploading image:", uploadError);
-    return createErrorResult(
-      uploadError instanceof Error ? uploadError.message : "Unknown error",
-    );
+    return createErrorResult(uploadError instanceof Error ? uploadError.message : "Unknown error");
   }
 
   if (!uploadResult.success) {
@@ -129,7 +127,7 @@ export async function processAndUploadImage(
 export function validateImageFile(
   file: File | Buffer,
   maxSizeBytes = 50 * 1024 * 1024, // 50MB
-): { valid: boolean; error?: string; } {
+): { valid: boolean; error?: string } {
   const size = Buffer.isBuffer(file) ? file.length : (file as File).size;
 
   if (size > maxSizeBytes) {
@@ -141,5 +139,3 @@ export function validateImageFile(
 
   return { valid: true };
 }
-
-

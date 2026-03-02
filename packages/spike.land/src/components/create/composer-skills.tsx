@@ -28,7 +28,9 @@ export function ComposerSkills({ query }: ComposerSkillsProps) {
         className="flex items-center gap-1 overflow-x-auto scrollbar-none px-4"
       >
         <AnimatePresence mode="popLayout">
-          {skills.map((skill, i) => <SkillBadge key={skill.id} skill={skill} index={i} />)}
+          {skills.map((skill, i) => (
+            <SkillBadge key={skill.id} skill={skill} index={i} />
+          ))}
         </AnimatePresence>
       </motion.div>
     </div>

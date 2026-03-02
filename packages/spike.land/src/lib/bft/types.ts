@@ -7,12 +7,7 @@
 
 export type NodeBehavior = "honest" | "silent" | "equivocating";
 
-export type PbftPhase =
-  | "idle"
-  | "pre_prepare"
-  | "prepare"
-  | "commit"
-  | "decided";
+export type PbftPhase = "idle" | "pre_prepare" | "prepare" | "commit" | "decided";
 
 export interface PbftMessage {
   id: string;

@@ -33,12 +33,7 @@ export interface AbTest {
   updatedAt: Date;
 }
 
-export type VariationType =
-  | "headline"
-  | "cta"
-  | "emoji"
-  | "hashtags"
-  | "tone";
+export type VariationType = "headline" | "cta" | "emoji" | "hashtags" | "tone";
 
 export interface SignificanceResult {
   isSignificant: boolean;

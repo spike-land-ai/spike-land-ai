@@ -38,7 +38,4 @@ const server = http.createServer(async (req, res) => {
   }
 });
 
-server.listen(
-  PORT,
-  () => console.log(`Redis REST proxy listening on :${PORT}`),
-);
+server.listen(PORT, () => console.log(`Redis REST proxy listening on :${PORT}`));

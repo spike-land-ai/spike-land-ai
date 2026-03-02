@@ -1,29 +1,22 @@
-import {
-  checkSessionHealth,
-  checkSessionsHealth,
-} from "@/lib/codespace/session-service";
+import { checkSessionHealth, checkSessionsHealth } from "@/lib/codespace/session-service";
 import logger from "@/lib/logger";
 import { tryCatch } from "@/lib/try-catch";
 
 // Cache health check results for 60 seconds
-const healthCache = new Map<string, { healthy: boolean; cachedAt: number; }>();
+const healthCache = new Map<string, { healthy: boolean; cachedAt: number }>();
 const CACHE_TTL_MS = 60_000;
 
 /**
  * Check if a codespace has real, non-default content
  */
-export async function isCodespaceHealthy(
-  codespaceId: string,
-): Promise<boolean> {
+export async function isCodespaceHealthy(codespaceId: string): Promise<boolean> {
   // Check cache first
   const cached = healthCache.get(codespaceId);
   if (cached && Date.now() - cached.cachedAt < CACHE_TTL_MS) {
     return cached.healthy;
   }
 
-  const { data: healthy, error } = await tryCatch(
-    checkSessionHealth(codespaceId),
-  );
+  const { data: healthy, error } = await tryCatch(checkSessionHealth(codespaceId));
 
   if (error || healthy === undefined) {
     logger.warn(`[codespace-health] No session found for ${codespaceId}`);
@@ -42,9 +35,7 @@ function cacheResult(codespaceId: string, healthy: boolean) {
 /**
  * Batch check multiple codespace IDs
  */
-export async function filterHealthyCodespaces<
-  T extends { codespaceId: string | null; },
->(
+export async function filterHealthyCodespaces<T extends { codespaceId: string | null }>(
   items: T[],
 ): Promise<T[]> {
   const needsCheck = new Set<string>();
@@ -69,9 +60,7 @@ export async function filterHealthyCodespaces<
     );
 
     if (error) {
-      logger.warn(
-        `[codespace-health] Batch health check failed: ${error.message}`,
-      );
+      logger.warn(`[codespace-health] Batch health check failed: ${error.message}`);
     }
 
     if (batchResults) {
@@ -82,7 +71,7 @@ export async function filterHealthyCodespaces<
     }
 
     // For any that are still missing (failed or not found), mark as unhealthy and cache it
-    needsCheck.forEach(id => {
+    needsCheck.forEach((id) => {
       if (!results.has(id)) {
         // Only cache failure if we didn't get a result (e.g. DB error handled inside checkSessionsHealth)
         cacheResult(id, false);
@@ -91,7 +80,7 @@ export async function filterHealthyCodespaces<
     });
   }
 
-  return items.filter(item => {
+  return items.filter((item) => {
     if (!item.codespaceId) return false;
     return results.get(item.codespaceId) === true;
   });
@@ -102,9 +91,7 @@ export async function filterHealthyCodespaces<
  * Returns true if the app is healthy, false if it should be marked as FAILED.
  * This is a lightweight check intended to be called on page access.
  */
-export async function revalidatePublishedApp(
-  codespaceId: string,
-): Promise<boolean> {
+export async function revalidatePublishedApp(codespaceId: string): Promise<boolean> {
   // Bypass cache for revalidation — we want a fresh check
   healthCache.delete(codespaceId);
   return isCodespaceHealthy(codespaceId);

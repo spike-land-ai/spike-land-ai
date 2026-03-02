@@ -40,9 +40,7 @@ import {
 } from "./redis-client";
 import type { AgentRedisData } from "./redis-client";
 
-const makeAgentData = (
-  overrides?: Partial<AgentRedisData>,
-): AgentRedisData => ({
+const makeAgentData = (overrides?: Partial<AgentRedisData>): AgentRedisData => ({
   agentId: "agent-1",
   userId: "user-1",
   machineId: "machine-1",
@@ -77,15 +75,8 @@ describe("redis-client", () => {
         JSON.stringify(data),
         { ex: 30 * 24 * 60 * 60 }, // 30-day TTL to prevent orphaned keys
       );
-      expect(mockRedis.set).toHaveBeenCalledWith(
-        "agent:agent-1:status",
-        "online",
-        { ex: 90 },
-      );
-      expect(mockRedis.sadd).toHaveBeenCalledWith(
-        "user:user-1:agents",
-        "agent-1",
-      );
+      expect(mockRedis.set).toHaveBeenCalledWith("agent:agent-1:status", "online", { ex: 90 });
+      expect(mockRedis.sadd).toHaveBeenCalledWith("user:user-1:agents", "agent-1");
       // Activity logged (lpush called for activity)
       expect(mockRedis.lpush).toHaveBeenCalled();
       // SSE event published
@@ -97,11 +88,7 @@ describe("redis-client", () => {
     it("should refresh status TTL", async () => {
       await processHeartbeat("agent-1");
 
-      expect(mockRedis.set).toHaveBeenCalledWith(
-        "agent:agent-1:status",
-        "online",
-        { ex: 90 },
-      );
+      expect(mockRedis.set).toHaveBeenCalledWith("agent:agent-1:status", "online", { ex: 90 });
     });
 
     it("should update agent data when projectPath provided", async () => {
@@ -125,16 +112,8 @@ describe("redis-client", () => {
         toolUsage: { read: 5, write: 3 },
       });
 
-      expect(mockRedis.hincrby).toHaveBeenCalledWith(
-        "agent:agent-1:tools",
-        "read",
-        5,
-      );
-      expect(mockRedis.hincrby).toHaveBeenCalledWith(
-        "agent:agent-1:tools",
-        "write",
-        3,
-      );
+      expect(mockRedis.hincrby).toHaveBeenCalledWith("agent:agent-1:tools", "read", 5);
+      expect(mockRedis.hincrby).toHaveBeenCalledWith("agent:agent-1:tools", "write", 3);
     });
 
     it("should log activity when activity provided", async () => {
@@ -146,11 +125,7 @@ describe("redis-client", () => {
 
       await processHeartbeat("agent-1", "sleeping", { activity });
 
-      expect(mockRedis.set).toHaveBeenCalledWith(
-        "agent:agent-1:status",
-        "sleeping",
-        { ex: 90 },
-      );
+      expect(mockRedis.set).toHaveBeenCalledWith("agent:agent-1:status", "sleeping", { ex: 90 });
       expect(mockRedis.lpush).toHaveBeenCalled();
     });
   });
@@ -169,15 +144,8 @@ describe("redis-client", () => {
         "agent:agent-1:activity",
         JSON.stringify(activity),
       );
-      expect(mockRedis.ltrim).toHaveBeenCalledWith(
-        "agent:agent-1:activity",
-        0,
-        99,
-      );
-      expect(mockRedis.expire).toHaveBeenCalledWith(
-        "agent:agent-1:activity",
-        86400,
-      );
+      expect(mockRedis.ltrim).toHaveBeenCalledWith("agent:agent-1:activity", 0, 99);
+      expect(mockRedis.expire).toHaveBeenCalledWith("agent:agent-1:activity", 86400);
     });
   });
 
@@ -201,11 +169,7 @@ describe("redis-client", () => {
 
       await getAgentActivity("agent-1", 10);
 
-      expect(mockRedis.lrange).toHaveBeenCalledWith(
-        "agent:agent-1:activity",
-        0,
-        9,
-      );
+      expect(mockRedis.lrange).toHaveBeenCalledWith("agent:agent-1:activity", 0, 9);
     });
   });
 
@@ -266,9 +230,7 @@ describe("redis-client", () => {
       mockRedis.get
         .mockResolvedValueOnce(null) // agent-1 data missing
         .mockResolvedValueOnce(null) // agent-1 status
-        .mockResolvedValueOnce(
-          JSON.stringify(makeAgentData({ agentId: "agent-2" })),
-        )
+        .mockResolvedValueOnce(JSON.stringify(makeAgentData({ agentId: "agent-2" })))
         .mockResolvedValueOnce("sleeping");
 
       const result = await getUserAgents("user-1");
@@ -323,10 +285,7 @@ describe("redis-client", () => {
       expect(mockRedis.del).toHaveBeenCalledWith("agent:agent-1:activity");
       expect(mockRedis.del).toHaveBeenCalledWith("agent:agent-1:tools");
       expect(mockRedis.del).toHaveBeenCalledWith("agent:agent-1:tasks");
-      expect(mockRedis.srem).toHaveBeenCalledWith(
-        "user:user-1:agents",
-        "agent-1",
-      );
+      expect(mockRedis.srem).toHaveBeenCalledWith("user:user-1:agents", "agent-1");
     });
   });
 
@@ -336,15 +295,10 @@ describe("redis-client", () => {
 
       await sendTaskToAgent("agent-1", task);
 
-      const pushed = JSON.parse(
-        mockRedis.lpush.mock.calls[0]![1] as string,
-      );
+      const pushed = JSON.parse(mockRedis.lpush.mock.calls[0]![1] as string);
       expect(pushed.status).toBe("pending");
       expect(pushed.id).toBe("task-1");
-      expect(mockRedis.expire).toHaveBeenCalledWith(
-        "agent:agent-1:tasks",
-        86400,
-      );
+      expect(mockRedis.expire).toHaveBeenCalledWith("agent:agent-1:tasks", 86400);
     });
   });
 
@@ -416,10 +370,7 @@ describe("redis-client", () => {
 
       await publishAgentEvent("user-1", event);
 
-      expect(mockRedis.publish).toHaveBeenCalledWith(
-        "sse:agents:user-1",
-        JSON.stringify(event),
-      );
+      expect(mockRedis.publish).toHaveBeenCalledWith("sse:agents:user-1", JSON.stringify(event));
       expect(mockRedis.lpush).toHaveBeenCalledWith(
         "sse:agents:user-1:events",
         JSON.stringify(event),
@@ -428,9 +379,7 @@ describe("redis-client", () => {
 
     it("should handle publish errors gracefully", async () => {
       mockRedis.publish.mockRejectedValue(new Error("connection failed"));
-      const consoleSpy = vi.spyOn(console, "error").mockImplementation(
-        () => {},
-      );
+      const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
 
       const event = {
         type: "agent_connected" as const,

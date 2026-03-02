@@ -31,11 +31,7 @@ export interface ORSetState {
   elements: Record<string, string[]>; // value -> uniqueTags[]
 }
 
-export type ReplicaState =
-  | GCounterState
-  | PNCounterState
-  | LWWRegisterState
-  | ORSetState;
+export type ReplicaState = GCounterState | PNCounterState | LWWRegisterState | ORSetState;
 
 // --- Replica ---
 

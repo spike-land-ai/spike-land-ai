@@ -8,11 +8,7 @@
 import type { ToolRegistry } from "../mcp/registry";
 import type { DrizzleDB } from "../db/index";
 
-export function registerEmailTools(
-  _registry: ToolRegistry,
-  _userId: string,
-  _db: DrizzleDB,
-): void {
+export function registerEmailTools(_registry: ToolRegistry, _userId: string, _db: DrizzleDB): void {
   // Not yet migrated — requires email service adapter
 }
 

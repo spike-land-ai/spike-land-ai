@@ -35,9 +35,7 @@ vi.mock("./fallback-bot", () => ({
     const encoder = new TextEncoder();
     return new ReadableStream({
       start(controller) {
-        controller.enqueue(
-          encoder.encode("data: {\"type\":\"text\",\"text\":\"fallback\"}\n\n"),
-        );
+        controller.enqueue(encoder.encode('data: {"type":"text","text":"fallback"}\n\n'));
         controller.close();
       },
     });
@@ -46,10 +44,7 @@ vi.mock("./fallback-bot", () => ({
 
 // ─── Import under test ──────────────────────────────────────────────────────
 
-import {
-  clearSession,
-  createAgentLoopStream,
-} from "./agent-loop-server";
+import { clearSession, createAgentLoopStream } from "./agent-loop-server";
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
@@ -90,7 +85,7 @@ describe("createAgentLoopStream", () => {
     const stream = createAgentLoopStream(makeOptions());
     const output = await collectStream(stream);
 
-    expect(output).toContain("\"type\":\"done\"");
+    expect(output).toContain('"type":"done"');
     expect(mockRunAgentLoop).toHaveBeenCalled();
   });
 
@@ -116,7 +111,7 @@ describe("createAgentLoopStream", () => {
     const stream = createAgentLoopStream(makeOptions());
     const output = await collectStream(stream);
 
-    expect(output).toContain("\"type\":\"done\"");
+    expect(output).toContain('"type":"done"');
     expect(mockChatClientConstructor).toHaveBeenCalledWith(
       expect.objectContaining({ apiKey: "env-key" }),
     );
@@ -140,7 +135,7 @@ describe("createAgentLoopStream", () => {
 
   it("emits text_delta events via onTextDelta callback", async () => {
     mockRunAgentLoop.mockImplementation(
-      async (_content: unknown, ctx: { onTextDelta: (text: string) => void; }) => {
+      async (_content: unknown, ctx: { onTextDelta: (text: string) => void }) => {
         ctx.onTextDelta("Hello ");
         ctx.onTextDelta("world");
       },
@@ -149,9 +144,9 @@ describe("createAgentLoopStream", () => {
     const stream = createAgentLoopStream(makeOptions());
     const output = await collectStream(stream);
 
-    expect(output).toContain("\"type\":\"text_delta\"");
-    expect(output).toContain("\"text\":\"Hello \"");
-    expect(output).toContain("\"text\":\"world\"");
+    expect(output).toContain('"type":"text_delta"');
+    expect(output).toContain('"text":"Hello "');
+    expect(output).toContain('"text":"world"');
   });
 
   it("emits error event on non-auth failure", async () => {
@@ -160,7 +155,7 @@ describe("createAgentLoopStream", () => {
     const stream = createAgentLoopStream(makeOptions());
     const output = await collectStream(stream);
 
-    expect(output).toContain("\"type\":\"error\"");
+    expect(output).toContain('"type":"error"');
     expect(output).toContain("An error occurred");
   });
 
@@ -202,9 +197,7 @@ describe("createAgentLoopStream", () => {
 
     const stream = createAgentLoopStream(
       makeOptions({
-        attachments: [
-          { type: "image/png", data: "data:image/png;base64,iVBORw0KGgo=" },
-        ],
+        attachments: [{ type: "image/png", data: "data:image/png;base64,iVBORw0KGgo=" }],
       }),
     );
     await collectStream(stream);

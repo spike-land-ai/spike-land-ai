@@ -2,16 +2,7 @@
  * State Machine Templates: Basics & Web & API
  */
 
-import {
-  Globe,
-  Lock,
-  Radio,
-  RefreshCw,
-  ShieldCheck,
-  Timer,
-  TrafficCone,
-  Zap,
-} from "lucide-react";
+import { Globe, Lock, Radio, RefreshCw, ShieldCheck, Timer, TrafficCone, Zap } from "lucide-react";
 import type { TemplateDefinition } from "../TemplateLibrary";
 
 export const BASICS_TEMPLATES: TemplateDefinition[] = [
@@ -137,10 +128,12 @@ export const WEB_API_TEMPLATES: TemplateDefinition[] = [
         source: "authenticating",
         target: "logged_out",
         event: "AUTH_FAILURE",
-        actions: [{
-          type: "assign",
-          params: { error: "Authentication failed" },
-        }],
+        actions: [
+          {
+            type: "assign",
+            params: { error: "Authentication failed" },
+          },
+        ],
       },
       { source: "logged_in", target: "expired", event: "TOKEN_EXPIRED" },
       { source: "expired", target: "authenticating", event: "REFRESH" },
@@ -176,10 +169,12 @@ export const WEB_API_TEMPLATES: TemplateDefinition[] = [
         target: "waiting",
         event: "FAILURE",
         guard_expression: "context.retryCount < 3",
-        actions: [{
-          type: "assign",
-          params: { retryCount: "context.retryCount + 1" },
-        }],
+        actions: [
+          {
+            type: "assign",
+            params: { retryCount: "context.retryCount + 1" },
+          },
+        ],
       },
       {
         source: "attempting",

@@ -17,35 +17,22 @@ interface SkillRadarChartProps {
 
 export function SkillRadarChart({ gaps }: SkillRadarChartProps) {
   // Take top 8 skills for readability
-  const chartData = gaps.slice(0, 8).map(gap => ({
-    skill: gap.skill.title.length > 15
-      ? gap.skill.title.slice(0, 15) + "..."
-      : gap.skill.title,
+  const chartData = gaps.slice(0, 8).map((gap) => ({
+    skill: gap.skill.title.length > 15 ? gap.skill.title.slice(0, 15) + "..." : gap.skill.title,
     required: gap.requiredLevel,
     yours: gap.userProficiency,
   }));
 
   if (chartData.length === 0) {
-    return (
-      <p className="text-zinc-500 text-sm text-center py-8">
-        No skill data available.
-      </p>
-    );
+    return <p className="text-zinc-500 text-sm text-center py-8">No skill data available.</p>;
   }
 
   return (
     <ResponsiveContainer width="100%" height={300}>
       <RadarChart data={chartData}>
         <PolarGrid stroke="#333" />
-        <PolarAngleAxis
-          dataKey="skill"
-          tick={{ fill: "#a1a1aa", fontSize: 11 }}
-        />
-        <PolarRadiusAxis
-          angle={30}
-          domain={[0, 5]}
-          tick={{ fill: "#71717a", fontSize: 10 }}
-        />
+        <PolarAngleAxis dataKey="skill" tick={{ fill: "#a1a1aa", fontSize: 11 }} />
+        <PolarRadiusAxis angle={30} domain={[0, 5]} tick={{ fill: "#71717a", fontSize: 10 }} />
         <Radar
           name="Required"
           dataKey="required"

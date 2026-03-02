@@ -1,9 +1,6 @@
 "use client";
 
-import type {
-  OnboardingData,
-  OnboardingPersona,
-} from "@/lib/onboarding/personas";
+import type { OnboardingData, OnboardingPersona } from "@/lib/onboarding/personas";
 import { PERSONAS } from "@/lib/onboarding/personas";
 import { STORE_APPS } from "@/app/store/data/store-apps";
 import { ArrowRight, Sparkles } from "lucide-react";
@@ -16,10 +13,10 @@ export function PersonalizedWelcome() {
 
   useEffect(() => {
     fetch("/api/onboarding")
-      .then(res => res.json())
-      .then((data: { onboarding: OnboardingData | null; }) => {
+      .then((res) => res.json())
+      .then((data: { onboarding: OnboardingData | null }) => {
         if (data.onboarding) {
-          const found = PERSONAS.find(p => p.id === data.onboarding!.personaId);
+          const found = PERSONAS.find((p) => p.id === data.onboarding!.personaId);
           setPersona(found ?? null);
         }
       })
@@ -39,7 +36,9 @@ export function PersonalizedWelcome() {
             </div>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            {[1, 2, 3, 4].map(i => <div key={i} className="h-20 rounded-2xl bg-muted" />)}
+            {[1, 2, 3, 4].map((i) => (
+              <div key={i} className="h-20 rounded-2xl bg-muted" />
+            ))}
           </div>
         </div>
       </section>
@@ -48,7 +47,7 @@ export function PersonalizedWelcome() {
 
   if (!persona) return null;
 
-  const apps = STORE_APPS.filter(app => persona.recommendedAppSlugs.includes(app.slug));
+  const apps = STORE_APPS.filter((app) => persona.recommendedAppSlugs.includes(app.slug));
 
   function getAppEmoji(slug: string): string {
     const emojiMap: Record<string, string> = {
@@ -63,7 +62,7 @@ export function PersonalizedWelcome() {
       mcp: "🔧",
       pixel: "🎨",
     };
-    const key = Object.keys(emojiMap).find(k => slug.includes(k));
+    const key = Object.keys(emojiMap).find((k) => slug.includes(k));
     return (key ? emojiMap[key] : undefined) ?? "⚡";
   }
 
@@ -87,9 +86,7 @@ export function PersonalizedWelcome() {
               <p className="text-sm text-cyan-400/80 font-medium tracking-wide uppercase mb-0.5">
                 Welcome back, {persona.name}
               </p>
-              <p className="text-lg font-semibold text-white">
-                {persona.heroText}
-              </p>
+              <p className="text-lg font-semibold text-white">{persona.heroText}</p>
             </div>
           </div>
           <div className="flex items-center gap-3">
@@ -109,7 +106,7 @@ export function PersonalizedWelcome() {
             Recommended for you
           </p>
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-            {apps.map(app => (
+            {apps.map((app) => (
               <Link
                 key={app.id}
                 href={app.appUrl ?? `/store/${app.slug}`}
@@ -120,9 +117,7 @@ export function PersonalizedWelcome() {
                   <span className="text-sm font-medium text-foreground">{app.name}</span>
                   <ArrowRight className="w-4 h-4 text-muted-foreground opacity-0 group-hover/card:opacity-100 group-hover/card:translate-x-1 transition-all duration-300" />
                 </div>
-                <span className="line-clamp-2 text-xs text-zinc-500">
-                  {app.tagline}
-                </span>
+                <span className="line-clamp-2 text-xs text-zinc-500">{app.tagline}</span>
               </Link>
             ))}
           </div>

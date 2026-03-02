@@ -27,7 +27,7 @@ describe("Proxy CSP Header", () => {
     // Create a mock NextRequest
     const request = new NextRequest("http://localhost:3000/settings", {
       headers: {
-        "origin": "http://localhost:3000",
+        origin: "http://localhost:3000",
       },
     });
 

@@ -5,12 +5,7 @@ import { cn } from "@/lib/utils";
 import { Loader2, Pause, Volume2, VolumeX } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 const MIN_TEXT_LENGTH = 20;
 
@@ -52,19 +47,23 @@ export function ReadAloudParagraph({ children }: ReadAloudParagraphProps) {
     return undefined;
   }, [state]);
 
-  const icon = state === "loading"
-    ? <Loader2 className="h-4 w-4 animate-spin" />
-    : state === "playing"
-    ? <Pause className="h-4 w-4" />
-    : showError
-    ? <VolumeX className="h-4 w-4 text-destructive" />
-    : <Volume2 className="h-4 w-4" />;
+  const icon =
+    state === "loading" ? (
+      <Loader2 className="h-4 w-4 animate-spin" />
+    ) : state === "playing" ? (
+      <Pause className="h-4 w-4" />
+    ) : showError ? (
+      <VolumeX className="h-4 w-4 text-destructive" />
+    ) : (
+      <Volume2 className="h-4 w-4" />
+    );
 
-  const tooltip = state === "playing"
-    ? "Stop reading"
-    : state === "loading"
-    ? "Generating audio..."
-    : "Listen to this paragraph";
+  const tooltip =
+    state === "playing"
+      ? "Stop reading"
+      : state === "loading"
+        ? "Generating audio..."
+        : "Listen to this paragraph";
 
   return (
     <div ref={ref} className="group relative">
@@ -81,8 +80,7 @@ export function ReadAloudParagraph({ children }: ReadAloudParagraphProps) {
                   "opacity-40 md:opacity-0 md:group-hover:opacity-100",
                   "hover:bg-muted focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
                   "text-muted-foreground hover:text-foreground",
-                  state === "playing"
-                    && "opacity-100 md:opacity-100 text-primary",
+                  state === "playing" && "opacity-100 md:opacity-100 text-primary",
                 )}
                 aria-label={tooltip}
               >

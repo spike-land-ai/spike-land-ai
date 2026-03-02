@@ -38,18 +38,17 @@ export function AIPanel({
 
     try {
       const data = await mcpCall("chat_send_message", {
-        message:
-          `Describe this state machine in plain English. Explain its purpose, states, transitions, and edge cases:\n\n${
-            JSON.stringify(machineExport, null, 2)
-          }`,
+        message: `Describe this state machine in plain English. Explain its purpose, states, transitions, and edge cases:\n\n${JSON.stringify(
+          machineExport,
+          null,
+          2,
+        )}`,
       });
 
       const text = data ?? "No description generated.";
       setResult(text);
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Failed to describe machine",
-      );
+      setError(err instanceof Error ? err.message : "Failed to describe machine");
     } finally {
       setIsProcessing(false);
     }
@@ -68,9 +67,7 @@ export function AIPanel({
       );
       setPrompt("");
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Failed to generate machine",
-      );
+      setError(err instanceof Error ? err.message : "Failed to generate machine");
     } finally {
       setIsProcessing(false);
     }
@@ -84,18 +81,17 @@ export function AIPanel({
 
     try {
       const data = await mcpCall("chat_send_message", {
-        message:
-          `Analyze this state machine and suggest improvements. Look for: missing error states, unreachable paths, missing guards, dead-end recovery transitions, and optimization opportunities. Be specific with actionable suggestions.\n\nMachine: ${
-            JSON.stringify(machineExport, null, 2)
-          }`,
+        message: `Analyze this state machine and suggest improvements. Look for: missing error states, unreachable paths, missing guards, dead-end recovery transitions, and optimization opportunities. Be specific with actionable suggestions.\n\nMachine: ${JSON.stringify(
+          machineExport,
+          null,
+          2,
+        )}`,
       });
 
       const text = data ?? "No suggestions generated.";
       setResult(text);
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Failed to get suggestions",
-      );
+      setError(err instanceof Error ? err.message : "Failed to get suggestions");
     } finally {
       setIsProcessing(false);
     }
@@ -134,7 +130,7 @@ export function AIPanel({
         tabIndex={0}
         className="absolute inset-0 bg-black/60 backdrop-blur-sm"
         onClick={onClose}
-        onKeyDown={e => {
+        onKeyDown={(e) => {
           if (e.key === "Escape" || e.key === "Enter") onClose();
         }}
         aria-label="Close AI panel"
@@ -148,13 +144,9 @@ export function AIPanel({
               <Sparkles className="w-5 h-5 text-purple-400" />
             </div>
             <div>
-              <h2 className="text-base font-semibold text-white tracking-tight">
-                AI Assistant
-              </h2>
+              <h2 className="text-base font-semibold text-white tracking-tight">AI Assistant</h2>
               <p className="text-[11px] text-zinc-400 uppercase tracking-wider font-medium mt-0.5">
-                {machineName
-                  ? `Working on: ${machineName}`
-                  : "Create or analyze state machines"}
+                {machineName ? `Working on: ${machineName}` : "Create or analyze state machines"}
               </p>
             </div>
           </div>
@@ -168,7 +160,7 @@ export function AIPanel({
 
         {/* Mode tabs */}
         <div className="flex gap-1.5 px-6 pt-5 shrink-0">
-          {modes.map(m => (
+          {modes.map((m) => (
             <button
               key={m.id}
               onClick={() => {
@@ -181,12 +173,14 @@ export function AIPanel({
                   ? "text-white shadow-md"
                   : "text-zinc-500 hover:text-zinc-300 bg-transparent"
               }`}
-              style={mode === m.id
-                ? {
-                  background: `${m.color}25`,
-                  border: `1px solid ${m.color}40`,
-                }
-                : { border: `1px solid transparent` }}
+              style={
+                mode === m.id
+                  ? {
+                      background: `${m.color}25`,
+                      border: `1px solid ${m.color}40`,
+                    }
+                  : { border: `1px solid transparent` }
+              }
             >
               {m.icon}
               {m.label}
@@ -205,10 +199,10 @@ export function AIPanel({
                 <input
                   type="text"
                   value={prompt}
-                  onChange={e => setPrompt(e.target.value)}
+                  onChange={(e) => setPrompt(e.target.value)}
                   placeholder='e.g. "Traffic light cycling red → green → yellow → red with NEXT event"'
                   className="flex-1 px-4 py-3 bg-zinc-900/50 border border-zinc-800 rounded-xl text-sm text-zinc-200 placeholder-zinc-600 focus:outline-none focus:border-purple-500/50 focus:ring-1 focus:ring-purple-500/30 transition-all shadow-inner"
-                  onKeyDown={e => e.key === "Enter" && handleGenerate()}
+                  onKeyDown={(e) => e.key === "Enter" && handleGenerate()}
                   id="ai-generate-input"
                 />
                 <button
@@ -217,9 +211,11 @@ export function AIPanel({
                   className="px-5 py-3 rounded-xl text-sm font-medium bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white disabled:from-zinc-800 disabled:to-zinc-800 shadow-md transition-all flex items-center justify-center shrink-0"
                   id="ai-generate-btn"
                 >
-                  {isProcessing
-                    ? <Loader2 className="w-4 h-4 animate-spin" />
-                    : <Send className="w-4 h-4 shadow-sm" />}
+                  {isProcessing ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <Send className="w-4 h-4 shadow-sm" />
+                  )}
                 </button>
               </div>
               <div className="text-xs text-zinc-500 space-y-2 mt-2">
@@ -230,10 +226,7 @@ export function AIPanel({
                   <button
                     type="button"
                     className="block w-full text-left cursor-pointer hover:text-zinc-300 transition-colors pl-2"
-                    onClick={() =>
-                      setPrompt(
-                        "A stopwatch with start, stop, reset, and lap events",
-                      )}
+                    onClick={() => setPrompt("A stopwatch with start, stop, reset, and lap events")}
                   >
                     &ldquo;A stopwatch with start, stop, reset, and lap events&rdquo;
                   </button>
@@ -243,7 +236,8 @@ export function AIPanel({
                     onClick={() =>
                       setPrompt(
                         "A vending machine that accepts coins, dispenses items, and gives change",
-                      )}
+                      )
+                    }
                   >
                     &ldquo;A vending machine that accepts coins, dispenses items, and gives
                     change&rdquo;
@@ -251,10 +245,7 @@ export function AIPanel({
                   <button
                     type="button"
                     className="block w-full text-left cursor-pointer hover:text-zinc-300 transition-colors pl-2"
-                    onClick={() =>
-                      setPrompt(
-                        "An elevator controller for a 5-floor building",
-                      )}
+                    onClick={() => setPrompt("An elevator controller for a 5-floor building")}
                   >
                     &ldquo;An elevator controller for a 5-floor building&rdquo;
                   </button>
@@ -274,9 +265,11 @@ export function AIPanel({
                 className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm font-semibold bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 text-white disabled:from-zinc-800 disabled:to-zinc-800 transition-all shadow-md"
                 id="ai-describe-btn"
               >
-                {isProcessing
-                  ? <Loader2 className="w-4 h-4 animate-spin" />
-                  : <FileText className="w-4 h-4" />}
+                {isProcessing ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <FileText className="w-4 h-4" />
+                )}
                 {isProcessing ? "Analyzing..." : "Describe Machine"}
               </button>
             </div>
@@ -294,9 +287,11 @@ export function AIPanel({
                 className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm font-semibold bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-500 hover:to-orange-500 text-white disabled:from-zinc-800 disabled:to-zinc-800 transition-all shadow-md"
                 id="ai-suggest-btn"
               >
-                {isProcessing
-                  ? <Loader2 className="w-4 h-4 animate-spin" />
-                  : <Lightbulb className="w-4 h-4" />}
+                {isProcessing ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <Lightbulb className="w-4 h-4" />
+                )}
                 {isProcessing ? "Analyzing..." : "Suggest Improvements"}
               </button>
             </div>

@@ -1,14 +1,6 @@
 "use client";
 
-import {
-  Bar,
-  BarChart,
-  CartesianGrid,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from "recharts";
+import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { SalaryData } from "@/lib/career/types";
 
@@ -46,7 +38,7 @@ export function SalaryChart({ salary }: SalaryChartProps) {
                 borderRadius: 8,
               }}
               labelStyle={{ color: "#fff" }}
-              formatter={value => `${salary.currency}${Number(value).toLocaleString()}`}
+              formatter={(value) => `${salary.currency}${Number(value).toLocaleString()}`}
             />
             <Bar dataKey="value" fill="#3b82f6" radius={[4, 4, 0, 0]} />
           </BarChart>

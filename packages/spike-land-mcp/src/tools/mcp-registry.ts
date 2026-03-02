@@ -58,8 +58,7 @@ async function searchSmithery(query: string, limit: number): Promise<McpServerIn
       description: s.description ?? "",
       source: "smithery" as const,
       url: `https://smithery.ai/server/${s.qualifiedName}`,
-      transport:
-        (s.connections?.[0]?.type as "stdio" | "sse" | "streamable-http") ?? "stdio",
+      transport: (s.connections?.[0]?.type as "stdio" | "sse" | "streamable-http") ?? "stdio",
       envVarsRequired: [],
       ...(s.homepage !== undefined ? { homepage: s.homepage } : {}),
     }));
@@ -68,10 +67,7 @@ async function searchSmithery(query: string, limit: number): Promise<McpServerIn
   }
 }
 
-async function searchOfficialRegistry(
-  query: string,
-  limit: number,
-): Promise<McpServerInfo[]> {
+async function searchOfficialRegistry(query: string, limit: number): Promise<McpServerInfo[]> {
   const url = `${OFFICIAL_MCP_REGISTRY_BASE}?q=${encodeURIComponent(query)}&count=${limit}`;
   try {
     const response = await fetch(url);
@@ -133,10 +129,7 @@ async function searchGlama(query: string, limit: number): Promise<McpServerInfo[
   }
 }
 
-async function searchAllRegistries(
-  query: string,
-  limit: number,
-): Promise<McpServerInfo[]> {
+async function searchAllRegistries(query: string, limit: number): Promise<McpServerInfo[]> {
   const [smithery, official, glama] = await Promise.allSettled([
     searchSmithery(query, limit),
     searchOfficialRegistry(query, limit),
@@ -172,18 +165,8 @@ export function registerMcpRegistryTools(
         "mcp_registry_search",
         "Search across Smithery, Official MCP Registry, and Glama for MCP servers by keyword. Returns server names, descriptions, and sources.",
         {
-          query: z
-            .string()
-            .min(1)
-            .max(200)
-            .describe("Search query for MCP servers."),
-          limit: z
-            .number()
-            .int()
-            .min(1)
-            .max(50)
-            .optional()
-            .describe("Max results (default 10)."),
+          query: z.string().min(1).max(200).describe("Search query for MCP servers."),
+          limit: z.number().int().min(1).max(50).optional().describe("Max results (default 10)."),
         },
       )
       .meta({ category: "mcp-registry", tier: "free" })
@@ -219,10 +202,7 @@ export function registerMcpRegistryTools(
         "mcp_registry_get",
         "Get detailed information about a specific MCP server including connection config and required environment variables.",
         {
-          serverId: z
-            .string()
-            .min(1)
-            .describe("Server identifier from search results."),
+          serverId: z.string().min(1).describe("Server identifier from search results."),
           source: z
             .enum(["smithery", "official", "glama"])
             .describe("Which registry the server came from."),
@@ -236,8 +216,7 @@ export function registerMcpRegistryTools(
           async () => {
             let results: McpServerInfo[];
             if (source === "smithery") results = await searchSmithery(serverId, 1);
-            else if (source === "official")
-              results = await searchOfficialRegistry(serverId, 1);
+            else if (source === "official") results = await searchOfficialRegistry(serverId, 1);
             else results = await searchGlama(serverId, 1);
 
             const server = results.find((s) => s.id === serverId);
@@ -271,9 +250,7 @@ export function registerMcpRegistryTools(
         "Auto-configure an MCP server by generating a .mcp.json entry. Provide the server ID and any required environment variables.",
         {
           serverId: z.string().min(1).describe("Server identifier."),
-          source: z
-            .enum(["smithery", "official", "glama"])
-            .describe("Registry source."),
+          source: z.enum(["smithery", "official", "glama"]).describe("Registry source."),
           envVars: z
             .record(z.string(), z.string())
             .optional()
@@ -288,8 +265,7 @@ export function registerMcpRegistryTools(
           async () => {
             let results: McpServerInfo[];
             if (source === "smithery") results = await searchSmithery(serverId, 1);
-            else if (source === "official")
-              results = await searchOfficialRegistry(serverId, 1);
+            else if (source === "official") results = await searchOfficialRegistry(serverId, 1);
             else results = await searchGlama(serverId, 1);
 
             const server = results.find((s) => s.id === serverId);
@@ -303,17 +279,15 @@ export function registerMcpRegistryTools(
               [server.name]: {
                 transport: server.transport,
                 url: server.url,
-                ...(envVars && Object.keys(envVars).length > 0
-                  ? { env: envVars }
-                  : {}),
+                ...(envVars && Object.keys(envVars).length > 0 ? { env: envVars } : {}),
               },
             };
 
             return textResult(
-              `**MCP Server Configured:** ${server.name}\n\n`
-                + `Add to your \`.mcp.json\`:\n\`\`\`json\n${JSON.stringify(config, null, 2)}\n\`\`\`\n\n`
-                + `**Transport:** ${server.transport}\n`
-                + `**Source:** ${server.source}`,
+              `**MCP Server Configured:** ${server.name}\n\n` +
+                `Add to your \`.mcp.json\`:\n\`\`\`json\n${JSON.stringify(config, null, 2)}\n\`\`\`\n\n` +
+                `**Transport:** ${server.transport}\n` +
+                `**Source:** ${server.source}`,
             );
           },
           { timeoutMs: 30_000 },

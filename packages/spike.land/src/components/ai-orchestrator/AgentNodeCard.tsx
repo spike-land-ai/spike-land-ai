@@ -1,12 +1,7 @@
 "use client";
 
 import { Badge } from "@/components/ui/badge";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 
 type AgentType = "researcher" | "coder" | "reviewer" | "coordinator" | "specialist";
@@ -55,28 +50,14 @@ export function AgentNodeCard({
     <Card className="bg-zinc-900 border-zinc-800 hover:border-zinc-700 transition-colors h-full">
       <CardHeader className="pb-2">
         <div className="flex items-center gap-2 mb-2 flex-wrap">
-          <Badge
-            variant="outline"
-            className={cn("text-xs", agentTypeBadgeClass[agentType])}
-          >
+          <Badge variant="outline" className={cn("text-xs", agentTypeBadgeClass[agentType])}>
             {agentType}
           </Badge>
-          <span
-            className={cn("text-xs font-mono ml-auto", statusTextClass[status])}
-          >
-            {status}
-          </span>
+          <span className={cn("text-xs font-mono ml-auto", statusTextClass[status])}>{status}</span>
         </div>
         <div className="flex items-center gap-2">
-          <span
-            className={cn(
-              "h-2 w-2 rounded-full shrink-0",
-              statusDotClass[status],
-            )}
-          />
-          <CardTitle className="text-base text-zinc-100 leading-tight">
-            {agentName}
-          </CardTitle>
+          <span className={cn("h-2 w-2 rounded-full shrink-0", statusDotClass[status])} />
+          <CardTitle className="text-base text-zinc-100 leading-tight">{agentName}</CardTitle>
         </div>
         <p className="text-xs text-zinc-600 font-mono">{agentId}</p>
       </CardHeader>

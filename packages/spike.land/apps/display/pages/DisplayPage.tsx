@@ -45,7 +45,7 @@ export default function DisplayPage() {
       peerRef.current = peer;
 
       // Handle peer open event - we now have an ID
-      peer.on("open", id => {
+      peer.on("open", (id) => {
         setDisplayId(id);
 
         // Generate QR code URL
@@ -58,7 +58,7 @@ export default function DisplayPage() {
             light: "#FFFFFF",
           },
         })
-          .then(url => {
+          .then((url) => {
             setQrCodeUrl(url);
           })
           .catch(() => {
@@ -67,7 +67,7 @@ export default function DisplayPage() {
       });
 
       // Handle incoming connections from clients
-      peer.on("connection", dataConnection => {
+      peer.on("connection", (dataConnection) => {
         // Send a welcome message
         dataConnection.on("open", () => {
           dataConnection.send({
@@ -78,15 +78,15 @@ export default function DisplayPage() {
       });
 
       // Handle incoming media calls from clients
-      peer.on("call", call => {
+      peer.on("call", (call) => {
         // Answer the call (we don't send our own stream)
         call.answer();
 
         // Receive the remote stream
-        call.on("stream", remoteStream => {
-          setVideoStreams(prev => {
+        call.on("stream", (remoteStream) => {
+          setVideoStreams((prev) => {
             // Check if stream already exists
-            const exists = prev.some(vs => vs.id === call.peer);
+            const exists = prev.some((vs) => vs.id === call.peer);
             if (exists) {
               return prev;
             }
@@ -105,25 +105,25 @@ export default function DisplayPage() {
 
         // Handle call close
         call.on("close", () => {
-          setVideoStreams(prev => {
-            const streamToRemove = prev.find(vs => vs.id === call.peer);
+          setVideoStreams((prev) => {
+            const streamToRemove = prev.find((vs) => vs.id === call.peer);
             if (streamToRemove) {
               // Stop all tracks to free up resources
-              streamToRemove.stream.getTracks().forEach(track => track.stop());
+              streamToRemove.stream.getTracks().forEach((track) => track.stop());
             }
-            return prev.filter(vs => vs.id !== call.peer);
+            return prev.filter((vs) => vs.id !== call.peer);
           });
         });
 
         // Handle errors
         call.on("error", () => {
-          setVideoStreams(prev => {
-            const streamToRemove = prev.find(vs => vs.id === call.peer);
+          setVideoStreams((prev) => {
+            const streamToRemove = prev.find((vs) => vs.id === call.peer);
             if (streamToRemove) {
               // Stop all tracks to free up resources
-              streamToRemove.stream.getTracks().forEach(track => track.stop());
+              streamToRemove.stream.getTracks().forEach((track) => track.stop());
             }
-            return prev.filter(vs => vs.id !== call.peer);
+            return prev.filter((vs) => vs.id !== call.peer);
           });
         });
       });
@@ -188,83 +188,76 @@ export default function DisplayPage() {
       </div>
 
       {/* Video Grid */}
-      {videoStreams.length > 0
-        ? (
-          <div
-            className="grid h-full w-full gap-3 p-3 transition-all duration-700 ease-in-out z-10 relative"
-            style={{
-              gridTemplateRows: `repeat(${layout.rows}, 1fr)`,
-              gridTemplateColumns: `repeat(${layout.cols}, 1fr)`,
-            }}
-          >
-            {videoStreams.map(videoStream => (
-              <VideoCell
-                key={videoStream.id}
-                stream={videoStream.stream}
-                peerId={videoStream.id}
-                layout={layout}
-              />
-            ))}
-          </div>
-        )
-        : (
-          <div className="flex h-full w-full items-center justify-center z-10 relative px-6">
-            <div className="text-center max-w-2xl space-y-8">
-              <div className="space-y-3">
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-bold uppercase tracking-widest mb-2">
-                  <div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-                  Live Display System
-                </div>
-                <h1 className="text-5xl sm:text-6xl font-black tracking-tighter text-white">
-                  Smart Video Wall
-                </h1>
-                <p className="text-zinc-400 text-lg sm:text-xl font-medium max-w-lg mx-auto">
-                  Transform multiple devices into a single synchronized display. Scan to start
-                  streaming.
-                </p>
+      {videoStreams.length > 0 ? (
+        <div
+          className="grid h-full w-full gap-3 p-3 transition-all duration-700 ease-in-out z-10 relative"
+          style={{
+            gridTemplateRows: `repeat(${layout.rows}, 1fr)`,
+            gridTemplateColumns: `repeat(${layout.cols}, 1fr)`,
+          }}
+        >
+          {videoStreams.map((videoStream) => (
+            <VideoCell
+              key={videoStream.id}
+              stream={videoStream.stream}
+              peerId={videoStream.id}
+              layout={layout}
+            />
+          ))}
+        </div>
+      ) : (
+        <div className="flex h-full w-full items-center justify-center z-10 relative px-6">
+          <div className="text-center max-w-2xl space-y-8">
+            <div className="space-y-3">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-bold uppercase tracking-widest mb-2">
+                <div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+                Live Display System
               </div>
-
-              {qrCodeUrl && displayId
-                ? (
-                  <div className="bg-white p-8 rounded-[2rem] inline-block shadow-2xl shadow-blue-500/10 border border-white/10 animate-in fade-in zoom-in duration-500">
-                    <div className="relative group">
-                      <Image
-                        src={qrCodeUrl}
-                        alt="QR Code"
-                        width={220}
-                        height={220}
-                        className="mx-auto"
-                      />
-                      <div className="absolute inset-0 border-2 border-emerald-500/20 rounded-lg group-hover:border-emerald-500/40 transition-colors" />
-                    </div>
-                    <div className="mt-6 space-y-4">
-                      <p className="text-sm text-zinc-600 font-bold uppercase tracking-tight">
-                        Scan with mobile device
-                      </p>
-                      <button
-                        onClick={() => {
-                          const clientUrl =
-                            `${window.location.origin}/apps/display/client?displayId=${displayId}`;
-                          window.open(clientUrl, "_blank");
-                        }}
-                        className="w-full px-6 py-3 bg-zinc-900 text-white rounded-xl font-bold hover:bg-black transition-all hover:scale-[1.02] active:scale-95 shadow-lg border border-white/5"
-                      >
-                        Open Local Client
-                      </button>
-                    </div>
-                  </div>
-                )
-                : (
-                  <div className="flex flex-col items-center gap-4">
-                    <div className="h-12 w-12 border-4 border-emerald-500/20 border-t-emerald-500 rounded-full animate-spin" />
-                    <p className="text-zinc-500 font-mono text-sm">
-                      Generating Display Session...
-                    </p>
-                  </div>
-                )}
+              <h1 className="text-5xl sm:text-6xl font-black tracking-tighter text-white">
+                Smart Video Wall
+              </h1>
+              <p className="text-zinc-400 text-lg sm:text-xl font-medium max-w-lg mx-auto">
+                Transform multiple devices into a single synchronized display. Scan to start
+                streaming.
+              </p>
             </div>
+
+            {qrCodeUrl && displayId ? (
+              <div className="bg-white p-8 rounded-[2rem] inline-block shadow-2xl shadow-blue-500/10 border border-white/10 animate-in fade-in zoom-in duration-500">
+                <div className="relative group">
+                  <Image
+                    src={qrCodeUrl}
+                    alt="QR Code"
+                    width={220}
+                    height={220}
+                    className="mx-auto"
+                  />
+                  <div className="absolute inset-0 border-2 border-emerald-500/20 rounded-lg group-hover:border-emerald-500/40 transition-colors" />
+                </div>
+                <div className="mt-6 space-y-4">
+                  <p className="text-sm text-zinc-600 font-bold uppercase tracking-tight">
+                    Scan with mobile device
+                  </p>
+                  <button
+                    onClick={() => {
+                      const clientUrl = `${window.location.origin}/apps/display/client?displayId=${displayId}`;
+                      window.open(clientUrl, "_blank");
+                    }}
+                    className="w-full px-6 py-3 bg-zinc-900 text-white rounded-xl font-bold hover:bg-black transition-all hover:scale-[1.02] active:scale-95 shadow-lg border border-white/5"
+                  >
+                    Open Local Client
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="flex flex-col items-center gap-4">
+                <div className="h-12 w-12 border-4 border-emerald-500/20 border-t-emerald-500 rounded-full animate-spin" />
+                <p className="text-zinc-500 font-mono text-sm">Generating Display Session...</p>
+              </div>
+            )}
           </div>
-        )}
+        </div>
+      )}
 
       {/* QR Code in corner when clients are connected */}
       {videoStreams.length > 0 && qrCodeUrl && displayId && (
@@ -281,15 +274,11 @@ export default function DisplayPage() {
         <div className="flex items-center gap-3">
           <div
             className={`w-2.5 h-2.5 rounded-full ${
-              displayId
-                ? "bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]"
-                : "bg-yellow-500"
+              displayId ? "bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]" : "bg-yellow-500"
             } animate-pulse`}
           />
           <span className="text-xs font-bold uppercase tracking-widest">
-            {displayId
-              ? `Display Online (${videoStreams.length} active)`
-              : "Initializing..."}
+            {displayId ? `Display Online (${videoStreams.length} active)` : "Initializing..."}
           </span>
         </div>
         {displayId && (

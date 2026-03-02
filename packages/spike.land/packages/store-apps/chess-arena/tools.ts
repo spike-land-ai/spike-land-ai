@@ -42,10 +42,7 @@ const MakeMoveSchema = z.object({
   player_id: z.string().min(1).describe("Your chess player profile ID."),
   from: z.string().min(2).max(2).describe("Source square (e.g. 'e2')."),
   to: z.string().min(2).max(2).describe("Target square (e.g. 'e4')."),
-  promotion: z
-    .string()
-    .optional()
-    .describe("Promotion piece: q, r, b, n (for pawn promotion)."),
+  promotion: z.string().optional().describe("Promotion piece: q, r, b, n (for pawn promotion)."),
 });
 
 const GetGameSchema = z.object({
@@ -54,10 +51,7 @@ const GetGameSchema = z.object({
 
 const ListGamesSchema = z.object({
   player_id: z.string().min(1).describe("Your chess player profile ID."),
-  status: z
-    .string()
-    .optional()
-    .describe("Filter by status: WAITING, ACTIVE, CHECKMATE, etc."),
+  status: z.string().optional().describe("Filter by status: WAITING, ACTIVE, CHECKMATE, etc."),
 });
 
 const ResignSchema = z.object({
@@ -85,12 +79,8 @@ const DeclineDrawSchema = z.object({
 // ---------------------------------------------------------------------------
 
 const CreatePlayerSchema = z.object({
-  name: z.string().min(1).max(30).describe(
-    "Display name for the player profile.",
-  ),
-  avatar: z.string().optional().describe(
-    "Avatar URL or emoji for the profile.",
-  ),
+  name: z.string().min(1).max(30).describe("Display name for the player profile."),
+  avatar: z.string().optional().describe("Avatar URL or emoji for the profile."),
 });
 
 const GetPlayerSchema = z.object({
@@ -103,9 +93,7 @@ const UpdatePlayerSchema = z.object({
   player_id: z.string().min(1).describe("Chess player profile ID to update."),
   name: z.string().optional().describe("New display name."),
   avatar: z.string().optional().describe("New avatar URL or emoji."),
-  sound_enabled: z.boolean().optional().describe(
-    "Enable or disable move sounds.",
-  ),
+  sound_enabled: z.boolean().optional().describe("Enable or disable move sounds."),
 });
 
 const GetStatsSchema = z.object({
@@ -120,9 +108,7 @@ const ListOnlineSchema = z.object({});
 
 const SendChallengeSchema = z.object({
   sender_id: z.string().min(1).describe("Your chess player profile ID."),
-  receiver_id: z.string().min(1).describe(
-    "Opponent's chess player profile ID.",
-  ),
+  receiver_id: z.string().min(1).describe("Opponent's chess player profile ID."),
   time_control: z
     .enum([
       "BULLET_1",
@@ -145,30 +131,22 @@ const SendChallengeSchema = z.object({
 
 const AcceptChallengeSchema = z.object({
   challenge_id: z.string().min(1).describe("ID of the challenge to accept."),
-  player_id: z.string().min(1).describe(
-    "Your chess player profile ID (must be receiver).",
-  ),
+  player_id: z.string().min(1).describe("Your chess player profile ID (must be receiver)."),
 });
 
 const DeclineChallengeSchema = z.object({
   challenge_id: z.string().min(1).describe("ID of the challenge to decline."),
-  player_id: z.string().min(1).describe(
-    "Your chess player profile ID (must be receiver).",
-  ),
+  player_id: z.string().min(1).describe("Your chess player profile ID (must be receiver)."),
 });
 
 const CancelChallengeSchema = z.object({
   challenge_id: z.string().min(1).describe("ID of the challenge to cancel."),
-  player_id: z.string().min(1).describe(
-    "Your chess player profile ID (must be sender).",
-  ),
+  player_id: z.string().min(1).describe("Your chess player profile ID (must be sender)."),
 });
 
 const ListChallengesSchema = z.object({
   player_id: z.string().min(1).describe("Your chess player profile ID."),
-  status: z.string().optional().describe(
-    "Filter by status: PENDING, ACCEPTED, etc.",
-  ),
+  status: z.string().optional().describe("Filter by status: PENDING, ACCEPTED, etc."),
 });
 
 // ---------------------------------------------------------------------------
@@ -201,12 +179,7 @@ const TimeControlEnum = z.enum([
   "CLASSICAL_30",
 ]);
 
-const TournamentFormatEnum = z.enum([
-  "swiss",
-  "round-robin",
-  "elimination",
-  "arena",
-]);
+const TournamentFormatEnum = z.enum(["swiss", "round-robin", "elimination", "arena"]);
 
 const CreateTournamentSchema = z.object({
   name: z.string().min(1).max(80).describe("Display name for the tournament."),
@@ -222,10 +195,7 @@ const CreateTournamentSchema = z.object({
     .optional()
     .default(16)
     .describe("Maximum number of participants (4-64, default 16)."),
-  start_time: z
-    .string()
-    .optional()
-    .describe("ISO 8601 start time. Omit to start immediately."),
+  start_time: z.string().optional().describe("ISO 8601 start time. Omit to start immediately."),
 });
 
 const JoinTournamentSchema = z.object({
@@ -234,10 +204,7 @@ const JoinTournamentSchema = z.object({
 });
 
 const GetTournamentSchema = z.object({
-  tournament_id: z
-    .string()
-    .min(1)
-    .describe("ID of the tournament to retrieve."),
+  tournament_id: z.string().min(1).describe("ID of the tournament to retrieve."),
 });
 
 const ListTournamentsSchema = z.object({
@@ -254,15 +221,7 @@ const GetPuzzleSchema = z.object({
     .optional()
     .describe("Puzzle difficulty level. Omit for any difficulty."),
   theme: z
-    .enum([
-      "mate_in_1",
-      "mate_in_2",
-      "fork",
-      "pin",
-      "skewer",
-      "discovery",
-      "random",
-    ])
+    .enum(["mate_in_1", "mate_in_2", "fork", "pin", "skewer", "discovery", "random"])
     .optional()
     .default("random")
     .describe("Tactical theme (default: random)."),
@@ -281,13 +240,13 @@ interface TournamentListItem {
   startTime: string | null;
   status: string;
   joinCode: string;
-  participants: Array<{ playerId: string; }>;
+  participants: Array<{ playerId: string }>;
 }
 
 interface TournamentParticipantWithPlayer {
   playerId: string;
   points: number;
-  player: { id: string; name: string; };
+  player: { id: string; name: string };
 }
 
 interface TournamentPairing {
@@ -343,10 +302,10 @@ export const chessArenaTools: StandaloneToolDefinition[] = [
         const { createGameRecord } = await import("@/lib/chess/game-manager");
         const game = await createGameRecord(args.player_id, args.time_control);
         return textResult(
-          `**Game Created**\n\n`
-            + `**Game ID:** ${game.id}\n`
-            + `**Time Control:** ${args.time_control}\n`
-            + `**Status:** WAITING for opponent`,
+          `**Game Created**\n\n` +
+            `**Game ID:** ${game.id}\n` +
+            `**Time Control:** ${args.time_control}\n` +
+            `**Status:** WAITING for opponent`,
         );
       }),
   },
@@ -365,9 +324,9 @@ export const chessArenaTools: StandaloneToolDefinition[] = [
         const { joinGame } = await import("@/lib/chess/game-manager");
         const game = await joinGame(args.game_id, args.player_id);
         return textResult(
-          `**Game Joined**\n\n`
-            + `**Game ID:** ${game.id}\n`
-            + `**Status:** ACTIVE — White moves first`,
+          `**Game Joined**\n\n` +
+            `**Game ID:** ${game.id}\n` +
+            `**Status:** ACTIVE — White moves first`,
         );
       }),
   },
@@ -389,13 +348,12 @@ export const chessArenaTools: StandaloneToolDefinition[] = [
           args.promotion,
         );
         if (!result.success) {
-          return textResult(
-            `**Invalid Move**\n\nThe move ${args.from}-${args.to} is not legal.`,
-          );
+          return textResult(`**Invalid Move**\n\nThe move ${args.from}-${args.to} is not legal.`);
         }
-        let text = `**Move Played:** ${result.san}\n`
-          + `**From:** ${result.from} → **To:** ${result.to}\n`
-          + `**FEN:** ${result.fen}`;
+        let text =
+          `**Move Played:** ${result.san}\n` +
+          `**From:** ${result.from} → **To:** ${result.to}\n` +
+          `**FEN:** ${result.fen}`;
         if (result.isCheckmate) text += `\n\n**CHECKMATE!**`;
         else if (result.isCheck) text += `\n\n**Check!**`;
         else if (result.isStalemate) text += `\n\n**Stalemate — Draw**`;
@@ -417,20 +375,19 @@ export const chessArenaTools: StandaloneToolDefinition[] = [
         const { getGame } = await import("@/lib/chess/game-manager");
         const game = await getGame(args.game_id);
         const moves = game.moves ?? [];
-        const moveList = moves.length > 0
-          ? moves
-            .map(
-              (m: { moveNumber: number; san: string; }) => `${m.moveNumber}. ${m.san}`,
-            )
-            .join(" ")
-          : "No moves yet";
+        const moveList =
+          moves.length > 0
+            ? moves
+                .map((m: { moveNumber: number; san: string }) => `${m.moveNumber}. ${m.san}`)
+                .join(" ")
+            : "No moves yet";
         return textResult(
-          `**Chess Game**\n\n`
-            + `**ID:** ${game.id}\n`
-            + `**Status:** ${game.status}\n`
-            + `**FEN:** ${game.fen}\n`
-            + `**Moves (${moves.length}):** ${moveList}\n`
-            + `**Time Control:** ${game.timeControl}`,
+          `**Chess Game**\n\n` +
+            `**ID:** ${game.id}\n` +
+            `**Status:** ${game.status}\n` +
+            `**FEN:** ${game.fen}\n` +
+            `**Moves (${moves.length}):** ${moveList}\n` +
+            `**Time Control:** ${game.timeControl}`,
         );
       }),
   },
@@ -450,12 +407,10 @@ export const chessArenaTools: StandaloneToolDefinition[] = [
           return textResult("**No games found.**");
         }
         const lines = games.map(
-          (g: { id: string; status: string; moveCount: number; }) =>
+          (g: { id: string; status: string; moveCount: number }) =>
             `- **${g.id}** — ${g.status} (${g.moveCount} moves)`,
         );
-        return textResult(
-          `**Your Games (${games.length})**\n\n${lines.join("\n")}`,
-        );
+        return textResult(`**Your Games (${games.length})**\n\n${lines.join("\n")}`);
       }),
   },
   {
@@ -469,9 +424,7 @@ export const chessArenaTools: StandaloneToolDefinition[] = [
         const args = input as z.infer<typeof ResignSchema>;
         const { resignGame } = await import("@/lib/chess/game-manager");
         await resignGame(args.game_id, args.player_id);
-        return textResult(
-          `**Game Resigned**\n\nYou resigned from game ${args.game_id}.`,
-        );
+        return textResult(`**Game Resigned**\n\nYou resigned from game ${args.game_id}.`);
       }),
   },
   {
@@ -485,9 +438,7 @@ export const chessArenaTools: StandaloneToolDefinition[] = [
         const args = input as z.infer<typeof OfferDrawSchema>;
         const { offerDraw } = await import("@/lib/chess/game-manager");
         await offerDraw(args.game_id, args.player_id);
-        return textResult(
-          `**Draw Offered**\n\nDraw offer sent in game ${args.game_id}.`,
-        );
+        return textResult(`**Draw Offered**\n\nDraw offer sent in game ${args.game_id}.`);
       }),
   },
   {
@@ -501,9 +452,7 @@ export const chessArenaTools: StandaloneToolDefinition[] = [
         const args = input as z.infer<typeof AcceptDrawSchema>;
         const { acceptDraw } = await import("@/lib/chess/game-manager");
         await acceptDraw(args.game_id, args.player_id);
-        return textResult(
-          `**Draw Accepted**\n\nGame ${args.game_id} ended in a draw.`,
-        );
+        return textResult(`**Draw Accepted**\n\nGame ${args.game_id} ended in a draw.`);
       }),
   },
   {
@@ -517,9 +466,7 @@ export const chessArenaTools: StandaloneToolDefinition[] = [
         const args = input as z.infer<typeof DeclineDrawSchema>;
         const { declineDraw } = await import("@/lib/chess/game-manager");
         await declineDraw(args.game_id, args.player_id);
-        return textResult(
-          `**Draw Declined**\n\nDraw offer declined in game ${args.game_id}.`,
-        );
+        return textResult(`**Draw Declined**\n\nDraw offer declined in game ${args.game_id}.`);
       }),
   },
 
@@ -538,10 +485,10 @@ export const chessArenaTools: StandaloneToolDefinition[] = [
         const { createPlayer } = await import("@/lib/chess/player-manager");
         const player = await createPlayer(ctx.userId, args.name, args.avatar);
         return textResult(
-          `**Player Created**\n\n`
-            + `**ID:** ${player.id}\n`
-            + `**Name:** ${player.name}\n`
-            + `**ELO:** ${player.elo}`,
+          `**Player Created**\n\n` +
+            `**ID:** ${player.id}\n` +
+            `**Name:** ${player.name}\n` +
+            `**ELO:** ${player.elo}`,
         );
       }),
   },
@@ -561,11 +508,11 @@ export const chessArenaTools: StandaloneToolDefinition[] = [
           return textResult("**Player not found.**");
         }
         return textResult(
-          `**Chess Player**\n\n`
-            + `**ID:** ${player.id}\n`
-            + `**Name:** ${player.name}\n`
-            + `**ELO:** ${player.elo}\n`
-            + `**Online:** ${player.isOnline}`,
+          `**Chess Player**\n\n` +
+            `**ID:** ${player.id}\n` +
+            `**Name:** ${player.name}\n` +
+            `**ELO:** ${player.elo}\n` +
+            `**Online:** ${player.isOnline}`,
         );
       }),
   },
@@ -581,17 +528,13 @@ export const chessArenaTools: StandaloneToolDefinition[] = [
         const { getPlayersByUser } = await import("@/lib/chess/player-manager");
         const players = await getPlayersByUser(ctx.userId);
         if (players.length === 0) {
-          return textResult(
-            "**No profiles found.** Create one with chess_create_player.",
-          );
+          return textResult("**No profiles found.** Create one with chess_create_player.");
         }
         const lines = players.map(
-          (p: { id: string; name: string; elo: number; }) =>
+          (p: { id: string; name: string; elo: number }) =>
             `- **${p.name}** (${p.elo} ELO) — ID: ${p.id}`,
         );
-        return textResult(
-          `**Your Profiles (${players.length})**\n\n${lines.join("\n")}`,
-        );
+        return textResult(`**Your Profiles (${players.length})**\n\n${lines.join("\n")}`);
       }),
   },
   {
@@ -610,9 +553,9 @@ export const chessArenaTools: StandaloneToolDefinition[] = [
           soundEnabled: args.sound_enabled,
         });
         return textResult(
-          `**Player Updated**\n\n`
-            + `**Name:** ${player.name}\n`
-            + `**Sound:** ${player.soundEnabled}`,
+          `**Player Updated**\n\n` +
+            `**Name:** ${player.name}\n` +
+            `**Sound:** ${player.soundEnabled}`,
         );
       }),
   },
@@ -629,12 +572,12 @@ export const chessArenaTools: StandaloneToolDefinition[] = [
         const { getPlayerStats } = await import("@/lib/chess/player-manager");
         const stats = await getPlayerStats(args.player_id);
         return textResult(
-          `**Player Stats**\n\n`
-            + `**ELO:** ${stats.elo} (Best: ${stats.bestElo})\n`
-            + `**Record:** ${stats.wins}W / ${stats.losses}L / ${stats.draws}D\n`
-            + `**Total Games:** ${stats.totalGames}\n`
-            + `**Win Rate:** ${(stats.winRate * 100).toFixed(1)}%\n`
-            + `**Streak:** ${stats.streak}`,
+          `**Player Stats**\n\n` +
+            `**ELO:** ${stats.elo} (Best: ${stats.bestElo})\n` +
+            `**Record:** ${stats.wins}W / ${stats.losses}L / ${stats.draws}D\n` +
+            `**Total Games:** ${stats.totalGames}\n` +
+            `**Win Rate:** ${(stats.winRate * 100).toFixed(1)}%\n` +
+            `**Streak:** ${stats.streak}`,
         );
       }),
   },
@@ -653,12 +596,10 @@ export const chessArenaTools: StandaloneToolDefinition[] = [
           return textResult("**No players online.**");
         }
         const lines = players.map(
-          (p: { id: string; name: string; elo: number; }) =>
+          (p: { id: string; name: string; elo: number }) =>
             `- **${p.name}** (${p.elo} ELO) — ID: ${p.id}`,
         );
-        return textResult(
-          `**Online Players (${players.length})**\n\n${lines.join("\n")}`,
-        );
+        return textResult(`**Online Players (${players.length})**\n\n${lines.join("\n")}`);
       }),
   },
 
@@ -683,10 +624,10 @@ export const chessArenaTools: StandaloneToolDefinition[] = [
           args.sender_color,
         );
         return textResult(
-          `**Challenge Sent**\n\n`
-            + `**ID:** ${challenge.id}\n`
-            + `**Time Control:** ${args.time_control}\n`
-            + `**Expires:** ${challenge.expiresAt}`,
+          `**Challenge Sent**\n\n` +
+            `**ID:** ${challenge.id}\n` +
+            `**Time Control:** ${args.time_control}\n` +
+            `**Expires:** ${challenge.expiresAt}`,
         );
       }),
   },
@@ -700,15 +641,12 @@ export const chessArenaTools: StandaloneToolDefinition[] = [
       safeToolCall("chess_accept_challenge", async () => {
         const args = input as z.infer<typeof AcceptChallengeSchema>;
         const { acceptChallenge } = await import("@/lib/chess/challenge-manager");
-        const { challenge, gameId } = await acceptChallenge(
-          args.challenge_id,
-          args.player_id,
-        );
+        const { challenge, gameId } = await acceptChallenge(args.challenge_id, args.player_id);
         return textResult(
-          `**Challenge Accepted**\n\n`
-            + `**Challenge ID:** ${challenge.id}\n`
-            + `**Game ID:** ${gameId}\n`
-            + `**Status:** Game is starting!`,
+          `**Challenge Accepted**\n\n` +
+            `**Challenge ID:** ${challenge.id}\n` +
+            `**Game ID:** ${gameId}\n` +
+            `**Status:** Game is starting!`,
         );
       }),
   },
@@ -755,10 +693,7 @@ export const chessArenaTools: StandaloneToolDefinition[] = [
       safeToolCall("chess_list_challenges", async () => {
         const args = input as z.infer<typeof ListChallengesSchema>;
         const { listChallenges } = await import("@/lib/chess/challenge-manager");
-        const challenges = await listChallenges(
-          args.player_id,
-          args.status,
-        );
+        const challenges = await listChallenges(args.player_id, args.status);
         if (challenges.length === 0) {
           return textResult("**No challenges found.**");
         }
@@ -772,9 +707,7 @@ export const chessArenaTools: StandaloneToolDefinition[] = [
           }) =>
             `- **${c.id}** — ${c.status} (${c.timeControl}) sender: ${c.senderId}, receiver: ${c.receiverId}`,
         );
-        return textResult(
-          `**Challenges (${challenges.length})**\n\n${lines.join("\n")}`,
-        );
+        return textResult(`**Challenges (${challenges.length})**\n\n${lines.join("\n")}`);
       }),
   },
 
@@ -793,18 +726,17 @@ export const chessArenaTools: StandaloneToolDefinition[] = [
         const args = input as z.infer<typeof ReplayGameSchema>;
         const { getGameReplay } = await import("@/lib/chess/game-manager");
         const replay = await getGameReplay(args.game_id);
-        const moveList = replay.moves.length > 0
-          ? replay.moves
-            .map(
-              (m: { moveNumber: number; san: string; }) => `${m.moveNumber}. ${m.san}`,
-            )
-            .join(" ")
-          : "No moves";
+        const moveList =
+          replay.moves.length > 0
+            ? replay.moves
+                .map((m: { moveNumber: number; san: string }) => `${m.moveNumber}. ${m.san}`)
+                .join(" ")
+            : "No moves";
         return textResult(
-          `**Game Replay**\n\n`
-            + `**Result:** ${replay.result ?? "Unknown"}\n`
-            + `**Moves (${replay.moves.length}):** ${moveList}\n\n`
-            + `**PGN:**\n${replay.pgn || "(empty)"}`,
+          `**Game Replay**\n\n` +
+            `**Result:** ${replay.result ?? "Unknown"}\n` +
+            `**Moves (${replay.moves.length}):** ${moveList}\n\n` +
+            `**PGN:**\n${replay.pgn || "(empty)"}`,
         );
       }),
   },
@@ -838,9 +770,7 @@ export const chessArenaTools: StandaloneToolDefinition[] = [
             i: number,
           ) => `${i + 1}. **${p.name}** — ${p.elo} ELO (${p.wins}W/${p.losses}L/${p.draws}D)`,
         );
-        return textResult(
-          `**Leaderboard (Top ${players.length})**\n\n${lines.join("\n")}`,
-        );
+        return textResult(`**Leaderboard (Top ${players.length})**\n\n${lines.join("\n")}`);
       }),
   },
 
@@ -882,14 +812,14 @@ export const chessArenaTools: StandaloneToolDefinition[] = [
         };
 
         return textResult(
-          `**Tournament Created**\n\n`
-            + `**ID:** ${tournament.id}\n`
-            + `**Name:** ${tournament.name}\n`
-            + `**Format:** ${tournament.format} — ${formatDetails[tournament.format]}\n`
-            + `**Time Control:** ${tournament.timeControl}\n`
-            + `**Max Players:** ${tournament.maxPlayers}\n`
-            + `**Join Code:** ${tournament.joinCode}\n`
-            + `**Start Time:** ${tournament.startTime ?? "Immediate"}`,
+          `**Tournament Created**\n\n` +
+            `**ID:** ${tournament.id}\n` +
+            `**Name:** ${tournament.name}\n` +
+            `**Format:** ${tournament.format} — ${formatDetails[tournament.format]}\n` +
+            `**Time Control:** ${tournament.timeControl}\n` +
+            `**Max Players:** ${tournament.maxPlayers}\n` +
+            `**Join Code:** ${tournament.joinCode}\n` +
+            `**Start Time:** ${tournament.startTime ?? "Immediate"}`,
         );
       }),
   },
@@ -915,14 +845,10 @@ export const chessArenaTools: StandaloneToolDefinition[] = [
         }
 
         if (tournament.status !== "upcoming") {
-          return textResult(
-            `**Cannot Join**\n\nTournament is already **${tournament.status}**.`,
-          );
+          return textResult(`**Cannot Join**\n\nTournament is already **${tournament.status}**.`);
         }
 
-        const alreadyJoined = tournament.participants.some(
-          p => p.playerId === args.player_id,
-        );
+        const alreadyJoined = tournament.participants.some((p) => p.playerId === args.player_id);
         if (alreadyJoined) {
           return textResult("**Already Joined**\n\nYou are already registered in this tournament.");
         }
@@ -942,10 +868,10 @@ export const chessArenaTools: StandaloneToolDefinition[] = [
         const seedPosition = newCount;
 
         return textResult(
-          `**Joined Tournament**\n\n`
-            + `**Tournament:** ${tournament.name}\n`
-            + `**Players:** ${newCount} / ${tournament.maxPlayers}\n`
-            + `**Your Seeding Position:** #${seedPosition}`,
+          `**Joined Tournament**\n\n` +
+            `**Tournament:** ${tournament.name}\n` +
+            `**Players:** ${newCount} / ${tournament.maxPlayers}\n` +
+            `**Your Seeding Position:** #${seedPosition}`,
         );
       }),
   },
@@ -963,13 +889,13 @@ export const chessArenaTools: StandaloneToolDefinition[] = [
         const args = input as z.infer<typeof GetTournamentSchema>;
         const prisma = (await import("@/lib/prisma")).default;
 
-        const raw = await prisma.chessTournament.findUnique({
+        const raw = (await prisma.chessTournament.findUnique({
           where: { id: args.tournament_id },
           include: {
             participants: { include: { player: { select: { id: true, name: true } } } },
             pairings: true,
           },
-        }) as TournamentWithRelations | null;
+        })) as TournamentWithRelations | null;
 
         if (!raw) {
           return textResult("**Tournament not found.**");
@@ -981,24 +907,22 @@ export const chessArenaTools: StandaloneToolDefinition[] = [
 
         const recentPairings = raw.pairings
           .slice(0, 10)
-          .map(
-            p => `Round ${p.round}: ${p.whiteId} vs ${p.blackId} — ${p.result ?? "pending"}`,
-          );
+          .map((p) => `Round ${p.round}: ${p.whiteId} vs ${p.blackId} — ${p.result ?? "pending"}`);
 
-        const completedGames = raw.pairings.filter(p => p.result !== null).length;
+        const completedGames = raw.pairings.filter((p) => p.result !== null).length;
 
         return textResult(
-          `**Tournament: ${raw.name}**\n\n`
-            + `**Format:** ${raw.format}\n`
-            + `**Time Control:** ${raw.timeControl}\n`
-            + `**Status:** ${raw.status}\n`
-            + `**Players:** ${raw.participants.length} / ${raw.maxPlayers}\n`
-            + `**Current Round:** ${raw.currentRound ?? 0}\n`
-            + `**Completed Games:** ${completedGames}\n\n`
-            + `**Standings:**\n${
+          `**Tournament: ${raw.name}**\n\n` +
+            `**Format:** ${raw.format}\n` +
+            `**Time Control:** ${raw.timeControl}\n` +
+            `**Status:** ${raw.status}\n` +
+            `**Players:** ${raw.participants.length} / ${raw.maxPlayers}\n` +
+            `**Current Round:** ${raw.currentRound ?? 0}\n` +
+            `**Completed Games:** ${completedGames}\n\n` +
+            `**Standings:**\n${
               standings.length > 0 ? standings.join("\n") : "No standings yet."
-            }\n\n`
-            + `**Recent Pairings:**\n${
+            }\n\n` +
+            `**Recent Pairings:**\n${
               recentPairings.length > 0 ? recentPairings.join("\n") : "No pairings yet."
             }`,
         );
@@ -1017,32 +941,28 @@ export const chessArenaTools: StandaloneToolDefinition[] = [
         const args = input as z.infer<typeof ListTournamentsSchema>;
         const prisma = (await import("@/lib/prisma")).default;
 
-        const where = args.status && args.status !== "all"
-          ? { status: args.status }
-          : {};
+        const where = args.status && args.status !== "all" ? { status: args.status } : {};
 
-        const tournaments = await prisma.chessTournament.findMany({
+        const tournaments = (await prisma.chessTournament.findMany({
           where,
           include: { participants: { select: { playerId: true } } },
           orderBy: { createdAt: "desc" },
           take: 50,
-        }) as TournamentListItem[];
+        })) as TournamentListItem[];
 
         if (tournaments.length === 0) {
           return textResult("**No tournaments found.**");
         }
 
         const lines = tournaments.map(
-          t =>
-            `- **${t.name}** (${t.format} / ${t.timeControl}) — `
-            + `${t.participants.length}/${t.maxPlayers} players — **${t.status}**`
-            + (t.startTime ? ` — Starts: ${t.startTime}` : "")
-            + ` — ID: ${t.id}`,
+          (t) =>
+            `- **${t.name}** (${t.format} / ${t.timeControl}) — ` +
+            `${t.participants.length}/${t.maxPlayers} players — **${t.status}**` +
+            (t.startTime ? ` — Starts: ${t.startTime}` : "") +
+            ` — ID: ${t.id}`,
         );
 
-        return textResult(
-          `**Tournaments (${tournaments.length})**\n\n${lines.join("\n")}`,
-        );
+        return textResult(`**Tournaments (${tournaments.length})**\n\n${lines.join("\n")}`);
       }),
   },
   {
@@ -1058,7 +978,7 @@ export const chessArenaTools: StandaloneToolDefinition[] = [
         const args = input as z.infer<typeof GetPuzzleSchema>;
         const prisma = (await import("@/lib/prisma")).default;
 
-        const difficultyRatingMap: Record<string, { min: number; max: number; }> = {
+        const difficultyRatingMap: Record<string, { min: number; max: number }> = {
           beginner: { min: 600, max: 1200 },
           intermediate: { min: 1200, max: 1800 },
           advanced: { min: 1800, max: 2400 },
@@ -1066,18 +986,18 @@ export const chessArenaTools: StandaloneToolDefinition[] = [
         };
 
         const ratingRange = args.difficulty
-          ? difficultyRatingMap[args.difficulty] ?? { min: 600, max: 3200 }
+          ? (difficultyRatingMap[args.difficulty] ?? { min: 600, max: 3200 })
           : { min: 600, max: 3200 };
 
         const themeFilter = args.theme && args.theme !== "random" ? { theme: args.theme } : {};
 
-        const puzzles = await prisma.chessPuzzle.findMany({
+        const puzzles = (await prisma.chessPuzzle.findMany({
           where: {
             rating: { gte: ratingRange.min, lte: ratingRange.max },
             ...themeFilter,
           },
           take: 50,
-        }) as PuzzleRecord[];
+        })) as PuzzleRecord[];
 
         if (puzzles.length === 0) {
           return textResult(
@@ -1093,13 +1013,13 @@ export const chessArenaTools: StandaloneToolDefinition[] = [
         }
 
         return textResult(
-          `**Chess Puzzle**\n\n`
-            + `**ID:** ${puzzle.id}\n`
-            + `**FEN:** ${puzzle.fen}\n`
-            + `**Rating:** ${puzzle.rating}\n`
-            + `**Theme:** ${puzzle.theme}\n`
-            + `**Difficulty:** ${puzzle.difficulty}\n`
-            + `**Moves to Solve:** ${puzzle.movesToSolve}`,
+          `**Chess Puzzle**\n\n` +
+            `**ID:** ${puzzle.id}\n` +
+            `**FEN:** ${puzzle.fen}\n` +
+            `**Rating:** ${puzzle.rating}\n` +
+            `**Theme:** ${puzzle.theme}\n` +
+            `**Difficulty:** ${puzzle.difficulty}\n` +
+            `**Moves to Solve:** ${puzzle.movesToSolve}`,
         );
       }),
   },

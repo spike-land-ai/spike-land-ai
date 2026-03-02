@@ -105,13 +105,17 @@ describe("agent-tools", () => {
     });
 
     it("returns error when disconnect throws", async () => {
-      client.disconnect = vi.fn(() => { throw new Error("Socket error"); });
+      client.disconnect = vi.fn(() => {
+        throw new Error("Socket error");
+      });
       const result = await server.call("stdb_disconnect", {});
       expect(result.isError).toBe(true);
     });
 
     it("handles non-Error thrown in disconnect", async () => {
-      client.disconnect = vi.fn(() => { throw "unexpected"; });
+      client.disconnect = vi.fn(() => {
+        throw "unexpected";
+      });
       const result = await server.call("stdb_disconnect", {});
       expect(result.isError).toBe(true);
       const parsed = JSON.parse(result.content[0].text);
@@ -156,8 +160,20 @@ describe("agent-tools", () => {
   describe("stdb_list_agents", () => {
     it("lists all agents", async () => {
       client._agents.push(
-        { identity: "agent-1", displayName: "Agent1", capabilities: ["a"], online: true, lastSeen: BigInt(1000) },
-        { identity: "agent-2", displayName: "Agent2", capabilities: ["b"], online: false, lastSeen: BigInt(900) },
+        {
+          identity: "agent-1",
+          displayName: "Agent1",
+          capabilities: ["a"],
+          online: true,
+          lastSeen: BigInt(1000),
+        },
+        {
+          identity: "agent-2",
+          displayName: "Agent2",
+          capabilities: ["b"],
+          online: false,
+          lastSeen: BigInt(900),
+        },
       );
 
       const result = await server.call("stdb_list_agents", { onlineOnly: false });
@@ -168,8 +184,20 @@ describe("agent-tools", () => {
 
     it("filters to online-only agents", async () => {
       client._agents.push(
-        { identity: "agent-1", displayName: "Agent1", capabilities: [], online: true, lastSeen: BigInt(1000) },
-        { identity: "agent-2", displayName: "Agent2", capabilities: [], online: false, lastSeen: BigInt(900) },
+        {
+          identity: "agent-1",
+          displayName: "Agent1",
+          capabilities: [],
+          online: true,
+          lastSeen: BigInt(1000),
+        },
+        {
+          identity: "agent-2",
+          displayName: "Agent2",
+          capabilities: [],
+          online: false,
+          lastSeen: BigInt(900),
+        },
       );
 
       const result = await server.call("stdb_list_agents", { onlineOnly: true });
@@ -239,8 +267,22 @@ describe("agent-tools", () => {
 
     it("includes delivered when requested", async () => {
       client._messages.push(
-        { id: BigInt(1), fromAgent: "a", toAgent: "mock-identity-abc123", content: "old", timestamp: BigInt(100), delivered: true },
-        { id: BigInt(2), fromAgent: "b", toAgent: "mock-identity-abc123", content: "new", timestamp: BigInt(200), delivered: false },
+        {
+          id: BigInt(1),
+          fromAgent: "a",
+          toAgent: "mock-identity-abc123",
+          content: "old",
+          timestamp: BigInt(100),
+          delivered: true,
+        },
+        {
+          id: BigInt(2),
+          fromAgent: "b",
+          toAgent: "mock-identity-abc123",
+          content: "new",
+          timestamp: BigInt(200),
+          delivered: false,
+        },
       );
 
       const result = await server.call("stdb_get_messages", { includeDelivered: true });
@@ -264,7 +306,9 @@ describe("agent-tools", () => {
     });
 
     it("returns QUERY_FAILED on non-connection errors", async () => {
-      client.getMessages = vi.fn(() => { throw new Error("Subscription expired"); });
+      client.getMessages = vi.fn(() => {
+        throw new Error("Subscription expired");
+      });
       const result = await server.call("stdb_get_messages", { includeDelivered: false });
       expect(result.isError).toBe(true);
       const parsed = JSON.parse(result.content[0].text);
@@ -295,7 +339,9 @@ describe("agent-tools", () => {
     });
 
     it("returns REDUCER_FAILED on other errors", async () => {
-      client.markDelivered = vi.fn(async () => { throw new Error("Permission denied"); });
+      client.markDelivered = vi.fn(async () => {
+        throw new Error("Permission denied");
+      });
       const result = await server.call("stdb_mark_delivered", { messageId: "1" });
       expect(result.isError).toBe(true);
       const parsed = JSON.parse(result.content[0].text);
@@ -308,7 +354,9 @@ describe("agent-tools", () => {
 
   describe("stdb_send_message error paths", () => {
     it("returns REDUCER_FAILED on non-connection errors", async () => {
-      client.sendMessage = vi.fn(async () => { throw new Error("Reducer panicked"); });
+      client.sendMessage = vi.fn(async () => {
+        throw new Error("Reducer panicked");
+      });
       const result = await server.call("stdb_send_message", {
         toAgent: "agent-2",
         content: "test",
@@ -323,7 +371,9 @@ describe("agent-tools", () => {
 
   describe("stdb_register_agent edge cases", () => {
     it("handles non-Error thrown values", async () => {
-      client.registerAgent = vi.fn(async () => { throw "string error"; });
+      client.registerAgent = vi.fn(async () => {
+        throw "string error";
+      });
       const result = await server.call("stdb_register_agent", {
         displayName: "Test",
         capabilities: [],
@@ -338,7 +388,9 @@ describe("agent-tools", () => {
 
   describe("stdb_list_agents error paths", () => {
     it("returns QUERY_FAILED on non-connection errors", async () => {
-      client.listAgents = vi.fn(() => { throw new Error("DB corrupt"); });
+      client.listAgents = vi.fn(() => {
+        throw new Error("DB corrupt");
+      });
       const result = await server.call("stdb_list_agents", { onlineOnly: false });
       expect(result.isError).toBe(true);
       const parsed = JSON.parse(result.content[0].text);

@@ -66,15 +66,15 @@ function createPrismaClient() {
   // Use production database when --prod flag is passed
   const isProdMode = process.argv.includes("--prod");
   const connectionString = isProdMode
-    ? (process.env.DATABASE_URL_PROD || process.env.DATABASE_URL)
+    ? process.env.DATABASE_URL_PROD || process.env.DATABASE_URL
     : process.env.DATABASE_URL;
 
   if (!connectionString) {
     throw new Error(
       `${
         isProdMode ? "DATABASE_URL_PROD or " : ""
-      }DATABASE_URL environment variable is required for database access. `
-        + "Please ensure it is set in your environment.",
+      }DATABASE_URL environment variable is required for database access. ` +
+        "Please ensure it is set in your environment.",
     );
   }
 
@@ -110,10 +110,8 @@ let redis: Redis | null = null;
  */
 function getRedis(): Redis {
   if (!redis) {
-    const redisUrl = process.env.UPSTASH_REDIS_REST_URL
-      || process.env.KV_REST_API_URL;
-    const redisToken = process.env.UPSTASH_REDIS_REST_TOKEN
-      || process.env.KV_REST_API_TOKEN;
+    const redisUrl = process.env.UPSTASH_REDIS_REST_URL || process.env.KV_REST_API_URL;
+    const redisToken = process.env.UPSTASH_REDIS_REST_TOKEN || process.env.KV_REST_API_TOKEN;
 
     if (!redisUrl || !redisToken) {
       throw new Error(
@@ -204,8 +202,8 @@ interface ClaudeStreamEvent {
   name?: string;
   content?: unknown;
   text?: string;
-  delta?: { text?: string; };
-  input?: { codespace_id?: string; }; // For tool_use events
+  delta?: { text?: string };
+  input?: { codespace_id?: string }; // For tool_use events
 }
 
 interface SpawnResult {
@@ -222,7 +220,7 @@ interface SpawnResult {
  */
 interface SessionResponse {
   code?: string;
-  cSess?: { code?: string; };
+  cSess?: { code?: string };
 }
 
 // Constants for Claude Code spawning
@@ -233,9 +231,7 @@ const isProd = process.argv.includes("--prod");
 const isDebug = process.argv.includes("--debug");
 const PROD_URL = "https://spike.land";
 const LOCAL_URL = "http://localhost:3000";
-const AGENT_API_URL = isProd
-  ? PROD_URL
-  : (process.env.NEXT_PUBLIC_APP_URL || LOCAL_URL);
+const AGENT_API_URL = isProd ? PROD_URL : process.env.NEXT_PUBLIC_APP_URL || LOCAL_URL;
 
 // ============================================================
 // E2E Test Mode - Keyword-based handlers for testing without Claude
@@ -248,10 +244,7 @@ interface TestKeywordResult {
   error?: string;
 }
 
-type TestKeywordHandler = (
-  content: string,
-  appId: string,
-) => Promise<TestKeywordResult>;
+type TestKeywordHandler = (content: string, appId: string) => Promise<TestKeywordResult>;
 
 /**
  * Test keyword handlers - these bypass Claude CLI for E2E testing
@@ -259,7 +252,7 @@ type TestKeywordHandler = (
  */
 const TEST_KEYWORD_HANDLERS: Record<string, TestKeywordHandler> = {
   // Echo back the message content (fast, no external calls)
-  "E2E_TEST_ECHO:": async content => {
+  "E2E_TEST_ECHO:": async (content) => {
     const message = content.replace("E2E_TEST_ECHO:", "").trim();
     return {
       response: `ECHO: ${message}`,
@@ -268,7 +261,7 @@ const TEST_KEYWORD_HANDLERS: Record<string, TestKeywordHandler> = {
   },
 
   // Simulate a code update (triggers codeUpdated=true, SSE broadcast)
-  "E2E_TEST_CODE_UPDATE": async (_content, appId) => {
+  E2E_TEST_CODE_UPDATE: async (_content, appId) => {
     return {
       response: `Mock code update completed for app ${appId}. The preview should reload.`,
       codeUpdated: true,
@@ -277,7 +270,7 @@ const TEST_KEYWORD_HANDLERS: Record<string, TestKeywordHandler> = {
   },
 
   // Simulate an agent error
-  "E2E_TEST_ERROR": async () => {
+  E2E_TEST_ERROR: async () => {
     return {
       response: "Simulated error for E2E testing",
       codeUpdated: false,
@@ -286,13 +279,13 @@ const TEST_KEYWORD_HANDLERS: Record<string, TestKeywordHandler> = {
   },
 
   // Wait N milliseconds, then respond (for testing timeout/loading states)
-  "E2E_TEST_DELAY:": async content => {
+  "E2E_TEST_DELAY:": async (content) => {
     const delayMatch = content.match(/E2E_TEST_DELAY:(\d+)/);
     // Safe non-null assertion: regex capture group (\d+) guarantees index 1 exists when match succeeds
     const delayMs = delayMatch ? parseInt(delayMatch[1]!, 10) : 1000;
     const clampedDelay = Math.min(delayMs, 30000); // Max 30 seconds
 
-    await new Promise(resolve => setTimeout(resolve, clampedDelay));
+    await new Promise((resolve) => setTimeout(resolve, clampedDelay));
 
     return {
       response: `Delayed response after ${clampedDelay}ms`,
@@ -302,8 +295,7 @@ const TEST_KEYWORD_HANDLERS: Record<string, TestKeywordHandler> = {
 
   // Call real MCP tools with a test codespace (for deeper integration testing)
   "E2E_TEST_MCP:": async (content, appId) => {
-    const codespaceId = content.replace("E2E_TEST_MCP:", "").trim()
-      || `e2e-mcp-${appId}`;
+    const codespaceId = content.replace("E2E_TEST_MCP:", "").trim() || `e2e-mcp-${appId}`;
     // This keyword could be extended to actually call MCP tools if needed
     // For now, it just simulates the behavior
     return {
@@ -320,7 +312,7 @@ const TEST_KEYWORD_HANDLERS: Record<string, TestKeywordHandler> = {
  */
 function findTestKeywordHandler(
   content: string,
-): { keyword: string; handler: TestKeywordHandler; } | null {
+): { keyword: string; handler: TestKeywordHandler } | null {
   for (const [keyword, handler] of Object.entries(TEST_KEYWORD_HANDLERS)) {
     if (content.startsWith(keyword)) {
       return { keyword, handler };
@@ -386,9 +378,7 @@ async function downloadCodeToLive(codeSpace: string): Promise<string> {
     if (!response.ok) {
       if (response.status === 404) {
         // Codespace doesn't exist yet - create an empty placeholder
-        console.log(
-          `  Codespace ${codeSpace} not found - creating placeholder`,
-        );
+        console.log(`  Codespace ${codeSpace} not found - creating placeholder`);
         const placeholderCode = `// New codespace: ${codeSpace}
 // This file will be synced to testing.spike.land automatically
 
@@ -464,17 +454,14 @@ async function notifySyncStatus(
 ): Promise<void> {
   try {
     const uiBaseUrl = process.env.UI_BASE_URL || "http://localhost:3000";
-    const response = await fetch(
-      `${uiBaseUrl}/api/apps/${appId}/sync-status`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "x-internal-api-key": process.env.INTERNAL_API_KEY || "",
-        },
-        body: JSON.stringify({ isSyncing, codeUpdated }),
+    const response = await fetch(`${uiBaseUrl}/api/apps/${appId}/sync-status`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-internal-api-key": process.env.INTERNAL_API_KEY || "",
       },
-    );
+      body: JSON.stringify({ isSyncing, codeUpdated }),
+    });
     if (!response.ok) {
       console.warn(`[Sync] Failed to notify UI: ${response.status}`);
     }
@@ -495,11 +482,7 @@ async function notifySyncStatus(
  * @param code - The code to sync
  * @param appId - The app ID (optional, but needed for UI notifications)
  */
-async function syncCodeToServer(
-  codeSpace: string,
-  code: string,
-  appId?: string,
-): Promise<void> {
+async function syncCodeToServer(codeSpace: string, code: string, appId?: string): Promise<void> {
   // Notify UI that sync is starting
   if (appId) {
     void notifySyncStatus(appId, true);
@@ -542,12 +525,10 @@ async function syncCodeToServer(
       return;
     } catch (error) {
       lastError = error instanceof Error ? error : new Error("Unknown error");
-      console.warn(
-        `  Sync attempt ${attempt}/${MAX_SYNC_RETRIES} failed: ${lastError.message}`,
-      );
+      console.warn(`  Sync attempt ${attempt}/${MAX_SYNC_RETRIES} failed: ${lastError.message}`);
 
       if (attempt < MAX_SYNC_RETRIES) {
-        await new Promise(resolve => setTimeout(resolve, delay));
+        await new Promise((resolve) => setTimeout(resolve, delay));
         delay *= 2; // Exponential backoff
       }
     }
@@ -566,11 +547,7 @@ async function syncCodeToServer(
  * @param onSync - Optional callback when sync occurs
  * @returns The FSWatcher instance (call .close() to stop)
  */
-function startFileWatcher(
-  codeSpace: string,
-  appId: string,
-  onSync?: () => void,
-): FSWatcher {
+function startFileWatcher(codeSpace: string, appId: string, onSync?: () => void): FSWatcher {
   const localPath = getLocalFilePath(codeSpace);
   console.log(`  Starting file watcher for: ${localPath}`);
 
@@ -598,9 +575,7 @@ function startFileWatcher(
         await syncCodeToServer(codeSpace, code, appId);
         if (onSync) onSync();
       } catch (error) {
-        const errorMsg = error instanceof Error
-          ? error.message
-          : "Unknown error";
+        const errorMsg = error instanceof Error ? error.message : "Unknown error";
         console.error(`  File sync error: ${errorMsg}`);
       }
     }, FILE_SYNC_DEBOUNCE_MS);
@@ -638,9 +613,7 @@ function debugLog(message: string, data?: unknown): void {
   if (isDebug) {
     console.log(`  [DEBUG] ${message}`);
     if (data !== undefined) {
-      console.log(
-        `          ${JSON.stringify(data, null, 2).split("\n").join("\n          ")}`,
-      );
+      console.log(`          ${JSON.stringify(data, null, 2).split("\n").join("\n          ")}`);
     }
   }
 }
@@ -666,9 +639,7 @@ async function getAppsWithPending(): Promise<string[]> {
  */
 async function dequeueMessage(appId: string): Promise<string | null> {
   const redisClient = getRedis();
-  const messageId = await redisClient.rpop<string>(
-    KEYS.APP_PENDING_MESSAGES(appId),
-  );
+  const messageId = await redisClient.rpop<string>(KEYS.APP_PENDING_MESSAGES(appId));
 
   // Check if queue is now empty
   const remaining = await redisClient.llen(KEYS.APP_PENDING_MESSAGES(appId));
@@ -700,10 +671,7 @@ async function cleanupAppQueue(appId: string): Promise<void> {
 /**
  * Mark agent as working on an app
  */
-async function setAgentWorking(
-  appId: string,
-  isWorking: boolean,
-): Promise<void> {
+async function setAgentWorking(appId: string, isWorking: boolean): Promise<void> {
   const redisClient = getRedis();
   if (isWorking) {
     await redisClient.set(KEYS.AGENT_WORKING(appId), "1", { ex: 300 }); // 5 min TTL
@@ -837,10 +805,7 @@ async function getAppContext(appId: string) {
 /**
  * Get the last N messages with their attachments for context
  */
-async function getChatHistory(
-  appId: string,
-  limit = 10,
-): Promise<ChatMessage[]> {
+async function getChatHistory(appId: string, limit = 10): Promise<ChatMessage[]> {
   const messages = await getPrisma().appMessage.findMany({
     where: { appId },
     include: {
@@ -886,11 +851,7 @@ function formatPromptWithHistory(
   prompt += `# Chat History (last ${messages.length} messages)\n\n`;
 
   for (const msg of messages) {
-    const roleLabel = msg.role === "USER"
-      ? "User"
-      : msg.role === "AGENT"
-      ? "Assistant"
-      : "System";
+    const roleLabel = msg.role === "USER" ? "User" : msg.role === "AGENT" ? "Assistant" : "System";
     const timestamp = msg.createdAt.toISOString();
     prompt += `## ${roleLabel} (${timestamp})\n\n`;
     prompt += msg.content + "\n\n";
@@ -978,8 +939,7 @@ Available spike-land MCP tools:
 ## Guidelines
 1. ${
     app.localFilePath
-      ? "PREFER editing the local file at " + app.localFilePath
-        + " for faster updates"
+      ? "PREFER editing the local file at " + app.localFilePath + " for faster updates"
       : "ALWAYS use codespace_update to modify code - do NOT just describe changes"
   }
 2. For new apps, use a codespace_id like "my-app-name" (lowercase, hyphens)
@@ -998,8 +958,7 @@ async function createTempMcpConfig(): Promise<string> {
   await mkdir(tmpDir, { recursive: true });
   const configPath = join(tmpDir, "mcp-config.json");
 
-  const mcpDockerUrl = process.env.MCP_DOCKER_URL
-    || "http://localhost:8808/sse";
+  const mcpDockerUrl = process.env.MCP_DOCKER_URL || "http://localhost:8808/sse";
 
   const config = {
     mcpServers: {
@@ -1007,7 +966,7 @@ async function createTempMcpConfig(): Promise<string> {
         type: "url",
         url: "https://spike.land/api/mcp",
       },
-      "MCP_DOCKER": {
+      MCP_DOCKER: {
         type: "sse",
         url: mcpDockerUrl,
       },
@@ -1046,10 +1005,7 @@ function extractResponseText(output: string): string {
       }
 
       // Check for "assistant" type (message content)
-      if (
-        event.type === "assistant"
-        && event.message?.content?.[0]?.text
-      ) {
+      if (event.type === "assistant" && event.message?.content?.[0]?.text) {
         return event.message.content[0].text;
       }
     } catch {
@@ -1069,7 +1025,7 @@ async function spawnClaudeCode(
   systemPrompt: string,
   mcpConfigPath: string,
 ): Promise<SpawnResult> {
-  return new Promise(resolve => {
+  return new Promise((resolve) => {
     const args = [
       "--print",
       "--verbose",
@@ -1132,8 +1088,8 @@ async function spawnClaudeCode(
                 console.log(`    Codespace ID: ${codespaceId}`);
               }
             } else if (
-              event.name.includes("codespace_run")
-              || event.name.includes("codespace_link")
+              event.name.includes("codespace_run") ||
+              event.name.includes("codespace_link")
             ) {
               codeUpdated = true;
             }
@@ -1160,7 +1116,7 @@ async function spawnClaudeCode(
       });
     }, CLAUDE_TIMEOUT_MS);
 
-    claude.on("close", code => {
+    claude.on("close", (code) => {
       clearTimeout(timeoutId);
 
       if (code !== 0) {
@@ -1192,7 +1148,7 @@ async function spawnClaudeCode(
       });
     });
 
-    claude.on("error", err => {
+    claude.on("error", (err) => {
       clearTimeout(timeoutId);
       resolve({
         success: false,
@@ -1258,17 +1214,15 @@ async function postAgentResponse(
     // Provide helpful error message based on status code
     if (response.status === 401 || response.status === 403) {
       throw new Error(
-        `Authentication failed (HTTP ${response.status}): `
-          + `Check that AGENT_API_KEY in .env.local matches Vercel production. `
-          + `Key preview: ${maskApiKey(apiKey)}. `
-          + `Run 'yarn agent:test-auth:prod' to verify. `
-          + `Error: ${errorBody}`,
+        `Authentication failed (HTTP ${response.status}): ` +
+          `Check that AGENT_API_KEY in .env.local matches Vercel production. ` +
+          `Key preview: ${maskApiKey(apiKey)}. ` +
+          `Run 'yarn agent:test-auth:prod' to verify. ` +
+          `Error: ${errorBody}`,
       );
     }
 
-    throw new Error(
-      `Failed to post agent response (HTTP ${response.status}): ${errorBody}`,
-    );
+    throw new Error(`Failed to post agent response (HTTP ${response.status}): ${errorBody}`);
   }
 
   debugLog("API request succeeded", { status: response.status });
@@ -1277,10 +1231,7 @@ async function postAgentResponse(
 /**
  * Update app's codespace info via agent API
  */
-async function updateAppCodespace(
-  appId: string,
-  codespaceId: string,
-): Promise<void> {
+async function updateAppCodespace(appId: string, codespaceId: string): Promise<void> {
   const apiKey = process.env.AGENT_API_KEY;
   if (!apiKey) {
     throw new Error("AGENT_API_KEY not configured");
@@ -1310,10 +1261,7 @@ async function updateAppCodespace(
 /**
  * Process a single message - Spawns Claude Code to handle it
  */
-async function processMessage(
-  appId: string,
-  messageId: string,
-): Promise<ProcessResult> {
+async function processMessage(appId: string, messageId: string): Promise<ProcessResult> {
   const content = await getMessageContent(messageId);
   if (!content) {
     return { success: false, agentMessage: "Could not find message content" };
@@ -1361,20 +1309,13 @@ async function processMessage(
         try {
           await updateAppCodespace(appId, testResult.codespaceId);
         } catch (updateError) {
-          console.error(
-            `  [TEST MODE] Failed to update codespace: ${updateError}`,
-          );
+          console.error(`  [TEST MODE] Failed to update codespace: ${updateError}`);
         }
       }
 
       // Post response via API (still exercises real infrastructure)
       try {
-        await postAgentResponse(
-          appId,
-          testResult.response,
-          testResult.codeUpdated,
-          [messageId],
-        );
+        await postAgentResponse(appId, testResult.response, testResult.codeUpdated, [messageId]);
         console.log(
           `  [TEST MODE] Posted response via API (codeUpdated: ${testResult.codeUpdated})`,
         );
@@ -1386,30 +1327,22 @@ async function processMessage(
           agentMessage: testResult.response,
           appUpdate: testResult.codeUpdated
             ? {
-              status: "BUILDING" as AppBuildStatus,
-              codespaceId: testResult.codespaceId,
-            }
+                status: "BUILDING" as AppBuildStatus,
+                codespaceId: testResult.codespaceId,
+              }
             : undefined,
-          statusMessage: testResult.codeUpdated
-            ? "Code updated by agent (test mode)"
-            : undefined,
+          statusMessage: testResult.codeUpdated ? "Code updated by agent (test mode)" : undefined,
         };
       }
 
       // Success via API
       return {
         success: true,
-        appUpdate: testResult.codeUpdated
-          ? { status: "BUILDING" as AppBuildStatus }
-          : undefined,
-        statusMessage: testResult.codeUpdated
-          ? "Code updated by agent (test mode)"
-          : undefined,
+        appUpdate: testResult.codeUpdated ? { status: "BUILDING" as AppBuildStatus } : undefined,
+        statusMessage: testResult.codeUpdated ? "Code updated by agent (test mode)" : undefined,
       };
     } catch (testError) {
-      const errorMsg = testError instanceof Error
-        ? testError.message
-        : "Unknown test error";
+      const errorMsg = testError instanceof Error ? testError.message : "Unknown test error";
       console.error(`  [TEST MODE] Error: ${errorMsg}`);
       return {
         success: false,
@@ -1452,9 +1385,7 @@ async function processMessage(
         localFileSyncOccurred = true;
       });
     } catch (syncError) {
-      const errorMsg = syncError instanceof Error
-        ? syncError.message
-        : "Unknown error";
+      const errorMsg = syncError instanceof Error ? syncError.message : "Unknown error";
       console.warn(`  Local file sync setup failed: ${errorMsg}`);
       console.log(`  Continuing with MCP-only mode...`);
       // Continue without local file - MCP tools will still work
@@ -1501,12 +1432,8 @@ async function processMessage(
 
     // Post response via API (triggers SSE broadcast including code_updated)
     try {
-      await postAgentResponse(appId, result.response, finalCodeUpdated, [
-        messageId,
-      ]);
-      console.log(
-        `  Posted response via API (codeUpdated: ${finalCodeUpdated})`,
-      );
+      await postAgentResponse(appId, result.response, finalCodeUpdated, [messageId]);
+      console.log(`  Posted response via API (codeUpdated: ${finalCodeUpdated})`);
     } catch (apiError) {
       console.error(`  API error: ${apiError}`);
       // Fall back to direct database insert
@@ -1515,9 +1442,9 @@ async function processMessage(
         agentMessage: result.response,
         appUpdate: finalCodeUpdated
           ? {
-            status: "BUILDING" as AppBuildStatus,
-            codespaceId: result.codespaceId || app.codespaceId || undefined,
-          }
+              status: "BUILDING" as AppBuildStatus,
+              codespaceId: result.codespaceId || app.codespaceId || undefined,
+            }
           : undefined,
         statusMessage: finalCodeUpdated ? "Code updated by agent" : undefined,
       };
@@ -1527,9 +1454,7 @@ async function processMessage(
     return {
       success: true,
       // agentMessage is handled by API, so don't return it here
-      appUpdate: finalCodeUpdated
-        ? { status: "BUILDING" as AppBuildStatus }
-        : undefined,
+      appUpdate: finalCodeUpdated ? { status: "BUILDING" as AppBuildStatus } : undefined,
       statusMessage: finalCodeUpdated ? "Code updated by agent" : undefined,
     };
   } catch (error) {
@@ -1556,9 +1481,7 @@ async function processMessage(
         console.log(`  Final sync: ${finalCode.length} bytes`);
         await syncCodeToServer(app.codespaceId, finalCode, appId);
       } catch (syncError) {
-        const errorMsg = syncError instanceof Error
-          ? syncError.message
-          : "Unknown error";
+        const errorMsg = syncError instanceof Error ? syncError.message : "Unknown error";
         console.warn(`  Final sync failed: ${errorMsg}`);
       }
     }
@@ -1610,11 +1533,7 @@ async function processApp(appId: string): Promise<void> {
         // Update app properties if specified
         if (result.appUpdate) {
           if (result.appUpdate.status) {
-            await updateAppStatus(
-              appId,
-              result.appUpdate.status,
-              result.statusMessage,
-            );
+            await updateAppStatus(appId, result.appUpdate.status, result.statusMessage);
             // Remove status from appUpdate to avoid duplicate update
             const { status: _, ...restUpdate } = result.appUpdate;
             if (Object.keys(restUpdate).length > 0) {
@@ -1629,10 +1548,7 @@ async function processApp(appId: string): Promise<void> {
       } else {
         console.error(`  Failed to process message: ${result.agentMessage}`);
         // Add error message to chat
-        await addSystemMessage(
-          appId,
-          `Error processing message: ${result.agentMessage}`,
-        );
+        await addSystemMessage(appId, `Error processing message: ${result.agentMessage}`);
       }
 
       // Get next message
@@ -1708,41 +1624,30 @@ async function main(): Promise<void> {
   const args = process.argv.slice(2);
   const runOnce = args.includes("--once");
   const showStats = args.includes("--stats");
-  const intervalArg = args.find(a => a.startsWith("--interval="));
-  const interval = intervalArg
-    ? parseInt(intervalArg.split("=")[1]!, 10)
-    : 5000;
+  const intervalArg = args.find((a) => a.startsWith("--interval="));
+  const interval = intervalArg ? parseInt(intervalArg.split("=")[1]!, 10) : 5000;
 
   console.log("Agent Poll Script");
   console.log("=================");
   console.log(`Environment: ${isProd ? "PRODUCTION" : "LOCAL"}`);
   console.log(`API URL: ${AGENT_API_URL}`);
-  const redisUrl = process.env.UPSTASH_REDIS_REST_URL
-    || process.env.KV_REST_API_URL;
-  console.log(
-    `Redis URL: ${redisUrl?.substring(0, 30) || "(not configured)"}...`,
-  );
+  const redisUrl = process.env.UPSTASH_REDIS_REST_URL || process.env.KV_REST_API_URL;
+  console.log(`Redis URL: ${redisUrl?.substring(0, 30) || "(not configured)"}...`);
   console.log(`Debug mode: ${isDebug ? "ON" : "OFF"}`);
 
   // Show additional debug info
   if (isDebug) {
     console.log("\n[DEBUG] Configuration:");
     console.log(`  AGENT_API_KEY: ${maskApiKey(process.env.AGENT_API_KEY)}`);
-    console.log(
-      `  SPIKE_LAND_API_KEY: ${maskApiKey(process.env.SPIKE_LAND_API_KEY)}`,
-    );
+    console.log(`  SPIKE_LAND_API_KEY: ${maskApiKey(process.env.SPIKE_LAND_API_KEY)}`);
     const dbUrl = isProd
-      ? (process.env.DATABASE_URL_PROD || process.env.DATABASE_URL)
+      ? process.env.DATABASE_URL_PROD || process.env.DATABASE_URL
       : process.env.DATABASE_URL;
-    const dbSource = isProd && process.env.DATABASE_URL_PROD
-      ? "DATABASE_URL_PROD"
-      : "DATABASE_URL";
-    console.log(
-      `  ${dbSource}: ${dbUrl ? `(set - ${isProd ? "PROD" : "LOCAL"})` : "(not set)"}`,
-    );
+    const dbSource = isProd && process.env.DATABASE_URL_PROD ? "DATABASE_URL_PROD" : "DATABASE_URL";
+    console.log(`  ${dbSource}: ${dbUrl ? `(set - ${isProd ? "PROD" : "LOCAL"})` : "(not set)"}`);
     console.log(`  Skip permissions: ${SKIP_PERMISSIONS}`);
     console.log("\n[DEBUG] E2E Test Keywords Available:");
-    Object.keys(TEST_KEYWORD_HANDLERS).forEach(keyword => {
+    Object.keys(TEST_KEYWORD_HANDLERS).forEach((keyword) => {
       console.log(`  - ${keyword}`);
     });
     console.log("");

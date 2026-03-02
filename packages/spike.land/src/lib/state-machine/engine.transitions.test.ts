@@ -118,7 +118,7 @@ describe("state machine engine - transitions & state types", () => {
       });
 
       expect(() => sendEvent("m1", "UNKNOWN")).toThrow(
-        "No matching transition for event \"UNKNOWN\"",
+        'No matching transition for event "UNKNOWN"',
       );
     });
   });
@@ -167,9 +167,7 @@ describe("state machine engine - transitions & state types", () => {
 
     it("should block transition when guard condition is not met", () => {
       createGuardedMachine();
-      expect(() => sendEvent("gm", "TRY_UNLOCK")).toThrow(
-        "No matching transition",
-      );
+      expect(() => sendEvent("gm", "TRY_UNLOCK")).toThrow("No matching transition");
       expect(getState("gm").activeStates).toEqual(["locked"]);
     });
 

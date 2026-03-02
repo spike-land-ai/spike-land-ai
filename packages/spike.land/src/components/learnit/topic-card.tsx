@@ -10,14 +10,9 @@ interface TopicCardProps {
   viewCount?: number;
 }
 
-export function TopicCard(
-  { title, description, slug, viewCount }: TopicCardProps,
-) {
+export function TopicCard({ title, description, slug, viewCount }: TopicCardProps) {
   return (
-    <Link
-      href={`/learnit/${slug}`}
-      className="block transition-all hover:-translate-y-1"
-    >
+    <Link href={`/learnit/${slug}`} className="block transition-all hover:-translate-y-1">
       <Card className="h-full hover:shadow-md cursor-pointer border-primary/10 hover:border-primary/30">
         <CardHeader className="pb-2">
           <CardTitle className="flex items-center justify-between text-lg">
@@ -30,11 +25,7 @@ export function TopicCard(
             {stripMarkdown(description)}
           </p>
           <div className="flex items-center justify-between text-xs text-muted-foreground mt-auto">
-            <span>
-              {viewCount !== undefined
-                ? `${viewCount} views`
-                : "Start learning"}
-            </span>
+            <span>{viewCount !== undefined ? `${viewCount} views` : "Start learning"}</span>
             <ArrowRight className="w-3 h-3" />
           </div>
         </CardContent>

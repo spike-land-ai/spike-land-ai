@@ -20,15 +20,13 @@ import crypto from "crypto";
  * is logged.  In production the secret must be present and match.
  */
 export function validateCronSecret(request: {
-  headers: { get(name: string): string | null; };
+  headers: { get(name: string): string | null };
 }): boolean {
   const cronSecret = process.env.CRON_SECRET;
 
   if (!cronSecret) {
     if (process.env.NODE_ENV === "development") {
-      console.warn(
-        "[cron-auth] CRON_SECRET not configured — allowing in development mode",
-      );
+      console.warn("[cron-auth] CRON_SECRET not configured — allowing in development mode");
       return true;
     }
     return false;
@@ -41,8 +39,8 @@ export function validateCronSecret(request: {
   if (authHeader?.startsWith("Bearer ")) {
     const token = authHeader.substring(7);
     if (
-      token.length === cronSecret.length
-      && crypto.timingSafeEqual(Buffer.from(token), secretBuf)
+      token.length === cronSecret.length &&
+      crypto.timingSafeEqual(Buffer.from(token), secretBuf)
     ) {
       return true;
     }
@@ -51,9 +49,9 @@ export function validateCronSecret(request: {
   // Check x-cron-secret header (also used by Vercel Cron)
   const cronSecretHeader = request.headers.get("x-cron-secret");
   if (
-    cronSecretHeader !== null
-    && cronSecretHeader.length === cronSecret.length
-    && crypto.timingSafeEqual(Buffer.from(cronSecretHeader), secretBuf)
+    cronSecretHeader !== null &&
+    cronSecretHeader.length === cronSecret.length &&
+    crypto.timingSafeEqual(Buffer.from(cronSecretHeader), secretBuf)
   ) {
     return true;
   }

@@ -27,10 +27,10 @@ export class EscalationService {
 
     const settings = await getSmartRoutingSettings(this.workspaceId);
     const currentLevel = item.escalationLevel || 0;
-    const nextLevel = targetLevel ?? (currentLevel + 1);
+    const nextLevel = targetLevel ?? currentLevel + 1;
 
     // Validate level exists
-    const levelDef = settings.escalation.levels.find(l => l.level === nextLevel);
+    const levelDef = settings.escalation.levels.find((l) => l.level === nextLevel);
     if (!levelDef) {
       // Max level reached or invalid
       logger.warn(`Cannot escalate item ${itemId} to level ${nextLevel}`);
@@ -46,9 +46,7 @@ export class EscalationService {
         escalatedAt: new Date(),
         ...(targetUserId !== undefined ? { escalatedToId: targetUserId } : {}),
         // Reset or update SLA deadline for new level
-        slaDeadline: this.calculateSLADeadline(
-          settings.escalation.slaTimeoutMinutes,
-        ),
+        slaDeadline: this.calculateSLADeadline(settings.escalation.slaTimeoutMinutes),
       },
     });
 
@@ -89,11 +87,7 @@ export class EscalationService {
       });
 
       // Auto-escalate on breach
-      await this.escalateItem(
-        item.id,
-        EscalationTrigger.SLA_TIMEOUT,
-        "SLA Deadline exceeded",
-      );
+      await this.escalateItem(item.id, EscalationTrigger.SLA_TIMEOUT, "SLA Deadline exceeded");
     }
   }
 

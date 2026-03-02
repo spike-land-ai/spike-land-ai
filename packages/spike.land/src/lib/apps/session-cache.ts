@@ -43,10 +43,7 @@ export function getSessionCache(codeSpace: string): SessionCacheData | null {
   }
 }
 
-export function setSessionCache(
-  codeSpace: string,
-  data: SessionCacheData,
-): void {
+export function setSessionCache(codeSpace: string, data: SessionCacheData): void {
   if (typeof window === "undefined") return;
 
   const key = getSessionCacheKey(codeSpace);

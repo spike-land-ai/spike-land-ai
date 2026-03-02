@@ -44,7 +44,7 @@ interface ValidationResult {
   /** List of valid files */
   validFiles: File[];
   /** List of invalid files with their specific errors */
-  invalidFiles: Array<{ file: File; error: string; }>;
+  invalidFiles: Array<{ file: File; error: string }>;
 }
 
 /**
@@ -80,15 +80,12 @@ export function formatFileSize(bytes: number): string {
 /**
  * Validate a single file against validation options
  */
-export function validateFile(
-  file: File,
-  options: ValidationOptions = {},
-): SingleValidationResult {
+export function validateFile(file: File, options: ValidationOptions = {}): SingleValidationResult {
   const maxFileSize = options.maxFileSize ?? DEFAULT_MAX_SIZE;
   const allowedTypes = options.allowedTypes ?? IMAGE_TYPES;
 
   // Validate file type
-  const isTypeAllowed = allowedTypes.some(type => {
+  const isTypeAllowed = allowedTypes.some((type) => {
     if (type.endsWith("/*")) {
       const prefix = type.slice(0, -2);
       return file.type.startsWith(prefix);
@@ -107,9 +104,9 @@ export function validateFile(
   if (file.size > maxFileSize) {
     return {
       valid: false,
-      error: `File too large: ${formatFileSize(file.size)}. Maximum size is ${
-        formatFileSize(maxFileSize)
-      }.`,
+      error: `File too large: ${formatFileSize(file.size)}. Maximum size is ${formatFileSize(
+        maxFileSize,
+      )}.`,
     };
   }
 
@@ -124,10 +121,7 @@ export function validateFile(
   // Validate filename security (path traversal, hidden files, length)
   if (!isSecureFilename(file.name)) {
     // Provide specific error messages based on the security issue
-    if (
-      file.name.includes("..") || file.name.includes("/")
-      || file.name.includes("\\")
-    ) {
+    if (file.name.includes("..") || file.name.includes("/") || file.name.includes("\\")) {
       return {
         valid: false,
         error: "Insecure filename: path traversal characters are not allowed.",
@@ -162,7 +156,7 @@ export function validateFiles(
 
   const errors: string[] = [];
   const validFiles: File[] = [];
-  const invalidFiles: Array<{ file: File; error: string; }> = [];
+  const invalidFiles: Array<{ file: File; error: string }> = [];
 
   // Validate file count
   if (fileArray.length === 0) {
@@ -171,9 +165,7 @@ export function validateFiles(
   }
 
   if (fileArray.length > maxFiles) {
-    errors.push(
-      `Too many files: ${fileArray.length}. Maximum is ${maxFiles} files.`,
-    );
+    errors.push(`Too many files: ${fileArray.length}. Maximum is ${maxFiles} files.`);
     return { valid: false, errors, validFiles, invalidFiles };
   }
 
@@ -231,9 +223,7 @@ export function hasImageExtension(filename: string): boolean {
  */
 export function isSecureFilename(filename: string): boolean {
   // Prevent path traversal
-  if (
-    filename.includes("..") || filename.includes("/") || filename.includes("\\")
-  ) {
+  if (filename.includes("..") || filename.includes("/") || filename.includes("\\")) {
     return false;
   }
 

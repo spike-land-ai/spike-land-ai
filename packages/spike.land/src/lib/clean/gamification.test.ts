@@ -267,10 +267,8 @@ describe("Gamification Pure Functions", () => {
       const newAchievements = checkNewAchievements(stats, alreadyUnlocked);
 
       // Should include THREE_DAY_STREAK, ROOM_CLEAR, SKIP_ZERO but not FIRST_SESSION
-      expect(newAchievements.find(a => a.type === "FIRST_SESSION"))
-        .toBeUndefined();
-      expect(newAchievements.find(a => a.type === "THREE_DAY_STREAK"))
-        .toBeDefined();
+      expect(newAchievements.find((a) => a.type === "FIRST_SESSION")).toBeUndefined();
+      expect(newAchievements.find((a) => a.type === "THREE_DAY_STREAK")).toBeDefined();
     });
 
     it("returns empty array when all are already unlocked", () => {
@@ -286,7 +284,7 @@ describe("Gamification Pure Functions", () => {
         sessionHour: 12,
         daysSinceLastSession: 0,
       };
-      const allTypes = new Set(ACHIEVEMENTS.map(a => a.type));
+      const allTypes = new Set(ACHIEVEMENTS.map((a) => a.type));
       const newAchievements = checkNewAchievements(stats, allTypes);
       expect(newAchievements).toHaveLength(0);
     });

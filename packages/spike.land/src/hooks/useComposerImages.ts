@@ -36,9 +36,7 @@ function generateId(): string {
   return `img-${Date.now()}-${idCounter++}`;
 }
 
-export function useComposerImages(
-  options?: UseComposerImagesOptions,
-): UseComposerImagesReturn {
+export function useComposerImages(options?: UseComposerImagesOptions): UseComposerImagesReturn {
   const {
     maxImages = 4,
     maxSizeBytes = 10 * 1024 * 1024,
@@ -52,7 +50,7 @@ export function useComposerImages(
   useEffect(() => {
     const urls = objectUrlsRef.current;
     return () => {
-      urls.forEach(url => URL.revokeObjectURL(url));
+      urls.forEach((url) => URL.revokeObjectURL(url));
     };
   }, []);
 
@@ -68,31 +66,27 @@ export function useComposerImages(
         });
 
         if (!res.ok) {
-          const data = await res
-            .json()
-            .catch(() => ({ error: "Upload failed" }));
+          const data = await res.json().catch(() => ({ error: "Upload failed" }));
           throw new Error(data.error || "Upload failed");
         }
 
         const data = await res.json();
-        setImages(prev =>
-          prev.map(img =>
-            img.id === image.id
-              ? { ...img, uploadedUrl: data.url, isUploading: false }
-              : img
-          )
+        setImages((prev) =>
+          prev.map((img) =>
+            img.id === image.id ? { ...img, uploadedUrl: data.url, isUploading: false } : img,
+          ),
         );
       } catch (error) {
-        setImages(prev =>
-          prev.map(img =>
+        setImages((prev) =>
+          prev.map((img) =>
             img.id === image.id
               ? {
-                ...img,
-                isUploading: false,
-                error: error instanceof Error ? error.message : "Upload failed",
-              }
-              : img
-          )
+                  ...img,
+                  isUploading: false,
+                  error: error instanceof Error ? error.message : "Upload failed",
+                }
+              : img,
+          ),
         );
       }
     },
@@ -103,16 +97,16 @@ export function useComposerImages(
     (files: FileList | File[]) => {
       const fileArray = Array.from(files);
 
-      setImages(prev => {
+      setImages((prev) => {
         const remaining = maxImages - prev.length;
         if (remaining <= 0) return prev;
 
         const validFiles = fileArray
-          .filter(f => f.type.startsWith("image/"))
-          .filter(f => f.size <= maxSizeBytes)
+          .filter((f) => f.type.startsWith("image/"))
+          .filter((f) => f.size <= maxSizeBytes)
           .slice(0, remaining);
 
-        const newImages: ComposerImage[] = validFiles.map(file => {
+        const newImages: ComposerImage[] = validFiles.map((file) => {
           const previewUrl = URL.createObjectURL(file);
           objectUrlsRef.current.push(previewUrl);
           return {
@@ -125,7 +119,7 @@ export function useComposerImages(
 
         // Start uploads (fire-and-forget from state update)
         setTimeout(() => {
-          newImages.forEach(img => uploadImage(img));
+          newImages.forEach((img) => uploadImage(img));
         }, 0);
 
         return [...prev, ...newImages];
@@ -135,18 +129,18 @@ export function useComposerImages(
   );
 
   const removeImage = useCallback((id: string) => {
-    setImages(prev => {
-      const img = prev.find(i => i.id === id);
+    setImages((prev) => {
+      const img = prev.find((i) => i.id === id);
       if (img) {
         URL.revokeObjectURL(img.previewUrl);
       }
-      return prev.filter(i => i.id !== id);
+      return prev.filter((i) => i.id !== id);
     });
   }, []);
 
   const clearAll = useCallback(() => {
-    setImages(prev => {
-      prev.forEach(img => URL.revokeObjectURL(img.previewUrl));
+    setImages((prev) => {
+      prev.forEach((img) => URL.revokeObjectURL(img.previewUrl));
       return [];
     });
   }, []);
@@ -172,9 +166,7 @@ export function useComposerImages(
     },
   };
 
-  const uploadedUrls = images
-    .filter(img => img.uploadedUrl)
-    .map(img => img.uploadedUrl!);
+  const uploadedUrls = images.filter((img) => img.uploadedUrl).map((img) => img.uploadedUrl!);
 
   return {
     images,

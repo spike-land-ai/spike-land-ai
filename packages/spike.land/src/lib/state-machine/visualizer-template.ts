@@ -216,8 +216,8 @@ function StateMachineVisualizer() {
   const svgRef = useRef(null);
   const [dimensions, setDimensions] = useState({ width: 800, height: 500 });
 ${
-    interactive
-      ? `
+  interactive
+    ? `
   const [machineState, setMachineState] = useState({
     currentStates: MACHINE_DATA.currentStates,
     context: MACHINE_DATA.context,
@@ -259,12 +259,12 @@ ${
     return () => clearTimeout(timer);
   }, [isAutoPlaying, availableEvents, handleSendEvent, autoPlaySpeed]);
 `
-      : `
+    : `
   const currentStates = MACHINE_DATA.currentStates;
   const context = MACHINE_DATA.context;
   const transitionLog = MACHINE_DATA.transitionLog || [];
 `
-  }
+}
   const layoutGraph = useMemo(
     () => computeLayout(MACHINE_DATA.definition, currentStates),
     [currentStates]
@@ -369,8 +369,8 @@ ${
         style: { fontWeight: "bold", fontSize: 15, color: "#333", borderBottom: "1px solid #eee", paddingBottom: 8 },
       }, "Inspector"),
 ${
-    interactive
-      ? `
+  interactive
+    ? `
       React.createElement("div", null,
         React.createElement("div", {
           style: { fontWeight: "bold", fontSize: 13, color: "#333", marginBottom: 8 },
@@ -412,8 +412,8 @@ ${
         }, isAutoPlaying ? "Pause" : "Play")
       ),
 `
-      : ""
-  }
+    : ""
+}
       React.createElement(ContextInspector, { context }),
       React.createElement("div", null,
         React.createElement("div", {

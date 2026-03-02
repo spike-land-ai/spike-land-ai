@@ -139,10 +139,7 @@ export function AgentControlPanel({ box }: AgentControlPanelProps) {
   useEffect(() => {
     if (box.status === BoxStatus.RUNNING) {
       void fetchVncSession();
-      vncRefreshTimer.current = setInterval(
-        () => void fetchVncSession(),
-        VNC_TOKEN_REFRESH_MS,
-      );
+      vncRefreshTimer.current = setInterval(() => void fetchVncSession(), VNC_TOKEN_REFRESH_MS);
     } else {
       setVncUrl(null);
     }
@@ -187,7 +184,7 @@ export function AgentControlPanel({ box }: AgentControlPanelProps) {
 
       const data = (await response.json()) as SendMessageResponse;
 
-      setMessages(prev => [
+      setMessages((prev) => [
         ...prev,
         {
           ...data.userMessage,
@@ -244,9 +241,7 @@ export function AgentControlPanel({ box }: AgentControlPanelProps) {
           throw new Error("Action failed");
         }
 
-        toast.success(
-          `Agent ${action === "STOP" ? "paused" : "restarted"} successfully`,
-        );
+        toast.success(`Agent ${action === "STOP" ? "paused" : "restarted"} successfully`);
         window.location.reload();
       } catch (error) {
         toast.error("Failed to perform action");
@@ -266,8 +261,8 @@ export function AgentControlPanel({ box }: AgentControlPanelProps) {
   const vncPlaceholderText = vncLoading
     ? "Connecting to session..."
     : box.status === BoxStatus.RUNNING
-    ? "Loading VNC session..."
-    : "Session unavailable";
+      ? "Loading VNC session..."
+      : "Session unavailable";
 
   // ---------------------------------------------------------------------------
   // Render
@@ -284,25 +279,20 @@ export function AgentControlPanel({ box }: AgentControlPanelProps) {
             <h2 className="text-lg font-semibold">Chat</h2>
           </div>
 
-          {
-            /*
-             * role="log" marks this region as an ARIA live region that
-             * announces new messages to screen readers.
-             */
-          }
+          {/*
+           * role="log" marks this region as an ARIA live region that
+           * announces new messages to screen readers.
+           */}
           <div
             role="log"
             aria-label="Conversation with agent"
             aria-live="polite"
             className="flex-1 overflow-y-auto p-4 space-y-3"
           >
-            {messages.map(message => (
+            {messages.map((message) => (
               <div
                 key={message.id}
-                className={cn(
-                  "flex",
-                  message.role === "USER" ? "justify-end" : "justify-start",
-                )}
+                className={cn("flex", message.role === "USER" ? "justify-end" : "justify-start")}
               >
                 <div
                   className={cn(
@@ -317,12 +307,10 @@ export function AgentControlPanel({ box }: AgentControlPanelProps) {
               </div>
             ))}
 
-            {
-              /*
-               * The typing indicator is inside the log region so it is announced
-               * automatically without a separate aria-live region.
-               */
-            }
+            {/*
+             * The typing indicator is inside the log region so it is announced
+             * automatically without a separate aria-live region.
+             */}
             {isTyping && (
               <div className="flex justify-start" aria-label="Agent is typing">
                 <div className="max-w-[80%] rounded-2xl px-4 py-2 bg-white/10 text-foreground backdrop-blur-xl">
@@ -340,7 +328,7 @@ export function AgentControlPanel({ box }: AgentControlPanelProps) {
             <div className="flex gap-2">
               <Textarea
                 value={inputValue}
-                onChange={e => setInputValue(e.target.value)}
+                onChange={(e) => setInputValue(e.target.value)}
                 placeholder="Type your message..."
                 className="min-h-[60px] resize-none"
                 aria-label="Message input"
@@ -372,13 +360,8 @@ export function AgentControlPanel({ box }: AgentControlPanelProps) {
 
               <div className="flex items-center gap-2">
                 {/* Decorative dot – hidden from screen readers; Badge carries the label */}
-                <div
-                  className={cn("w-2 h-2 rounded-full", statusColorClass)}
-                  aria-hidden
-                />
-                <Badge variant={statusBadgeVariant}>
-                  {box.status}
-                </Badge>
+                <div className={cn("w-2 h-2 rounded-full", statusColorClass)} aria-hidden />
+                <Badge variant={statusBadgeVariant}>{box.status}</Badge>
               </div>
             </div>
 
@@ -411,19 +394,17 @@ export function AgentControlPanel({ box }: AgentControlPanelProps) {
           </div>
 
           <div className="flex-1 relative bg-black/20">
-            {vncUrl && !vncLoading
-              ? (
-                <iframe
-                  src={vncUrl}
-                  className="w-full h-full absolute inset-0"
-                  title="Live agent desktop session"
-                />
-              )
-              : (
-                <div className="flex items-center justify-center h-full text-muted-foreground">
-                  <p>{vncPlaceholderText}</p>
-                </div>
-              )}
+            {vncUrl && !vncLoading ? (
+              <iframe
+                src={vncUrl}
+                className="w-full h-full absolute inset-0"
+                title="Live agent desktop session"
+              />
+            ) : (
+              <div className="flex items-center justify-center h-full text-muted-foreground">
+                <p>{vncPlaceholderText}</p>
+              </div>
+            )}
           </div>
         </Card>
       </div>

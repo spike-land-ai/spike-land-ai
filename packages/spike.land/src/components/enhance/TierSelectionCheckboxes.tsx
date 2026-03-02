@@ -14,10 +14,7 @@ interface TierSelectionCheckboxesProps {
   disabled?: boolean;
 }
 
-const TIER_INFO: Record<
-  EnhancementTierType,
-  { name: string; resolution: string; cost: number; }
-> = {
+const TIER_INFO: Record<EnhancementTierType, { name: string; resolution: string; cost: number }> = {
   TIER_1K: { name: "1K", resolution: "1024px", cost: 2 },
   TIER_2K: { name: "2K", resolution: "2048px", cost: 5 },
   TIER_4K: { name: "4K", resolution: "4096px", cost: 10 },
@@ -31,17 +28,14 @@ export function TierSelectionCheckboxes({
   userBalance,
   disabled = false,
 }: TierSelectionCheckboxesProps) {
-  const totalCost = selectedTiers.reduce(
-    (sum, tier) => sum + TIER_INFO[tier].cost,
-    0,
-  );
+  const totalCost = selectedTiers.reduce((sum, tier) => sum + TIER_INFO[tier].cost, 0);
   const exceedsBalance = totalCost > userBalance;
 
   const handleTierToggle = (tier: EnhancementTierType, checked: boolean) => {
     if (checked) {
       onSelectionChange([...selectedTiers, tier]);
     } else {
-      onSelectionChange(selectedTiers.filter(t => t !== tier));
+      onSelectionChange(selectedTiers.filter((t) => t !== tier));
     }
   };
 
@@ -60,7 +54,7 @@ export function TierSelectionCheckboxes({
   return (
     <div className="space-y-4" data-testid="tier-selection-checkboxes">
       <div className="space-y-3">
-        {TIER_ORDER.map(tier => {
+        {TIER_ORDER.map((tier) => {
           const info = TIER_INFO[tier];
           const isSelected = selectedTiers.includes(tier);
           const canAfford = canAffordTier(tier);
@@ -81,21 +75,16 @@ export function TierSelectionCheckboxes({
                 <Checkbox
                   id={`tier-checkbox-${tier}`}
                   checked={isSelected}
-                  onCheckedChange={checked => handleTierToggle(tier, checked === true)}
+                  onCheckedChange={(checked) => handleTierToggle(tier, checked === true)}
                   disabled={isDisabled}
                   data-testid={`tier-checkbox-${tier}`}
                 />
                 <Label
                   htmlFor={`tier-checkbox-${tier}`}
-                  className={cn(
-                    "flex flex-col cursor-pointer",
-                    isDisabled && "cursor-not-allowed",
-                  )}
+                  className={cn("flex flex-col cursor-pointer", isDisabled && "cursor-not-allowed")}
                 >
                   <span className="font-medium">{info.name}</span>
-                  <span className="text-xs text-muted-foreground">
-                    {info.resolution}
-                  </span>
+                  <span className="text-xs text-muted-foreground">{info.resolution}</span>
                 </Label>
               </div>
 
@@ -110,9 +99,7 @@ export function TierSelectionCheckboxes({
                   {info.cost}
                 </span>
                 {!canAfford && !isSelected && (
-                  <span className="text-xs text-destructive">
-                    (Insufficient)
-                  </span>
+                  <span className="text-xs text-destructive">(Insufficient)</span>
                 )}
               </div>
             </div>
@@ -123,9 +110,7 @@ export function TierSelectionCheckboxes({
       <div
         className={cn(
           "flex items-center justify-between p-3 rounded-lg",
-          exceedsBalance
-            ? "bg-destructive/10 border border-destructive/20"
-            : "bg-muted/50",
+          exceedsBalance ? "bg-destructive/10 border border-destructive/20" : "bg-muted/50",
         )}
         data-testid="total-cost-section"
       >
@@ -141,17 +126,12 @@ export function TierSelectionCheckboxes({
         <div className="flex items-center gap-1.5">
           <Coins className="h-4 w-4 text-yellow-500" />
           <span
-            className={cn(
-              "text-sm font-bold",
-              exceedsBalance && "text-destructive",
-            )}
+            className={cn("text-sm font-bold", exceedsBalance && "text-destructive")}
             data-testid="total-cost-value"
           >
             {totalCost}
           </span>
-          <span className="text-xs text-muted-foreground">
-            / {userBalance} available
-          </span>
+          <span className="text-xs text-muted-foreground">/ {userBalance} available</span>
         </div>
       </div>
 

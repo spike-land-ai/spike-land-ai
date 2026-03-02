@@ -25,6 +25,12 @@ export default defineConfig({
         "src/app.ts",
         "src/env.ts",
       ],
+      thresholds: {
+        lines: 96,
+        functions: 96,
+        branches: 96,
+        statements: 96,
+      },
     },
   },
 });

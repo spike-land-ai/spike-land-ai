@@ -37,17 +37,23 @@ const MatchJobsSchema = z.object({
 const LearningPathSchema = z.object({
   current_skills: z.array(z.string()).min(1).describe("Skills the user already has"),
   target_occupation: z.string().describe("Target job title or occupation"),
-  time_budget_hours: z.number().positive().optional().describe(
-    "Total hours available for learning (optional, used to prioritise)",
-  ),
+  time_budget_hours: z
+    .number()
+    .positive()
+    .optional()
+    .describe("Total hours available for learning (optional, used to prioritise)"),
 });
 
 const InterviewPrepSchema = z.object({
   occupation: z.string().describe("Job title to prepare for"),
   level: z.enum(["junior", "mid", "senior", "lead"]).describe("Seniority level"),
-  question_count: z.number().min(5).max(20).optional().default(10).describe(
-    "Number of questions to generate (5-20, default 10)",
-  ),
+  question_count: z
+    .number()
+    .min(5)
+    .max(20)
+    .optional()
+    .default(10)
+    .describe("Number of questions to generate (5-20, default 10)"),
 });
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -73,7 +79,7 @@ function scoreResume(resume: ResumeData): number {
   else score += Math.floor((resume.skills.length / 8) * 20);
   if (resume.experience.length >= 3) score += 30;
   else score += Math.floor((resume.experience.length / 3) * 30);
-  const highlightedEntries = resume.experience.filter(e => e.highlights.length >= 2);
+  const highlightedEntries = resume.experience.filter((e) => e.highlights.length >= 2);
   if (highlightedEntries.length === resume.experience.length && resume.experience.length > 0) {
     score += 30;
   } else {
@@ -112,16 +118,66 @@ interface MockJob {
 }
 
 const SAMPLE_JOBS: MockJob[] = [
-  { id: "j1", title: "Frontend Engineer", company: "TechCorp", location: "London", remote: true, requiredSkills: ["TypeScript", "React", "CSS", "HTML", "Git"], salaryMin: 60000, salaryMax: 85000, currency: "GBP" },
-  { id: "j2", title: "Full-Stack Developer", company: "StartupXYZ", location: "Remote", remote: true, requiredSkills: ["Node.js", "React", "PostgreSQL", "TypeScript", "Docker"], salaryMin: 70000, salaryMax: 95000, currency: "GBP" },
-  { id: "j3", title: "Backend Engineer", company: "FinTech Ltd", location: "Edinburgh", remote: false, requiredSkills: ["Python", "PostgreSQL", "Redis", "AWS", "Docker"], salaryMin: 55000, salaryMax: 80000, currency: "GBP" },
-  { id: "j4", title: "DevOps Engineer", company: "CloudOps Inc", location: "Manchester", remote: true, requiredSkills: ["Kubernetes", "Docker", "AWS", "Terraform", "Linux"], salaryMin: 65000, salaryMax: 90000, currency: "GBP" },
-  { id: "j5", title: "Data Engineer", company: "DataFlow", location: "Bristol", remote: false, requiredSkills: ["Python", "SQL", "Spark", "Kafka", "AWS"], salaryMin: 58000, salaryMax: 82000, currency: "GBP" },
+  {
+    id: "j1",
+    title: "Frontend Engineer",
+    company: "TechCorp",
+    location: "London",
+    remote: true,
+    requiredSkills: ["TypeScript", "React", "CSS", "HTML", "Git"],
+    salaryMin: 60000,
+    salaryMax: 85000,
+    currency: "GBP",
+  },
+  {
+    id: "j2",
+    title: "Full-Stack Developer",
+    company: "StartupXYZ",
+    location: "Remote",
+    remote: true,
+    requiredSkills: ["Node.js", "React", "PostgreSQL", "TypeScript", "Docker"],
+    salaryMin: 70000,
+    salaryMax: 95000,
+    currency: "GBP",
+  },
+  {
+    id: "j3",
+    title: "Backend Engineer",
+    company: "FinTech Ltd",
+    location: "Edinburgh",
+    remote: false,
+    requiredSkills: ["Python", "PostgreSQL", "Redis", "AWS", "Docker"],
+    salaryMin: 55000,
+    salaryMax: 80000,
+    currency: "GBP",
+  },
+  {
+    id: "j4",
+    title: "DevOps Engineer",
+    company: "CloudOps Inc",
+    location: "Manchester",
+    remote: true,
+    requiredSkills: ["Kubernetes", "Docker", "AWS", "Terraform", "Linux"],
+    salaryMin: 65000,
+    salaryMax: 90000,
+    currency: "GBP",
+  },
+  {
+    id: "j5",
+    title: "Data Engineer",
+    company: "DataFlow",
+    location: "Bristol",
+    remote: false,
+    requiredSkills: ["Python", "SQL", "Spark", "Kafka", "AWS"],
+    salaryMin: 58000,
+    salaryMax: 82000,
+    currency: "GBP",
+  },
 ];
 
 function computeJobMatchScore(resumeSkills: string[], job: MockJob): number {
-  const normalised = resumeSkills.map(s => s.toLowerCase());
-  const matched = job.requiredSkills.filter(s => normalised.includes(s.toLowerCase()));
+  const normalised = resumeSkills.map((s) => s.toLowerCase());
+  const matched = job.requiredSkills.filter((s) => normalised.includes(s.toLowerCase()));
   return Math.round((matched.length / job.requiredSkills.length) * 100);
 }
 
@@ -135,7 +191,10 @@ interface LearningItem {
 }
 
 const SKILL_METADATA: Record<string, { hours: number; resources: string[] }> = {
-  typescript: { hours: 40, resources: ["TypeScript Handbook (typescriptlang.org)", "Execute Program"] },
+  typescript: {
+    hours: 40,
+    resources: ["TypeScript Handbook (typescriptlang.org)", "Execute Program"],
+  },
   react: { hours: 60, resources: ["react.dev official docs", "Scrimba React course"] },
   python: { hours: 50, resources: ["Python.org tutorial", "Real Python"] },
   docker: { hours: 20, resources: ["Docker Getting Started guide", "KodeKloud Docker course"] },
@@ -147,7 +206,10 @@ const SKILL_METADATA: Record<string, { hours: number; resources: string[] }> = {
   "node.js": { hours: 35, resources: ["nodejs.dev docs", "The Odin Project Node path"] },
 };
 
-const DEFAULT_SKILL_META = { hours: 20, resources: ["Official documentation", "Udemy or Coursera courses"] };
+const DEFAULT_SKILL_META = {
+  hours: 20,
+  resources: ["Official documentation", "Udemy or Coursera courses"],
+};
 
 function buildLearningPath(
   currentSkills: string[],
@@ -176,18 +238,19 @@ function buildLearningPath(
     candidates.push("Python", "Docker", "PostgreSQL");
   }
 
-  const normalisedCurrent = currentSkills.map(s => s.toLowerCase());
-  const gaps = candidates.filter(c => !normalisedCurrent.includes(c.toLowerCase()));
+  const normalisedCurrent = currentSkills.map((s) => s.toLowerCase());
+  const gaps = candidates.filter((c) => !normalisedCurrent.includes(c.toLowerCase()));
 
   const items: LearningItem[] = gaps.map((skill, index) => {
     const meta = SKILL_METADATA[skill.toLowerCase()] ?? DEFAULT_SKILL_META;
-    const priority: LearningItem["priority"] = index === 0 ? "critical" : index === 1 ? "high" : index <= 3 ? "medium" : "low";
+    const priority: LearningItem["priority"] =
+      index === 0 ? "critical" : index === 1 ? "high" : index <= 3 ? "medium" : "low";
     return { skill, estimatedHours: meta.hours, priority, resources: meta.resources };
   });
 
   if (timeBudget !== undefined) {
     let remaining = timeBudget;
-    return items.filter(item => {
+    return items.filter((item) => {
       if (remaining >= item.estimatedHours) {
         remaining -= item.estimatedHours;
         return true;
@@ -212,36 +275,137 @@ interface InterviewQuestion {
 }
 
 const BEHAVIORAL_QUESTIONS: InterviewQuestion[] = [
-  { question: "Describe a time you had to learn a new technology quickly under a deadline.", category: "behavioral", difficulty: "medium", sampleAnswerOutline: "Use STAR: Situation, Task, Action, Result." },
-  { question: "Tell me about a conflict with a teammate and how you resolved it.", category: "behavioral", difficulty: "medium", sampleAnswerOutline: "STAR: Explain the disagreement, empathetic approach, compromise, outcome." },
-  { question: "Give an example of a project where you took ownership beyond your role.", category: "behavioral", difficulty: "medium", sampleAnswerOutline: "STAR: Context of gap, why you stepped up, what you did, measurable impact." },
-  { question: "Describe a situation where you received critical feedback. How did you respond?", category: "behavioral", difficulty: "easy", sampleAnswerOutline: "Show receptiveness, specific actions to improve, long-term outcome." },
+  {
+    question: "Describe a time you had to learn a new technology quickly under a deadline.",
+    category: "behavioral",
+    difficulty: "medium",
+    sampleAnswerOutline: "Use STAR: Situation, Task, Action, Result.",
+  },
+  {
+    question: "Tell me about a conflict with a teammate and how you resolved it.",
+    category: "behavioral",
+    difficulty: "medium",
+    sampleAnswerOutline:
+      "STAR: Explain the disagreement, empathetic approach, compromise, outcome.",
+  },
+  {
+    question: "Give an example of a project where you took ownership beyond your role.",
+    category: "behavioral",
+    difficulty: "medium",
+    sampleAnswerOutline:
+      "STAR: Context of gap, why you stepped up, what you did, measurable impact.",
+  },
+  {
+    question: "Describe a situation where you received critical feedback. How did you respond?",
+    category: "behavioral",
+    difficulty: "easy",
+    sampleAnswerOutline: "Show receptiveness, specific actions to improve, long-term outcome.",
+  },
 ];
 
 const SITUATIONAL_QUESTIONS: InterviewQuestion[] = [
-  { question: "Your PR is blocking three teammates. The reviewer is unavailable for two days. What do you do?", category: "situational", difficulty: "hard", sampleAnswerOutline: "Seek another reviewer, split PR, communicate proactively." },
-  { question: "Production is down. You have a potential fix but it is untested. What is your process?", category: "situational", difficulty: "hard", sampleAnswerOutline: "Triage, notify, staging first, rollback plan, deploy with monitoring." },
-  { question: "You are asked to estimate a feature with unclear requirements. How do you proceed?", category: "situational", difficulty: "medium", sampleAnswerOutline: "Clarify requirements, break into known/unknown, range estimate." },
+  {
+    question:
+      "Your PR is blocking three teammates. The reviewer is unavailable for two days. What do you do?",
+    category: "situational",
+    difficulty: "hard",
+    sampleAnswerOutline: "Seek another reviewer, split PR, communicate proactively.",
+  },
+  {
+    question:
+      "Production is down. You have a potential fix but it is untested. What is your process?",
+    category: "situational",
+    difficulty: "hard",
+    sampleAnswerOutline: "Triage, notify, staging first, rollback plan, deploy with monitoring.",
+  },
+  {
+    question: "You are asked to estimate a feature with unclear requirements. How do you proceed?",
+    category: "situational",
+    difficulty: "medium",
+    sampleAnswerOutline: "Clarify requirements, break into known/unknown, range estimate.",
+  },
 ];
 
 const TECHNICAL_BANKS: Record<string, InterviewQuestion[]> = {
   default: [
-    { question: "What is the difference between horizontal and vertical scaling?", category: "technical", difficulty: "easy", sampleAnswerOutline: "Horizontal: add nodes. Vertical: add resources. Trade-offs: cost, complexity." },
-    { question: "Explain the CAP theorem in your own words.", category: "technical", difficulty: "medium", sampleAnswerOutline: "Consistency, Availability, Partition tolerance — pick two." },
-    { question: "What is a database index and when should you avoid one?", category: "technical", difficulty: "medium", sampleAnswerOutline: "Speeds reads, costs writes. Avoid on low-cardinality or small tables." },
-    { question: "How does TLS/HTTPS protect data in transit?", category: "technical", difficulty: "easy", sampleAnswerOutline: "Certificate exchange, key negotiation, symmetric encryption, CA trust." },
-    { question: "Describe eventual consistency. Give a real-world example.", category: "technical", difficulty: "medium", sampleAnswerOutline: "Replicas converge over time. Example: DNS propagation." },
-    { question: "What is the N+1 query problem and how do you fix it?", category: "technical", difficulty: "medium", sampleAnswerOutline: "Fetching list then per-item queries. Fix: eager loading / DataLoader." },
-    { question: "How would you design a rate limiter?", category: "technical", difficulty: "hard", sampleAnswerOutline: "Token bucket or sliding window. Redis atomic ops. Per-user vs per-IP." },
+    {
+      question: "What is the difference between horizontal and vertical scaling?",
+      category: "technical",
+      difficulty: "easy",
+      sampleAnswerOutline:
+        "Horizontal: add nodes. Vertical: add resources. Trade-offs: cost, complexity.",
+    },
+    {
+      question: "Explain the CAP theorem in your own words.",
+      category: "technical",
+      difficulty: "medium",
+      sampleAnswerOutline: "Consistency, Availability, Partition tolerance — pick two.",
+    },
+    {
+      question: "What is a database index and when should you avoid one?",
+      category: "technical",
+      difficulty: "medium",
+      sampleAnswerOutline: "Speeds reads, costs writes. Avoid on low-cardinality or small tables.",
+    },
+    {
+      question: "How does TLS/HTTPS protect data in transit?",
+      category: "technical",
+      difficulty: "easy",
+      sampleAnswerOutline: "Certificate exchange, key negotiation, symmetric encryption, CA trust.",
+    },
+    {
+      question: "Describe eventual consistency. Give a real-world example.",
+      category: "technical",
+      difficulty: "medium",
+      sampleAnswerOutline: "Replicas converge over time. Example: DNS propagation.",
+    },
+    {
+      question: "What is the N+1 query problem and how do you fix it?",
+      category: "technical",
+      difficulty: "medium",
+      sampleAnswerOutline: "Fetching list then per-item queries. Fix: eager loading / DataLoader.",
+    },
+    {
+      question: "How would you design a rate limiter?",
+      category: "technical",
+      difficulty: "hard",
+      sampleAnswerOutline: "Token bucket or sliding window. Redis atomic ops. Per-user vs per-IP.",
+    },
   ],
   senior: [
-    { question: "Walk me through designing a distributed job queue with at-least-once delivery.", category: "technical", difficulty: "hard", sampleAnswerOutline: "Message broker, visibility timeout, DLQ, idempotency keys." },
-    { question: "Explain the trade-offs between REST, GraphQL, and gRPC.", category: "technical", difficulty: "hard", sampleAnswerOutline: "REST: simple, cacheable. GraphQL: flexible, complex caching. gRPC: binary, streaming." },
-    { question: "How do you approach database migrations in a zero-downtime deployment?", category: "technical", difficulty: "hard", sampleAnswerOutline: "Expand-contract pattern: add column, deploy, backfill, drop old." },
+    {
+      question: "Walk me through designing a distributed job queue with at-least-once delivery.",
+      category: "technical",
+      difficulty: "hard",
+      sampleAnswerOutline: "Message broker, visibility timeout, DLQ, idempotency keys.",
+    },
+    {
+      question: "Explain the trade-offs between REST, GraphQL, and gRPC.",
+      category: "technical",
+      difficulty: "hard",
+      sampleAnswerOutline:
+        "REST: simple, cacheable. GraphQL: flexible, complex caching. gRPC: binary, streaming.",
+    },
+    {
+      question: "How do you approach database migrations in a zero-downtime deployment?",
+      category: "technical",
+      difficulty: "hard",
+      sampleAnswerOutline: "Expand-contract pattern: add column, deploy, backfill, drop old.",
+    },
   ],
   lead: [
-    { question: "How do you balance technical debt reduction with shipping new features?", category: "technical", difficulty: "hard", sampleAnswerOutline: "Debt register, budget allocation, link to velocity, product buy-in." },
-    { question: "Describe your approach to defining and enforcing engineering standards.", category: "technical", difficulty: "hard", sampleAnswerOutline: "ADRs, style guides, automated linting, code review culture." },
+    {
+      question: "How do you balance technical debt reduction with shipping new features?",
+      category: "technical",
+      difficulty: "hard",
+      sampleAnswerOutline: "Debt register, budget allocation, link to velocity, product buy-in.",
+    },
+    {
+      question: "Describe your approach to defining and enforcing engineering standards.",
+      category: "technical",
+      difficulty: "hard",
+      sampleAnswerOutline: "ADRs, style guides, automated linting, code review culture.",
+    },
   ],
 };
 
@@ -257,10 +421,21 @@ function generateInterviewQuestions(
   ];
 
   if (occupation.toLowerCase().includes("frontend") || occupation.toLowerCase().includes("ui")) {
-    techPool.push({ question: "What techniques do you use to optimise Core Web Vitals?", category: "technical", difficulty: "medium", sampleAnswerOutline: "LCP: lazy loading, preload. CLS: explicit dimensions. FID/INP: defer scripts." });
+    techPool.push({
+      question: "What techniques do you use to optimise Core Web Vitals?",
+      category: "technical",
+      difficulty: "medium",
+      sampleAnswerOutline:
+        "LCP: lazy loading, preload. CLS: explicit dimensions. FID/INP: defer scripts.",
+    });
   }
   if (occupation.toLowerCase().includes("data") || occupation.toLowerCase().includes("ml")) {
-    techPool.push({ question: "Explain the difference between a data warehouse and a data lake.", category: "technical", difficulty: "easy", sampleAnswerOutline: "Warehouse: structured, schema-on-write. Lake: raw, schema-on-read." });
+    techPool.push({
+      question: "Explain the difference between a data warehouse and a data lake.",
+      category: "technical",
+      difficulty: "easy",
+      sampleAnswerOutline: "Warehouse: structured, schema-on-write. Lake: raw, schema-on-read.",
+    });
   }
 
   const technical = techPool.slice(0, Math.ceil(count * 0.5));
@@ -270,7 +445,7 @@ function generateInterviewQuestions(
 
   if (merged.length < count) {
     const allQuestions = [...techPool, ...BEHAVIORAL_QUESTIONS, ...SITUATIONAL_QUESTIONS];
-    const extras = allQuestions.filter(q => !merged.includes(q));
+    const extras = allQuestions.filter((q) => !merged.includes(q));
     merged.push(...extras.slice(0, count - merged.length));
   }
 
@@ -289,7 +464,11 @@ export function registerCareerGrowthTools(
   // career_create_resume
   registry.registerBuilt(
     t
-      .tool("career_create_resume", "Build a structured resume from skills and work experience. Returns a resume ID, formatted preview, and completeness score.", CreateResumeSchema.shape)
+      .tool(
+        "career_create_resume",
+        "Build a structured resume from skills and work experience. Returns a resume ID, formatted preview, and completeness score.",
+        CreateResumeSchema.shape,
+      )
       .meta({ category: "career-growth", tier: "free" })
       .handler(async ({ input }) => {
         return safeToolCall("career_create_resume", async () => {
@@ -324,7 +503,11 @@ export function registerCareerGrowthTools(
   // career_match_jobs
   registry.registerBuilt(
     t
-      .tool("career_match_jobs", "Match a saved resume against available job listings. Returns a ranked list with match score, skill overlap, and salary range.", MatchJobsSchema.shape)
+      .tool(
+        "career_match_jobs",
+        "Match a saved resume against available job listings. Returns a ranked list with match score, skill overlap, and salary range.",
+        MatchJobsSchema.shape,
+      )
       .meta({ category: "career-growth", tier: "free" })
       .handler(async ({ input }) => {
         return safeToolCall("career_match_jobs", async () => {
@@ -337,11 +520,11 @@ export function registerCareerGrowthTools(
 
           let jobs = [...SAMPLE_JOBS];
           if (input.remote_only === true) {
-            jobs = jobs.filter(j => j.remote);
+            jobs = jobs.filter((j) => j.remote);
           }
           if (input.location) {
             const loc = input.location.toLowerCase();
-            jobs = jobs.filter(j => j.location.toLowerCase().includes(loc) || j.remote);
+            jobs = jobs.filter((j) => j.location.toLowerCase().includes(loc) || j.remote);
           }
 
           if (jobs.length === 0) {
@@ -349,11 +532,11 @@ export function registerCareerGrowthTools(
           }
 
           const ranked = jobs
-            .map(job => ({
+            .map((job) => ({
               job,
               score: computeJobMatchScore(resume.skills, job),
-              matched: job.requiredSkills.filter(s =>
-                resume.skills.map(r => r.toLowerCase()).includes(s.toLowerCase()),
+              matched: job.requiredSkills.filter((s) =>
+                resume.skills.map((r) => r.toLowerCase()).includes(s.toLowerCase()),
               ),
             }))
             .sort((a, b) => b.score - a.score);
@@ -366,7 +549,7 @@ export function registerCareerGrowthTools(
             text += `**Salary:** ${job.currency} ${job.salaryMin.toLocaleString()}-${job.salaryMax.toLocaleString()}\n`;
             text += `**Skills Matched:** ${matched.join(", ") || "none"}\n`;
             const missing = job.requiredSkills.filter(
-              s => !resume.skills.map(r => r.toLowerCase()).includes(s.toLowerCase()),
+              (s) => !resume.skills.map((r) => r.toLowerCase()).includes(s.toLowerCase()),
             );
             if (missing.length > 0) {
               text += `**Skills to Develop:** ${missing.join(", ")}\n`;
@@ -381,11 +564,19 @@ export function registerCareerGrowthTools(
   // career_get_learning_path
   registry.registerBuilt(
     t
-      .tool("career_get_learning_path", "Generate an ordered learning path from current skills to a target occupation. Returns prioritised skills with resources and estimated hours.", LearningPathSchema.shape)
+      .tool(
+        "career_get_learning_path",
+        "Generate an ordered learning path from current skills to a target occupation. Returns prioritised skills with resources and estimated hours.",
+        LearningPathSchema.shape,
+      )
       .meta({ category: "career-growth", tier: "free" })
       .handler(async ({ input }) => {
         return safeToolCall("career_get_learning_path", async () => {
-          const path = buildLearningPath(input.current_skills, input.target_occupation, input.time_budget_hours);
+          const path = buildLearningPath(
+            input.current_skills,
+            input.target_occupation,
+            input.time_budget_hours,
+          );
 
           if (path.length === 0) {
             return textResult(
@@ -413,11 +604,19 @@ export function registerCareerGrowthTools(
   // career_interview_prep
   registry.registerBuilt(
     t
-      .tool("career_interview_prep", "Generate tailored interview questions for a given occupation and seniority level. Includes technical, behavioral, and situational questions with sample answer outlines.", InterviewPrepSchema.shape)
+      .tool(
+        "career_interview_prep",
+        "Generate tailored interview questions for a given occupation and seniority level. Includes technical, behavioral, and situational questions with sample answer outlines.",
+        InterviewPrepSchema.shape,
+      )
       .meta({ category: "career-growth", tier: "free" })
       .handler(async ({ input }) => {
         return safeToolCall("career_interview_prep", async () => {
-          const questions = generateInterviewQuestions(input.occupation, input.level, input.question_count);
+          const questions = generateInterviewQuestions(
+            input.occupation,
+            input.level,
+            input.question_count,
+          );
 
           let text = `**Interview Prep: ${input.occupation} (${input.level})**\n\n`;
           text += `${questions.length} questions generated.\n\n`;

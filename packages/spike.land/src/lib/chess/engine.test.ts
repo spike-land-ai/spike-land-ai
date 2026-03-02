@@ -15,9 +15,7 @@ import {
 describe("createGame", () => {
   it("creates a game with default starting position", () => {
     const game = createGame();
-    expect(game.fen()).toBe(
-      "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
-    );
+    expect(game.fen()).toBe("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
   });
 
   it("creates a game from a custom FEN", () => {
@@ -184,11 +182,7 @@ describe("getGameState", () => {
 
 describe("isValidFen", () => {
   it("returns true for valid FEN", () => {
-    expect(
-      isValidFen(
-        "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
-      ),
-    ).toBe(true);
+    expect(isValidFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")).toBe(true);
   });
 
   it("returns false for invalid FEN", () => {
@@ -196,11 +190,7 @@ describe("isValidFen", () => {
   });
 
   it("validates a mid-game FEN", () => {
-    expect(
-      isValidFen(
-        "rnbqkbnr/pppp1ppp/8/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2",
-      ),
-    ).toBe(true);
+    expect(isValidFen("rnbqkbnr/pppp1ppp/8/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2")).toBe(true);
   });
 });
 
@@ -226,7 +216,7 @@ describe("getLegalMovesForSquare", () => {
     const game = createGame();
     const moves = getLegalMovesForSquare(game, "e2");
     expect(moves).toHaveLength(2);
-    const targets = moves.map(m => m.to);
+    const targets = moves.map((m) => m.to);
     expect(targets).toContain("e3");
     expect(targets).toContain("e4");
   });

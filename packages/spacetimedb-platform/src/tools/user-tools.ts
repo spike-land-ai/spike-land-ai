@@ -7,10 +7,7 @@ import { z } from "zod";
 import type { SpacetimePlatformClient } from "../client.js";
 import { errorResult, jsonResult } from "../types.js";
 
-export function registerUserTools(
-  server: McpServer,
-  client: SpacetimePlatformClient,
-): void {
+export function registerUserTools(server: McpServer, client: SpacetimePlatformClient): void {
   // ─── stdb_register_user ───
 
   server.tool(

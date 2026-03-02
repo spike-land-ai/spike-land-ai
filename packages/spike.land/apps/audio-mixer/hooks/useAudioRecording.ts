@@ -10,7 +10,7 @@ import { blobToAudioBuffer, createRecorder } from "../lib/audio-engine";
 import type { RecordingState } from "../types";
 
 export function useAudioRecording() {
-  const [state, setState] = useState<RecordingState & { error: Error | null; }>({
+  const [state, setState] = useState<RecordingState & { error: Error | null }>({
     isRecording: false,
     isPaused: false,
     duration: 0,
@@ -27,7 +27,7 @@ export function useAudioRecording() {
   const pausedDurationRef = useRef<number>(0);
 
   const startRecording = useCallback(async () => {
-    setState(prev => ({ ...prev, error: null }));
+    setState((prev) => ({ ...prev, error: null }));
 
     try {
       // 1. Request simple audio first to trigger permission prompt reliably
@@ -45,10 +45,7 @@ export function useAudioRecording() {
             autoGainControl: true,
           });
         } catch (constraintError) {
-          console.warn(
-            "Failed to apply advanced audio constraints:",
-            constraintError,
-          );
+          console.warn("Failed to apply advanced audio constraints:", constraintError);
           // Continue with simple audio - better than failing completely
         }
       }
@@ -59,7 +56,7 @@ export function useAudioRecording() {
       const mediaRecorder = createRecorder(stream);
       mediaRecorderRef.current = mediaRecorder;
 
-      mediaRecorder.ondataavailable = e => {
+      mediaRecorder.ondataavailable = (e) => {
         if (e.data.size > 0) {
           chunksRef.current.push(e.data);
         }
@@ -71,9 +68,8 @@ export function useAudioRecording() {
 
       // Update duration timer
       timerRef.current = window.setInterval(() => {
-        const elapsed = (Date.now() - startTimeRef.current - pausedDurationRef.current)
-          / 1000;
-        setState(prev => ({ ...prev, duration: elapsed }));
+        const elapsed = (Date.now() - startTimeRef.current - pausedDurationRef.current) / 1000;
+        setState((prev) => ({ ...prev, duration: elapsed }));
       }, 100);
 
       setState({
@@ -88,7 +84,7 @@ export function useAudioRecording() {
       return true;
     } catch (error) {
       console.error("Failed to start recording:", error);
-      setState(prev => ({
+      setState((prev) => ({
         ...prev,
         error: error instanceof Error ? error : new Error(String(error)),
       }));
@@ -106,7 +102,7 @@ export function useAudioRecording() {
         window.clearInterval(timerRef.current);
         timerRef.current = null;
       }
-      setState(prev => ({ ...prev, isPaused: true }));
+      setState((prev) => ({ ...prev, isPaused: true }));
     }
   }, []);
 
@@ -118,17 +114,16 @@ export function useAudioRecording() {
 
       // Restart the duration timer
       timerRef.current = window.setInterval(() => {
-        const elapsed = (Date.now() - startTimeRef.current - pausedDurationRef.current)
-          / 1000;
-        setState(prev => ({ ...prev, duration: elapsed }));
+        const elapsed = (Date.now() - startTimeRef.current - pausedDurationRef.current) / 1000;
+        setState((prev) => ({ ...prev, duration: elapsed }));
       }, 100);
 
-      setState(prev => ({ ...prev, isPaused: false }));
+      setState((prev) => ({ ...prev, isPaused: false }));
     }
   }, []);
 
   const stopRecording = useCallback(async (): Promise<Blob | null> => {
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
       if (!mediaRecorderRef.current) {
         resolve(null);
         return;
@@ -145,7 +140,7 @@ export function useAudioRecording() {
         });
 
         // Stop all tracks
-        streamRef.current?.getTracks().forEach(track => track.stop());
+        streamRef.current?.getTracks().forEach((track) => track.stop());
 
         setState({
           isRecording: false,
@@ -177,7 +172,7 @@ export function useAudioRecording() {
       }
     }
 
-    streamRef.current?.getTracks().forEach(track => track.stop());
+    streamRef.current?.getTracks().forEach((track) => track.stop());
 
     chunksRef.current = [];
     mediaRecorderRef.current = null;

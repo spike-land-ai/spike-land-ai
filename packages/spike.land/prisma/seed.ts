@@ -86,14 +86,10 @@ async function main() {
     select: { id: true, name: true, email: true },
   });
 
-  console.log(
-    `Found ${usersWithoutWorkspaces.length} users without workspaces`,
-  );
+  console.log(`Found ${usersWithoutWorkspaces.length} users without workspaces`);
 
   for (const user of usersWithoutWorkspaces) {
-    const workspaceName = user.name
-      ? `${user.name}'s Workspace`
-      : "Personal Workspace";
+    const workspaceName = user.name ? `${user.name}'s Workspace` : "Personal Workspace";
 
     // Generate unique slug using user ID suffix
     const slug = generateSlug(user.name || "personal", user.id.slice(-8));
@@ -113,9 +109,7 @@ async function main() {
       },
     });
 
-    console.log(
-      `Created workspace "${workspaceName}" for user ${user.email || user.id}`,
-    );
+    console.log(`Created workspace "${workspaceName}" for user ${user.email || user.id}`);
   }
 
   // Example: Create sample apps
@@ -189,12 +183,7 @@ async function main() {
               type: "SUBSCRIPTION",
               price: 9.99,
               subscriptionInterval: "MONTHLY",
-              features: [
-                "Unlimited notes",
-                "Advanced formatting",
-                "Cloud sync",
-                "Collaboration",
-              ],
+              features: ["Unlimited notes", "Advanced formatting", "Cloud sync", "Collaboration"],
             },
           ],
         },
@@ -211,7 +200,7 @@ main()
   .then(async () => {
     await prisma.$disconnect();
   })
-  .catch(async e => {
+  .catch(async (e) => {
     console.error("Error during database seed:", e);
     await prisma.$disconnect();
     process.exit(1);

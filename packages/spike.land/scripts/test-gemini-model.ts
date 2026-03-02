@@ -141,9 +141,7 @@ async function testModel(modelName: string) {
     console.log(`  - Time: ${elapsed}ms`);
   } catch (error) {
     console.log(`\n✗ FAILED: Model "${modelName}" does not work`);
-    console.log(
-      `  - Error: ${error instanceof Error ? error.message : String(error)}`,
-    );
+    console.log(`  - Error: ${error instanceof Error ? error.message : String(error)}`);
 
     if (error instanceof Error && error.message.includes("not found")) {
       console.log(`  - This model does not exist in the API`);
@@ -164,14 +162,14 @@ async function main() {
 
   for (const model of modelsToTest) {
     await testModel(model);
-    await new Promise(resolve => setTimeout(resolve, 1000)); // Rate limit
+    await new Promise((resolve) => setTimeout(resolve, 1000)); // Rate limit
   }
 
   console.log("\n" + "=".repeat(60));
   console.log("Testing complete!");
 }
 
-main().catch(error => {
+main().catch((error) => {
   console.error("Fatal error:", error);
   process.exit(1);
 });

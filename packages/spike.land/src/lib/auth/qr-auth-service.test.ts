@@ -11,12 +11,7 @@ vi.mock("@/lib/upstash/client", () => ({
   redis: mockRedis,
 }));
 
-import {
-  approveQRAuth,
-  completeQRAuth,
-  initiateQRAuth,
-  pollQRAuth,
-} from "./qr-auth-service";
+import { approveQRAuth, completeQRAuth, initiateQRAuth, pollQRAuth } from "./qr-auth-service";
 
 describe("qr-auth-service", () => {
   beforeEach(() => {
@@ -70,7 +65,7 @@ describe("qr-auth-service", () => {
 
       await initiateQRAuth();
 
-      const options = mockRedis.set.mock.calls[0]![2] as { ex: number; };
+      const options = mockRedis.set.mock.calls[0]![2] as { ex: number };
       expect(options.ex).toBe(300);
     });
 
@@ -193,7 +188,7 @@ describe("qr-auth-service", () => {
       await approveQRAuth(token, "user-123");
 
       const [, , options] = mockRedis.set.mock.calls[0]!;
-      expect((options as { ex: number; }).ex).toBe(300);
+      expect((options as { ex: number }).ex).toBe(300);
     });
 
     it("uses remaining TTL when valid", async () => {
@@ -205,7 +200,7 @@ describe("qr-auth-service", () => {
       await approveQRAuth(token, "user-123");
 
       const [, , options] = mockRedis.set.mock.calls[0]!;
-      expect((options as { ex: number; }).ex).toBe(120);
+      expect((options as { ex: number }).ex).toBe(120);
     });
   });
 
@@ -249,9 +244,7 @@ describe("qr-auth-service", () => {
     });
 
     it("returns null when session is not APPROVED (still PENDING)", async () => {
-      mockRedis.get.mockResolvedValue(
-        JSON.stringify({ status: "PENDING" }),
-      );
+      mockRedis.get.mockResolvedValue(JSON.stringify({ status: "PENDING" }));
 
       const result = await completeQRAuth("testhash", "any-code");
 
@@ -282,9 +275,7 @@ describe("qr-auth-service", () => {
     });
 
     it("returns null when session missing oneTimeCode", async () => {
-      mockRedis.get.mockResolvedValue(
-        JSON.stringify({ status: "APPROVED", userId: "user-123" }),
-      );
+      mockRedis.get.mockResolvedValue(JSON.stringify({ status: "APPROVED", userId: "user-123" }));
 
       const result = await completeQRAuth("testhash", "any-code");
 

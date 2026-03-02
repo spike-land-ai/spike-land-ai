@@ -10,12 +10,7 @@ export interface AgentStreamEvent {
   tool?: string;
 }
 
-const VALID_STREAM_TYPES = new Set<string>([
-  "chunk",
-  "stage",
-  "status",
-  "error",
-]);
+const VALID_STREAM_TYPES = new Set<string>(["chunk", "stage", "status", "error"]);
 
 export function parseAgentStreamLine(line: string): AgentStreamEvent | null {
   if (!line.startsWith("data: ")) return null;
@@ -23,10 +18,10 @@ export function parseAgentStreamLine(line: string): AgentStreamEvent | null {
   try {
     const data = JSON.parse(line.substring(6));
     if (
-      typeof data !== "object"
-      || data === null
-      || typeof data.type !== "string"
-      || !VALID_STREAM_TYPES.has(data.type)
+      typeof data !== "object" ||
+      data === null ||
+      typeof data.type !== "string" ||
+      !VALID_STREAM_TYPES.has(data.type)
     ) {
       return null;
     }

@@ -41,8 +41,7 @@ const GLOBAL_DEPENDENCIES = [
 ];
 
 const PROJECT_ROOT = process.cwd();
-const CACHE_DIR = process.env.TEST_CACHE_DIR
-  || path.join(PROJECT_ROOT, ".test-cache");
+const CACHE_DIR = process.env.TEST_CACHE_DIR || path.join(PROJECT_ROOT, ".test-cache");
 const CACHE_PATH = path.join(CACHE_DIR, "test-cache.json");
 const DEBUG = process.env.DEBUG === "true";
 
@@ -72,9 +71,7 @@ function loadCache(): TestCache | null {
 
 function getFileHash(filePath: string): string {
   try {
-    const fullPath = path.isAbsolute(filePath)
-      ? filePath
-      : path.join(PROJECT_ROOT, filePath);
+    const fullPath = path.isAbsolute(filePath) ? filePath : path.join(PROJECT_ROOT, filePath);
     const content = readFileSync(fullPath, "utf-8");
     return createHash("sha256").update(content).digest("hex").slice(0, 16);
   } catch {
@@ -115,19 +112,17 @@ function getAllTestFiles(): string[] {
         // Skip common non-test directories
         if (entry.isDirectory()) {
           if (
-            entry.name === "node_modules"
-            || entry.name === ".git"
-            || entry.name === ".next"
-            || entry.name === "coverage"
-            || entry.name === "dist"
+            entry.name === "node_modules" ||
+            entry.name === ".git" ||
+            entry.name === ".next" ||
+            entry.name === "coverage" ||
+            entry.name === "dist"
           ) {
             continue;
           }
           walkDir(fullPath);
         } else if (entry.isFile()) {
-          if (
-            entry.name.endsWith(".test.ts") || entry.name.endsWith(".test.tsx")
-          ) {
+          if (entry.name.endsWith(".test.ts") || entry.name.endsWith(".test.tsx")) {
             const relativePath = path.relative(PROJECT_ROOT, fullPath);
             testFiles.push(relativePath);
           }
@@ -258,11 +253,9 @@ function showStats(): void {
   console.log(`Tests to run: ${testsToRun.length}`);
   console.log(`Tests skippable: ${allTests.length - testsToRun.length}`);
   console.log(
-    `\nCache hit rate: ${
-      (((allTests.length - testsToRun.length) / allTests.length) * 100).toFixed(
-        1,
-      )
-    }%`,
+    `\nCache hit rate: ${(((allTests.length - testsToRun.length) / allTests.length) * 100).toFixed(
+      1,
+    )}%`,
   );
 
   if (testsToRun.length > 0 && testsToRun.length <= 10) {
@@ -317,21 +310,13 @@ switch (command) {
     console.error("Usage: test-cache-manager <command>");
     console.error("");
     console.error("Commands:");
-    console.error(
-      "  list-tests-to-run  Returns JSON array of tests needing execution",
-    );
-    console.error(
-      "  should-skip-all    Exit 0 if all cached, exit 1 if tests needed",
-    );
-    console.error(
-      "  get-test-filter    Space-separated test paths for vitest CLI",
-    );
+    console.error("  list-tests-to-run  Returns JSON array of tests needing execution");
+    console.error("  should-skip-all    Exit 0 if all cached, exit 1 if tests needed");
+    console.error("  get-test-filter    Space-separated test paths for vitest CLI");
     console.error("  stats              Show cache statistics");
     console.error("");
     console.error("Environment:");
-    console.error(
-      "  TEST_CACHE_DIR     Cache directory (default: .test-cache)",
-    );
+    console.error("  TEST_CACHE_DIR     Cache directory (default: .test-cache)");
     console.error("  DEBUG=true         Enable debug logging");
     process.exit(1);
   }

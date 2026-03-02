@@ -23,9 +23,7 @@ export interface AuthResult {
  * Authenticate a request using Bearer token.
  * Works with standard Request (no Next.js dependency).
  */
-export async function authenticateRequest(
-  request: Request,
-): Promise<AuthResult> {
+export async function authenticateRequest(request: Request): Promise<AuthResult> {
   const authHeader = request.headers.get("Authorization");
 
   if (!authHeader) {
@@ -46,12 +44,8 @@ export async function authenticateRequest(
 
   // Capability token (cap_ prefix)
   if (token.startsWith("cap_")) {
-    const { verifyCapabilityToken } = await import(
-      "@/lib/agents/capability-token-service"
-    );
-    const { data: capResult, error: capError } = await tryCatch(
-      verifyCapabilityToken(token),
-    );
+    const { verifyCapabilityToken } = await import("@/lib/agents/capability-token-service");
+    const { data: capResult, error: capError } = await tryCatch(verifyCapabilityToken(token));
 
     if (capError || !capResult) {
       return { success: false, error: "Invalid or expired capability token" };
@@ -67,9 +61,7 @@ export async function authenticateRequest(
 
   // OAuth MCP token (mcp_ prefix)
   if (token.startsWith("mcp_")) {
-    const { data: payload, error: oauthError } = await tryCatch(
-      verifyAccessToken(token),
-    );
+    const { data: payload, error: oauthError } = await tryCatch(verifyAccessToken(token));
 
     if (oauthError || !payload) {
       return { success: false, error: "Invalid or expired OAuth token" };
@@ -86,9 +78,7 @@ export async function authenticateRequest(
   const { data: validationResult, error: validationError } = await tryCatch<
     ApiKeyValidationResult,
     Error
-  >(
-    validateApiKey(token),
-  );
+  >(validateApiKey(token));
 
   if (validationError) {
     return {

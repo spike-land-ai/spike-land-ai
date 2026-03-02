@@ -5,11 +5,7 @@
 "use client";
 
 import { Badge } from "@/components/ui/badge";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import { Headphones, Scissors, Trash2, Volume2, VolumeX } from "lucide-react";
 import type { AudioTrack } from "../../types";
@@ -54,12 +50,8 @@ export function SelectedTrackPanel({
       {/* Track name */}
       <div className="flex items-center gap-1.5 min-w-0">
         <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
-        <span className="text-xs font-bold text-white truncate max-w-[100px]">
-          {track.name}
-        </span>
-        <span className="text-[9px] font-mono text-white/40">
-          {formatTime(trimmedDuration)}
-        </span>
+        <span className="text-xs font-bold text-white truncate max-w-[100px]">{track.name}</span>
+        <span className="text-[9px] font-mono text-white/40">{formatTime(trimmedDuration)}</span>
       </div>
 
       {/* Volume */}
@@ -70,7 +62,7 @@ export function SelectedTrackPanel({
           min="0"
           max="100"
           value={Math.round(track.volume * 100)}
-          onChange={e => onVolumeChange(parseInt(e.target.value) / 100)}
+          onChange={(e) => onVolumeChange(parseInt(e.target.value) / 100)}
           className="w-16 h-0.5 bg-white/10 rounded appearance-none cursor-pointer accent-primary"
           aria-label="Track volume"
         />
@@ -95,9 +87,7 @@ export function SelectedTrackPanel({
               <VolumeX className="w-3.5 h-3.5" />
             </button>
           </TooltipTrigger>
-          <TooltipContent side="top">
-            {track.muted ? "Unmute (M)" : "Mute (M)"}
-          </TooltipContent>
+          <TooltipContent side="top">{track.muted ? "Unmute (M)" : "Mute (M)"}</TooltipContent>
         </Tooltip>
 
         <Tooltip>
@@ -114,9 +104,7 @@ export function SelectedTrackPanel({
               <Headphones className="w-3.5 h-3.5" />
             </button>
           </TooltipTrigger>
-          <TooltipContent side="top">
-            {track.solo ? "Unsolo (S)" : "Solo (S)"}
-          </TooltipContent>
+          <TooltipContent side="top">{track.solo ? "Unsolo (S)" : "Solo (S)"}</TooltipContent>
         </Tooltip>
       </div>
 
@@ -129,7 +117,7 @@ export function SelectedTrackPanel({
           max={effectiveTrimEnd - 0.1}
           step="0.1"
           value={track.trimStart.toFixed(1)}
-          onChange={e => onTrimChange(parseFloat(e.target.value) || 0, effectiveTrimEnd)}
+          onChange={(e) => onTrimChange(parseFloat(e.target.value) || 0, effectiveTrimEnd)}
           className="w-12 h-5 text-[10px] bg-black/40 text-primary font-mono rounded border border-white/5 text-center"
           aria-label="Trim start"
         />
@@ -140,11 +128,9 @@ export function SelectedTrackPanel({
           max={track.duration}
           step="0.1"
           value={effectiveTrimEnd.toFixed(1)}
-          onChange={e =>
-            onTrimChange(
-              track.trimStart,
-              parseFloat(e.target.value) || track.duration,
-            )}
+          onChange={(e) =>
+            onTrimChange(track.trimStart, parseFloat(e.target.value) || track.duration)
+          }
           className="w-12 h-5 text-[10px] bg-black/40 text-primary font-mono rounded border border-white/5 text-center"
           aria-label="Trim end"
         />

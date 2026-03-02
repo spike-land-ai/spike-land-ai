@@ -28,7 +28,7 @@ interface PendingError {
  * Uses Prisma's createMany for efficient bulk inserts.
  */
 export async function reportErrorsBatchToDatabase(
-  errors: Array<{ error: PendingError; environment: "FRONTEND" | "BACKEND"; }>,
+  errors: Array<{ error: PendingError; environment: "FRONTEND" | "BACKEND" }>,
 ): Promise<void> {
   if (errors.length === 0) return;
 
@@ -45,9 +45,7 @@ export async function reportErrorsBatchToDatabase(
       ...(error.route !== undefined ? { route: error.route } : {}),
       ...(error.userId !== undefined ? { userId: error.userId } : {}),
       environment,
-      metadata: error.metadata
-        ? JSON.parse(JSON.stringify(error.metadata))
-        : null,
+      metadata: error.metadata ? JSON.parse(JSON.stringify(error.metadata)) : null,
       timestamp: error.timestamp ? new Date(error.timestamp) : new Date(),
     })),
   });

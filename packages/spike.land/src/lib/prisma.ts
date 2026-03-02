@@ -11,14 +11,12 @@ const prismaClientSingleton = () => {
     // This allows the build/tests to succeed. If any code *actually* tries to query
     // the DB, it will fail, which is the desired behavior.
     const isBuild = process.env.NEXT_PHASE === "phase-production-build";
-    const isE2ETestContext = process.env.CI === "true"
-      && process.env.BASE_URL && !rawConnectionString;
+    const isE2ETestContext =
+      process.env.CI === "true" && process.env.BASE_URL && !rawConnectionString;
 
     if (isBuild || isE2ETestContext) {
       if (isBuild) {
-        logger.warn(
-          "DATABASE_URL not available during build. Using mocked Prisma Client.",
-        );
+        logger.warn("DATABASE_URL not available during build. Using mocked Prisma Client.");
       }
       return new Proxy(
         {},
@@ -26,11 +24,9 @@ const prismaClientSingleton = () => {
           get: (_, prop) => {
             // This proxy will throw an error if any prisma method is called.
             throw new Error(
-              `Attempted to access Prisma without DATABASE_URL (property: ${
-                String(
-                  prop,
-                )
-              }). Please ensure DATABASE_URL is set.`,
+              `Attempted to access Prisma without DATABASE_URL (property: ${String(
+                prop,
+              )}). Please ensure DATABASE_URL is set.`,
             );
           },
         },
@@ -38,16 +34,13 @@ const prismaClientSingleton = () => {
     }
 
     throw new Error(
-      "DATABASE_URL environment variable is required for database access. "
-        + "Please ensure it is set in your environment.",
+      "DATABASE_URL environment variable is required for database access. " +
+        "Please ensure it is set in your environment.",
     );
   }
 
   // Rewrite sslmode=require → sslmode=verify-full to suppress pg v9 deprecation warning
-  const connectionString = rawConnectionString.replace(
-    /sslmode=require\b/,
-    "sslmode=verify-full",
-  );
+  const connectionString = rawConnectionString.replace(/sslmode=require\b/, "sslmode=verify-full");
 
   const adapter = new PrismaPg({
     connectionString,

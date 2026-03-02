@@ -10,9 +10,10 @@ interface OptimizationInput {
   settings: SmartRoutingSettings;
 }
 
-export function calculatePriorityScore(
-  input: OptimizationInput,
-): { score: number; factors: Record<string, number>; } {
+export function calculatePriorityScore(input: OptimizationInput): {
+  score: number;
+  factors: Record<string, number>;
+} {
   const { analysis, senderFollowers = 0, senderTier = "FREE", settings } = input;
   const weights = settings.priorityWeights;
 
@@ -38,10 +39,7 @@ export function calculatePriorityScore(
   // 3. Follower Count (Logarithmic scale)
   // 1000 followers = 10pts, 100k = 50pts, 1M = 100pts approx
   // log10(1000) = 3. log10(1M) = 6.
-  const followerScore = Math.min(
-    100,
-    Math.max(0, Math.log10(senderFollowers + 1) * 15),
-  );
+  const followerScore = Math.min(100, Math.max(0, Math.log10(senderFollowers + 1) * 15));
   factors.followerCount = (followerScore * weights.followerCount) / 100;
   score += factors.followerCount;
 

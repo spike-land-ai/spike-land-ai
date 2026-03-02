@@ -25,17 +25,13 @@ export function CtaBlock({ content }: CtaBlockProps) {
     <section className="w-full py-16 px-6 md:px-12 lg:px-24 bg-muted/30">
       <div className="max-w-3xl mx-auto text-center">
         <h2 className="text-3xl font-bold mb-4">{data.headline}</h2>
-        {data.description
-          ? (
-            <p className="text-lg text-muted-foreground mb-8">
-              {data.description}
-            </p>
-          )
-          : null}
+        {data.description ? (
+          <p className="text-lg text-muted-foreground mb-8">{data.description}</p>
+        ) : null}
         <div className="flex flex-wrap justify-center gap-4">
           {data.buttons.map((button, index) => {
-            const variantClass = buttonVariantClasses[button.variant ?? "primary"]
-              ?? buttonVariantClasses.primary;
+            const variantClass =
+              buttonVariantClasses[button.variant ?? "primary"] ?? buttonVariantClasses.primary;
             return (
               <a
                 key={`${button.text}-${index}`}

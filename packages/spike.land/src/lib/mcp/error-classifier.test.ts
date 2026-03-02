@@ -5,11 +5,7 @@ import { McpError, McpErrorCode } from "./errors";
 describe("classifyError", () => {
   describe("McpError passthrough", () => {
     it("should return classification from existing McpError", () => {
-      const mcpError = new McpError(
-        "Original message",
-        McpErrorCode.RATE_LIMITED,
-        true,
-      );
+      const mcpError = new McpError("Original message", McpErrorCode.RATE_LIMITED, true);
 
       const result = classifyError(mcpError);
 
@@ -20,7 +16,7 @@ describe("classifyError", () => {
 
   describe("error code property classification", () => {
     it("should classify ETIMEDOUT as TIMEOUT", () => {
-      const error = new Error("Connection failed") as Error & { code: string; };
+      const error = new Error("Connection failed") as Error & { code: string };
       error.code = "ETIMEDOUT";
 
       const result = classifyError(error);
@@ -28,7 +24,7 @@ describe("classifyError", () => {
     });
 
     it("should classify ESOCKETTIMEDOUT as TIMEOUT", () => {
-      const error = new Error("Socket timeout") as Error & { code: string; };
+      const error = new Error("Socket timeout") as Error & { code: string };
       error.code = "ESOCKETTIMEDOUT";
 
       const result = classifyError(error);
@@ -36,7 +32,7 @@ describe("classifyError", () => {
     });
 
     it("should classify DEADLINE_EXCEEDED as TIMEOUT", () => {
-      const error = new Error("Deadline exceeded") as Error & { code: string; };
+      const error = new Error("Deadline exceeded") as Error & { code: string };
       error.code = "DEADLINE_EXCEEDED";
 
       const result = classifyError(error);
@@ -44,7 +40,7 @@ describe("classifyError", () => {
     });
 
     it("should classify RESOURCE_EXHAUSTED as RATE_LIMITED", () => {
-      const error = new Error("Rate limited") as Error & { code: string; };
+      const error = new Error("Rate limited") as Error & { code: string };
       error.code = "RESOURCE_EXHAUSTED";
 
       const result = classifyError(error);
@@ -52,7 +48,7 @@ describe("classifyError", () => {
     });
 
     it("should classify UNAUTHENTICATED as AUTH_ERROR", () => {
-      const error = new Error("Not authenticated") as Error & { code: string; };
+      const error = new Error("Not authenticated") as Error & { code: string };
       error.code = "UNAUTHENTICATED";
 
       const result = classifyError(error);
@@ -60,7 +56,7 @@ describe("classifyError", () => {
     });
 
     it("should classify PERMISSION_DENIED as AUTH_ERROR", () => {
-      const error = new Error("Permission denied") as Error & { code: string; };
+      const error = new Error("Permission denied") as Error & { code: string };
       error.code = "PERMISSION_DENIED";
 
       const result = classifyError(error);
@@ -68,7 +64,7 @@ describe("classifyError", () => {
     });
 
     it("should classify ECONNREFUSED as GEMINI_API_ERROR", () => {
-      const error = new Error("Connection refused") as Error & { code: string; };
+      const error = new Error("Connection refused") as Error & { code: string };
       error.code = "ECONNREFUSED";
 
       const result = classifyError(error);
@@ -76,7 +72,7 @@ describe("classifyError", () => {
     });
 
     it("should classify INVALID_ARGUMENT as INVALID_INPUT", () => {
-      const error = new Error("Invalid argument") as Error & { code: string; };
+      const error = new Error("Invalid argument") as Error & { code: string };
       error.code = "INVALID_ARGUMENT";
 
       const result = classifyError(error);
@@ -104,7 +100,7 @@ describe("classifyError", () => {
     });
 
     it("should classify QUOTA_EXCEEDED code as RATE_LIMITED", () => {
-      const error = new Error("Quota exceeded") as Error & { code: string; };
+      const error = new Error("Quota exceeded") as Error & { code: string };
       error.code = "QUOTA_EXCEEDED";
 
       const result = classifyError(error);
@@ -112,7 +108,7 @@ describe("classifyError", () => {
     });
 
     it("should classify ECONNRESET as GEMINI_API_ERROR", () => {
-      const error = new Error("Connection reset") as Error & { code: string; };
+      const error = new Error("Connection reset") as Error & { code: string };
       error.code = "ECONNRESET";
 
       const result = classifyError(error);
@@ -120,7 +116,7 @@ describe("classifyError", () => {
     });
 
     it("should classify ENOTFOUND as GEMINI_API_ERROR", () => {
-      const error = new Error("DNS lookup failed") as Error & { code: string; };
+      const error = new Error("DNS lookup failed") as Error & { code: string };
       error.code = "ENOTFOUND";
 
       const result = classifyError(error);
@@ -128,7 +124,7 @@ describe("classifyError", () => {
     });
 
     it("should classify INVALID_REQUEST as INVALID_INPUT", () => {
-      const error = new Error("Invalid request") as Error & { code: string; };
+      const error = new Error("Invalid request") as Error & { code: string };
       error.code = "INVALID_REQUEST";
 
       const result = classifyError(error);
@@ -146,7 +142,7 @@ describe("classifyError", () => {
     });
 
     it("should handle numeric error codes (no match)", () => {
-      const error = new Error("Some error") as Error & { code: number; };
+      const error = new Error("Some error") as Error & { code: number };
       error.code = 12345;
 
       const result = classifyError(error);
@@ -157,7 +153,7 @@ describe("classifyError", () => {
 
   describe("HTTP status code classification", () => {
     it("should classify status 400 as INVALID_INPUT", () => {
-      const error = new Error("Bad request") as Error & { status: number; };
+      const error = new Error("Bad request") as Error & { status: number };
       error.status = 400;
 
       const result = classifyError(error);
@@ -165,7 +161,7 @@ describe("classifyError", () => {
     });
 
     it("should classify status 401 as AUTH_ERROR", () => {
-      const error = new Error("Unauthorized") as Error & { status: number; };
+      const error = new Error("Unauthorized") as Error & { status: number };
       error.status = 401;
 
       const result = classifyError(error);
@@ -173,7 +169,7 @@ describe("classifyError", () => {
     });
 
     it("should classify status 403 as AUTH_ERROR", () => {
-      const error = new Error("Forbidden") as Error & { status: number; };
+      const error = new Error("Forbidden") as Error & { status: number };
       error.status = 403;
 
       const result = classifyError(error);
@@ -181,7 +177,7 @@ describe("classifyError", () => {
     });
 
     it("should classify status 404 as INVALID_INPUT", () => {
-      const error = new Error("Not found") as Error & { status: number; };
+      const error = new Error("Not found") as Error & { status: number };
       error.status = 404;
 
       const result = classifyError(error);
@@ -189,7 +185,7 @@ describe("classifyError", () => {
     });
 
     it("should classify status 408 as TIMEOUT", () => {
-      const error = new Error("Request timeout") as Error & { status: number; };
+      const error = new Error("Request timeout") as Error & { status: number };
       error.status = 408;
 
       const result = classifyError(error);
@@ -237,7 +233,7 @@ describe("classifyError", () => {
     });
 
     it("should classify status 504 as TIMEOUT", () => {
-      const error = new Error("Gateway timeout") as Error & { status: number; };
+      const error = new Error("Gateway timeout") as Error & { status: number };
       error.status = 504;
 
       const result = classifyError(error);
@@ -245,7 +241,7 @@ describe("classifyError", () => {
     });
 
     it("should use statusCode if status is not available", () => {
-      const error = new Error("Unauthorized") as Error & { statusCode: number; };
+      const error = new Error("Unauthorized") as Error & { statusCode: number };
       error.statusCode = 401;
 
       const result = classifyError(error);
@@ -254,7 +250,7 @@ describe("classifyError", () => {
 
     it("should use response.status if available", () => {
       const error = new Error("Error with response") as Error & {
-        response: { status: number; };
+        response: { status: number };
       };
       error.response = { status: 429 };
 
@@ -264,7 +260,7 @@ describe("classifyError", () => {
 
     it("should use response.statusCode when response.status is not available", () => {
       const error = new Error("Error with response statusCode") as Error & {
-        response: { statusCode: number; };
+        response: { statusCode: number };
       };
       error.response = { statusCode: 401 };
 
@@ -286,7 +282,7 @@ describe("classifyError", () => {
 
     it("should fall through when error has response but both response.status and response.statusCode are undefined", () => {
       const error = new Error("Some odd response error") as Error & {
-        response: { status: undefined; statusCode: undefined; };
+        response: { status: undefined; statusCode: undefined };
       };
       error.response = { status: undefined, statusCode: undefined };
 
@@ -317,7 +313,7 @@ describe("classifyError", () => {
     });
 
     it("should classify status 502 as GEMINI_API_ERROR", () => {
-      const error = new Error("Bad gateway") as Error & { status: number; };
+      const error = new Error("Bad gateway") as Error & { status: number };
       error.status = 502;
 
       const result = classifyError(error);
@@ -325,35 +321,40 @@ describe("classifyError", () => {
     });
 
     it("should handle error with status property but no code", () => {
-      const error = new Error("Status only") as Error & { status: number; };
+      const error = new Error("Status only") as Error & { status: number };
       error.status = 429;
       const result = classifyError(error);
       expect(result.code).toBe(McpErrorCode.RATE_LIMITED);
     });
 
     it("should handle error with statusCode property", () => {
-      const error = new Error("StatusCode only") as Error & { statusCode: number; };
+      const error = new Error("StatusCode only") as Error & { statusCode: number };
       error.statusCode = 401;
       const result = classifyError(error);
       expect(result.code).toBe(McpErrorCode.AUTH_ERROR);
     });
 
     it("should handle error with response object status", () => {
-      const error = new Error("Response status") as any;
+      const error = new Error("Response status") as Error & { response: { status: number } };
       error.response = { status: 503 };
       const result = classifyError(error);
       expect(result.code).toBe(McpErrorCode.RATE_LIMITED);
     });
 
     it("should handle error with response object statusCode", () => {
-      const error = new Error("Response statusCode") as any;
+      const error = new Error("Response statusCode") as Error & {
+        response: { statusCode: number };
+      };
       error.response = { statusCode: 408 };
       const result = classifyError(error);
       expect(result.code).toBe(McpErrorCode.TIMEOUT);
     });
 
     it("should fall through if status and statusCode are undefined", () => {
-      const error = new Error("Undefined status") as any;
+      const error = new Error("Undefined status") as Error & {
+        status: undefined;
+        statusCode: undefined;
+      };
       error.status = undefined;
       error.statusCode = undefined;
       const result = classifyError(error);
@@ -361,7 +362,9 @@ describe("classifyError", () => {
     });
 
     it("should fall through if response status and statusCode are undefined", () => {
-      const error = new Error("Undefined response status") as any;
+      const error = new Error("Undefined response status") as Error & {
+        response: { status: undefined; statusCode: undefined };
+      };
       error.response = { status: undefined, statusCode: undefined };
       const result = classifyError(error);
       expect(result.code).toBe(McpErrorCode.GENERATION_ERROR);
@@ -420,18 +423,14 @@ describe("classifyError", () => {
       });
 
       it("should classify 'took too long' in message", () => {
-        const result = classifyError(
-          new Error("The operation took too long"),
-        );
+        const result = classifyError(new Error("The operation took too long"));
         expect(result.code).toBe(McpErrorCode.TIMEOUT);
       });
     });
 
     describe("content policy patterns", () => {
       it("should classify 'content policy' in message", () => {
-        const result = classifyError(
-          new Error("Violates content policy"),
-        );
+        const result = classifyError(new Error("Violates content policy"));
         expect(result.code).toBe(McpErrorCode.CONTENT_POLICY);
       });
 
@@ -584,9 +583,7 @@ describe("classifyError", () => {
 
   describe("default classification", () => {
     it("should return GENERATION_ERROR with original message for unmatched errors", () => {
-      const result = classifyError(
-        new Error("Some completely unexpected error"),
-      );
+      const result = classifyError(new Error("Some completely unexpected error"));
 
       expect(result.code).toBe(McpErrorCode.GENERATION_ERROR);
       expect(result.message).toBe("Some completely unexpected error");

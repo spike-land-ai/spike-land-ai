@@ -18,10 +18,7 @@ vi.mock("@/lib/prisma", () => ({
 }));
 
 import prisma from "@/lib/prisma";
-import {
-  getDefaultAIProvider,
-  resolveAIProviderConfig,
-} from "./ai-config-resolver";
+import { getDefaultAIProvider, resolveAIProviderConfig } from "./ai-config-resolver";
 
 describe("ai-config-resolver", () => {
   beforeEach(() => {
@@ -52,7 +49,7 @@ describe("ai-config-resolver", () => {
       };
 
       vi.mocked(prisma.aIProvider.findFirst).mockResolvedValue(
-        mockProvider as any,
+        mockProvider as unknown as Awaited<ReturnType<typeof prisma.aIProvider.findFirst>>,
       );
 
       const result = await getDefaultAIProvider();
@@ -66,9 +63,7 @@ describe("ai-config-resolver", () => {
     });
 
     it("should handle error gracefully without throwing", async () => {
-      vi.mocked(prisma.aIProvider.findFirst).mockRejectedValue(
-        new Error("DB Error"),
-      );
+      vi.mocked(prisma.aIProvider.findFirst).mockRejectedValue(new Error("DB Error"));
 
       const result = await getDefaultAIProvider();
       expect(result).toBeNull();
@@ -86,7 +81,7 @@ describe("ai-config-resolver", () => {
       };
 
       vi.mocked(prisma.aIProvider.findUnique).mockResolvedValue(
-        mockProvider as any,
+        mockProvider as unknown as Awaited<ReturnType<typeof prisma.aIProvider.findFirst>>,
       );
 
       const result = await resolveAIProviderConfig("specific-provider");
@@ -119,7 +114,7 @@ describe("ai-config-resolver", () => {
       };
 
       vi.mocked(prisma.aIProvider.findUnique).mockResolvedValueOnce(
-        mockProvider as any,
+        mockProvider as unknown as Awaited<ReturnType<typeof prisma.aIProvider.findFirst>>,
       );
 
       // First call hits DB

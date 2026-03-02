@@ -29,8 +29,8 @@ export function createAppServer(
       const reqCheck = checkRequires(tool, ctx.calledTools);
       if (!reqCheck.ok) {
         return errorResult(
-          `**Prerequisite tools not called:** ${reqCheck.missing.join(", ")}\n`
-            + `You must call these tools first before using \`${tool.name}\`.`,
+          `**Prerequisite tools not called:** ${reqCheck.missing.join(", ")}\n` +
+            `You must call these tools first before using \`${tool.name}\`.`,
         );
       }
 

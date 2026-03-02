@@ -154,9 +154,7 @@ export interface UsePipelinesReturn {
  * }
  * ```
  */
-export function usePipelines(
-  options: UsePipelinesOptions = {},
-): UsePipelinesReturn {
+export function usePipelines(options: UsePipelinesOptions = {}): UsePipelinesReturn {
   const { enabled = true } = options;
 
   const [pipelines, setPipelines] = useState<Pipeline[]>([]);
@@ -189,9 +187,8 @@ export function usePipelines(
     const { data, error: fetchError } = await tryCatch(fetchAndParse());
 
     if (fetchError) {
-      const errorMessage = fetchError instanceof Error
-        ? fetchError.message
-        : "An unknown error occurred";
+      const errorMessage =
+        fetchError instanceof Error ? fetchError.message : "An unknown error occurred";
       setError(new Error(errorMessage));
       if (!append) {
         setPipelines([]);
@@ -199,7 +196,7 @@ export function usePipelines(
       }
     } else {
       if (append) {
-        setPipelines(prev => [...prev, ...data.pipelines]);
+        setPipelines((prev) => [...prev, ...data.pipelines]);
       } else {
         setPipelines(data.pipelines);
       }
@@ -252,7 +249,7 @@ export function usePipelines(
 
   // Get pipeline by ID
   const getPipelineById = useCallback(
-    (id: string) => pipelines.find(p => p.id === id),
+    (id: string) => pipelines.find((p) => p.id === id),
     [pipelines],
   );
 

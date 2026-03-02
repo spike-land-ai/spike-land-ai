@@ -42,30 +42,21 @@ async function updateCodespaceSession(
 // Read Tools
 // ---------------------------------------------------------------------------
 
-export function executeReadCode(
-  session: ICodeSession,
-  codeSpace: string,
-): ReadCodeResult {
+export function executeReadCode(session: ICodeSession, codeSpace: string): ReadCodeResult {
   return {
     code: session.code,
     codeSpace,
   };
 }
 
-export function executeReadHtml(
-  session: ICodeSession,
-  codeSpace: string,
-): ReadHtmlResult {
+export function executeReadHtml(session: ICodeSession, codeSpace: string): ReadHtmlResult {
   return {
     html: session.html,
     codeSpace,
   };
 }
 
-export function executeReadSession(
-  session: ICodeSession,
-  codeSpace: string,
-): ReadSessionResult {
+export function executeReadSession(session: ICodeSession, codeSpace: string): ReadSessionResult {
   return {
     code: session.code,
     html: session.html,
@@ -110,8 +101,8 @@ export async function executeUpdateCode(
     message: transpiled
       ? `Code updated and transpiled successfully (${code.length} chars).`
       : transpilationFailed
-      ? `Code updated (${code.length} chars). Transpilation failed - will retry on next load.`
-      : `Code updated (${code.length} chars). Transpilation pending.`,
+        ? `Code updated (${code.length} chars). Transpilation failed - will retry on next load.`
+        : `Code updated (${code.length} chars). Transpilation pending.`,
     codeSpace,
     requiresTranspilation: !transpiled,
   };
@@ -183,10 +174,7 @@ export async function executeSearchAndReplace(
       }
     } else {
       if (global) {
-        const regex = new RegExp(
-          search.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"),
-          "g",
-        );
+        const regex = new RegExp(search.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "g");
         const matches = originalCode.match(regex);
         replacements = matches ? matches.length : 0;
         newCode = originalCode.replace(regex, replace);
@@ -194,9 +182,10 @@ export async function executeSearchAndReplace(
         const index = originalCode.indexOf(search);
         if (index !== -1) {
           replacements = 1;
-          newCode = originalCode.substring(0, index)
-            + replace
-            + originalCode.substring(index + search.length);
+          newCode =
+            originalCode.substring(0, index) +
+            replace +
+            originalCode.substring(index + search.length);
         } else {
           replacements = 0;
           newCode = originalCode;
@@ -215,10 +204,7 @@ export async function executeSearchAndReplace(
     try {
       transpiled = await transpileCode(newCode, origin);
     } catch (error) {
-      logger.error(
-        "[MCP] Transpilation error in search_and_replace",
-        { error },
-      );
+      logger.error("[MCP] Transpilation error in search_and_replace", { error });
     }
     transpilationPending = !transpiled;
 
@@ -236,11 +222,12 @@ export async function executeSearchAndReplace(
 
   return {
     success: true,
-    message: replacements > 0
-      ? transpilationPending
-        ? `Made ${replacements} replacement(s). Code updated. Transpilation pending.`
-        : `Made ${replacements} replacement(s). Code transpiled and updated.`
-      : "No matches found",
+    message:
+      replacements > 0
+        ? transpilationPending
+          ? `Made ${replacements} replacement(s). Code updated. Transpilation pending.`
+          : `Made ${replacements} replacement(s). Code transpiled and updated.`
+        : "No matches found",
     replacements,
     search,
     replace,

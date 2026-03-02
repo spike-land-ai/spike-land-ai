@@ -46,7 +46,9 @@ describe("user-tools", () => {
       registerUserTools(dcServer as unknown as McpServer, dcClient);
 
       const result = await dcServer.call("stdb_register_user", {
-        handle: "test", displayName: "Test", email: "t@t.com",
+        handle: "test",
+        displayName: "Test",
+        email: "t@t.com",
       });
       expect(result.isError).toBe(true);
       const parsed = JSON.parse(result.content[0].text);
@@ -54,9 +56,13 @@ describe("user-tools", () => {
     });
 
     it("returns REDUCER_FAILED on other errors", async () => {
-      client.registerUser = vi.fn(async () => { throw new Error("Reducer panicked"); });
+      client.registerUser = vi.fn(async () => {
+        throw new Error("Reducer panicked");
+      });
       const result = await server.call("stdb_register_user", {
-        handle: "test", displayName: "Test", email: "t@t.com",
+        handle: "test",
+        displayName: "Test",
+        email: "t@t.com",
       });
       expect(result.isError).toBe(true);
       const parsed = JSON.parse(result.content[0].text);
@@ -65,9 +71,13 @@ describe("user-tools", () => {
     });
 
     it("handles non-Error thrown values", async () => {
-      client.registerUser = vi.fn(async () => { throw "string error"; });
+      client.registerUser = vi.fn(async () => {
+        throw "string error";
+      });
       const result = await server.call("stdb_register_user", {
-        handle: "test", displayName: "Test", email: "t@t.com",
+        handle: "test",
+        displayName: "Test",
+        email: "t@t.com",
       });
       expect(result.isError).toBe(true);
       const parsed = JSON.parse(result.content[0].text);
@@ -80,9 +90,13 @@ describe("user-tools", () => {
   describe("stdb_get_user", () => {
     it("gets an existing user", async () => {
       client._users.push({
-        identity: "user-1", handle: "alice", displayName: "Alice",
-        email: "alice@example.com", online: true,
-        createdAt: BigInt(1000), lastSeen: BigInt(2000),
+        identity: "user-1",
+        handle: "alice",
+        displayName: "Alice",
+        email: "alice@example.com",
+        online: true,
+        createdAt: BigInt(1000),
+        lastSeen: BigInt(2000),
       });
 
       const result = await server.call("stdb_get_user", { identity: "user-1" });
@@ -116,8 +130,24 @@ describe("user-tools", () => {
   describe("stdb_list_users", () => {
     it("lists all users", async () => {
       client._users.push(
-        { identity: "u1", handle: "alice", displayName: "Alice", email: "a@a.com", online: true, createdAt: 1000n, lastSeen: 2000n },
-        { identity: "u2", handle: "bob", displayName: "Bob", email: "b@b.com", online: false, createdAt: 1000n, lastSeen: 1500n },
+        {
+          identity: "u1",
+          handle: "alice",
+          displayName: "Alice",
+          email: "a@a.com",
+          online: true,
+          createdAt: 1000n,
+          lastSeen: 2000n,
+        },
+        {
+          identity: "u2",
+          handle: "bob",
+          displayName: "Bob",
+          email: "b@b.com",
+          online: false,
+          createdAt: 1000n,
+          lastSeen: 1500n,
+        },
       );
 
       const result = await server.call("stdb_list_users", { onlineOnly: false });
@@ -127,8 +157,24 @@ describe("user-tools", () => {
 
     it("filters to online-only users", async () => {
       client._users.push(
-        { identity: "u1", handle: "alice", displayName: "Alice", email: "a@a.com", online: true, createdAt: 1000n, lastSeen: 2000n },
-        { identity: "u2", handle: "bob", displayName: "Bob", email: "b@b.com", online: false, createdAt: 1000n, lastSeen: 1500n },
+        {
+          identity: "u1",
+          handle: "alice",
+          displayName: "Alice",
+          email: "a@a.com",
+          online: true,
+          createdAt: 1000n,
+          lastSeen: 2000n,
+        },
+        {
+          identity: "u2",
+          handle: "bob",
+          displayName: "Bob",
+          email: "b@b.com",
+          online: false,
+          createdAt: 1000n,
+          lastSeen: 1500n,
+        },
       );
 
       const result = await server.call("stdb_list_users", { onlineOnly: true });
@@ -175,7 +221,9 @@ describe("user-tools", () => {
     });
 
     it("returns REDUCER_FAILED on other errors", async () => {
-      client.updateProfile = vi.fn(async () => { throw new Error("Permission denied"); });
+      client.updateProfile = vi.fn(async () => {
+        throw new Error("Permission denied");
+      });
       const result = await server.call("stdb_update_profile", { displayName: "X" });
       expect(result.isError).toBe(true);
       const parsed = JSON.parse(result.content[0].text);

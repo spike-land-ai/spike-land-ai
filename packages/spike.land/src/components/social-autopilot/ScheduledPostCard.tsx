@@ -1,11 +1,7 @@
 "use client";
 
 import { Badge } from "@/components/ui/badge";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 
 type Platform = "twitter" | "linkedin" | "instagram" | "facebook";
@@ -20,14 +16,14 @@ interface ScheduledPostCardProps {
   mediaType?: MediaType;
 }
 
-const platformConfig: Record<Platform, { abbr: string; color: string; bg: string; }> = {
+const platformConfig: Record<Platform, { abbr: string; color: string; bg: string }> = {
   twitter: { abbr: "TW", color: "text-sky-400", bg: "bg-sky-500/10 border-sky-500/20" },
   linkedin: { abbr: "LI", color: "text-blue-400", bg: "bg-blue-700/10 border-blue-700/20" },
   instagram: { abbr: "IG", color: "text-pink-400", bg: "bg-pink-500/10 border-pink-500/20" },
   facebook: { abbr: "FB", color: "text-blue-500", bg: "bg-blue-500/10 border-blue-500/20" },
 };
 
-const statusConfig: Record<PostStatus, { label: string; className: string; }> = {
+const statusConfig: Record<PostStatus, { label: string; className: string }> = {
   scheduled: {
     label: "Scheduled",
     className: "bg-yellow-500/10 text-yellow-400 border-yellow-500/20",
@@ -73,9 +69,7 @@ export function ScheduledPostCard({
               {pConfig.abbr}
             </div>
             <div>
-              <p className={cn("text-sm font-semibold capitalize", pConfig.color)}>
-                {platform}
-              </p>
+              <p className={cn("text-sm font-semibold capitalize", pConfig.color)}>{platform}</p>
               <p className="text-xs text-zinc-500">{scheduledTime}</p>
             </div>
           </div>

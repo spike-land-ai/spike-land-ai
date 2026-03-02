@@ -8,7 +8,7 @@ async function main() {
     const prisma = (await import("../src/lib/prisma")).default;
     const errors = await prisma.errorLog.findMany({
       orderBy: { timestamp: "desc" },
-      take: 20
+      take: 20,
     });
     console.log(JSON.stringify(errors, null, 2));
   } catch (err) {

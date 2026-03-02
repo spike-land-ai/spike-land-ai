@@ -8,9 +8,7 @@ describe("cors", () => {
     });
 
     it("should allow expected methods", () => {
-      expect(CORS_HEADERS["Access-Control-Allow-Methods"]).toBe(
-        "GET, POST, PUT, OPTIONS",
-      );
+      expect(CORS_HEADERS["Access-Control-Allow-Methods"]).toBe("GET, POST, PUT, OPTIONS");
     });
 
     it("should allow Content-Type header", () => {
@@ -27,12 +25,8 @@ describe("cors", () => {
     it("should include CORS headers", () => {
       const response = corsOptions();
       expect(response.headers.get("Access-Control-Allow-Origin")).toBe("*");
-      expect(response.headers.get("Access-Control-Allow-Methods")).toBe(
-        "GET, POST, PUT, OPTIONS",
-      );
-      expect(response.headers.get("Access-Control-Allow-Headers")).toBe(
-        "Content-Type",
-      );
+      expect(response.headers.get("Access-Control-Allow-Methods")).toBe("GET, POST, PUT, OPTIONS");
+      expect(response.headers.get("Access-Control-Allow-Headers")).toBe("Content-Type");
     });
 
     it("should have null body", () => {

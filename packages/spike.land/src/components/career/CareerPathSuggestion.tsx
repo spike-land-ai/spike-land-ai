@@ -7,17 +7,15 @@ interface CareerPathSuggestionProps {
   userSkills: UserSkill[];
 }
 
-export function CareerPathSuggestion(
-  { occupation, userSkills }: CareerPathSuggestionProps,
-) {
-  const userSkillUris = new Set(userSkills.map(s => s.uri));
+export function CareerPathSuggestion({ occupation, userSkills }: CareerPathSuggestionProps) {
+  const userSkillUris = new Set(userSkills.map((s) => s.uri));
 
   const missingEssential = occupation.skills
-    .filter(s => s.skillType === "essential" && !userSkillUris.has(s.uri))
+    .filter((s) => s.skillType === "essential" && !userSkillUris.has(s.uri))
     .sort((a, b) => b.importance - a.importance);
 
   const missingOptional = occupation.skills
-    .filter(s => s.skillType === "optional" && !userSkillUris.has(s.uri))
+    .filter((s) => s.skillType === "optional" && !userSkillUris.has(s.uri))
     .sort((a, b) => b.importance - a.importance)
     .slice(0, 5);
 
@@ -44,16 +42,10 @@ export function CareerPathSuggestion(
           </CardHeader>
           <CardContent className="space-y-2">
             {missingEssential.map((skill, i) => (
-              <div
-                key={skill.uri}
-                className="flex items-center gap-3 p-2 rounded bg-zinc-800/50"
-              >
+              <div key={skill.uri} className="flex items-center gap-3 p-2 rounded bg-zinc-800/50">
                 <span className="text-xs text-zinc-500 w-6">{i + 1}.</span>
                 <span className="text-sm text-white flex-1">{skill.title}</span>
-                <Badge
-                  variant="outline"
-                  className="text-xs border-red-500/20 text-red-400"
-                >
+                <Badge variant="outline" className="text-xs border-red-500/20 text-red-400">
                   Essential
                 </Badge>
               </div>
@@ -71,16 +63,10 @@ export function CareerPathSuggestion(
           </CardHeader>
           <CardContent className="space-y-2">
             {missingOptional.map((skill, i) => (
-              <div
-                key={skill.uri}
-                className="flex items-center gap-3 p-2 rounded bg-zinc-800/50"
-              >
+              <div key={skill.uri} className="flex items-center gap-3 p-2 rounded bg-zinc-800/50">
                 <span className="text-xs text-zinc-500 w-6">{i + 1}.</span>
                 <span className="text-sm text-white flex-1">{skill.title}</span>
-                <Badge
-                  variant="outline"
-                  className="text-xs border-zinc-500/20 text-zinc-400"
-                >
+                <Badge variant="outline" className="text-xs border-zinc-500/20 text-zinc-400">
                   Optional
                 </Badge>
               </div>

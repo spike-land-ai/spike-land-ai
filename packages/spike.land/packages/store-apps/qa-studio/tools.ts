@@ -20,7 +20,7 @@ const CATEGORY_STUDIO = "qa-studio";
 const CATEGORY_PERF = "qa-performance";
 const TIER = "free" as const;
 
-const VIEWPORT_PRESETS: Record<string, { width: number; height: number; }> = {
+const VIEWPORT_PRESETS: Record<string, { width: number; height: number }> = {
   mobile: { width: 375, height: 812 },
   tablet: { width: 768, height: 1024 },
   desktop: { width: 1440, height: 900 },
@@ -71,29 +71,19 @@ function simulateLighthouseAudit(
     recommendations.push("Reduce server response time (TTFB > target)");
   }
   if (metrics.lcp_ms > 2500) {
-    recommendations.push(
-      "Optimise Largest Contentful Paint element (image or text block)",
-    );
+    recommendations.push("Optimise Largest Contentful Paint element (image or text block)");
   }
   if (metrics.cls > 0.1) {
-    recommendations.push(
-      "Fix Cumulative Layout Shift — set explicit width/height on images",
-    );
+    recommendations.push("Fix Cumulative Layout Shift — set explicit width/height on images");
   }
   if (metrics.tbt_ms > 200) {
-    recommendations.push(
-      "Reduce Total Blocking Time — split or defer long JavaScript tasks",
-    );
+    recommendations.push("Reduce Total Blocking Time — split or defer long JavaScript tasks");
   }
   if (metrics.tti_ms > 3800) {
-    recommendations.push(
-      "Defer non-critical scripts to improve Time to Interactive",
-    );
+    recommendations.push("Defer non-critical scripts to improve Time to Interactive");
   }
   if (recommendations.length === 0) {
-    recommendations.push(
-      "All core metrics are within acceptable thresholds",
-    );
+    recommendations.push("All core metrics are within acceptable thresholds");
   }
 
   return { scores, metrics, recommendations };
@@ -107,14 +97,12 @@ function mockScreenshotId(url: string, suffix: string): string {
 function mockVisualDiff(
   baselineId: string,
   currentId: string,
-): { diffPct: number; changedRegions: string[]; } {
+): { diffPct: number; changedRegions: string[] } {
   const same = baselineId === currentId;
   if (same) {
     return { diffPct: 0, changedRegions: [] };
   }
-  const seed = (baselineId + currentId)
-    .split("")
-    .reduce((acc, c) => acc + c.charCodeAt(0), 0);
+  const seed = (baselineId + currentId).split("").reduce((acc, c) => acc + c.charCodeAt(0), 0);
   const diffPct = Math.round(((seed % 17) + 1) * 10) / 10;
   const regionNames = ["header", "hero", "navigation", "footer", "sidebar"];
   const changedCount = (seed % regionNames.length) + 1;
@@ -127,7 +115,7 @@ function mockVisualDiff(
 function generateTestCases(
   url: string,
   testType: string,
-): Array<{ description: string; steps: string[]; expectedResult: string; }> {
+): Array<{ description: string; steps: string[]; expectedResult: string }> {
   const host = (() => {
     try {
       return new URL(url).hostname;
@@ -140,11 +128,7 @@ function generateTestCases(
     e2e: [
       {
         description: `Page loads successfully at ${host}`,
-        steps: [
-          `Navigate to ${url}`,
-          "Wait for network idle",
-          "Assert page title is non-empty",
-        ],
+        steps: [`Navigate to ${url}`, "Wait for network idle", "Assert page title is non-empty"],
         expectedResult: "HTTP 200, non-blank title, no JS console errors",
       },
       {
@@ -258,26 +242,18 @@ export const qaStudioTools: StandaloneToolDefinition[] = [
       url: z.string().url().describe("The URL to navigate to"),
     },
     handler: async (input: never): Promise<CallToolResult> => {
-      const { url } = input as { url: string; };
+      const { url } = input as { url: string };
       try {
-        const { getOrCreateTab } = await import(
-          "@/lib/qa-studio/browser-session"
-        );
+        const { getOrCreateTab } = await import("@/lib/qa-studio/browser-session");
         const { page } = await getOrCreateTab();
         await page.goto(url, { waitUntil: "domcontentloaded" });
         const title = await page.title();
         const finalUrl = page.url();
         return textResult(
-          [
-            `## Navigation Complete`,
-            `- **URL:** ${finalUrl}`,
-            `- **Title:** ${title}`,
-          ].join("\n"),
+          [`## Navigation Complete`, `- **URL:** ${finalUrl}`, `- **Title:** ${title}`].join("\n"),
         );
       } catch (err: unknown) {
-        return errorResult(
-          `Navigation failed: ${(err as Error).message}`,
-        );
+        return errorResult(`Navigation failed: ${(err as Error).message}`);
       }
     },
   },
@@ -290,12 +266,8 @@ export const qaStudioTools: StandaloneToolDefinition[] = [
     tier: TIER,
     alwaysEnabled: true,
     inputSchema: {
-      fullPage: z.boolean().optional().describe(
-        "Capture full scrollable page (default: false)",
-      ),
-      selector: z.string().optional().describe(
-        "CSS selector to screenshot a specific element",
-      ),
+      fullPage: z.boolean().optional().describe("Capture full scrollable page (default: false)"),
+      selector: z.string().optional().describe("CSS selector to screenshot a specific element"),
     },
     handler: async (input: never): Promise<CallToolResult> => {
       const { fullPage, selector } = input as {
@@ -303,19 +275,13 @@ export const qaStudioTools: StandaloneToolDefinition[] = [
         selector?: string;
       };
       try {
-        const { getActiveTab } = await import(
-          "@/lib/qa-studio/browser-session"
-        );
+        const { getActiveTab } = await import("@/lib/qa-studio/browser-session");
         const tab = getActiveTab();
         if (!tab) {
-          return errorResult(
-            "No active browser tab. Use qa_navigate first.",
-          );
+          return errorResult("No active browser tab. Use qa_navigate first.");
         }
         if (!tab.page) {
-          return errorResult(
-            "Browser tab has no active page. Navigate to a URL first.",
-          );
+          return errorResult("Browser tab has no active page. Navigate to a URL first.");
         }
 
         let base64: string;
@@ -344,9 +310,7 @@ export const qaStudioTools: StandaloneToolDefinition[] = [
           ].join("\n"),
         );
       } catch (err: unknown) {
-        return errorResult(
-          `Screenshot failed: ${(err as Error).message}`,
-        );
+        return errorResult(`Screenshot failed: ${(err as Error).message}`);
       }
     },
   },
@@ -365,26 +329,20 @@ export const qaStudioTools: StandaloneToolDefinition[] = [
         .describe("WCAG standard to audit against (default: wcag2aa)"),
     },
     handler: async (input: never): Promise<CallToolResult> => {
-      const { standard } = input as { standard?: string; };
+      const { standard } = input as { standard?: string };
       try {
-        const { getActiveTab } = await import(
-          "@/lib/qa-studio/browser-session"
-        );
+        const { getActiveTab } = await import("@/lib/qa-studio/browser-session");
         const tab = getActiveTab();
         if (!tab) {
-          return errorResult(
-            "No active browser tab. Use qa_navigate first.",
-          );
+          return errorResult("No active browser tab. Use qa_navigate first.");
         }
         if (!tab.page) {
-          return errorResult(
-            "Browser tab has no active page. Navigate to a URL first.",
-          );
+          return errorResult("Browser tab has no active page. Navigate to a URL first.");
         }
 
         const auditResult = (await tab.page.evaluate(() => {
-          const issues: Array<{ issue: string; impact: string; }> = [];
-          document.querySelectorAll("img").forEach(img => {
+          const issues: Array<{ issue: string; impact: string }> = [];
+          document.querySelectorAll("img").forEach((img) => {
             if (!img.getAttribute("alt")) {
               issues.push({
                 issue: "Image missing alt text",
@@ -392,22 +350,16 @@ export const qaStudioTools: StandaloneToolDefinition[] = [
               });
             }
           });
-          document.querySelectorAll("a").forEach(a => {
-            if (
-              !a.textContent?.trim()
-              && !a.getAttribute("aria-label")
-            ) {
+          document.querySelectorAll("a").forEach((a) => {
+            if (!a.textContent?.trim() && !a.getAttribute("aria-label")) {
               issues.push({
                 issue: "Link missing accessible name",
                 impact: "serious",
               });
             }
           });
-          document.querySelectorAll("button").forEach(btn => {
-            if (
-              !btn.textContent?.trim()
-              && !btn.getAttribute("aria-label")
-            ) {
+          document.querySelectorAll("button").forEach((btn) => {
+            if (!btn.textContent?.trim() && !btn.getAttribute("aria-label")) {
               issues.push({
                 issue: "Button missing accessible name",
                 impact: "serious",
@@ -421,19 +373,16 @@ export const qaStudioTools: StandaloneToolDefinition[] = [
             });
           }
           return issues;
-        })) as Array<{ issue: string; impact: string; }>;
+        })) as Array<{ issue: string; impact: string }>;
 
         const stdName = standard ?? "wcag2aa";
         const violations = auditResult;
-        const score = violations.length === 0
-          ? 100
-          : Math.max(0, 100 - violations.length * 15);
+        const score = violations.length === 0 ? 100 : Math.max(0, 100 - violations.length * 15);
 
-        const violationsList = violations.length > 0
-          ? violations
-            .map(v => `  - [${v.impact.toUpperCase()}] ${v.issue}`)
-            .join("\n")
-          : "  None found";
+        const violationsList =
+          violations.length > 0
+            ? violations.map((v) => `  - [${v.impact.toUpperCase()}] ${v.issue}`).join("\n")
+            : "  None found";
 
         return textResult(
           [
@@ -447,9 +396,7 @@ export const qaStudioTools: StandaloneToolDefinition[] = [
           ].join("\n"),
         );
       } catch (err: unknown) {
-        return errorResult(
-          `Accessibility audit failed: ${(err as Error).message}`,
-        );
+        return errorResult(`Accessibility audit failed: ${(err as Error).message}`);
       }
     },
   },
@@ -467,36 +414,28 @@ export const qaStudioTools: StandaloneToolDefinition[] = [
         .describe("Minimum log level to include (default: info)"),
     },
     handler: async (input: never): Promise<CallToolResult> => {
-      const { level } = input as { level?: string; };
-      const { getActiveTab } = await import(
-        "@/lib/qa-studio/browser-session"
-      );
+      const { level } = input as { level?: string };
+      const { getActiveTab } = await import("@/lib/qa-studio/browser-session");
       const tab = getActiveTab();
       if (!tab) {
-        return errorResult(
-          "No active browser tab. Use qa_navigate first.",
-        );
+        return errorResult("No active browser tab. Use qa_navigate first.");
       }
 
       const levelOrder = ["error", "warning", "info", "debug"];
       const minLevel = level ?? "info";
       const minIndex = levelOrder.indexOf(minLevel);
 
-      const filtered = tab.entry.consoleMessages.filter(msg => {
-        const msgIndex = levelOrder.indexOf(
-          msg.type === "warn" ? "warning" : msg.type,
-        );
+      const filtered = tab.entry.consoleMessages.filter((msg) => {
+        const msgIndex = levelOrder.indexOf(msg.type === "warn" ? "warning" : msg.type);
         return msgIndex >= 0 && msgIndex <= minIndex;
       });
 
       if (filtered.length === 0) {
-        return textResult(
-          `## Console Messages\n\nNo messages at level "${minLevel}" or above.`,
-        );
+        return textResult(`## Console Messages\n\nNo messages at level "${minLevel}" or above.`);
       }
 
       const lines = filtered.map(
-        msg =>
+        (msg) =>
           `[${msg.type.toUpperCase()}] ${msg.text}${msg.url ? ` (${msg.url}:${msg.line})` : ""}`,
       );
 
@@ -524,52 +463,37 @@ export const qaStudioTools: StandaloneToolDefinition[] = [
       includeStatic: z
         .boolean()
         .optional()
-        .describe(
-          "Include static resources like images, fonts, scripts (default: false)",
-        ),
+        .describe("Include static resources like images, fonts, scripts (default: false)"),
     },
     handler: async (input: never): Promise<CallToolResult> => {
-      const { includeStatic } = input as { includeStatic?: boolean; };
-      const { getActiveTab } = await import(
-        "@/lib/qa-studio/browser-session"
-      );
+      const { includeStatic } = input as { includeStatic?: boolean };
+      const { getActiveTab } = await import("@/lib/qa-studio/browser-session");
       const tab = getActiveTab();
       if (!tab) {
-        return errorResult(
-          "No active browser tab. Use qa_navigate first.",
-        );
+        return errorResult("No active browser tab. Use qa_navigate first.");
       }
 
-      const staticTypes = new Set([
-        "image",
-        "font",
-        "stylesheet",
-        "media",
-      ]);
+      const staticTypes = new Set(["image", "font", "stylesheet", "media"]);
       let requests = tab.entry.networkRequests;
       if (!includeStatic) {
-        requests = requests.filter(
-          r => !staticTypes.has(r.resourceType),
-        );
+        requests = requests.filter((r) => !staticTypes.has(r.resourceType));
       }
 
       if (requests.length === 0) {
         return textResult(`## Network Requests\n\nNo requests captured.`);
       }
 
-      const totalSize = requests.reduce(
-        (sum, r) => sum + parseInt(r.contentLength || "0", 10),
-        0,
-      );
-      const errors = requests.filter(r => r.status >= 400);
+      const totalSize = requests.reduce((sum, r) => sum + parseInt(r.contentLength || "0", 10), 0);
+      const errors = requests.filter((r) => r.status >= 400);
 
       const rows = requests
         .slice(0, 50)
         .map(
-          r =>
-            `| ${r.method} | ${r.status} | ${r.resourceType} | ${r.contentLength} | ${
-              r.url.slice(0, 80)
-            } |`,
+          (r) =>
+            `| ${r.method} | ${r.status} | ${r.resourceType} | ${r.contentLength} | ${r.url.slice(
+              0,
+              80,
+            )} |`,
         );
 
       return textResult(
@@ -599,31 +523,26 @@ export const qaStudioTools: StandaloneToolDefinition[] = [
         .optional()
         .describe("Viewport preset (overrides width/height)"),
       width: z.number().optional().describe("Custom viewport width in pixels"),
-      height: z
-        .number()
-        .optional()
-        .describe("Custom viewport height in pixels"),
+      height: z.number().optional().describe("Custom viewport height in pixels"),
     },
     handler: async (input: never): Promise<CallToolResult> => {
-      const { preset, width: inputWidth, height: inputHeight } = input as {
+      const {
+        preset,
+        width: inputWidth,
+        height: inputHeight,
+      } = input as {
         preset?: string;
         width?: number;
         height?: number;
       };
       try {
-        const { getActiveTab } = await import(
-          "@/lib/qa-studio/browser-session"
-        );
+        const { getActiveTab } = await import("@/lib/qa-studio/browser-session");
         const tab = getActiveTab();
         if (!tab) {
-          return errorResult(
-            "No active browser tab. Use qa_navigate first.",
-          );
+          return errorResult("No active browser tab. Use qa_navigate first.");
         }
         if (!tab.page) {
-          return errorResult(
-            "Browser tab has no active page. Navigate to a URL first.",
-          );
+          return errorResult("Browser tab has no active page. Navigate to a URL first.");
         }
 
         let width: number;
@@ -637,9 +556,7 @@ export const qaStudioTools: StandaloneToolDefinition[] = [
           width = inputWidth;
           height = inputHeight;
         } else {
-          return errorResult(
-            "Provide either a preset or both width and height.",
-          );
+          return errorResult("Provide either a preset or both width and height.");
         }
 
         await tab.page.setViewportSize({ width, height });
@@ -652,9 +569,7 @@ export const qaStudioTools: StandaloneToolDefinition[] = [
           ].join("\n"),
         );
       } catch (err: unknown) {
-        return errorResult(
-          `Viewport change failed: ${(err as Error).message}`,
-        );
+        return errorResult(`Viewport change failed: ${(err as Error).message}`);
       }
     },
   },
@@ -667,32 +582,22 @@ export const qaStudioTools: StandaloneToolDefinition[] = [
     tier: TIER,
     alwaysEnabled: true,
     inputSchema: {
-      expression: z.string().describe(
-        "JavaScript expression to evaluate in the page context",
-      ),
+      expression: z.string().describe("JavaScript expression to evaluate in the page context"),
     },
     handler: async (input: never): Promise<CallToolResult> => {
-      const { expression } = input as { expression: string; };
+      const { expression } = input as { expression: string };
       try {
-        const { getActiveTab } = await import(
-          "@/lib/qa-studio/browser-session"
-        );
+        const { getActiveTab } = await import("@/lib/qa-studio/browser-session");
         const tab = getActiveTab();
         if (!tab) {
-          return errorResult(
-            "No active browser tab. Use qa_navigate first.",
-          );
+          return errorResult("No active browser tab. Use qa_navigate first.");
         }
         if (!tab.page) {
-          return errorResult(
-            "Browser tab has no active page. Navigate to a URL first.",
-          );
+          return errorResult("Browser tab has no active page. Navigate to a URL first.");
         }
 
         const result = await tab.page.evaluate(expression);
-        const output = typeof result === "string"
-          ? result
-          : JSON.stringify(result, null, 2);
+        const output = typeof result === "string" ? result : JSON.stringify(result, null, 2);
 
         return textResult(
           [
@@ -705,9 +610,7 @@ export const qaStudioTools: StandaloneToolDefinition[] = [
           ].join("\n"),
         );
       } catch (err: unknown) {
-        return errorResult(
-          `Evaluation failed: ${(err as Error).message}`,
-        );
+        return errorResult(`Evaluation failed: ${(err as Error).message}`);
       }
     },
   },
@@ -719,13 +622,8 @@ export const qaStudioTools: StandaloneToolDefinition[] = [
     tier: TIER,
     alwaysEnabled: true,
     inputSchema: {
-      action: z
-        .enum(["list", "switch", "close"])
-        .describe("Tab action to perform"),
-      index: z
-        .number()
-        .optional()
-        .describe("Tab index (required for switch/close)"),
+      action: z.enum(["list", "switch", "close"]).describe("Tab action to perform"),
+      index: z.number().optional().describe("Tab index (required for switch/close)"),
     },
     handler: async (input: never): Promise<CallToolResult> => {
       const { action, index } = input as {
@@ -733,12 +631,9 @@ export const qaStudioTools: StandaloneToolDefinition[] = [
         index?: number;
       };
       try {
-        const {
-          closeTab,
-          getActiveTab,
-          getOrCreateTab,
-          listTabs,
-        } = await import("@/lib/qa-studio/browser-session");
+        const { closeTab, getActiveTab, getOrCreateTab, listTabs } = await import(
+          "@/lib/qa-studio/browser-session"
+        );
 
         switch (action) {
           case "list": {
@@ -748,10 +643,11 @@ export const qaStudioTools: StandaloneToolDefinition[] = [
             }
             const active = getActiveTab();
             const rows = tabList.map(
-              t =>
-                `| ${t.index === active?.index ? "**>>**" : ""} ${t.index} | ${
-                  t.title.slice(0, 40)
-                } | ${t.url.slice(0, 60)} |`,
+              (t) =>
+                `| ${t.index === active?.index ? "**>>**" : ""} ${t.index} | ${t.title.slice(
+                  0,
+                  40,
+                )} | ${t.url.slice(0, 60)} |`,
             );
             return textResult(
               [
@@ -765,18 +661,14 @@ export const qaStudioTools: StandaloneToolDefinition[] = [
           }
           case "switch": {
             if (index === undefined) {
-              return errorResult(
-                "Tab index required for switch action.",
-              );
+              return errorResult("Tab index required for switch action.");
             }
             const result = await getOrCreateTab(index);
             return textResult(`Switched to tab ${result.index}.`);
           }
           case "close": {
             if (index === undefined) {
-              return errorResult(
-                "Tab index required for close action.",
-              );
+              return errorResult("Tab index required for close action.");
             }
             const closed = await closeTab(index);
             return closed
@@ -787,9 +679,7 @@ export const qaStudioTools: StandaloneToolDefinition[] = [
             return errorResult(`Unknown action: ${action}`);
         }
       } catch (err: unknown) {
-        return errorResult(
-          `Tab operation failed: ${(err as Error).message}`,
-        );
+        return errorResult(`Tab operation failed: ${(err as Error).message}`);
       }
     },
   },
@@ -802,15 +692,8 @@ export const qaStudioTools: StandaloneToolDefinition[] = [
     tier: TIER,
     alwaysEnabled: true,
     inputSchema: {
-      target: z
-        .string()
-        .describe(
-          "Test file or directory path (e.g., 'src/lib/mcp')",
-        ),
-      reporter: z
-        .enum(["verbose", "default"])
-        .optional()
-        .describe("Test reporter format"),
+      target: z.string().describe("Test file or directory path (e.g., 'src/lib/mcp')"),
+      reporter: z.enum(["verbose", "default"]).optional().describe("Test reporter format"),
     },
     handler: async (input: never): Promise<CallToolResult> => {
       const { target, reporter } = input as {
@@ -825,12 +708,7 @@ export const qaStudioTools: StandaloneToolDefinition[] = [
 
       const { execFileSync } = await import("node:child_process");
       const reporterVal = reporter ?? "verbose";
-      const args = [
-        "vitest",
-        "run",
-        target,
-        `--reporter=${reporterVal}`,
-      ];
+      const args = ["vitest", "run", target, `--reporter=${reporterVal}`];
 
       try {
         const output = execFileSync("yarn", args, {
@@ -849,7 +727,7 @@ export const qaStudioTools: StandaloneToolDefinition[] = [
           ].join("\n"),
         );
       } catch (err: unknown) {
-        const output = (err as { stdout?: string; }).stdout ?? String(err);
+        const output = (err as { stdout?: string }).stdout ?? String(err);
         return errorResult(
           [
             `## Test Results: FAIL`,
@@ -872,11 +750,7 @@ export const qaStudioTools: StandaloneToolDefinition[] = [
     tier: TIER,
     alwaysEnabled: true,
     inputSchema: {
-      target: z
-        .string()
-        .describe(
-          "Source file or directory to analyze coverage for",
-        ),
+      target: z.string().describe("Source file or directory to analyze coverage for"),
       format: z
         .enum(["summary", "detailed"])
         .optional()
@@ -895,13 +769,7 @@ export const qaStudioTools: StandaloneToolDefinition[] = [
 
       const { execFileSync } = await import("node:child_process");
       const formatVal = format ?? "summary";
-      const args = [
-        "vitest",
-        "run",
-        target,
-        "--coverage",
-        "--coverage.reporter=json-summary",
-      ];
+      const args = ["vitest", "run", target, "--coverage", "--coverage.reporter=json-summary"];
 
       try {
         const output = execFileSync("yarn", args, {
@@ -950,7 +818,7 @@ export const qaStudioTools: StandaloneToolDefinition[] = [
           ].join("\n"),
         );
       } catch (err: unknown) {
-        const output = (err as { stdout?: string; }).stdout ?? String(err);
+        const output = (err as { stdout?: string }).stdout ?? String(err);
         return errorResult(
           [
             `## Coverage Analysis Failed`,
@@ -975,19 +843,13 @@ export const qaStudioTools: StandaloneToolDefinition[] = [
     inputSchema: {},
     handler: async (): Promise<CallToolResult> => {
       try {
-        const { getActiveTab } = await import(
-          "@/lib/qa-studio/browser-session"
-        );
+        const { getActiveTab } = await import("@/lib/qa-studio/browser-session");
         const tab = getActiveTab();
         if (!tab) {
-          return errorResult(
-            "No active browser tab. Use qa_navigate first.",
-          );
+          return errorResult("No active browser tab. Use qa_navigate first.");
         }
         if (!tab.page) {
-          return errorResult(
-            "Browser tab has no active page. Navigate to a URL first.",
-          );
+          return errorResult("Browser tab has no active page. Navigate to a URL first.");
         }
 
         await tab.page.setViewportSize(VIEWPORT_PRESETS.mobile!);
@@ -999,31 +861,21 @@ export const qaStudioTools: StandaloneToolDefinition[] = [
             impact: string;
           }> = [];
 
-          const vhElements = Array.from(
-            document.querySelectorAll("*"),
-          ).filter(el => {
+          const vhElements = Array.from(document.querySelectorAll("*")).filter((el) => {
             const style = (el as HTMLElement).style;
-            return (
-              style.height?.includes("vh")
-              || style.minHeight?.includes("vh")
-            );
+            return style.height?.includes("vh") || style.minHeight?.includes("vh");
           });
 
           if (vhElements.length > 0) {
             issues.push({
               type: "100vh Usage",
-              details:
-                `Found ${vhElements.length} elements with inline 100vh. Use 100dvh for better mobile support.`,
+              details: `Found ${vhElements.length} elements with inline 100vh. Use 100dvh for better mobile support.`,
               impact: "moderate",
             });
           }
 
-          const touchTargets = Array.from(
-            document.querySelectorAll(
-              "button, a, [role='button']",
-            ),
-          );
-          const smallTargets = touchTargets.filter(el => {
+          const touchTargets = Array.from(document.querySelectorAll("button, a, [role='button']"));
+          const smallTargets = touchTargets.filter((el) => {
             const rect = el.getBoundingClientRect();
             return rect.width < 44 || rect.height < 44;
           });
@@ -1036,8 +888,8 @@ export const qaStudioTools: StandaloneToolDefinition[] = [
             });
           }
 
-          const hasHorizontalScroll = document.documentElement.scrollWidth
-            > document.documentElement.clientWidth;
+          const hasHorizontalScroll =
+            document.documentElement.scrollWidth > document.documentElement.clientWidth;
           if (hasHorizontalScroll) {
             issues.push({
               type: "Horizontal Scroll",
@@ -1046,9 +898,7 @@ export const qaStudioTools: StandaloneToolDefinition[] = [
             });
           }
 
-          const viewportMeta = document.querySelector(
-            "meta[name='viewport']",
-          );
+          const viewportMeta = document.querySelector("meta[name='viewport']");
           const content = viewportMeta?.getAttribute("content") || "";
           if (!content.includes("viewport-fit=cover")) {
             issues.push({
@@ -1066,16 +916,12 @@ export const qaStudioTools: StandaloneToolDefinition[] = [
           impact: string;
         }>;
 
-        const lines = audit.map(
-          i => `- **[${i.impact.toUpperCase()}]** ${i.type}: ${i.details}`,
-        );
+        const lines = audit.map((i) => `- **[${i.impact.toUpperCase()}]** ${i.type}: ${i.details}`);
 
         return textResult(
           [
             `## Mobile Compatibility Audit (iPhone 15)`,
-            lines.length > 0
-              ? lines.join("\n")
-              : "No common mobile issues found.",
+            lines.length > 0 ? lines.join("\n") : "No common mobile issues found.",
             "",
             "### Recommendations:",
             "- Use `100dvh` instead of `100vh` for full-screen elements.",
@@ -1085,9 +931,7 @@ export const qaStudioTools: StandaloneToolDefinition[] = [
           ].join("\n"),
         );
       } catch (err: unknown) {
-        return errorResult(
-          `Mobile audit failed: ${(err as Error).message}`,
-        );
+        return errorResult(`Mobile audit failed: ${(err as Error).message}`);
       }
     },
   },
@@ -1097,23 +941,17 @@ export const qaStudioTools: StandaloneToolDefinition[] = [
   // ══════════════════════════════════════════════════════════════════════════
   {
     name: "qa_lighthouse",
-    description: "Run a Lighthouse-style performance audit against a URL. "
-      + "Returns scores per category plus key Core Web Vitals metrics "
-      + "(FCP, LCP, CLS, TBT, TTI) and actionable recommendations.",
+    description:
+      "Run a Lighthouse-style performance audit against a URL. " +
+      "Returns scores per category plus key Core Web Vitals metrics " +
+      "(FCP, LCP, CLS, TBT, TTI) and actionable recommendations.",
     category: CATEGORY_PERF,
     tier: TIER,
     alwaysEnabled: true,
     inputSchema: {
       url: z.string().url().describe("Page URL to audit"),
       categories: z
-        .array(
-          z.enum([
-            "performance",
-            "accessibility",
-            "seo",
-            "best-practices",
-          ]),
-        )
+        .array(z.enum(["performance", "accessibility", "seo", "best-practices"]))
         .optional()
         .describe("Lighthouse categories to audit (default: all four)"),
     },
@@ -1125,29 +963,18 @@ export const qaStudioTools: StandaloneToolDefinition[] = [
         };
         const cats = categories?.length
           ? categories
-          : [
-            "performance",
-            "accessibility",
-            "seo",
-            "best-practices",
-          ];
+          : ["performance", "accessibility", "seo", "best-practices"];
 
         const audit = simulateLighthouseAudit(url, cats);
 
         const scoreRows = Object.entries(audit.scores)
           .map(([cat, score]) => {
-            const badge = score >= 90
-              ? "GOOD"
-              : score >= 50
-              ? "NEEDS WORK"
-              : "POOR";
+            const badge = score >= 90 ? "GOOD" : score >= 50 ? "NEEDS WORK" : "POOR";
             return `| ${cat} | ${score}/100 | ${badge} |`;
           })
           .join("\n");
 
-        const recsText = audit.recommendations
-          .map((r, i) => `${i + 1}. ${r}`)
-          .join("\n");
+        const recsText = audit.recommendations.map((r, i) => `${i + 1}. ${r}`).join("\n");
 
         return textResult(
           [
@@ -1177,9 +1004,9 @@ export const qaStudioTools: StandaloneToolDefinition[] = [
   {
     name: "qa_visual_diff",
     description:
-      "Compare a visual snapshot of a URL against a stored baseline for regression testing. "
-      + "If no baseline_id is provided a new baseline is created and its ID is returned. "
-      + "Returns diff percentage and the list of changed page regions.",
+      "Compare a visual snapshot of a URL against a stored baseline for regression testing. " +
+      "If no baseline_id is provided a new baseline is created and its ID is returned. " +
+      "Returns diff percentage and the list of changed page regions.",
     category: CATEGORY_PERF,
     tier: TIER,
     alwaysEnabled: true,
@@ -1189,8 +1016,8 @@ export const qaStudioTools: StandaloneToolDefinition[] = [
         .string()
         .optional()
         .describe(
-          "Existing baseline ID to compare against. "
-            + "If omitted a new baseline is created and its ID is returned.",
+          "Existing baseline ID to compare against. " +
+            "If omitted a new baseline is created and its ID is returned.",
         ),
     },
     handler: async (input: never): Promise<CallToolResult> =>
@@ -1229,20 +1056,17 @@ export const qaStudioTools: StandaloneToolDefinition[] = [
           );
         }
 
-        const { diffPct, changedRegions } = mockVisualDiff(
-          storedSnapshot,
-          currentId,
-        );
+        const { diffPct, changedRegions } = mockVisualDiff(storedSnapshot, currentId);
 
-        const status = diffPct === 0
-          ? "PASS — no visual changes detected"
-          : diffPct < 5
-          ? "WARN — minor visual changes detected"
-          : "FAIL — significant visual regression detected";
+        const status =
+          diffPct === 0
+            ? "PASS — no visual changes detected"
+            : diffPct < 5
+              ? "WARN — minor visual changes detected"
+              : "FAIL — significant visual regression detected";
 
-        const regionsText = changedRegions.length > 0
-          ? changedRegions.map(r => `  - ${r}`).join("\n")
-          : "  (none)";
+        const regionsText =
+          changedRegions.length > 0 ? changedRegions.map((r) => `  - ${r}`).join("\n") : "  (none)";
 
         return textResult(
           [
@@ -1262,27 +1086,21 @@ export const qaStudioTools: StandaloneToolDefinition[] = [
 
   {
     name: "qa_api_test",
-    description: "Test an API endpoint by sending an HTTP request and inspecting the response. "
-      + "Returns status code, response time, headers, body preview, and a pass/fail "
-      + "result when expected_status is provided.",
+    description:
+      "Test an API endpoint by sending an HTTP request and inspecting the response. " +
+      "Returns status code, response time, headers, body preview, and a pass/fail " +
+      "result when expected_status is provided.",
     category: CATEGORY_PERF,
     tier: TIER,
     alwaysEnabled: true,
     inputSchema: {
       url: z.string().url().describe("API endpoint URL"),
-      method: z
-        .enum(["GET", "POST", "PUT", "DELETE", "PATCH"])
-        .describe("HTTP method"),
-      headers: z
-        .record(z.string(), z.string())
-        .optional()
-        .describe("Optional request headers"),
+      method: z.enum(["GET", "POST", "PUT", "DELETE", "PATCH"]).describe("HTTP method"),
+      headers: z.record(z.string(), z.string()).optional().describe("Optional request headers"),
       body: z
         .string()
         .optional()
-        .describe(
-          "Optional request body (serialised JSON string or plain text)",
-        ),
+        .describe("Optional request body (serialised JSON string or plain text)"),
       expected_status: z
         .number()
         .int()
@@ -1310,9 +1128,7 @@ export const qaStudioTools: StandaloneToolDefinition[] = [
         if (body !== undefined && !["GET", "DELETE"].includes(method)) {
           requestInit.body = body;
           if (!headers?.["Content-Type"]) {
-            (requestInit.headers as Record<string, string>)[
-              "Content-Type"
-            ] = "application/json";
+            (requestInit.headers as Record<string, string>)["Content-Type"] = "application/json";
           }
         }
 
@@ -1331,22 +1147,21 @@ export const qaStudioTools: StandaloneToolDefinition[] = [
         }
 
         const responseTimeMs = Date.now() - start;
-        const bodyText = await response
-          .text()
-          .catch(() => "(unreadable)");
-        const bodyPreview = bodyText.slice(0, 500)
-          + (bodyText.length > 500 ? "\n...(truncated)" : "");
+        const bodyText = await response.text().catch(() => "(unreadable)");
+        const bodyPreview =
+          bodyText.slice(0, 500) + (bodyText.length > 500 ? "\n...(truncated)" : "");
 
         const headerLines = Array.from(response.headers.entries())
           .slice(0, 10)
           .map(([k, v]) => `  ${k}: ${v}`)
           .join("\n");
 
-        const assertionResult = expected_status !== undefined
-          ? response.status === expected_status
-            ? `PASS (got ${response.status}, expected ${expected_status})`
-            : `FAIL (got ${response.status}, expected ${expected_status})`
-          : "N/A (no expected_status provided)";
+        const assertionResult =
+          expected_status !== undefined
+            ? response.status === expected_status
+              ? `PASS (got ${response.status}, expected ${expected_status})`
+              : `FAIL (got ${response.status}, expected ${expected_status})`
+            : "N/A (no expected_status provided)";
 
         return textResult(
           [
@@ -1373,17 +1188,15 @@ export const qaStudioTools: StandaloneToolDefinition[] = [
 
   {
     name: "qa_generate_test",
-    description: "Generate a structured test plan for a URL. "
-      + "Supports unit, integration, e2e, and accessibility test types. "
-      + "Returns an array of test cases each with a description, ordered steps, and expected results.",
+    description:
+      "Generate a structured test plan for a URL. " +
+      "Supports unit, integration, e2e, and accessibility test types. " +
+      "Returns an array of test cases each with a description, ordered steps, and expected results.",
     category: CATEGORY_PERF,
     tier: TIER,
     alwaysEnabled: true,
     inputSchema: {
-      url: z
-        .string()
-        .url()
-        .describe("URL of the page or API endpoint to analyse"),
+      url: z.string().url().describe("URL of the page or API endpoint to analyse"),
       test_type: z
         .enum(["unit", "integration", "e2e", "accessibility"])
         .describe("Type of test plan to generate"),
@@ -1398,9 +1211,7 @@ export const qaStudioTools: StandaloneToolDefinition[] = [
 
         const casesText = cases
           .map((tc, i) => {
-            const stepsText = tc.steps
-              .map((s, si) => `    ${si + 1}. ${s}`)
-              .join("\n");
+            const stepsText = tc.steps.map((s, si) => `    ${si + 1}. ${s}`).join("\n");
             return [
               `### Test Case ${i + 1}: ${tc.description}`,
               ``,

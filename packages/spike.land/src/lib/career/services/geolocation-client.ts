@@ -30,17 +30,13 @@ export async function detectLocation(ip?: string): Promise<GeoLocation> {
   });
 
   if (!response.ok) {
-    throw new Error(
-      `Geolocation API error: ${response.status} ${response.statusText}`,
-    );
+    throw new Error(`Geolocation API error: ${response.status} ${response.statusText}`);
   }
 
   const data = (await response.json()) as IpApiResponse;
 
   if (data.status === "fail") {
-    throw new Error(
-      `Geolocation lookup failed: ${data.message ?? "unknown error"}`,
-    );
+    throw new Error(`Geolocation lookup failed: ${data.message ?? "unknown error"}`);
   }
 
   const location: GeoLocation = {

@@ -27,16 +27,8 @@ interface AbTestProviderProps {
  * React Context provider for A/B testing.
  * All cookie/API logic lives in @/lib/ab-test/assignment.
  */
-export function AbTestProvider({
-  testId,
-  visitorId,
-  children,
-}: AbTestProviderProps) {
+export function AbTestProvider({ testId, visitorId, children }: AbTestProviderProps) {
   const { variant, isLoading } = useAbTestHook(testId, visitorId);
 
-  return (
-    <AbTestContext.Provider value={{ variant, isLoading }}>
-      {children}
-    </AbTestContext.Provider>
-  );
+  return <AbTestContext.Provider value={{ variant, isLoading }}>{children}</AbTestContext.Provider>;
 }

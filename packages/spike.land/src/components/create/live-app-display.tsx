@@ -20,12 +20,7 @@ interface LiveAppDisplayProps {
   className?: string;
 }
 
-export function LiveAppDisplay({
-  codespaceId,
-  title,
-  slug,
-  className,
-}: LiveAppDisplayProps) {
+export function LiveAppDisplay({ codespaceId, title, slug, className }: LiveAppDisplayProps) {
   const [iframeKey, setIframeKey] = useState(0);
   const [loading, setLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
@@ -40,16 +35,16 @@ export function LiveAppDisplay({
     setIsRebuilding(false);
     rebuildAttemptedRef.current = false;
     setUseRebuildSrc(false);
-    setIframeKey(prev => prev + 1);
+    setIframeKey((prev) => prev + 1);
   }, []);
 
   // Listen for error messages from the sandboxed bundle iframe
   useEffect(() => {
     function handleMessage(event: MessageEvent): void {
       if (
-        event.data?.type !== "iframe-error"
-        || event.data?.source !== "spike-land-bundle"
-        || event.data?.codeSpace !== codespaceId
+        event.data?.type !== "iframe-error" ||
+        event.data?.source !== "spike-land-bundle" ||
+        event.data?.codeSpace !== codespaceId
       ) {
         return;
       }
@@ -61,7 +56,7 @@ export function LiveAppDisplay({
         setIsRebuilding(true);
         setLoading(true);
         setUseRebuildSrc(true);
-        setIframeKey(prev => prev + 1);
+        setIframeKey((prev) => prev + 1);
       } else {
         // Rebuild also failed: show error UI
         setIsRebuilding(false);
@@ -77,9 +72,7 @@ export function LiveAppDisplay({
   const iframeSrc = `/api/codespace/${codespaceId}/bundle${useRebuildSrc ? "?rebuild=true" : ""}`;
 
   return (
-    <div
-      className={cn("flex flex-col h-[calc(100dvh-4rem)] w-full", className)}
-    >
+    <div className={cn("flex flex-col h-[calc(100dvh-4rem)] w-full", className)}>
       <div className="flex items-center justify-between px-4 py-2.5 border-b bg-card">
         <div className="flex items-center gap-4">
           <Link
@@ -89,9 +82,7 @@ export function LiveAppDisplay({
             <ArrowLeft className="w-5 h-5 transition-transform duration-200 group-hover/back:-translate-x-0.5" />
             <span className="flex flex-col leading-tight">
               <span>All Apps</span>
-              <span className="text-[10px] font-normal opacity-75">
-                /create
-              </span>
+              <span className="text-[10px] font-normal opacity-75">/create</span>
             </span>
           </Link>
           <div className="h-8 w-px bg-border" />
@@ -144,9 +135,7 @@ export function LiveAppDisplay({
             <div className="flex flex-col items-center gap-3">
               <div className="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full" />
               {isRebuilding && (
-                <span className="text-sm text-muted-foreground">
-                  Rebuilding app...
-                </span>
+                <span className="text-sm text-muted-foreground">Rebuilding app...</span>
               )}
             </div>
           </div>

@@ -125,8 +125,20 @@ describe("type shape validation", () => {
   it("QaNetworkResult with multiple requests", () => {
     const result: QaNetworkResult = {
       requests: [
-        { url: "https://example.com/a", method: "GET", resourceType: "document", status: 200, contentLength: "500" },
-        { url: "https://example.com/b", method: "POST", resourceType: "fetch", status: 500, contentLength: "0" },
+        {
+          url: "https://example.com/a",
+          method: "GET",
+          resourceType: "document",
+          status: 200,
+          contentLength: "500",
+        },
+        {
+          url: "https://example.com/b",
+          method: "POST",
+          resourceType: "fetch",
+          status: 500,
+          contentLength: "0",
+        },
       ],
       totalSize: 500,
       errorCount: 1,

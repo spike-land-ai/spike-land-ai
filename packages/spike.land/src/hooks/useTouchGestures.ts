@@ -138,9 +138,7 @@ export function useTouchGestures(
       const deltaY = Math.abs(touch.clientY - touchStateRef.current.startY);
 
       // Cancel long press if moved too much
-      if (
-        deltaX > LONG_PRESS_MOVE_THRESHOLD || deltaY > LONG_PRESS_MOVE_THRESHOLD
-      ) {
+      if (deltaX > LONG_PRESS_MOVE_THRESHOLD || deltaY > LONG_PRESS_MOVE_THRESHOLD) {
         hasMoved.current = true;
         clearLongPressTimer();
       }
@@ -206,10 +204,7 @@ export function useTouchGestures(
       }
 
       // Check for tap (no significant movement)
-      if (
-        absDeltaX < LONG_PRESS_MOVE_THRESHOLD
-        && absDeltaY < LONG_PRESS_MOVE_THRESHOLD
-      ) {
+      if (absDeltaX < LONG_PRESS_MOVE_THRESHOLD && absDeltaY < LONG_PRESS_MOVE_THRESHOLD) {
         const now = Date.now();
         const timeSinceLastTap = now - lastTapTimeRef.current;
 

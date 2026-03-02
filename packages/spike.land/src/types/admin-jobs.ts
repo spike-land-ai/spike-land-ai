@@ -90,9 +90,7 @@ export interface UnifiedJob {
 
   // Crop data (enhancement jobs only)
   wasCropped?: boolean;
-  cropDimensions?:
-    | { left: number; top: number; width: number; height: number; }
-    | null;
+  cropDimensions?: { left: number; top: number; width: number; height: number } | null;
 
   // Pipeline (enhancement jobs only)
   currentStage?: string | null;

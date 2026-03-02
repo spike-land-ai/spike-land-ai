@@ -92,7 +92,7 @@ export async function generateDeviceCode(
  */
 export async function verifyUserCode(
   userCode: string,
-): Promise<{ valid: boolean; clientName?: string; expiresAt?: Date; }> {
+): Promise<{ valid: boolean; clientName?: string; expiresAt?: Date }> {
   const record = await prisma.deviceAuthorizationCode.findUnique({
     where: { userCode },
     select: {
@@ -117,10 +117,7 @@ export async function verifyUserCode(
  * Approve a device code on behalf of a user.
  * Uses atomic updateMany (same pattern as exchangeAuthorizationCode) to prevent TOCTOU.
  */
-export async function approveDeviceCode(
-  userCode: string,
-  userId: string,
-): Promise<boolean> {
+export async function approveDeviceCode(userCode: string, userId: string): Promise<boolean> {
   const updated = await prisma.deviceAuthorizationCode.updateMany({
     where: {
       userCode,
@@ -154,27 +151,24 @@ export async function denyDeviceCode(userCode: string): Promise<boolean> {
 }
 
 type PollResult =
-  | { status: "authorization_pending"; }
-  | { status: "slow_down"; interval: number; }
-  | { status: "access_denied"; }
-  | { status: "expired_token"; }
+  | { status: "authorization_pending" }
+  | { status: "slow_down"; interval: number }
+  | { status: "access_denied" }
+  | { status: "expired_token" }
   | {
-    status: "approved";
-    accessToken: string;
-    refreshToken: string;
-    expiresIn: number;
-    tokenType: string;
-    scope: string;
-  };
+      status: "approved";
+      accessToken: string;
+      refreshToken: string;
+      expiresIn: number;
+      tokenType: string;
+      scope: string;
+    };
 
 /**
  * Poll for device code status. Called by the MCP client.
  * Returns token pair when approved, or error status otherwise.
  */
-export async function pollDeviceCode(
-  deviceCode: string,
-  clientId: string,
-): Promise<PollResult> {
+export async function pollDeviceCode(deviceCode: string, clientId: string): Promise<PollResult> {
   const deviceCodeHash = hashDeviceCode(deviceCode);
 
   const record = await prisma.deviceAuthorizationCode.findUnique({
@@ -231,11 +225,7 @@ export async function pollDeviceCode(
 
       try {
         // Generate token pair
-        const tokens = await generateTokenPair(
-          record.userId,
-          record.clientId,
-          record.scope,
-        );
+        const tokens = await generateTokenPair(record.userId, record.clientId, record.scope);
 
         // Mark as used by deleting the record
         await prisma.deviceAuthorizationCode.delete({

@@ -38,9 +38,8 @@ async function main() {
     select: { imageId: true },
   });
 
-  const albumImageIds = new Set(albumImages.map(ai => ai.imageId));
-  const orphanedImageIds = allImages.filter(img => !albumImageIds.has(img.id))
-    .map(i => i.id);
+  const albumImageIds = new Set(albumImages.map((ai) => ai.imageId));
+  const orphanedImageIds = allImages.filter((img) => !albumImageIds.has(img.id)).map((i) => i.id);
 
   console.log(`Found ${orphanedImageIds.length} orphaned images.`);
 
@@ -76,9 +75,7 @@ async function main() {
     });
   }
 
-  console.log(
-    `Moving images to album: ${targetAlbum.name} (${targetAlbum.id})`,
-  );
+  console.log(`Moving images to album: ${targetAlbum.name} (${targetAlbum.id})`);
 
   // Move images
   let movedCount = 0;
@@ -104,7 +101,7 @@ async function main() {
 }
 
 main()
-  .catch(e => {
+  .catch((e) => {
     console.error(e);
     process.exit(1);
   })

@@ -13,28 +13,28 @@ vi.mock("@/lib/prisma", () => ({ default: mockPrisma }));
 import { calculateTrend, getErrorStats, getInitialErrorData } from "./errors";
 
 describe("calculateTrend", () => {
-  it("returns \"up\" when current exceeds previous by more than 10%", () => {
+  it('returns "up" when current exceeds previous by more than 10%', () => {
     expect(calculateTrend(120, 100)).toBe("up");
     expect(calculateTrend(200, 100)).toBe("up");
   });
 
-  it("returns \"down\" when current is below previous by more than 10%", () => {
+  it('returns "down" when current is below previous by more than 10%', () => {
     expect(calculateTrend(80, 100)).toBe("down");
     expect(calculateTrend(50, 100)).toBe("down");
   });
 
-  it("returns \"stable\" when change is within 10%", () => {
+  it('returns "stable" when change is within 10%', () => {
     expect(calculateTrend(105, 100)).toBe("stable");
     expect(calculateTrend(95, 100)).toBe("stable");
     expect(calculateTrend(100, 100)).toBe("stable");
   });
 
-  it("returns \"up\" when previous is 0 but current is positive", () => {
+  it('returns "up" when previous is 0 but current is positive', () => {
     expect(calculateTrend(5, 0)).toBe("up");
     expect(calculateTrend(1, 0)).toBe("up");
   });
 
-  it("returns \"stable\" when both are 0", () => {
+  it('returns "stable" when both are 0', () => {
     expect(calculateTrend(0, 0)).toBe("stable");
   });
 });
@@ -71,9 +71,7 @@ describe("getInitialErrorData", () => {
 
   it("calculates totalPages correctly for non-even totals", async () => {
     mockPrisma.errorLog.findMany.mockResolvedValue([]);
-    mockPrisma.errorLog.count
-      .mockResolvedValueOnce(75)
-      .mockResolvedValueOnce(10);
+    mockPrisma.errorLog.count.mockResolvedValueOnce(75).mockResolvedValueOnce(10);
 
     const result = await getInitialErrorData();
 
@@ -82,9 +80,7 @@ describe("getInitialErrorData", () => {
 
   it("handles zero total", async () => {
     mockPrisma.errorLog.findMany.mockResolvedValue([]);
-    mockPrisma.errorLog.count
-      .mockResolvedValueOnce(0)
-      .mockResolvedValueOnce(0);
+    mockPrisma.errorLog.count.mockResolvedValueOnce(0).mockResolvedValueOnce(0);
 
     const result = await getInitialErrorData();
 
@@ -105,9 +101,7 @@ describe("getErrorStats", () => {
         { sourceFile: "index.ts", _count: { sourceFile: 10 } },
         { sourceFile: "app.ts", _count: { sourceFile: 5 } },
       ]) // topFiles
-      .mockResolvedValueOnce([
-        { errorType: "TypeError", _count: { errorType: 8 } },
-      ]) // topErrors
+      .mockResolvedValueOnce([{ errorType: "TypeError", _count: { errorType: 8 } }]) // topErrors
       .mockResolvedValueOnce([
         { environment: "production", _count: { environment: 30 } },
         { environment: "development", _count: { environment: 20 } },
@@ -129,9 +123,7 @@ describe("getErrorStats", () => {
       .mockResolvedValueOnce(0);
 
     mockPrisma.errorLog.groupBy
-      .mockResolvedValueOnce([
-        { sourceFile: "utils.ts", _count: { sourceFile: 3 } },
-      ])
+      .mockResolvedValueOnce([{ sourceFile: "utils.ts", _count: { sourceFile: 3 } }])
       .mockResolvedValueOnce([])
       .mockResolvedValueOnce([]);
 
@@ -171,9 +163,7 @@ describe("getErrorStats", () => {
     mockPrisma.errorLog.groupBy
       .mockResolvedValueOnce([])
       .mockResolvedValueOnce([])
-      .mockResolvedValueOnce([
-        { environment: "staging", _count: { environment: 12 } },
-      ]);
+      .mockResolvedValueOnce([{ environment: "staging", _count: { environment: 12 } }]);
 
     const result = await getErrorStats();
 

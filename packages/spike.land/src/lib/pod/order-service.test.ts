@@ -234,9 +234,7 @@ describe("order-service", () => {
       const { updateOrderFromWebhook } = await import("./order-service");
       await updateOrderFromWebhook("unknown-id", "PRODIGI", "shipped");
 
-      expect(mockLogger.warn).toHaveBeenCalledWith(
-        expect.stringContaining("No order items found"),
-      );
+      expect(mockLogger.warn).toHaveBeenCalledWith(expect.stringContaining("No order items found"));
     });
 
     it("should update order status and create event for status update", async () => {
@@ -254,16 +252,12 @@ describe("order-service", () => {
         merchShipment: { findFirst: vi.fn(), create: vi.fn() },
         merchOrderEvent: { create: vi.fn() },
       };
-      mockPrisma.$transaction.mockImplementation(
-        async (fn: (tx: typeof txMock) => Promise<void>) => fn(txMock),
+      mockPrisma.$transaction.mockImplementation(async (fn: (tx: typeof txMock) => Promise<void>) =>
+        fn(txMock),
       );
 
       const { updateOrderFromWebhook } = await import("./order-service");
-      await updateOrderFromWebhook(
-        "prod-123",
-        "PRODIGI",
-        "in_production",
-      );
+      await updateOrderFromWebhook("prod-123", "PRODIGI", "in_production");
 
       expect(txMock.merchOrder.update).toHaveBeenCalledWith({
         where: { id: "order-1" },
@@ -290,8 +284,8 @@ describe("order-service", () => {
         },
         merchOrderEvent: { create: vi.fn() },
       };
-      mockPrisma.$transaction.mockImplementation(
-        async (fn: (tx: typeof txMock) => Promise<void>) => fn(txMock),
+      mockPrisma.$transaction.mockImplementation(async (fn: (tx: typeof txMock) => Promise<void>) =>
+        fn(txMock),
       );
 
       const { updateOrderFromWebhook } = await import("./order-service");
@@ -328,8 +322,8 @@ describe("order-service", () => {
         merchOrder: { update: vi.fn() },
         merchOrderEvent: { create: vi.fn() },
       };
-      mockPrisma.$transaction.mockImplementation(
-        async (fn: (tx: typeof txMock) => Promise<void>) => fn(txMock),
+      mockPrisma.$transaction.mockImplementation(async (fn: (tx: typeof txMock) => Promise<void>) =>
+        fn(txMock),
       );
 
       const { updateOrderFromWebhook } = await import("./order-service");

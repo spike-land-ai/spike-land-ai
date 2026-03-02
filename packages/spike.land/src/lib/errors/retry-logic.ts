@@ -29,13 +29,13 @@ const DEFAULT_RETRY_OPTIONS: Required<RetryOptions> = {
     // Default: retry on network errors, timeouts, and 5xx errors
     const errorMessage = error.message.toLowerCase();
     return (
-      errorMessage.includes("network")
-      || errorMessage.includes("timeout")
-      || errorMessage.includes("503")
-      || errorMessage.includes("502")
-      || errorMessage.includes("500")
-      || errorMessage.includes("fetch failed")
-      || errorMessage.includes("econnrefused")
+      errorMessage.includes("network") ||
+      errorMessage.includes("timeout") ||
+      errorMessage.includes("503") ||
+      errorMessage.includes("502") ||
+      errorMessage.includes("500") ||
+      errorMessage.includes("fetch failed") ||
+      errorMessage.includes("econnrefused")
     );
   },
   onRetry: (_error: Error, _attempt: number, _delayMs: number) => {
@@ -53,8 +53,7 @@ function calculateDelay(
   backoffMultiplier: number,
 ): number {
   // Exponential backoff: initialDelay * (multiplier ^ attempt)
-  const exponentialDelay = initialDelayMs
-    * Math.pow(backoffMultiplier, attempt);
+  const exponentialDelay = initialDelayMs * Math.pow(backoffMultiplier, attempt);
 
   // Add random jitter (±25%) to prevent thundering herd
   const jitter = exponentialDelay * 0.25 * (Math.random() * 2 - 1);
@@ -169,7 +168,5 @@ export async function retryBatch<T>(
   operations: Array<() => Promise<T>>,
   options: RetryOptions = {},
 ): Promise<Array<RetryResult<T>>> {
-  return Promise.all(
-    operations.map(operation => retryWithBackoff(operation, options)),
-  );
+  return Promise.all(operations.map((operation) => retryWithBackoff(operation, options)));
 }

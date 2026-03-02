@@ -24,9 +24,7 @@ export function MarkdownBlock({ content }: MarkdownBlockProps) {
     <section className="w-full py-16 px-6 md:px-12 lg:px-24">
       <div className="max-w-3xl mx-auto">
         <div className="prose dark:prose-invert max-w-none">
-          <ReactMarkdown remarkPlugins={[remarkGfm]}>
-            {data.content}
-          </ReactMarkdown>
+          <ReactMarkdown remarkPlugins={[remarkGfm]}>{data.content}</ReactMarkdown>
         </div>
       </div>
     </section>

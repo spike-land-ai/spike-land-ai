@@ -40,11 +40,7 @@ const DEDUP_WINDOW_MS = 60_000;
 const MAX_DEDUP_ENTRIES = 100;
 
 // Stack trace patterns to skip (internal logging infrastructure)
-const STACK_SKIP_PATTERNS = [
-  "console-capture",
-  "structured-logger",
-  "node_modules",
-];
+const STACK_SKIP_PATTERNS = ["console-capture", "structured-logger", "node_modules"];
 
 function getErrorFingerprint(error: CapturedError): string {
   return `${error.message}:${error.sourceFile || ""}:${error.sourceLine || ""}`;
@@ -82,11 +78,7 @@ function isFromStructuredLogger(): boolean {
  * Get base URL for internal API calls
  */
 function getBaseUrl(): string {
-  return (
-    process.env.NEXTAUTH_URL
-    || process.env.NEXT_PUBLIC_APP_URL
-    || "http://localhost:3000"
-  );
+  return process.env.NEXTAUTH_URL || process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
 }
 
 /**
@@ -104,7 +96,7 @@ function parseStackTrace(stack?: string): {
   for (let i = 1; i < lines.length; i++) {
     const line = lines[i];
     if (!line) continue;
-    if (STACK_SKIP_PATTERNS.some(pattern => line.includes(pattern))) {
+    if (STACK_SKIP_PATTERNS.some((pattern) => line.includes(pattern))) {
       continue;
     }
 
@@ -143,10 +135,7 @@ async function flushErrors(): Promise<void> {
     });
   } catch (error) {
     // Log to original console to avoid infinite loop
-    originalConsoleError?.(
-      "[ServerConsoleCapture] Failed to flush errors:",
-      error,
-    );
+    originalConsoleError?.("[ServerConsoleCapture] Failed to flush errors:", error);
   }
 }
 
@@ -205,7 +194,7 @@ export function initializeServerConsoleCapture(): void {
       errorType = firstArg.name;
     } else {
       message = args
-        .map(arg => (typeof arg === "object") ? JSON.stringify(arg) : String(arg))
+        .map((arg) => (typeof arg === "object" ? JSON.stringify(arg) : String(arg)))
         .join(" ");
       stack = new Error().stack;
       errorType = "ConsoleError";

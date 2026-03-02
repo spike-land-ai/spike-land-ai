@@ -16,10 +16,7 @@ const FALLBACK_COLORS = {
   text: "text-zinc-400",
 };
 
-const COLOR_CLASSES: Record<
-  string,
-  { bg: string; border: string; icon: string; text: string; }
-> = {
+const COLOR_CLASSES: Record<string, { bg: string; border: string; icon: string; text: string }> = {
   blue: {
     bg: "bg-blue-500/10",
     border: "border-blue-500/20 hover:border-blue-500/40",
@@ -64,20 +61,16 @@ const COLOR_CLASSES: Record<
   },
 };
 
-export function McpCategoryGrid(
-  { selectedCategory, onCategorySelect }: McpCategoryGridProps,
-) {
+export function McpCategoryGrid({ selectedCategory, onCategorySelect }: McpCategoryGridProps) {
   return (
     <section className="px-4 pb-12">
       <div className="max-w-7xl mx-auto">
-        <h2 className="text-xl font-black text-white mb-6">
-          Browse by Category
-        </h2>
+        <h2 className="text-xl font-black text-white mb-6">Browse by Category</h2>
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
-          {MCP_SUPER_CATEGORIES.map(sup => {
+          {MCP_SUPER_CATEGORIES.map((sup) => {
             const colors = COLOR_CLASSES[sup.color] ?? FALLBACK_COLORS;
             const Icon = ICON_MAP[sup.icon] as
-              | React.ComponentType<{ className?: string; }>
+              | React.ComponentType<{ className?: string }>
               | undefined;
             const isSelected = selectedCategory === sup.id;
 
@@ -98,9 +91,7 @@ export function McpCategoryGrid(
                   {Icon && <Icon className={`w-5 h-5 ${colors.icon}`} />}
                 </div>
 
-                <p className="font-semibold text-white text-sm leading-tight mb-1">
-                  {sup.name}
-                </p>
+                <p className="font-semibold text-white text-sm leading-tight mb-1">{sup.name}</p>
                 <p className="text-xs text-zinc-500 leading-snug line-clamp-2 mb-2">
                   {sup.description}
                 </p>
@@ -110,7 +101,7 @@ export function McpCategoryGrid(
                     {sup.toolCount} tools
                   </span>
                   <div className="flex flex-wrap gap-1">
-                    {sup.subcategories.slice(0, 2).map(sub => (
+                    {sup.subcategories.slice(0, 2).map((sub) => (
                       <span
                         key={sub.id}
                         className="text-[9px] px-1.5 py-0.5 rounded bg-white/[0.05] text-zinc-500"

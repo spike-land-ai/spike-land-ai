@@ -1,9 +1,7 @@
 "use client";
 import { useEffect, useRef } from "react";
 
-function VideoPlayer(
-  { stream, muted = false }: { stream: MediaStream; muted?: boolean; },
-) {
+function VideoPlayer({ stream, muted = false }: { stream: MediaStream; muted?: boolean }) {
   const ref = useRef<HTMLVideoElement>(null);
   useEffect(() => {
     if (ref.current && stream) {
@@ -28,14 +26,9 @@ interface VideoOverlayProps {
   remoteStreams: Map<string, MediaStream>;
 }
 
-export function VideoOverlay(
-  { localStream, remoteStreams }: VideoOverlayProps,
-) {
+export function VideoOverlay({ localStream, remoteStreams }: VideoOverlayProps) {
   return (
-    <div
-      className="fixed top-4 right-4 flex flex-col gap-2 z-50"
-      data-testid="video-overlay"
-    >
+    <div className="fixed top-4 right-4 flex flex-col gap-2 z-50" data-testid="video-overlay">
       {localStream && (
         <div className="relative">
           <VideoPlayer stream={localStream} muted />

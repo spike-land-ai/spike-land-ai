@@ -14,9 +14,15 @@ import type { ToolDefinition } from "./registry";
 function makeRegisteredTool(enabled = false): RegisteredTool {
   let _enabled = enabled;
   return {
-    enable: () => { _enabled = true; },
-    disable: () => { _enabled = false; },
-    get enabled() { return _enabled; },
+    enable: () => {
+      _enabled = true;
+    },
+    disable: () => {
+      _enabled = false;
+    },
+    get enabled() {
+      return _enabled;
+    },
     update: vi.fn(),
     remove: vi.fn(),
     handler: vi.fn(),
@@ -82,7 +88,7 @@ describe("ToolSearch.search", () => {
     ]);
 
     const results = search.search(tools, "upload");
-    expect(results.some(r => r.name === "upload_file")).toBe(true);
+    expect(results.some((r) => r.name === "upload_file")).toBe(true);
   });
 
   it("finds tool by category keyword", () => {
@@ -96,8 +102,8 @@ describe("ToolSearch.search", () => {
     ]);
 
     const results = search.search(tools, "chat");
-    expect(results.some(r => r.name === "send_message")).toBe(true);
-    expect(results.some(r => r.name === "upload_file")).toBe(false);
+    expect(results.some((r) => r.name === "send_message")).toBe(true);
+    expect(results.some((r) => r.name === "upload_file")).toBe(false);
   });
 
   it("finds tool by description keyword", () => {
@@ -111,7 +117,7 @@ describe("ToolSearch.search", () => {
     ]);
 
     const results = search.search(tools, "csv");
-    expect(results.some(r => r.name === "bulk_export")).toBe(true);
+    expect(results.some((r) => r.name === "bulk_export")).toBe(true);
   });
 
   it("excludes gateway-meta tools from results", () => {
@@ -125,7 +131,7 @@ describe("ToolSearch.search", () => {
     ]);
 
     const results = search.search(tools, "search");
-    expect(results.some(r => r.name === "search_tools")).toBe(false);
+    expect(results.some((r) => r.name === "search_tools")).toBe(false);
   });
 
   it("respects limit parameter", () => {
@@ -167,13 +173,23 @@ describe("ToolSearch.search", () => {
     search.index("disabled_tool", "test", "A disabled test tool");
 
     const tools = makeToolMap([
-      { name: "enabled_tool", category: "test", description: "An enabled test tool", enabled: true },
-      { name: "disabled_tool", category: "test", description: "A disabled test tool", enabled: false },
+      {
+        name: "enabled_tool",
+        category: "test",
+        description: "An enabled test tool",
+        enabled: true,
+      },
+      {
+        name: "disabled_tool",
+        category: "test",
+        description: "A disabled test tool",
+        enabled: false,
+      },
     ]);
 
     const results = search.search(tools, "test tool");
-    const enabledResult = results.find(r => r.name === "enabled_tool");
-    const disabledResult = results.find(r => r.name === "disabled_tool");
+    const enabledResult = results.find((r) => r.name === "enabled_tool");
+    const disabledResult = results.find((r) => r.name === "disabled_tool");
 
     expect(enabledResult?.enabled).toBe(true);
     expect(disabledResult?.enabled).toBe(false);
@@ -212,12 +228,16 @@ describe("ToolSearch.searchSemantic", () => {
     search.index("send_chat", "chat", "Send a message to a user");
 
     const tools = makeToolMap([
-      { name: "store_document", category: "storage", description: "Save a document to cloud storage" },
+      {
+        name: "store_document",
+        category: "storage",
+        description: "Save a document to cloud storage",
+      },
       { name: "send_chat", category: "chat", description: "Send a message to a user" },
     ]);
 
     const results = search.searchSemantic(tools, "save file to storage");
-    expect(results.some(r => r.name === "store_document")).toBe(true);
+    expect(results.some((r) => r.name === "store_document")).toBe(true);
   });
 
   it("excludes gateway-meta tools", () => {
@@ -231,7 +251,7 @@ describe("ToolSearch.searchSemantic", () => {
     ]);
 
     const results = search.searchSemantic(tools, "search find");
-    expect(results.some(r => r.name === "search_tools")).toBe(false);
+    expect(results.some((r) => r.name === "search_tools")).toBe(false);
   });
 
   it("includes score in results", () => {
@@ -255,7 +275,11 @@ describe("ToolSearch.searchSemantic", () => {
 
     for (let i = 0; i < 20; i++) {
       search.index(`file_${i}`, "storage", `Upload file number ${i} to storage`);
-      tools.push({ name: `file_${i}`, category: "storage", description: `Upload file number ${i} to storage` });
+      tools.push({
+        name: `file_${i}`,
+        category: "storage",
+        description: `Upload file number ${i} to storage`,
+      });
     }
 
     const results = search.searchSemantic(makeToolMap(tools), "file storage", 3);

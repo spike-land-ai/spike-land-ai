@@ -79,7 +79,7 @@ describe("pipeline-validation", () => {
             },
           ],
         },
-      } as any;
+      } as unknown as Parameters<typeof validatePipelineConfigs>[0];
       const result = validatePipelineConfigs(data);
       expect(result.valid).toBe(true);
       expect(result.validatedData?.promptConfig).toEqual(data.promptConfig);
@@ -106,9 +106,7 @@ describe("pipeline-validation", () => {
       };
       const result = validatePipelineConfigs(data);
       expect(result.valid).toBe(true);
-      expect(result.validatedData?.generationConfig).toEqual(
-        data.generationConfig,
-      );
+      expect(result.validatedData?.generationConfig).toEqual(data.generationConfig);
     });
 
     it("catches invalid generationConfig", () => {

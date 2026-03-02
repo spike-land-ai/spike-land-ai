@@ -14,7 +14,7 @@ interface BrandCompetitorCardProps {
   logoInitial: string;
 }
 
-const sentimentConfig: Record<Sentiment, { label: string; badgeClass: string; barClass: string; }> =
+const sentimentConfig: Record<Sentiment, { label: string; badgeClass: string; barClass: string }> =
   {
     positive: {
       label: "Positive",
@@ -51,18 +51,11 @@ export function BrandCompetitorCard({
             className="h-9 w-9 rounded-full bg-zinc-700 border border-zinc-600 flex items-center justify-center shrink-0"
             aria-hidden="true"
           >
-            <span className="text-sm font-bold text-zinc-200 uppercase">
-              {logoInitial}
-            </span>
+            <span className="text-sm font-bold text-zinc-200 uppercase">{logoInitial}</span>
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-semibold text-zinc-100 truncate">
-              {name}
-            </p>
-            <Badge
-              variant="outline"
-              className={cn("text-xs mt-0.5", config.badgeClass)}
-            >
+            <p className="text-sm font-semibold text-zinc-100 truncate">{name}</p>
+            <Badge variant="outline" className={cn("text-xs mt-0.5", config.badgeClass)}>
               {config.label}
             </Badge>
           </div>
@@ -84,10 +77,7 @@ export function BrandCompetitorCard({
         </div>
         <div className="flex items-center gap-2 text-xs text-zinc-500">
           <span>Top keyword:</span>
-          <Badge
-            variant="outline"
-            className="text-xs text-zinc-400 border-zinc-700"
-          >
+          <Badge variant="outline" className="text-xs text-zinc-400 border-zinc-700">
             {topKeyword}
           </Badge>
         </div>

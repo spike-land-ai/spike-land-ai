@@ -9,20 +9,17 @@ interface CleanAchievementCardProps {
   achievement: CleaningAchievement;
 }
 
-export function CleanAchievementCard(
-  { achievement }: CleanAchievementCardProps,
-) {
+export function CleanAchievementCard({ achievement }: CleanAchievementCardProps) {
   const unlocked = !!achievement.unlockedAt;
 
   return (
-    <Card
-      variant={unlocked ? "green" : "solid"}
-      className={cn(!unlocked && "opacity-50")}
-    >
+    <Card variant={unlocked ? "green" : "solid"} className={cn(!unlocked && "opacity-50")}>
       <CardContent className="flex flex-col items-center gap-2 p-4 text-center">
-        {unlocked
-          ? <Trophy className="h-8 w-8 text-yellow-300" />
-          : <Lock className="h-8 w-8 text-muted-foreground" />}
+        {unlocked ? (
+          <Trophy className="h-8 w-8 text-yellow-300" />
+        ) : (
+          <Lock className="h-8 w-8 text-muted-foreground" />
+        )}
         <p className="font-semibold text-sm">{achievement.name}</p>
         <p className="text-xs text-white/70">{achievement.description}</p>
         {unlocked && achievement.unlockedAt && (

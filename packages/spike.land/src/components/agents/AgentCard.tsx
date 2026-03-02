@@ -2,13 +2,7 @@
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -58,13 +52,7 @@ const statusConfig = {
   },
 };
 
-export function AgentCard({
-  agent,
-  onRename,
-  onSendTask,
-  onDisconnect,
-  onDelete,
-}: AgentCardProps) {
+export function AgentCard({ agent, onRename, onSendTask, onDisconnect, onDelete }: AgentCardProps) {
   const status = statusConfig[agent.status];
 
   // Calculate time since last seen
@@ -87,8 +75,8 @@ export function AgentCard({
   // Get top tools used
   const topTools = agent.toolStats
     ? Object.entries(agent.toolStats)
-      .sort(([, a], [, b]) => b - a)
-      .slice(0, 3)
+        .sort(([, a], [, b]) => b - a)
+        .slice(0, 3)
     : [];
 
   return (
@@ -103,20 +91,13 @@ export function AgentCard({
           <div className="flex items-center gap-3">
             {/* Status indicator */}
             <div className="relative">
-              <div
-                className={cn(
-                  "h-3 w-3 rounded-full",
-                  status.dotClass,
-                )}
-              />
+              <div className={cn("h-3 w-3 rounded-full", status.dotClass)} />
               {agent.status === "online" && (
                 <div className="absolute inset-0 h-3 w-3 animate-ping rounded-full bg-aurora-green/50" />
               )}
             </div>
             <div>
-              <CardTitle className="text-base font-semibold">
-                {agent.displayName}
-              </CardTitle>
+              <CardTitle className="text-base font-semibold">{agent.displayName}</CardTitle>
               <CardDescription className="text-xs">
                 {agent.machineId.slice(0, 8)}...
               </CardDescription>
@@ -157,10 +138,7 @@ export function AgentCard({
                     Disconnect
                   </DropdownMenuItem>
                 )}
-                <DropdownMenuItem
-                  onClick={() => onDelete?.(agent)}
-                  className="text-destructive"
-                >
+                <DropdownMenuItem onClick={() => onDelete?.(agent)} className="text-destructive">
                   <Trash2 className="mr-2 h-4 w-4" />
                   Delete
                 </DropdownMenuItem>
@@ -211,9 +189,7 @@ export function AgentCard({
         {/* Recent activity */}
         {agent.recentActivity && agent.recentActivity.length > 0 && (
           <div className="space-y-1">
-            <p className="text-xs font-medium text-muted-foreground">
-              Recent Activity
-            </p>
+            <p className="text-xs font-medium text-muted-foreground">Recent Activity</p>
             <div className="space-y-1">
               {agent.recentActivity.slice(0, 2).map((activity, i) => (
                 <p
@@ -230,12 +206,7 @@ export function AgentCard({
 
         {/* Action buttons */}
         <div className="flex gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            className="flex-1"
-            asChild
-          >
+          <Button variant="outline" size="sm" className="flex-1" asChild>
             <Link href={`/agents/${agent.id}`}>
               <MessageSquare className="mr-2 h-4 w-4" />
               Chat

@@ -26,9 +26,7 @@ export class AIDecisionLogger {
   /**
    * Create an AI decision log entry
    */
-  static async log(
-    options: CreateAIDecisionLogOptions,
-  ): Promise<string | null> {
+  static async log(options: CreateAIDecisionLogOptions): Promise<string | null> {
     const { data, error } = await tryCatch(
       prisma.aIDecisionLog.create({
         data: {
@@ -36,9 +34,13 @@ export class AIDecisionLogger {
           ...(options.userId !== undefined ? { userId: options.userId } : {}),
           requestType: options.requestType,
           ...(options.inputPrompt !== undefined ? { inputPrompt: options.inputPrompt } : {}),
-          ...(options.inputContext !== undefined ? { inputContext: options.inputContext as object } : {}),
+          ...(options.inputContext !== undefined
+            ? { inputContext: options.inputContext as object }
+            : {}),
           ...(options.outputResult !== undefined ? { outputResult: options.outputResult } : {}),
-          ...(options.outputMetadata !== undefined ? { outputMetadata: options.outputMetadata as object } : {}),
+          ...(options.outputMetadata !== undefined
+            ? { outputMetadata: options.outputMetadata as object }
+            : {}),
           ...(options.modelId !== undefined ? { modelId: options.modelId } : {}),
           ...(options.modelVersion !== undefined ? { modelVersion: options.modelVersion } : {}),
           ...(options.tokensUsed !== undefined ? { tokensUsed: options.tokensUsed } : {}),
@@ -158,18 +160,16 @@ export class AIDecisionLogger {
   /**
    * Search AI decision logs
    */
-  static async search(
-    params: {
-      workspaceId?: string;
-      userId?: string;
-      requestTypes?: string[];
-      statuses?: string[];
-      startDate?: Date;
-      endDate?: Date;
-      limit?: number;
-      offset?: number;
-    },
-  ): Promise<PaginatedAuditLogResponse<AIDecisionLogEntry>> {
+  static async search(params: {
+    workspaceId?: string;
+    userId?: string;
+    requestTypes?: string[];
+    statuses?: string[];
+    startDate?: Date;
+    endDate?: Date;
+    limit?: number;
+    offset?: number;
+  }): Promise<PaginatedAuditLogResponse<AIDecisionLogEntry>> {
     const limit = Math.min(params.limit || 50, 1000);
     const offset = params.offset || 0;
 
@@ -214,7 +214,7 @@ export class AIDecisionLogger {
     ]);
 
     return {
-      data: logs.map(log => ({
+      data: logs.map((log) => ({
         id: log.id,
         workspaceId: log.workspaceId,
         userId: log.userId,
@@ -302,9 +302,7 @@ export class AIDecisionLogger {
 
     // Calculate success rate
     const successCount = decisionsByStatus.success || 0;
-    const successRate = totalDecisions > 0
-      ? (successCount / totalDecisions) * 100
-      : 0;
+    const successRate = totalDecisions > 0 ? (successCount / totalDecisions) * 100 : 0;
 
     return {
       totalDecisions,

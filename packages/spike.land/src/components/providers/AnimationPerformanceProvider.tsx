@@ -33,8 +33,6 @@ export function AnimationPerformanceProvider({ children }: AnimationPerformanceP
   }, []);
 
   return (
-    <MotionConfig reducedMotion={shouldReduceMotion ? "always" : "user"}>
-      {children}
-    </MotionConfig>
+    <MotionConfig reducedMotion={shouldReduceMotion ? "always" : "user"}>{children}</MotionConfig>
   );
 }

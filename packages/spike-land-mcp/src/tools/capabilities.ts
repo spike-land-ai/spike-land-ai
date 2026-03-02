@@ -25,11 +25,21 @@ export function registerCapabilitiesTools(
 
   registry.registerBuilt(
     t
-      .tool("capabilities_request_permissions", "Request additional tool or category permissions. Creates an approval request for the user.", {
-        tools: z.array(z.string()).optional().describe("Specific tool names to request access to."),
-        categories: z.array(z.string()).optional().describe("Tool categories to request access to."),
-        reason: z.string().min(1).describe("Why access is needed."),
-      })
+      .tool(
+        "capabilities_request_permissions",
+        "Request additional tool or category permissions. Creates an approval request for the user.",
+        {
+          tools: z
+            .array(z.string())
+            .optional()
+            .describe("Specific tool names to request access to."),
+          categories: z
+            .array(z.string())
+            .optional()
+            .describe("Tool categories to request access to."),
+          reason: z.string().min(1).describe("Why access is needed."),
+        },
+      )
       .meta({ category: "capabilities", tier: "free" })
       .handler(async ({ input, ctx }) => {
         const { tools, categories, reason } = input;
@@ -39,10 +49,7 @@ export function registerCapabilitiesTools(
           .select({ id: claudeCodeAgents.id })
           .from(claudeCodeAgents)
           .where(
-            and(
-              eq(claudeCodeAgents.userId, ctx.userId),
-              eq(claudeCodeAgents.status, "running"),
-            ),
+            and(eq(claudeCodeAgents.userId, ctx.userId), eq(claudeCodeAgents.status, "running")),
           )
           .limit(1);
 
@@ -68,20 +75,24 @@ export function registerCapabilitiesTools(
         });
 
         return textResult(
-          `**Permission Request Created**\n\n`
-          + `**Request ID:** ${requestId}\n`
-          + `**Tools:** ${(tools ?? []).join(", ") || "(none)"}\n`
-          + `**Categories:** ${(categories ?? []).join(", ") || "(none)"}\n`
-          + `**Reason:** ${reason}\n`
-          + `**Status:** pending\n\n`
-          + `The user will be notified to approve or deny this request.`,
+          `**Permission Request Created**\n\n` +
+            `**Request ID:** ${requestId}\n` +
+            `**Tools:** ${(tools ?? []).join(", ") || "(none)"}\n` +
+            `**Categories:** ${(categories ?? []).join(", ") || "(none)"}\n` +
+            `**Reason:** ${reason}\n` +
+            `**Status:** pending\n\n` +
+            `The user will be notified to approve or deny this request.`,
         );
       }),
   );
 
   registry.registerBuilt(
     t
-      .tool("capabilities_check_permissions", "Check current permission status and any active agents.", {})
+      .tool(
+        "capabilities_check_permissions",
+        "Check current permission status and any active agents.",
+        {},
+      )
       .meta({ category: "capabilities", tier: "free" })
       .handler(async ({ ctx }) => {
         // Find active agent
@@ -93,17 +104,14 @@ export function registerCapabilitiesTools(
           })
           .from(claudeCodeAgents)
           .where(
-            and(
-              eq(claudeCodeAgents.userId, ctx.userId),
-              eq(claudeCodeAgents.status, "running"),
-            ),
+            and(eq(claudeCodeAgents.userId, ctx.userId), eq(claudeCodeAgents.status, "running")),
           )
           .limit(1);
 
         if (agent.length === 0 || !agent[0]) {
           return textResult(
-            "**No Active Agent**\n\n"
-            + "No running agent found. You are operating with full user permissions.",
+            "**No Active Agent**\n\n" +
+              "No running agent found. You are operating with full user permissions.",
           );
         }
 
@@ -129,11 +137,11 @@ export function registerCapabilitiesTools(
           );
 
         return textResult(
-          `**Current Capabilities**\n\n`
-          + `**Agent:** ${agent[0].name}\n`
-          + `**Agent Status:** ${agent[0].status}\n`
-          + `**Pending Requests:** ${pending.length}\n`
-          + `**Approved Requests:** ${approved.length}\n`,
+          `**Current Capabilities**\n\n` +
+            `**Agent:** ${agent[0].name}\n` +
+            `**Agent Status:** ${agent[0].status}\n` +
+            `**Pending Requests:** ${pending.length}\n` +
+            `**Approved Requests:** ${approved.length}\n`,
         );
       }),
   );
@@ -141,9 +149,11 @@ export function registerCapabilitiesTools(
   registry.registerBuilt(
     t
       .tool("capabilities_list_queued_actions", "List permission requests and their status.", {
-        status: z.string().optional().default("pending").describe(
-          "Filter by status: pending, approved, denied.",
-        ),
+        status: z
+          .string()
+          .optional()
+          .default("pending")
+          .describe("Filter by status: pending, approved, denied."),
       })
       .meta({ category: "capabilities", tier: "free" })
       .handler(async ({ input, ctx }) => {
@@ -161,10 +171,7 @@ export function registerCapabilitiesTools(
           .from(permissionRequests)
           .leftJoin(claudeCodeAgents, eq(claudeCodeAgents.id, permissionRequests.agentId))
           .where(
-            and(
-              eq(permissionRequests.userId, ctx.userId),
-              eq(permissionRequests.status, status),
-            ),
+            and(eq(permissionRequests.userId, ctx.userId), eq(permissionRequests.status, status)),
           )
           .limit(20);
 

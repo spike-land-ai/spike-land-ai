@@ -14,44 +14,41 @@ import { safeToolCall, textResult } from "../shared/tool-helpers";
 
 const McpRegistrySearchSchema = z.object({
   query: z.string().min(1).max(200).describe("Search query for MCP servers"),
-  limit: z.number().int().min(1).max(50).optional().describe(
-    "Max results (default 10)",
-  ),
+  limit: z.number().int().min(1).max(50).optional().describe("Max results (default 10)"),
 });
 
 const McpRegistryGetSchema = z.object({
   serverId: z.string().min(1).describe("Server identifier from search results"),
-  source: z.enum(["smithery", "official", "glama"]).describe(
-    "Which registry the server came from",
-  ),
+  source: z.enum(["smithery", "official", "glama"]).describe("Which registry the server came from"),
 });
 
 const McpRegistryInstallSchema = z.object({
   serverId: z.string().min(1).describe("Server identifier"),
   source: z.enum(["smithery", "official", "glama"]).describe("Registry source"),
-  envVars: z.record(z.string(), z.string()).optional().describe(
-    "Environment variables needed by the server",
-  ),
+  envVars: z
+    .record(z.string(), z.string())
+    .optional()
+    .describe("Environment variables needed by the server"),
 });
 
 const PeriodEnum = z.enum(["24h", "7d", "30d", "all"]);
 
 const ToolUsageStatsSchema = z.object({
-  period: PeriodEnum.optional().default("7d").describe(
-    "Time period for analytics: 24h, 7d, 30d, or all.",
-  ),
-  category: z.string().optional().describe(
-    "Filter stats to a specific tool category (e.g. 'chess', 'netsim').",
-  ),
+  period: PeriodEnum.optional()
+    .default("7d")
+    .describe("Time period for analytics: 24h, 7d, 30d, or all."),
+  category: z
+    .string()
+    .optional()
+    .describe("Filter stats to a specific tool category (e.g. 'chess', 'netsim')."),
 });
 
 const GenerateDocsSchema = z.object({
-  tool_name: z.string().optional().describe(
-    "Specific tool name to generate documentation for.",
-  ),
-  category: z.string().optional().describe(
-    "Category to generate documentation for (all tools in category).",
-  ),
+  tool_name: z.string().optional().describe("Specific tool name to generate documentation for."),
+  category: z
+    .string()
+    .optional()
+    .describe("Category to generate documentation for (all tools in category)."),
 });
 
 const HealthCheckSchema = z.object({});
@@ -63,7 +60,7 @@ function periodLabel(period: string): string {
     "24h": "last 24 hours",
     "7d": "last 7 days",
     "30d": "last 30 days",
-    "all": "all time",
+    all: "all time",
   };
   return map[period] ?? period;
 }
@@ -73,7 +70,7 @@ function periodHours(period: string): number {
     "24h": 24,
     "7d": 168,
     "30d": 720,
-    "all": 87600, // 10 years
+    all: 87600, // 10 years
   };
   return map[period] ?? 168;
 }
@@ -90,26 +87,28 @@ export const mcpExplorerTools: StandaloneToolDefinition[] = [
     annotations: { readOnlyHint: true },
     inputSchema: McpRegistrySearchSchema.shape,
     handler: async (input: never, _ctx: ServerContext): Promise<CallToolResult> =>
-      safeToolCall("mcp_registry_search", async () => {
-        const { query, limit = 10 } = input as z.infer<typeof McpRegistrySearchSchema>;
-        const { searchAllRegistries } = await import(
-          "@/lib/mcp/services/registry-client"
-        );
-        const results = await searchAllRegistries(query, limit);
-        if (results.length === 0) {
-          return textResult("No MCP servers found matching your query.");
-        }
+      safeToolCall(
+        "mcp_registry_search",
+        async () => {
+          const { query, limit = 10 } = input as z.infer<typeof McpRegistrySearchSchema>;
+          const { searchAllRegistries } = await import("@/lib/mcp/services/registry-client");
+          const results = await searchAllRegistries(query, limit);
+          if (results.length === 0) {
+            return textResult("No MCP servers found matching your query.");
+          }
 
-        let text = `**MCP Servers Found (${results.length}):**\n\n`;
-        for (const server of results) {
-          text += `- **${server.name}** (${server.source})\n`;
-          text += `  ${server.description.slice(0, 200)}\n`;
-          text += `  ID: \`${server.id}\` | Transport: ${server.transport}\n`;
-          if (server.homepage) text += `  Homepage: ${server.homepage}\n`;
-          text += "\n";
-        }
-        return textResult(text);
-      }, { timeoutMs: 30_000 }),
+          let text = `**MCP Servers Found (${results.length}):**\n\n`;
+          for (const server of results) {
+            text += `- **${server.name}** (${server.source})\n`;
+            text += `  ${server.description.slice(0, 200)}\n`;
+            text += `  ID: \`${server.id}\` | Transport: ${server.transport}\n`;
+            if (server.homepage) text += `  Homepage: ${server.homepage}\n`;
+            text += "\n";
+          }
+          return textResult(text);
+        },
+        { timeoutMs: 30_000 },
+      ),
   },
 
   {
@@ -121,36 +120,38 @@ export const mcpExplorerTools: StandaloneToolDefinition[] = [
     annotations: { readOnlyHint: true },
     inputSchema: McpRegistryGetSchema.shape,
     handler: async (input: never, _ctx: ServerContext): Promise<CallToolResult> =>
-      safeToolCall("mcp_registry_get", async () => {
-        const { serverId, source } = input as z.infer<typeof McpRegistryGetSchema>;
-        const { searchSmithery, searchOfficialRegistry, searchGlama } = await import(
-          "@/lib/mcp/services/registry-client"
-        );
-
-        let results;
-        if (source === "smithery") results = await searchSmithery(serverId, 1);
-        else if (source === "official") {
-          results = await searchOfficialRegistry(serverId, 1);
-        } else results = await searchGlama(serverId, 1);
-
-        const server = results.find(s => s.id === serverId);
-        if (!server) {
-          return textResult(
-            "**Error: NOT_FOUND**\nMCP server not found.\n**Retryable:** false",
+      safeToolCall(
+        "mcp_registry_get",
+        async () => {
+          const { serverId, source } = input as z.infer<typeof McpRegistryGetSchema>;
+          const { searchSmithery, searchOfficialRegistry, searchGlama } = await import(
+            "@/lib/mcp/services/registry-client"
           );
-        }
 
-        let text = `**${server.name}**\n\n`;
-        text += `**Source:** ${server.source}\n`;
-        text += `**Transport:** ${server.transport}\n`;
-        text += `**URL:** ${server.url}\n`;
-        if (server.homepage) text += `**Homepage:** ${server.homepage}\n`;
-        if (server.envVarsRequired.length > 0) {
-          text += `**Required Env Vars:** ${server.envVarsRequired.join(", ")}\n`;
-        }
-        text += `\n**Description:**\n${server.description}\n`;
-        return textResult(text);
-      }, { timeoutMs: 30_000 }),
+          let results;
+          if (source === "smithery") results = await searchSmithery(serverId, 1);
+          else if (source === "official") {
+            results = await searchOfficialRegistry(serverId, 1);
+          } else results = await searchGlama(serverId, 1);
+
+          const server = results.find((s) => s.id === serverId);
+          if (!server) {
+            return textResult("**Error: NOT_FOUND**\nMCP server not found.\n**Retryable:** false");
+          }
+
+          let text = `**${server.name}**\n\n`;
+          text += `**Source:** ${server.source}\n`;
+          text += `**Transport:** ${server.transport}\n`;
+          text += `**URL:** ${server.url}\n`;
+          if (server.homepage) text += `**Homepage:** ${server.homepage}\n`;
+          if (server.envVarsRequired.length > 0) {
+            text += `**Required Env Vars:** ${server.envVarsRequired.join(", ")}\n`;
+          }
+          text += `\n**Description:**\n${server.description}\n`;
+          return textResult(text);
+        },
+        { timeoutMs: 30_000 },
+      ),
   },
 
   {
@@ -161,44 +162,46 @@ export const mcpExplorerTools: StandaloneToolDefinition[] = [
     tier: "free",
     inputSchema: McpRegistryInstallSchema.shape,
     handler: async (input: never, _ctx: ServerContext): Promise<CallToolResult> =>
-      safeToolCall("mcp_registry_install", async () => {
-        const { serverId, source, envVars } = input as z.infer<typeof McpRegistryInstallSchema>;
-        const { searchSmithery, searchOfficialRegistry, searchGlama } = await import(
-          "@/lib/mcp/services/registry-client"
-        );
-
-        let results;
-        if (source === "smithery") results = await searchSmithery(serverId, 1);
-        else if (source === "official") {
-          results = await searchOfficialRegistry(serverId, 1);
-        } else results = await searchGlama(serverId, 1);
-
-        const server = results.find(s => s.id === serverId);
-        if (!server) {
-          return textResult(
-            "**Error: NOT_FOUND**\nMCP server not found.\n**Retryable:** false",
+      safeToolCall(
+        "mcp_registry_install",
+        async () => {
+          const { serverId, source, envVars } = input as z.infer<typeof McpRegistryInstallSchema>;
+          const { searchSmithery, searchOfficialRegistry, searchGlama } = await import(
+            "@/lib/mcp/services/registry-client"
           );
-        }
 
-        const config = {
-          [server.name]: {
-            transport: server.transport,
-            url: server.url,
-            ...(envVars && Object.keys(envVars).length > 0
-              ? { env: envVars }
-              : {}),
-          },
-        };
+          let results;
+          if (source === "smithery") results = await searchSmithery(serverId, 1);
+          else if (source === "official") {
+            results = await searchOfficialRegistry(serverId, 1);
+          } else results = await searchGlama(serverId, 1);
 
-        return textResult(
-          `**MCP Server Configured:** ${server.name}\n\n`
-            + `Add to your \`.mcp.json\`:\n\`\`\`json\n${
-              JSON.stringify(config, null, 2)
-            }\n\`\`\`\n\n`
-            + `**Transport:** ${server.transport}\n`
-            + `**Source:** ${server.source}`,
-        );
-      }, { timeoutMs: 30_000 }),
+          const server = results.find((s) => s.id === serverId);
+          if (!server) {
+            return textResult("**Error: NOT_FOUND**\nMCP server not found.\n**Retryable:** false");
+          }
+
+          const config = {
+            [server.name]: {
+              transport: server.transport,
+              url: server.url,
+              ...(envVars && Object.keys(envVars).length > 0 ? { env: envVars } : {}),
+            },
+          };
+
+          return textResult(
+            `**MCP Server Configured:** ${server.name}\n\n` +
+              `Add to your \`.mcp.json\`:\n\`\`\`json\n${JSON.stringify(
+                config,
+                null,
+                2,
+              )}\n\`\`\`\n\n` +
+              `**Transport:** ${server.transport}\n` +
+              `**Source:** ${server.source}`,
+          );
+        },
+        { timeoutMs: 30_000 },
+      ),
   },
 
   {
@@ -214,17 +217,12 @@ export const mcpExplorerTools: StandaloneToolDefinition[] = [
 
         const mcpJsonPath = path.join(process.cwd(), ".mcp.json");
         if (!fs.existsSync(mcpJsonPath)) {
-          return textResult(
-            "No .mcp.json found. No MCP servers are configured.",
-          );
+          return textResult("No .mcp.json found. No MCP servers are configured.");
         }
 
         const content = fs.readFileSync(mcpJsonPath, "utf-8");
         const config = JSON.parse(content) as Record<string, unknown>;
-        const mcpServers = (config.mcpServers ?? config) as Record<
-          string,
-          unknown
-        >;
+        const mcpServers = (config.mcpServers ?? config) as Record<string, unknown>;
         const serverNames = Object.keys(mcpServers);
 
         if (serverNames.length === 0) {
@@ -260,9 +258,7 @@ export const mcpExplorerTools: StandaloneToolDefinition[] = [
         const where = {
           userId: ctx.userId,
           createdAt: { gte: since },
-          ...(category
-            ? { tool: { startsWith: category.replace(/-/g, "_") } }
-            : {}),
+          ...(category ? { tool: { startsWith: category.replace(/-/g, "_") } } : {}),
         };
 
         const [totalAgg, errorAgg, durationAgg, perToolStats] = await Promise.all([
@@ -296,17 +292,18 @@ export const mcpExplorerTools: StandaloneToolDefinition[] = [
         const errorRate = ((errorCalls / totalCalls) * 100).toFixed(1);
         const avgDurationMs = Math.round(durationAgg._avg.durationMs ?? 0);
 
-        const topToolNames = perToolStats.map(s => s.tool);
-        const perToolErrors = topToolNames.length > 0
-          ? await prisma.toolInvocation.groupBy({
-            by: ["tool"],
-            where: { ...where, isError: true, tool: { in: topToolNames } },
-            _count: { tool: true },
-          })
-          : [];
-        const errorMap = new Map(perToolErrors.map(e => [e.tool, e._count?.tool ?? 0]));
+        const topToolNames = perToolStats.map((s) => s.tool);
+        const perToolErrors =
+          topToolNames.length > 0
+            ? await prisma.toolInvocation.groupBy({
+                by: ["tool"],
+                where: { ...where, isError: true, tool: { in: topToolNames } },
+                _count: { tool: true },
+              })
+            : [];
+        const errorMap = new Map(perToolErrors.map((e) => [e.tool, e._count?.tool ?? 0]));
 
-        const topTools = perToolStats.map(stats => {
+        const topTools = perToolStats.map((stats) => {
           const avgMs = Math.round(stats._avg?.durationMs ?? 0);
           const toolCount = stats._count?.tool ?? 0;
           const errors = errorMap.get(stats.tool) ?? 0;
@@ -318,12 +315,12 @@ export const mcpExplorerTools: StandaloneToolDefinition[] = [
         const categoryLine = category ? ` (category: ${category})` : "";
 
         return textResult(
-          `**MCP Tool Usage Stats — ${label}${categoryLine}**\n\n`
-            + `**Total Calls:** ${totalCalls}\n`
-            + `**Error Rate:** ${errorRate}%\n`
-            + `**Avg Response Time:** ${avgDurationMs}ms\n\n`
-            + `**Top Tools by Usage:**\n`
-            + topTools.join("\n"),
+          `**MCP Tool Usage Stats — ${label}${categoryLine}**\n\n` +
+            `**Total Calls:** ${totalCalls}\n` +
+            `**Error Rate:** ${errorRate}%\n` +
+            `**Avg Response Time:** ${avgDurationMs}ms\n\n` +
+            `**Top Tools by Usage:**\n` +
+            topTools.join("\n"),
         );
       }),
   },
@@ -340,18 +337,19 @@ export const mcpExplorerTools: StandaloneToolDefinition[] = [
       safeToolCall("mcp_generate_docs", async () => {
         const { tool_name, category } = input as z.infer<typeof GenerateDocsSchema>;
         if (!tool_name && !category) {
-          return textResult(
-            "Provide either `tool_name` or `category` to generate documentation.",
-          );
+          return textResult("Provide either `tool_name` or `category` to generate documentation.");
         }
 
         // In standalone mode, document the tools in this server
         const allTools = mcpExplorerTools;
 
         if (tool_name) {
-          const tool = allTools.find(t => t.name === tool_name);
+          const tool = allTools.find((t) => t.name === tool_name);
           if (!tool) {
-            const available = allTools.slice(0, 5).map(t => t.name).join(", ");
+            const available = allTools
+              .slice(0, 5)
+              .map((t) => t.name)
+              .join(", ");
             return textResult(
               `Tool "${tool_name}" not found. Examples of available tools: ${available}...`,
             );
@@ -359,53 +357,51 @@ export const mcpExplorerTools: StandaloneToolDefinition[] = [
 
           const params = tool.inputSchema
             ? Object.entries(tool.inputSchema)
-              .map(([key, schema]) => {
-                const s = schema as { description?: string; _def?: { typeName?: string; }; };
-                const typeHint = s._def?.typeName?.replace("Zod", "").toLowerCase() ?? "unknown";
-                const desc = s.description ?? "No description";
-                return `  - \`${key}\` (${typeHint}): ${desc}`;
-              })
-              .join("\n")
+                .map(([key, schema]) => {
+                  const s = schema as { description?: string; _def?: { typeName?: string } };
+                  const typeHint = s._def?.typeName?.replace("Zod", "").toLowerCase() ?? "unknown";
+                  const desc = s.description ?? "No description";
+                  return `  - \`${key}\` (${typeHint}): ${desc}`;
+                })
+                .join("\n")
             : "  No parameters.";
 
           return textResult(
-            `# ${tool.name}\n\n`
-              + `**Category:** ${tool.category}\n`
-              + `**Tier:** ${tool.tier}\n\n`
-              + `## Description\n\n${tool.description}\n\n`
-              + `## Parameters\n\n${params}\n\n`
-              + `## Example Usage\n\n`
-              + `\`\`\`json\n`
-              + `{\n  "name": "${tool.name}",\n  "arguments": {}\n}\n`
-              + `\`\`\`\n\n`
-              + `## Error Codes\n\n`
-              + `- \`INVALID_INPUT\`: Required parameters missing or invalid\n`
-              + `- \`PERMISSION_DENIED\`: Insufficient permissions\n`
-              + `- \`RATE_LIMITED\`: Too many requests, retry after backoff\n`
-              + `- \`UNKNOWN\`: Unexpected error, see message for details`,
+            `# ${tool.name}\n\n` +
+              `**Category:** ${tool.category}\n` +
+              `**Tier:** ${tool.tier}\n\n` +
+              `## Description\n\n${tool.description}\n\n` +
+              `## Parameters\n\n${params}\n\n` +
+              `## Example Usage\n\n` +
+              `\`\`\`json\n` +
+              `{\n  "name": "${tool.name}",\n  "arguments": {}\n}\n` +
+              `\`\`\`\n\n` +
+              `## Error Codes\n\n` +
+              `- \`INVALID_INPUT\`: Required parameters missing or invalid\n` +
+              `- \`PERMISSION_DENIED\`: Insufficient permissions\n` +
+              `- \`RATE_LIMITED\`: Too many requests, retry after backoff\n` +
+              `- \`UNKNOWN\`: Unexpected error, see message for details`,
           );
         }
 
         // category docs
-        const catTools = allTools.filter(t => t.category === category);
+        const catTools = allTools.filter((t) => t.category === category);
         if (catTools.length === 0) {
-          const categories = [...new Set(allTools.map(t => t.category))].slice(0, 10).join(", ");
+          const categories = [...new Set(allTools.map((t) => t.category))].slice(0, 10).join(", ");
           return textResult(
             `No tools found for category "${category}". Available categories include: ${categories}`,
           );
         }
 
-        const toolDocs = catTools.map(tool => {
-          const paramCount = tool.inputSchema
-            ? Object.keys(tool.inputSchema).length
-            : 0;
+        const toolDocs = catTools.map((tool) => {
+          const paramCount = tool.inputSchema ? Object.keys(tool.inputSchema).length : 0;
           return `### \`${tool.name}\`\n\n${tool.description}\n\n- **Parameters:** ${paramCount}\n- **Tier:** ${tool.tier}`;
         });
 
         return textResult(
-          `# ${category} — Tool Category Documentation\n\n`
-            + `**${catTools.length} tool(s)** in this category.\n\n`
-            + toolDocs.join("\n\n---\n\n"),
+          `# ${category} — Tool Category Documentation\n\n` +
+            `**${catTools.length} tool(s)** in this category.\n\n` +
+            toolDocs.join("\n\n---\n\n"),
         );
       }),
   },
@@ -439,20 +435,20 @@ export const mcpExplorerTools: StandaloneToolDefinition[] = [
         const enabledTools = mcpExplorerTools.length;
 
         const lastErrorLine = lastError
-          ? `**Last Error:**\n`
-            + `  - Tool: ${lastError.tool}\n`
-            + `  - Message: ${lastError.error ?? "unknown"}\n`
-            + `  - At: ${lastError.createdAt.toISOString()}`
+          ? `**Last Error:**\n` +
+            `  - Tool: ${lastError.tool}\n` +
+            `  - Message: ${lastError.error ?? "unknown"}\n` +
+            `  - At: ${lastError.createdAt.toISOString()}`
           : "**Last Error:** None recorded.";
 
         return textResult(
-          `**MCP Service Health Check**\n\n`
-            + `**Status:** healthy\n`
-            + `**DB Response Time:** ${responseMs}ms\n`
-            + `**Total Tools Registered:** ${totalTools}\n`
-            + `**Enabled Tools:** ${enabledTools}\n`
-            + `**Total Invocations (this user):** ${totalInvocations}\n\n`
-            + lastErrorLine,
+          `**MCP Service Health Check**\n\n` +
+            `**Status:** healthy\n` +
+            `**DB Response Time:** ${responseMs}ms\n` +
+            `**Total Tools Registered:** ${totalTools}\n` +
+            `**Enabled Tools:** ${enabledTools}\n` +
+            `**Total Invocations (this user):** ${totalInvocations}\n\n` +
+            lastErrorLine,
         );
       }),
   },

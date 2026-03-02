@@ -26,13 +26,7 @@ vi.mock("playwright", () => ({
   },
 }));
 
-import {
-  cleanup,
-  closeTab,
-  getActiveTab,
-  getOrCreateTab,
-  listTabs,
-} from "./browser-session";
+import { cleanup, closeTab, getActiveTab, getOrCreateTab, listTabs } from "./browser-session";
 
 describe("browser-session", () => {
   beforeEach(() => {
@@ -165,9 +159,7 @@ describe("browser-session", () => {
   describe("environment check", () => {
     it("should throw in non-development mode", async () => {
       vi.stubEnv("NODE_ENV", "production");
-      await expect(getOrCreateTab()).rejects.toThrow(
-        "only available in development",
-      );
+      await expect(getOrCreateTab()).rejects.toThrow("only available in development");
     });
   });
 });

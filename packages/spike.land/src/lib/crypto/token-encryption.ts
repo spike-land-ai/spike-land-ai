@@ -22,8 +22,8 @@ function getEncryptionKey(): Buffer {
 
   if (!keyHex) {
     throw new Error(
-      "TOKEN_ENCRYPTION_KEY environment variable is not configured. "
-        + "Generate one with: node -e \"logger.info(require('crypto').randomBytes(32).toString('hex'))\"",
+      "TOKEN_ENCRYPTION_KEY environment variable is not configured. " +
+        "Generate one with: node -e \"logger.info(require('crypto').randomBytes(32).toString('hex'))\"",
     );
   }
 
@@ -33,8 +33,8 @@ function getEncryptionKey(): Buffer {
     throw new Error(
       `TOKEN_ENCRYPTION_KEY must be a ${
         KEY_LENGTH * 2
-      }-character hex string (${KEY_LENGTH} bytes). `
-        + `Current length: ${keyHex.length} characters.`,
+      }-character hex string (${KEY_LENGTH} bytes). ` +
+        `Current length: ${keyHex.length} characters.`,
     );
   }
 
@@ -78,9 +78,7 @@ export function decryptToken(encryptedData: string): string {
 
   const parts = encryptedData.split(":");
   if (parts.length !== 3) {
-    throw new Error(
-      "Invalid encrypted data format. Expected format: iv:authTag:ciphertext",
-    );
+    throw new Error("Invalid encrypted data format. Expected format: iv:authTag:ciphertext");
   }
 
   const [ivHex, authTagHex, encrypted] = parts;
@@ -92,11 +90,7 @@ export function decryptToken(encryptedData: string): string {
   const key = getEncryptionKey();
 
   const { data: decrypted, error } = tryCatchSync<string>(() => {
-    const decipher = crypto.createDecipheriv(
-      ALGORITHM,
-      key,
-      Buffer.from(ivHex, "hex"),
-    );
+    const decipher = crypto.createDecipheriv(ALGORITHM, key, Buffer.from(ivHex, "hex"));
     decipher.setAuthTag(Buffer.from(authTagHex, "hex"));
 
     let res = decipher.update(encrypted, "hex", "utf8");
@@ -141,12 +135,12 @@ export function isEncrypted(data: string): boolean {
   const HEX_REGEX = /^[a-fA-F0-9]+$/;
 
   return (
-    ivHex.length === 32
-    && HEX_REGEX.test(ivHex)
-    && authTagHex.length === 32
-    && HEX_REGEX.test(authTagHex)
-    && encrypted.length > 0
-    && HEX_REGEX.test(encrypted)
+    ivHex.length === 32 &&
+    HEX_REGEX.test(ivHex) &&
+    authTagHex.length === 32 &&
+    HEX_REGEX.test(authTagHex) &&
+    encrypted.length > 0 &&
+    HEX_REGEX.test(encrypted)
   );
 }
 
@@ -160,7 +154,7 @@ export function isEncrypted(data: string): boolean {
  */
 export function safeEncryptToken(
   plaintext: string,
-  options?: { throwOnMissingKey?: boolean; },
+  options?: { throwOnMissingKey?: boolean },
 ): string {
   if (!plaintext) return plaintext;
 
@@ -168,10 +162,7 @@ export function safeEncryptToken(
 
   if (error) {
     // Only catch the "not configured" error, not "wrong length" errors
-    if (
-      error instanceof Error
-      && error.message.includes("is not configured")
-    ) {
+    if (error instanceof Error && error.message.includes("is not configured")) {
       if (options?.throwOnMissingKey) {
         throw error;
       }
@@ -210,10 +201,9 @@ export function safeDecryptToken(data: string): string {
     // If decryption fails, it might be an old unencrypted token that
     // happens to match the format. Return as-is.
     if (process.env.NODE_ENV === "development") {
-      logger.warn(
-        "[token-encryption] Failed to decrypt token, returning as-is",
-        { error: error instanceof Error ? error.message : "Unknown error" },
-      );
+      logger.warn("[token-encryption] Failed to decrypt token, returning as-is", {
+        error: error instanceof Error ? error.message : "Unknown error",
+      });
     }
     return data;
   }

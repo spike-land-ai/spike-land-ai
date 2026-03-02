@@ -64,10 +64,7 @@ export async function createBidirectionalRelation(
  * Create relationships from wiki links found in content
  * This is called after content generation to link topics
  */
-export async function createRelationsFromWikiLinks(
-  fromTopicId: string,
-  wikiLinkSlugs: string[],
-) {
+export async function createRelationsFromWikiLinks(fromTopicId: string, wikiLinkSlugs: string[]) {
   const existingTopics = await prisma.learnItContent.findMany({
     where: {
       slug: { in: wikiLinkSlugs },
@@ -76,13 +73,13 @@ export async function createRelationsFromWikiLinks(
     select: { id: true, slug: true },
   });
 
-  const relations = existingTopics.map(topic =>
+  const relations = existingTopics.map((topic) =>
     createRelation({
       fromTopicId,
       toTopicId: topic.id,
       type: "RELATED",
       strength: 0.8, // Wiki links are strong indicators of relevance
-    })
+    }),
   );
 
   await Promise.all(relations);
@@ -93,10 +90,7 @@ export async function createRelationsFromWikiLinks(
 /**
  * Set up parent-child relationship based on path hierarchy
  */
-export async function createParentChildRelation(
-  childId: string,
-  parentSlug: string | null,
-) {
+export async function createParentChildRelation(childId: string, parentSlug: string | null) {
   if (!parentSlug) return null;
 
   const parent = await prisma.learnItContent.findUnique({
@@ -140,7 +134,7 @@ export async function getRelatedTopics(topicId: string, limit = 5) {
     take: limit,
   });
 
-  return relations.map(r => r.toTopic);
+  return relations.map((r) => r.toTopic);
 }
 
 /**
@@ -168,7 +162,7 @@ export async function getPrerequisites(topicId: string) {
     orderBy: { strength: "desc" },
   });
 
-  return relations.map(r => r.fromTopic);
+  return relations.map((r) => r.fromTopic);
 }
 
 /**
@@ -198,7 +192,7 @@ export async function getChildTopics(topicId: string) {
     },
   });
 
-  return relations.map(r => r.toTopic);
+  return relations.map((r) => r.toTopic);
 }
 
 /**
@@ -283,9 +277,7 @@ export async function relationExists(
   toTopicId: string,
   type?: LearnItRelationType,
 ) {
-  const where = type
-    ? { fromTopicId, toTopicId, type }
-    : { fromTopicId, toTopicId };
+  const where = type ? { fromTopicId, toTopicId, type } : { fromTopicId, toTopicId };
 
   const count = await prisma.learnItRelation.count({ where });
   return count > 0;

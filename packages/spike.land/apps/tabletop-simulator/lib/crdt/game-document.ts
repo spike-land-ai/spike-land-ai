@@ -36,11 +36,7 @@ export function addPlayer(doc: Y.Doc, player: Player) {
   players.set(player.id, player);
 }
 
-export function updatePlayer(
-  doc: Y.Doc,
-  playerId: string,
-  updates: Partial<Player>,
-) {
+export function updatePlayer(doc: Y.Doc, playerId: string, updates: Partial<Player>) {
   const players = getPlayersMap(doc);
   const current = players.get(playerId);
   if (current) {
@@ -51,8 +47,8 @@ export function updatePlayer(
 export function moveCard(
   doc: Y.Doc,
   cardId: string,
-  position: { x: number; y: number; z: number; },
-  rotation?: { x: number; y: number; z: number; },
+  position: { x: number; y: number; z: number },
+  rotation?: { x: number; y: number; z: number },
 ) {
   doc.transact(() => {
     const deck = getDeckArray(doc);
@@ -202,7 +198,7 @@ export function drawCard(doc: Y.Doc, playerId: string): Card | null {
 export function playCard(
   doc: Y.Doc,
   cardId: string,
-  position: { x: number; y: number; z: number; },
+  position: { x: number; y: number; z: number },
 ) {
   doc.transact(() => {
     const deckArray = getDeckArray(doc);

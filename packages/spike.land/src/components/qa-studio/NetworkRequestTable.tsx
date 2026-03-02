@@ -54,7 +54,7 @@ export function NetworkRequestTable({ requests }: NetworkRequestTableProps) {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {requests.map(req => (
+          {requests.map((req) => (
             <TableRow key={req.id} className="border-zinc-800 hover:bg-zinc-800/50">
               <TableCell>
                 <Badge

@@ -32,10 +32,7 @@ const stepHandlers: Map<string, StepHandler> = new Map();
  * @param actionType - The action type (from step.config.actionType)
  * @param handler - The handler function
  */
-export function registerStepHandler(
-  actionType: string,
-  handler: StepHandler,
-): void {
+export function registerStepHandler(actionType: string, handler: StepHandler): void {
   stepHandlers.set(actionType, handler);
 }
 

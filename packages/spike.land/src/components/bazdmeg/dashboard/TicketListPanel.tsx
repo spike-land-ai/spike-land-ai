@@ -18,13 +18,7 @@ const MemoTicketListItem = memo(function MemoTicketListItem({
   onSelectTicket: (ticket: TicketItem) => void;
 }) {
   const handleClick = useCallback(() => onSelectTicket(ticket), [onSelectTicket, ticket]);
-  return (
-    <TicketListItem
-      ticket={ticket}
-      isSelected={isSelected}
-      onClick={handleClick}
-    />
-  );
+  return <TicketListItem ticket={ticket} isSelected={isSelected} onClick={handleClick} />;
 });
 
 const STATUS_FILTERS = [
@@ -51,21 +45,25 @@ export function TicketListPanel({
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
 
-  const filteredTickets = useMemo(() =>
-    tickets.filter(t => {
-      const matchesSearch = !search
-        || t.title.toLowerCase().includes(search.toLowerCase())
-        || String(t.number).includes(search);
+  const filteredTickets = useMemo(
+    () =>
+      tickets.filter((t) => {
+        const matchesSearch =
+          !search ||
+          t.title.toLowerCase().includes(search.toLowerCase()) ||
+          String(t.number).includes(search);
 
-      const status = t.plan?.status ?? "UNPLANNED";
-      const matchesFilter = statusFilter === "all"
-        || (statusFilter === "active"
-          && ["SENT_TO_JULES", "JULES_WORKING", "JULES_REVIEW", "BUILD_FIXING"]
-            .includes(status))
-        || status === statusFilter;
+        const status = t.plan?.status ?? "UNPLANNED";
+        const matchesFilter =
+          statusFilter === "all" ||
+          (statusFilter === "active" &&
+            ["SENT_TO_JULES", "JULES_WORKING", "JULES_REVIEW", "BUILD_FIXING"].includes(status)) ||
+          status === statusFilter;
 
-      return matchesSearch && matchesFilter;
-    }), [tickets, search, statusFilter]);
+        return matchesSearch && matchesFilter;
+      }),
+    [tickets, search, statusFilter],
+  );
 
   return (
     <div className="flex flex-col h-full">
@@ -73,10 +71,7 @@ export function TicketListPanel({
       <div className="p-3 border-b border-white/10">
         <div className="flex items-center justify-between mb-3">
           <h2 className="text-sm font-semibold text-white">
-            Tickets{" "}
-            <span className="text-zinc-500 font-normal">
-              ({filteredTickets.length})
-            </span>
+            Tickets <span className="text-zinc-500 font-normal">({filteredTickets.length})</span>
           </h2>
           <Button
             variant="ghost"
@@ -85,9 +80,11 @@ export function TicketListPanel({
             disabled={isLoading}
             className="h-7 w-7 text-zinc-400 hover:text-white"
           >
-            {isLoading
-              ? <Loader2 className="h-3.5 w-3.5 animate-spin" />
-              : <RefreshCw className="h-3.5 w-3.5" />}
+            {isLoading ? (
+              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+            ) : (
+              <RefreshCw className="h-3.5 w-3.5" />
+            )}
           </Button>
         </div>
 
@@ -98,14 +95,14 @@ export function TicketListPanel({
             type="text"
             placeholder="Search tickets..."
             value={search}
-            onChange={e => setSearch(e.target.value)}
+            onChange={(e) => setSearch(e.target.value)}
             className="w-full pl-8 pr-3 py-1.5 text-xs bg-zinc-800/50 border border-white/10 rounded-md text-white placeholder:text-zinc-600 focus:outline-none focus:border-amber-500/50"
           />
         </div>
 
         {/* Status filters */}
         <div className="flex flex-wrap gap-1">
-          {STATUS_FILTERS.map(f => (
+          {STATUS_FILTERS.map((f) => (
             <button
               key={f.value}
               onClick={() => setStatusFilter(f.value)}
@@ -129,7 +126,7 @@ export function TicketListPanel({
               {isLoading ? "Loading tickets..." : "No tickets found"}
             </p>
           )}
-          {filteredTickets.map(ticket => (
+          {filteredTickets.map((ticket) => (
             <MemoTicketListItem
               key={ticket.number}
               ticket={ticket}

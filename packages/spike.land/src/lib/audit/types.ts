@@ -194,8 +194,8 @@ export interface RetentionJobResult {
 export interface AuditLogMetrics {
   totalLogs: number;
   logsByAction: Record<string, number>;
-  logsByUser: Array<{ userId: string; userName?: string; count: number; }>;
-  logsByDay: Array<{ date: string; count: number; }>;
+  logsByUser: Array<{ userId: string; userName?: string; count: number }>;
+  logsByDay: Array<{ date: string; count: number }>;
   averageLogsPerDay: number;
   oldestLog?: Date;
   newestLog?: Date;

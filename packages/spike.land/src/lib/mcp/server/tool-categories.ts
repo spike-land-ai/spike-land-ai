@@ -95,10 +95,8 @@ export const CATEGORY_DESCRIPTIONS: Record<string, string> = {
 
   // Swarm & dashboard
   swarm: "AI agent swarm management: list, spawn, stop, redirect, broadcast, and monitor agents",
-  dash:
-    "CEO dashboard: system overview, health checks, error feed, activity stream, and widget data",
-  env:
-    "Environment management: list, status, compare, and track deployments across dev/preview/prod",
+  dash: "CEO dashboard: system overview, health checks, error feed, activity stream, and widget data",
+  env: "Environment management: list, status, compare, and track deployments across dev/preview/prod",
 
   // MCP Observability
   "mcp-observability":
@@ -171,16 +169,13 @@ export const CATEGORY_DESCRIPTIONS: Record<string, string> = {
     "Chess Arena replay and leaderboard: review completed games and view ELO rankings",
 
   // Distributed Systems Simulators
-  raft:
-    "Raft consensus simulation: create clusters, run elections, replicate logs, simulate failures",
+  raft: "Raft consensus simulation: create clusters, run elections, replicate logs, simulate failures",
   netsim:
     "Network topology simulation: partitions, latency, packet loss — wraps consensus protocols with realistic network conditions",
   causality:
     "Logical clock simulation: Lamport and Vector clocks, happens-before reasoning, causal ordering verification",
-  crdt:
-    "CRDT simulation: G-Counter, PN-Counter, LWW-Register, OR-Set — concurrent edits, merge, convergence checking, AP vs CP comparison",
-  bft:
-    "Byzantine fault tolerance simulation: PBFT consensus with honest, silent, and equivocating node behaviors",
+  crdt: "CRDT simulation: G-Counter, PN-Counter, LWW-Register, OR-Set — concurrent edits, merge, convergence checking, AP vs CP comparison",
+  bft: "Byzantine fault tolerance simulation: PBFT consensus with honest, silent, and equivocating node behaviors",
 
   // CleanSweep
   "clean-photo":
@@ -201,8 +196,7 @@ export const CATEGORY_DESCRIPTIONS: Record<string, string> = {
     "Distributed coding sessions: create, track, assign roles, manage lifecycle, events, and metrics",
   codegen:
     "Zero-shot code generation: build prompts from context bundles, dispatch to AI, and store results",
-  diff:
-    "Code diff management: parse unified diffs, apply patches, detect conflicts, and merge changesets",
+  diff: "Code diff management: parse unified diffs, apply patches, detect conflicts, and merge changesets",
   review: "Automated code review: convention checks, complexity analysis, and AI-powered reviews",
   testgen:
     "Test generation: create unit tests and suites from specs and source code using patterns",

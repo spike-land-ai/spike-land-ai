@@ -12,10 +12,7 @@ export const blogPostFrontmatterSchema = z.object({
   /** Short description for SEO and previews */
   description: z.string().min(1, "Description is required"),
   /** Publication date in YYYY-MM-DD format */
-  date: z.string().regex(
-    /^\d{4}-\d{2}-\d{2}$/,
-    "Date must be in YYYY-MM-DD format",
-  ),
+  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Date must be in YYYY-MM-DD format"),
   /** Author name */
   author: z.string().min(1, "Author is required"),
   /** Category for the blog post */

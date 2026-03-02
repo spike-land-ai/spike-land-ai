@@ -1,12 +1,6 @@
 "use client";
 
-import {
-  type ReactNode,
-  useCallback,
-  useReducer,
-  useRef,
-  useState,
-} from "react";
+import { type ReactNode, useCallback, useReducer, useRef, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -35,16 +29,13 @@ interface QaStudioState {
 }
 
 type QaStudioAction =
-  | { type: "SET_URL"; payload: string; }
-  | { type: "SET_ACTIVE_TAB"; payload: string; }
-  | { type: "NAVIGATE_START"; }
-  | { type: "NAVIGATE_SUCCESS"; payload: { url: string; title: string; }; }
-  | { type: "NAVIGATE_ERROR"; payload: string; };
+  | { type: "SET_URL"; payload: string }
+  | { type: "SET_ACTIVE_TAB"; payload: string }
+  | { type: "NAVIGATE_START" }
+  | { type: "NAVIGATE_SUCCESS"; payload: { url: string; title: string } }
+  | { type: "NAVIGATE_ERROR"; payload: string };
 
-function qaStudioReducer(
-  state: QaStudioState,
-  action: QaStudioAction,
-): QaStudioState {
+function qaStudioReducer(state: QaStudioState, action: QaStudioAction): QaStudioState {
   switch (action.type) {
     case "SET_URL":
       return { ...state, url: action.payload };
@@ -84,9 +75,7 @@ const initialState: QaStudioState = {
 };
 
 /** Double-click a panel to expand it to fullscreen overlay. Click minimize or press Esc to close. */
-function FullscreenPanel(
-  { children, className }: { children: ReactNode; className?: string; },
-) {
+function FullscreenPanel({ children, className }: { children: ReactNode; className?: string }) {
   const [expanded, setExpanded] = useState(false);
   const ref = useRef<HTMLDialogElement>(null);
 
@@ -133,7 +122,7 @@ function FullscreenPanel(
     <div
       className={className}
       onDoubleClick={handleDoubleClick}
-      onKeyDown={e => e.key === "Enter" && setExpanded(true)}
+      onKeyDown={(e) => e.key === "Enter" && setExpanded(true)}
       role="button"
       tabIndex={0}
       aria-label="Double-click to expand panel"
@@ -184,7 +173,7 @@ export function QaStudioClient() {
         <Globe className="h-4 w-4 text-primary shrink-0" />
         <Input
           value={state.url}
-          onChange={e => dispatch({ type: "SET_URL", payload: e.target.value })}
+          onChange={(e) => dispatch({ type: "SET_URL", payload: e.target.value })}
           onKeyDown={handleKeyDown}
           placeholder="https://example.com"
           className="text-sm font-mono h-9 bg-black/20 border-border/30 flex-1"
@@ -196,9 +185,9 @@ export function QaStudioClient() {
           disabled={state.navigationStatus === "loading" || !state.url.trim()}
           className="h-9 px-4 shrink-0 bg-emerald-600 hover:bg-emerald-500 text-white"
         >
-          {state.navigationStatus === "loading"
-            ? <Loader2 className="h-3.5 w-3.5 animate-spin mr-1.5" />
-            : null}
+          {state.navigationStatus === "loading" ? (
+            <Loader2 className="h-3.5 w-3.5 animate-spin mr-1.5" />
+          ) : null}
           Navigate
         </Button>
         <Button
@@ -214,10 +203,7 @@ export function QaStudioClient() {
           Auto-Audit
         </Button>
         {state.navigationStatus === "success" && state.currentTitle && (
-          <Badge
-            variant="secondary"
-            className="shrink-0 max-w-[200px] truncate"
-          >
+          <Badge variant="secondary" className="shrink-0 max-w-[200px] truncate">
             {state.currentTitle}
           </Badge>
         )}
@@ -241,7 +227,7 @@ export function QaStudioClient() {
       {/* Main Tabs */}
       <Tabs
         value={state.activeTab}
-        onValueChange={value => dispatch({ type: "SET_ACTIVE_TAB", payload: value })}
+        onValueChange={(value) => dispatch({ type: "SET_ACTIVE_TAB", payload: value })}
       >
         <TabsList>
           <TabsTrigger value="browser">Browser</TabsTrigger>

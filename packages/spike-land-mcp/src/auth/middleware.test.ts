@@ -57,7 +57,7 @@ describe("authMiddleware", () => {
     expect(res.status).toBe(401);
     expect(res.headers.get("WWW-Authenticate")).toContain("Bearer");
 
-    const body = await res.json() as { error: string };
+    const body = (await res.json()) as { error: string };
     expect(body.error).toBe("Unauthorized");
   });
 
@@ -78,7 +78,7 @@ describe("authMiddleware", () => {
     });
 
     expect(res.status).toBe(401);
-    const body = await res.json() as { error: string };
+    const body = (await res.json()) as { error: string };
     expect(body.error).toBe("Unauthorized");
   });
 
@@ -128,7 +128,7 @@ describe("authMiddleware", () => {
     const app = await createTestApp();
     const res = await makeRequest(app, "/protected/resource");
 
-    const body = await res.json() as { help: Record<string, string> };
+    const body = (await res.json()) as { help: Record<string, string> };
     expect(body.help).toBeDefined();
     expect(body.help.api_key).toContain("spike.land");
     expect(body.help.oauth_discovery).toContain("mcp.spike.land");

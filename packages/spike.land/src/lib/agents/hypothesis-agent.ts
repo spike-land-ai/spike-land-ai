@@ -33,7 +33,7 @@ export interface ExperimentAnalysis {
   variants: {
     id: string;
     metricValue: number;
-    confidenceInterval: { lower: number; upper: number; };
+    confidenceInterval: { lower: number; upper: number };
     effectSize: number | null;
   }[];
   insights: string;
@@ -73,7 +73,7 @@ export class HypothesisAgent {
       return "Professional";
     }
 
-    const profile = brandProfile as { toneDescriptors?: unknown; };
+    const profile = brandProfile as { toneDescriptors?: unknown };
 
     if (Array.isArray(profile.toneDescriptors)) {
       return profile.toneDescriptors.join(", ");
@@ -125,7 +125,7 @@ export class HypothesisAgent {
       Goal: Optimize for ${focus}
 
       Recent Content Observations:
-      ${topPosts.map(p => `- "${p.content.substring(0, 50)}..."`).join("\n")}
+      ${topPosts.map((p) => `- "${p.content.substring(0, 50)}..."`).join("\n")}
 
       Generate ${count} testable hypotheses for improving content performance.
       For each hypothesis, provide:
@@ -206,17 +206,17 @@ export class HypothesisAgent {
     const MINIMUM_DETECTABLE_EFFECT = params.minimumDetectableEffect ?? 0.2;
 
     if (!params.baselineRate || !params.minimumDetectableEffect) {
-      logger.warn("Using default experiment parameters — provide baselineRate and minimumDetectableEffect for accurate sample sizing", {
-        hypothesisId,
-        baselineRate: BASELINE_RATE,
-        minimumDetectableEffect: MINIMUM_DETECTABLE_EFFECT,
-      });
+      logger.warn(
+        "Using default experiment parameters — provide baselineRate and minimumDetectableEffect for accurate sample sizing",
+        {
+          hypothesisId,
+          baselineRate: BASELINE_RATE,
+          minimumDetectableEffect: MINIMUM_DETECTABLE_EFFECT,
+        },
+      );
     }
 
-    const sampleSize = calculateRequiredSampleSize(
-      BASELINE_RATE,
-      MINIMUM_DETECTABLE_EFFECT,
-    );
+    const sampleSize = calculateRequiredSampleSize(BASELINE_RATE, MINIMUM_DETECTABLE_EFFECT);
 
     return {
       hypothesisId,
@@ -302,9 +302,7 @@ export class HypothesisAgent {
   /**
    * Analyze experiment results
    */
-  async analyzeResults(params: {
-    experimentId: string;
-  }): Promise<ExperimentAnalysis> {
+  async analyzeResults(params: { experimentId: string }): Promise<ExperimentAnalysis> {
     const experiment = await prisma.socialPostAbTest.findUnique({
       where: { id: params.experimentId },
       include: { variants: true },
@@ -320,7 +318,7 @@ export class HypothesisAgent {
     // For now, let's just pick the best performing one first.
     const alpha = 1 - experiment.significanceLevel; // e.g., 0.05
 
-    const results = experiment.variants.map(v => {
+    const results = experiment.variants.map((v) => {
       const visitors = v.impressions;
       const conversions = v.engagements; // or clicks, based on metric
       const rate = visitors > 0 ? conversions / visitors : 0;
@@ -347,7 +345,7 @@ export class HypothesisAgent {
     // Check statistical significance (simplified pairwise against best)
     // Note: This is a simplified check.
     const isSignificant = isStatisticallySignificant(
-      results.map(r => ({
+      results.map((r) => ({
         visitors: r.visitors,
         conversions: r.conversions,
       })),
@@ -357,7 +355,7 @@ export class HypothesisAgent {
     const control = results[0]!;
 
     // Determine winner
-    const variantsForWinner = results.map(r => ({
+    const variantsForWinner = results.map((r) => ({
       id: r.id,
       name: r.id,
       visitors: r.visitors,
@@ -367,7 +365,7 @@ export class HypothesisAgent {
 
     // Save results to DB (ExperimentResult)
     await prisma.experimentResult.createMany({
-      data: results.map(r => ({
+      data: results.map((r) => ({
         experimentId: experiment.id,
         variantId: r.id,
         metricName: "engagement_rate", // Placeholder
@@ -386,13 +384,12 @@ export class HypothesisAgent {
     // Generate AI insights
     const insightsPrompt = `
       Analyze these A/B test results:
-      ${
-      results
+      ${results
         .map(
-          r => `Variant ${r.id}: ${(r.metricValue * 100).toFixed(2)}% conversion (N=${r.visitors})`,
+          (r) =>
+            `Variant ${r.id}: ${(r.metricValue * 100).toFixed(2)}% conversion (N=${r.visitors})`,
         )
-        .join("\n")
-    }
+        .join("\n")}
       
       Is the result statistically significant? ${isSignificant}
       Winner: ${winner ? winner.id : "None"}
@@ -425,7 +422,7 @@ export class HypothesisAgent {
       isSignificant,
       winnerVariantId: winner?.id || null,
       confidenceLevel: experiment.significanceLevel,
-      variants: results.map(r => ({
+      variants: results.map((r) => ({
         id: r.id,
         metricValue: r.metricValue,
         confidenceInterval: r.confidenceInterval,

@@ -328,9 +328,9 @@ describe("traversal", () => {
         status: "IN_PROGRESS",
       });
 
-      await expect(
-        answerQuestion("user-1", "session-1", true),
-      ).rejects.toThrow("Session does not belong to this user");
+      await expect(answerQuestion("user-1", "session-1", true)).rejects.toThrow(
+        "Session does not belong to this user",
+      );
     });
   });
 
@@ -369,9 +369,9 @@ describe("traversal", () => {
         treeId: "tree-1",
         leafNodeId: "leaf-1",
       });
-      mockPrisma.$transaction.mockImplementation(async (
-        fn: (tx: typeof mockPrisma) => Promise<unknown>,
-      ) => fn(mockPrisma));
+      mockPrisma.$transaction.mockImplementation(
+        async (fn: (tx: typeof mockPrisma) => Promise<unknown>) => fn(mockPrisma),
+      );
       mockPrisma.avlProfileNode.update.mockResolvedValue({});
       mockPrisma.avlUserProfile.delete.mockResolvedValue({});
       mockPrisma.avlTraversalSession.deleteMany.mockResolvedValue({});
@@ -405,12 +405,14 @@ describe("traversal", () => {
         userId: "user-1",
         treeId: "tree-1",
         leafNodeId: "leaf-1",
-        answerPath: [{
-          nodeId: "n1",
-          question: "Q1?",
-          questionTags: ["tag1"],
-          answer: true,
-        }],
+        answerPath: [
+          {
+            nodeId: "n1",
+            question: "Q1?",
+            questionTags: ["tag1"],
+            answer: true,
+          },
+        ],
         derivedTags: ["developer"],
         profileVector: {},
         completedAt: new Date(),
@@ -449,12 +451,14 @@ describe("traversal", () => {
         userId: "user-1",
         treeId: "tree-1",
         leafNodeId: "leaf-1",
-        answerPath: [{
-          nodeId: "n1",
-          question: "Q1?",
-          questionTags: ["tag1"],
-          answer: true,
-        }],
+        answerPath: [
+          {
+            nodeId: "n1",
+            question: "Q1?",
+            questionTags: ["tag1"],
+            answer: true,
+          },
+        ],
         derivedTags: ["developer"],
         profileVector: {},
         completedAt: new Date(),

@@ -61,9 +61,11 @@ export function EvaluatePanel() {
             disabled={status === "loading" || !expression.trim()}
             className="h-7"
           >
-            {status === "loading"
-              ? <Loader2 className="h-3 w-3 animate-spin mr-1.5" />
-              : <Play className="h-3 w-3 mr-1.5" />}
+            {status === "loading" ? (
+              <Loader2 className="h-3 w-3 animate-spin mr-1.5" />
+            ) : (
+              <Play className="h-3 w-3 mr-1.5" />
+            )}
             Run
           </Button>
         </div>
@@ -71,15 +73,13 @@ export function EvaluatePanel() {
       <CardContent className="space-y-3">
         <Textarea
           value={expression}
-          onChange={e => setExpression(e.target.value)}
+          onChange={(e) => setExpression(e.target.value)}
           onKeyDown={handleKeyDown}
           placeholder="document.title"
           className="font-mono text-xs min-h-[80px] resize-y bg-black/20 border-border/30"
           aria-label="JavaScript expression"
         />
-        <p className="text-[10px] text-muted-foreground/60">
-          Press Cmd+Enter or Ctrl+Enter to run
-        </p>
+        <p className="text-[10px] text-muted-foreground/60">Press Cmd+Enter or Ctrl+Enter to run</p>
 
         {status === "loading" && <Skeleton className="h-16 w-full" />}
 

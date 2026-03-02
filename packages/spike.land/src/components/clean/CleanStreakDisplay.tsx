@@ -8,9 +8,7 @@ interface CleanStreakDisplayProps {
   bestStreak: number;
 }
 
-export function CleanStreakDisplay(
-  { streak, bestStreak }: CleanStreakDisplayProps,
-) {
+export function CleanStreakDisplay({ streak, bestStreak }: CleanStreakDisplayProps) {
   return (
     <Card variant="orange">
       <CardContent className="flex items-center justify-between p-6">

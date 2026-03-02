@@ -5,20 +5,14 @@
  * Replaces Prisma (spike.land) with Drizzle ORM + D1.
  */
 
-import {
-  createProcedure,
-  middleware,
-} from "@spike-land-ai/shared/tool-builder";
+import { createProcedure, middleware } from "@spike-land-ai/shared/tool-builder";
 import type { DrizzleDB } from "../db/index";
 import { textResult, jsonResult } from "../tools/tool-helpers";
 
 // ─── Middleware: userId injection ───
 
 function withUserId(userId: string) {
-  return middleware<
-    Record<string, unknown>,
-    { userId: string }
-  >(async ({ ctx, next }) => {
+  return middleware<Record<string, unknown>, { userId: string }>(async ({ ctx, next }) => {
     return next({ ...ctx, userId });
   });
 }
@@ -26,10 +20,7 @@ function withUserId(userId: string) {
 // ─── Middleware: Drizzle DB injection ───
 
 function withDrizzle(db: DrizzleDB) {
-  return middleware<
-    Record<string, unknown>,
-    { db: DrizzleDB }
-  >(async ({ ctx, next }) => {
+  return middleware<Record<string, unknown>, { db: DrizzleDB }>(async ({ ctx, next }) => {
     return next({ ...ctx, db });
   });
 }
@@ -53,9 +44,7 @@ function withDrizzle(db: DrizzleDB) {
  * ```
  */
 export function freeTool(userId: string, db: DrizzleDB) {
-  return createProcedure()
-    .use(withUserId(userId))
-    .use(withDrizzle(db));
+  return createProcedure().use(withUserId(userId)).use(withDrizzle(db));
 }
 
 /**

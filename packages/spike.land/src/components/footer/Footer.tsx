@@ -54,47 +54,30 @@ export function Footer() {
 
             {/* Developers */}
             <div className="space-y-4">
-              <h4 className="text-sm font-semibold text-white font-heading">
-                Developers
-              </h4>
+              <h4 className="text-sm font-semibold text-white font-heading">Developers</h4>
               <ul className="space-y-2 text-sm text-muted-foreground">
                 <li>
-                  <Link
-                    href="/docs"
-                    className="hover:text-primary transition-colors"
-                  >
+                  <Link href="/docs" className="hover:text-primary transition-colors">
                     Docs
                   </Link>
                 </li>
                 <li>
-                  <Link
-                    href="/mcp"
-                    className="hover:text-primary transition-colors"
-                  >
+                  <Link href="/mcp" className="hover:text-primary transition-colors">
                     MCP Tools
                   </Link>
                 </li>
                 <li>
-                  <Link
-                    href="/store"
-                    className="hover:text-primary transition-colors"
-                  >
+                  <Link href="/store" className="hover:text-primary transition-colors">
                     App Store
                   </Link>
                 </li>
                 <li>
-                  <Link
-                    href="/store/skills"
-                    className="hover:text-primary transition-colors"
-                  >
+                  <Link href="/store/skills" className="hover:text-primary transition-colors">
                     Skills
                   </Link>
                 </li>
                 <li>
-                  <Link
-                    href="/docs/api"
-                    className="hover:text-primary transition-colors"
-                  >
+                  <Link href="/docs/api" className="hover:text-primary transition-colors">
                     API Reference
                   </Link>
                 </li>
@@ -103,31 +86,20 @@ export function Footer() {
 
             {/* Company */}
             <div className="space-y-4">
-              <h4 className="text-sm font-semibold text-white font-heading">
-                Company
-              </h4>
+              <h4 className="text-sm font-semibold text-white font-heading">Company</h4>
               <ul className="space-y-2 text-sm text-muted-foreground">
                 <li>
-                  <Link
-                    href="/blog"
-                    className="hover:text-primary transition-colors"
-                  >
+                  <Link href="/blog" className="hover:text-primary transition-colors">
                     Blog
                   </Link>
                 </li>
                 <li>
-                  <Link
-                    href="/about"
-                    className="hover:text-primary transition-colors"
-                  >
+                  <Link href="/about" className="hover:text-primary transition-colors">
                     About
                   </Link>
                 </li>
                 <li>
-                  <Link
-                    href="/pricing"
-                    className="hover:text-primary transition-colors"
-                  >
+                  <Link href="/pricing" className="hover:text-primary transition-colors">
                     Pricing
                   </Link>
                 </li>
@@ -146,23 +118,15 @@ export function Footer() {
 
             {/* Legal */}
             <div className="space-y-4">
-              <h4 className="text-sm font-semibold text-white font-heading">
-                Legal
-              </h4>
+              <h4 className="text-sm font-semibold text-white font-heading">Legal</h4>
               <ul className="space-y-2 text-sm text-muted-foreground">
                 <li>
-                  <Link
-                    href="/privacy"
-                    className="hover:text-primary transition-colors"
-                  >
+                  <Link href="/privacy" className="hover:text-primary transition-colors">
                     Privacy Policy
                   </Link>
                 </li>
                 <li>
-                  <Link
-                    href="/terms"
-                    className="hover:text-primary transition-colors"
-                  >
+                  <Link href="/terms" className="hover:text-primary transition-colors">
                     Terms of Service
                   </Link>
                 </li>
@@ -171,9 +135,7 @@ export function Footer() {
 
             {/* Resources */}
             <div className="space-y-4">
-              <h4 className="text-sm font-semibold text-white font-heading">
-                Resources
-              </h4>
+              <h4 className="text-sm font-semibold text-white font-heading">Resources</h4>
               <ul className="space-y-2 text-sm text-muted-foreground">
                 <li>
                   <a
@@ -196,18 +158,12 @@ export function Footer() {
                   </a>
                 </li>
                 <li>
-                  <Link
-                    href="/changelog"
-                    className="hover:text-primary transition-colors"
-                  >
+                  <Link href="/changelog" className="hover:text-primary transition-colors">
                     Changelog
                   </Link>
                 </li>
                 <li>
-                  <Link
-                    href="/status"
-                    className="hover:text-primary transition-colors"
-                  >
+                  <Link href="/status" className="hover:text-primary transition-colors">
                     Status Page
                   </Link>
                 </li>
@@ -216,9 +172,7 @@ export function Footer() {
           </div>
 
           <div className="mt-12 border-t border-white/10 pt-8 text-sm text-muted-foreground flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
-            <p>
-              &copy; {new Date().getFullYear()} Spike Land. All rights reserved.
-            </p>
+            <p>&copy; {new Date().getFullYear()} Spike Land. All rights reserved.</p>
             <span className="flex items-center gap-1.5 text-xs text-emerald-400">
               <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
               All systems operational

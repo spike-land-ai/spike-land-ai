@@ -24,7 +24,7 @@ export interface ProjectField {
   id: string;
   name: string;
   dataType: string;
-  options?: Array<{ id: string; name: string; }>;
+  options?: Array<{ id: string; name: string }>;
 }
 
 interface GitHubConfig {
@@ -36,7 +36,7 @@ interface GitHubConfig {
 
 interface GraphQLResponse<T> {
   data?: T;
-  errors?: Array<{ message: string; type?: string; }>;
+  errors?: Array<{ message: string; type?: string }>;
 }
 
 interface RateLimitInfo {
@@ -79,19 +79,14 @@ export class GitHubProjectsClient {
     if (this.rateLimitRemaining === null) return null;
     return {
       remaining: this.rateLimitRemaining,
-      resetAt: this.rateLimitResetAt
-        ? new Date(this.rateLimitResetAt).toISOString()
-        : "",
+      resetAt: this.rateLimitResetAt ? new Date(this.rateLimitResetAt).toISOString() : "",
     };
   }
 
   /**
    * List project items with cursor-based pagination
    */
-  async listItems(options?: {
-    first?: number;
-    after?: string;
-  }): Promise<{
+  async listItems(options?: { first?: number; after?: string }): Promise<{
     data: {
       items: ProjectItem[];
       hasNextPage: boolean;
@@ -156,7 +151,7 @@ export class GitHubProjectsClient {
     const result = await this.graphql<{
       node: {
         items: {
-          pageInfo: { hasNextPage: boolean; endCursor: string | null; };
+          pageInfo: { hasNextPage: boolean; endCursor: string | null };
           nodes: Array<{
             id: string;
             createdAt: string;
@@ -166,14 +161,14 @@ export class GitHubProjectsClient {
               body?: string;
               number?: number;
               url?: string;
-              labels?: { nodes: Array<{ name: string; }>; };
+              labels?: { nodes: Array<{ name: string }> };
             };
             fieldValues: {
               nodes: Array<{
                 text?: string;
                 name?: string;
                 date?: string;
-                field?: { name: string; };
+                field?: { name: string };
               }>;
             };
           }>;
@@ -186,7 +181,7 @@ export class GitHubProjectsClient {
     }
 
     const itemsData = result.data.node.items;
-    const items: ProjectItem[] = itemsData.nodes.map(node => {
+    const items: ProjectItem[] = itemsData.nodes.map((node) => {
       const fieldValues: Record<string, string> = {};
       for (const fv of node.fieldValues.nodes) {
         const fieldName = fv.field?.name;
@@ -202,7 +197,7 @@ export class GitHubProjectsClient {
         status: fieldValues.Status ?? "",
         ...(node.content?.number !== undefined ? { issueNumber: node.content.number } : {}),
         ...(node.content?.url !== undefined ? { issueUrl: node.content.url } : {}),
-        labels: node.content?.labels?.nodes.map(l => l.name) ?? [],
+        labels: node.content?.labels?.nodes.map((l) => l.name) ?? [],
         createdAt: node.createdAt,
         updatedAt: node.updatedAt,
         fieldValues,
@@ -222,14 +217,15 @@ export class GitHubProjectsClient {
   /**
    * Get all items (auto-paginate)
    */
-  async listAllItems(): Promise<
-    { data: ProjectItem[] | null; error: string | null; }
-  > {
+  async listAllItems(): Promise<{ data: ProjectItem[] | null; error: string | null }> {
     const allItems: ProjectItem[] = [];
     let cursor: string | undefined;
 
     for (let page = 0; page < 20; page++) {
-      const result = await this.listItems({ first: 100, ...(cursor !== undefined ? { after: cursor } : {}) });
+      const result = await this.listItems({
+        first: 100,
+        ...(cursor !== undefined ? { after: cursor } : {}),
+      });
       if (result.error || !result.data) {
         return {
           data: allItems.length > 0 ? allItems : null,
@@ -251,16 +247,10 @@ export class GitHubProjectsClient {
   /**
    * Create a GitHub issue
    */
-  async createIssue(options: {
-    title: string;
-    body: string;
-    labels?: string[];
-  }): Promise<
-    {
-      data: { number: number; id: string; url: string; } | null;
-      error: string | null;
-    }
-  > {
+  async createIssue(options: { title: string; body: string; labels?: string[] }): Promise<{
+    data: { number: number; id: string; url: string } | null;
+    error: string | null;
+  }> {
     const query = `
       mutation($repositoryId: ID!, $title: String!, $body: String!, $labelIds: [ID!]) {
         createIssue(input: {
@@ -297,7 +287,7 @@ export class GitHubProjectsClient {
     }
 
     const result = await this.graphql<{
-      createIssue: { issue: { number: number; id: string; url: string; }; };
+      createIssue: { issue: { number: number; id: string; url: string } };
     }>(query, {
       repositoryId: repoResult.data,
       title: options.title,
@@ -317,7 +307,7 @@ export class GitHubProjectsClient {
    */
   async addItemToProject(
     issueId: string,
-  ): Promise<{ data: { itemId: string; } | null; error: string | null; }> {
+  ): Promise<{ data: { itemId: string } | null; error: string | null }> {
     const query = `
       mutation($projectId: ID!, $contentId: ID!) {
         addProjectV2ItemById(input: {
@@ -330,7 +320,7 @@ export class GitHubProjectsClient {
     `;
 
     const result = await this.graphql<{
-      addProjectV2ItemById: { item: { id: string; }; };
+      addProjectV2ItemById: { item: { id: string } };
     }>(query, {
       projectId: this.config.projectId,
       contentId: issueId,
@@ -352,8 +342,8 @@ export class GitHubProjectsClient {
   async updateItemField(
     itemId: string,
     fieldId: string,
-    value: { text?: string; singleSelectOptionId?: string; date?: string; },
-  ): Promise<{ data: boolean; error: string | null; }> {
+    value: { text?: string; singleSelectOptionId?: string; date?: string },
+  ): Promise<{ data: boolean; error: string | null }> {
     const query = `
       mutation($projectId: ID!, $itemId: ID!, $fieldId: ID!, $value: ProjectV2FieldValue!) {
         updateProjectV2ItemFieldValue(input: {
@@ -368,7 +358,7 @@ export class GitHubProjectsClient {
     `;
 
     const result = await this.graphql<{
-      updateProjectV2ItemFieldValue: { projectV2Item: { id: string; }; };
+      updateProjectV2ItemFieldValue: { projectV2Item: { id: string } };
     }>(query, {
       projectId: this.config.projectId,
       itemId,
@@ -386,9 +376,7 @@ export class GitHubProjectsClient {
   /**
    * Get project fields (to discover field IDs for updates)
    */
-  async getProjectFields(): Promise<
-    { data: ProjectField[] | null; error: string | null; }
-  > {
+  async getProjectFields(): Promise<{ data: ProjectField[] | null; error: string | null }> {
     const query = `
       query($projectId: ID!) {
         node(id: $projectId) {
@@ -425,7 +413,7 @@ export class GitHubProjectsClient {
             id: string;
             name: string;
             dataType: string;
-            options?: Array<{ id: string; name: string; }>;
+            options?: Array<{ id: string; name: string }>;
           }>;
         };
       };
@@ -436,7 +424,7 @@ export class GitHubProjectsClient {
     }
 
     return {
-      data: result.data.node.fields.nodes.map(f => ({
+      data: result.data.node.fields.nodes.map((f) => ({
         id: f.id,
         name: f.name,
         dataType: f.dataType,
@@ -504,7 +492,7 @@ export class GitHubProjectsClient {
                 commits: {
                   nodes: Array<{
                     commit: {
-                      statusCheckRollup: { state: string; } | null;
+                      statusCheckRollup: { state: string } | null;
                     };
                   }>;
                 };
@@ -525,7 +513,7 @@ export class GitHubProjectsClient {
 
     // Find the most recent PR
     const timeline = result.data.repository.issue.timelineItems.nodes;
-    const pr = timeline.find(n => n.subject)?.subject;
+    const pr = timeline.find((n) => n.subject)?.subject;
 
     if (!pr) {
       return {
@@ -540,8 +528,7 @@ export class GitHubProjectsClient {
       };
     }
 
-    const ciStatus = pr.commits.nodes[0]?.commit.statusCheckRollup?.state
-      ?? null;
+    const ciStatus = pr.commits.nodes[0]?.commit.statusCheckRollup?.state ?? null;
 
     return {
       data: {
@@ -562,7 +549,7 @@ export class GitHubProjectsClient {
   private async graphql<T>(
     query: string,
     variables: Record<string, unknown>,
-  ): Promise<{ data: T | null; error: string | null; }> {
+  ): Promise<{ data: T | null; error: string | null }> {
     // Rate limit check
     if (this.rateLimitRemaining !== null && this.rateLimitRemaining <= 0) {
       const now = Date.now();
@@ -606,7 +593,7 @@ export class GitHubProjectsClient {
       if (json.errors?.length) {
         return {
           data: null,
-          error: json.errors.map(e => e.message).join("; "),
+          error: json.errors.map((e) => e.message).join("; "),
         };
       }
 
@@ -619,16 +606,14 @@ export class GitHubProjectsClient {
     }
   }
 
-  private async getRepositoryId(): Promise<
-    { data: string | null; error: string | null; }
-  > {
+  private async getRepositoryId(): Promise<{ data: string | null; error: string | null }> {
     const query = `
       query($owner: String!, $repo: String!) {
         repository(owner: $owner, name: $repo) { id }
       }
     `;
 
-    const result = await this.graphql<{ repository: { id: string; }; }>(query, {
+    const result = await this.graphql<{ repository: { id: string } }>(query, {
       owner: this.config.owner,
       repo: this.config.repo,
     });
@@ -642,7 +627,7 @@ export class GitHubProjectsClient {
 
   private async getLabelIds(
     labelNames: string[],
-  ): Promise<{ data: string[] | null; error: string | null; }> {
+  ): Promise<{ data: string[] | null; error: string | null }> {
     const query = `
       query($owner: String!, $repo: String!) {
         repository(owner: $owner, name: $repo) {
@@ -654,7 +639,7 @@ export class GitHubProjectsClient {
     `;
 
     const result = await this.graphql<{
-      repository: { labels: { nodes: Array<{ id: string; name: string; }>; }; };
+      repository: { labels: { nodes: Array<{ id: string; name: string }> } };
     }>(query, { owner: this.config.owner, repo: this.config.repo });
 
     if (result.error || !result.data) {
@@ -663,7 +648,7 @@ export class GitHubProjectsClient {
 
     const allLabels = result.data.repository.labels.nodes;
     const matchedIds = labelNames
-      .map(name => allLabels.find(l => l.name === name)?.id)
+      .map((name) => allLabels.find((l) => l.name === name)?.id)
       .filter((id): id is string => !!id);
 
     return { data: matchedIds, error: null };

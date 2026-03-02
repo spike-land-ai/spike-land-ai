@@ -29,12 +29,10 @@ export interface StorageConfig {
  */
 export function getStorageConfig(bucketEnvKeys?: string[]): StorageConfig {
   const accessKeyId = (
-    process.env.S3_ACCESS_KEY_ID
-    || process.env.CLOUDFLARE_R2_ACCESS_KEY_ID
+    process.env.S3_ACCESS_KEY_ID || process.env.CLOUDFLARE_R2_ACCESS_KEY_ID
   )?.trim();
   const secretAccessKey = (
-    process.env.S3_SECRET_ACCESS_KEY
-    || process.env.CLOUDFLARE_R2_SECRET_ACCESS_KEY
+    process.env.S3_SECRET_ACCESS_KEY || process.env.CLOUDFLARE_R2_SECRET_ACCESS_KEY
   )?.trim();
 
   // Check additional bucket env keys first, then fall back to defaults
@@ -46,28 +44,28 @@ export function getStorageConfig(bucketEnvKeys?: string[]): StorageConfig {
     }
   }
   if (!bucket) {
-    bucket = (
-      process.env.S3_BUCKET_NAME
-      || process.env.CLOUDFLARE_R2_BUCKET_NAME
-    )?.trim();
+    bucket = (process.env.S3_BUCKET_NAME || process.env.CLOUDFLARE_R2_BUCKET_NAME)?.trim();
   }
 
   // Endpoint is optional for native AWS S3, required for R2 / LocalStack
-  const endpoint = (
-    process.env.S3_ENDPOINT
-    || process.env.CLOUDFLARE_R2_ENDPOINT
-  )?.trim();
+  const endpoint = (process.env.S3_ENDPOINT || process.env.CLOUDFLARE_R2_ENDPOINT)?.trim();
   const region = process.env.S3_REGION || process.env.AWS_REGION || "auto";
 
   if (!accessKeyId || !secretAccessKey || !bucket) {
     throw new Error(
-      "Object storage credentials are not configured. "
-        + "Set S3_ACCESS_KEY_ID, S3_SECRET_ACCESS_KEY, S3_BUCKET_NAME "
-        + "(or CLOUDFLARE_R2_* equivalents).",
+      "Object storage credentials are not configured. " +
+        "Set S3_ACCESS_KEY_ID, S3_SECRET_ACCESS_KEY, S3_BUCKET_NAME " +
+        "(or CLOUDFLARE_R2_* equivalents).",
     );
   }
 
-  return { accessKeyId, secretAccessKey, bucket, ...(endpoint !== undefined ? { endpoint } : {}), region };
+  return {
+    accessKeyId,
+    secretAccessKey,
+    bucket,
+    ...(endpoint !== undefined ? { endpoint } : {}),
+    region,
+  };
 }
 
 /**
@@ -158,9 +156,7 @@ export interface DeleteImageResult {
 /**
  * Upload a file to object storage (S3 / R2)
  */
-export async function uploadToR2(
-  params: UploadImageParams,
-): Promise<UploadImageResult> {
+export async function uploadToR2(params: UploadImageParams): Promise<UploadImageResult> {
   const { key, buffer, contentType, metadata } = params;
 
   const uploadOperation = async () => {
@@ -181,14 +177,9 @@ export async function uploadToR2(
     await upload.done();
 
     // Construct the public URL
-    const publicUrl = (
-      process.env.S3_PUBLIC_URL
-      || process.env.CLOUDFLARE_R2_PUBLIC_URL
-    )?.trim();
+    const publicUrl = (process.env.S3_PUBLIC_URL || process.env.CLOUDFLARE_R2_PUBLIC_URL)?.trim();
     if (!publicUrl) {
-      throw new Error(
-        "S3_PUBLIC_URL (or CLOUDFLARE_R2_PUBLIC_URL) is not configured",
-      );
+      throw new Error("S3_PUBLIC_URL (or CLOUDFLARE_R2_PUBLIC_URL) is not configured");
     }
     return `${publicUrl}/${key}`;
   };
@@ -285,18 +276,18 @@ export async function deleteFromR2(key: string): Promise<DeleteImageResult> {
  */
 export function isStorageConfigured(): boolean {
   const hasS3 = !!(
-    process.env.S3_ACCESS_KEY_ID
-    && process.env.S3_SECRET_ACCESS_KEY
-    && process.env.S3_BUCKET_NAME
-    && (process.env.S3_PUBLIC_URL || process.env.CLOUDFLARE_R2_PUBLIC_URL)
+    process.env.S3_ACCESS_KEY_ID &&
+    process.env.S3_SECRET_ACCESS_KEY &&
+    process.env.S3_BUCKET_NAME &&
+    (process.env.S3_PUBLIC_URL || process.env.CLOUDFLARE_R2_PUBLIC_URL)
   );
   const hasR2 = !!(
-    process.env.CLOUDFLARE_ACCOUNT_ID
-    && process.env.CLOUDFLARE_R2_ACCESS_KEY_ID
-    && process.env.CLOUDFLARE_R2_SECRET_ACCESS_KEY
-    && process.env.CLOUDFLARE_R2_BUCKET_NAME
-    && process.env.CLOUDFLARE_R2_ENDPOINT
-    && process.env.CLOUDFLARE_R2_PUBLIC_URL
+    process.env.CLOUDFLARE_ACCOUNT_ID &&
+    process.env.CLOUDFLARE_R2_ACCESS_KEY_ID &&
+    process.env.CLOUDFLARE_R2_SECRET_ACCESS_KEY &&
+    process.env.CLOUDFLARE_R2_BUCKET_NAME &&
+    process.env.CLOUDFLARE_R2_ENDPOINT &&
+    process.env.CLOUDFLARE_R2_PUBLIC_URL
   );
   return hasS3 || hasR2;
 }
@@ -305,7 +296,7 @@ export interface StorageStats {
   totalFiles: number;
   totalSizeBytes: number;
   averageSizeBytes: number;
-  byFileType: Record<string, { count: number; sizeBytes: number; }>;
+  byFileType: Record<string, { count: number; sizeBytes: number }>;
 }
 
 export interface ListStorageResult {
@@ -372,9 +363,7 @@ export async function listR2StorageStats(): Promise<ListStorageResult> {
 
     // Calculate average
     if (stats.totalFiles > 0) {
-      stats.averageSizeBytes = Math.round(
-        stats.totalSizeBytes / stats.totalFiles,
-      );
+      stats.averageSizeBytes = Math.round(stats.totalSizeBytes / stats.totalFiles);
     }
 
     const truncated = hasMore && iterations >= MAX_ITERATIONS;

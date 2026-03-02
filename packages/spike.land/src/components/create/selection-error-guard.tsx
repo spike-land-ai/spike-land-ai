@@ -14,9 +14,9 @@ export function SelectionErrorGuard() {
   useEffect(() => {
     function handleError(event: ErrorEvent): void {
       if (
-        event.error instanceof DOMException
-        && event.error.name === "InvalidNodeTypeError"
-        && event.message?.includes("selectNode")
+        event.error instanceof DOMException &&
+        event.error.name === "InvalidNodeTypeError" &&
+        event.message?.includes("selectNode")
       ) {
         event.preventDefault();
         // Clear any stale selection to prevent further errors

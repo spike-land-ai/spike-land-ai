@@ -10,9 +10,7 @@ interface RelatedAppsProps {
   className?: string;
 }
 
-export function RelatedApps(
-  { links, publishedApps, className }: RelatedAppsProps,
-) {
+export function RelatedApps({ links, publishedApps, className }: RelatedAppsProps) {
   const hasPublished = publishedApps && publishedApps.length > 0;
   const hasLinks = links && links.length > 0;
 
@@ -60,7 +58,7 @@ export function RelatedApps(
             More Apps
           </h3>
           <div className="space-y-3">
-            {publishedApps.map(app => (
+            {publishedApps.map((app) => (
               <Link
                 key={app.id}
                 href={`/create/${app.slug}`}
@@ -77,9 +75,7 @@ export function RelatedApps(
                   </div>
                 )}
                 <div className="p-2">
-                  <div className="font-medium text-sm truncate">
-                    {app.title}
-                  </div>
+                  <div className="font-medium text-sm truncate">{app.title}</div>
                 </div>
               </Link>
             ))}

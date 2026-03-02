@@ -304,7 +304,7 @@ async function checkGemini(): Promise<CheckResult> {
       };
     }
 
-    const data = (await response.json()) as { models?: unknown[]; };
+    const data = (await response.json()) as { models?: unknown[] };
     const modelCount = data.models?.length ?? 0;
     return {
       name,
@@ -364,8 +364,8 @@ async function checkResend(): Promise<CheckResult> {
       };
     }
 
-    const data = (await response.json()) as { data?: { name: string; }[]; };
-    const domains = data.data?.map(d => d.name).join(", ") || "no domains";
+    const data = (await response.json()) as { data?: { name: string }[] };
+    const domains = data.data?.map((d) => d.name).join(", ") || "no domains";
     return {
       name,
       category: "services",
@@ -444,8 +444,7 @@ async function checkR2(): Promise<CheckResult> {
 async function checkUpstash(): Promise<CheckResult> {
   const name = "Upstash Redis";
   const url = process.env.UPSTASH_REDIS_REST_URL || process.env.KV_REST_API_URL;
-  const token = process.env.UPSTASH_REDIS_REST_TOKEN
-    || process.env.KV_REST_API_TOKEN;
+  const token = process.env.UPSTASH_REDIS_REST_TOKEN || process.env.KV_REST_API_TOKEN;
 
   if (!url || !token) {
     return {
@@ -482,7 +481,7 @@ async function checkUpstash(): Promise<CheckResult> {
       };
     }
 
-    const data = (await response.json()) as { result?: string; };
+    const data = (await response.json()) as { result?: string };
     if (data.result === "PONG") {
       return {
         name,
@@ -526,12 +525,9 @@ async function checkStripe(): Promise<CheckResult> {
   }
 
   try {
-    const response = await fetchWithTimeout(
-      "https://api.stripe.com/v1/balance",
-      {
-        headers: { Authorization: `Bearer ${secretKey}` },
-      },
-    );
+    const response = await fetchWithTimeout("https://api.stripe.com/v1/balance", {
+      headers: { Authorization: `Bearer ${secretKey}` },
+    });
 
     if (response.status === 401) {
       return {
@@ -626,12 +622,9 @@ async function checkDiscord(): Promise<CheckResult> {
   }
 
   try {
-    const response = await fetchWithTimeout(
-      "https://discord.com/api/v10/users/@me",
-      {
-        headers: { Authorization: `Bot ${token}` },
-      },
-    );
+    const response = await fetchWithTimeout("https://discord.com/api/v10/users/@me", {
+      headers: { Authorization: `Bot ${token}` },
+    });
 
     if (response.status === 401) {
       return {
@@ -694,20 +687,15 @@ async function checkTwitter(): Promise<CheckResult> {
 
   try {
     // Twitter OAuth 2.0 client credentials flow
-    const credentials = Buffer.from(`${clientId}:${clientSecret}`).toString(
-      "base64",
-    );
-    const response = await fetchWithTimeout(
-      "https://api.twitter.com/2/oauth2/token",
-      {
-        method: "POST",
-        headers: {
-          Authorization: `Basic ${credentials}`,
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
-        body: "grant_type=client_credentials",
+    const credentials = Buffer.from(`${clientId}:${clientSecret}`).toString("base64");
+    const response = await fetchWithTimeout("https://api.twitter.com/2/oauth2/token", {
+      method: "POST",
+      headers: {
+        Authorization: `Basic ${credentials}`,
+        "Content-Type": "application/x-www-form-urlencoded",
       },
-    );
+      body: "grant_type=client_credentials",
+    });
 
     if (response.status === 401) {
       return {
@@ -887,21 +875,16 @@ async function main() {
   console.log("=".repeat(60));
 
   // Run all checks in parallel
-  const results = await Promise.all(checks.map(check => check()));
+  const results = await Promise.all(checks.map((check) => check()));
 
   // Group by category
-  const categories: CheckResult["category"][] = [
-    "core",
-    "oauth",
-    "services",
-    "social",
-  ];
+  const categories: CheckResult["category"][] = ["core", "oauth", "services", "social"];
   let totalPass = 0;
   let totalFail = 0;
   let totalSkip = 0;
 
   for (const category of categories) {
-    const categoryResults = results.filter(r => r.category === category);
+    const categoryResults = results.filter((r) => r.category === category);
     if (categoryResults.length === 0) continue;
 
     console.log("");
@@ -921,31 +904,23 @@ async function main() {
 
   console.log("");
   console.log("=".repeat(60));
-  console.log(
-    `Summary: ${totalPass} passed, ${totalFail} failed, ${totalSkip} skipped`,
-  );
+  console.log(`Summary: ${totalPass} passed, ${totalFail} failed, ${totalSkip} skipped`);
   console.log("");
 
   // Exit with error if any configured service failed
   // (skip doesn't count as failure - only configured services that don't work)
   if (totalFail > 0) {
-    console.log(
-      "\x1b[31mError: Some configured services failed validation.\x1b[0m",
-    );
-    console.log(
-      "Fix the issues above or remove the invalid environment variables.",
-    );
+    console.log("\x1b[31mError: Some configured services failed validation.\x1b[0m");
+    console.log("Fix the issues above or remove the invalid environment variables.");
     process.exit(1);
   }
 
   if (verbose) {
-    console.log(
-      "\x1b[32mAll configured services are working correctly.\x1b[0m",
-    );
+    console.log("\x1b[32mAll configured services are working correctly.\x1b[0m");
   }
 }
 
-main().catch(error => {
+main().catch((error) => {
   console.error("Unexpected error:", error);
   process.exit(1);
 });

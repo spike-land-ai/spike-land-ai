@@ -27,22 +27,23 @@ export function TaskBoard({
   onSkip,
   onRequeue,
 }: TaskBoardProps) {
-  const [skipDialogTask, setSkipDialogTask] = useState<CleaningTask | null>(
-    null,
-  );
+  const [skipDialogTask, setSkipDialogTask] = useState<CleaningTask | null>(null);
 
-  const pendingTasks = tasks.filter(t => t.status === "PENDING");
-  const completedTasks = tasks.filter(t => t.status === "COMPLETED");
-  const skippedTasks = tasks.filter(t => t.status === "SKIPPED");
+  const pendingTasks = tasks.filter((t) => t.status === "PENDING");
+  const completedTasks = tasks.filter((t) => t.status === "COMPLETED");
+  const skippedTasks = tasks.filter((t) => t.status === "SKIPPED");
   const currentTask = pendingTasks[0] ?? null;
 
   const doneCount = completedTasks.length + skippedTasks.length;
   const totalCount = tasks.length;
 
-  const handleSkipClick = useCallback((taskId: string) => {
-    const task = tasks.find(t => t.id === taskId);
-    if (task) setSkipDialogTask(task);
-  }, [tasks]);
+  const handleSkipClick = useCallback(
+    (taskId: string) => {
+      const task = tasks.find((t) => t.id === taskId);
+      if (task) setSkipDialogTask(task);
+    },
+    [tasks],
+  );
 
   const handleConfirmSkip = useCallback(
     (reason?: string) => {
@@ -94,10 +95,7 @@ export function TaskBoard({
     );
   }
 
-  const totalPointsPending = pendingTasks.reduce(
-    (sum, t) => sum + t.pointsValue,
-    0,
-  );
+  const totalPointsPending = pendingTasks.reduce((sum, t) => sum + t.pointsValue, 0);
 
   return (
     <div className="space-y-4">
@@ -111,13 +109,9 @@ export function TaskBoard({
           </div>
         </CardHeader>
         <CardContent className="space-y-4 pt-0">
-          <CleanProgressBar
-            completed={doneCount}
-            total={totalCount}
-            label="Progress"
-          />
+          <CleanProgressBar completed={doneCount} total={totalCount} label="Progress" />
           <div className="space-y-3 max-h-[55vh] overflow-y-auto pr-1">
-            {tasks.map(task => (
+            {tasks.map((task) => (
               <CleanTaskCard
                 key={task.id}
                 task={task}

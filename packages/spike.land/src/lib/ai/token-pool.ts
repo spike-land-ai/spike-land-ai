@@ -72,8 +72,7 @@ async function setLastGoodIdx(idx: number): Promise<void> {
 function isAuthError(error: unknown): boolean {
   if (error instanceof Anthropic.AuthenticationError) return true;
   if (error instanceof Error) {
-    return error.message.includes("authentication_error")
-      || error.message.includes("401");
+    return error.message.includes("authentication_error") || error.message.includes("401");
   }
   return false;
 }
@@ -92,8 +91,8 @@ export async function withTokenFallback<T>(
   const pool = resolveTokenPool();
   if (pool.length === 0) {
     throw new Error(
-      "No Anthropic auth tokens available. "
-        + "Set CLAUDE_CODE_OAUTH_TOKEN or CLAUDE_CODE_OAUTH_TOKEN_2…_10.",
+      "No Anthropic auth tokens available. " +
+        "Set CLAUDE_CODE_OAUTH_TOKEN or CLAUDE_CODE_OAUTH_TOKEN_2…_10.",
     );
   }
 

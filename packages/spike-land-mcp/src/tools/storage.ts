@@ -22,24 +22,22 @@ export function registerStorageTools(
     t
       .tool(
         "storage_get_upload_url",
-        "Get a presigned URL for uploading a file to object storage. "
-          + "Currently delegates to spike.land — R2 bindings not yet available in this worker.",
+        "Get a presigned URL for uploading a file to object storage. " +
+          "Currently delegates to spike.land — R2 bindings not yet available in this worker.",
         {
           filename: z.string().describe("Original filename"),
           content_type: z.string().describe("MIME type of the file"),
-          purpose: z
-            .enum(["image", "audio", "asset", "brand"])
-            .describe("Purpose of the upload"),
+          purpose: z.enum(["image", "audio", "asset", "brand"]).describe("Purpose of the upload"),
         },
       )
       .meta({ category: "storage", tier: "workspace" })
       .handler(async () => {
         return textResult(
-          "**Storage operations are managed at spike.land**\n\n"
-            + "This worker does not have R2 bindings configured. "
-            + "Use the spike.land platform directly for file uploads:\n"
-            + "- Upload via https://spike.land/api/storage/upload\n"
-            + "- Or use the spike.land MCP server's storage tools.",
+          "**Storage operations are managed at spike.land**\n\n" +
+            "This worker does not have R2 bindings configured. " +
+            "Use the spike.land platform directly for file uploads:\n" +
+            "- Upload via https://spike.land/api/storage/upload\n" +
+            "- Or use the spike.land MCP server's storage tools.",
         );
       }),
   );
@@ -48,29 +46,22 @@ export function registerStorageTools(
     t
       .tool(
         "storage_register_upload",
-        "Register a completed upload and create a database record. "
-          + "Currently delegates to spike.land.",
+        "Register a completed upload and create a database record. " +
+          "Currently delegates to spike.land.",
         {
-          r2_key: z
-            .string()
-            .describe("The key returned by storage_get_upload_url"),
-          purpose: z
-            .enum(["image", "audio", "asset", "brand"])
-            .describe("Purpose of the upload"),
-          metadata: z
-            .record(z.string(), z.unknown())
-            .optional()
-            .describe("Additional metadata"),
+          r2_key: z.string().describe("The key returned by storage_get_upload_url"),
+          purpose: z.enum(["image", "audio", "asset", "brand"]).describe("Purpose of the upload"),
+          metadata: z.record(z.string(), z.unknown()).optional().describe("Additional metadata"),
         },
       )
       .meta({ category: "storage", tier: "workspace" })
       .handler(async () => {
         return textResult(
-          "**Storage operations are managed at spike.land**\n\n"
-            + "This worker does not have R2 bindings configured. "
-            + "Use the spike.land platform directly for upload registration:\n"
-            + "- Register via https://spike.land/api/storage/register\n"
-            + "- Or use the spike.land MCP server's storage tools.",
+          "**Storage operations are managed at spike.land**\n\n" +
+            "This worker does not have R2 bindings configured. " +
+            "Use the spike.land platform directly for upload registration:\n" +
+            "- Register via https://spike.land/api/storage/register\n" +
+            "- Or use the spike.land MCP server's storage tools.",
         );
       }),
   );

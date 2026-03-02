@@ -106,13 +106,7 @@ describe("AuditLogger.logTokenAdjustment", () => {
 describe("AuditLogger.logVoucherCreate", () => {
   it("logs voucher creation", async () => {
     mockCreate.mockResolvedValue({ id: "log-5" });
-    await AuditLogger.logVoucherCreate(
-      "admin-1",
-      "voucher-1",
-      "WELCOME50",
-      "PERCENTAGE",
-      50,
-    );
+    await AuditLogger.logVoucherCreate("admin-1", "voucher-1", "WELCOME50", "PERCENTAGE", 50);
     expect(mockCreate).toHaveBeenCalledWith({
       data: expect.objectContaining({
         action: "VOUCHER_CREATE",
@@ -161,13 +155,10 @@ describe("AuditLogger.logVoucherDelete", () => {
 describe("AuditLogger.logUserDelete", () => {
   it("logs user deletion with deleted data", async () => {
     mockCreate.mockResolvedValue({ id: "log-8" });
-    await AuditLogger.logUserDelete(
-      "admin-1",
-      "user-1",
-      "test@example.com",
-      "Test User",
-      { albums: 3, images: 10 },
-    );
+    await AuditLogger.logUserDelete("admin-1", "user-1", "test@example.com", "Test User", {
+      albums: 3,
+      images: 10,
+    });
     expect(mockCreate).toHaveBeenCalledWith({
       data: expect.objectContaining({
         action: "USER_DELETE",
@@ -199,9 +190,7 @@ describe("AuditLogger.getLogsByUser", () => {
   it("respects custom limit", async () => {
     mockFindMany.mockResolvedValue([]);
     await AuditLogger.getLogsByUser("user-1", 10);
-    expect(mockFindMany).toHaveBeenCalledWith(
-      expect.objectContaining({ take: 10 }),
-    );
+    expect(mockFindMany).toHaveBeenCalledWith(expect.objectContaining({ take: 10 }));
   });
 });
 
@@ -224,16 +213,12 @@ describe("AuditLogger.getRecentLogs", () => {
   it("queries recent logs with default limit 100", async () => {
     mockFindMany.mockResolvedValue([]);
     await AuditLogger.getRecentLogs();
-    expect(mockFindMany).toHaveBeenCalledWith(
-      expect.objectContaining({ take: 100 }),
-    );
+    expect(mockFindMany).toHaveBeenCalledWith(expect.objectContaining({ take: 100 }));
   });
 
   it("respects custom limit", async () => {
     mockFindMany.mockResolvedValue([]);
     await AuditLogger.getRecentLogs(25);
-    expect(mockFindMany).toHaveBeenCalledWith(
-      expect.objectContaining({ take: 25 }),
-    );
+    expect(mockFindMany).toHaveBeenCalledWith(expect.objectContaining({ take: 25 }));
   });
 });

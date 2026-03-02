@@ -12,11 +12,12 @@ let evidenceCounter = 0;
 
 function makeEvidence(type: EvidenceType, successRatio: number): EvidencePoint {
   evidenceCounter += 1;
-  const base = type === "positive"
-    ? 0.65 + Math.random() * 0.3
-    : type === "negative"
-    ? 0.05 + Math.random() * 0.3
-    : 0.35 + Math.random() * 0.3;
+  const base =
+    type === "positive"
+      ? 0.65 + Math.random() * 0.3
+      : type === "negative"
+        ? 0.05 + Math.random() * 0.3
+        : 0.35 + Math.random() * 0.3;
   const value = Math.min(0.98, Math.max(0.02, base * 0.7 + successRatio * 0.3));
   return { id: `ev-${evidenceCounter}`, type, value };
 }
@@ -53,22 +54,22 @@ export function BayesianConfidenceDemo() {
 
   const addPositive = useCallback(() => {
     const pt = makeEvidence("positive", successRatio);
-    setEvidencePoints(prev => [...prev.slice(-29), pt]);
-    setSuccesses(s => s + 1);
+    setEvidencePoints((prev) => [...prev.slice(-29), pt]);
+    setSuccesses((s) => s + 1);
     triggerFlash();
   }, [successRatio, triggerFlash]);
 
   const addNegative = useCallback(() => {
     const pt = makeEvidence("negative", successRatio);
-    setEvidencePoints(prev => [...prev.slice(-29), pt]);
-    setFailures(f => f + 1);
+    setEvidencePoints((prev) => [...prev.slice(-29), pt]);
+    setFailures((f) => f + 1);
     triggerFlash();
   }, [successRatio, triggerFlash]);
 
   const addNeutral = useCallback(() => {
     const pt = makeEvidence("neutral", successRatio);
-    setEvidencePoints(prev => [...prev.slice(-29), pt]);
-    setNeutrals(n => n + 1);
+    setEvidencePoints((prev) => [...prev.slice(-29), pt]);
+    setNeutrals((n) => n + 1);
     triggerFlash();
   }, [successRatio, triggerFlash]);
 
@@ -100,20 +101,8 @@ export function BayesianConfidenceDemo() {
 
       <div className="flex flex-col sm:flex-row gap-6 p-6 sm:p-8 rounded-xl bg-slate-950/80 backdrop-blur-xl border border-slate-800 relative overflow-hidden">
         <div className="absolute top-0 right-0 p-4 opacity-10 pointer-events-none">
-          <svg
-            width="40"
-            height="40"
-            viewBox="0 0 100 100"
-            className="stroke-emerald-500"
-          >
-            <circle
-              cx="50"
-              cy="50"
-              r="40"
-              fill="none"
-              strokeWidth="2"
-              strokeDasharray="4 8"
-            />
+          <svg width="40" height="40" viewBox="0 0 100 100" className="stroke-emerald-500">
+            <circle cx="50" cy="50" r="40" fill="none" strokeWidth="2" strokeDasharray="4 8" />
             <circle cx="50" cy="50" r="20" fill="none" strokeWidth="2" />
           </svg>
         </div>

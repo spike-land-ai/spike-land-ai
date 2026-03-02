@@ -22,9 +22,7 @@ function StatItem({ label, count, dotClass, textClass }: StatItemProps) {
   return (
     <div className="flex items-center gap-2">
       <span className={cn("h-2 w-2 rounded-full", dotClass)} />
-      <span className={cn("text-sm font-semibold tabular-nums", textClass)}>
-        {count}
-      </span>
+      <span className={cn("text-sm font-semibold tabular-nums", textClass)}>{count}</span>
       <span className="text-xs text-zinc-500">{label}</span>
     </div>
   );
@@ -49,24 +47,14 @@ export function SwarmStatsBar({
           dotClass="bg-green-400 animate-pulse"
           textClass="text-green-400"
         />
-        <StatItem
-          label="idle"
-          count={idle}
-          dotClass="bg-zinc-500"
-          textClass="text-zinc-300"
-        />
+        <StatItem label="idle" count={idle} dotClass="bg-zinc-500" textClass="text-zinc-300" />
         <StatItem
           label="completed"
           count={completed}
           dotClass="bg-blue-400"
           textClass="text-blue-400"
         />
-        <StatItem
-          label="failed"
-          count={failed}
-          dotClass="bg-red-400"
-          textClass="text-red-400"
-        />
+        <StatItem label="failed" count={failed} dotClass="bg-red-400" textClass="text-red-400" />
 
         <div className="flex-1 min-w-[160px]">
           <div className="flex items-center justify-between mb-1.5">

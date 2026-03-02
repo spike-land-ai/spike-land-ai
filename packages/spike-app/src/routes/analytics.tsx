@@ -95,10 +95,7 @@ export function AnalyticsPage() {
     [allEvents, cutoff],
   );
 
-  const onlineUsers = useMemo(
-    () => agents.filter((a) => a.online).length,
-    [agents],
-  );
+  const onlineUsers = useMemo(() => agents.filter((a) => a.online).length, [agents]);
 
   const toolInvocations = useMemo(
     () => filteredEvents.filter((e) => e.event_type === "tool_use"),
@@ -122,10 +119,7 @@ export function AnalyticsPage() {
   }, [toolInvocations]);
 
   const recentEvents = useMemo(
-    () =>
-      [...filteredEvents]
-        .sort((a, b) => b.created_at - a.created_at)
-        .slice(0, 20),
+    () => [...filteredEvents].sort((a, b) => b.created_at - a.created_at).slice(0, 20),
     [filteredEvents],
   );
 
@@ -178,9 +172,7 @@ export function AnalyticsPage() {
                   key={tool.name}
                   className="flex items-center justify-between rounded-lg bg-gray-50 px-3 py-2"
                 >
-                  <span className="text-sm font-medium text-gray-700">
-                    {tool.name}
-                  </span>
+                  <span className="text-sm font-medium text-gray-700">{tool.name}</span>
                   <div className="flex items-center gap-2">
                     <div
                       className="h-2 rounded-full bg-blue-500"
@@ -219,9 +211,7 @@ export function AnalyticsPage() {
                     <span className="inline-block rounded bg-gray-100 px-1.5 py-0.5 text-xs font-medium text-gray-600">
                       {event.event_type}
                     </span>
-                    <span className="text-sm text-gray-500">
-                      {event.source}
-                    </span>
+                    <span className="text-sm text-gray-500">{event.source}</span>
                   </div>
                   <span className="text-xs text-gray-400">
                     {new Date(event.created_at).toLocaleTimeString()}
@@ -256,16 +246,10 @@ export function AnalyticsPage() {
               <tbody>
                 {appsByActivity.slice(0, 10).map((app) => (
                   <tr key={app.id} className="border-b last:border-0">
-                    <td className="py-2 font-medium text-gray-900">
-                      {app.name}
-                    </td>
+                    <td className="py-2 font-medium text-gray-900">{app.name}</td>
                     <td className="py-2 text-gray-500">{app.owner}</td>
-                    <td className="py-2 text-right text-gray-700">
-                      {app.message_count}
-                    </td>
-                    <td className="py-2 text-right text-gray-400">
-                      v{app.version}
-                    </td>
+                    <td className="py-2 text-right text-gray-700">{app.message_count}</td>
+                    <td className="py-2 text-right text-gray-400">v{app.version}</td>
                   </tr>
                 ))}
               </tbody>

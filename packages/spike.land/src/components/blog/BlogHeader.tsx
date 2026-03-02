@@ -60,7 +60,7 @@ export function BlogHeader({ frontmatter, readingTime }: BlogHeaderProps) {
       {/* Tags */}
       {frontmatter.tags.length > 0 && (
         <div className="flex flex-wrap gap-2 mt-4">
-          {frontmatter.tags.map(tag => (
+          {frontmatter.tags.map((tag) => (
             <span
               key={tag}
               className="text-xs font-bold tracking-wider uppercase bg-primary/10 text-primary px-3 py-1.5 rounded-full border border-primary/20 backdrop-blur-sm"

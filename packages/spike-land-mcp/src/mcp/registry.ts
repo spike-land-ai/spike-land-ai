@@ -8,14 +8,8 @@
  * removed Gemini semantic search (keyword + TF-IDF only).
  */
 
-import type {
-  McpServer,
-  RegisteredTool,
-} from "@modelcontextprotocol/sdk/server/mcp.js";
-import type {
-  CallToolResult,
-  ToolAnnotations,
-} from "@modelcontextprotocol/sdk/types.js";
+import type { McpServer, RegisteredTool } from "@modelcontextprotocol/sdk/server/mcp.js";
+import type { CallToolResult, ToolAnnotations } from "@modelcontextprotocol/sdk/types.js";
 import type { z } from "zod";
 import type { BuiltTool } from "@spike-land-ai/shared/tool-builder";
 import { CATEGORY_DESCRIPTIONS } from "./categories";
@@ -28,9 +22,7 @@ export { CATEGORY_DESCRIPTIONS } from "./categories";
  * Validate that all fields in a Zod input schema have `.describe()` calls.
  * Returns an array of field names missing descriptions.
  */
-export function validateSchemaDescriptions(
-  inputSchema: z.ZodRawShape | undefined,
-): string[] {
+export function validateSchemaDescriptions(inputSchema: z.ZodRawShape | undefined): string[] {
   if (!inputSchema) return [];
   const missing: string[] = [];
   for (const [fieldName, zodType] of Object.entries(inputSchema)) {
@@ -166,10 +158,18 @@ export class ToolRegistry {
       tier: built.meta.tier ?? "free",
       ...(built.meta.complexity ? { complexity: built.meta.complexity } : {}),
       ...(built.meta.annotations ? { annotations: built.meta.annotations as ToolAnnotations } : {}),
-      ...(built.meta.alwaysEnabled !== undefined ? { alwaysEnabled: built.meta.alwaysEnabled } : {}),
-      ...((built.meta as Record<string, unknown>).version ? { version: (built.meta as Record<string, unknown>).version as string } : {}),
-      ...((built.meta as Record<string, unknown>).stability ? { stability: (built.meta as Record<string, unknown>).stability as ToolStability } : {}),
-      ...((built.meta as Record<string, unknown>).examples ? { examples: (built.meta as Record<string, unknown>).examples as ToolExample[] } : {}),
+      ...(built.meta.alwaysEnabled !== undefined
+        ? { alwaysEnabled: built.meta.alwaysEnabled }
+        : {}),
+      ...((built.meta as Record<string, unknown>).version
+        ? { version: (built.meta as Record<string, unknown>).version as string }
+        : {}),
+      ...((built.meta as Record<string, unknown>).stability
+        ? { stability: (built.meta as Record<string, unknown>).stability as ToolStability }
+        : {}),
+      ...((built.meta as Record<string, unknown>).examples
+        ? { examples: (built.meta as Record<string, unknown>).examples as ToolExample[] }
+        : {}),
       inputSchema: built.inputSchema,
       handler: built.handler as unknown as ToolDefinition["handler"],
     });
@@ -209,11 +209,7 @@ export class ToolRegistry {
   disableCategory(category: string): string[] {
     const disabled: string[] = [];
     for (const [, { definition, registered }] of this.tools) {
-      if (
-        definition.category === category
-        && registered.enabled
-        && !definition.alwaysEnabled
-      ) {
+      if (definition.category === category && registered.enabled && !definition.alwaysEnabled) {
         registered.disable();
         disabled.push(definition.name);
       }
@@ -222,10 +218,7 @@ export class ToolRegistry {
   }
 
   listCategories(): CategoryInfo[] {
-    const categories = new Map<
-      string,
-      { tools: string[]; enabledCount: number; tier: string }
-    >();
+    const categories = new Map<string, { tools: string[]; enabledCount: number; tier: string }>();
 
     for (const [, { definition, registered }] of this.tools) {
       let cat = categories.get(definition.category);
@@ -255,9 +248,9 @@ export class ToolRegistry {
     const categories = new Set<string>();
     for (const [, { definition, registered }] of this.tools) {
       if (
-        registered.enabled
-        && !definition.alwaysEnabled
-        && definition.category !== "gateway-meta"
+        registered.enabled &&
+        !definition.alwaysEnabled &&
+        definition.category !== "gateway-meta"
       ) {
         categories.add(definition.category);
       }
@@ -314,7 +307,9 @@ export class ToolRegistry {
       handler: definition.handler,
       ...(definition.inputSchema !== undefined ? { inputSchema: definition.inputSchema } : {}),
       enabled: registered.enabled ?? false,
-      ...(definition.alwaysEnabled !== undefined ? { alwaysEnabled: definition.alwaysEnabled } : {}),
+      ...(definition.alwaysEnabled !== undefined
+        ? { alwaysEnabled: definition.alwaysEnabled }
+        : {}),
       version: definition.version ?? "1.0.0",
       stability: definition.stability ?? "stable",
       ...(definition.examples !== undefined ? { examples: definition.examples } : {}),
@@ -325,10 +320,7 @@ export class ToolRegistry {
    * Call a tool handler directly, bypassing MCP transport.
    * Used by InProcessToolProvider for Docker/production environments.
    */
-  async callToolDirect(
-    name: string,
-    input: Record<string, unknown>,
-  ): Promise<CallToolResult> {
+  async callToolDirect(name: string, input: Record<string, unknown>): Promise<CallToolResult> {
     const tracked = this.tools.get(name);
     if (!tracked) {
       return {

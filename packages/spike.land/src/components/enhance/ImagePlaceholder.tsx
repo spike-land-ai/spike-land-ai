@@ -28,7 +28,7 @@ export function ImagePlaceholder({
     // Note: FileReader.readAsDataURL creates a base64 data URL string,
     // NOT a blob URL. Data URLs don't need cleanup/revocation.
     const reader = new FileReader();
-    reader.onload = e => {
+    reader.onload = (e) => {
       if (e.target?.result) {
         setPreview(e.target.result as string);
       }
@@ -62,8 +62,8 @@ export function ImagePlaceholder({
             status === "uploading" || status === "processing"
               ? "blur-sm opacity-70"
               : status === "failed"
-              ? "blur-sm opacity-50 grayscale"
-              : "blur-0 opacity-100",
+                ? "blur-sm opacity-50 grayscale"
+                : "blur-0 opacity-100",
           )}
           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
         />
@@ -76,9 +76,7 @@ export function ImagePlaceholder({
       {(status === "uploading" || status === "processing") && (
         <div className="absolute inset-0 flex flex-col items-center justify-center bg-background/50">
           <Loader2 className="h-8 w-8 animate-spin text-primary mb-2" />
-          <span className="text-sm font-medium text-foreground">
-            {statusLabel[status]}
-          </span>
+          <span className="text-sm font-medium text-foreground">{statusLabel[status]}</span>
           {status === "uploading" && progress > 0 && progress < 100 && (
             <div className="w-24 h-1 mt-2 bg-muted rounded-full overflow-hidden">
               <div
@@ -93,9 +91,7 @@ export function ImagePlaceholder({
       {/* Error overlay */}
       {status === "failed" && (
         <div className="absolute inset-0 flex flex-col items-center justify-center bg-destructive/20">
-          <span className="text-sm font-medium text-destructive">
-            {statusLabel.failed}
-          </span>
+          <span className="text-sm font-medium text-destructive">{statusLabel.failed}</span>
         </div>
       )}
 

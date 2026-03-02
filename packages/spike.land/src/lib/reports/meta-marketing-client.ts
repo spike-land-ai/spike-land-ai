@@ -17,10 +17,7 @@ import type { MetaAdsData, MetaCampaignData } from "./types";
  * Check if Meta Marketing is configured
  */
 export function isMetaMarketingConfigured(): boolean {
-  return !!(
-    process.env.FACEBOOK_MARKETING_APP_ID
-    && process.env.FACEBOOK_MARKETING_APP_SECRET
-  );
+  return !!(process.env.FACEBOOK_MARKETING_APP_ID && process.env.FACEBOOK_MARKETING_APP_SECRET);
 }
 
 /**
@@ -28,7 +25,7 @@ export function isMetaMarketingConfigured(): boolean {
  */
 async function getStoredAccessToken(
   userId: string,
-): Promise<{ token: string; accountId: string; } | null> {
+): Promise<{ token: string; accountId: string } | null> {
   const { data: account, error } = await tryCatch(
     prisma.marketingAccount.findFirst({
       where: {
@@ -65,7 +62,7 @@ async function getStoredAccessToken(
  * Get all active Facebook marketing accounts for admin users
  */
 async function getActiveMarketingAccounts(): Promise<
-  Array<{ userId: string; accessToken: string; accountId: string; }>
+  Array<{ userId: string; accessToken: string; accountId: string }>
 > {
   const { data: accounts, error } = await tryCatch(
     prisma.marketingAccount.findMany({
@@ -86,8 +83,8 @@ async function getActiveMarketingAccounts(): Promise<
   }
 
   return accounts
-    .filter(account => account.accessToken !== null)
-    .map(account => {
+    .filter((account) => account.accessToken !== null)
+    .map((account) => {
       try {
         return {
           ...account,
@@ -113,9 +110,7 @@ async function fetchAccountMetrics(
   startDate: Date,
   endDate: Date,
 ): Promise<MetaCampaignData[]> {
-  const { data: campaigns, error: listError } = await tryCatch(
-    client.listCampaigns(accountId),
-  );
+  const { data: campaigns, error: listError } = await tryCatch(client.listCampaigns(accountId));
 
   if (listError || !campaigns) {
     logger.error("Failed to list Facebook campaigns", { error: listError });
@@ -192,9 +187,7 @@ export async function fetchMetaAdsForUser(
   }
 
   const { data: client, error: clientError } = await tryCatch(
-    Promise.resolve(
-      new FacebookMarketingClient({ accessToken: credentials.token }),
-    ),
+    Promise.resolve(new FacebookMarketingClient({ accessToken: credentials.token })),
   );
 
   if (clientError || !client) {
@@ -202,12 +195,7 @@ export async function fetchMetaAdsForUser(
     return null;
   }
 
-  const campaigns = await fetchAccountMetrics(
-    client,
-    credentials.accountId,
-    startDate,
-    endDate,
-  );
+  const campaigns = await fetchAccountMetrics(client, credentials.accountId, startDate, endDate);
 
   return aggregateMetrics(campaigns);
 }
@@ -234,9 +222,7 @@ export async function fetchMetaAdsAggregated(
 
   for (const account of accounts) {
     const { data: client, error: clientError } = await tryCatch(
-      Promise.resolve(
-        new FacebookMarketingClient({ accessToken: account.accessToken }),
-      ),
+      Promise.resolve(new FacebookMarketingClient({ accessToken: account.accessToken })),
     );
 
     if (clientError || !client) {
@@ -246,12 +232,7 @@ export async function fetchMetaAdsAggregated(
       continue;
     }
 
-    const campaigns = await fetchAccountMetrics(
-      client,
-      account.accountId,
-      startDate,
-      endDate,
-    );
+    const campaigns = await fetchAccountMetrics(client, account.accountId, startDate, endDate);
 
     allCampaigns.push(...campaigns);
   }
@@ -285,9 +266,7 @@ export async function validateStoredToken(userId: string): Promise<boolean> {
     return false;
   }
 
-  const { data: isValid, error } = await tryCatch(
-    client.validateToken(credentials.token),
-  );
+  const { data: isValid, error } = await tryCatch(client.validateToken(credentials.token));
 
   return !error && isValid === true;
 }

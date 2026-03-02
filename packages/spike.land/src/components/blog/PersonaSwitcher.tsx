@@ -16,7 +16,7 @@ export function PersonaSwitcher() {
     setCurrentSlug(getPersonaCookieClient());
   }, []);
 
-  const currentPersona = PERSONAS.find(p => p.slug === currentSlug);
+  const currentPersona = PERSONAS.find((p) => p.slug === currentSlug);
 
   function handleChange(e: React.ChangeEvent<HTMLSelectElement>) {
     const slug = e.target.value;
@@ -49,7 +49,7 @@ export function PersonaSwitcher() {
         <option value="" disabled>
           Select a persona...
         </option>
-        {PERSONAS.map(p => (
+        {PERSONAS.map((p) => (
           <option key={p.slug} value={p.slug}>
             {p.name} — {p.description}
           </option>

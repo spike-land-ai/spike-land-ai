@@ -79,11 +79,7 @@ import {
 // Helpers
 // ---------------------------------------------------------------------------
 
-function makeDescribeResponse(
-  state: string,
-  publicIp?: string,
-  privateIp?: string,
-) {
+function makeDescribeResponse(state: string, publicIp?: string, privateIp?: string) {
   return {
     Reservations: [
       {
@@ -111,9 +107,7 @@ describe("ec2-actions", () => {
   // -------------------------------------------------------------------------
   describe("getInstanceStatus", () => {
     it("returns status with IPs when instance exists", async () => {
-      mockSend.mockResolvedValueOnce(
-        makeDescribeResponse("running", "1.2.3.4", "10.0.0.1"),
-      );
+      mockSend.mockResolvedValueOnce(makeDescribeResponse("running", "1.2.3.4", "10.0.0.1"));
 
       const result = await getInstanceStatus("i-abc123");
 
@@ -158,11 +152,9 @@ describe("ec2-actions", () => {
       const result = await getInstanceStatus("i-abc123");
 
       expect(result).toBeNull();
-      expect(mockLogger.error).toHaveBeenCalledWith(
-        "[EC2] Failed to describe instance",
-        err,
-        { instanceId: "i-abc123" },
-      );
+      expect(mockLogger.error).toHaveBeenCalledWith("[EC2] Failed to describe instance", err, {
+        instanceId: "i-abc123",
+      });
     });
 
     it("returns null when Reservations array is empty", async () => {
@@ -200,9 +192,7 @@ describe("ec2-actions", () => {
       const result = await startBoxInstance("i-start1");
 
       expect(result).toBe(true);
-      expect(mockLogger.info).toHaveBeenCalledWith(
-        "[EC2] Started instance i-start1",
-      );
+      expect(mockLogger.info).toHaveBeenCalledWith("[EC2] Started instance i-start1");
     });
 
     it("returns false and logs error when EC2 call throws", async () => {
@@ -212,11 +202,9 @@ describe("ec2-actions", () => {
       const result = await startBoxInstance("i-start1");
 
       expect(result).toBe(false);
-      expect(mockLogger.error).toHaveBeenCalledWith(
-        "[EC2] Failed to start instance",
-        err,
-        { instanceId: "i-start1" },
-      );
+      expect(mockLogger.error).toHaveBeenCalledWith("[EC2] Failed to start instance", err, {
+        instanceId: "i-start1",
+      });
     });
   });
 
@@ -228,9 +216,7 @@ describe("ec2-actions", () => {
       const result = await stopBoxInstance("i-stop1");
 
       expect(result).toBe(true);
-      expect(mockLogger.info).toHaveBeenCalledWith(
-        "[EC2] Stopped instance i-stop1",
-      );
+      expect(mockLogger.info).toHaveBeenCalledWith("[EC2] Stopped instance i-stop1");
     });
 
     it("returns false and logs error when EC2 call throws", async () => {
@@ -240,11 +226,9 @@ describe("ec2-actions", () => {
       const result = await stopBoxInstance("i-stop1");
 
       expect(result).toBe(false);
-      expect(mockLogger.error).toHaveBeenCalledWith(
-        "[EC2] Failed to stop instance",
-        err,
-        { instanceId: "i-stop1" },
-      );
+      expect(mockLogger.error).toHaveBeenCalledWith("[EC2] Failed to stop instance", err, {
+        instanceId: "i-stop1",
+      });
     });
   });
 
@@ -256,9 +240,7 @@ describe("ec2-actions", () => {
       const result = await restartBoxInstance("i-reboot1");
 
       expect(result).toBe(true);
-      expect(mockLogger.info).toHaveBeenCalledWith(
-        "[EC2] Rebooted instance i-reboot1",
-      );
+      expect(mockLogger.info).toHaveBeenCalledWith("[EC2] Rebooted instance i-reboot1");
     });
 
     it("returns false and logs error when EC2 call throws", async () => {
@@ -268,11 +250,9 @@ describe("ec2-actions", () => {
       const result = await restartBoxInstance("i-reboot1");
 
       expect(result).toBe(false);
-      expect(mockLogger.error).toHaveBeenCalledWith(
-        "[EC2] Failed to reboot instance",
-        err,
-        { instanceId: "i-reboot1" },
-      );
+      expect(mockLogger.error).toHaveBeenCalledWith("[EC2] Failed to reboot instance", err, {
+        instanceId: "i-reboot1",
+      });
     });
   });
 
@@ -284,9 +264,7 @@ describe("ec2-actions", () => {
       const result = await terminateBoxInstance("i-term1");
 
       expect(result).toBe(true);
-      expect(mockLogger.info).toHaveBeenCalledWith(
-        "[EC2] Terminated instance i-term1",
-      );
+      expect(mockLogger.info).toHaveBeenCalledWith("[EC2] Terminated instance i-term1");
     });
 
     it("returns false and logs error when EC2 call throws", async () => {
@@ -296,11 +274,9 @@ describe("ec2-actions", () => {
       const result = await terminateBoxInstance("i-term1");
 
       expect(result).toBe(false);
-      expect(mockLogger.error).toHaveBeenCalledWith(
-        "[EC2] Failed to terminate instance",
-        err,
-        { instanceId: "i-term1" },
-      );
+      expect(mockLogger.error).toHaveBeenCalledWith("[EC2] Failed to terminate instance", err, {
+        instanceId: "i-term1",
+      });
     });
   });
 
@@ -366,9 +342,7 @@ describe("ec2-actions", () => {
         ec2InstanceId: "i-abc",
         status: "CREATING",
       });
-      mockSend.mockResolvedValueOnce(
-        makeDescribeResponse("pending", "1.2.3.4", "10.0.0.1"),
-      );
+      mockSend.mockResolvedValueOnce(makeDescribeResponse("pending", "1.2.3.4", "10.0.0.1"));
       mockPrisma.box.update.mockResolvedValueOnce({});
 
       await syncBoxStatus("box-1");
@@ -386,9 +360,7 @@ describe("ec2-actions", () => {
         ec2InstanceId: "i-abc",
         status: "STARTING",
       });
-      mockSend.mockResolvedValueOnce(
-        makeDescribeResponse("running", "5.6.7.8", "10.0.0.2"),
-      );
+      mockSend.mockResolvedValueOnce(makeDescribeResponse("running", "5.6.7.8", "10.0.0.2"));
       mockPrisma.box.update.mockResolvedValueOnce({});
 
       await syncBoxStatus("box-1");
@@ -444,9 +416,7 @@ describe("ec2-actions", () => {
         status: "STOPPING",
       });
       // Even if EC2 returns IPs, they must be cleared for STOPPED
-      mockSend.mockResolvedValueOnce(
-        makeDescribeResponse("stopped", "1.2.3.4", "10.0.0.1"),
-      );
+      mockSend.mockResolvedValueOnce(makeDescribeResponse("stopped", "1.2.3.4", "10.0.0.1"));
       mockPrisma.box.update.mockResolvedValueOnce({});
 
       await syncBoxStatus("box-1");
@@ -467,9 +437,7 @@ describe("ec2-actions", () => {
         ec2InstanceId: "i-abc",
         status: "STOPPING",
       });
-      mockSend.mockResolvedValueOnce(
-        makeDescribeResponse("terminated", "1.2.3.4", "10.0.0.1"),
-      );
+      mockSend.mockResolvedValueOnce(makeDescribeResponse("terminated", "1.2.3.4", "10.0.0.1"));
       mockPrisma.box.update.mockResolvedValueOnce({});
 
       await syncBoxStatus("box-1");
@@ -497,7 +465,7 @@ describe("ec2-actions", () => {
       await syncBoxStatus("box-1");
 
       const updateCall = mockPrisma.box.update.mock.calls[0]?.[0] as
-        | { data: Record<string, unknown>; }
+        | { data: Record<string, unknown> }
         | undefined;
       expect(updateCall).toBeDefined();
       expect(updateCall!.data).not.toHaveProperty("publicIp");
@@ -516,11 +484,9 @@ describe("ec2-actions", () => {
 
       await syncBoxStatus("box-1");
 
-      expect(mockLogger.error).toHaveBeenCalledWith(
-        "[EC2] Failed to sync box status",
-        updateErr,
-        { boxId: "box-1" },
-      );
+      expect(mockLogger.error).toHaveBeenCalledWith("[EC2] Failed to sync box status", updateErr, {
+        boxId: "box-1",
+      });
     });
   });
 });

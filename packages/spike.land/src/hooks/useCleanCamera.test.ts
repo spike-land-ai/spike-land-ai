@@ -79,9 +79,7 @@ describe("useCleanCamera", () => {
       await result.current.requestCamera();
     });
 
-    expect(result.current.error).toBe(
-      "Camera requires a secure connection (HTTPS)",
-    );
+    expect(result.current.error).toBe("Camera requires a secure connection (HTTPS)");
     expect(result.current.errorKind).toBe("not-supported");
   });
 
@@ -94,9 +92,7 @@ describe("useCleanCamera", () => {
       await result.current.requestCamera();
     });
 
-    expect(result.current.error).toBe(
-      "Camera is in use by another application",
-    );
+    expect(result.current.error).toBe("Camera is in use by another application");
     expect(result.current.errorKind).toBe("unknown");
   });
 

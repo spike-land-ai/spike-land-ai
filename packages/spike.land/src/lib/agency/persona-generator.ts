@@ -2,11 +2,7 @@ import { generateStructuredResponse } from "@/lib/ai/gemini-client";
 import logger from "@/lib/logger";
 import { z } from "zod";
 
-import {
-  bulkCreatePersonas,
-  type CreatePersonaInput,
-  recalculateRanks,
-} from "./persona-service";
+import { bulkCreatePersonas, type CreatePersonaInput, recalculateRanks } from "./persona-service";
 
 /**
  * Schema for AI-generated persona
@@ -49,8 +45,7 @@ export async function generatePersonas(
     ? `Focus on personas from the ${industry} industry.`
     : "Cover a diverse range of industries including tech startups, SMBs, enterprises, and individual entrepreneurs.";
 
-  const prompt =
-    `You are an expert marketing strategist creating customer personas for an AI development agency.
+  const prompt = `You are an expert marketing strategist creating customer personas for an AI development agency.
 
 The agency offers:
 - AI Integration & Automation (adding AI to existing products)
@@ -128,7 +123,7 @@ Ensure personas are diverse in:
 export async function generateAndSavePersonas(
   count: number,
   industry?: string,
-): Promise<{ generated: number; saved: number; }> {
+): Promise<{ generated: number; saved: number }> {
   const personas = await generatePersonas(count, industry);
 
   // Assign initial ranks based on generation order (will be recalculated)
@@ -177,8 +172,7 @@ export async function generateTargetedPersona(criteria: {
   const urgencyMap = { low: "1-3", medium: "4-6", high: "7-10" };
   const budgetMap = { low: "10-30", medium: "30-60", high: "60-100" };
 
-  const prompt =
-    `Generate ONE customer persona for an AI development agency with these specific characteristics:
+  const prompt = `Generate ONE customer persona for an AI development agency with these specific characteristics:
 
 - Industry: ${criteria.industry}
 - Company size: ${criteria.companySize}

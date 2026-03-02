@@ -43,12 +43,10 @@ export function UniquenessQuestionCard({
             style={{ width: `${(questionNumber / totalQuestions) * 100}%` }}
           />
         </div>
-        <CardTitle className="text-lg text-zinc-100 mt-4 leading-snug">
-          {question}
-        </CardTitle>
+        <CardTitle className="text-lg text-zinc-100 mt-4 leading-snug">{question}</CardTitle>
       </CardHeader>
       <CardContent className="space-y-2">
-        {options.map(option => (
+        {options.map((option) => (
           <button
             key={option.id}
             type="button"

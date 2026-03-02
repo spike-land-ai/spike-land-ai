@@ -17,7 +17,7 @@ import type { IMarketingClient, MarketingPlatform } from "./types";
  */
 export function createMarketingClient(
   platform: MarketingPlatform,
-  options?: { accessToken?: string; customerId?: string; },
+  options?: { accessToken?: string; customerId?: string },
 ): IMarketingClient {
   switch (platform) {
     case "FACEBOOK":

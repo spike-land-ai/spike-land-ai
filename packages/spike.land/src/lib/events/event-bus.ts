@@ -53,11 +53,7 @@ class EventBus {
    * @param workspaceId - Optional workspace filter
    * @returns Subscription ID for unsubscribing
    */
-  subscribe(
-    eventType: WorkflowEventType,
-    handler: EventHandler,
-    workspaceId?: string,
-  ): string {
+  subscribe(eventType: WorkflowEventType, handler: EventHandler, workspaceId?: string): string {
     const id = crypto.randomUUID();
     const subscription: EventSubscription = {
       id,
@@ -96,10 +92,8 @@ class EventBus {
    * @param event - The event to emit
    * @returns Array of results from all handlers (for error tracking)
    */
-  async emit(
-    event: WorkflowEvent,
-  ): Promise<Array<{ subscriptionId: string; error?: Error; }>> {
-    const results: Array<{ subscriptionId: string; error?: Error; }> = [];
+  async emit(event: WorkflowEvent): Promise<Array<{ subscriptionId: string; error?: Error }>> {
+    const results: Array<{ subscriptionId: string; error?: Error }> = [];
 
     // Get subscriptions for this event type
     const subscriptionIds = this.eventTypeIndex.get(event.type);
@@ -108,17 +102,14 @@ class EventBus {
     }
 
     // Process all subscriptions
-    const promises = Array.from(subscriptionIds).map(async subscriptionId => {
+    const promises = Array.from(subscriptionIds).map(async (subscriptionId) => {
       const subscription = this.subscriptions.get(subscriptionId);
       if (!subscription) {
         return { subscriptionId };
       }
 
       // Check workspace filter
-      if (
-        subscription.workspaceId
-        && subscription.workspaceId !== event.workspaceId
-      ) {
+      if (subscription.workspaceId && subscription.workspaceId !== event.workspaceId) {
         return { subscriptionId };
       }
 

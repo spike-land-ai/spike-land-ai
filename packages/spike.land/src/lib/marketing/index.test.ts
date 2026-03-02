@@ -10,15 +10,11 @@ describe("marketing/index", () => {
     });
 
     it("should throw with config error for Facebook when env vars missing", () => {
-      expect(() => createMarketingClient("FACEBOOK")).toThrow(
-        "credentials not configured",
-      );
+      expect(() => createMarketingClient("FACEBOOK")).toThrow("credentials not configured");
     });
 
     it("should throw with config error for Google Ads when env vars missing", () => {
-      expect(() => createMarketingClient("GOOGLE_ADS")).toThrow(
-        "credentials not configured",
-      );
+      expect(() => createMarketingClient("GOOGLE_ADS")).toThrow("credentials not configured");
     });
   });
 });

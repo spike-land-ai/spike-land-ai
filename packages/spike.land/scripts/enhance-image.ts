@@ -2,10 +2,7 @@ import { GoogleGenAI } from "@google/genai";
 import dotenv from "dotenv";
 import * as fs from "fs";
 import * as path from "path";
-import {
-  detectMimeType,
-  getImageDimensionsFromBuffer,
-} from "../src/lib/images/image-dimensions";
+import { detectMimeType, getImageDimensionsFromBuffer } from "../src/lib/images/image-dimensions";
 
 // Load environment variables from .env.local
 // Use quiet: true to suppress verbose logging
@@ -22,12 +19,9 @@ interface EnhanceImageParams {
   originalHeight?: number;
 }
 
-const ENHANCEMENT_BASE_PROMPT =
-  `Create a high resolution version of this photo. Please generate it detailed with perfect focus, lights, and colors, make it look like if this photo was taken by a professional photographer with a modern professional camera in 2025.`;
+const ENHANCEMENT_BASE_PROMPT = `Create a high resolution version of this photo. Please generate it detailed with perfect focus, lights, and colors, make it look like if this photo was taken by a professional photographer with a modern professional camera in 2025.`;
 
-async function enhanceImageWithGemini(
-  params: EnhanceImageParams,
-): Promise<Buffer> {
+async function enhanceImageWithGemini(params: EnhanceImageParams): Promise<Buffer> {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
     throw new Error("GEMINI_API_KEY environment variable is not set");
@@ -48,8 +42,7 @@ async function enhanceImageWithGemini(
     },
   };
 
-  const enhancementPrompt =
-    `${ENHANCEMENT_BASE_PROMPT}\n\nFocus on improving: sharpness, color enhancement, detail preservation`;
+  const enhancementPrompt = `${ENHANCEMENT_BASE_PROMPT}\n\nFocus on improving: sharpness, color enhancement, detail preservation`;
 
   const contents = [
     {
@@ -68,12 +61,8 @@ async function enhanceImageWithGemini(
     },
   ];
 
-  console.log(
-    `Generating enhanced image with Gemini API using model: ${DEFAULT_MODEL}`,
-  );
-  console.log(
-    `Tier: ${params.tier}, Resolution: ${resolutionMap[params.tier]}`,
-  );
+  console.log(`Generating enhanced image with Gemini API using model: ${DEFAULT_MODEL}`);
+  console.log(`Tier: ${params.tier}, Resolution: ${resolutionMap[params.tier]}`);
 
   const processStream = async (): Promise<Buffer> => {
     let response;
@@ -99,8 +88,9 @@ async function enhanceImageWithGemini(
       for await (const chunk of response) {
         chunkCount++;
         if (
-          !chunk.candidates || !chunk.candidates[0]?.content
-          || !chunk.candidates[0]?.content.parts
+          !chunk.candidates ||
+          !chunk.candidates[0]?.content ||
+          !chunk.candidates[0]?.content.parts
         ) {
           continue;
         }
@@ -122,19 +112,12 @@ async function enhanceImageWithGemini(
     console.log("");
 
     if (imageChunks.length === 0) {
-      console.error(
-        `No image data received after processing ${chunkCount} chunks`,
-      );
+      console.error(`No image data received after processing ${chunkCount} chunks`);
       throw new Error("No image data received from Gemini API");
     }
 
-    const totalBytes = imageChunks.reduce(
-      (sum, chunk) => sum + chunk.length,
-      0,
-    );
-    console.log(
-      `Successfully received ${imageChunks.length} chunks, total ${totalBytes} bytes`,
-    );
+    const totalBytes = imageChunks.reduce((sum, chunk) => sum + chunk.length, 0);
+    console.log(`Successfully received ${imageChunks.length} chunks, total ${totalBytes} bytes`);
 
     return Buffer.concat(imageChunks);
   };
@@ -147,10 +130,7 @@ async function enhanceImageWithGemini(
     });
   };
 
-  return Promise.race([
-    processStream(),
-    createTimeoutPromise(GEMINI_API_TIMEOUT_MS),
-  ]);
+  return Promise.race([processStream(), createTimeoutPromise(GEMINI_API_TIMEOUT_MS)]);
 }
 
 async function main() {
@@ -159,9 +139,7 @@ async function main() {
   const tier = (process.argv[4] as "1K" | "2K" | "4K") || "2K";
 
   if (!inputPath) {
-    console.error(
-      "Usage: npx tsx scripts/enhance-image.ts <input-path> [output-path] [tier]",
-    );
+    console.error("Usage: npx tsx scripts/enhance-image.ts <input-path> [output-path] [tier]");
     console.error("Tiers: 1K, 2K, 4K (default: 2K)");
     process.exit(1);
   }
@@ -172,13 +150,8 @@ async function main() {
     process.exit(1);
   }
 
-  const defaultOutputPath = absoluteInputPath.replace(
-    /(\.[^.]+)$/,
-    `-enhanced-${tier}$1`,
-  );
-  const absoluteOutputPath = outputPath
-    ? path.resolve(outputPath)
-    : defaultOutputPath;
+  const defaultOutputPath = absoluteInputPath.replace(/(\.[^.]+)$/, `-enhanced-${tier}$1`);
+  const absoluteOutputPath = outputPath ? path.resolve(outputPath) : defaultOutputPath;
 
   console.log(`Input: ${absoluteInputPath}`);
   console.log(`Output: ${absoluteOutputPath}`);
@@ -222,13 +195,11 @@ async function main() {
       enhancedDimensions?.height || "unknown"
     }`,
   );
-  console.log(
-    `File size: ${(geminiBuffer.length / 1024 / 1024).toFixed(2)} MB`,
-  );
+  console.log(`File size: ${(geminiBuffer.length / 1024 / 1024).toFixed(2)} MB`);
   console.log(`Saved to: ${absoluteOutputPath}`);
 }
 
-main().catch(error => {
+main().catch((error) => {
   console.error("Enhancement failed:", error.message);
   process.exit(1);
 });

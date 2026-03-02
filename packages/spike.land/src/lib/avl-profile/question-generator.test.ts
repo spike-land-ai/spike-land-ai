@@ -36,10 +36,7 @@ const mockAI = vi.hoisted(() => ({
 }));
 vi.mock("@/lib/ai/claude-client", () => mockAI);
 
-import {
-  generateDifferentiatingQuestion,
-  getFallbackQuestion,
-} from "./question-generator";
+import { generateDifferentiatingQuestion, getFallbackQuestion } from "./question-generator";
 
 describe("question-generator", () => {
   beforeEach(() => {
@@ -66,18 +63,14 @@ describe("question-generator", () => {
       ];
 
       const result = getFallbackQuestion(allUsed);
-      expect(result.question).toBe(
-        `Do you use spike.land feature set #${allUsed.length + 1}?`,
-      );
+      expect(result.question).toBe(`Do you use spike.land feature set #${allUsed.length + 1}?`);
       expect(result.tags).toEqual(["general"]);
     });
 
     it("skips already used questions", () => {
       const used = ["Do you analyze data regularly?"];
       const result = getFallbackQuestion(used);
-      expect(result.question).toBe(
-        "Do you create content for an audience?",
-      );
+      expect(result.question).toBe("Do you create content for an audience?");
     });
   });
 
@@ -90,8 +83,7 @@ describe("question-generator", () => {
             content: [
               {
                 type: "text",
-                text:
-                  "{\"question\": \"Do you use Docker?\", \"tags\": [\"devops\", \"developer\"]}",
+                text: '{"question": "Do you use Docker?", "tags": ["devops", "developer"]}',
               },
             ],
           }),
@@ -146,7 +138,7 @@ describe("question-generator", () => {
             content: [
               {
                 type: "text",
-                text: "{\"answer\": \"yes\"}",
+                text: '{"answer": "yes"}',
               },
             ],
           }),

@@ -7,10 +7,7 @@ import { z } from "zod";
 import type { SpacetimePlatformClient } from "../client.js";
 import { errorResult, jsonResult } from "../types.js";
 
-export function registerMessageTools(
-  server: McpServer,
-  client: SpacetimePlatformClient,
-): void {
+export function registerMessageTools(server: McpServer, client: SpacetimePlatformClient): void {
   // ─── stdb_send_dm ───
 
   server.tool(

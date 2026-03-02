@@ -36,19 +36,17 @@ export function AssessmentForm() {
             </p>
           )}
 
-          {userSkills.map(skill => (
+          {userSkills.map((skill) => (
             <div
               key={skill.uri}
               className="flex items-center gap-3 p-3 rounded-lg bg-zinc-800/50 border border-white/[0.04]"
             >
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-white truncate">
-                  {skill.title}
-                </p>
+                <p className="text-sm font-medium text-white truncate">{skill.title}</p>
               </div>
               <SkillProficiencySlider
                 value={skill.proficiency}
-                onChange={v => updateSkillProficiency(skill.uri, v)}
+                onChange={(v) => updateSkillProficiency(skill.uri, v)}
               />
               <Button
                 variant="ghost"
@@ -62,21 +60,15 @@ export function AssessmentForm() {
           ))}
 
           {userSkills.length > 0 && (
-            <Button
-              onClick={handleAssess}
-              disabled={isAssessing}
-              className="w-full mt-4"
-            >
-              {isAssessing
-                ? (
-                  <>
-                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    Analyzing...
-                  </>
-                )
-                : (
-                  `Assess ${userSkills.length} Skills`
-                )}
+            <Button onClick={handleAssess} disabled={isAssessing} className="w-full mt-4">
+              {isAssessing ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Analyzing...
+                </>
+              ) : (
+                `Assess ${userSkills.length} Skills`
+              )}
             </Button>
           )}
         </CardContent>
@@ -95,9 +87,7 @@ export function AssessmentForm() {
                 className="flex items-center justify-between p-3 rounded-lg bg-zinc-800/50 border border-white/[0.04] hover:border-white/[0.12] transition-colors"
               >
                 <div>
-                  <p className="text-sm font-medium text-white">
-                    {match.occupation.title}
-                  </p>
+                  <p className="text-sm font-medium text-white">{match.occupation.title}</p>
                   <p className="text-xs text-zinc-500">
                     {match.matchedSkills}/{match.totalRequired} skills matched
                   </p>

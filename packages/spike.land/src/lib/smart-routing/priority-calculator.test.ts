@@ -77,7 +77,7 @@ describe("calculatePriorityScore", () => {
       "critical",
     ];
 
-    const scores = levels.map(urgency => {
+    const scores = levels.map((urgency) => {
       const result = calculatePriorityScore({
         analysis: { ...baseAnalysis, urgency },
         item: fakeItem,
@@ -106,9 +106,7 @@ describe("calculatePriorityScore", () => {
       settings: defaultSettings,
     });
 
-    expect(result1M.factors.followerCount).toBeGreaterThan(
-      result1k.factors.followerCount!,
-    );
+    expect(result1M.factors.followerCount).toBeGreaterThan(result1k.factors.followerCount!);
     // Both should be positive
     expect(result1k.factors.followerCount).toBeGreaterThan(0);
     expect(result1M.factors.followerCount).toBeGreaterThan(0);
@@ -127,13 +125,9 @@ describe("calculatePriorityScore", () => {
   });
 
   it("should assign tier-based scores", () => {
-    const tiers: Array<"FREE" | "PRO" | "ENTERPRISE"> = [
-      "FREE",
-      "PRO",
-      "ENTERPRISE",
-    ];
+    const tiers: Array<"FREE" | "PRO" | "ENTERPRISE"> = ["FREE", "PRO", "ENTERPRISE"];
 
-    const scores = tiers.map(senderTier => {
+    const scores = tiers.map((senderTier) => {
       const result = calculatePriorityScore({
         analysis: baseAnalysis,
         item: fakeItem,

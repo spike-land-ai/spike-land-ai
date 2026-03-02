@@ -17,21 +17,15 @@ vi.mock("@/lib/prisma", () => ({ default: mockPrisma }));
 
 // Mock the elo module's calculateEloChange
 vi.mock("@/lib/arena/elo", () => ({
-  calculateEloChange: vi.fn(
-    (playerElo: number, opponentElo: number, won: number) => {
-      // Simplified ELO for testing
-      const expected = 1 / (1 + Math.pow(10, (opponentElo - playerElo) / 400));
-      return Math.round(32 * (won - expected));
-    },
-  ),
+  calculateEloChange: vi.fn((playerElo: number, opponentElo: number, won: number) => {
+    // Simplified ELO for testing
+    const expected = 1 / (1 + Math.pow(10, (opponentElo - playerElo) / 400));
+    return Math.round(32 * (won - expected));
+  }),
   expectedScore: vi.fn(),
 }));
 
-import {
-  getOrCreateAgentElo,
-  selectByElo,
-  settleReviewElo,
-} from "./elo-tracker";
+import { getOrCreateAgentElo, selectByElo, settleReviewElo } from "./elo-tracker";
 
 describe("elo-tracker", () => {
   beforeEach(() => {
@@ -74,7 +68,7 @@ describe("elo-tracker", () => {
     it("seeds default agents when none exist", async () => {
       mockPrisma.agentReviewerElo.findMany.mockResolvedValue([]);
       mockPrisma.agentReviewerElo.upsert.mockImplementation(
-        ({ create }: { create: Record<string, unknown>; }) =>
+        ({ create }: { create: Record<string, unknown> }) =>
           Promise.resolve({
             ...create,
             id: "x",
@@ -149,7 +143,7 @@ describe("elo-tracker", () => {
       const result = await selectByElo(2);
       expect(result).toHaveLength(2);
       // Each selected agent should be unique
-      const ids = result.map(a => a.agentId);
+      const ids = result.map((a) => a.agentId);
       expect(new Set(ids).size).toBe(2);
     });
   });

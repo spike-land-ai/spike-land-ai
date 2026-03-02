@@ -36,8 +36,8 @@ export function useChatStream(
 
       setError(null);
       setIsStreaming(true);
-      setMessages(prev => [...prev, { role: "user", content: question }]);
-      setMessages(prev => [...prev, { role: "assistant", content: "" }]);
+      setMessages((prev) => [...prev, { role: "user", content: question }]);
+      setMessages((prev) => [...prev, { role: "assistant", content: "" }]);
 
       const controller = new AbortController();
       abortRef.current = controller;
@@ -54,9 +54,7 @@ export function useChatStream(
           const errBody = await response.json().catch(() => ({
             error: "Request failed",
           }));
-          throw new Error(
-            (errBody as { error?: string; }).error || `HTTP ${response.status}`,
-          );
+          throw new Error((errBody as { error?: string }).error || `HTTP ${response.status}`);
         }
 
         const reader = response.body?.getReader();
@@ -78,7 +76,7 @@ export function useChatStream(
             if (!event) continue;
 
             if (event.type === "text" && event.text) {
-              setMessages(prev => {
+              setMessages((prev) => {
                 const updated = [...prev];
                 const last = updated[updated.length - 1];
                 if (last && last.role === "assistant") {

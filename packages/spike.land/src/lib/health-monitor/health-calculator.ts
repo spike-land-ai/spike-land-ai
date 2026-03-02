@@ -32,10 +32,10 @@ export function calculateHealthScore(
   weights: HealthWeights = DEFAULT_HEALTH_WEIGHTS,
 ): number {
   const score = Math.round(
-    syncScore * weights.syncStatus
-      + rateLimitScore * weights.rateLimitUsage
-      + errorScore * weights.errorFrequency
-      + tokenScore * weights.tokenHealth,
+    syncScore * weights.syncStatus +
+      rateLimitScore * weights.rateLimitUsage +
+      errorScore * weights.errorFrequency +
+      tokenScore * weights.tokenHealth,
   );
 
   return Math.max(0, Math.min(100, score));
@@ -55,8 +55,7 @@ export function calculateSyncScore(
   }
 
   const now = new Date();
-  const hoursSinceSync = (now.getTime() - lastSuccessfulSync.getTime())
-    / (1000 * 60 * 60);
+  const hoursSinceSync = (now.getTime() - lastSuccessfulSync.getTime()) / (1000 * 60 * 60);
 
   // Base score from sync time
   let score = 100;
@@ -149,8 +148,7 @@ export function calculateTokenScore(
   }
 
   const now = new Date();
-  const hoursUntilExpiry = (tokenExpiresAt.getTime() - now.getTime())
-    / (1000 * 60 * 60);
+  const hoursUntilExpiry = (tokenExpiresAt.getTime() - now.getTime()) / (1000 * 60 * 60);
 
   // Already expired
   if (hoursUntilExpiry <= 0) {
@@ -188,11 +186,8 @@ export function scoreToStatus(score: number): AccountHealthStatus {
 export function calculateFullHealth(
   health: SocialAccountHealth,
   weights: HealthWeights = DEFAULT_HEALTH_WEIGHTS,
-): { score: number; status: AccountHealthStatus; } {
-  const syncScore = calculateSyncScore(
-    health.lastSuccessfulSync,
-    health.consecutiveErrors,
-  );
+): { score: number; status: AccountHealthStatus } {
+  const syncScore = calculateSyncScore(health.lastSuccessfulSync, health.consecutiveErrors);
 
   const rateLimitScore = calculateRateLimitScore(
     health.rateLimitRemaining,
@@ -202,18 +197,9 @@ export function calculateFullHealth(
 
   const errorScore = calculateErrorScore(health.totalErrorsLast24h);
 
-  const tokenScore = calculateTokenScore(
-    health.tokenExpiresAt,
-    health.tokenRefreshRequired,
-  );
+  const tokenScore = calculateTokenScore(health.tokenExpiresAt, health.tokenRefreshRequired);
 
-  const score = calculateHealthScore(
-    syncScore,
-    rateLimitScore,
-    errorScore,
-    tokenScore,
-    weights,
-  );
+  const score = calculateHealthScore(syncScore, rateLimitScore, errorScore, tokenScore, weights);
 
   return {
     score,
@@ -224,9 +210,7 @@ export function calculateFullHealth(
 /**
  * Create or get health record for an account
  */
-export async function getOrCreateHealth(
-  accountId: string,
-): Promise<SocialAccountHealth> {
+export async function getOrCreateHealth(accountId: string): Promise<SocialAccountHealth> {
   // upsert eliminates the separate findUnique + create round-trip
   return prisma.socialAccountHealth.upsert({
     where: { accountId },
@@ -276,5 +260,3 @@ export async function updateHealth(
 
   return updated;
 }
-
-

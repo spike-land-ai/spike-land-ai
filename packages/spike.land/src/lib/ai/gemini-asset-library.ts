@@ -129,22 +129,18 @@ Response must be valid JSON only, no additional text.`;
   // Validate and sanitize the response
   const result: AssetAnalysisResult = {
     altText: String(parsed.altText || "Image"),
-    qualityScore: Math.max(
-      0,
-      Math.min(100, Number(parsed.qualityScore) || 50),
-    ),
+    qualityScore: Math.max(0, Math.min(100, Number(parsed.qualityScore) || 50)),
     suggestedTags: Array.isArray(parsed.suggestedTags)
       ? parsed.suggestedTags.map(String).slice(0, 7)
       : [],
     analysisDetails: {
       mainSubject: String(parsed.analysisDetails?.mainSubject || "Unknown"),
-      imageStyle: ["photo", "illustration", "graphic", "screenshot", "other"]
-          .includes(parsed.analysisDetails?.imageStyle)
+      imageStyle: ["photo", "illustration", "graphic", "screenshot", "other"].includes(
+        parsed.analysisDetails?.imageStyle,
+      )
         ? parsed.analysisDetails.imageStyle
         : "other",
-      technicalQuality: String(
-        parsed.analysisDetails?.technicalQuality || "Unknown quality",
-      ),
+      technicalQuality: String(parsed.analysisDetails?.technicalQuality || "Unknown quality"),
       colorPalette: Array.isArray(parsed.analysisDetails?.colorPalette)
         ? parsed.analysisDetails.colorPalette.map(String).slice(0, 5)
         : undefined,

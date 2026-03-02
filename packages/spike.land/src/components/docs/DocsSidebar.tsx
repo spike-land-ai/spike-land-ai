@@ -24,16 +24,14 @@ interface DocsSidebarProps {
 
 interface NavLinkProps {
   href: string;
-  icon: React.ComponentType<{ className?: string; }>;
+  icon: React.ComponentType<{ className?: string }>;
   label: string;
   pathname: string;
   onLinkClick?: (() => void) | undefined;
   badge?: React.ReactNode;
 }
 
-function NavLink(
-  { href, icon: Icon, label, pathname, onLinkClick, badge }: NavLinkProps,
-) {
+function NavLink({ href, icon: Icon, label, pathname, onLinkClick, badge }: NavLinkProps) {
   const isActive = pathname === href;
 
   return (
@@ -68,15 +66,13 @@ interface CategoryGroupProps {
   onLinkClick?: (() => void) | undefined;
 }
 
-function CategoryGroup(
-  { category, pathname, onLinkClick }: CategoryGroupProps,
-) {
+function CategoryGroup({ category, pathname, onLinkClick }: CategoryGroupProps) {
   const categoryPath = `/docs/tools/${category.name}`;
   const isActive = pathname === categoryPath;
   const [expanded, setExpanded] = useState(isActive);
 
   const toggleExpanded = useCallback(() => {
-    setExpanded(prev => !prev);
+    setExpanded((prev) => !prev);
   }, []);
 
   return (
@@ -100,9 +96,7 @@ function CategoryGroup(
             isActive ? "text-primary" : "opacity-60 group-hover:opacity-100",
           )}
         />
-        <span className="flex-1 capitalize">
-          {category.name.replace(/-/g, " ")}
-        </span>
+        <span className="flex-1 capitalize">{category.name.replace(/-/g, " ")}</span>
         <span className="text-[10px] font-semibold bg-white/10 text-muted-foreground px-1.5 py-0.5 rounded-md tabular-nums">
           {category.toolCount}
         </span>
@@ -139,8 +133,8 @@ export function DocsSidebar({ onLinkClick }: DocsSidebarProps) {
 
   useEffect(() => {
     fetch("/docs-data/tools-manifest.json")
-      .then(res => res.json())
-      .then((data: { categories?: DocsCategory[]; }) => {
+      .then((res) => res.json())
+      .then((data: { categories?: DocsCategory[] }) => {
         if (data.categories) {
           setCategories(data.categories);
         }
@@ -158,7 +152,11 @@ export function DocsSidebar({ onLinkClick }: DocsSidebarProps) {
     <div className="flex flex-col h-full bg-background/40 backdrop-blur-xl">
       {/* Header */}
       <div className="p-4">
-        <Link href="/docs" {...(onLinkClick !== undefined ? { onClick: onLinkClick } : {})} className="group">
+        <Link
+          href="/docs"
+          {...(onLinkClick !== undefined ? { onClick: onLinkClick } : {})}
+          className="group"
+        >
           <h1 className="text-xl font-bold font-heading text-gradient-primary group-hover:opacity-80 transition-opacity">
             Documentation
           </h1>
@@ -221,7 +219,7 @@ export function DocsSidebar({ onLinkClick }: DocsSidebarProps) {
               MCP Tools
             </h3>
             <div className="space-y-0.5">
-              {categories.map(category => (
+              {categories.map((category) => (
                 <CategoryGroup
                   key={category.name}
                   category={category}
@@ -283,7 +281,8 @@ export function DocsSidebar({ onLinkClick }: DocsSidebarProps) {
           </span>
         </div>
         <p className="text-[9px] text-muted-foreground leading-snug opacity-50">
-          Built for Spike Land Platform<br />
+          Built for Spike Land Platform
+          <br />
           &copy; 2026 spike.land
         </p>
       </div>

@@ -63,9 +63,7 @@ describe("tracking/google-analytics", () => {
     const body = JSON.parse(options.body as string) as Record<string, unknown>;
     expect(body.client_id).toBe("client-1");
     expect(body.user_id).toBe("user-1");
-    expect(body.events).toEqual([
-      { name: "test_event", params: { key: "value" } },
-    ]);
+    expect(body.events).toEqual([{ name: "test_event", params: { key: "value" } }]);
   });
 
   it("should use NEXT_PUBLIC_GA_MEASUREMENT_ID as fallback", async () => {
@@ -108,7 +106,7 @@ describe("tracking/google-analytics", () => {
 
     const body = JSON.parse(
       (mockFetch.mock.calls[0] as [string, RequestInit])[1].body as string,
-    ) as { events: Array<{ params: Record<string, unknown>; }>; };
+    ) as { events: Array<{ params: Record<string, unknown> }> };
     const params = body.events[0]!.params;
     expect(params).toEqual({ valid: "yes", num: 42, bool: true });
     expect(params).not.toHaveProperty("nullVal");
@@ -127,7 +125,7 @@ describe("tracking/google-analytics", () => {
 
     const body = JSON.parse(
       (mockFetch.mock.calls[0] as [string, RequestInit])[1].body as string,
-    ) as { events: Array<{ params: Record<string, string>; }>; };
+    ) as { events: Array<{ params: Record<string, string> }> };
     const paramValue = body.events[0]!.params.long!;
     expect(paramValue.length).toBe(503); // 500 + "..."
     expect(paramValue).toMatch(/^x{500}\.\.\.$/);

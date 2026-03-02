@@ -22,8 +22,8 @@ import { z } from "zod";
 export const socialHandleSchema = z
   .string()
   .max(100, "Handle is too long")
-  .transform(val => val.trim().replace(/^@/, "")) // Remove leading @ if present
-  .refine(val => val.length > 0, { message: "Handle must not be empty" });
+  .transform((val) => val.trim().replace(/^@/, "")) // Remove leading @ if present
+  .refine((val) => val.length > 0, { message: "Handle must not be empty" });
 
 /**
  * Social handles object for a competitor.
@@ -37,11 +37,7 @@ export const socialHandlesSchema = z
     facebook: socialHandleSchema.optional(),
   })
   .refine(
-    handles =>
-      handles.twitter
-      || handles.linkedin
-      || handles.instagram
-      || handles.facebook,
+    (handles) => handles.twitter || handles.linkedin || handles.instagram || handles.facebook,
     {
       message: "At least one social handle must be provided",
     },
@@ -58,7 +54,7 @@ export const websiteUrlSchema = z
   .url("Invalid website URL")
   .max(2000, "URL is too long")
   .optional()
-  .transform(val => val?.trim());
+  .transform((val) => val?.trim());
 
 // ============================================
 // Competitor Name Validation
@@ -67,8 +63,8 @@ export const websiteUrlSchema = z
 export const competitorNameSchema = z
   .string()
   .max(200, "Name is too long")
-  .transform(val => val.trim())
-  .refine(val => val.length > 0, { message: "Name must not be empty" });
+  .transform((val) => val.trim())
+  .refine((val) => val.length > 0, { message: "Name must not be empty" });
 
 // ============================================
 // Create Competitor Request Schema
@@ -80,9 +76,7 @@ export const createCompetitorRequestSchema = z.object({
   socialHandles: socialHandlesSchema,
 });
 
-export type CreateCompetitorRequest = z.infer<
-  typeof createCompetitorRequestSchema
->;
+export type CreateCompetitorRequest = z.infer<typeof createCompetitorRequestSchema>;
 
 // ============================================
 // Update Competitor Request Schema
@@ -94,15 +88,13 @@ export const updateCompetitorRequestSchema = z.object({
   name: z
     .string()
     .max(200, "Name is too long")
-    .transform(val => val.trim())
-    .refine(val => val.length > 0, { message: "Name must not be empty" })
+    .transform((val) => val.trim())
+    .refine((val) => val.length > 0, { message: "Name must not be empty" })
     .optional(),
   isActive: z.boolean().optional(),
 });
 
-export type UpdateCompetitorRequest = z.infer<
-  typeof updateCompetitorRequestSchema
->;
+export type UpdateCompetitorRequest = z.infer<typeof updateCompetitorRequestSchema>;
 
 // ============================================
 // Legacy Single-Handle Request Schema
@@ -122,6 +114,4 @@ export const legacyAddCompetitorRequestSchema = z.object({
   handle: socialHandleSchema,
 });
 
-export type LegacyAddCompetitorRequest = z.infer<
-  typeof legacyAddCompetitorRequestSchema
->;
+export type LegacyAddCompetitorRequest = z.infer<typeof legacyAddCompetitorRequestSchema>;

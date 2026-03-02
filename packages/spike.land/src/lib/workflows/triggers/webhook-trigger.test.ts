@@ -5,13 +5,7 @@
  * verification, and request validation.
  */
 
-import {
-  beforeEach,
-  describe,
-  expect,
-  it,
-  vi,
-} from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 // Use vi.hoisted() so variables are available inside vi.mock() factory closures
 const {
@@ -74,16 +68,18 @@ const mockSafeEncryptToken = vi.mocked(safeEncryptToken);
 // Test helpers
 // ============================================================================
 
-function makeWebhook(overrides: Partial<{
-  id: string;
-  workflowId: string;
-  webhookToken: string;
-  secretHash: string | null;
-  secretEncrypted: string | null;
-  isActive: boolean;
-  lastTriggeredAt: Date | null;
-  createdAt: Date;
-}> = {}) {
+function makeWebhook(
+  overrides: Partial<{
+    id: string;
+    workflowId: string;
+    webhookToken: string;
+    secretHash: string | null;
+    secretEncrypted: string | null;
+    isActive: boolean;
+    lastTriggeredAt: Date | null;
+    createdAt: Date;
+  }> = {},
+) {
   return {
     id: "webhook-1",
     workflowId: "wf-1",
@@ -97,11 +93,13 @@ function makeWebhook(overrides: Partial<{
   };
 }
 
-function makeWorkflow(overrides: Partial<{
-  id: string;
-  workspaceId: string;
-  status: string;
-}> = {}) {
+function makeWorkflow(
+  overrides: Partial<{
+    id: string;
+    workspaceId: string;
+    status: string;
+  }> = {},
+) {
   return {
     id: "wf-1",
     workspaceId: "ws-1",
@@ -237,18 +235,14 @@ describe("createWebhookTrigger", () => {
   it("throws when workflow is not found", async () => {
     mockWorkflowFindFirst.mockResolvedValue(null);
 
-    await expect(
-      createWebhookTrigger("missing", "ws-1", {}),
-    ).rejects.toThrow("Workflow not found");
+    await expect(createWebhookTrigger("missing", "ws-1", {})).rejects.toThrow("Workflow not found");
   });
 
   it("generates a unique webhookToken for each webhook", async () => {
     const webhook1 = makeWebhook({ webhookToken: "token-aaa" });
     const webhook2 = makeWebhook({ webhookToken: "token-bbb" });
     mockWorkflowFindFirst.mockResolvedValue(makeWorkflow());
-    mockWorkflowWebhookCreate
-      .mockResolvedValueOnce(webhook1)
-      .mockResolvedValueOnce(webhook2);
+    mockWorkflowWebhookCreate.mockResolvedValueOnce(webhook1).mockResolvedValueOnce(webhook2);
 
     const r1 = await createWebhookTrigger("wf-1", "ws-1", {});
     const r2 = await createWebhookTrigger("wf-1", "ws-1", {});
@@ -317,9 +311,7 @@ describe("updateWebhookTrigger", () => {
   it("clears secret when empty string is provided", async () => {
     mockWorkflowFindFirst.mockResolvedValue(makeWorkflow());
     mockWorkflowWebhookFindFirst.mockResolvedValue(makeWebhook());
-    mockWorkflowWebhookUpdate.mockResolvedValue(
-      makeWebhook({ secretEncrypted: null }),
-    );
+    mockWorkflowWebhookUpdate.mockResolvedValue(makeWebhook({ secretEncrypted: null }));
 
     await updateWebhookTrigger("webhook-1", "wf-1", "ws-1", { secret: "" });
 
@@ -330,18 +322,18 @@ describe("updateWebhookTrigger", () => {
   it("throws when workflow is not found", async () => {
     mockWorkflowFindFirst.mockResolvedValue(null);
 
-    await expect(
-      updateWebhookTrigger("webhook-1", "wf-1", "ws-1", {}),
-    ).rejects.toThrow("Workflow not found");
+    await expect(updateWebhookTrigger("webhook-1", "wf-1", "ws-1", {})).rejects.toThrow(
+      "Workflow not found",
+    );
   });
 
   it("throws when webhook is not found", async () => {
     mockWorkflowFindFirst.mockResolvedValue(makeWorkflow());
     mockWorkflowWebhookFindFirst.mockResolvedValue(null);
 
-    await expect(
-      updateWebhookTrigger("missing", "wf-1", "ws-1", {}),
-    ).rejects.toThrow("Webhook not found");
+    await expect(updateWebhookTrigger("missing", "wf-1", "ws-1", {})).rejects.toThrow(
+      "Webhook not found",
+    );
   });
 });
 
@@ -359,9 +351,7 @@ describe("deleteWebhookTrigger", () => {
     mockWorkflowWebhookFindFirst.mockResolvedValue(makeWebhook());
     mockWorkflowWebhookDelete.mockResolvedValue(makeWebhook());
 
-    await expect(
-      deleteWebhookTrigger("webhook-1", "wf-1", "ws-1"),
-    ).resolves.toBeUndefined();
+    await expect(deleteWebhookTrigger("webhook-1", "wf-1", "ws-1")).resolves.toBeUndefined();
 
     expect(mockWorkflowWebhookDelete).toHaveBeenCalledWith({
       where: { id: "webhook-1" },
@@ -371,18 +361,18 @@ describe("deleteWebhookTrigger", () => {
   it("throws when workflow is not found", async () => {
     mockWorkflowFindFirst.mockResolvedValue(null);
 
-    await expect(
-      deleteWebhookTrigger("webhook-1", "wf-1", "ws-1"),
-    ).rejects.toThrow("Workflow not found");
+    await expect(deleteWebhookTrigger("webhook-1", "wf-1", "ws-1")).rejects.toThrow(
+      "Workflow not found",
+    );
   });
 
   it("throws when webhook is not found", async () => {
     mockWorkflowFindFirst.mockResolvedValue(makeWorkflow());
     mockWorkflowWebhookFindFirst.mockResolvedValue(null);
 
-    await expect(
-      deleteWebhookTrigger("missing", "wf-1", "ws-1"),
-    ).rejects.toThrow("Webhook not found");
+    await expect(deleteWebhookTrigger("missing", "wf-1", "ws-1")).rejects.toThrow(
+      "Webhook not found",
+    );
   });
 });
 
@@ -437,9 +427,7 @@ describe("getWorkflowWebhooks", () => {
   it("throws when workflow is not found", async () => {
     mockWorkflowFindFirst.mockResolvedValue(null);
 
-    await expect(
-      getWorkflowWebhooks("missing", "ws-1"),
-    ).rejects.toThrow("Workflow not found");
+    await expect(getWorkflowWebhooks("missing", "ws-1")).rejects.toThrow("Workflow not found");
   });
 });
 

@@ -59,8 +59,11 @@ function computeDiff(path: string, base: string, modified: string): FileDiff {
   const baseLines = base.split("\n");
   const modifiedLines = modified.split("\n");
   const hunk: DiffHunk = {
-    oldStart: 1, oldLines: baseLines.length, newStart: 1, newLines: modifiedLines.length,
-    lines: [...baseLines.map(l => "-" + l), ...modifiedLines.map(l => "+" + l)],
+    oldStart: 1,
+    oldLines: baseLines.length,
+    newStart: 1,
+    newLines: modifiedLines.length,
+    lines: [...baseLines.map((l) => "-" + l), ...modifiedLines.map((l) => "+" + l)],
   };
   return { path, type: "modified", hunks: [hunk] };
 }
@@ -80,10 +83,19 @@ function parseUnifiedDiff(diffText: string): FileDiff[] {
     } else if (line.startsWith("@@ ") && currentFile) {
       const match = line.match(/@@ -(\d+),?(\d*) \+(\d+),?(\d*) @@/);
       if (match) {
-        currentHunk = { oldStart: parseInt(match[1]!, 10), oldLines: parseInt(match[2] || "1", 10), newStart: parseInt(match[3]!, 10), newLines: parseInt(match[4] || "1", 10), lines: [] };
+        currentHunk = {
+          oldStart: parseInt(match[1]!, 10),
+          oldLines: parseInt(match[2] || "1", 10),
+          newStart: parseInt(match[3]!, 10),
+          newLines: parseInt(match[4] || "1", 10),
+          lines: [],
+        };
         currentFile.hunks.push(currentHunk);
       }
-    } else if (currentHunk && (line.startsWith("+") || line.startsWith("-") || line.startsWith(" "))) {
+    } else if (
+      currentHunk &&
+      (line.startsWith("+") || line.startsWith("-") || line.startsWith(" "))
+    ) {
       currentHunk.lines.push(line);
     }
   }
@@ -96,24 +108,29 @@ function applyPatch(base: string, hunks: DiffHunk[]): string {
   const result: string[] = [];
   let currentLine = 1;
   for (const hunk of hunks) {
-    while (currentLine < hunk.oldStart) { result.push(lines[currentLine - 1]!); currentLine++; }
+    while (currentLine < hunk.oldStart) {
+      result.push(lines[currentLine - 1]!);
+      currentLine++;
+    }
     for (const hunkLine of hunk.lines) {
       if (hunkLine.startsWith("+")) result.push(hunkLine.substring(1));
       else if (hunkLine.startsWith("-")) currentLine++;
-      else if (hunkLine.startsWith(" ")) { result.push(hunkLine.substring(1)); currentLine++; }
+      else if (hunkLine.startsWith(" ")) {
+        result.push(hunkLine.substring(1));
+        currentLine++;
+      }
     }
   }
-  while (currentLine <= lines.length) { result.push(lines[currentLine - 1]!); currentLine++; }
+  while (currentLine <= lines.length) {
+    result.push(lines[currentLine - 1]!);
+    currentLine++;
+  }
   return result.join("\n");
 }
 
 // ─── Registration ────────────────────────────────────────────────────────────
 
-export function registerDiffTools(
-  registry: ToolRegistry,
-  userId: string,
-  db: DrizzleDB,
-): void {
+export function registerDiffTools(registry: ToolRegistry, userId: string, db: DrizzleDB): void {
   registry.registerBuilt(
     freeTool(userId, db)
       .tool("diff_parse", "Parse a unified diff string into structured FileDiff objects.", {
@@ -129,18 +146,28 @@ export function registerDiffTools(
   registry.registerBuilt(
     freeTool(userId, db)
       .tool("diff_create", "Create a changeset between base and modified file contents.", {
-        base_files: z.array(z.object({ path: z.string(), content: z.string() })).describe("Base files."),
-        modified_files: z.array(z.object({ path: z.string(), content: z.string() })).describe("Modified files."),
+        base_files: z
+          .array(z.object({ path: z.string(), content: z.string() }))
+          .describe("Base files."),
+        modified_files: z
+          .array(z.object({ path: z.string(), content: z.string() }))
+          .describe("Modified files."),
         description: z.string().describe("Changeset description."),
       })
       .meta({ category: "diff", tier: "free" })
       .handler(async ({ input }) => {
         const id = crypto.randomUUID();
-        const fileDiffs = input.modified_files.map(mod => {
-          const base = input.base_files.find(b => b.path === mod.path);
+        const fileDiffs = input.modified_files.map((mod) => {
+          const base = input.base_files.find((b) => b.path === mod.path);
           return computeDiff(base?.path || mod.path, base?.content || "", mod.content);
         });
-        const changeset: Changeset = { id, userId, description: input.description, files: fileDiffs, createdAt: new Date().toISOString() };
+        const changeset: Changeset = {
+          id,
+          userId,
+          description: input.description,
+          files: fileDiffs,
+          createdAt: new Date().toISOString(),
+        };
         changesets.set(id, changeset);
         return jsonResult(`Changeset ${id} created with ${fileDiffs.length} file(s)`, changeset);
       }),
@@ -150,14 +177,16 @@ export function registerDiffTools(
     freeTool(userId, db)
       .tool("diff_apply", "Apply a structured changeset to target files.", {
         changeset_id: z.string().describe("Changeset ID."),
-        target_files: z.array(z.object({ path: z.string(), content: z.string() })).describe("Target files."),
+        target_files: z
+          .array(z.object({ path: z.string(), content: z.string() }))
+          .describe("Target files."),
       })
       .meta({ category: "diff", tier: "free" })
       .handler(async ({ input }) => {
         const changeset = changesets.get(input.changeset_id);
         if (!changeset) throw new Error(`Changeset ${input.changeset_id} not found`);
-        const applied = input.target_files.map(target => {
-          const diff = changeset.files.find(f => f.path === target.path);
+        const applied = input.target_files.map((target) => {
+          const diff = changeset.files.find((f) => f.path === target.path);
           if (!diff) return target;
           return { path: target.path, content: applyPatch(target.content, diff.hunks) };
         });
@@ -174,7 +203,9 @@ export function registerDiffTools(
       .handler(async ({ input }) => {
         const changeset = changesets.get(input.changeset_id);
         if (!changeset) throw new Error(`Changeset ${input.changeset_id} not found`);
-        return jsonResult(`Changeset ${input.changeset_id} is valid`, { fileCount: changeset.files.length });
+        return jsonResult(`Changeset ${input.changeset_id} is valid`, {
+          fileCount: changeset.files.length,
+        });
       }),
   );
 
@@ -186,7 +217,12 @@ export function registerDiffTools(
       .meta({ category: "diff", tier: "free" })
       .handler(async ({ input }) => {
         const id = crypto.randomUUID();
-        const mergeResult: MergeResult = { id, baseChangesetIds: input.changeset_ids, files: [], status: "merged" };
+        const mergeResult: MergeResult = {
+          id,
+          baseChangesetIds: input.changeset_ids,
+          files: [],
+          status: "merged",
+        };
         merges.set(id, mergeResult);
         return jsonResult(`Merge ${id} complete`, mergeResult);
       }),
@@ -203,7 +239,7 @@ export function registerDiffTools(
       .handler(async ({ input }) => {
         const merge = merges.get(input.merge_id);
         if (!merge) throw new Error(`Merge ${input.merge_id} not found`);
-        const file = merge.files.find(f => f.path === input.path);
+        const file = merge.files.find((f) => f.path === input.path);
         if (file && input.manual_content) file.content = input.manual_content;
         return jsonResult(`Conflict resolved for ${input.path} in merge ${input.merge_id}`, merge);
       }),
@@ -229,8 +265,13 @@ export function registerDiffTools(
       })
       .meta({ category: "diff", tier: "free" })
       .handler(async ({ input }) => {
-        const list = input.changeset_ids.map(cid => changesets.get(cid)).filter((c): c is Changeset => !!c);
-        return jsonResult(`Summary of ${list.length} changesets`, list.map(c => ({ id: c.id, desc: c.description })));
+        const list = input.changeset_ids
+          .map((cid) => changesets.get(cid))
+          .filter((c): c is Changeset => !!c);
+        return jsonResult(
+          `Summary of ${list.length} changesets`,
+          list.map((c) => ({ id: c.id, desc: c.description })),
+        );
       }),
   );
 }

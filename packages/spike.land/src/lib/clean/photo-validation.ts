@@ -23,9 +23,7 @@ function extractExif(buffer: Buffer): Record<string, unknown> | null {
         const length = buffer.readUInt16BE(offset + 2);
         const exifData = buffer.subarray(offset + 4, offset + 2 + length);
         // Skip "Exif\0\0" header (6 bytes)
-        if (
-          exifData.length > 6 && exifData.toString("ascii", 0, 4) === "Exif"
-        ) {
+        if (exifData.length > 6 && exifData.toString("ascii", 0, 4) === "Exif") {
           return exifReader(exifData.subarray(6)) as Record<string, unknown>;
         }
       }
@@ -101,9 +99,7 @@ export function validatePhoto(
     };
   }
 
-  const ageSeconds = Math.floor(
-    (Date.now() - new Date(timestamp).getTime()) / 1000,
-  );
+  const ageSeconds = Math.floor((Date.now() - new Date(timestamp).getTime()) / 1000);
   const cameraModel = (image?.Model ?? null) as string | null;
 
   if (ageSeconds > maxAgeSeconds) {
@@ -111,9 +107,9 @@ export function validatePhoto(
       valid: false,
       ageSeconds,
       cameraModel,
-      rejectionReason: `Photo is ${
-        Math.floor(ageSeconds / 60)
-      } minutes old. Please take a fresh photo (max ${Math.floor(maxAgeSeconds / 60)} minutes).`,
+      rejectionReason: `Photo is ${Math.floor(
+        ageSeconds / 60,
+      )} minutes old. Please take a fresh photo (max ${Math.floor(maxAgeSeconds / 60)} minutes).`,
       isScreenshot: false,
     };
   }
@@ -162,9 +158,7 @@ export function extractPhotoMetadata(base64Data: string): {
   return {
     hasExif: true,
     cameraModel: (image?.Model ?? null) as string | null,
-    timestamp: (photo?.DateTimeOriginal ?? image?.DateTime ?? null) as
-      | Date
-      | null,
+    timestamp: (photo?.DateTimeOriginal ?? image?.DateTime ?? null) as Date | null,
     software: (image?.Software ?? null) as string | null,
   };
 }

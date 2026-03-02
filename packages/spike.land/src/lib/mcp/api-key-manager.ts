@@ -42,10 +42,8 @@ export interface ApiKeyValidationResult {
  * Generates a new API key
  * @returns Object containing the full key, its hash, and a masked prefix
  */
-function generateApiKey(): { key: string; hash: string; prefix: string; } {
-  const prefix = process.env.NODE_ENV === "production"
-    ? KEY_PREFIX_PROD
-    : KEY_PREFIX_DEV;
+function generateApiKey(): { key: string; hash: string; prefix: string } {
+  const prefix = process.env.NODE_ENV === "production" ? KEY_PREFIX_PROD : KEY_PREFIX_DEV;
   const keyBody = randomBytes(32).toString("base64url");
   const fullKey = prefix + keyBody;
   const hash = createHash("sha256").update(fullKey).digest("hex");
@@ -74,10 +72,7 @@ function hashApiKey(key: string): string {
 /**
  * Creates a new API key for a user
  */
-export async function createApiKey(
-  userId: string,
-  name: string,
-): Promise<ApiKeyCreateResult> {
+export async function createApiKey(userId: string, name: string): Promise<ApiKeyCreateResult> {
   const { key, hash, prefix } = generateApiKey();
 
   const apiKey = await prisma.apiKey.create({
@@ -102,22 +97,14 @@ export async function createApiKey(
  * Validates an API key and returns the associated user ID
  * Uses constant-time comparison to prevent timing attacks
  */
-export async function validateApiKey(
-  providedKey: string,
-): Promise<ApiKeyValidationResult> {
+export async function validateApiKey(providedKey: string): Promise<ApiKeyValidationResult> {
   // Validate format
-  if (
-    !providedKey.startsWith(KEY_PREFIX_PROD)
-    && !providedKey.startsWith(KEY_PREFIX_DEV)
-  ) {
+  if (!providedKey.startsWith(KEY_PREFIX_PROD) && !providedKey.startsWith(KEY_PREFIX_DEV)) {
     return { isValid: false, error: "Invalid API key format" };
   }
 
   // Security: Reject development keys in production environment
-  if (
-    process.env.NODE_ENV === "production"
-    && providedKey.startsWith(KEY_PREFIX_DEV)
-  ) {
+  if (process.env.NODE_ENV === "production" && providedKey.startsWith(KEY_PREFIX_DEV)) {
     return {
       isValid: false,
       error: "Development keys not allowed in production",
@@ -202,7 +189,7 @@ export async function listApiKeys(userId: string): Promise<ApiKeyListItem[]> {
 export async function revokeApiKey(
   userId: string,
   apiKeyId: string,
-): Promise<{ success: boolean; error?: string; }> {
+): Promise<{ success: boolean; error?: string }> {
   // Verify the key belongs to the user
   const apiKey = await prisma.apiKey.findFirst({
     where: {
@@ -230,10 +217,7 @@ export async function revokeApiKey(
 /**
  * Gets a single API key by ID (for the owner)
  */
-export async function getApiKey(
-  userId: string,
-  apiKeyId: string,
-): Promise<ApiKeyListItem | null> {
+export async function getApiKey(userId: string, apiKeyId: string): Promise<ApiKeyListItem | null> {
   const apiKey = await prisma.apiKey.findFirst({
     where: {
       id: apiKeyId,

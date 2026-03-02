@@ -19,9 +19,10 @@ const SkillEntrySchema = z.object({
 });
 
 const AssessSkillsShape = {
-  skills: z.array(SkillEntrySchema).min(1).describe(
-    "List of user skills with optional proficiency",
-  ),
+  skills: z
+    .array(SkillEntrySchema)
+    .min(1)
+    .describe("List of user skills with optional proficiency"),
   limit: z.number().min(1).max(50).optional().default(10).describe("Max results (default 10)"),
 };
 
@@ -79,17 +80,23 @@ const MatchJobsShape = {
 const LearningPathShape = {
   current_skills: z.array(z.string()).min(1).describe("Skills the user already has"),
   target_occupation: z.string().describe("Target job title or occupation"),
-  time_budget_hours: z.number().positive().optional().describe(
-    "Total hours available for learning (optional, used to prioritise)",
-  ),
+  time_budget_hours: z
+    .number()
+    .positive()
+    .optional()
+    .describe("Total hours available for learning (optional, used to prioritise)"),
 };
 
 const InterviewPrepShape = {
   occupation: z.string().describe("Job title to prepare for"),
   level: z.enum(["junior", "mid", "senior", "lead"]).describe("Seniority level"),
-  question_count: z.number().min(5).max(20).optional().default(10).describe(
-    "Number of questions to generate (5–20, default 10)",
-  ),
+  question_count: z
+    .number()
+    .min(5)
+    .max(20)
+    .optional()
+    .default(10)
+    .describe("Number of questions to generate (5–20, default 10)"),
 };
 
 // ─── Career Tools (ESCO + Adzuna) ───────────────────────────────────────────
@@ -102,76 +109,66 @@ const careerAssessSkills: StandaloneToolDefinition = {
   tier: "free",
   annotations: { readOnlyHint: true },
   inputSchema: AssessSkillsShape,
-  handler: async (
-    input: never,
-    _ctx: ServerContext,
-  ): Promise<CallToolResult> => {
+  handler: async (input: never, _ctx: ServerContext): Promise<CallToolResult> => {
     const { skills, limit = 10 } = input as {
-      skills: Array<{ title: string; proficiency?: number; }>;
+      skills: Array<{ title: string; proficiency?: number }>;
       limit?: number;
     };
-    return safeToolCall("career_assess_skills", async () => {
-      const { searchOccupations, getOccupation } = await import(
-        "@/lib/career/services/esco-client"
-      );
-      const { assessSkills } = await import(
-        "@/lib/career/services/matching-engine"
-      );
+    return safeToolCall(
+      "career_assess_skills",
+      async () => {
+        const { searchOccupations, getOccupation } = await import(
+          "@/lib/career/services/esco-client"
+        );
+        const { assessSkills } = await import("@/lib/career/services/matching-engine");
 
-      const queries = skills.slice(0, 5).map(s => s.title);
-      const searchResults = await Promise.all(
-        queries.map(q => searchOccupations(q, 20)),
-      );
+        const queries = skills.slice(0, 5).map((s) => s.title);
+        const searchResults = await Promise.all(queries.map((q) => searchOccupations(q, 20)));
 
-      const seen = new Set<string>();
-      const uniqueUris: string[] = [];
-      for (const { results } of searchResults) {
-        for (const result of results) {
-          if (!seen.has(result.uri)) {
-            seen.add(result.uri);
-            uniqueUris.push(result.uri);
+        const seen = new Set<string>();
+        const uniqueUris: string[] = [];
+        for (const { results } of searchResults) {
+          for (const result of results) {
+            if (!seen.has(result.uri)) {
+              seen.add(result.uri);
+              uniqueUris.push(result.uri);
+            }
           }
         }
-      }
 
-      if (uniqueUris.length === 0) {
-        return textResult(
-          "No matching occupations found. Try different skill terms.",
-        );
-      }
-
-      const occupationDetails = await Promise.all(
-        uniqueUris.slice(0, 10).map(uri => getOccupation(uri).catch(() => null)),
-      );
-      const occupations = occupationDetails.filter((
-        o,
-      ): o is NonNullable<typeof o> => o !== null);
-
-      if (occupations.length === 0) {
-        return textResult(
-          "No matching occupations found. Try different skill terms.",
-        );
-      }
-
-      const typedSkills = skills.map(s => ({ ...s, uri: "", proficiency: s.proficiency ?? 3 }));
-      const results = assessSkills(typedSkills, occupations).slice(0, limit);
-
-      let text = `**Skills Assessment Results (${results.length} matches):**\n\n`;
-      for (const match of results) {
-        text += `- **${match.occupation.title}** — Score: ${match.score}%\n`;
-        text += `  Matched: ${match.matchedSkills}/${match.totalRequired} skills\n`;
-        const highGaps = match.gaps.filter((g: { priority: string; }) => g.priority === "high");
-        if (highGaps.length > 0) {
-          text += `  Key gaps: ${
-            highGaps.slice(0, 3).map((g: { skill: { title: string; }; }) => g.skill.title).join(
-              ", ",
-            )
-          }\n`;
+        if (uniqueUris.length === 0) {
+          return textResult("No matching occupations found. Try different skill terms.");
         }
-        text += "\n";
-      }
-      return textResult(text);
-    }, { timeoutMs: 30_000 });
+
+        const occupationDetails = await Promise.all(
+          uniqueUris.slice(0, 10).map((uri) => getOccupation(uri).catch(() => null)),
+        );
+        const occupations = occupationDetails.filter((o): o is NonNullable<typeof o> => o !== null);
+
+        if (occupations.length === 0) {
+          return textResult("No matching occupations found. Try different skill terms.");
+        }
+
+        const typedSkills = skills.map((s) => ({ ...s, uri: "", proficiency: s.proficiency ?? 3 }));
+        const results = assessSkills(typedSkills, occupations).slice(0, limit);
+
+        let text = `**Skills Assessment Results (${results.length} matches):**\n\n`;
+        for (const match of results) {
+          text += `- **${match.occupation.title}** — Score: ${match.score}%\n`;
+          text += `  Matched: ${match.matchedSkills}/${match.totalRequired} skills\n`;
+          const highGaps = match.gaps.filter((g: { priority: string }) => g.priority === "high");
+          if (highGaps.length > 0) {
+            text += `  Key gaps: ${highGaps
+              .slice(0, 3)
+              .map((g: { skill: { title: string } }) => g.skill.title)
+              .join(", ")}\n`;
+          }
+          text += "\n";
+        }
+        return textResult(text);
+      },
+      { timeoutMs: 30_000 },
+    );
   },
 };
 
@@ -183,33 +180,36 @@ const careerSearchOccupations: StandaloneToolDefinition = {
   tier: "free",
   annotations: { readOnlyHint: true },
   inputSchema: SearchOccupationsShape,
-  handler: async (
-    input: never,
-    _ctx: ServerContext,
-  ): Promise<CallToolResult> => {
-    const { query, limit = 20, offset = 0 } = input as {
+  handler: async (input: never, _ctx: ServerContext): Promise<CallToolResult> => {
+    const {
+      query,
+      limit = 20,
+      offset = 0,
+    } = input as {
       query: string;
       limit?: number;
       offset?: number;
     };
-    return safeToolCall("career_search_occupations", async () => {
-      const { searchOccupations } = await import(
-        "@/lib/career/services/esco-client"
-      );
-      const { results, total } = await searchOccupations(query, limit, offset);
+    return safeToolCall(
+      "career_search_occupations",
+      async () => {
+        const { searchOccupations } = await import("@/lib/career/services/esco-client");
+        const { results, total } = await searchOccupations(query, limit, offset);
 
-      if (results.length === 0) {
-        return textResult("No occupations found matching your query.");
-      }
+        if (results.length === 0) {
+          return textResult("No occupations found matching your query.");
+        }
 
-      let text = `**Occupations Found (${results.length} of ${total}):**\n\n`;
-      for (const occ of results) {
-        text += `- **${occ.title}**\n`;
-        text += `  URI: \`${occ.uri}\`\n`;
-        text += `  Type: ${occ.className}\n\n`;
-      }
-      return textResult(text);
-    }, { timeoutMs: 30_000 });
+        let text = `**Occupations Found (${results.length} of ${total}):**\n\n`;
+        for (const occ of results) {
+          text += `- **${occ.title}**\n`;
+          text += `  URI: \`${occ.uri}\`\n`;
+          text += `  Type: ${occ.className}\n\n`;
+        }
+        return textResult(text);
+      },
+      { timeoutMs: 30_000 },
+    );
   },
 };
 
@@ -221,56 +221,53 @@ const careerGetOccupation: StandaloneToolDefinition = {
   tier: "free",
   annotations: { readOnlyHint: true },
   inputSchema: GetOccupationShape,
-  handler: async (
-    input: never,
-    _ctx: ServerContext,
-  ): Promise<CallToolResult> => {
-    const { uri } = input as { uri: string; };
-    return safeToolCall("career_get_occupation", async () => {
-      const { getOccupation } = await import(
-        "@/lib/career/services/esco-client"
-      );
-      const occupation = await getOccupation(uri);
+  handler: async (input: never, _ctx: ServerContext): Promise<CallToolResult> => {
+    const { uri } = input as { uri: string };
+    return safeToolCall(
+      "career_get_occupation",
+      async () => {
+        const { getOccupation } = await import("@/lib/career/services/esco-client");
+        const occupation = await getOccupation(uri);
 
-      if (!occupation) {
-        return textResult(
-          "**Error: NOT_FOUND**\nOccupation not found.\n**Retryable:** false",
+        if (!occupation) {
+          return textResult("**Error: NOT_FOUND**\nOccupation not found.\n**Retryable:** false");
+        }
+
+        const essentialSkills = occupation.skills.filter(
+          (s: { skillType: string }) => s.skillType === "essential",
         );
-      }
+        const optionalSkills = occupation.skills.filter(
+          (s: { skillType: string }) => s.skillType === "optional",
+        );
 
-      const essentialSkills = occupation.skills.filter((
-        s: { skillType: string; },
-      ) => s.skillType === "essential");
-      const optionalSkills = occupation.skills.filter((
-        s: { skillType: string; },
-      ) => s.skillType === "optional");
-
-      let text = `**${occupation.title}**\n\n`;
-      text += `**URI:** ${occupation.uri}\n`;
-      text += `**ISCO Group:** ${occupation.iscoGroup}\n`;
-      if (occupation.alternativeLabels.length > 0) {
-        text += `**Also known as:** ${occupation.alternativeLabels.join(", ")}\n`;
-      }
-      text += `\n**Description:**\n${occupation.description}\n\n`;
-      text += `**Essential Skills (${essentialSkills.length}):**\n`;
-      const displayedEssential = essentialSkills.slice(0, 15);
-      for (const skill of displayedEssential) {
-        text += `- ${skill.title}\n`;
-      }
-      if (essentialSkills.length > 15) {
-        text += `- ...and ${essentialSkills.length - 15} more\n`;
-      }
-      if (optionalSkills.length > 0) {
-        text += `\n**Optional Skills (${optionalSkills.length}):**\n`;
-        for (const skill of optionalSkills.slice(0, 10)) {
+        let text = `**${occupation.title}**\n\n`;
+        text += `**URI:** ${occupation.uri}\n`;
+        text += `**ISCO Group:** ${occupation.iscoGroup}\n`;
+        if (occupation.alternativeLabels.length > 0) {
+          text += `**Also known as:** ${occupation.alternativeLabels.join(", ")}\n`;
+        }
+        text += `\n**Description:**\n${occupation.description}\n\n`;
+        text += `**Essential Skills (${essentialSkills.length}):**\n`;
+        const displayedEssential = essentialSkills.slice(0, 15);
+        for (const skill of displayedEssential) {
           text += `- ${skill.title}\n`;
         }
-        if (optionalSkills.length > 10) {
-          text += `- ...and ${optionalSkills.length - 10} more\n`;
+        if (essentialSkills.length > 15) {
+          text += `- ...and ${essentialSkills.length - 15} more\n`;
         }
-      }
-      return textResult(text);
-    }, { timeoutMs: 30_000 });
+        if (optionalSkills.length > 0) {
+          text += `\n**Optional Skills (${optionalSkills.length}):**\n`;
+          for (const skill of optionalSkills.slice(0, 10)) {
+            text += `- ${skill.title}\n`;
+          }
+          if (optionalSkills.length > 10) {
+            text += `- ...and ${optionalSkills.length - 10} more\n`;
+          }
+        }
+        return textResult(text);
+      },
+      { timeoutMs: 30_000 },
+    );
   },
 };
 
@@ -282,44 +279,38 @@ const careerCompareSkills: StandaloneToolDefinition = {
   tier: "free",
   annotations: { readOnlyHint: true },
   inputSchema: CompareSkillsShape,
-  handler: async (
-    input: never,
-    _ctx: ServerContext,
-  ): Promise<CallToolResult> => {
+  handler: async (input: never, _ctx: ServerContext): Promise<CallToolResult> => {
     const { skills, occupationUri } = input as {
-      skills: Array<{ title: string; proficiency?: number; }>;
+      skills: Array<{ title: string; proficiency?: number }>;
       occupationUri: string;
     };
-    return safeToolCall("career_compare_skills", async () => {
-      const { getOccupation } = await import(
-        "@/lib/career/services/esco-client"
-      );
-      const { compareSkills } = await import(
-        "@/lib/career/services/matching-engine"
-      );
+    return safeToolCall(
+      "career_compare_skills",
+      async () => {
+        const { getOccupation } = await import("@/lib/career/services/esco-client");
+        const { compareSkills } = await import("@/lib/career/services/matching-engine");
 
-      const occupation = await getOccupation(occupationUri);
-      if (!occupation) {
-        return textResult(
-          "**Error: NOT_FOUND**\nOccupation not found.\n**Retryable:** false",
-        );
-      }
+        const occupation = await getOccupation(occupationUri);
+        if (!occupation) {
+          return textResult("**Error: NOT_FOUND**\nOccupation not found.\n**Retryable:** false");
+        }
 
-      const typedSkills = skills.map(s => ({ ...s, uri: "", proficiency: s.proficiency ?? 3 }));
-      const result = compareSkills(typedSkills, occupation);
+        const typedSkills = skills.map((s) => ({ ...s, uri: "", proficiency: s.proficiency ?? 3 }));
+        const result = compareSkills(typedSkills, occupation);
 
-      let text = `**Skill Comparison: ${occupation.title}**\n`;
-      text += `**Overall Score:** ${result.score}%\n`;
-      text += `**Skills Matched:** ${result.matchedSkills}/${result.totalRequired}\n\n`;
+        let text = `**Skill Comparison: ${occupation.title}**\n`;
+        text += `**Overall Score:** ${result.score}%\n`;
+        text += `**Skills Matched:** ${result.matchedSkills}/${result.totalRequired}\n\n`;
 
-      text += `| Skill | Required | Your Level | Gap | Priority |\n`;
-      text += `|-------|----------|------------|-----|----------|\n`;
-      for (const gap of result.gaps) {
-        text +=
-          `| ${gap.skill.title} | ${gap.requiredLevel} | ${gap.userProficiency} | ${gap.gap} | ${gap.priority} |\n`;
-      }
-      return textResult(text);
-    }, { timeoutMs: 30_000 });
+        text += `| Skill | Required | Your Level | Gap | Priority |\n`;
+        text += `|-------|----------|------------|-----|----------|\n`;
+        for (const gap of result.gaps) {
+          text += `| ${gap.skill.title} | ${gap.requiredLevel} | ${gap.userProficiency} | ${gap.gap} | ${gap.priority} |\n`;
+        }
+        return textResult(text);
+      },
+      { timeoutMs: 30_000 },
+    );
   },
 };
 
@@ -330,34 +321,31 @@ const careerGetSalary: StandaloneToolDefinition = {
   tier: "free",
   annotations: { readOnlyHint: true },
   inputSchema: GetSalaryShape,
-  handler: async (
-    input: never,
-    _ctx: ServerContext,
-  ): Promise<CallToolResult> => {
+  handler: async (input: never, _ctx: ServerContext): Promise<CallToolResult> => {
     const { occupationTitle, countryCode = "gb" } = input as {
       occupationTitle: string;
       countryCode?: string;
     };
-    return safeToolCall("career_get_salary", async () => {
-      const { getSalaryEstimate } = await import(
-        "@/lib/career/services/job-search-client"
-      );
-      const salary = await getSalaryEstimate(occupationTitle, countryCode);
+    return safeToolCall(
+      "career_get_salary",
+      async () => {
+        const { getSalaryEstimate } = await import("@/lib/career/services/job-search-client");
+        const salary = await getSalaryEstimate(occupationTitle, countryCode);
 
-      if (!salary) {
+        if (!salary) {
+          return textResult("Salary data not available for this occupation/location.");
+        }
+
         return textResult(
-          "Salary data not available for this occupation/location.",
+          `**Salary: ${occupationTitle}** (${salary.location})\n\n` +
+            `**Median:** ${salary.currency}${salary.median.toLocaleString()}\n` +
+            `**25th Percentile:** ${salary.currency}${salary.p25.toLocaleString()}\n` +
+            `**75th Percentile:** ${salary.currency}${salary.p75.toLocaleString()}\n` +
+            `**Source:** ${salary.source}`,
         );
-      }
-
-      return textResult(
-        `**Salary: ${occupationTitle}** (${salary.location})\n\n`
-          + `**Median:** ${salary.currency}${salary.median.toLocaleString()}\n`
-          + `**25th Percentile:** ${salary.currency}${salary.p25.toLocaleString()}\n`
-          + `**75th Percentile:** ${salary.currency}${salary.p75.toLocaleString()}\n`
-          + `**Source:** ${salary.source}`,
-      );
-    }, { timeoutMs: 30_000 });
+      },
+      { timeoutMs: 30_000 },
+    );
   },
 };
 
@@ -368,43 +356,49 @@ const careerGetJobs: StandaloneToolDefinition = {
   tier: "free",
   annotations: { readOnlyHint: true },
   inputSchema: GetJobsShape,
-  handler: async (
-    input: never,
-    _ctx: ServerContext,
-  ): Promise<CallToolResult> => {
-    const { query, location, countryCode = "gb", page = 1, limit = 10 } = input as {
+  handler: async (input: never, _ctx: ServerContext): Promise<CallToolResult> => {
+    const {
+      query,
+      location,
+      countryCode = "gb",
+      page = 1,
+      limit = 10,
+    } = input as {
       query: string;
       location?: string;
       countryCode?: string;
       page?: number;
       limit?: number;
     };
-    return safeToolCall("career_get_jobs", async () => {
-      const { searchJobs } = await import(
-        "@/lib/career/services/job-search-client"
-      );
-      const { jobs } = await searchJobs(query, location, countryCode, page, limit);
+    return safeToolCall(
+      "career_get_jobs",
+      async () => {
+        const { searchJobs } = await import("@/lib/career/services/job-search-client");
+        const { jobs } = await searchJobs(query, location, countryCode, page, limit);
 
-      if (jobs.length === 0) {
-        return textResult("No job listings found matching your criteria.");
-      }
-
-      let text = `**Job Listings (${jobs.length}):**\n\n`;
-      for (const job of jobs) {
-        text += `- **${job.title}** at ${job.company}\n`;
-        text += `  Location: ${job.location}\n`;
-        if (job.salary_min !== null || job.salary_max !== null) {
-          const salary = job.salary_min && job.salary_max
-            ? `${job.currency}${job.salary_min.toLocaleString()} - ${job.currency}${job.salary_max.toLocaleString()}`
-            : job.salary_min
-            ? `From ${job.currency}${job.salary_min.toLocaleString()}`
-            : `Up to ${job.currency}${job.salary_max!.toLocaleString()}`;
-          text += `  Salary: ${salary}\n`;
+        if (jobs.length === 0) {
+          return textResult("No job listings found matching your criteria.");
         }
-        text += `  [Apply](${job.url})\n\n`;
-      }
-      return textResult(text);
-    }, { timeoutMs: 30_000 });
+
+        let text = `**Job Listings (${jobs.length}):**\n\n`;
+        for (const job of jobs) {
+          text += `- **${job.title}** at ${job.company}\n`;
+          text += `  Location: ${job.location}\n`;
+          if (job.salary_min !== null || job.salary_max !== null) {
+            const salary =
+              job.salary_min && job.salary_max
+                ? `${job.currency}${job.salary_min.toLocaleString()} - ${job.currency}${job.salary_max.toLocaleString()}`
+                : job.salary_min
+                  ? `From ${job.currency}${job.salary_min.toLocaleString()}`
+                  : `Up to ${job.currency}${job.salary_max!.toLocaleString()}`;
+            text += `  Salary: ${salary}\n`;
+          }
+          text += `  [Apply](${job.url})\n\n`;
+        }
+        return textResult(text);
+      },
+      { timeoutMs: 30_000 },
+    );
   },
 };
 
@@ -417,7 +411,7 @@ interface ResumeData {
   email: string;
   summary: string;
   skills: string[];
-  experience: Array<{ title: string; company: string; duration: string; highlights: string[]; }>;
+  experience: Array<{ title: string; company: string; duration: string; highlights: string[] }>;
   createdAt: string;
 }
 
@@ -435,7 +429,7 @@ function scoreResume(resume: ResumeData): number {
   else score += Math.floor((resume.skills.length / 8) * 20);
   if (resume.experience.length >= 3) score += 30;
   else score += Math.floor((resume.experience.length / 3) * 30);
-  const highlightedEntries = resume.experience.filter(e => e.highlights.length >= 2);
+  const highlightedEntries = resume.experience.filter((e) => e.highlights.length >= 2);
   if (highlightedEntries.length === resume.experience.length && resume.experience.length > 0) {
     score += 30;
   } else {
@@ -530,8 +524,8 @@ const SAMPLE_JOBS: MockJob[] = [
 ];
 
 function computeJobMatchScore(resumeSkills: string[], job: MockJob): number {
-  const normalised = resumeSkills.map(s => s.toLowerCase());
-  const matched = job.requiredSkills.filter(s => normalised.includes(s.toLowerCase()));
+  const normalised = resumeSkills.map((s) => s.toLowerCase());
+  const matched = job.requiredSkills.filter((s) => normalised.includes(s.toLowerCase()));
   return Math.round((matched.length / job.requiredSkills.length) * 100);
 }
 
@@ -542,7 +536,7 @@ interface LearningItem {
   resources: string[];
 }
 
-const SKILL_METADATA: Record<string, { hours: number; resources: string[]; }> = {
+const SKILL_METADATA: Record<string, { hours: number; resources: string[] }> = {
   typescript: {
     hours: 40,
     resources: ["TypeScript Handbook (typescriptlang.org)", "Execute Program — TypeScript"],
@@ -590,24 +584,19 @@ function buildLearningPath(
     candidates.push("Python", "Docker", "PostgreSQL");
   }
 
-  const normalisedCurrent = currentSkills.map(s => s.toLowerCase());
-  const gaps = candidates.filter(c => !normalisedCurrent.includes(c.toLowerCase()));
+  const normalisedCurrent = currentSkills.map((s) => s.toLowerCase());
+  const gaps = candidates.filter((c) => !normalisedCurrent.includes(c.toLowerCase()));
 
   const items: LearningItem[] = gaps.map((skill, index) => {
     const meta = SKILL_METADATA[skill.toLowerCase()] ?? DEFAULT_SKILL_META;
-    const priority: LearningItem["priority"] = index === 0
-      ? "critical"
-      : index === 1
-      ? "high"
-      : index <= 3
-      ? "medium"
-      : "low";
+    const priority: LearningItem["priority"] =
+      index === 0 ? "critical" : index === 1 ? "high" : index <= 3 ? "medium" : "low";
     return { skill, estimatedHours: meta.hours, priority, resources: meta.resources };
   });
 
   if (timeBudget !== undefined) {
     let remaining = timeBudget;
-    return items.filter(item => {
+    return items.filter((item) => {
       if (remaining >= item.estimatedHours) {
         remaining -= item.estimatedHours;
         return true;
@@ -822,7 +811,7 @@ function generateInterviewQuestions(
   const merged = [...technical, ...behavioral, ...situational];
 
   if (merged.length < count) {
-    const extras = allQuestions.filter(q => !merged.includes(q));
+    const extras = allQuestions.filter((q) => !merged.includes(q));
     merged.push(...extras.slice(0, count - merged.length));
   }
 
@@ -837,18 +826,13 @@ const careerCreateResume: StandaloneToolDefinition = {
   tier: "free",
   alwaysEnabled: true,
   inputSchema: CreateResumeShape,
-  handler: async (
-    input: never,
-    _ctx: ServerContext,
-  ): Promise<CallToolResult> => {
+  handler: async (input: never, _ctx: ServerContext): Promise<CallToolResult> => {
     const typedInput = input as {
       name: string;
       email: string;
       summary: string;
       skills: string[];
-      experience: Array<
-        { title: string; company: string; duration: string; highlights: string[]; }
-      >;
+      experience: Array<{ title: string; company: string; duration: string; highlights: string[] }>;
     };
     return safeToolCall("career_create_resume", async () => {
       const id = generateResumeId();
@@ -887,10 +871,7 @@ const careerMatchJobs: StandaloneToolDefinition = {
   tier: "free",
   alwaysEnabled: true,
   inputSchema: MatchJobsShape,
-  handler: async (
-    input: never,
-    _ctx: ServerContext,
-  ): Promise<CallToolResult> => {
+  handler: async (input: never, _ctx: ServerContext): Promise<CallToolResult> => {
     const { resume_id, location, remote_only } = input as {
       resume_id: string;
       location?: string;
@@ -906,13 +887,11 @@ const careerMatchJobs: StandaloneToolDefinition = {
 
       let jobs = [...SAMPLE_JOBS];
       if (remote_only === true) {
-        jobs = jobs.filter(j => j.remote);
+        jobs = jobs.filter((j) => j.remote);
       }
       if (location) {
         const loc = location.toLowerCase();
-        jobs = jobs.filter(
-          j => j.location.toLowerCase().includes(loc) || j.remote,
-        );
+        jobs = jobs.filter((j) => j.location.toLowerCase().includes(loc) || j.remote);
       }
 
       if (jobs.length === 0) {
@@ -920,11 +899,11 @@ const careerMatchJobs: StandaloneToolDefinition = {
       }
 
       const ranked = jobs
-        .map(job => ({
+        .map((job) => ({
           job,
           score: computeJobMatchScore(resume.skills, job),
-          matched: job.requiredSkills.filter(s =>
-            resume.skills.map(r => r.toLowerCase()).includes(s.toLowerCase())
+          matched: job.requiredSkills.filter((s) =>
+            resume.skills.map((r) => r.toLowerCase()).includes(s.toLowerCase()),
           ),
         }))
         .sort((a, b) => b.score - a.score);
@@ -934,11 +913,10 @@ const careerMatchJobs: StandaloneToolDefinition = {
         text += `### ${job.title} — ${job.company}\n`;
         text += `**Match Score:** ${score}%\n`;
         text += `**Location:** ${job.location}${job.remote ? " (remote)" : ""}\n`;
-        text +=
-          `**Salary:** ${job.currency} ${job.salaryMin.toLocaleString()}–${job.salaryMax.toLocaleString()}\n`;
+        text += `**Salary:** ${job.currency} ${job.salaryMin.toLocaleString()}–${job.salaryMax.toLocaleString()}\n`;
         text += `**Skills Matched:** ${matched.join(", ") || "none"}\n`;
         const missing = job.requiredSkills.filter(
-          s => !resume.skills.map(r => r.toLowerCase()).includes(s.toLowerCase()),
+          (s) => !resume.skills.map((r) => r.toLowerCase()).includes(s.toLowerCase()),
         );
         if (missing.length > 0) {
           text += `**Skills to Develop:** ${missing.join(", ")}\n`;
@@ -958,10 +936,7 @@ const careerGetLearningPath: StandaloneToolDefinition = {
   tier: "free",
   alwaysEnabled: true,
   inputSchema: LearningPathShape,
-  handler: async (
-    input: never,
-    _ctx: ServerContext,
-  ): Promise<CallToolResult> => {
+  handler: async (input: never, _ctx: ServerContext): Promise<CallToolResult> => {
     const { current_skills, target_occupation, time_budget_hours } = input as {
       current_skills: string[];
       target_occupation: string;
@@ -986,9 +961,9 @@ const careerGetLearningPath: StandaloneToolDefinition = {
       text += `| # | Skill | Hours | Priority | Resources |\n`;
       text += `|---|-------|-------|----------|-----------|\n`;
       for (const [index, item] of path.entries()) {
-        text += `| ${index + 1} | ${item.skill} | ${item.estimatedHours}h | ${item.priority} | ${
-          item.resources.join("; ")
-        } |\n`;
+        text += `| ${index + 1} | ${item.skill} | ${item.estimatedHours}h | ${item.priority} | ${item.resources.join(
+          "; ",
+        )} |\n`;
       }
       return textResult(text);
     });
@@ -1003,11 +978,12 @@ const careerInterviewPrep: StandaloneToolDefinition = {
   tier: "free",
   alwaysEnabled: true,
   inputSchema: InterviewPrepShape,
-  handler: async (
-    input: never,
-    _ctx: ServerContext,
-  ): Promise<CallToolResult> => {
-    const { occupation, level, question_count = 10 } = input as {
+  handler: async (input: never, _ctx: ServerContext): Promise<CallToolResult> => {
+    const {
+      occupation,
+      level,
+      question_count = 10,
+    } = input as {
       occupation: string;
       level: "junior" | "mid" | "senior" | "lead";
       question_count?: number;

@@ -6,11 +6,7 @@
 "use client";
 
 import { useCallback, useRef, useState } from "react";
-import {
-  createAnalyser,
-  createAudioContext,
-  createMasterGain,
-} from "../lib/audio-engine";
+import { createAnalyser, createAudioContext, createMasterGain } from "../lib/audio-engine";
 import type { AudioContextState } from "../types";
 
 export function useAudioContext() {

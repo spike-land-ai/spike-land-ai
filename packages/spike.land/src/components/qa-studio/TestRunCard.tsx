@@ -1,12 +1,7 @@
 "use client";
 
 import { Badge } from "@/components/ui/badge";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 
 interface TestRunCardProps {
@@ -55,10 +50,7 @@ export function TestRunCard({
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between gap-2">
           <CardTitle className="text-base text-zinc-100">{suiteName}</CardTitle>
-          <Badge
-            variant="outline"
-            className={cn("text-xs shrink-0", statusStyles[status])}
-          >
+          <Badge variant="outline" className={cn("text-xs shrink-0", statusStyles[status])}>
             {status}
           </Badge>
         </div>

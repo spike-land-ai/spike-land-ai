@@ -107,25 +107,23 @@ describe("api-key-manager", () => {
 
     it("should reject development keys in production environment", async () => {
       const originalEnv = process.env.NODE_ENV;
-      (process.env as { NODE_ENV?: string; }).NODE_ENV = "production";
+      (process.env as { NODE_ENV?: string }).NODE_ENV = "production";
 
       try {
-        const result = await validateApiKey(
-          "sk_test_validkey123456789012345678",
-        );
+        const result = await validateApiKey("sk_test_validkey123456789012345678");
 
         expect(result.isValid).toBe(false);
         expect(result.error).toBe("Development keys not allowed in production");
         // Should not even attempt to query the database
         expect(mockApiKey.findUnique).not.toHaveBeenCalled();
       } finally {
-        (process.env as { NODE_ENV?: string; }).NODE_ENV = originalEnv;
+        (process.env as { NODE_ENV?: string }).NODE_ENV = originalEnv;
       }
     });
 
     it("should allow production keys in production environment", async () => {
       const originalEnv = process.env.NODE_ENV;
-      (process.env as { NODE_ENV?: string; }).NODE_ENV = "production";
+      (process.env as { NODE_ENV?: string }).NODE_ENV = "production";
       mockApiKey.findUnique.mockResolvedValue(null);
 
       try {
@@ -137,7 +135,7 @@ describe("api-key-manager", () => {
         expect(mockApiKey.findUnique).toHaveBeenCalled();
         expect(result.error).toBe("Invalid API key");
       } finally {
-        (process.env as { NODE_ENV?: string; }).NODE_ENV = originalEnv;
+        (process.env as { NODE_ENV?: string }).NODE_ENV = originalEnv;
       }
     });
 
@@ -360,7 +358,7 @@ describe("api-key-manager", () => {
   describe("generateApiKey - production prefix", () => {
     it("should generate keys with sk_live_ prefix in production", async () => {
       const originalEnv = process.env.NODE_ENV;
-      (process.env as { NODE_ENV?: string; }).NODE_ENV = "production";
+      (process.env as { NODE_ENV?: string }).NODE_ENV = "production";
 
       try {
         mockApiKey.create.mockResolvedValue({
@@ -378,7 +376,7 @@ describe("api-key-manager", () => {
         expect(result.key.startsWith(expectedPrefix)).toBe(true);
         expect(result.keyPrefix).toContain("...****");
       } finally {
-        (process.env as { NODE_ENV?: string; }).NODE_ENV = originalEnv;
+        (process.env as { NODE_ENV?: string }).NODE_ENV = originalEnv;
       }
     });
 
@@ -589,9 +587,7 @@ describe("api-key-manager", () => {
 
       mockApiKey.findUnique.mockResolvedValue(mockKeyRecord);
       // Simulate an error during the lastUsedAt update
-      mockApiKey.update.mockRejectedValue(
-        new Error("Database connection lost"),
-      );
+      mockApiKey.update.mockRejectedValue(new Error("Database connection lost"));
 
       // Should not throw - the error is caught silently
       const result = await validateApiKey(fullKey);

@@ -16,8 +16,7 @@ interface PageCanvasPreviewProps {
 }
 
 const blockStyles: Record<BlockType, string> = {
-  hero:
-    "bg-gradient-to-r from-violet-900/40 to-indigo-900/40 border border-violet-700/30 rounded-xl p-6 min-h-[100px]",
+  hero: "bg-gradient-to-r from-violet-900/40 to-indigo-900/40 border border-violet-700/30 rounded-xl p-6 min-h-[100px]",
   text: "bg-zinc-900 border border-zinc-800 rounded-lg p-4 min-h-[60px]",
   image: "bg-zinc-800/50 border border-dashed border-zinc-600 rounded-xl p-4 min-h-[80px]",
   cta: "bg-indigo-900/30 border border-indigo-600/40 rounded-xl p-4 min-h-[60px]",
@@ -32,14 +31,10 @@ const blockLabels: Record<BlockType, string> = {
   divider: "Divider",
 };
 
-function BlockPlaceholder({ block }: { block: CanvasBlock; }) {
+function BlockPlaceholder({ block }: { block: CanvasBlock }) {
   if (block.type === "divider") {
     return (
-      <div
-        className={blockStyles.divider}
-        role="separator"
-        aria-label="Divider block"
-      >
+      <div className={blockStyles.divider} role="separator" aria-label="Divider block">
         <div className="flex items-center gap-3">
           <div className="flex-1 h-px bg-zinc-700" />
           <span className="text-[10px] font-mono text-zinc-600 uppercase tracking-widest">
@@ -122,7 +117,9 @@ export function PageCanvasPreview({ blocks, className }: PageCanvasPreviewProps)
           <span className="text-xs mt-1">Use the palette to add blocks.</span>
         </div>
       )}
-      {blocks.map(block => <BlockPlaceholder key={block.id} block={block} />)}
+      {blocks.map((block) => (
+        <BlockPlaceholder key={block.id} block={block} />
+      ))}
     </div>
   );
 }

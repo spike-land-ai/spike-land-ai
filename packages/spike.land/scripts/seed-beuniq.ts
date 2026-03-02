@@ -1,8 +1,5 @@
 import prisma from "../src/lib/prisma";
-import {
-  answerQuestion,
-  startTraversal,
-} from "../src/lib/avl-profile/traversal";
+import { answerQuestion, startTraversal } from "../src/lib/avl-profile/traversal";
 
 async function main() {
   console.log("Resetting tree...");
@@ -41,9 +38,7 @@ async function main() {
     }
 
     if (result.status === "ASSIGNED") {
-      console.log(
-        `Assigned to leaf! Tags: ${result.profile?.derivedTags.join(", ")}`,
-      );
+      console.log(`Assigned to leaf! Tags: ${result.profile?.derivedTags.join(", ")}`);
     } else if (result.status === "ALREADY_PROFILED") {
       console.log(`Already profiled!`);
     } else {

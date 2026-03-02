@@ -11,12 +11,7 @@ interface SignInButtonProps {
   callbackUrl?: string;
 }
 
-export function SignInButton({
-  provider,
-  children,
-  className,
-  callbackUrl,
-}: SignInButtonProps) {
+export function SignInButton({ provider, children, className, callbackUrl }: SignInButtonProps) {
   const handleSignIn = () => {
     const options = callbackUrl ? { callbackUrl } : undefined;
     if (provider) {
@@ -27,11 +22,7 @@ export function SignInButton({
   };
 
   return (
-    <Button
-      onClick={handleSignIn}
-      className={className}
-      variant="default"
-    >
+    <Button onClick={handleSignIn} className={className} variant="default">
       {children || (
         <>
           <LogIn className="mr-2 h-4 w-4" />

@@ -9,7 +9,7 @@ async function hashToken(token: string): Promise<string> {
   const encoded = new TextEncoder().encode(token);
   const hashBuffer = await crypto.subtle.digest("SHA-256", encoded);
   return Array.from(new Uint8Array(hashBuffer))
-    .map(b => b.toString(16).padStart(2, "0"))
+    .map((b) => b.toString(16).padStart(2, "0"))
     .join("");
 }
 
@@ -35,7 +35,10 @@ export const authMiddleware = createMiddleware<{
         },
       },
       401,
-      { "WWW-Authenticate": 'Bearer resource_metadata="https://mcp.spike.land/.well-known/oauth-protected-resource/mcp"' },
+      {
+        "WWW-Authenticate":
+          'Bearer resource_metadata="https://mcp.spike.land/.well-known/oauth-protected-resource/mcp"',
+      },
     );
   }
 
@@ -56,12 +59,7 @@ export const authMiddleware = createMiddleware<{
     const result = await db
       .select({ userId: oauthAccessTokens.userId })
       .from(oauthAccessTokens)
-      .where(
-        and(
-          eq(oauthAccessTokens.tokenHash, tokenHash),
-          gt(oauthAccessTokens.expiresAt, now),
-        ),
-      )
+      .where(and(eq(oauthAccessTokens.tokenHash, tokenHash), gt(oauthAccessTokens.expiresAt, now)))
       .limit(1);
 
     userId = result[0]?.userId ?? null;

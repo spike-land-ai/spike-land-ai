@@ -1,12 +1,7 @@
 "use client";
 
 import { slideUpVariants, transitions } from "@/lib/animation-variants";
-import {
-  motion,
-  type Transition,
-  useInView,
-  type Variants,
-} from "framer-motion";
+import { motion, type Transition, useInView, type Variants } from "framer-motion";
 import React, { useRef } from "react";
 
 interface ScrollRevealProps {

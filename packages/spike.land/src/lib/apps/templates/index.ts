@@ -44,7 +44,7 @@ export const templates: Template[] = [
  * @returns Template if found, undefined otherwise
  */
 export function getTemplateById(id: string): Template | undefined {
-  return templates.find(template => template.id === id);
+  return templates.find((template) => template.id === id);
 }
 
 /**

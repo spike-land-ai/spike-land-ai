@@ -31,11 +31,7 @@ interface ImagePlaceholderProps {
  * />
  * ```
  */
-export function ImagePlaceholder({
-  description,
-  type,
-  className,
-}: ImagePlaceholderProps) {
+export function ImagePlaceholder({ description, type, className }: ImagePlaceholderProps) {
   const isEnhanced = type === "enhanced";
 
   return (
@@ -44,9 +40,7 @@ export function ImagePlaceholder({
         "flex flex-col items-center justify-center gap-4",
         "w-full aspect-video rounded-lg border-2 border-dashed",
         "p-6 my-6",
-        isEnhanced
-          ? "bg-teal-950/30 border-teal-700"
-          : "bg-gray-800/50 border-gray-600",
+        isEnhanced ? "bg-teal-950/30 border-teal-700" : "bg-gray-800/50 border-gray-600",
         className,
       )}
       role="img"
@@ -55,15 +49,11 @@ export function ImagePlaceholder({
       <div
         className={cn(
           "flex items-center justify-center w-16 h-16 rounded-full",
-          isEnhanced
-            ? "bg-teal-900/50 text-teal-400"
-            : "bg-gray-700 text-gray-400",
+          isEnhanced ? "bg-teal-900/50 text-teal-400" : "bg-gray-700 text-gray-400",
         )}
         aria-hidden="true"
       >
-        {isEnhanced
-          ? <Sparkles className="w-8 h-8" />
-          : <Camera className="w-8 h-8" />}
+        {isEnhanced ? <Sparkles className="w-8 h-8" /> : <Camera className="w-8 h-8" />}
       </div>
       <p
         className={cn(

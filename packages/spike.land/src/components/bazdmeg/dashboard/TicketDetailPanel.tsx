@@ -30,7 +30,7 @@ interface PlanData {
 
 interface JulesStatus {
   state: string;
-  activities: Array<{ type?: string; content?: string; }>;
+  activities: Array<{ type?: string; content?: string }>;
   url?: string;
 }
 
@@ -86,9 +86,8 @@ export function TicketDetailPanel({
   // Poll Jules status
   useEffect(() => {
     if (
-      !plan?.julesSessionId
-      || !["SENT_TO_JULES", "JULES_WORKING", "JULES_REVIEW", "BUILD_FIXING"]
-        .includes(plan.status)
+      !plan?.julesSessionId ||
+      !["SENT_TO_JULES", "JULES_WORKING", "JULES_REVIEW", "BUILD_FIXING"].includes(plan.status)
     ) {
       return;
     }
@@ -102,17 +101,14 @@ export function TicketDetailPanel({
         const data = await response.json();
         if (data.jules) setJulesStatus(data.jules);
         if (data.plan?.status && data.plan.status !== planStatusRef.current) {
-          setPlan(prev => prev ? { ...prev, status: data.plan.status } : prev);
+          setPlan((prev) => (prev ? { ...prev, status: data.plan.status } : prev));
         }
       }
       setIsPollingJules(false);
     };
 
     poll();
-    const interval = setInterval(
-      poll,
-      planStatusRef.current === "JULES_WORKING" ? 15_000 : 60_000,
-    );
+    const interval = setInterval(poll, planStatusRef.current === "JULES_WORKING" ? 15_000 : 60_000);
     return () => clearInterval(interval);
   }, [plan?.id, plan?.julesSessionId, plan?.status]);
 
@@ -136,7 +132,7 @@ export function TicketDetailPanel({
       if (response?.ok) {
         const data = await response.json();
         if (data.plan) {
-          setPlan(prev => ({
+          setPlan((prev) => ({
             ...prev!,
             ...data.plan,
             chatMessages: prev?.chatMessages || [],
@@ -159,7 +155,7 @@ export function TicketDetailPanel({
     );
     if (response?.ok) {
       const data = await response.json();
-      setPlan(prev => prev ? { ...prev, status: data.plan.status } : prev);
+      setPlan((prev) => (prev ? { ...prev, status: data.plan.status } : prev));
     }
     setIsApproving(false);
   };
@@ -174,16 +170,16 @@ export function TicketDetailPanel({
     );
     if (response?.ok) {
       const data = await response.json();
-      setPlan(prev =>
+      setPlan((prev) =>
         prev
           ? {
-            ...prev,
-            status: data.plan.status,
-            julesSessionId: data.plan.julesSessionId,
-            julesSessionUrl: data.plan.julesSessionUrl,
-            julesLastState: data.plan.julesLastState,
-          }
-          : prev
+              ...prev,
+              status: data.plan.status,
+              julesSessionId: data.plan.julesSessionId,
+              julesSessionUrl: data.plan.julesSessionUrl,
+              julesLastState: data.plan.julesLastState,
+            }
+          : prev,
       );
     }
     setIsSendingToJules(false);
@@ -200,19 +196,16 @@ export function TicketDetailPanel({
       const data = await response.json();
       if (data.jules) setJulesStatus(data.jules);
       if (data.plan?.status) {
-        setPlan(prev => prev ? { ...prev, status: data.plan.status } : prev);
+        setPlan((prev) => (prev ? { ...prev, status: data.plan.status } : prev));
       }
     }
     setIsPollingJules(false);
   };
 
   const status = plan?.status || "UNPLANNED";
-  const isJulesActive = [
-    "SENT_TO_JULES",
-    "JULES_WORKING",
-    "JULES_REVIEW",
-    "BUILD_FIXING",
-  ].includes(status);
+  const isJulesActive = ["SENT_TO_JULES", "JULES_WORKING", "JULES_REVIEW", "BUILD_FIXING"].includes(
+    status,
+  );
   const isReadOnly = isJulesActive || status === "COMPLETED";
 
   if (isLoadingPlan) {
@@ -229,9 +222,7 @@ export function TicketDetailPanel({
       <div className="p-3 border-b border-white/10">
         <div className="flex items-center justify-between mb-2">
           <div className="flex items-center gap-2">
-            <span className="text-xs text-zinc-500 font-mono">
-              #{ticket.number}
-            </span>
+            <span className="text-xs text-zinc-500 font-mono">#{ticket.number}</span>
             <a
               href={ticket.url}
               target="_blank"
@@ -243,9 +234,7 @@ export function TicketDetailPanel({
           </div>
           <WorkflowStepper status={status} />
         </div>
-        <h2 className="text-sm font-semibold text-white mb-2">
-          {ticket.title}
-        </h2>
+        <h2 className="text-sm font-semibold text-white mb-2">{ticket.title}</h2>
 
         {/* Action buttons */}
         <div className="flex gap-2">
@@ -257,9 +246,11 @@ export function TicketDetailPanel({
               disabled={isApproving || !plan?.planContent}
               className="h-7 text-xs border-green-500/30 text-green-400 hover:bg-green-500/10"
             >
-              {isApproving
-                ? <Loader2 className="h-3 w-3 animate-spin mr-1" />
-                : <Check className="h-3 w-3 mr-1" />}
+              {isApproving ? (
+                <Loader2 className="h-3 w-3 animate-spin mr-1" />
+              ) : (
+                <Check className="h-3 w-3 mr-1" />
+              )}
               Approve Plan
             </Button>
           )}
@@ -288,10 +279,7 @@ export function TicketDetailPanel({
       </div>
 
       {/* Content tabs */}
-      <Tabs
-        defaultValue="plan"
-        className="flex-1 flex flex-col overflow-hidden"
-      >
+      <Tabs defaultValue="plan" className="flex-1 flex flex-col overflow-hidden">
         <TabsList className="w-full bg-transparent border-b border-white/10 rounded-none h-8 p-0">
           <TabsTrigger
             value="plan"
@@ -330,7 +318,7 @@ export function TicketDetailPanel({
           <ScrollArea className="h-full">
             <div className="p-3">
               <div className="flex flex-wrap gap-1 mb-3">
-                {ticket.labels.map(label => (
+                {ticket.labels.map((label) => (
                   <span
                     key={label}
                     className="text-[10px] px-1.5 py-0.5 rounded bg-zinc-800 text-zinc-400 border border-zinc-700"

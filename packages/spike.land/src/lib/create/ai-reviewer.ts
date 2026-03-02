@@ -17,8 +17,7 @@ import prisma from "@/lib/prisma";
 import logger from "@/lib/logger";
 import type { ReviewDecision, ReviewPhase } from "@prisma/client";
 
-const AI_REVIEW_SYSTEM =
-  `You are a senior React developer and accessibility expert reviewing a generated React component.
+const AI_REVIEW_SYSTEM = `You are a senior React developer and accessibility expert reviewing a generated React component.
 
 Evaluate the code on three dimensions:
 1. **Code Quality**: Is the code correct, well-structured, and free of runtime errors? Does it have a valid default export?
@@ -79,18 +78,14 @@ export async function runAiReview(
 
   const reviewers = await selectReviewers(2);
   const reviews = await Promise.all(
-    reviewers.map(reviewer => executeReview(appId, sourceCode!, reviewer)),
+    reviewers.map((reviewer) => executeReview(appId, sourceCode!, reviewer)),
   );
 
-  const approved = reviews.every(r => r.decision === "APPROVED");
-  const scores = reviews.map(r => r.score).filter((s): s is number => s !== null);
-  const averageScore = scores.length > 0
-    ? scores.reduce((a, b) => a + b, 0) / scores.length
-    : 0;
+  const approved = reviews.every((r) => r.decision === "APPROVED");
+  const scores = reviews.map((r) => r.score).filter((s): s is number => s !== null);
+  const averageScore = scores.length > 0 ? scores.reduce((a, b) => a + b, 0) / scores.length : 0;
 
-  const feedbackParts = reviews
-    .map(r => r.feedback)
-    .filter(Boolean);
+  const feedbackParts = reviews.map((r) => r.feedback).filter(Boolean);
   const feedback = feedbackParts.join(" | ") || "No feedback provided";
 
   return { passed: approved, reviews, averageScore, feedback };
@@ -98,7 +93,7 @@ export async function runAiReview(
 
 async function selectReviewers(count: number): Promise<AgentIdentity[]> {
   const agents = await selectByElo(count);
-  return agents.map(a => ({
+  return agents.map((a) => ({
     agentId: a.agentId,
     model: a.agentModel,
     elo: a.elo,
@@ -116,11 +111,8 @@ async function executeReview(
   score: number | null;
   eloAtReview: number;
 }> {
-  const codePreview = code.length > 8000
-    ? code.slice(0, 8000) + "\n// ... truncated"
-    : code;
-  const userPrompt =
-    `Review this generated React component for code quality, accessibility, and responsiveness:\n\n\`\`\`tsx\n${codePreview}\n\`\`\``;
+  const codePreview = code.length > 8000 ? code.slice(0, 8000) + "\n// ... truncated" : code;
+  const userPrompt = `Review this generated React component for code quality, accessibility, and responsiveness:\n\n\`\`\`tsx\n${codePreview}\n\`\`\``;
 
   try {
     const response = await callClaude({

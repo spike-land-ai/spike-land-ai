@@ -14,7 +14,8 @@ const skeletonVariants = cva("rounded-md", {
 });
 
 interface SkeletonProps
-  extends React.HTMLAttributes<HTMLDivElement>, VariantProps<typeof skeletonVariants> {}
+  extends React.HTMLAttributes<HTMLDivElement>,
+    VariantProps<typeof skeletonVariants> {}
 
 function Skeleton({ className, variant, ...props }: SkeletonProps) {
   return <div className={cn(skeletonVariants({ variant }), className)} {...props} />;

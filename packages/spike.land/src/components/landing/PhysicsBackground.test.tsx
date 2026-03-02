@@ -37,7 +37,7 @@ vi.mock("three", () => {
 
 // Mock @react-three/fiber
 vi.mock("@react-three/fiber", () => ({
-  Canvas: ({ children }: { children: React.ReactNode; }) => (
+  Canvas: ({ children }: { children: React.ReactNode }) => (
     <div data-testid="r3f-canvas">{children}</div>
   ),
   useFrame: vi.fn(),
@@ -45,8 +45,8 @@ vi.mock("@react-three/fiber", () => ({
 
 // Mock @react-three/rapier
 vi.mock("@react-three/rapier", () => ({
-  Physics: ({ children }: { children: React.ReactNode; }) => <>{children}</>,
-  RigidBody: ({ children }: { children: React.ReactNode; }) => <>{children}</>,
+  Physics: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+  RigidBody: ({ children }: { children: React.ReactNode }) => <>{children}</>,
   CuboidCollider: () => null,
 }));
 
@@ -84,8 +84,6 @@ describe("PhysicsBackground", () => {
     const errorBoundary = screen.getByTestId("error-boundary");
     expect(errorBoundary).toBeInTheDocument();
     // Canvas should be inside the error boundary
-    expect(
-      errorBoundary.querySelector("[data-testid='r3f-canvas']"),
-    ).toBeInTheDocument();
+    expect(errorBoundary.querySelector("[data-testid='r3f-canvas']")).toBeInTheDocument();
   });
 });

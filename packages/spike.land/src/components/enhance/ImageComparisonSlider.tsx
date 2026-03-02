@@ -56,15 +56,20 @@ export function ImageComparisonSlider({
   const [enhancedError, setEnhancedError] = useState(false);
   const [originalError, setOriginalError] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
-  const [detectedDimensions, setDetectedDimensions] = useState<
-    { width: number; height: number; } | null
-  >(null);
+  const [detectedDimensions, setDetectedDimensions] = useState<{
+    width: number;
+    height: number;
+  } | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
   // Auto-detect original dimensions if not provided (or invalid)
-  const shouldAutoDetect = width === undefined || height === undefined
-    || !Number.isFinite(width)
-    || !Number.isFinite(height) || width <= 0 || height <= 0;
+  const shouldAutoDetect =
+    width === undefined ||
+    height === undefined ||
+    !Number.isFinite(width) ||
+    !Number.isFinite(height) ||
+    width <= 0 ||
+    height <= 0;
 
   useEffect(() => {
     if (!shouldAutoDetect) return;
@@ -80,12 +85,10 @@ export function ImageComparisonSlider({
   }, [originalUrl, shouldAutoDetect]);
 
   // Use provided dimensions if valid, detected dimensions if available, or default 16:9
-  const safeWidth = (Number.isFinite(width) && width && width > 0)
-    ? width
-    : (detectedDimensions?.width ?? 16);
-  const safeHeight = (Number.isFinite(height) && height && height > 0)
-    ? height
-    : (detectedDimensions?.height ?? 9);
+  const safeWidth =
+    Number.isFinite(width) && width && width > 0 ? width : (detectedDimensions?.width ?? 16);
+  const safeHeight =
+    Number.isFinite(height) && height && height > 0 ? height : (detectedDimensions?.height ?? 9);
 
   const updatePosition = useCallback((clientX: number) => {
     if (!containerRef.current) return;
@@ -95,33 +98,45 @@ export function ImageComparisonSlider({
     setSliderPosition(percentage);
   }, []);
 
-  const handleDragStart = useCallback((clientX: number) => {
-    setIsDragging(true);
-    updatePosition(clientX);
-  }, [updatePosition]);
+  const handleDragStart = useCallback(
+    (clientX: number) => {
+      setIsDragging(true);
+      updatePosition(clientX);
+    },
+    [updatePosition],
+  );
 
-  const handleDragMove = useCallback((clientX: number) => {
-    if (!isDragging) return;
-    updatePosition(clientX);
-  }, [isDragging, updatePosition]);
+  const handleDragMove = useCallback(
+    (clientX: number) => {
+      if (!isDragging) return;
+      updatePosition(clientX);
+    },
+    [isDragging, updatePosition],
+  );
 
   const handleDragEnd = useCallback(() => {
     setIsDragging(false);
   }, []);
 
   // Mouse event handlers
-  const onMouseDown = useCallback((e: React.MouseEvent) => {
-    e.preventDefault();
-    handleDragStart(e.clientX);
-  }, [handleDragStart]);
+  const onMouseDown = useCallback(
+    (e: React.MouseEvent) => {
+      e.preventDefault();
+      handleDragStart(e.clientX);
+    },
+    [handleDragStart],
+  );
 
   // Touch event handlers
-  const onTouchStart = useCallback((e: React.TouchEvent) => {
-    const touch = e.touches[0];
-    if (touch) {
-      handleDragStart(touch.clientX);
-    }
-  }, [handleDragStart]);
+  const onTouchStart = useCallback(
+    (e: React.TouchEvent) => {
+      const touch = e.touches[0];
+      if (touch) {
+        handleDragStart(touch.clientX);
+      }
+    },
+    [handleDragStart],
+  );
 
   // Document-level listeners for drag continuation
   useEffect(() => {
@@ -186,48 +201,40 @@ export function ImageComparisonSlider({
         aria-valuemax={100}
       >
         {/* Enhanced image (background) */}
-        {!enhancedError
-          ? (
-            <Image
-              src={enhancedUrl}
-              alt={enhancedLabel}
-              className="absolute inset-0 w-full h-full object-cover"
-              onError={handleEnhancedError}
-              fill
-              unoptimized
-            />
-          )
-          : (
-            <div className="absolute inset-0 flex items-center justify-center bg-destructive/10">
-              <p className="text-sm text-destructive">
-                Enhanced image failed to load
-              </p>
-            </div>
-          )}
+        {!enhancedError ? (
+          <Image
+            src={enhancedUrl}
+            alt={enhancedLabel}
+            className="absolute inset-0 w-full h-full object-cover"
+            onError={handleEnhancedError}
+            fill
+            unoptimized
+          />
+        ) : (
+          <div className="absolute inset-0 flex items-center justify-center bg-destructive/10">
+            <p className="text-sm text-destructive">Enhanced image failed to load</p>
+          </div>
+        )}
 
         {/* Original image (clipped overlay) */}
         <div
           className="absolute inset-0 overflow-hidden"
           style={{ clipPath: `inset(0 ${100 - sliderPosition}% 0 0)` }}
         >
-          {!originalError
-            ? (
-              <Image
-                src={originalUrl}
-                alt={originalLabel}
-                className="w-full h-full object-cover"
-                onError={handleOriginalError}
-                fill
-                unoptimized
-              />
-            )
-            : (
-              <div className="absolute inset-0 flex items-center justify-center bg-destructive/10">
-                <p className="text-sm text-destructive">
-                  Original image failed to load
-                </p>
-              </div>
-            )}
+          {!originalError ? (
+            <Image
+              src={originalUrl}
+              alt={originalLabel}
+              className="w-full h-full object-cover"
+              onError={handleOriginalError}
+              fill
+              unoptimized
+            />
+          ) : (
+            <div className="absolute inset-0 flex items-center justify-center bg-destructive/10">
+              <p className="text-sm text-destructive">Original image failed to load</p>
+            </div>
+          )}
         </div>
 
         {/* Divider line with cyan glow */}

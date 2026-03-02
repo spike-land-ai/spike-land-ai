@@ -1,9 +1,5 @@
 import { describe, expect, it } from "vitest";
-import {
-  buildDependencyGraph,
-  createFilePlan,
-  decomposeFeature,
-} from "./engine";
+import { buildDependencyGraph, createFilePlan, decomposeFeature } from "./engine";
 
 describe("architect engine", () => {
   it("should decompose a feature", () => {

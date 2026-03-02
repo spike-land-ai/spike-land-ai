@@ -1,26 +1,22 @@
 "use client";
 
 import { useCallback, useRef, useState } from "react";
-import {
-  type AgentSSEEvent,
-  parseSSE,
-  splitSSEBuffer,
-} from "@/lib/chat/agent-sse-protocol";
+import { type AgentSSEEvent, parseSSE, splitSSEBuffer } from "@/lib/chat/agent-sse-protocol";
 
 /** A single content block within an agent message. */
 export type AgentContentBlock =
-  | { type: "text"; content: string; }
-  | { type: "image"; content: string; name?: string; }
+  | { type: "text"; content: string }
+  | { type: "image"; content: string; name?: string }
   | {
-    type: "tool_call";
-    id: string;
-    name: string;
-    serverName: string;
-    input: Record<string, unknown>;
-    status: "running" | "done" | "error";
-    result?: string;
-    isError?: boolean;
-  };
+      type: "tool_call";
+      id: string;
+      name: string;
+      serverName: string;
+      input: Record<string, unknown>;
+      status: "running" | "done" | "error";
+      result?: string;
+      isError?: boolean;
+    };
 
 /** A message in the agent conversation. */
 export interface AgentMessage {
@@ -38,7 +34,7 @@ export interface UseAgentChatReturn {
   error: string | null;
   sendMessage: (
     question: string,
-    attachments?: { type: string; data: string; name: string; }[],
+    attachments?: { type: string; data: string; name: string }[],
   ) => Promise<void>;
   clearMessages: () => void;
   abort: () => void;
@@ -63,10 +59,7 @@ export function useAgentChat(
   const abortRef = useRef<AbortController | null>(null);
 
   const sendMessage = useCallback(
-    async (
-      question: string,
-      attachments?: { type: string; data: string; name: string; }[],
-    ) => {
+    async (question: string, attachments?: { type: string; data: string; name: string }[]) => {
       if (isStreaming) return;
 
       setError(null);
@@ -99,7 +92,7 @@ export function useAgentChat(
         timestamp: Date.now(),
       };
 
-      setMessages(prev => [...prev, userMsg, assistantMsg]);
+      setMessages((prev) => [...prev, userMsg, assistantMsg]);
 
       const controller = new AbortController();
       abortRef.current = controller;
@@ -121,9 +114,7 @@ export function useAgentChat(
           const errBody = await response.json().catch(() => ({
             error: "Request failed",
           }));
-          throw new Error(
-            (errBody as { error?: string; }).error || `HTTP ${response.status}`,
-          );
+          throw new Error((errBody as { error?: string }).error || `HTTP ${response.status}`);
         }
 
         const reader = response.body?.getReader();
@@ -215,17 +206,17 @@ function applyEvents(
     } else if (event.type === "error") {
       setError(event.message);
     } else if (
-      event.type === "text_delta"
-      || event.type === "tool_call_start"
-      || event.type === "tool_call_end"
+      event.type === "text_delta" ||
+      event.type === "tool_call_start" ||
+      event.type === "tool_call_end"
     ) {
       hasMessageUpdates = true;
     }
   }
 
   if (hasMessageUpdates) {
-    setMessages(prev =>
-      updateAssistant(prev, assistantId, msg => {
+    setMessages((prev) =>
+      updateAssistant(prev, assistantId, (msg) => {
         const currentBlocks = [...msg.blocks];
 
         for (const event of events) {
@@ -252,7 +243,7 @@ function applyEvents(
             });
           } else if (event.type === "tool_call_end") {
             const index = currentBlocks.findIndex(
-              b => b.type === "tool_call" && b.id === event.id,
+              (b) => b.type === "tool_call" && b.id === event.id,
             );
             if (index !== -1) {
               const block = currentBlocks[index];
@@ -268,7 +259,7 @@ function applyEvents(
           }
         }
         return { ...msg, blocks: currentBlocks };
-      })
+      }),
     );
   }
 }
@@ -279,5 +270,5 @@ function updateAssistant(
   id: string,
   updater: (msg: AgentMessage) => AgentMessage,
 ): AgentMessage[] {
-  return messages.map(msg => (msg.id === id ? updater(msg) : msg));
+  return messages.map((msg) => (msg.id === id ? updater(msg) : msg));
 }

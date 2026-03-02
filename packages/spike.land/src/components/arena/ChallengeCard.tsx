@@ -1,13 +1,7 @@
 "use client";
 
 import { Badge } from "@/components/ui/badge";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import Link from "next/link";
 
 interface ChallengeCardProps {
@@ -39,23 +33,15 @@ export function ChallengeCard({
       <Card className="bg-zinc-900 border-zinc-800 hover:border-zinc-700 transition-colors cursor-pointer h-full">
         <CardHeader className="pb-3">
           <div className="flex items-center gap-2 mb-2">
-            <Badge
-              variant="outline"
-              className="text-xs text-zinc-400 border-zinc-700"
-            >
+            <Badge variant="outline" className="text-xs text-zinc-400 border-zinc-700">
               {category}
             </Badge>
-            <Badge
-              variant="outline"
-              className={`text-xs ${difficultyColor[difficulty] || ""}`}
-            >
+            <Badge variant="outline" className={`text-xs ${difficultyColor[difficulty] || ""}`}>
               {difficulty.toLowerCase()}
             </Badge>
           </div>
           <CardTitle className="text-lg text-zinc-100">{title}</CardTitle>
-          <CardDescription className="text-zinc-400 line-clamp-2">
-            {description}
-          </CardDescription>
+          <CardDescription className="text-zinc-400 line-clamp-2">{description}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="text-sm text-zinc-500">

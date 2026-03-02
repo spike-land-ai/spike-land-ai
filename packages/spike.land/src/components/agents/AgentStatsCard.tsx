@@ -47,7 +47,7 @@ export function AgentStatsCard({ stats }: AgentStatsCardProps) {
 
   return (
     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-      {statItems.map(item => (
+      {statItems.map((item) => (
         <Card key={item.label} className="overflow-hidden">
           <CardContent className="p-4">
             <div className="flex items-center gap-3">

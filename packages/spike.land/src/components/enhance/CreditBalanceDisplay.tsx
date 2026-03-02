@@ -31,9 +31,7 @@ export function CreditBalanceDisplay({
       <Card className={className}>
         <CardContent className="flex items-center gap-2 p-4">
           <Sparkles className="h-5 w-5 text-muted-foreground animate-pulse" />
-          <span className="text-sm text-muted-foreground">
-            Loading credits...
-          </span>
+          <span className="text-sm text-muted-foreground">Loading credits...</span>
         </CardContent>
       </Card>
     );
@@ -57,8 +55,8 @@ export function CreditBalanceDisplay({
                 isCriticalCredits
                   ? "text-destructive"
                   : isLowCredits
-                  ? "text-yellow-500"
-                  : "text-primary",
+                    ? "text-yellow-500"
+                    : "text-primary",
               )}
             />
             <div>
@@ -77,9 +75,7 @@ export function CreditBalanceDisplay({
               data-testid="low-credits-warning"
             >
               <AlertTriangle className="h-3 w-3" />
-              <span>
-                {isCriticalCredits ? "Critical" : "Low balance"}
-              </span>
+              <span>{isCriticalCredits ? "Critical" : "Low balance"}</span>
             </div>
           )}
         </div>
@@ -87,9 +83,7 @@ export function CreditBalanceDisplay({
         {/* Usage Progress */}
         <div className="space-y-1">
           <Progress value={usagePercent} className="h-1" />
-          <p className="text-[10px] text-muted-foreground text-right">
-            {usagePercent}% used
-          </p>
+          <p className="text-[10px] text-muted-foreground text-right">{usagePercent}% used</p>
         </div>
 
         {/* Estimated Enhancements */}
@@ -128,9 +122,7 @@ export function CreditBalanceDisplay({
               variant={isCriticalCredits ? "default" : "outline"}
               className="w-full text-xs h-8"
             >
-              <Link href="/pricing">
-                {isCriticalCredits ? "Upgrade Plan" : "View Plans"}
-              </Link>
+              <Link href="/pricing">{isCriticalCredits ? "Upgrade Plan" : "View Plans"}</Link>
             </Button>
           </div>
         )}

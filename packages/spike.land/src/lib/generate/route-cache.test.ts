@@ -16,12 +16,7 @@ vi.mock("@/lib/logger", () => ({
   default: { warn: vi.fn(), info: vi.fn(), error: vi.fn() },
 }));
 
-import {
-  getOrCreateRoute,
-  getRouteBySlug,
-  incrementViewCount,
-  isRouteCached,
-} from "./route-cache";
+import { getOrCreateRoute, getRouteBySlug, incrementViewCount, isRouteCached } from "./route-cache";
 
 describe("route-cache", () => {
   beforeEach(() => {
@@ -118,9 +113,7 @@ describe("route-cache", () => {
     });
 
     it("silently handles errors", async () => {
-      mockPrisma.generatedRoute.update.mockRejectedValue(
-        new Error("not found"),
-      );
+      mockPrisma.generatedRoute.update.mockRejectedValue(new Error("not found"));
       await expect(incrementViewCount("missing")).resolves.toBeUndefined();
     });
   });

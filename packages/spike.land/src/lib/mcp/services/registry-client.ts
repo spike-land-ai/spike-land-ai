@@ -32,10 +32,7 @@ async function setCached<T>(key: string, value: T): Promise<void> {
   await redis.set(key, value, { ex: MCP_REGISTRY_CACHE_TTL });
 }
 
-export async function searchSmithery(
-  query: string,
-  limit: number,
-): Promise<McpServerInfo[]> {
+export async function searchSmithery(query: string, limit: number): Promise<McpServerInfo[]> {
   const key = cacheKey("smithery", query, String(limit));
   const cached = await getCached<McpServerInfo[]>(key);
   if (cached) return cached;
@@ -52,26 +49,25 @@ export async function searchSmithery(
     const response = await fetch(url, { headers });
     if (!response.ok) return [];
 
-    data = await response.json() as {
+    data = (await response.json()) as {
       servers?: Array<{
         qualifiedName: string;
         displayName: string;
         description: string;
         homepage?: string;
-        connections?: Array<{ type: string; }>;
+        connections?: Array<{ type: string }>;
       }>;
     };
   } catch {
     return [];
   }
-  const results = (data.servers ?? []).map(s => ({
+  const results = (data.servers ?? []).map((s) => ({
     id: s.qualifiedName,
     name: s.displayName,
     description: s.description ?? "",
     source: "smithery" as const,
     url: `https://smithery.ai/server/${s.qualifiedName}`,
-    transport: (s.connections?.[0]?.type as "stdio" | "sse" | "streamable-http")
-      ?? "stdio",
+    transport: (s.connections?.[0]?.type as "stdio" | "sse" | "streamable-http") ?? "stdio",
     envVarsRequired: [],
     ...(s.homepage !== undefined ? { homepage: s.homepage } : {}),
   }));
@@ -94,7 +90,7 @@ export async function searchOfficialRegistry(
     const response = await fetch(url);
     if (!response.ok) return [];
 
-    data = await response.json() as {
+    data = (await response.json()) as {
       servers?: Array<{
         id: string;
         name: string;
@@ -106,7 +102,7 @@ export async function searchOfficialRegistry(
   } catch {
     return [];
   }
-  const results = (data.servers ?? []).map(s => ({
+  const results = (data.servers ?? []).map((s) => ({
     id: s.id,
     name: s.name,
     description: s.description ?? "",
@@ -120,10 +116,7 @@ export async function searchOfficialRegistry(
   return results;
 }
 
-export async function searchGlama(
-  query: string,
-  limit: number,
-): Promise<McpServerInfo[]> {
+export async function searchGlama(query: string, limit: number): Promise<McpServerInfo[]> {
   const key = cacheKey("glama", query, String(limit));
   const cached = await getCached<McpServerInfo[]>(key);
   if (cached) return cached;
@@ -134,7 +127,7 @@ export async function searchGlama(
     const response = await fetch(url);
     if (!response.ok) return [];
 
-    data = await response.json() as {
+    data = (await response.json()) as {
       servers?: Array<{
         id: string;
         name: string;
@@ -147,7 +140,7 @@ export async function searchGlama(
   } catch {
     return [];
   }
-  const results = (data.servers ?? []).map(s => ({
+  const results = (data.servers ?? []).map((s) => ({
     id: s.id,
     name: s.name,
     description: s.description ?? "",
@@ -162,10 +155,7 @@ export async function searchGlama(
   return results;
 }
 
-export async function searchAllRegistries(
-  query: string,
-  limit: number,
-): Promise<McpServerInfo[]> {
+export async function searchAllRegistries(query: string, limit: number): Promise<McpServerInfo[]> {
   const [smithery, official, glama] = await Promise.allSettled([
     searchSmithery(query, limit),
     searchOfficialRegistry(query, limit),

@@ -53,8 +53,8 @@ interface ViteModuleNode {
  * These properties exist at runtime but aren't in the public type definitions.
  */
 interface VitestProjectWithInternals {
-  browser?: { vite?: { moduleGraph?: ViteModuleGraph; }; };
-  server?: { moduleGraph?: ViteModuleGraph; };
+  browser?: { vite?: { moduleGraph?: ViteModuleGraph } };
+  server?: { moduleGraph?: ViteModuleGraph };
 }
 
 export default class CoverageMapperReporter implements Reporter {
@@ -66,8 +66,7 @@ export default class CoverageMapperReporter implements Reporter {
 
   constructor() {
     this.projectRoot = process.cwd();
-    this.cacheDir = process.env.TEST_CACHE_DIR
-      || path.join(this.projectRoot, ".test-cache");
+    this.cacheDir = process.env.TEST_CACHE_DIR || path.join(this.projectRoot, ".test-cache");
     this.currentCommit = this.getCurrentCommit();
   }
 
@@ -80,8 +79,7 @@ export default class CoverageMapperReporter implements Reporter {
       return execSync("git rev-parse HEAD", {
         encoding: "utf-8",
         stdio: ["pipe", "pipe", "pipe"],
-      })
-        .trim();
+      }).trim();
     } catch {
       return "unknown";
     }
@@ -89,9 +87,7 @@ export default class CoverageMapperReporter implements Reporter {
 
   private getFileHash(filePath: string): string {
     try {
-      const fullPath = path.isAbsolute(filePath)
-        ? filePath
-        : path.join(this.projectRoot, filePath);
+      const fullPath = path.isAbsolute(filePath) ? filePath : path.join(this.projectRoot, filePath);
       const content = readFileSync(fullPath, "utf-8");
       return createHash("sha256").update(content).digest("hex").slice(0, 16);
     } catch {
@@ -151,9 +147,9 @@ export default class CoverageMapperReporter implements Reporter {
 
             // Skip test files themselves and node_modules
             if (
-              relativePath.includes(".test.")
-              || relativePath.includes(".spec.")
-              || relativePath.includes("node_modules")
+              relativePath.includes(".test.") ||
+              relativePath.includes(".spec.") ||
+              relativePath.includes("node_modules")
             ) {
               continue;
             }
@@ -175,8 +171,9 @@ export default class CoverageMapperReporter implements Reporter {
       for (const project of this.ctx.projects) {
         // Cast to internal type - these properties exist at runtime but not in public types
         const projectWithInternals = project as unknown as VitestProjectWithInternals;
-        const moduleGraph = projectWithInternals.browser?.vite?.moduleGraph
-          || projectWithInternals.server?.moduleGraph;
+        const moduleGraph =
+          projectWithInternals.browser?.vite?.moduleGraph ||
+          projectWithInternals.server?.moduleGraph;
         if (moduleGraph) {
           for (const [testPath, result] of this.testResults) {
             const fullTestPath = path.join(this.projectRoot, testPath);
@@ -194,9 +191,9 @@ export default class CoverageMapperReporter implements Reporter {
 
                 const relativePath = this.toRelativePath(imported.id);
                 if (
-                  !relativePath.includes("node_modules")
-                  && !relativePath.includes(".test.")
-                  && !relativePath.includes(".spec.")
+                  !relativePath.includes("node_modules") &&
+                  !relativePath.includes(".test.") &&
+                  !relativePath.includes(".spec.")
                 ) {
                   result.sourceFiles.add(relativePath);
                 }

@@ -55,14 +55,19 @@ export function SplitPreview({
   const [clipY, setClipY] = useState(50);
   const [enhancedError, setEnhancedError] = useState(false);
   const [originalError, setOriginalError] = useState(false);
-  const [detectedDimensions, setDetectedDimensions] = useState<
-    { width: number; height: number; } | null
-  >(null);
+  const [detectedDimensions, setDetectedDimensions] = useState<{
+    width: number;
+    height: number;
+  } | null>(null);
 
   // Auto-detect dimensions if not provided (or invalid)
-  const shouldAutoDetect = width === undefined || height === undefined
-    || !Number.isFinite(width)
-    || !Number.isFinite(height) || width <= 0 || height <= 0;
+  const shouldAutoDetect =
+    width === undefined ||
+    height === undefined ||
+    !Number.isFinite(width) ||
+    !Number.isFinite(height) ||
+    width <= 0 ||
+    height <= 0;
 
   useEffect(() => {
     if (!shouldAutoDetect) return;
@@ -78,12 +83,10 @@ export function SplitPreview({
   }, [originalUrl, shouldAutoDetect]);
 
   // Use provided dimensions if valid, detected dimensions if available, or default 16:9
-  const safeWidth = (Number.isFinite(width) && width && width > 0)
-    ? width
-    : (detectedDimensions?.width ?? 16);
-  const safeHeight = (Number.isFinite(height) && height && height > 0)
-    ? height
-    : (detectedDimensions?.height ?? 9);
+  const safeWidth =
+    Number.isFinite(width) && width && width > 0 ? width : (detectedDimensions?.width ?? 16);
+  const safeHeight =
+    Number.isFinite(height) && height && height > 0 ? height : (detectedDimensions?.height ?? 9);
 
   useEffect(() => {
     const updateSplit = () => {
@@ -129,31 +132,24 @@ export function SplitPreview({
     <div
       ref={containerRef}
       data-testid="split-preview-container"
-      className={cn(
-        "relative bg-muted rounded-lg overflow-hidden w-full",
-        className,
-      )}
+      className={cn("relative bg-muted rounded-lg overflow-hidden w-full", className)}
       style={{ aspectRatio: `${safeWidth} / ${safeHeight}` }}
     >
       {/* Original image (full, behind) */}
-      {!originalError
-        ? (
-          <Image
-            src={originalUrl}
-            alt={`${originalLabel}`}
-            fill
-            className="object-cover"
-            priority
-            onError={handleOriginalError}
-          />
-        )
-        : (
-          <div className="absolute inset-0 flex items-center justify-center bg-destructive/10">
-            <p className="text-sm text-destructive">
-              Original image failed to load
-            </p>
-          </div>
-        )}
+      {!originalError ? (
+        <Image
+          src={originalUrl}
+          alt={`${originalLabel}`}
+          fill
+          className="object-cover"
+          priority
+          onError={handleOriginalError}
+        />
+      ) : (
+        <div className="absolute inset-0 flex items-center justify-center bg-destructive/10">
+          <p className="text-sm text-destructive">Original image failed to load</p>
+        </div>
+      )}
 
       {/* Enhanced image (clipped to top portion based on scroll) */}
       <div
@@ -161,24 +157,20 @@ export function SplitPreview({
         className="absolute inset-0 overflow-hidden"
         style={{ clipPath: `inset(0 0 ${100 - clipY}% 0)` }}
       >
-        {!enhancedError
-          ? (
-            <Image
-              src={enhancedUrl}
-              alt={`${enhancedLabel}`}
-              fill
-              className="object-cover"
-              priority
-              onError={handleEnhancedError}
-            />
-          )
-          : (
-            <div className="absolute inset-0 flex items-center justify-center bg-destructive/10">
-              <p className="text-sm text-destructive">
-                Enhanced image failed to load
-              </p>
-            </div>
-          )}
+        {!enhancedError ? (
+          <Image
+            src={enhancedUrl}
+            alt={`${enhancedLabel}`}
+            fill
+            className="object-cover"
+            priority
+            onError={handleEnhancedError}
+          />
+        ) : (
+          <div className="absolute inset-0 flex items-center justify-center bg-destructive/10">
+            <p className="text-sm text-destructive">Enhanced image failed to load</p>
+          </div>
+        )}
       </div>
 
       {/* Split line indicator */}

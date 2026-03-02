@@ -367,14 +367,7 @@ export const SKILL_DEFINITIONS: SkillDefinition[] = [
     icon: "🔗",
     category: "URL Params",
     colorClass: "border-slate-400/30 bg-slate-500/10 text-slate-400",
-    triggers: [
-      "dashboard",
-      "tracker",
-      "monitor",
-      "analytics",
-      "config",
-      "settings",
-    ],
+    triggers: ["dashboard", "tracker", "monitor", "analytics", "config", "settings"],
     description: "Shareable URL state",
   },
 ];

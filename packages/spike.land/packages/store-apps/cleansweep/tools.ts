@@ -23,20 +23,12 @@ const cleanPhotoAnalyze: StandaloneToolDefinition = {
     enables: ["clean_scan_room"],
   },
   inputSchema: {
-    photo_base64: z
-      .string()
-      .min(1)
-      .describe("Base64-encoded photo data (JPEG preferred)"),
+    photo_base64: z.string().min(1).describe("Base64-encoded photo data (JPEG preferred)"),
   },
-  handler: async (
-    input: never,
-    _ctx: ServerContext,
-  ): Promise<CallToolResult> => {
-    const { photo_base64 } = input as { photo_base64: string; };
+  handler: async (input: never, _ctx: ServerContext): Promise<CallToolResult> => {
+    const { photo_base64 } = input as { photo_base64: string };
     return safeToolCall("clean_photo_analyze", async () => {
-      const { validatePhoto, extractPhotoMetadata } = await import(
-        "@/lib/clean/photo-validation"
-      );
+      const { validatePhoto, extractPhotoMetadata } = await import("@/lib/clean/photo-validation");
 
       const validation = validatePhoto(photo_base64);
       const meta = extractPhotoMetadata(photo_base64);
@@ -95,19 +87,13 @@ const cleanScannerAnalyzeRoom: StandaloneToolDefinition = {
     enables: ["clean_create_task"],
   },
   inputSchema: {
-    photo_base64: z
-      .string()
-      .min(1)
-      .describe("Base64-encoded photo of the room"),
+    photo_base64: z.string().min(1).describe("Base64-encoded photo of the room"),
     session_id: z
       .string()
       .optional()
       .describe("Optional session ID to associate with the analysis"),
   },
-  handler: async (
-    input: never,
-    ctx: ServerContext,
-  ): Promise<CallToolResult> => {
+  handler: async (input: never, ctx: ServerContext): Promise<CallToolResult> => {
     const { photo_base64, session_id } = input as {
       photo_base64: string;
       session_id?: string;
@@ -127,20 +113,11 @@ const cleanScannerAnalyzeRoom: StandaloneToolDefinition = {
       let analysis: RoomAnalysisResult;
 
       try {
-        const { analyzeImageWithGemini } = await import(
-          "@/lib/ai/gemini-client"
-        );
-        const { ROOM_ANALYSIS_PROMPT } = await import(
-          "@/lib/clean/vision-prompts"
-        );
-        const rawResult = await analyzeImageWithGemini(
-          photo_base64,
-          ROOM_ANALYSIS_PROMPT,
-        );
+        const { analyzeImageWithGemini } = await import("@/lib/ai/gemini-client");
+        const { ROOM_ANALYSIS_PROMPT } = await import("@/lib/clean/vision-prompts");
+        const rawResult = await analyzeImageWithGemini(photo_base64, ROOM_ANALYSIS_PROMPT);
         analysis = JSON.parse(
-          typeof rawResult === "string"
-            ? rawResult
-            : JSON.stringify(rawResult),
+          typeof rawResult === "string" ? rawResult : JSON.stringify(rawResult),
         ) as RoomAnalysisResult;
       } catch (error) {
         throw new Error(
@@ -179,19 +156,10 @@ const cleanScannerGenerateTasks: StandaloneToolDefinition = {
   category: "clean-scanner",
   tier: "free",
   inputSchema: {
-    analysis_json: z
-      .string()
-      .min(1)
-      .describe("JSON string from clean_scanner_analyze_room result"),
-    session_id: z
-      .string()
-      .min(1)
-      .describe("Session ID to create tasks in"),
+    analysis_json: z.string().min(1).describe("JSON string from clean_scanner_analyze_room result"),
+    session_id: z.string().min(1).describe("Session ID to create tasks in"),
   },
-  handler: async (
-    input: never,
-    ctx: ServerContext,
-  ): Promise<CallToolResult> => {
+  handler: async (input: never, ctx: ServerContext): Promise<CallToolResult> => {
     const { analysis_json, session_id } = input as {
       analysis_json: string;
       session_id: string;
@@ -210,9 +178,7 @@ const cleanScannerGenerateTasks: StandaloneToolDefinition = {
       const analysis = JSON.parse(analysis_json) as RoomAnalysisResult;
 
       if (!analysis.items || analysis.items.length === 0) {
-        return textResult(
-          "No tasks found in the analysis. The room looks clean!",
-        );
+        return textResult("No tasks found in the analysis. The room looks clean!");
       }
 
       const difficultyOrder: Record<string, number> = {
@@ -222,27 +188,23 @@ const cleanScannerGenerateTasks: StandaloneToolDefinition = {
         EFFORT: 3,
       };
       const sorted = [...analysis.items].sort(
-        (a, b) =>
-          (difficultyOrder[a.difficulty] ?? 4)
-          - (difficultyOrder[b.difficulty] ?? 4),
+        (a, b) => (difficultyOrder[a.difficulty] ?? 4) - (difficultyOrder[b.difficulty] ?? 4),
       );
 
       const taskData = sorted.map((item, index) => {
-        const difficulty = (["QUICK", "EASY", "MEDIUM", "EFFORT"].includes(
-            item.difficulty,
-          )
-          ? item.difficulty
-          : "EASY") as keyof typeof POINTS;
+        const difficulty = (
+          ["QUICK", "EASY", "MEDIUM", "EFFORT"].includes(item.difficulty) ? item.difficulty : "EASY"
+        ) as keyof typeof POINTS;
         const category = [
-            "PICKUP",
-            "DISHES",
-            "LAUNDRY",
-            "SURFACES",
-            "FLOORS",
-            "TRASH",
-            "ORGANIZE",
-            "OTHER",
-          ].includes(item.category)
+          "PICKUP",
+          "DISHES",
+          "LAUNDRY",
+          "SURFACES",
+          "FLOORS",
+          "TRASH",
+          "ORGANIZE",
+          "OTHER",
+        ].includes(item.category)
           ? item.category
           : "OTHER";
 
@@ -303,15 +265,10 @@ const cleanTasksStartSession: StandaloneToolDefinition = {
     room_label: z
       .string()
       .optional()
-      .describe(
-        "Optional label for the room being cleaned (e.g. 'kitchen', 'bedroom')",
-      ),
+      .describe("Optional label for the room being cleaned (e.g. 'kitchen', 'bedroom')"),
   },
-  handler: async (
-    input: never,
-    ctx: ServerContext,
-  ): Promise<CallToolResult> => {
-    const { room_label } = input as { room_label?: string; };
+  handler: async (input: never, ctx: ServerContext): Promise<CallToolResult> => {
+    const { room_label } = input as { room_label?: string };
     return safeToolCall("clean_tasks_start_session", async () => {
       const prisma = (await import("@/lib/prisma")).default;
 
@@ -326,8 +283,7 @@ const cleanTasksStartSession: StandaloneToolDefinition = {
       text += `- **Session ID:** \`${session.id}\`\n`;
       if (room_label) text += `- **Room:** ${room_label}\n`;
       text += `- **Status:** ACTIVE\n`;
-      text +=
-        `\nUse \`clean_scanner_analyze_room\` to scan a room photo, or \`clean_tasks_add_tasks\` to add tasks manually.`;
+      text += `\nUse \`clean_scanner_analyze_room\` to scan a room photo, or \`clean_tasks_add_tasks\` to add tasks manually.`;
 
       return textResult(text);
     });
@@ -371,10 +327,7 @@ const cleanTasksAddTasks: StandaloneToolDefinition = {
       .min(1)
       .describe("Array of tasks to add"),
   },
-  handler: async (
-    input: never,
-    ctx: ServerContext,
-  ): Promise<CallToolResult> => {
+  handler: async (input: never, ctx: ServerContext): Promise<CallToolResult> => {
     const { session_id, tasks } = input as {
       session_id: string;
       tasks: Array<{
@@ -443,11 +396,8 @@ const cleanTasksList: StandaloneToolDefinition = {
   inputSchema: {
     session_id: z.string().min(1).describe("The session ID"),
   },
-  handler: async (
-    input: never,
-    ctx: ServerContext,
-  ): Promise<CallToolResult> => {
-    const { session_id } = input as { session_id: string; };
+  handler: async (input: never, ctx: ServerContext): Promise<CallToolResult> => {
+    const { session_id } = input as { session_id: string };
     return safeToolCall("clean_tasks_list", async () => {
       const prisma = (await import("@/lib/prisma")).default;
 
@@ -497,11 +447,8 @@ const cleanTasksGetCurrent: StandaloneToolDefinition = {
   inputSchema: {
     session_id: z.string().min(1).describe("The session ID"),
   },
-  handler: async (
-    input: never,
-    ctx: ServerContext,
-  ): Promise<CallToolResult> => {
-    const { session_id } = input as { session_id: string; };
+  handler: async (input: never, ctx: ServerContext): Promise<CallToolResult> => {
+    const { session_id } = input as { session_id: string };
     return safeToolCall("clean_tasks_get_current", async () => {
       const prisma = (await import("@/lib/prisma")).default;
 
@@ -542,16 +489,10 @@ const cleanTasksSkip: StandaloneToolDefinition = {
   tier: "free",
   inputSchema: {
     task_id: z.string().min(1).describe("The task ID to skip"),
-    reason: z
-      .string()
-      .optional()
-      .describe("Optional reason for skipping"),
+    reason: z.string().optional().describe("Optional reason for skipping"),
   },
-  handler: async (
-    input: never,
-    ctx: ServerContext,
-  ): Promise<CallToolResult> => {
-    const { task_id, reason } = input as { task_id: string; reason?: string; };
+  handler: async (input: never, ctx: ServerContext): Promise<CallToolResult> => {
+    const { task_id, reason } = input as { task_id: string; reason?: string };
     return safeToolCall("clean_tasks_skip", async () => {
       const prisma = (await import("@/lib/prisma")).default;
 
@@ -578,8 +519,7 @@ const cleanTasksSkip: StandaloneToolDefinition = {
 
       let text = `**Task skipped!** No worries.\n`;
       if (reason) text += `- Reason: ${reason}\n`;
-      text +=
-        `\nUse \`clean_tasks_get_current\` for the next task, or \`clean_tasks_requeue_skipped\` later to try again.`;
+      text += `\nUse \`clean_tasks_get_current\` for the next task, or \`clean_tasks_requeue_skipped\` later to try again.`;
 
       return textResult(text);
     });
@@ -597,11 +537,8 @@ const cleanTasksComplete: StandaloneToolDefinition = {
   inputSchema: {
     task_id: z.string().min(1).describe("The task ID to complete"),
   },
-  handler: async (
-    input: never,
-    ctx: ServerContext,
-  ): Promise<CallToolResult> => {
-    const { task_id } = input as { task_id: string; };
+  handler: async (input: never, ctx: ServerContext): Promise<CallToolResult> => {
+    const { task_id } = input as { task_id: string };
     return safeToolCall("clean_tasks_complete", async () => {
       const prisma = (await import("@/lib/prisma")).default;
 
@@ -647,16 +584,11 @@ const cleanTasksEndSession: StandaloneToolDefinition = {
   inputSchema: {
     session_id: z.string().min(1).describe("The session ID to end"),
   },
-  handler: async (
-    input: never,
-    ctx: ServerContext,
-  ): Promise<CallToolResult> => {
-    const { session_id } = input as { session_id: string; };
+  handler: async (input: never, ctx: ServerContext): Promise<CallToolResult> => {
+    const { session_id } = input as { session_id: string };
     return safeToolCall("clean_tasks_end_session", async () => {
       const prisma = (await import("@/lib/prisma")).default;
-      const { calculateSessionPoints } = await import(
-        "@/lib/clean/gamification"
-      );
+      const { calculateSessionPoints } = await import("@/lib/clean/gamification");
 
       const session = await prisma.cleaningSession.findFirst({
         where: { id: session_id, userId: ctx.userId },
@@ -671,22 +603,18 @@ const cleanTasksEndSession: StandaloneToolDefinition = {
       }
 
       const taskPoints = session.tasks
-        .filter(t => t.status === "COMPLETED" || t.status === "VERIFIED")
+        .filter((t) => t.status === "COMPLETED" || t.status === "VERIFIED")
         .reduce((sum, t) => sum + t.pointsValue, 0);
 
       const streak = await prisma.cleaningStreak.findUnique({
         where: { userId: ctx.userId },
       });
 
-      const hasVerificationPhoto = session.tasks.some(
-        t => t.status === "VERIFIED",
-      );
-      const zeroSkips = session.skippedTasks === 0
-        && session.completedTasks > 0;
-      const allTasksDone = session.completedTasks + session.tasks.filter(t =>
-                t.status === "VERIFIED"
-              ).length
-          === session.totalTasks && session.totalTasks > 0;
+      const hasVerificationPhoto = session.tasks.some((t) => t.status === "VERIFIED");
+      const zeroSkips = session.skippedTasks === 0 && session.completedTasks > 0;
+      const allTasksDone =
+        session.completedTasks + session.tasks.filter((t) => t.status === "VERIFIED").length ===
+          session.totalTasks && session.totalTasks > 0;
 
       const points = calculateSessionPoints({
         taskPoints,
@@ -725,8 +653,7 @@ const cleanTasksEndSession: StandaloneToolDefinition = {
         text += `- **All-tasks bonus:** +${points.allTasksBonus}\n`;
       }
       text += `- **Total:** ${points.total} points\n`;
-      text +=
-        `\nUse \`clean_streaks_record_session\` to update your streak and \`clean_motivate_check_achievements\` to check for new achievements!`;
+      text += `\nUse \`clean_streaks_record_session\` to update your streak and \`clean_motivate_check_achievements\` to check for new achievements!`;
 
       return textResult(text);
     });
@@ -741,11 +668,8 @@ const cleanTasksRequeueSkipped: StandaloneToolDefinition = {
   inputSchema: {
     session_id: z.string().min(1).describe("The session ID"),
   },
-  handler: async (
-    input: never,
-    ctx: ServerContext,
-  ): Promise<CallToolResult> => {
-    const { session_id } = input as { session_id: string; };
+  handler: async (input: never, ctx: ServerContext): Promise<CallToolResult> => {
+    const { session_id } = input as { session_id: string };
     return safeToolCall("clean_tasks_requeue_skipped", async () => {
       const prisma = (await import("@/lib/prisma")).default;
 
@@ -785,10 +709,7 @@ const cleanStreaksGet: StandaloneToolDefinition = {
   category: "clean-streaks",
   tier: "free",
   inputSchema: {},
-  handler: async (
-    _input: never,
-    ctx: ServerContext,
-  ): Promise<CallToolResult> => {
+  handler: async (_input: never, ctx: ServerContext): Promise<CallToolResult> => {
     return safeToolCall("clean_streaks_get", async () => {
       const prisma = (await import("@/lib/prisma")).default;
 
@@ -823,15 +744,9 @@ const cleanStreaksRecordSession: StandaloneToolDefinition = {
   inputSchema: {
     session_id: z.string().min(1).describe("The completed session ID"),
     points_earned: z.number().min(0).describe("Points earned in the session"),
-    tasks_completed: z
-      .number()
-      .min(0)
-      .describe("Number of tasks completed in the session"),
+    tasks_completed: z.number().min(0).describe("Number of tasks completed in the session"),
   },
-  handler: async (
-    input: never,
-    ctx: ServerContext,
-  ): Promise<CallToolResult> => {
+  handler: async (input: never, ctx: ServerContext): Promise<CallToolResult> => {
     const { session_id, points_earned, tasks_completed } = input as {
       session_id: string;
       points_earned: number;
@@ -839,19 +754,15 @@ const cleanStreaksRecordSession: StandaloneToolDefinition = {
     };
     return safeToolCall("clean_streaks_record_session", async () => {
       const prisma = (await import("@/lib/prisma")).default;
-      const {
-        calculateLevel,
-        isConsecutiveDay,
-        isSameDay,
-      } = await import("@/lib/clean/gamification");
+      const { calculateLevel, isConsecutiveDay, isSameDay } = await import(
+        "@/lib/clean/gamification"
+      );
 
       const session = await prisma.cleaningSession.findFirst({
         where: { id: session_id, userId: ctx.userId, status: "COMPLETED" },
       });
       if (!session) {
-        return textResult(
-          "Session not found, not completed, or not owned by you.",
-        );
+        return textResult("Session not found, not completed, or not owned by you.");
       }
 
       const streak = await prisma.cleaningStreak.upsert({
@@ -915,10 +826,7 @@ const cleanStreaksGetStats: StandaloneToolDefinition = {
   category: "clean-streaks",
   tier: "free",
   inputSchema: {},
-  handler: async (
-    _input: never,
-    ctx: ServerContext,
-  ): Promise<CallToolResult> => {
+  handler: async (_input: never, ctx: ServerContext): Promise<CallToolResult> => {
     return safeToolCall("clean_streaks_get_stats", async () => {
       const prisma = (await import("@/lib/prisma")).default;
       const { pointsToNextLevel } = await import("@/lib/clean/gamification");
@@ -969,16 +877,9 @@ const cleanRemindersCreate: StandaloneToolDefinition = {
       .array(z.enum(["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"]))
       .min(1)
       .describe("Days of the week for the reminder"),
-    message: z
-      .string()
-      .max(200)
-      .optional()
-      .describe("Optional custom reminder message"),
+    message: z.string().max(200).optional().describe("Optional custom reminder message"),
   },
-  handler: async (
-    input: never,
-    ctx: ServerContext,
-  ): Promise<CallToolResult> => {
+  handler: async (input: never, ctx: ServerContext): Promise<CallToolResult> => {
     const { time, days, message } = input as {
       time: string;
       days: Array<"MON" | "TUE" | "WED" | "THU" | "FRI" | "SAT" | "SUN">;
@@ -1014,10 +915,7 @@ const cleanRemindersList: StandaloneToolDefinition = {
   category: "clean-reminders",
   tier: "free",
   inputSchema: {},
-  handler: async (
-    _input: never,
-    ctx: ServerContext,
-  ): Promise<CallToolResult> => {
+  handler: async (_input: never, ctx: ServerContext): Promise<CallToolResult> => {
     return safeToolCall("clean_reminders_list", async () => {
       const prisma = (await import("@/lib/prisma")).default;
 
@@ -1027,9 +925,7 @@ const cleanRemindersList: StandaloneToolDefinition = {
       });
 
       if (reminders.length === 0) {
-        return textResult(
-          "No reminders set. Use `clean_reminders_create` to set one up!",
-        );
+        return textResult("No reminders set. Use `clean_reminders_create` to set one up!");
       }
 
       let text = `**Your Cleaning Reminders (${reminders.length})**\n\n`;
@@ -1059,24 +955,16 @@ const cleanVerifyCheckCompletion: StandaloneToolDefinition = {
   tier: "free",
   inputSchema: {
     task_id: z.string().min(1).describe("The task ID to verify"),
-    photo_base64: z
-      .string()
-      .min(1)
-      .describe("Base64-encoded photo showing the completed task"),
+    photo_base64: z.string().min(1).describe("Base64-encoded photo showing the completed task"),
   },
-  handler: async (
-    input: never,
-    ctx: ServerContext,
-  ): Promise<CallToolResult> => {
+  handler: async (input: never, ctx: ServerContext): Promise<CallToolResult> => {
     const { task_id, photo_base64 } = input as {
       task_id: string;
       photo_base64: string;
     };
     return safeToolCall("clean_verify_check_completion", async () => {
       const prisma = (await import("@/lib/prisma")).default;
-      const {
-        buildVerificationPrompt,
-      } = await import("@/lib/clean/vision-prompts");
+      const { buildVerificationPrompt } = await import("@/lib/clean/vision-prompts");
       const { BONUSES } = await import("@/lib/clean/gamification");
 
       interface VerificationResult {
@@ -1097,14 +985,10 @@ const cleanVerifyCheckCompletion: StandaloneToolDefinition = {
       let verification: VerificationResult;
 
       try {
-        const { analyzeImageWithGemini } = await import(
-          "@/lib/ai/gemini-client"
-        );
+        const { analyzeImageWithGemini } = await import("@/lib/ai/gemini-client");
         const rawResult = await analyzeImageWithGemini(photo_base64, prompt);
         verification = JSON.parse(
-          typeof rawResult === "string"
-            ? rawResult
-            : JSON.stringify(rawResult),
+          typeof rawResult === "string" ? rawResult : JSON.stringify(rawResult),
         ) as VerificationResult;
       } catch (error) {
         throw new Error(
@@ -1155,23 +1039,11 @@ const cleanVerifyCompareBeforeAfter: StandaloneToolDefinition = {
   category: "clean-verify",
   tier: "free",
   inputSchema: {
-    before_photo_base64: z
-      .string()
-      .min(1)
-      .describe("Base64-encoded BEFORE photo"),
-    after_photo_base64: z
-      .string()
-      .min(1)
-      .describe("Base64-encoded AFTER photo"),
-    session_id: z
-      .string()
-      .min(1)
-      .describe("The session ID for context"),
+    before_photo_base64: z.string().min(1).describe("Base64-encoded BEFORE photo"),
+    after_photo_base64: z.string().min(1).describe("Base64-encoded AFTER photo"),
+    session_id: z.string().min(1).describe("The session ID for context"),
   },
-  handler: async (
-    input: never,
-    ctx: ServerContext,
-  ): Promise<CallToolResult> => {
+  handler: async (input: never, ctx: ServerContext): Promise<CallToolResult> => {
     const { before_photo_base64, after_photo_base64, session_id } = input as {
       before_photo_base64: string;
       after_photo_base64: string;
@@ -1179,9 +1051,7 @@ const cleanVerifyCompareBeforeAfter: StandaloneToolDefinition = {
     };
     return safeToolCall("clean_verify_compare_before_after", async () => {
       const prisma = (await import("@/lib/prisma")).default;
-      const { COMPARISON_PROMPT } = await import(
-        "@/lib/clean/vision-prompts"
-      );
+      const { COMPARISON_PROMPT } = await import("@/lib/clean/vision-prompts");
 
       interface ComparisonResult {
         improvement_score: number;
@@ -1200,17 +1070,13 @@ const cleanVerifyCompareBeforeAfter: StandaloneToolDefinition = {
       let comparison: ComparisonResult;
 
       try {
-        const { analyzeImageWithGemini } = await import(
-          "@/lib/ai/gemini-client"
-        );
+        const { analyzeImageWithGemini } = await import("@/lib/ai/gemini-client");
         const rawResult = await analyzeImageWithGemini(
           [before_photo_base64, after_photo_base64],
           COMPARISON_PROMPT,
         );
         comparison = JSON.parse(
-          typeof rawResult === "string"
-            ? rawResult
-            : JSON.stringify(rawResult),
+          typeof rawResult === "string" ? rawResult : JSON.stringify(rawResult),
         ) as ComparisonResult;
       } catch (error) {
         throw new Error(
@@ -1256,28 +1122,12 @@ const cleanMotivateGetEncouragement: StandaloneToolDefinition = {
   tier: "free",
   inputSchema: {
     context: z
-      .enum([
-        "starting",
-        "task_complete",
-        "skip",
-        "session_complete",
-        "comeback",
-      ])
-      .describe(
-        "The context for the encouragement message",
-      ),
+      .enum(["starting", "task_complete", "skip", "session_complete", "comeback"])
+      .describe("The context for the encouragement message"),
   },
-  handler: async (
-    input: never,
-    _ctx: ServerContext,
-  ): Promise<CallToolResult> => {
+  handler: async (input: never, _ctx: ServerContext): Promise<CallToolResult> => {
     const { context } = input as {
-      context:
-        | "starting"
-        | "task_complete"
-        | "skip"
-        | "session_complete"
-        | "comeback";
+      context: "starting" | "task_complete" | "skip" | "session_complete" | "comeback";
     };
     return safeToolCall("clean_motivate_get_encouragement", async () => {
       const {
@@ -1318,21 +1168,13 @@ const cleanMotivateCheckAchievements: StandaloneToolDefinition = {
   category: "clean-motivate",
   tier: "free",
   inputSchema: {
-    session_id: z
-      .string()
-      .min(1)
-      .describe("The completed session ID to check achievements for"),
+    session_id: z.string().min(1).describe("The completed session ID to check achievements for"),
   },
-  handler: async (
-    input: never,
-    ctx: ServerContext,
-  ): Promise<CallToolResult> => {
-    const { session_id } = input as { session_id: string; };
+  handler: async (input: never, ctx: ServerContext): Promise<CallToolResult> => {
+    const { session_id } = input as { session_id: string };
     return safeToolCall("clean_motivate_check_achievements", async () => {
       const prisma = (await import("@/lib/prisma")).default;
-      const {
-        checkNewAchievements,
-      } = await import("@/lib/clean/gamification");
+      const { checkNewAchievements } = await import("@/lib/clean/gamification");
       type AchievementStats = Parameters<typeof checkNewAchievements>[0];
 
       const session = await prisma.cleaningSession.findFirst({
@@ -1347,27 +1189,22 @@ const cleanMotivateCheckAchievements: StandaloneToolDefinition = {
         where: { userId: ctx.userId },
       });
       if (!streak) {
-        return textResult(
-          "No streak data found. Use `clean_streaks_record_session` first.",
-        );
+        return textResult("No streak data found. Use `clean_streaks_record_session` first.");
       }
 
       const existing = await prisma.cleaningAchievement.findMany({
         where: { userId: ctx.userId },
         select: { achievementType: true },
       });
-      const alreadyUnlocked = new Set(
-        existing.map(a => a.achievementType),
-      );
+      const alreadyUnlocked = new Set(existing.map((a) => a.achievementType));
 
       const sessionDurationMs = session.completedAt
         ? session.completedAt.getTime() - session.startedAt.getTime()
         : 0;
       const daysSinceLastSession = streak.lastSessionDate
         ? Math.floor(
-          (new Date().getTime() - streak.lastSessionDate.getTime())
-            / (1000 * 60 * 60 * 24),
-        )
+            (new Date().getTime() - streak.lastSessionDate.getTime()) / (1000 * 60 * 60 * 24),
+          )
         : 999;
 
       const stats: AchievementStats = {
@@ -1387,7 +1224,7 @@ const cleanMotivateCheckAchievements: StandaloneToolDefinition = {
 
       if (newAchievements.length > 0) {
         await prisma.cleaningAchievement.createMany({
-          data: newAchievements.map(a => ({
+          data: newAchievements.map((a) => ({
             userId: ctx.userId,
             achievementType: a.type,
           })),
@@ -1396,9 +1233,7 @@ const cleanMotivateCheckAchievements: StandaloneToolDefinition = {
       }
 
       if (newAchievements.length === 0) {
-        return textResult(
-          "No new achievements this time. Keep going — you're making progress!",
-        );
+        return textResult("No new achievements this time. Keep going — you're making progress!");
       }
 
       let text = `**New Achievement(s) Unlocked!**\n\n`;
@@ -1418,10 +1253,7 @@ const cleanMotivateGetAchievements: StandaloneToolDefinition = {
   category: "clean-motivate",
   tier: "free",
   inputSchema: {},
-  handler: async (
-    _input: never,
-    ctx: ServerContext,
-  ): Promise<CallToolResult> => {
+  handler: async (_input: never, ctx: ServerContext): Promise<CallToolResult> => {
     return safeToolCall("clean_motivate_get_achievements", async () => {
       const prisma = (await import("@/lib/prisma")).default;
       const { ACHIEVEMENTS } = await import("@/lib/clean/gamification");
@@ -1430,9 +1262,7 @@ const cleanMotivateGetAchievements: StandaloneToolDefinition = {
         where: { userId: ctx.userId },
         select: { achievementType: true, unlockedAt: true },
       });
-      const unlockedMap = new Map(
-        unlocked.map(a => [a.achievementType, a.unlockedAt]),
-      );
+      const unlockedMap = new Map(unlocked.map((a) => [a.achievementType, a.unlockedAt]));
 
       let text = `**Your Achievements (${unlocked.length}/${ACHIEVEMENTS.length})**\n\n`;
 
@@ -1461,19 +1291,12 @@ const cleanMotivateCelebrate: StandaloneToolDefinition = {
     achievement_type: z
       .string()
       .min(1)
-      .describe(
-        "The achievement type to celebrate (e.g. 'FIRST_SESSION', 'THREE_DAY_STREAK')",
-      ),
+      .describe("The achievement type to celebrate (e.g. 'FIRST_SESSION', 'THREE_DAY_STREAK')"),
   },
-  handler: async (
-    input: never,
-    _ctx: ServerContext,
-  ): Promise<CallToolResult> => {
-    const { achievement_type } = input as { achievement_type: string; };
+  handler: async (input: never, _ctx: ServerContext): Promise<CallToolResult> => {
+    const { achievement_type } = input as { achievement_type: string };
     return safeToolCall("clean_motivate_celebrate", async () => {
-      const {
-        ACHIEVEMENT_MESSAGES,
-      } = await import("@/lib/clean/encouragement");
+      const { ACHIEVEMENT_MESSAGES } = await import("@/lib/clean/encouragement");
       const { ACHIEVEMENTS } = await import("@/lib/clean/gamification");
 
       const message = ACHIEVEMENT_MESSAGES[achievement_type];
@@ -1483,9 +1306,7 @@ const cleanMotivateCelebrate: StandaloneToolDefinition = {
         );
       }
 
-      const achievement = ACHIEVEMENTS.find(
-        a => a.type === achievement_type,
-      );
+      const achievement = ACHIEVEMENTS.find((a) => a.type === achievement_type);
       const name = achievement?.name ?? achievement_type;
 
       const text = `**${name}!**\n\n${message}`;

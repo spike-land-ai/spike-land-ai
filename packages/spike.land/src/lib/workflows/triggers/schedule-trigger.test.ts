@@ -5,13 +5,7 @@
  * and database operations.
  */
 
-import {
-  beforeEach,
-  describe,
-  expect,
-  it,
-  vi,
-} from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 // Use vi.hoisted() so variables are available inside vi.mock() factory closures
 const {
@@ -66,16 +60,18 @@ import {
 // Test helpers
 // ============================================================================
 
-function makeSchedule(overrides: Partial<{
-  id: string;
-  workflowId: string;
-  cronExpression: string;
-  timezone: string;
-  isActive: boolean;
-  nextRunAt: Date | null;
-  lastRunAt: Date | null;
-  createdAt: Date;
-}> = {}) {
+function makeSchedule(
+  overrides: Partial<{
+    id: string;
+    workflowId: string;
+    cronExpression: string;
+    timezone: string;
+    isActive: boolean;
+    nextRunAt: Date | null;
+    lastRunAt: Date | null;
+    createdAt: Date;
+  }> = {},
+) {
   return {
     id: "sched-1",
     workflowId: "wf-1",
@@ -89,11 +85,13 @@ function makeSchedule(overrides: Partial<{
   };
 }
 
-function makeWorkflow(overrides: Partial<{
-  id: string;
-  workspaceId: string;
-  status: string;
-}> = {}) {
+function makeWorkflow(
+  overrides: Partial<{
+    id: string;
+    workspaceId: string;
+    status: string;
+  }> = {},
+) {
   return {
     id: "wf-1",
     workspaceId: "ws-1",
@@ -423,18 +421,18 @@ describe("updateScheduleTrigger", () => {
   it("throws when workflow is not found", async () => {
     mockWorkflowFindFirst.mockResolvedValue(null);
 
-    await expect(
-      updateScheduleTrigger("sched-1", "wf-1", "ws-1", {}),
-    ).rejects.toThrow("Workflow not found");
+    await expect(updateScheduleTrigger("sched-1", "wf-1", "ws-1", {})).rejects.toThrow(
+      "Workflow not found",
+    );
   });
 
   it("throws when schedule is not found", async () => {
     mockWorkflowFindFirst.mockResolvedValue(makeWorkflow());
     mockWorkflowScheduleFindFirst.mockResolvedValue(null);
 
-    await expect(
-      updateScheduleTrigger("missing", "wf-1", "ws-1", {}),
-    ).rejects.toThrow("Schedule not found");
+    await expect(updateScheduleTrigger("missing", "wf-1", "ws-1", {})).rejects.toThrow(
+      "Schedule not found",
+    );
   });
 
   it("throws when an invalid cron expression is provided", async () => {
@@ -500,9 +498,7 @@ describe("deleteScheduleTrigger", () => {
     mockWorkflowScheduleFindFirst.mockResolvedValue(makeSchedule());
     mockWorkflowScheduleDelete.mockResolvedValue(makeSchedule());
 
-    await expect(
-      deleteScheduleTrigger("sched-1", "wf-1", "ws-1"),
-    ).resolves.toBeUndefined();
+    await expect(deleteScheduleTrigger("sched-1", "wf-1", "ws-1")).resolves.toBeUndefined();
 
     expect(mockWorkflowScheduleDelete).toHaveBeenCalledWith({
       where: { id: "sched-1" },
@@ -512,18 +508,18 @@ describe("deleteScheduleTrigger", () => {
   it("throws when workflow is not found", async () => {
     mockWorkflowFindFirst.mockResolvedValue(null);
 
-    await expect(
-      deleteScheduleTrigger("sched-1", "wf-1", "ws-1"),
-    ).rejects.toThrow("Workflow not found");
+    await expect(deleteScheduleTrigger("sched-1", "wf-1", "ws-1")).rejects.toThrow(
+      "Workflow not found",
+    );
   });
 
   it("throws when schedule is not found", async () => {
     mockWorkflowFindFirst.mockResolvedValue(makeWorkflow());
     mockWorkflowScheduleFindFirst.mockResolvedValue(null);
 
-    await expect(
-      deleteScheduleTrigger("missing", "wf-1", "ws-1"),
-    ).rejects.toThrow("Schedule not found");
+    await expect(deleteScheduleTrigger("missing", "wf-1", "ws-1")).rejects.toThrow(
+      "Schedule not found",
+    );
   });
 });
 
@@ -562,9 +558,7 @@ describe("getWorkflowSchedules", () => {
   it("throws when workflow is not found", async () => {
     mockWorkflowFindFirst.mockResolvedValue(null);
 
-    await expect(
-      getWorkflowSchedules("missing", "ws-1"),
-    ).rejects.toThrow("Workflow not found");
+    await expect(getWorkflowSchedules("missing", "ws-1")).rejects.toThrow("Workflow not found");
   });
 });
 

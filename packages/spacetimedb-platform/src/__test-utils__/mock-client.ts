@@ -79,7 +79,9 @@ export function createMockPlatformClient(options: MockClientOptions = {}): MockP
   const oauthLinks: OAuthLink[] = options.oauthLinks ? [...options.oauthLinks] : [];
   const tools: ToolEntry[] = options.tools ? [...options.tools] : [];
   const toolUsages: ToolUsage[] = options.toolUsages ? [...options.toolUsages] : [];
-  const toolPreferences: UserToolPreference[] = options.toolPreferences ? [...options.toolPreferences] : [];
+  const toolPreferences: UserToolPreference[] = options.toolPreferences
+    ? [...options.toolPreferences]
+    : [];
   const apps: App[] = options.apps ? [...options.apps] : [];
   const appVersions: AppVersion[] = options.appVersions ? [...options.appVersions] : [];
   const appMessages: AppMessage[] = options.appMessages ? [...options.appMessages] : [];
@@ -115,7 +117,9 @@ export function createMockPlatformClient(options: MockClientOptions = {}): MockP
     _directMessages: directMessages,
     _platformEvents: platformEvents,
     _healthChecks: healthChecks,
-    get _nextId() { return nextId; },
+    get _nextId() {
+      return nextId;
+    },
 
     getState: vi.fn(() => ({ ...state })),
 
@@ -207,7 +211,8 @@ export function createMockPlatformClient(options: MockClientOptions = {}): MockP
         if (category && t.category !== category) return false;
         if (query) {
           const q = query.toLowerCase();
-          if (!t.name.toLowerCase().includes(q) && !t.description.toLowerCase().includes(q)) return false;
+          if (!t.name.toLowerCase().includes(q) && !t.description.toLowerCase().includes(q))
+            return false;
         }
         return true;
       });
@@ -313,17 +318,19 @@ export function createMockPlatformClient(options: MockClientOptions = {}): MockP
       app.updatedAt = BigInt(Date.now());
     }),
 
-    createAppVersion: vi.fn(async (appId: bigint, version: string, codeHash: string, changeDescription: string) => {
-      requireConnected();
-      appVersions.push({
-        id: nextId++,
-        appId,
-        version,
-        codeHash,
-        changeDescription,
-        createdAt: BigInt(Date.now()),
-      });
-    }),
+    createAppVersion: vi.fn(
+      async (appId: bigint, version: string, codeHash: string, changeDescription: string) => {
+        requireConnected();
+        appVersions.push({
+          id: nextId++,
+          appId,
+          version,
+          codeHash,
+          changeDescription,
+          createdAt: BigInt(Date.now()),
+        });
+      },
+    ),
 
     listAppVersions: vi.fn((appId: bigint) => {
       requireConnected();
@@ -384,34 +391,38 @@ export function createMockPlatformClient(options: MockClientOptions = {}): MockP
       const pageId = pages[idx]?.id;
       if (pageId !== undefined) {
         const blockIdxs = pageBlocks
-          .map((b, i) => b.pageId === pageId ? i : -1)
+          .map((b, i) => (b.pageId === pageId ? i : -1))
           .filter((i) => i >= 0)
           .reverse();
         for (const i of blockIdxs) pageBlocks.splice(i, 1);
       }
     }),
 
-    createBlock: vi.fn(async (pageId: bigint, blockType: string, contentJson: string, sortOrder: number) => {
-      requireConnected();
-      pageBlocks.push({
-        id: nextId++,
-        pageId,
-        blockType,
-        contentJson,
-        sortOrder,
-        createdAt: BigInt(Date.now()),
-        updatedAt: BigInt(Date.now()),
-      });
-    }),
+    createBlock: vi.fn(
+      async (pageId: bigint, blockType: string, contentJson: string, sortOrder: number) => {
+        requireConnected();
+        pageBlocks.push({
+          id: nextId++,
+          pageId,
+          blockType,
+          contentJson,
+          sortOrder,
+          createdAt: BigInt(Date.now()),
+          updatedAt: BigInt(Date.now()),
+        });
+      },
+    ),
 
-    updateBlock: vi.fn(async (blockId: bigint, fields: { contentJson?: string; sortOrder?: number }) => {
-      requireConnected();
-      const block = pageBlocks.find((b) => b.id === blockId);
-      if (!block) throw new Error("Block not found");
-      if (fields.contentJson !== undefined) block.contentJson = fields.contentJson;
-      if (fields.sortOrder !== undefined) block.sortOrder = fields.sortOrder;
-      block.updatedAt = BigInt(Date.now());
-    }),
+    updateBlock: vi.fn(
+      async (blockId: bigint, fields: { contentJson?: string; sortOrder?: number }) => {
+        requireConnected();
+        const block = pageBlocks.find((b) => b.id === blockId);
+        if (!block) throw new Error("Block not found");
+        if (fields.contentJson !== undefined) block.contentJson = fields.contentJson;
+        if (fields.sortOrder !== undefined) block.sortOrder = fields.sortOrder;
+        block.updatedAt = BigInt(Date.now());
+      },
+    ),
 
     deleteBlock: vi.fn(async (blockId: bigint) => {
       requireConnected();
@@ -446,8 +457,10 @@ export function createMockPlatformClient(options: MockClientOptions = {}): MockP
       requireConnected();
       if (withIdentity) {
         return directMessages.filter((m) => {
-          return (m.fromIdentity === withIdentity || m.toIdentity === withIdentity) &&
-            (m.fromIdentity === state.identity || m.toIdentity === state.identity);
+          return (
+            (m.fromIdentity === withIdentity || m.toIdentity === withIdentity) &&
+            (m.fromIdentity === state.identity || m.toIdentity === state.identity)
+          );
         });
       }
       return directMessages.filter(
@@ -554,27 +567,31 @@ export function createMockPlatformClient(options: MockClientOptions = {}): MockP
 
     // ─── Analytics ───
 
-    recordEvent: vi.fn(async (source: string, eventType: string, metadataJson: string, userIdentity?: string) => {
-      requireConnected();
-      platformEvents.push({
-        id: nextId++,
-        source,
-        eventType,
-        metadataJson,
-        userIdentity,
-        timestamp: BigInt(Date.now()),
-      });
-    }),
+    recordEvent: vi.fn(
+      async (source: string, eventType: string, metadataJson: string, userIdentity?: string) => {
+        requireConnected();
+        platformEvents.push({
+          id: nextId++,
+          source,
+          eventType,
+          metadataJson,
+          userIdentity,
+          timestamp: BigInt(Date.now()),
+        });
+      },
+    ),
 
-    queryEvents: vi.fn((filters: { source?: string; eventType?: string; userIdentity?: string }) => {
-      requireConnected();
-      return platformEvents.filter((e) => {
-        if (filters.source && e.source !== filters.source) return false;
-        if (filters.eventType && e.eventType !== filters.eventType) return false;
-        if (filters.userIdentity && e.userIdentity !== filters.userIdentity) return false;
-        return true;
-      });
-    }),
+    queryEvents: vi.fn(
+      (filters: { source?: string; eventType?: string; userIdentity?: string }) => {
+        requireConnected();
+        return platformEvents.filter((e) => {
+          if (filters.source && e.source !== filters.source) return false;
+          if (filters.eventType && e.eventType !== filters.eventType) return false;
+          if (filters.userIdentity && e.userIdentity !== filters.userIdentity) return false;
+          return true;
+        });
+      },
+    ),
 
     getHealthStatus: vi.fn(() => {
       requireConnected();

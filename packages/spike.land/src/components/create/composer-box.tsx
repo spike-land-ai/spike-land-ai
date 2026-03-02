@@ -15,7 +15,10 @@ import { ComposerSkills } from "./composer-skills";
 import { ComposerTypingDemo } from "./composer-typing-demo";
 
 function slugify(text: string): string {
-  return text.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-/]/g, "");
+  return text
+    .toLowerCase()
+    .replace(/\s+/g, "-")
+    .replace(/[^a-z0-9-/]/g, "");
 }
 
 export interface ComposerBoxProps {
@@ -25,12 +28,13 @@ export interface ComposerBoxProps {
 export function ComposerBox({ initialPrompt }: ComposerBoxProps) {
   const [query, setQuery] = useState("");
   const [isClassifying, setIsClassifying] = useState(false);
-  const [classifyError, setClassifyError] = useState<
-    { type: "blocked" | "unclear"; message: string; } | null
-  >(null);
-  const [results, setResults] = useState<
-    { slug: string; title: string; description: string; }[]
-  >([]);
+  const [classifyError, setClassifyError] = useState<{
+    type: "blocked" | "unclear";
+    message: string;
+  } | null>(null);
+  const [results, setResults] = useState<{ slug: string; title: string; description: string }[]>(
+    [],
+  );
   const [isFocused, setIsFocused] = useState(false);
 
   const router = useRouter();
@@ -38,14 +42,8 @@ export function ComposerBox({ initialPrompt }: ComposerBoxProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { textareaRef, resize } = useAutoResizeTextarea();
 
-  const {
-    images,
-    addImages,
-    removeImage,
-    dragHandlers,
-    isDragging,
-    uploadedUrls,
-  } = useComposerImages();
+  const { images, addImages, removeImage, dragHandlers, isDragging, uploadedUrls } =
+    useComposerImages();
 
   const debouncedQuery = useDebounce(query, 300);
 
@@ -84,10 +82,9 @@ export function ComposerBox({ initialPrompt }: ComposerBoxProps) {
         return;
       }
       try {
-        const res = await fetch(
-          `/api/create/search?q=${encodeURIComponent(debouncedQuery)}`,
-          { signal: controller.signal },
-        );
+        const res = await fetch(`/api/create/search?q=${encodeURIComponent(debouncedQuery)}`, {
+          signal: controller.signal,
+        });
         const data = await res.json();
         setResults(data);
       } catch (e) {
@@ -105,10 +102,7 @@ export function ComposerBox({ initialPrompt }: ComposerBoxProps) {
     if (results.length === 0) return;
 
     const handleClickOutside = (event: MouseEvent) => {
-      if (
-        containerRef.current
-        && !containerRef.current.contains(event.target as Node)
-      ) {
+      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
         setResults([]);
       }
     };
@@ -193,17 +187,11 @@ export function ComposerBox({ initialPrompt }: ComposerBoxProps) {
   return (
     <div ref={containerRef} className="relative w-full max-w-2xl mx-auto">
       <ComposerGlow isFocused={isFocused || isDragging}>
-        <form
-          onSubmit={handleSubmit}
-          className="relative"
-          {...dragHandlers}
-        >
+        <form onSubmit={handleSubmit} className="relative" {...dragHandlers}>
           {/* Drag overlay */}
           {isDragging && (
             <div className="absolute inset-0 rounded-2xl border-2 border-dashed border-cyan-400/50 bg-cyan-400/5 z-20 flex items-center justify-center pointer-events-none">
-              <span className="text-cyan-400 text-sm font-medium">
-                Drop images here
-              </span>
+              <span className="text-cyan-400 text-sm font-medium">Drop images here</span>
             </div>
           )}
 
@@ -234,16 +222,14 @@ export function ComposerBox({ initialPrompt }: ComposerBoxProps) {
               className="w-full rounded-xl glass-input px-5 py-4 text-base text-white/90 placeholder:text-zinc-500 focus:outline-none resize-none min-h-[96px] max-h-[224px] bg-transparent tracking-wide leading-relaxed"
               rows={3}
               value={query}
-              onChange={e => {
+              onChange={(e) => {
                 setQuery(e.target.value);
                 if (classifyError) setClassifyError(null);
               }}
               onFocus={() => setIsFocused(true)}
               onBlur={() => setIsFocused(false)}
               onKeyDown={handleKeyDown}
-              placeholder={showTypewriter
-                ? ""
-                : "Describe the app you want to create..."}
+              placeholder={showTypewriter ? "" : "Describe the app you want to create..."}
             />
 
             {/* Typewriter animation when empty & unfocused */}
@@ -289,9 +275,7 @@ export function ComposerBox({ initialPrompt }: ComposerBoxProps) {
         <p
           className={cn(
             "mt-2 text-sm",
-            classifyError.type === "blocked"
-              ? "text-destructive"
-              : "text-muted-foreground",
+            classifyError.type === "blocked" ? "text-destructive" : "text-muted-foreground",
           )}
         >
           {classifyError.message}
@@ -307,7 +291,7 @@ export function ComposerBox({ initialPrompt }: ComposerBoxProps) {
           className="absolute top-full left-0 right-0 mt-2 bg-zinc-900/95 backdrop-blur-xl border border-white/10 rounded-xl shadow-magic z-50 overflow-hidden"
         >
           <div className="p-1">
-            {results.map(result => (
+            {results.map((result) => (
               <Button
                 key={result.slug}
                 variant="ghost"
@@ -319,9 +303,7 @@ export function ComposerBox({ initialPrompt }: ComposerBoxProps) {
               >
                 <div>
                   <div className="font-medium">{result.title}</div>
-                  <div className="text-xs text-muted-foreground truncate">
-                    {result.description}
-                  </div>
+                  <div className="text-xs text-muted-foreground truncate">{result.description}</div>
                 </div>
               </Button>
             ))}

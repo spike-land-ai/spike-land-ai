@@ -22,7 +22,7 @@ export function ApiEndpointCard({ endpoint }: ApiEndpointCardProps) {
     .replace(/^\/api\//, "")
     .split("/")
     .filter(Boolean)
-    .map(s => s.replace(/\[/g, "%5B").replace(/\]/g, "%5D"));
+    .map((s) => s.replace(/\[/g, "%5B").replace(/\]/g, "%5D"));
   const href = `/docs/api/${segments.join("/")}`;
 
   return (
@@ -36,13 +36,12 @@ export function ApiEndpointCard({ endpoint }: ApiEndpointCardProps) {
             {endpoint.auth && <Lock className="h-3.5 w-3.5 text-amber-400 shrink-0" />}
           </div>
           <div className="flex flex-wrap items-center gap-1.5 pt-1">
-            {endpoint.methods.map(method => (
+            {endpoint.methods.map((method) => (
               <span
                 key={method}
                 className={cn(
                   "inline-flex items-center rounded-md px-1.5 py-0.5 text-[10px] font-bold uppercase border",
-                  METHOD_COLORS[method]
-                    ?? "bg-white/10 text-muted-foreground border-white/10",
+                  METHOD_COLORS[method] ?? "bg-white/10 text-muted-foreground border-white/10",
                 )}
               >
                 {method}

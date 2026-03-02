@@ -37,9 +37,7 @@ function makeTabEntry() {
   return {
     page: mockPage,
     entry: {
-      consoleMessages: [] as Array<
-        { type: string; text: string; url: string; line: number; }
-      >,
+      consoleMessages: [] as Array<{ type: string; text: string; url: string; line: number }>,
       networkRequests: [] as Array<{
         url: string;
         method: string;
@@ -166,9 +164,7 @@ describe("isActionError", () => {
   });
 
   it("returns false for success results", () => {
-    expect(isActionError({ url: "https://example.com", title: "Test" })).toBe(
-      false,
-    );
+    expect(isActionError({ url: "https://example.com", title: "Test" })).toBe(false);
   });
 
   it("returns false for null", () => {

@@ -41,15 +41,11 @@ describe("ticket-service", () => {
 
   describe("updateTicketStatus", () => {
     it("resolves without error for null ticket IDs", async () => {
-      await expect(
-        updateTicketStatus(null, "CODING"),
-      ).resolves.toBeUndefined();
+      await expect(updateTicketStatus(null, "CODING")).resolves.toBeUndefined();
     });
 
     it("resolves without error for terminal phases", async () => {
-      await expect(
-        updateTicketStatus(42, "PUBLISHED"),
-      ).resolves.toBeUndefined();
+      await expect(updateTicketStatus(42, "PUBLISHED")).resolves.toBeUndefined();
     });
   });
 });

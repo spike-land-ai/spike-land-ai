@@ -12,18 +12,14 @@ async function main() {
   }
 
   console.log("Generating token...");
-  const tokenRecord = await generateTokenPair(
-    user.id,
-    "spike-cli-agent",
-    "mcp",
-  );
+  const tokenRecord = await generateTokenPair(user.id, "spike-cli-agent", "mcp");
   // SECURITY: Write token only to stderr so it is not captured in shell
   // command substitution or piped into logs. Callers should redirect stderr.
   process.stderr.write("TOKEN=" + tokenRecord.accessToken + "\n");
   process.exit(0);
 }
 
-main().catch(e => {
+main().catch((e) => {
   console.error(e);
   process.exit(1);
 });

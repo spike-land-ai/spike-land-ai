@@ -44,10 +44,7 @@ function getApiKey(): string {
   return key;
 }
 
-async function prodigiRequest<T>(
-  endpoint: string,
-  options: RequestInit = {},
-): Promise<T> {
+async function prodigiRequest<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
   const url = `${getBaseUrl()}${endpoint}`;
   const apiKey = getApiKey();
 
@@ -64,8 +61,9 @@ async function prodigiRequest<T>(
 
   if (!response.ok) {
     const error = data as ProdigiErrorResponse;
-    const errorMessage = error.errors?.map(e => `${e.property}: ${e.description}`).join(", ")
-      || `Prodigi API error: ${response.status}`;
+    const errorMessage =
+      error.errors?.map((e) => `${e.property}: ${e.description}`).join(", ") ||
+      `Prodigi API error: ${response.status}`;
     throw new Error(errorMessage);
   }
 
@@ -81,17 +79,23 @@ function mapOrderRequest(request: PodOrderRequest): ProdigiOrderRequest {
     shippingMethod: request.shippingMethod || "Standard",
     recipient: {
       name: request.shippingAddress.name,
-      ...(request.shippingAddress.email !== undefined ? { email: request.shippingAddress.email } : {}),
-      ...(request.shippingAddress.phone !== undefined ? { phoneNumber: request.shippingAddress.phone } : {}),
+      ...(request.shippingAddress.email !== undefined
+        ? { email: request.shippingAddress.email }
+        : {}),
+      ...(request.shippingAddress.phone !== undefined
+        ? { phoneNumber: request.shippingAddress.phone }
+        : {}),
       address: {
         line1: request.shippingAddress.line1,
-        ...(request.shippingAddress.line2 !== undefined ? { line2: request.shippingAddress.line2 } : {}),
+        ...(request.shippingAddress.line2 !== undefined
+          ? { line2: request.shippingAddress.line2 }
+          : {}),
         townOrCity: request.shippingAddress.city,
         postalOrZipCode: request.shippingAddress.postalCode,
         countryCode: request.shippingAddress.countryCode,
       },
     },
-    items: request.items.map(item => ({
+    items: request.items.map((item) => ({
       sku: item.sku,
       copies: item.quantity,
       sizing: item.sizing || "fillPrintArea",
@@ -109,15 +113,11 @@ function mapOrderRequest(request: PodOrderRequest): ProdigiOrderRequest {
 /**
  * Map Prodigi status to our internal status format
  */
-function mapOrderStatus(
-  order: ProdigiOrderStatusResponse["order"],
-): PodOrderStatus | null {
+function mapOrderStatus(order: ProdigiOrderStatusResponse["order"]): PodOrderStatus | null {
   if (!order) return null;
 
   // Find the first shipment with tracking info
-  const shipment = order.shipments.find(
-    s => s.tracking?.number || s.status === "Shipped",
-  );
+  const shipment = order.shipments.find((s) => s.tracking?.number || s.status === "Shipped");
 
   // Map Prodigi status stages to a simpler status string
   let status = "pending";
@@ -143,11 +143,13 @@ function mapOrderStatus(
     providerOrderId: order.id,
     status,
     statusDetail: stage,
-    ...(shipment?.tracking?.number !== undefined ? { trackingNumber: shipment.tracking.number } : {}),
+    ...(shipment?.tracking?.number !== undefined
+      ? { trackingNumber: shipment.tracking.number }
+      : {}),
     ...(shipment?.tracking?.url !== undefined ? { trackingUrl: shipment.tracking.url } : {}),
     ...(shipment?.carrier?.name !== undefined ? { carrier: shipment.carrier.name } : {}),
     ...(prodigiShippedAt !== undefined ? { shippedAt: prodigiShippedAt } : {}),
-    items: order.items.map(item => ({
+    items: order.items.map((item) => ({
       sku: item.sku,
       status: item.status,
     })),
@@ -177,27 +179,24 @@ export const prodigiProvider: PodProvider = {
       };
     }
 
-    const prodigiError = data.outcome === "CreatedWithIssues"
-      ? data.order.status.issues?.map(i => i.description).join(", ")
-      : undefined;
+    const prodigiError =
+      data.outcome === "CreatedWithIssues"
+        ? data.order.status.issues?.map((i) => i.description).join(", ")
+        : undefined;
     return {
-      success: data.outcome === "Created"
-        || data.outcome === "CreatedWithIssues",
+      success: data.outcome === "Created" || data.outcome === "CreatedWithIssues",
       providerOrderId: data.order.id,
       status: data.order.status.stage,
       ...(prodigiError !== undefined ? { error: prodigiError } : {}),
     };
   },
 
-  async getQuote(
-    items: PodQuoteItem[],
-    address: ShippingAddress,
-  ): Promise<PodQuote> {
+  async getQuote(items: PodQuoteItem[], address: ShippingAddress): Promise<PodQuote> {
     const quoteRequest: ProdigiQuoteRequest = {
       shippingMethod: "Standard",
       destinationCountryCode: address.countryCode,
       currencyCode: "GBP",
-      items: items.map(item => ({
+      items: items.map((item) => ({
         sku: item.sku,
         copies: item.quantity,
       })),
@@ -216,13 +215,13 @@ export const prodigiProvider: PodProvider = {
 
     return {
       currency: quote.costSummary.totalCost.currency,
-      items: quote.items.map(item => ({
+      items: quote.items.map((item) => ({
         sku: item.sku,
         quantity: item.copies,
         unitCost: parseFloat(item.unitCost.amount),
         totalCost: parseFloat(item.totalCost.amount),
       })),
-      shipping: quote.shipments.map(shipment => ({
+      shipping: quote.shipments.map((shipment) => ({
         method: shipment.carrier.service || shipment.carrier.name,
         cost: parseFloat(shipment.cost.amount),
         currency: shipment.cost.currency,
@@ -231,9 +230,7 @@ export const prodigiProvider: PodProvider = {
   },
 
   async getOrderStatus(providerOrderId: string): Promise<PodOrderStatus> {
-    const response = await prodigiRequest<ProdigiOrderStatusResponse>(
-      `/orders/${providerOrderId}`,
-    );
+    const response = await prodigiRequest<ProdigiOrderStatusResponse>(`/orders/${providerOrderId}`);
 
     if (response.outcome === "NotFound" || !response.order) {
       throw new Error(`Order ${providerOrderId} not found`);
@@ -247,14 +244,11 @@ export const prodigiProvider: PodProvider = {
     return status;
   },
 
-  async cancelOrder(
-    providerOrderId: string,
-  ): Promise<{ success: boolean; error?: string; }> {
+  async cancelOrder(providerOrderId: string): Promise<{ success: boolean; error?: string }> {
     const { data, error } = await tryCatch(
-      prodigiRequest<ProdigiCancelResponse>(
-        `/orders/${providerOrderId}/actions/cancel`,
-        { method: "POST" },
-      ),
+      prodigiRequest<ProdigiCancelResponse>(`/orders/${providerOrderId}/actions/cancel`, {
+        method: "POST",
+      }),
     );
 
     if (error) {
@@ -291,19 +285,15 @@ export function validateImageForProduct(
   minWidth: number,
   minHeight: number,
   minDpi: number = 150,
-): { valid: boolean; errors: string[]; } {
+): { valid: boolean; errors: string[] } {
   const errors: string[] = [];
 
   if (imageWidth < minWidth) {
-    errors.push(
-      `Image width (${imageWidth}px) is less than required (${minWidth}px)`,
-    );
+    errors.push(`Image width (${imageWidth}px) is less than required (${minWidth}px)`);
   }
 
   if (imageHeight < minHeight) {
-    errors.push(
-      `Image height (${imageHeight}px) is less than required (${minHeight}px)`,
-    );
+    errors.push(`Image height (${imageHeight}px) is less than required (${minHeight}px)`);
   }
 
   // Rough DPI estimation based on typical print sizes

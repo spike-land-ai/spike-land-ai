@@ -17,13 +17,9 @@ export function FeatureListBlock({ content }: FeatureListBlockProps) {
   return (
     <section className="w-full py-16 px-6 md:px-12 lg:px-24">
       <div className="max-w-4xl mx-auto">
-        {data.sectionTitle
-          ? (
-            <h2 className="text-3xl font-bold text-center mb-12">
-              {data.sectionTitle}
-            </h2>
-          )
-          : null}
+        {data.sectionTitle ? (
+          <h2 className="text-3xl font-bold text-center mb-12">{data.sectionTitle}</h2>
+        ) : null}
         <div className="flex flex-col gap-12">
           {data.features.map((feature, index) => {
             const isEven = index % 2 === 0;
@@ -34,17 +30,13 @@ export function FeatureListBlock({ content }: FeatureListBlockProps) {
                   isEven ? "" : "md:flex-row-reverse"
                 }`}
               >
-                {feature.icon
-                  ? (
-                    <div className="flex-shrink-0 flex h-14 w-14 items-center justify-center rounded-full bg-primary/10 text-primary text-xl">
-                      {feature.icon}
-                    </div>
-                  )
-                  : null}
+                {feature.icon ? (
+                  <div className="flex-shrink-0 flex h-14 w-14 items-center justify-center rounded-full bg-primary/10 text-primary text-xl">
+                    {feature.icon}
+                  </div>
+                ) : null}
                 <div className={isEven ? "md:text-left" : "md:text-right"}>
-                  <h3 className="text-xl font-semibold mb-2">
-                    {feature.title}
-                  </h3>
+                  <h3 className="text-xl font-semibold mb-2">{feature.title}</h3>
                   <p className="text-muted-foreground">{feature.description}</p>
                 </div>
               </div>

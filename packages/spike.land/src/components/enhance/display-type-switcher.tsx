@@ -12,31 +12,19 @@ interface DisplayTypeSwitcherProps {
   className?: string;
 }
 
-export function DisplayTypeSwitcher({
-  value,
-  onChange,
-  className,
-}: DisplayTypeSwitcherProps) {
+export function DisplayTypeSwitcher({ value, onChange, className }: DisplayTypeSwitcherProps) {
   return (
     <ToggleGroup
       type="single"
       value={value}
-      onValueChange={v => v && onChange(v as DisplayType)}
+      onValueChange={(v) => v && onChange(v as DisplayType)}
       className={cn("", className)}
     >
-      <ToggleGroupItem
-        value="original"
-        aria-label="Show original images"
-        className="gap-1 px-3"
-      >
+      <ToggleGroupItem value="original" aria-label="Show original images" className="gap-1 px-3">
         <ImageIcon className="h-4 w-4" />
         <span className="hidden sm:inline">Original</span>
       </ToggleGroupItem>
-      <ToggleGroupItem
-        value="auto"
-        aria-label="Auto - prefer enhanced"
-        className="gap-1 px-3"
-      >
+      <ToggleGroupItem value="auto" aria-label="Auto - prefer enhanced" className="gap-1 px-3">
         <Wand2 className="h-4 w-4" />
         <span className="hidden sm:inline">Auto</span>
       </ToggleGroupItem>

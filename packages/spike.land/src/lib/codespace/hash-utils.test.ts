@@ -49,44 +49,32 @@ describe("computeSessionHash", () => {
   });
 
   it("should be deterministic", () => {
-    expect(computeSessionHash(baseSession)).toBe(
-      computeSessionHash(baseSession),
-    );
+    expect(computeSessionHash(baseSession)).toBe(computeSessionHash(baseSession));
   });
 
   it("should change when code changes", () => {
     const modified = { ...baseSession, code: "const y = 2;" };
-    expect(computeSessionHash(baseSession)).not.toBe(
-      computeSessionHash(modified),
-    );
+    expect(computeSessionHash(baseSession)).not.toBe(computeSessionHash(modified));
   });
 
   it("should change when html changes", () => {
     const modified = { ...baseSession, html: "<p>different</p>" };
-    expect(computeSessionHash(baseSession)).not.toBe(
-      computeSessionHash(modified),
-    );
+    expect(computeSessionHash(baseSession)).not.toBe(computeSessionHash(modified));
   });
 
   it("should change when css changes", () => {
     const modified = { ...baseSession, css: ".other { color: blue; }" };
-    expect(computeSessionHash(baseSession)).not.toBe(
-      computeSessionHash(modified),
-    );
+    expect(computeSessionHash(baseSession)).not.toBe(computeSessionHash(modified));
   });
 
   it("should change when transpiled changes", () => {
     const modified = { ...baseSession, transpiled: "var y = 2;" };
-    expect(computeSessionHash(baseSession)).not.toBe(
-      computeSessionHash(modified),
-    );
+    expect(computeSessionHash(baseSession)).not.toBe(computeSessionHash(modified));
   });
 
   it("should change when codeSpace changes", () => {
     const modified = { ...baseSession, codeSpace: "other-space" };
-    expect(computeSessionHash(baseSession)).not.toBe(
-      computeSessionHash(modified),
-    );
+    expect(computeSessionHash(baseSession)).not.toBe(computeSessionHash(modified));
   });
 
   it("should NOT change when messages change (messages are not part of hash)", () => {
@@ -94,8 +82,6 @@ describe("computeSessionHash", () => {
       ...baseSession,
       messages: [{ id: "1", role: "user" as const, content: "hello" }],
     };
-    expect(computeSessionHash(baseSession)).toBe(
-      computeSessionHash(modified),
-    );
+    expect(computeSessionHash(baseSession)).toBe(computeSessionHash(modified));
   });
 });

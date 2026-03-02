@@ -337,5 +337,4 @@ export const LIFESTYLE_APPS: StoreApp[] = [
       },
     ],
   },
-
 ];

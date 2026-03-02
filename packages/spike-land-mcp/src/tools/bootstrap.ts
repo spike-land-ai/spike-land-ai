@@ -28,14 +28,11 @@ export function registerBootstrapTools(
     t
       .tool(
         "bootstrap_workspace",
-        "Create or update a workspace configuration for the user. "
-          + "A workspace is the container for secrets, tools, and apps.",
+        "Create or update a workspace configuration for the user. " +
+          "A workspace is the container for secrets, tools, and apps.",
         {
           name: z.string().min(1).max(100),
-          settings: z
-            .record(z.string(), z.unknown())
-            .optional()
-            .default({}),
+          settings: z.record(z.string(), z.unknown()).optional().default({}),
         },
       )
       .meta({ category: "bootstrap", tier: "free" })
@@ -91,12 +88,12 @@ export function registerBootstrapTools(
         }
 
         return textResult(
-          `**Workspace Ready!**\n\n`
-            + `**ID:** ${workspaceId}\n`
-            + `**Name:** ${name}\n\n`
-            + `Next steps:\n`
-            + `- Use \`bootstrap_connect_integration\` to add API credentials\n`
-            + `- Use \`bootstrap_create_app\` to deploy a live app`,
+          `**Workspace Ready!**\n\n` +
+            `**ID:** ${workspaceId}\n` +
+            `**Name:** ${name}\n\n` +
+            `Next steps:\n` +
+            `- Use \`bootstrap_connect_integration\` to add API credentials\n` +
+            `- Use \`bootstrap_create_app\` to deploy a live app`,
         );
       }),
   );
@@ -105,8 +102,8 @@ export function registerBootstrapTools(
     t
       .tool(
         "bootstrap_connect_integration",
-        "Connect an integration by storing its credentials in the encrypted vault. "
-          + "Each credential key/value pair is stored separately.",
+        "Connect an integration by storing its credentials in the encrypted vault. " +
+          "Each credential key/value pair is stored separately.",
         {
           integration_name: z
             .string()
@@ -166,20 +163,13 @@ export function registerBootstrapTools(
 
           const encryptedValue = JSON.stringify({
             iv: btoa(String.fromCharCode(...iv)),
-            data: btoa(
-              String.fromCharCode(...new Uint8Array(encrypted)),
-            ),
+            data: btoa(String.fromCharCode(...new Uint8Array(encrypted))),
           });
 
           // Upsert: delete then insert (D1 doesn't support ON CONFLICT well)
           await ctx.db
             .delete(vaultSecrets)
-            .where(
-              and(
-                eq(vaultSecrets.userId, ctx.userId),
-                eq(vaultSecrets.key, secretName),
-              ),
-            );
+            .where(and(eq(vaultSecrets.userId, ctx.userId), eq(vaultSecrets.key, secretName)));
 
           await ctx.db.insert(vaultSecrets).values({
             id: secretId,
@@ -235,8 +225,7 @@ export function registerBootstrapTools(
         // Delegate to spike.land API for codespace + app creation
         const body: Record<string, unknown> = {
           name: app_name,
-          description:
-            description || `App from codespace ${effectiveCodespaceId}`,
+          description: description || `App from codespace ${effectiveCodespaceId}`,
           requirements: "Bootstrap-created app",
           monetizationModel: "free",
           codespaceId: effectiveCodespaceId,
@@ -256,15 +245,14 @@ export function registerBootstrapTools(
           const dashboardUrl = `${SPIKE_LAND_BASE_URL}/create`;
 
           return textResult(
-            `**App Created!**\n\n`
-              + `**App:** ${appData.name} (ID: ${appData.id})\n`
-              + `**Codespace:** ${effectiveCodespaceId}\n`
-              + `**Live URL:** ${liveUrl}\n`
-              + `**Dashboard:** ${dashboardUrl}`,
+            `**App Created!**\n\n` +
+              `**App:** ${appData.name} (ID: ${appData.id})\n` +
+              `**Codespace:** ${effectiveCodespaceId}\n` +
+              `**Live URL:** ${liveUrl}\n` +
+              `**Dashboard:** ${dashboardUrl}`,
           );
         } catch (error) {
-          const msg =
-            error instanceof Error ? error.message : "Unknown error";
+          const msg = error instanceof Error ? error.message : "Unknown error";
           return textResult(`**Error creating app:** ${msg}`);
         }
       }),

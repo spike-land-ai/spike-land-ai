@@ -36,9 +36,7 @@ export function GoogleAnalytics({ nonce }: GoogleAnalyticsProps) {
   }, []);
 
   useEffect(() => {
-    if (
-      !consentGiven || !GA_MEASUREMENT_ID || typeof window.gtag !== "function"
-    ) return;
+    if (!consentGiven || !GA_MEASUREMENT_ID || typeof window.gtag !== "function") return;
 
     window.gtag("event", "page_view", {
       page_path: pathname,

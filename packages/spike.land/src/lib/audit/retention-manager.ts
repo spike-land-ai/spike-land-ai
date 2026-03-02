@@ -13,11 +13,7 @@ import prisma from "@/lib/prisma";
 import { tryCatch } from "@/lib/try-catch";
 import type { Prisma } from "@prisma/client";
 
-import type {
-  RetentionJobResult,
-  RetentionPolicy,
-  RetentionPolicyConfig,
-} from "./types";
+import type { RetentionJobResult, RetentionPolicy, RetentionPolicyConfig } from "./types";
 import { logger } from "@/lib/logger";
 
 /**
@@ -73,8 +69,12 @@ export class AuditRetentionManager {
           name: config.name,
           ...(config.description !== undefined ? { description: config.description } : {}),
           retentionDays: config.retentionDays,
-          ...(config.archiveAfterDays !== undefined ? { archiveAfterDays: config.archiveAfterDays } : {}),
-          ...(config.deleteAfterDays !== undefined ? { deleteAfterDays: config.deleteAfterDays } : {}),
+          ...(config.archiveAfterDays !== undefined
+            ? { archiveAfterDays: config.archiveAfterDays }
+            : {}),
+          ...(config.deleteAfterDays !== undefined
+            ? { deleteAfterDays: config.deleteAfterDays }
+            : {}),
           actionTypes: config.actionTypes?.map(String) ?? [],
           isActive: config.isActive,
         },
@@ -171,9 +171,7 @@ export class AuditRetentionManager {
   /**
    * List retention policies for a workspace (or system-wide if null)
    */
-  static async listPolicies(
-    workspaceId: string | null,
-  ): Promise<RetentionPolicy[]> {
+  static async listPolicies(workspaceId: string | null): Promise<RetentionPolicy[]> {
     const policies = await prisma.auditRetentionPolicy.findMany({
       where: { workspaceId },
       orderBy: { createdAt: "desc" },
@@ -185,9 +183,7 @@ export class AuditRetentionManager {
   /**
    * Get effective policy for a workspace (workspace policy or system default)
    */
-  static async getEffectivePolicy(
-    workspaceId: string,
-  ): Promise<RetentionPolicy | null> {
+  static async getEffectivePolicy(workspaceId: string): Promise<RetentionPolicy | null> {
     // First try to get workspace-specific policy
     const workspacePolicy = await prisma.auditRetentionPolicy.findFirst({
       where: {
@@ -218,9 +214,7 @@ export class AuditRetentionManager {
   /**
    * Execute retention job for a policy (archive and delete old logs)
    */
-  static async executeRetentionJob(
-    policyId: string,
-  ): Promise<RetentionJobResult> {
+  static async executeRetentionJob(policyId: string): Promise<RetentionJobResult> {
     const errors: string[] = [];
     let archivedCount = 0;
     let deletedCount = 0;
@@ -252,9 +246,7 @@ export class AuditRetentionManager {
     // Archive logs older than archiveAfterDays
     if (policy.archiveAfterDays) {
       const archiveThreshold = new Date(now);
-      archiveThreshold.setDate(
-        archiveThreshold.getDate() - policy.archiveAfterDays,
-      );
+      archiveThreshold.setDate(archiveThreshold.getDate() - policy.archiveAfterDays);
 
       // Build where clause for workspace audit logs
       const archiveWhere: Prisma.WorkspaceAuditLogWhereInput = {
@@ -279,7 +271,7 @@ export class AuditRetentionManager {
         if (logsToArchive.length > 0) {
           // Insert into archive table
           await prisma.archivedAuditLog.createMany({
-            data: logsToArchive.map(log => ({
+            data: logsToArchive.map((log) => ({
               originalId: log.id,
               workspaceId: log.workspaceId,
               userId: log.userId,
@@ -300,25 +292,21 @@ export class AuditRetentionManager {
           // Delete from main table
           await prisma.workspaceAuditLog.deleteMany({
             where: {
-              id: { in: logsToArchive.map(l => l.id) },
+              id: { in: logsToArchive.map((l) => l.id) },
             },
           });
 
           archivedCount = logsToArchive.length;
         }
       } catch (error) {
-        errors.push(
-          `Archive error: ${error instanceof Error ? error.message : String(error)}`,
-        );
+        errors.push(`Archive error: ${error instanceof Error ? error.message : String(error)}`);
       }
     }
 
     // Delete archived logs older than deleteAfterDays
     if (policy.deleteAfterDays) {
       const deleteThreshold = new Date(now);
-      deleteThreshold.setDate(
-        deleteThreshold.getDate() - policy.deleteAfterDays,
-      );
+      deleteThreshold.setDate(deleteThreshold.getDate() - policy.deleteAfterDays);
 
       const deleteWhere: Prisma.ArchivedAuditLogWhereInput = {
         originalCreatedAt: { lt: deleteThreshold },
@@ -335,9 +323,7 @@ export class AuditRetentionManager {
 
         deletedCount = deleteResult.count;
       } catch (error) {
-        errors.push(
-          `Delete error: ${error instanceof Error ? error.message : String(error)}`,
-        );
+        errors.push(`Delete error: ${error instanceof Error ? error.message : String(error)}`);
       }
     }
 
@@ -403,8 +389,12 @@ export class AuditRetentionManager {
     return {
       totalActiveLogs,
       totalArchivedLogs,
-      ...(oldestActiveLogResult?.createdAt !== undefined ? { oldestActiveLog: oldestActiveLogResult.createdAt } : {}),
-      ...(oldestArchivedLogResult?.originalCreatedAt !== undefined ? { oldestArchivedLog: oldestArchivedLogResult.originalCreatedAt } : {}),
+      ...(oldestActiveLogResult?.createdAt !== undefined
+        ? { oldestActiveLog: oldestActiveLogResult.createdAt }
+        : {}),
+      ...(oldestArchivedLogResult?.originalCreatedAt !== undefined
+        ? { oldestArchivedLog: oldestArchivedLogResult.originalCreatedAt }
+        : {}),
       ...(effectivePolicy !== undefined ? { effectivePolicy } : {}),
     };
   }

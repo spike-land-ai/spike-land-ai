@@ -46,15 +46,11 @@ describe("isLinkedInRateLimitError", () => {
   });
 
   it("returns true for rate limit message", () => {
-    expect(
-      isLinkedInRateLimitError({ message: "Rate Limit Exceeded" }),
-    ).toBe(true);
+    expect(isLinkedInRateLimitError({ message: "Rate Limit Exceeded" })).toBe(true);
   });
 
   it("returns false for regular error", () => {
-    expect(
-      isLinkedInRateLimitError({ status: 500, message: "Server error" }),
-    ).toBe(false);
+    expect(isLinkedInRateLimitError({ status: 500, message: "Server error" })).toBe(false);
   });
 
   it("returns false for null", () => {

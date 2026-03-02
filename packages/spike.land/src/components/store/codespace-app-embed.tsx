@@ -26,24 +26,17 @@ interface IframeClickMessage {
 function isIframeErrorMessage(data: unknown): data is IframeErrorMessage {
   if (typeof data !== "object" || data === null) return false;
   const msg = data as Record<string, unknown>;
-  return (
-    msg.type === "iframe-error" && msg.source === "spike-land-bundle"
-  );
+  return msg.type === "iframe-error" && msg.source === "spike-land-bundle";
 }
 
 function isIframeClickMessage(data: unknown): data is IframeClickMessage {
   if (typeof data !== "object" || data === null) return false;
   const msg = data as Record<string, unknown>;
-  return (
-    msg.type === "iframe-click" && msg.source === "spike-land-bundle"
-  );
+  return msg.type === "iframe-click" && msg.source === "spike-land-bundle";
 }
 
 /** Fire-and-forget metrics POST. Failures are silently ignored. */
-function trackMetric(
-  endpoint: "impression" | "error" | "engagement",
-  variantId: string,
-): void {
+function trackMetric(endpoint: "impression" | "error" | "engagement", variantId: string): void {
   fetch(`/api/store-app/${endpoint}`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -81,7 +74,7 @@ export function CodespaceAppEmbed({
     rebuildAttemptedRef.current = false;
     impressionTrackedRef.current = false;
     engagementTrackedRef.current = false;
-    setIframeKey(prev => prev + 1);
+    setIframeKey((prev) => prev + 1);
   }, []);
 
   // ── Iframe load handler ──────────────────────────────────────────────
@@ -118,7 +111,7 @@ export function CodespaceAppEmbed({
           setIsRebuilding(true);
           setLoading(true);
           setUseRebuildSrc(true);
-          setIframeKey(prev => prev + 1);
+          setIframeKey((prev) => prev + 1);
         } else {
           // Rebuild also failed: surface error UI
           setIsRebuilding(false);
@@ -142,21 +135,14 @@ export function CodespaceAppEmbed({
   const iframeSrc = `/api/codespace/${codespaceId}/bundle${useRebuildSrc ? "?rebuild=true" : ""}`;
 
   return (
-    <div
-      className={cn(
-        "relative w-full overflow-hidden rounded-lg border bg-muted/20",
-        className,
-      )}
-    >
+    <div className={cn("relative w-full overflow-hidden rounded-lg border bg-muted/20", className)}>
       {/* Loading overlay */}
       {loading && (
         <div className="absolute inset-0 z-10 flex items-center justify-center bg-background/60 backdrop-blur-sm">
           <div className="flex flex-col items-center gap-3">
             <Loader2 className="h-8 w-8 animate-spin text-primary" />
             {isRebuilding && (
-              <span className="text-sm text-muted-foreground">
-                Rebuilding app...
-              </span>
+              <span className="text-sm text-muted-foreground">Rebuilding app...</span>
             )}
           </div>
         </div>

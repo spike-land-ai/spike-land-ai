@@ -26,14 +26,18 @@ export function registerBuildFromGithubTools(
           repo: z.string().describe("GitHub repository (owner/repo)"),
           branch: z.string().optional().default("main").describe("Branch to build"),
           entry: z.string().optional().describe("Entry file path (defaults to package.json main)"),
-          format: z.enum(["esm", "cjs", "iife"]).optional().default("esm").describe("Output module format"),
+          format: z
+            .enum(["esm", "cjs", "iife"])
+            .optional()
+            .default("esm")
+            .describe("Output module format"),
         },
       )
       .meta({ category: "esbuild", tier: "workspace" })
       .handler(async ({ input: _input, ctx: _ctx }) => {
         return textResult(
           "build_from_github is not yet fully implemented in CF Workers mode. " +
-          "Use the esbuild tools to build from local source instead.",
+            "Use the esbuild tools to build from local source instead.",
         );
       }),
   );

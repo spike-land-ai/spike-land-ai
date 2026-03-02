@@ -1,10 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import {
-  generateTopicSchema,
-  learnItPathSchema,
-  pathSegmentSchema,
-} from "./validations";
+import { generateTopicSchema, learnItPathSchema, pathSegmentSchema } from "./validations";
 
 describe("pathSegmentSchema", () => {
   it("accepts lowercase alphanumeric with hyphens", () => {

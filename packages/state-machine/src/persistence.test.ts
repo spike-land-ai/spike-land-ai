@@ -51,19 +51,29 @@ function makeMachineInstance() {
   };
 }
 
-function makePrismaRecord(overrides: Partial<{
-  id: string;
-  shareToken: string;
-  definition: unknown;
-  currentStates: string[];
-  context: unknown;
-  history: unknown;
-  transitionLog: unknown;
-}> = {}) {
+function makePrismaRecord(
+  overrides: Partial<{
+    id: string;
+    shareToken: string;
+    definition: unknown;
+    currentStates: string[];
+    context: unknown;
+    history: unknown;
+    transitionLog: unknown;
+  }> = {},
+) {
   return {
     id: "db-id-1",
     shareToken: "abc123token",
-    definition: { id: "machine-1", name: "Test Machine", initial: "idle", states: {}, transitions: [], context: {}, userId: "user-1" },
+    definition: {
+      id: "machine-1",
+      name: "Test Machine",
+      initial: "idle",
+      states: {},
+      transitions: [],
+      context: {},
+      userId: "user-1",
+    },
     currentStates: ["idle"],
     context: { count: 0 },
     history: {},
@@ -202,9 +212,7 @@ describe("getSharedMachine", () => {
   it("throws when the token is not found", async () => {
     mockFindUnique.mockResolvedValue(null);
 
-    await expect(getSharedMachine("bad-token")).rejects.toThrow(
-      "Shared state machine not found",
-    );
+    await expect(getSharedMachine("bad-token")).rejects.toThrow("Shared state machine not found");
   });
 
   it("queries by shareToken", async () => {

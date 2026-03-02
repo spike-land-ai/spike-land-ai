@@ -1,9 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import {
-  fetchVariantAssignment,
-  getVariantFromCookie,
-  setVariantCookie,
-} from "./assignment";
+import { fetchVariantAssignment, getVariantFromCookie, setVariantCookie } from "./assignment";
 
 describe("getVariantFromCookie", () => {
   const originalDocument = globalThis.document;
@@ -99,9 +95,7 @@ describe("fetchVariantAssignment", () => {
 
     const result = await fetchVariantAssignment("test-1", "visitor-1");
     expect(result).toBe("variant-b");
-    expect(fetch).toHaveBeenCalledWith(
-      "/api/ab-test/assign?testId=test-1&visitorId=visitor-1",
-    );
+    expect(fetch).toHaveBeenCalledWith("/api/ab-test/assign?testId=test-1&visitorId=visitor-1");
 
     vi.unstubAllGlobals();
   });
@@ -137,10 +131,7 @@ describe("fetchVariantAssignment", () => {
   });
 
   it("should return 'control' on network failure", async () => {
-    vi.stubGlobal(
-      "fetch",
-      vi.fn().mockRejectedValue(new Error("Network error")),
-    );
+    vi.stubGlobal("fetch", vi.fn().mockRejectedValue(new Error("Network error")));
 
     const result = await fetchVariantAssignment("test-1", "visitor-1");
     expect(result).toBe("control");

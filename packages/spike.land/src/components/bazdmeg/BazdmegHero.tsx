@@ -81,8 +81,7 @@ export function BazdmegHero() {
         <div
           className="pointer-events-none fixed inset-0 z-30 transition-opacity duration-300"
           style={{
-            background:
-              `radial-gradient(600px circle at ${mousePos.x}px ${mousePos.y}px, rgba(245, 158, 11, 0.04), transparent 40%)`,
+            background: `radial-gradient(600px circle at ${mousePos.x}px ${mousePos.y}px, rgba(245, 158, 11, 0.04), transparent 40%)`,
           }}
         />
       )}
@@ -117,10 +116,7 @@ export function BazdmegHero() {
           </motion.div>
 
           {/* Title with per-letter animation */}
-          <motion.h1
-            variants={fadeUpVariants}
-            className="mb-6"
-          >
+          <motion.h1 variants={fadeUpVariants} className="mb-6">
             <span className="sr-only">{titleText}</span>
             <span
               aria-hidden="true"
@@ -133,9 +129,11 @@ export function BazdmegHero() {
                   variants={letterVariants}
                   initial="hidden"
                   animate="visible"
-                  className={i >= 4
-                    ? "text-amber-500 drop-shadow-[0_0_30px_rgba(245,158,11,0.3)]"
-                    : "text-white"}
+                  className={
+                    i >= 4
+                      ? "text-amber-500 drop-shadow-[0_0_30px_rgba(245,158,11,0.3)]"
+                      : "text-white"
+                  }
                 >
                   {letter}
                 </motion.span>
@@ -155,10 +153,7 @@ export function BazdmegHero() {
             variants={fadeUpVariants}
             className="text-base sm:text-lg text-zinc-500 max-w-xl leading-relaxed mb-12"
           >
-            Born from pain.{" "}
-            <span className="text-zinc-200 font-medium">
-              Tested in production.
-            </span>
+            Born from pain. <span className="text-zinc-200 font-medium">Tested in production.</span>
           </motion.p>
 
           {/* CTA Buttons */}
@@ -171,9 +166,8 @@ export function BazdmegHero() {
               whileTap={{ scale: 0.97 }}
               className="group relative px-8 py-4 bg-white text-zinc-950 font-bold rounded-xl overflow-hidden transition-shadow duration-300 shadow-[0_0_20px_rgba(255,255,255,0.15)] hover:shadow-[0_0_40px_rgba(255,255,255,0.25)]"
               onClick={() =>
-                document
-                  .getElementById("principles")
-                  ?.scrollIntoView({ behavior: "smooth" })}
+                document.getElementById("principles")?.scrollIntoView({ behavior: "smooth" })
+              }
             >
               <span className="relative z-10">Learn the Principles</span>
               <div className="absolute inset-0 bg-gradient-to-r from-amber-200 to-white opacity-0 group-hover:opacity-100 transition-opacity duration-300" />

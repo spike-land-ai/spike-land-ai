@@ -1,10 +1,6 @@
 import type { ContextBundle } from "./types";
 
-export function buildZeroShotPrompt(
-  bundle: ContextBundle,
-  role: string,
-  format: string,
-): string {
+export function buildZeroShotPrompt(bundle: ContextBundle, role: string, format: string): string {
   let prompt = `Role: ${role}\nFormat: ${format}\n\n`;
   prompt += `Specification: ${bundle.spec}\n\n`;
 
@@ -25,8 +21,8 @@ export function buildZeroShotPrompt(
 export function parseCodeOutput(
   rawOutput: string,
   _format: string,
-): Array<{ path: string; content: string; }> {
-  const files: Array<{ path: string; content: string; }> = [];
+): Array<{ path: string; content: string }> {
+  const files: Array<{ path: string; content: string }> = [];
 
   // Basic fenced block parsing
   const regex = /```(?:[\w.]+)?\s*(?:filepath:\s*([\w/.-]+))?\n([\s\S]*?)```/g;
@@ -51,10 +47,7 @@ export function parseCodeOutput(
   return files;
 }
 
-export function enrichBundle(
-  bundle: ContextBundle,
-  feedback: string,
-): ContextBundle {
+export function enrichBundle(bundle: ContextBundle, feedback: string): ContextBundle {
   return {
     ...bundle,
     constraints: [...bundle.constraints, `Correction/Feedback: ${feedback}`],

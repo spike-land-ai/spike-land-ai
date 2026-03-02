@@ -1,10 +1,6 @@
 "use client";
 
-import type {
-  ClientConnectionState,
-  ClientMetadata,
-  PeerMessage,
-} from "@/types/webrtc";
+import type { ClientConnectionState, ClientMetadata, PeerMessage } from "@/types/webrtc";
 import { getStreamMetadata } from "@apps/display/lib/webrtc/utils";
 import type { DataConnection, MediaConnection, Peer } from "peerjs";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -19,9 +15,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
  * - Connection state tracking
  */
 export function usePeerConnection(peer: Peer | null) {
-  const [connections, setConnections] = useState<
-    Map<string, ClientConnectionState>
-  >(new Map());
+  const [connections, setConnections] = useState<Map<string, ClientConnectionState>>(new Map());
   const connectionsRef = useRef<Map<string, ClientConnectionState>>(new Map());
 
   // Keep ref in sync with state
@@ -34,7 +28,7 @@ export function usePeerConnection(peer: Peer | null) {
    */
   const updateConnection = useCallback(
     (clientId: string, updates: Partial<ClientConnectionState>) => {
-      setConnections(prev => {
+      setConnections((prev) => {
         const newMap = new Map(prev);
         const existing = newMap.get(clientId);
 
@@ -51,21 +45,18 @@ export function usePeerConnection(peer: Peer | null) {
   /**
    * Send a message to a client via data connection
    */
-  const sendMessage = useCallback(
-    (clientId: string, message: PeerMessage) => {
-      const connection = connectionsRef.current.get(clientId);
-      if (connection?.dataConnection && connection.dataConnection.open) {
-        connection.dataConnection.send(message);
-      }
-    },
-    [],
-  );
+  const sendMessage = useCallback((clientId: string, message: PeerMessage) => {
+    const connection = connectionsRef.current.get(clientId);
+    if (connection?.dataConnection && connection.dataConnection.open) {
+      connection.dataConnection.send(message);
+    }
+  }, []);
 
   /**
    * Send a message to all connected clients
    */
   const broadcast = useCallback((message: PeerMessage) => {
-    connectionsRef.current.forEach(connection => {
+    connectionsRef.current.forEach((connection) => {
       if (connection.dataConnection && connection.dataConnection.open) {
         connection.dataConnection.send(message);
       }
@@ -106,7 +97,7 @@ export function usePeerConnection(peer: Peer | null) {
         streamMetadata: null,
       };
 
-      setConnections(prev => new Map(prev).set(remotePeerId, connectionState));
+      setConnections((prev) => new Map(prev).set(remotePeerId, connectionState));
 
       // Handle data connection events
       dataConn.on("open", () => {
@@ -132,7 +123,7 @@ export function usePeerConnection(peer: Peer | null) {
       });
 
       // Handle media connection events
-      mediaConn.on("stream", remoteStream => {
+      mediaConn.on("stream", (remoteStream) => {
         const metadata = getStreamMetadata(remoteStream, remotePeerId);
 
         updateConnection(remotePeerId, {
@@ -174,9 +165,9 @@ export function usePeerConnection(peer: Peer | null) {
         streamMetadata: null,
       };
 
-      setConnections(prev => new Map(prev).set(call.peer, connectionState));
+      setConnections((prev) => new Map(prev).set(call.peer, connectionState));
 
-      call.on("stream", remoteStream => {
+      call.on("stream", (remoteStream) => {
         const metadata = getStreamMetadata(remoteStream, call.peer);
 
         updateConnection(call.peer, {
@@ -219,10 +210,10 @@ export function usePeerConnection(peer: Peer | null) {
 
       // Stop remote stream
       if (connection.stream) {
-        connection.stream.getTracks().forEach(track => track.stop());
+        connection.stream.getTracks().forEach((track) => track.stop());
       }
 
-      setConnections(prev => {
+      setConnections((prev) => {
         const newMap = new Map(prev);
         newMap.delete(clientId);
         return newMap;
@@ -266,7 +257,7 @@ export function usePeerConnection(peer: Peer | null) {
             streamMetadata: null,
           };
 
-          setConnections(prev => new Map(prev).set(dataConn.peer, connectionState));
+          setConnections((prev) => new Map(prev).set(dataConn.peer, connectionState));
         }
       });
 

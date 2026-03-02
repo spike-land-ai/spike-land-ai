@@ -95,7 +95,7 @@ export function GenerationShell({ slug, className }: GenerationShellProps) {
 
       const eventSource = new EventSource(data.streamUrl);
 
-      eventSource.onmessage = e => {
+      eventSource.onmessage = (e) => {
         try {
           const event: StreamEvent = JSON.parse(e.data);
 
@@ -134,9 +134,7 @@ export function GenerationShell({ slug, className }: GenerationShellProps) {
       });
     } catch (err) {
       if (err instanceof Error && err.name === "AbortError") return;
-      setError(
-        err instanceof Error ? err.message : "Failed to start generation",
-      );
+      setError(err instanceof Error ? err.message : "Failed to start generation");
       setPhase("FAILED");
     }
   }, [slug, router, redirectToSignIn, phase]);
@@ -152,16 +150,9 @@ export function GenerationShell({ slug, className }: GenerationShellProps) {
 
   if (error) {
     return (
-      <div
-        className={cn(
-          "flex flex-col items-center justify-center min-h-[50vh] p-8",
-          className,
-        )}
-      >
+      <div className={cn("flex flex-col items-center justify-center min-h-[50vh] p-8", className)}>
         <div className="bg-destructive/10 border border-destructive/50 rounded-lg p-6 max-w-lg w-full text-center">
-          <h3 className="text-xl font-bold text-destructive mb-2">
-            Generation Failed
-          </h3>
+          <h3 className="text-xl font-bold text-destructive mb-2">Generation Failed</h3>
           <p className="text-muted-foreground mb-4">{error}</p>
           <button
             onClick={() => {
@@ -179,10 +170,7 @@ export function GenerationShell({ slug, className }: GenerationShellProps) {
 
   return (
     <div
-      className={cn(
-        "flex flex-col items-center justify-center min-h-[80vh] w-full p-8",
-        className,
-      )}
+      className={cn("flex flex-col items-center justify-center min-h-[80vh] w-full p-8", className)}
     >
       <div className="max-w-md w-full space-y-8">
         <div className="text-center space-y-4">
@@ -192,9 +180,7 @@ export function GenerationShell({ slug, className }: GenerationShellProps) {
             </div>
           </div>
 
-          <h1 className="text-3xl font-bold tracking-tight">
-            Building your app...
-          </h1>
+          <h1 className="text-3xl font-bold tracking-tight">Building your app...</h1>
           <p className="text-muted-foreground">
             Generating
             <span className="font-mono bg-muted px-2 py-0.5 rounded mx-1 text-foreground">
@@ -203,11 +189,7 @@ export function GenerationShell({ slug, className }: GenerationShellProps) {
           </p>
         </div>
 
-        <PipelineTimeline
-          currentPhase={phase}
-          message={message}
-          reviews={reviews}
-        />
+        <PipelineTimeline currentPhase={phase} message={message} reviews={reviews} />
       </div>
     </div>
   );

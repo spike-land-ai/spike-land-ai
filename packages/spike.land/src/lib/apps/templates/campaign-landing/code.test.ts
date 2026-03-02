@@ -13,7 +13,7 @@ describe("campaign-landing/code", () => {
   });
 
   it("should include email input field", () => {
-    expect(campaignLandingCode).toContain("type=\"email\"");
+    expect(campaignLandingCode).toContain('type="email"');
   });
 
   it("should use useState hook", () => {

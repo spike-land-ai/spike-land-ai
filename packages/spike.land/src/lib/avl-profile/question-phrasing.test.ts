@@ -29,16 +29,12 @@ describe("rephraseQuestion", () => {
   });
 
   it("adds subtext for round 2+", () => {
-    const result = rephraseQuestion("Do you create visual content?", [
-      "creative",
-    ], 2);
+    const result = rephraseQuestion("Do you create visual content?", ["creative"], 2);
     expect(result.subtext).toBe("We're getting to know you better");
   });
 
   it("does not add subtext for round 1", () => {
-    const result = rephraseQuestion("Do you create visual content?", [
-      "creative",
-    ], 1);
+    const result = rephraseQuestion("Do you create visual content?", ["creative"], 1);
     expect(result.subtext).toBeUndefined();
   });
 });

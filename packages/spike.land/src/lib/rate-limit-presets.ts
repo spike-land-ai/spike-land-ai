@@ -24,10 +24,8 @@ const AUTH_GENERATION_CONFIG = {
 export async function checkGenerationRateLimit(
   ip: string,
   authenticated: boolean,
-): Promise<{ allowed: boolean; retryAfterSeconds?: number; }> {
-  const config = authenticated
-    ? AUTH_GENERATION_CONFIG
-    : ANON_GENERATION_CONFIG;
+): Promise<{ allowed: boolean; retryAfterSeconds?: number }> {
+  const config = authenticated ? AUTH_GENERATION_CONFIG : ANON_GENERATION_CONFIG;
   const identifier = `generation:${authenticated ? "auth" : "anon"}:${ip}`;
 
   const result = await checkRateLimit(identifier, config);

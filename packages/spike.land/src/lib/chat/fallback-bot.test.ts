@@ -63,9 +63,7 @@ describe("createFallbackBotStream", () => {
     mockPrisma.directMessage.create.mockResolvedValue({ id: "dm-1" });
   });
 
-  async function readStream(
-    stream: ReadableStream<Uint8Array>,
-  ): Promise<string> {
+  async function readStream(stream: ReadableStream<Uint8Array>): Promise<string> {
     const reader = stream.getReader();
     const decoder = new TextDecoder();
     let result = "";
@@ -85,8 +83,8 @@ describe("createFallbackBotStream", () => {
     });
 
     const output = await readStream(stream);
-    expect(output).toContain("\"type\":\"text_delta\"");
-    expect(output).toContain("\"type\":\"done\"");
+    expect(output).toContain('"type":"text_delta"');
+    expect(output).toContain('"type":"done"');
     expect(output).toContain("Thanks for reaching out");
   });
 
@@ -164,8 +162,8 @@ describe("createFallbackBotStream", () => {
 
     const output = await readStream(stream);
     // Should still return a response even if DM save fails
-    expect(output).toContain("\"type\":\"text_delta\"");
-    expect(output).toContain("\"type\":\"done\"");
+    expect(output).toContain('"type":"text_delta"');
+    expect(output).toContain('"type":"done"');
     expect(mockPrisma.directMessage.create).not.toHaveBeenCalled();
   });
 });

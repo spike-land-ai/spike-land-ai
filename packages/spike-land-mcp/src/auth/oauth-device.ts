@@ -16,7 +16,9 @@ function generateUserCode(): string {
 function generateCode(prefix: string, length = 32): string {
   const bytes = new Uint8Array(length);
   crypto.getRandomValues(bytes);
-  const hex = Array.from(bytes).map(b => b.toString(16).padStart(2, "0")).join("");
+  const hex = Array.from(bytes)
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("");
   return `${prefix}${hex}`;
 }
 
@@ -24,7 +26,7 @@ async function hashToken(token: string): Promise<string> {
   const encoded = new TextEncoder().encode(token);
   const hashBuffer = await crypto.subtle.digest("SHA-256", encoded);
   return Array.from(new Uint8Array(hashBuffer))
-    .map(b => b.toString(16).padStart(2, "0"))
+    .map((b) => b.toString(16).padStart(2, "0"))
     .join("");
 }
 
@@ -61,12 +63,7 @@ export async function approveDeviceCode(
   const result = await db
     .select()
     .from(deviceAuthCodes)
-    .where(
-      and(
-        eq(deviceAuthCodes.userCode, userCode),
-        gt(deviceAuthCodes.expiresAt, now),
-      ),
-    )
+    .where(and(eq(deviceAuthCodes.userCode, userCode), gt(deviceAuthCodes.expiresAt, now)))
     .limit(1);
 
   if (result.length === 0) {
@@ -84,18 +81,16 @@ export async function approveDeviceCode(
 export async function exchangeDeviceCode(
   db: DrizzleDB,
   deviceCode: string,
-): Promise<{ accessToken: string; tokenType: string; scope: string } | { error: string; errorDescription: string }> {
+): Promise<
+  | { accessToken: string; tokenType: string; scope: string }
+  | { error: string; errorDescription: string }
+> {
   const now = Date.now();
 
   const result = await db
     .select()
     .from(deviceAuthCodes)
-    .where(
-      and(
-        eq(deviceAuthCodes.deviceCode, deviceCode),
-        gt(deviceAuthCodes.expiresAt, now),
-      ),
-    )
+    .where(and(eq(deviceAuthCodes.deviceCode, deviceCode), gt(deviceAuthCodes.expiresAt, now)))
     .limit(1);
 
   if (result.length === 0) {
@@ -108,7 +103,10 @@ export async function exchangeDeviceCode(
   }
 
   if (!code.approved || !code.userId) {
-    return { error: "authorization_pending", errorDescription: "User has not approved the device yet" };
+    return {
+      error: "authorization_pending",
+      errorDescription: "User has not approved the device yet",
+    };
   }
 
   // Generate access token

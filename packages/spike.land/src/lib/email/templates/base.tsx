@@ -18,12 +18,7 @@ interface BaseEmailProps {
   unsubscribeUrl?: string;
 }
 
-export function BaseEmail({
-  preview,
-  heading,
-  children,
-  unsubscribeUrl,
-}: BaseEmailProps) {
+export function BaseEmail({ preview, heading, children, unsubscribeUrl }: BaseEmailProps) {
   return (
     <Html>
       <Head />
@@ -78,7 +73,7 @@ export function BaseEmail({
 const main = {
   backgroundColor: "#f6f9fc",
   fontFamily:
-    "-apple-system,BlinkMacSystemFont,\"Segoe UI\",Roboto,\"Helvetica Neue\",Ubuntu,sans-serif",
+    '-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Ubuntu,sans-serif',
 };
 
 const container = {

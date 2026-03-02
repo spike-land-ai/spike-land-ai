@@ -35,10 +35,7 @@ interface OAuthClientRecord {
 const MAX_REGISTRATIONS_PER_HOUR = 10;
 
 // In-memory rate limit tracking (reset on server restart is acceptable)
-const registrationCounts = new Map<
-  string,
-  { count: number; resetAt: number; }
->();
+const registrationCounts = new Map<string, { count: number; resetAt: number }>();
 
 function checkRegistrationRateLimit(ip: string): boolean {
   const now = Date.now();
@@ -68,7 +65,7 @@ async function getPrisma() {
 export async function registerClient(
   request: ClientRegistrationRequest,
   clientIp: string,
-): Promise<ClientRegistrationResponse | { error: string; status: number; }> {
+): Promise<ClientRegistrationResponse | { error: string; status: number }> {
   // Rate limit
   if (!checkRegistrationRateLimit(clientIp)) {
     return {
@@ -82,13 +79,8 @@ export async function registerClient(
     return { error: "client_name is required (max 200 chars)", status: 400 };
   }
 
-  const grantTypes = request.grant_types || [
-    "authorization_code",
-    "refresh_token",
-  ];
-  const isDeviceFlow = grantTypes.includes(
-    "urn:ietf:params:oauth:grant-type:device_code",
-  );
+  const grantTypes = request.grant_types || ["authorization_code", "refresh_token"];
+  const isDeviceFlow = grantTypes.includes("urn:ietf:params:oauth:grant-type:device_code");
   const redirectUris = request.redirect_uris ?? [];
 
   // Device code flow clients don't use redirect URIs (RFC 8628)
@@ -102,8 +94,8 @@ export async function registerClient(
       const parsed = new URL(uri);
       // Allow http for localhost, require https otherwise
       if (
-        parsed.protocol !== "https:"
-        && !(parsed.protocol === "http:" && parsed.hostname === "localhost")
+        parsed.protocol !== "https:" &&
+        !(parsed.protocol === "http:" && parsed.hostname === "localhost")
       ) {
         return {
           error: `redirect_uri must use HTTPS (except localhost): ${uri}`,
@@ -121,13 +113,9 @@ export async function registerClient(
   let clientSecret: string | undefined;
   let clientSecretHash: string | null = null;
 
-  if (
-    authMethod === "client_secret_post" || authMethod === "client_secret_basic"
-  ) {
+  if (authMethod === "client_secret_post" || authMethod === "client_secret_basic") {
     clientSecret = randomBytes(32).toString("base64url");
-    clientSecretHash = createHash("sha256")
-      .update(clientSecret)
-      .digest("hex");
+    clientSecretHash = createHash("sha256").update(clientSecret).digest("hex");
   }
 
   const prisma = await getPrisma();
@@ -154,9 +142,7 @@ export async function registerClient(
 /**
  * Get a client by clientId
  */
-export async function getClient(
-  clientId: string,
-): Promise<OAuthClientRecord | null> {
+export async function getClient(clientId: string): Promise<OAuthClientRecord | null> {
   const prisma = await getPrisma();
   const client = await prisma.oAuthClient.findUnique({
     where: { clientId },
@@ -176,13 +162,8 @@ export async function getClient(
 /**
  * Verify a client's secret
  */
-export function verifyClientSecret(
-  storedHash: string,
-  providedSecret: string,
-): boolean {
-  const providedHash = createHash("sha256")
-    .update(providedSecret)
-    .digest("hex");
+export function verifyClientSecret(storedHash: string, providedSecret: string): boolean {
+  const providedHash = createHash("sha256").update(providedSecret).digest("hex");
   // Use timing-safe comparison to prevent side-channel attacks
   const a = Buffer.from(storedHash);
   const b = Buffer.from(providedHash);

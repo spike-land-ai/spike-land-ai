@@ -25,7 +25,7 @@ export async function getPersonalizedApps(userId: string): Promise<StoreApp[]> {
 
   const tags = profile.derivedTags;
 
-  return STORE_APPS.filter(app => {
+  return STORE_APPS.filter((app) => {
     if (app.category === "developer" && !tags.includes("developer")) {
       return false;
     }
@@ -37,9 +37,7 @@ export async function getPersonalizedApps(userId: string): Promise<StoreApp[]> {
  * Derives tags from an answer path by collecting questionTags
  * from entries where the user answered "yes".
  */
-export function deriveTagsFromAnswerPath(
-  answerPath: AnswerPathEntry[],
-): string[] {
+export function deriveTagsFromAnswerPath(answerPath: AnswerPathEntry[]): string[] {
   const tagSet = new Set<string>();
 
   for (const entry of answerPath) {

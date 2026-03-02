@@ -4,13 +4,12 @@ import { AuthDialogProvider, useAuthDialog } from "./AuthDialogProvider";
 
 // Mock the AuthDialog component since it has complex dependencies
 vi.mock("./AuthDialog", () => ({
-  AuthDialog: (
-    { open, onOpenChange }: { open: boolean; onOpenChange: (open: boolean) => void; },
-  ) => (
-    open
-      ? <button data-testid="auth-dialog" onClick={() => onOpenChange(false)}>Dialog</button>
-      : null
-  ),
+  AuthDialog: ({ open, onOpenChange }: { open: boolean; onOpenChange: (open: boolean) => void }) =>
+    open ? (
+      <button data-testid="auth-dialog" onClick={() => onOpenChange(false)}>
+        Dialog
+      </button>
+    ) : null,
 }));
 
 // Mock next-auth/react

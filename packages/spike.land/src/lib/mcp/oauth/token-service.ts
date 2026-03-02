@@ -107,7 +107,7 @@ export async function generateTokenPair(
   try {
     await createTokenPair(accessToken, refreshToken);
   } catch (err: unknown) {
-    const code = (err as { code?: string; }).code;
+    const code = (err as { code?: string }).code;
     if (code === "P2002") {
       // Unique constraint violation on tokenHash — regenerate tokens and retry
       accessToken = generateToken();
@@ -134,9 +134,7 @@ export async function generateTokenPair(
 /**
  * Verify an access token and return the associated user/client info
  */
-export async function verifyAccessToken(
-  token: string,
-): Promise<TokenPayload | null> {
+export async function verifyAccessToken(token: string): Promise<TokenPayload | null> {
   if (!token.startsWith(TOKEN_PREFIX)) {
     return null;
   }
@@ -340,13 +338,8 @@ export async function exchangeAuthorizationCode(
 /**
  * Verify PKCE code_verifier against stored code_challenge (S256 only)
  */
-export function verifyPkce(
-  codeVerifier: string,
-  codeChallenge: string,
-): boolean {
-  const computed = createHash("sha256")
-    .update(codeVerifier)
-    .digest("base64url");
+export function verifyPkce(codeVerifier: string, codeChallenge: string): boolean {
+  const computed = createHash("sha256").update(codeVerifier).digest("base64url");
   // Use timing-safe comparison to prevent side-channel attacks
   const a = Buffer.from(computed);
   const b = Buffer.from(codeChallenge);

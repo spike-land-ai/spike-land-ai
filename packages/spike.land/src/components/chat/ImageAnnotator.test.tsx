@@ -25,10 +25,12 @@ global.Image = class {
   constructor() {
     setTimeout(() => this.onload(), 0);
   }
-} as any;
+} as unknown as typeof globalThis.Image;
 
 beforeAll(() => {
-  HTMLCanvasElement.prototype.getContext = vi.fn(() => mockContext) as any;
+  HTMLCanvasElement.prototype.getContext = vi.fn(
+    () => mockContext,
+  ) as unknown as typeof HTMLCanvasElement.prototype.getContext;
   HTMLCanvasElement.prototype.toDataURL = vi.fn(() => "data:image/png;base64,saved");
 });
 
@@ -64,7 +66,7 @@ describe("ImageAnnotator", () => {
     } as DOMRect);
 
     // Wait for image to load and context to be set
-    await new Promise(resolve => setTimeout(resolve, 10));
+    await new Promise((resolve) => setTimeout(resolve, 10));
 
     // Simulate drawing
     fireEvent.mouseDown(canvas, { clientX: 10, clientY: 10 });

@@ -6,9 +6,9 @@
 import type { AudioTrack, WaveformOptions } from "../types";
 
 export function createAudioContext(): AudioContext {
-  const AudioContextClass = window.AudioContext
-    || (window as unknown as { webkitAudioContext: typeof AudioContext; })
-      .webkitAudioContext;
+  const AudioContextClass =
+    window.AudioContext ||
+    (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
   return new AudioContextClass();
 }
 
@@ -24,10 +24,7 @@ export function createAnalyser(context: AudioContext): AnalyserNode {
   return analyser;
 }
 
-export async function loadAudioFile(
-  context: AudioContext,
-  file: File,
-): Promise<AudioBuffer> {
+export async function loadAudioFile(context: AudioContext, file: File): Promise<AudioBuffer> {
   const arrayBuffer = await file.arrayBuffer();
   return context.decodeAudioData(arrayBuffer);
 }
@@ -36,7 +33,7 @@ export function createTrackNodes(
   context: AudioContext,
   masterGain: GainNode,
   buffer: AudioBuffer,
-): { source: AudioBufferSourceNode; gainNode: GainNode; } {
+): { source: AudioBufferSourceNode; gainNode: GainNode } {
   const source = context.createBufferSource();
   source.buffer = buffer;
 
@@ -47,10 +44,7 @@ export function createTrackNodes(
   return { source, gainNode };
 }
 
-export function generateWaveformData(
-  buffer: AudioBuffer,
-  samples: number = 100,
-): number[] {
+export function generateWaveformData(buffer: AudioBuffer, samples: number = 100): number[] {
   const channelData = buffer.getChannelData(0);
   const blockSize = Math.floor(channelData.length / samples);
   const waveform: number[] = [];
@@ -66,7 +60,7 @@ export function generateWaveformData(
 
   // Normalize
   const max = Math.max(...waveform, 0.01);
-  return waveform.map(v => v / max);
+  return waveform.map((v) => v / max);
 }
 
 export function drawWaveform(
@@ -109,29 +103,30 @@ export async function mixTracksToBlob(
   const sampleRate = context.sampleRate;
 
   // Calculate total duration considering positions and trims
-  const activeTracks = tracks.filter(t => t.buffer && !t.muted);
-  const totalDuration = activeTracks.length > 0
-    ? Math.max(
-      duration,
-      ...activeTracks.map(t => {
-        const effectiveTrimEnd = t.trimEnd > 0 ? t.trimEnd : t.duration;
-        // Use position (with delay fallback for backward compat)
-        const trackPosition = t.position ?? t.delay ?? 0;
+  const activeTracks = tracks.filter((t) => t.buffer && !t.muted);
+  const totalDuration =
+    activeTracks.length > 0
+      ? Math.max(
+          duration,
+          ...activeTracks.map((t) => {
+            const effectiveTrimEnd = t.trimEnd > 0 ? t.trimEnd : t.duration;
+            // Use position (with delay fallback for backward compat)
+            const trackPosition = t.position ?? t.delay ?? 0;
 
-        // Handle negative trimStart (lead-in silence)
-        if (t.trimStart < 0) {
-          // Silence duration + audio duration
-          const silenceDuration = Math.abs(t.trimStart);
-          const audioDuration = effectiveTrimEnd;
-          return Math.max(0, trackPosition) + silenceDuration + audioDuration;
-        } else {
-          // Normal trim
-          const trimmedDuration = effectiveTrimEnd - t.trimStart;
-          return Math.max(0, trackPosition) + trimmedDuration;
-        }
-      }),
-    )
-    : duration;
+            // Handle negative trimStart (lead-in silence)
+            if (t.trimStart < 0) {
+              // Silence duration + audio duration
+              const silenceDuration = Math.abs(t.trimStart);
+              const audioDuration = effectiveTrimEnd;
+              return Math.max(0, trackPosition) + silenceDuration + audioDuration;
+            } else {
+              // Normal trim
+              const trimmedDuration = effectiveTrimEnd - t.trimStart;
+              return Math.max(0, trackPosition) + trimmedDuration;
+            }
+          }),
+        )
+      : duration;
 
   const length = Math.ceil(totalDuration * sampleRate);
   const offlineContext = new OfflineAudioContext(2, length, sampleRate);
@@ -151,9 +146,7 @@ export async function mixTracksToBlob(
       gainNode.connect(masterGain);
 
       // Calculate effective trim boundaries
-      const effectiveTrimEnd = track.trimEnd > 0
-        ? track.trimEnd
-        : track.duration;
+      const effectiveTrimEnd = track.trimEnd > 0 ? track.trimEnd : track.duration;
 
       // Use position (with delay fallback for backward compat)
       const trackPosition = track.position ?? track.delay ?? 0;
@@ -242,16 +235,11 @@ function writeString(view: DataView, offset: number, str: string): void {
 }
 
 export function createRecorder(stream: MediaStream): MediaRecorder {
-  const mimeType = MediaRecorder.isTypeSupported("audio/webm")
-    ? "audio/webm"
-    : "audio/mp4";
+  const mimeType = MediaRecorder.isTypeSupported("audio/webm") ? "audio/webm" : "audio/mp4";
   return new MediaRecorder(stream, { mimeType });
 }
 
-export async function blobToAudioBuffer(
-  context: AudioContext,
-  blob: Blob,
-): Promise<AudioBuffer> {
+export async function blobToAudioBuffer(context: AudioContext, blob: Blob): Promise<AudioBuffer> {
   const arrayBuffer = await blob.arrayBuffer();
   return context.decodeAudioData(arrayBuffer);
 }

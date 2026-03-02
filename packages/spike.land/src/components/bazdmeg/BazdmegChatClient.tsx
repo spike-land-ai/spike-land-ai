@@ -21,10 +21,7 @@ interface BazdmegChatClientProps {
   userName: string;
 }
 
-export function BazdmegChatClient({
-  initialMessages,
-  userName,
-}: BazdmegChatClientProps) {
+export function BazdmegChatClient({ initialMessages, userName }: BazdmegChatClientProps) {
   const [messages, setMessages] = useState<ChatMessage[]>(initialMessages);
   const [input, setInput] = useState("");
   const [isStreaming, setIsStreaming] = useState(false);
@@ -36,7 +33,7 @@ export function BazdmegChatClient({
     "Ask about quality gates, CI, PRs, or give commands...",
   );
   useEffect(() => {
-    import("@/lib/constants/placeholders").then(m => {
+    import("@/lib/constants/placeholders").then((m) => {
       setPlaceholder(m.getRandomBazdmegPlaceholder());
     });
   }, []);
@@ -44,9 +41,7 @@ export function BazdmegChatClient({
   // Auto-scroll on new messages
   useEffect(() => {
     if (scrollAreaRef.current) {
-      const viewport = scrollAreaRef.current.querySelector(
-        "[data-radix-scroll-area-viewport]",
-      );
+      const viewport = scrollAreaRef.current.querySelector("[data-radix-scroll-area-viewport]");
       if (viewport) {
         viewport.scrollTop = viewport.scrollHeight;
       }
@@ -64,14 +59,14 @@ export function BazdmegChatClient({
       content,
       createdAt: new Date().toISOString(),
     };
-    setMessages(prev => [...prev, userMsg]);
+    setMessages((prev) => [...prev, userMsg]);
     setInput("");
     setIsStreaming(true);
     setToolActivity(null);
 
     // Placeholder for streaming agent response
     const agentMsgId = `agent-${Date.now()}`;
-    setMessages(prev => [
+    setMessages((prev) => [
       ...prev,
       {
         id: agentMsgId,
@@ -91,8 +86,8 @@ export function BazdmegChatClient({
 
     if (fetchError || !response || !response.ok) {
       const errorText = response ? await response.text() : "Network error";
-      setMessages(prev =>
-        prev.map(m => m.id === agentMsgId ? { ...m, content: `Error: ${errorText}` } : m)
+      setMessages((prev) =>
+        prev.map((m) => (m.id === agentMsgId ? { ...m, content: `Error: ${errorText}` } : m)),
       );
       setIsStreaming(false);
       return;
@@ -101,12 +96,8 @@ export function BazdmegChatClient({
     // Read SSE stream
     const reader = response.body?.getReader();
     if (!reader) {
-      setMessages(prev =>
-        prev.map(m =>
-          m.id === agentMsgId
-            ? { ...m, content: "Error: No response stream" }
-            : m
-        )
+      setMessages((prev) =>
+        prev.map((m) => (m.id === agentMsgId ? { ...m, content: "Error: No response stream" } : m)),
       );
       setIsStreaming(false);
       return;
@@ -138,28 +129,24 @@ export function BazdmegChatClient({
             };
 
             if (event.type === "chunk" && event.content) {
-              setMessages(prev =>
-                prev.map(m =>
-                  m.id === agentMsgId
-                    ? { ...m, content: m.content + event.content }
-                    : m
-                )
+              setMessages((prev) =>
+                prev.map((m) =>
+                  m.id === agentMsgId ? { ...m, content: m.content + event.content } : m,
+                ),
               );
               setToolActivity(null);
-            } else if (
-              event.type === "stage" && event.stage === "executing_tool"
-            ) {
+            } else if (event.type === "stage" && event.stage === "executing_tool") {
               setToolActivity(event.tool || "tool");
             } else if (event.type === "error" && event.content) {
-              setMessages(prev =>
-                prev.map(m =>
+              setMessages((prev) =>
+                prev.map((m) =>
                   m.id === agentMsgId
                     ? {
-                      ...m,
-                      content: m.content + `\n\nError: ${event.content}`,
-                    }
-                    : m
-                )
+                        ...m,
+                        content: m.content + `\n\nError: ${event.content}`,
+                      }
+                    : m,
+                ),
               );
             } else if (event.type === "complete") {
               setToolActivity(null);
@@ -198,17 +185,11 @@ export function BazdmegChatClient({
             <Bot className="h-4 w-4 text-amber-500" />
           </div>
           <div>
-            <h1 className="text-sm font-semibold text-white">
-              BAZDMEG Orchestrator
-            </h1>
-            <p className="text-xs text-zinc-500">
-              {isStreaming ? "Thinking..." : "Ready"}
-            </p>
+            <h1 className="text-sm font-semibold text-white">BAZDMEG Orchestrator</h1>
+            <p className="text-xs text-zinc-500">{isStreaming ? "Thinking..." : "Ready"}</p>
           </div>
         </div>
-        <div className="ml-auto text-xs text-zinc-600">
-          {userName}
-        </div>
+        <div className="ml-auto text-xs text-zinc-600">{userName}</div>
       </header>
 
       {/* Messages */}
@@ -217,36 +198,33 @@ export function BazdmegChatClient({
           {messages.length === 0 && (
             <div className="text-center py-20">
               <Bot className="h-12 w-12 text-amber-500/50 mx-auto mb-4" />
-              <h2 className="text-lg font-semibold text-white mb-2">
-                BAZDMEG Orchestrator
-              </h2>
+              <h2 className="text-lg font-semibold text-white mb-2">BAZDMEG Orchestrator</h2>
               <p className="text-zinc-500 text-sm max-w-md mx-auto">
                 Chat-driven development management. Ask about quality gates, CI status, PR
                 readiness, or create tickets.
               </p>
               <div className="flex flex-wrap gap-2 justify-center mt-6">
-                {[
-                  "What's the status?",
-                  "Can we deploy?",
-                  "Show open PRs",
-                  "Platform health",
-                ].map(suggestion => (
-                  <button
-                    key={suggestion}
-                    onClick={() => {
-                      setInput(suggestion);
-                      textareaRef.current?.focus();
-                    }}
-                    className="px-3 py-1.5 text-xs text-zinc-400 border border-zinc-700 rounded-full hover:border-amber-500/50 hover:text-amber-500 transition-colors"
-                  >
-                    {suggestion}
-                  </button>
-                ))}
+                {["What's the status?", "Can we deploy?", "Show open PRs", "Platform health"].map(
+                  (suggestion) => (
+                    <button
+                      key={suggestion}
+                      onClick={() => {
+                        setInput(suggestion);
+                        textareaRef.current?.focus();
+                      }}
+                      className="px-3 py-1.5 text-xs text-zinc-400 border border-zinc-700 rounded-full hover:border-amber-500/50 hover:text-amber-500 transition-colors"
+                    >
+                      {suggestion}
+                    </button>
+                  ),
+                )}
               </div>
             </div>
           )}
 
-          {messages.map(message => <MessageBubble key={message.id} message={message} />)}
+          {messages.map((message) => (
+            <MessageBubble key={message.id} message={message} />
+          ))}
 
           {/* Tool activity indicator */}
           {toolActivity && (
@@ -265,7 +243,7 @@ export function BazdmegChatClient({
             ref={textareaRef}
             placeholder={placeholder}
             value={input}
-            onChange={e => setInput(e.target.value)}
+            onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
             className="min-h-[48px] max-h-[120px] resize-none bg-zinc-800 border-zinc-700 text-white placeholder:text-zinc-600 focus:border-amber-500/50"
             disabled={isStreaming}
@@ -277,9 +255,11 @@ export function BazdmegChatClient({
             aria-label={isStreaming ? "Sending message" : "Send message"}
             className="h-[48px] w-[48px] bg-amber-500 hover:bg-amber-600 text-black"
           >
-            {isStreaming
-              ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
-              : <Send className="h-4 w-4" aria-hidden="true" />}
+            {isStreaming ? (
+              <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
+            ) : (
+              <Send className="h-4 w-4" aria-hidden="true" />
+            )}
           </Button>
         </div>
         <p className="text-[10px] text-zinc-600 text-center mt-2">
@@ -296,32 +276,24 @@ function isSafeIframeUrl(url: string): boolean {
     const parsed = new URL(url);
     return (
       parsed.protocol === "https:" &&
-      (parsed.hostname === "spike.land" ||
-        parsed.hostname.endsWith(".spike.land"))
+      (parsed.hostname === "spike.land" || parsed.hostname.endsWith(".spike.land"))
     );
   } catch {
     return false;
   }
 }
 
-const MessageBubble = memo(function MessageBubble({ message }: { message: ChatMessage; }) {
+const MessageBubble = memo(function MessageBubble({ message }: { message: ChatMessage }) {
   const isUser = message.role === "USER";
 
   // Check for iframe-worthy URLs in agent messages
   const rawIframeUrl = !isUser
-    ? message.content.match(
-      /https?:\/\/testing\.spike\.land\/live\/[^\s)]+/,
-    )?.[0]
+    ? message.content.match(/https?:\/\/testing\.spike\.land\/live\/[^\s)]+/)?.[0]
     : null;
   const iframeUrl = rawIframeUrl && isSafeIframeUrl(rawIframeUrl) ? rawIframeUrl : null;
 
   return (
-    <div
-      className={cn(
-        "flex gap-3",
-        isUser ? "justify-end" : "justify-start",
-      )}
-    >
+    <div className={cn("flex gap-3", isUser ? "justify-end" : "justify-start")}>
       {!isUser && (
         <div className="flex-shrink-0 mt-1">
           <div className="h-7 w-7 rounded-full bg-amber-500/20 flex items-center justify-center">
@@ -352,12 +324,7 @@ const MessageBubble = memo(function MessageBubble({ message }: { message: ChatMe
           </div>
         )}
 
-        <p
-          className={cn(
-            "text-[10px] mt-1.5",
-            isUser ? "text-black/50" : "text-zinc-600",
-          )}
-        >
+        <p className={cn("text-[10px] mt-1.5", isUser ? "text-black/50" : "text-zinc-600")}>
           {new Date(message.createdAt).toLocaleTimeString([], {
             hour: "2-digit",
             minute: "2-digit",

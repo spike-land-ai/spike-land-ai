@@ -35,14 +35,11 @@ export function usePeer(config: PeerConfig) {
   const initialize = useCallback(() => {
     // Prevent multiple simultaneous initializations
     if (isInitializing.current) return;
-    if (
-      peerRef.current && !peerRef.current.disconnected
-      && !peerRef.current.destroyed
-    ) return;
+    if (peerRef.current && !peerRef.current.disconnected && !peerRef.current.destroyed) return;
 
     // Check browser support
     if (!isWebRTCSupported()) {
-      setState(prev => ({
+      setState((prev) => ({
         ...prev,
         status: "failed",
         error: "Browser does not support WebRTC",
@@ -51,7 +48,7 @@ export function usePeer(config: PeerConfig) {
     }
 
     isInitializing.current = true;
-    setState(prev => ({ ...prev, status: "connecting", error: null }));
+    setState((prev) => ({ ...prev, status: "connecting", error: null }));
 
     try {
       // Generate peer ID if not provided
@@ -74,7 +71,7 @@ export function usePeer(config: PeerConfig) {
       const peer = new Peer(peerId, peerOptions);
 
       // Handle successful connection
-      peer.on("open", id => {
+      peer.on("open", (id) => {
         setState({
           peer,
           peerId: id,
@@ -85,13 +82,13 @@ export function usePeer(config: PeerConfig) {
       });
 
       // Handle errors
-      peer.on("error", error => {
+      peer.on("error", (error) => {
         const errorInfo = createWebRTCError(
           "network-error",
           error.message || "Peer connection error",
           error as Error,
         );
-        setState(prev => ({
+        setState((prev) => ({
           ...prev,
           status: "failed",
           error: errorInfo.message,
@@ -101,7 +98,7 @@ export function usePeer(config: PeerConfig) {
 
       // Handle disconnection
       peer.on("disconnected", () => {
-        setState(prev => ({
+        setState((prev) => ({
           ...prev,
           status: "disconnected",
         }));
@@ -121,12 +118,10 @@ export function usePeer(config: PeerConfig) {
 
       peerRef.current = peer;
     } catch (error) {
-      setState(prev => ({
+      setState((prev) => ({
         ...prev,
         status: "failed",
-        error: error instanceof Error
-          ? error.message
-          : "Failed to initialize peer",
+        error: error instanceof Error ? error.message : "Failed to initialize peer",
       }));
       isInitializing.current = false;
     }
@@ -137,7 +132,7 @@ export function usePeer(config: PeerConfig) {
    */
   const reconnect = useCallback(() => {
     if (peerRef.current && peerRef.current.disconnected) {
-      setState(prev => ({ ...prev, status: "connecting" }));
+      setState((prev) => ({ ...prev, status: "connecting" }));
       peerRef.current.reconnect();
     } else {
       initialize();

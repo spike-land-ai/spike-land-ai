@@ -13,7 +13,10 @@ import { safeToolCall, textResult } from "../shared/tool-helpers";
 /* ── Schemas ────────────────────────────────────────────────────────── */
 
 const ListAgentsSchema = z.object({
-  status: z.enum(["active", "idle", "stopped", "all"]).optional().default("all")
+  status: z
+    .enum(["active", "idle", "stopped", "all"])
+    .optional()
+    .default("all")
     .describe("Filter by agent status."),
   limit: z.number().int().min(1).max(100).optional().default(20).describe("Max results."),
 });
@@ -51,51 +54,77 @@ const AgentTimelineSchema = z.object({
 const SendMessageSchema = z.object({
   target_agent_id: z.string().min(1).describe("ID of the agent to send the message to."),
   content: z.string().min(1).max(10000).describe("Message content."),
-  metadata: z.record(z.string(), z.unknown()).optional()
+  metadata: z
+    .record(z.string(), z.unknown())
+    .optional()
     .describe("Optional metadata (JSON object) attached to the message."),
 });
 
 const ReadMessagesSchema = z.object({
   agent_id: z.string().min(1).describe("ID of the agent whose inbox to read."),
-  unread_only: z.boolean().optional().default(true).describe(
-    "Only return unread messages (default: true).",
-  ),
-  limit: z.number().int().min(1).max(100).optional().default(20).describe(
-    "Max messages to return.",
-  ),
-  mark_as_read: z.boolean().optional().default(true).describe(
-    "Mark returned messages as read (default: true).",
-  ),
+  unread_only: z
+    .boolean()
+    .optional()
+    .default(true)
+    .describe("Only return unread messages (default: true)."),
+  limit: z
+    .number()
+    .int()
+    .min(1)
+    .max(100)
+    .optional()
+    .default(20)
+    .describe("Max messages to return."),
+  mark_as_read: z
+    .boolean()
+    .optional()
+    .default(true)
+    .describe("Mark returned messages as read (default: true)."),
 });
 
 const DelegateTaskSchema = z.object({
   target_agent_id: z.string().min(1).describe("ID of the agent to delegate the task to."),
   task_description: z.string().min(1).max(10000).describe("Description of the task to delegate."),
-  priority: z.enum(["low", "medium", "high", "critical"]).optional().default("medium")
+  priority: z
+    .enum(["low", "medium", "high", "critical"])
+    .optional()
+    .default("medium")
     .describe("Task priority level."),
-  context: z.record(z.string(), z.unknown()).optional()
+  context: z
+    .record(z.string(), z.unknown())
+    .optional()
     .describe("Optional context data for the delegated task."),
 });
 
 const GetMetricsSchema = z.object({
-  period: z.enum(["1h", "24h", "7d", "30d"]).optional().default("24h")
+  period: z
+    .enum(["1h", "24h", "7d", "30d"])
+    .optional()
+    .default("24h")
     .describe("Time period to aggregate metrics over."),
 });
 
 const GetCostSchema = z.object({
-  agent_id: z.string().optional().describe(
-    "Filter cost breakdown by a specific agent ID. Omit for swarm-wide totals.",
-  ),
+  agent_id: z
+    .string()
+    .optional()
+    .describe("Filter cost breakdown by a specific agent ID. Omit for swarm-wide totals."),
 });
 
 const ReplaySchema = z.object({
   agent_id: z.string().min(1).describe("ID of the agent to replay."),
-  from_step: z.number().int().min(0).optional().describe(
-    "Start replaying from this step index (inclusive, 0-based).",
-  ),
-  to_step: z.number().int().min(0).optional().describe(
-    "Stop replaying at this step index (inclusive, 0-based).",
-  ),
+  from_step: z
+    .number()
+    .int()
+    .min(0)
+    .optional()
+    .describe("Start replaying from this step index (inclusive, 0-based)."),
+  to_step: z
+    .number()
+    .int()
+    .min(0)
+    .optional()
+    .describe("Stop replaying at this step index (inclusive, 0-based)."),
 });
 
 /* ── Helpers ────────────────────────────────────────────────────────── */
@@ -128,7 +157,7 @@ export const aiOrchestratorTools: StandaloneToolDefinition[] = [
     tier: "workspace",
     inputSchema: ListAgentsSchema.shape,
     handler: async (
-      { status = "all", limit = 20 }: { status?: string; limit?: number; },
+      { status = "all", limit = 20 }: { status?: string; limit?: number },
       ctx: ServerContext,
     ): Promise<CallToolResult> =>
       safeToolCall("swarm_list_agents", async () => {
@@ -151,20 +180,22 @@ export const aiOrchestratorTools: StandaloneToolDefinition[] = [
           take: limit,
           orderBy: { lastSeenAt: "desc" },
         });
-        const filtered = status === "all" ? agents : agents.filter(a => {
-          const isActive = a.lastSeenAt && a.lastSeenAt > fiveMinAgo;
-          if (status === "active") return isActive;
-          if (status === "idle") return a.lastSeenAt && !isActive;
-          if (status === "stopped") return !a.lastSeenAt;
-          return true;
-        });
+        const filtered =
+          status === "all"
+            ? agents
+            : agents.filter((a) => {
+                const isActive = a.lastSeenAt && a.lastSeenAt > fiveMinAgo;
+                if (status === "active") return isActive;
+                if (status === "idle") return a.lastSeenAt && !isActive;
+                if (status === "stopped") return !a.lastSeenAt;
+                return true;
+              });
         if (filtered.length === 0) return textResult("No agents found.");
         let text = `**Swarm Agents (${filtered.length}):**\n\n`;
         for (const a of filtered) {
           const isActive = a.lastSeenAt && a.lastSeenAt > fiveMinAgo;
           const statusLabel = isActive ? "ACTIVE" : a.lastSeenAt ? "IDLE" : "STOPPED";
-          text +=
-            `- **${a.displayName}** [${statusLabel}]\n  Tasks: ${a.totalTasksCompleted} | Tokens: ${a.totalTokensUsed} | Messages: ${a._count.messages}\n  ID: ${a.id}\n\n`;
+          text += `- **${a.displayName}** [${statusLabel}]\n  Tasks: ${a.totalTasksCompleted} | Tokens: ${a.totalTokensUsed} | Messages: ${a._count.messages}\n  ID: ${a.id}\n\n`;
         }
         return textResult(text);
       }),
@@ -177,7 +208,7 @@ export const aiOrchestratorTools: StandaloneToolDefinition[] = [
     tier: "workspace",
     inputSchema: GetAgentSchema.shape,
     handler: async (
-      { agent_id }: { agent_id: string; },
+      { agent_id }: { agent_id: string },
       ctx: ServerContext,
     ): Promise<CallToolResult> =>
       safeToolCall("swarm_get_agent", async () => {
@@ -189,14 +220,14 @@ export const aiOrchestratorTools: StandaloneToolDefinition[] = [
         });
         if (!agent || agent.deletedAt) return textResult("Agent not found.");
         return textResult(
-          `**Agent: ${agent.displayName}**\n\n`
-            + `- ID: ${agent.id}\n- Machine: ${agent.machineId}\n- Session: ${agent.sessionId}\n`
-            + `- Project: ${agent.projectPath || "(none)"}\n- Working Dir: ${
+          `**Agent: ${agent.displayName}**\n\n` +
+            `- ID: ${agent.id}\n- Machine: ${agent.machineId}\n- Session: ${agent.sessionId}\n` +
+            `- Project: ${agent.projectPath || "(none)"}\n- Working Dir: ${
               agent.workingDirectory || "(none)"
-            }\n`
-            + `- Messages: ${agent._count.messages}\n- Tokens: ${agent.totalTokensUsed}\n`
-            + `- Tasks: ${agent.totalTasksCompleted}\n- Session Time: ${agent.totalSessionTime}s\n`
-            + `- Last Seen: ${
+            }\n` +
+            `- Messages: ${agent._count.messages}\n- Tokens: ${agent.totalTokensUsed}\n` +
+            `- Tasks: ${agent.totalTasksCompleted}\n- Session Time: ${agent.totalSessionTime}s\n` +
+            `- Last Seen: ${
               agent.lastSeenAt?.toISOString() || "never"
             }\n- Created: ${agent.createdAt.toISOString()}`,
         );
@@ -209,7 +240,12 @@ export const aiOrchestratorTools: StandaloneToolDefinition[] = [
     tier: "workspace",
     inputSchema: SpawnAgentSchema.shape,
     handler: async (
-      { display_name, machine_id, session_id, project_path }: {
+      {
+        display_name,
+        machine_id,
+        session_id,
+        project_path,
+      }: {
         display_name: string;
         machine_id: string;
         session_id: string;
@@ -241,7 +277,7 @@ export const aiOrchestratorTools: StandaloneToolDefinition[] = [
     tier: "workspace",
     inputSchema: StopAgentSchema.shape,
     handler: async (
-      { agent_id }: { agent_id: string; },
+      { agent_id }: { agent_id: string },
       ctx: ServerContext,
     ): Promise<CallToolResult> =>
       safeToolCall("swarm_stop_agent", async () => {
@@ -261,7 +297,11 @@ export const aiOrchestratorTools: StandaloneToolDefinition[] = [
     tier: "workspace",
     inputSchema: RedirectAgentSchema.shape,
     handler: async (
-      { agent_id, project_path, working_directory }: {
+      {
+        agent_id,
+        project_path,
+        working_directory,
+      }: {
         agent_id: string;
         project_path?: string;
         working_directory?: string;
@@ -285,7 +325,7 @@ export const aiOrchestratorTools: StandaloneToolDefinition[] = [
     tier: "workspace",
     inputSchema: BroadcastSchema.shape,
     handler: async (
-      { content }: { content: string; },
+      { content }: { content: string },
       ctx: ServerContext,
     ): Promise<CallToolResult> =>
       safeToolCall("swarm_broadcast", async () => {
@@ -295,7 +335,7 @@ export const aiOrchestratorTools: StandaloneToolDefinition[] = [
           where: { deletedAt: null },
           select: { id: true },
         });
-        const messages = agents.map(a => ({
+        const messages = agents.map((a) => ({
           agentId: a.id,
           role: "USER" as const,
           content,
@@ -312,7 +352,7 @@ export const aiOrchestratorTools: StandaloneToolDefinition[] = [
     tier: "workspace",
     inputSchema: AgentTimelineSchema.shape,
     handler: async (
-      { agent_id, limit = 20 }: { agent_id: string; limit?: number; },
+      { agent_id, limit = 20 }: { agent_id: string; limit?: number },
       ctx: ServerContext,
     ): Promise<CallToolResult> =>
       safeToolCall("swarm_agent_timeline", async () => {
@@ -377,7 +417,11 @@ export const aiOrchestratorTools: StandaloneToolDefinition[] = [
     tier: "workspace",
     inputSchema: SendMessageSchema.shape,
     handler: async (
-      { target_agent_id, content, metadata }: {
+      {
+        target_agent_id,
+        content,
+        metadata,
+      }: {
         target_agent_id: string;
         content: string;
         metadata?: Record<string, unknown>;
@@ -423,7 +467,12 @@ export const aiOrchestratorTools: StandaloneToolDefinition[] = [
     tier: "workspace",
     inputSchema: ReadMessagesSchema.shape,
     handler: async (
-      { agent_id, unread_only = true, limit = 20, mark_as_read = true }: {
+      {
+        agent_id,
+        unread_only = true,
+        limit = 20,
+        mark_as_read = true,
+      }: {
         agent_id: string;
         unread_only?: boolean;
         limit?: number;
@@ -434,7 +483,7 @@ export const aiOrchestratorTools: StandaloneToolDefinition[] = [
       safeToolCall("swarm_read_messages", async () => {
         await requireAdminRole(ctx.userId);
         const prisma = (await import("@/lib/prisma")).default;
-        const where: { agentId: string; isRead?: boolean; } = { agentId: agent_id };
+        const where: { agentId: string; isRead?: boolean } = { agentId: agent_id };
         if (unread_only) where.isRead = false;
         const messages = await prisma.agentMessage.findMany({
           where,
@@ -451,7 +500,7 @@ export const aiOrchestratorTools: StandaloneToolDefinition[] = [
         });
         if (messages.length === 0) return textResult("No messages found.");
         if (mark_as_read && messages.length > 0) {
-          const ids = messages.filter(m => !m.isRead).map(m => m.id);
+          const ids = messages.filter((m) => !m.isRead).map((m) => m.id);
           if (ids.length > 0) {
             await prisma.agentMessage.updateMany({
               where: { id: { in: ids } },
@@ -462,9 +511,10 @@ export const aiOrchestratorTools: StandaloneToolDefinition[] = [
         let text = `**Messages (${messages.length}):**\n\n`;
         for (const m of messages) {
           const readLabel = m.isRead ? "READ" : "UNREAD";
-          text += `- **[${m.role}]** [${readLabel}] ${m.createdAt.toISOString()}\n  ${
-            m.content.slice(0, 200)
-          }${m.content.length > 200 ? "..." : ""}\n  ID: ${m.id}\n\n`;
+          text += `- **[${m.role}]** [${readLabel}] ${m.createdAt.toISOString()}\n  ${m.content.slice(
+            0,
+            200,
+          )}${m.content.length > 200 ? "..." : ""}\n  ID: ${m.id}\n\n`;
         }
         return textResult(text);
       }),
@@ -476,7 +526,12 @@ export const aiOrchestratorTools: StandaloneToolDefinition[] = [
     tier: "workspace",
     inputSchema: DelegateTaskSchema.shape,
     handler: async (
-      { target_agent_id, task_description, priority = "medium", context }: {
+      {
+        target_agent_id,
+        task_description,
+        priority = "medium",
+        context,
+      }: {
         target_agent_id: string;
         task_description: string;
         priority?: string;
@@ -517,9 +572,10 @@ export const aiOrchestratorTools: StandaloneToolDefinition[] = [
           },
         });
         return textResult(
-          `**Task delegated to ${target.displayName}**\n\nPriority: ${priority.toUpperCase()}\nMessage ID: ${msg.id}\nTask: ${
-            task_description.slice(0, 200)
-          }`,
+          `**Task delegated to ${target.displayName}**\n\nPriority: ${priority.toUpperCase()}\nMessage ID: ${msg.id}\nTask: ${task_description.slice(
+            0,
+            200,
+          )}`,
         );
       }),
   },
@@ -534,7 +590,7 @@ export const aiOrchestratorTools: StandaloneToolDefinition[] = [
     alwaysEnabled: true,
     inputSchema: GetMetricsSchema.shape,
     handler: async (
-      { period = "24h" }: { period?: string; },
+      { period = "24h" }: { period?: string },
       ctx: ServerContext,
     ): Promise<CallToolResult> =>
       safeToolCall("swarm_get_metrics", async () => {
@@ -557,27 +613,27 @@ export const aiOrchestratorTools: StandaloneToolDefinition[] = [
             select: { durationMs: true, isError: true, createdAt: true },
           }),
         ]);
-        const agentsSpawned = agents.filter(a => a.createdAt >= since).length;
+        const agentsSpawned = agents.filter((a) => a.createdAt >= since).length;
         const totalTasksCompleted = agents.reduce((s, a) => s + a.totalTasksCompleted, 0);
         const totalTokensUsed = agents.reduce((s, a) => s + a.totalTokensUsed, 0);
         const totalSessionTimeSeconds = agents.reduce((s, a) => s + a.totalSessionTime, 0);
-        const completedLogs = logs.filter(l => !l.isError);
-        const errorLogs = logs.filter(l => l.isError);
-        const avgDurationMs = completedLogs.length > 0
-          ? Math.round(
-            completedLogs.reduce((s, l) => s + (l.durationMs ?? 0), 0) / completedLogs.length,
-          )
-          : 0;
-        const successRate = logs.length > 0
-          ? Math.round((completedLogs.length / logs.length) * 100)
-          : 100;
+        const completedLogs = logs.filter((l) => !l.isError);
+        const errorLogs = logs.filter((l) => l.isError);
+        const avgDurationMs =
+          completedLogs.length > 0
+            ? Math.round(
+                completedLogs.reduce((s, l) => s + (l.durationMs ?? 0), 0) / completedLogs.length,
+              )
+            : 0;
+        const successRate =
+          logs.length > 0 ? Math.round((completedLogs.length / logs.length) * 100) : 100;
         return textResult(
-          `**Swarm Metrics (${period})**\n\n`
-            + `- Agents spawned: ${agentsSpawned}\n- Active agents: ${agents.length}\n`
-            + `- Tasks completed: ${totalTasksCompleted}\n`
-            + `- Audit log entries: ${logs.length} (${completedLogs.length} ok / ${errorLogs.length} errors)\n`
-            + `- Avg task duration: ${avgDurationMs}ms\n- Success rate: ${successRate}%\n`
-            + `- Total tokens used: ${totalTokensUsed}\n- Total session time: ${totalSessionTimeSeconds}s`,
+          `**Swarm Metrics (${period})**\n\n` +
+            `- Agents spawned: ${agentsSpawned}\n- Active agents: ${agents.length}\n` +
+            `- Tasks completed: ${totalTasksCompleted}\n` +
+            `- Audit log entries: ${logs.length} (${completedLogs.length} ok / ${errorLogs.length} errors)\n` +
+            `- Avg task duration: ${avgDurationMs}ms\n- Success rate: ${successRate}%\n` +
+            `- Total tokens used: ${totalTokensUsed}\n- Total session time: ${totalSessionTimeSeconds}s`,
         );
       }),
   },
@@ -589,7 +645,7 @@ export const aiOrchestratorTools: StandaloneToolDefinition[] = [
     alwaysEnabled: true,
     inputSchema: GetCostSchema.shape,
     handler: async (
-      { agent_id }: { agent_id?: string; },
+      { agent_id }: { agent_id?: string },
       ctx: ServerContext,
     ): Promise<CallToolResult> =>
       safeToolCall("swarm_get_cost", async () => {
@@ -607,15 +663,14 @@ export const aiOrchestratorTools: StandaloneToolDefinition[] = [
         const totalTokens = agents.reduce((s, a) => s + a.totalTokensUsed, 0);
         const totalCostUsd = (totalTokens * TOKEN_COST_USD).toFixed(4);
         let text = `**Swarm Token Cost${agent_id ? ` (agent: ${agent_id})` : ""}**\n\n`;
-        text +=
-          `- Total tokens: ${totalTokens.toLocaleString()}\n- Estimated cost: $${totalCostUsd}\n\n**Breakdown by agent:**\n\n`;
+        text += `- Total tokens: ${totalTokens.toLocaleString()}\n- Estimated cost: $${totalCostUsd}\n\n**Breakdown by agent:**\n\n`;
         for (const a of agents) {
           const agentCost = (a.totalTokensUsed * TOKEN_COST_USD).toFixed(4);
-          const tasksLabel = a.totalTasksCompleted > 0
-            ? `${(a.totalTokensUsed / a.totalTasksCompleted).toFixed(0)} tokens/task`
-            : "no tasks";
-          text +=
-            `- **${a.displayName}** — ${a.totalTokensUsed.toLocaleString()} tokens ($${agentCost}) | ${tasksLabel}\n  ID: ${a.id}\n`;
+          const tasksLabel =
+            a.totalTasksCompleted > 0
+              ? `${(a.totalTokensUsed / a.totalTasksCompleted).toFixed(0)} tokens/task`
+              : "no tasks";
+          text += `- **${a.displayName}** — ${a.totalTokensUsed.toLocaleString()} tokens ($${agentCost}) | ${tasksLabel}\n  ID: ${a.id}\n`;
         }
         return textResult(text);
       }),
@@ -628,7 +683,7 @@ export const aiOrchestratorTools: StandaloneToolDefinition[] = [
     alwaysEnabled: true,
     inputSchema: ReplaySchema.shape,
     handler: async (
-      { agent_id, from_step, to_step }: { agent_id: string; from_step?: number; to_step?: number; },
+      { agent_id, from_step, to_step }: { agent_id: string; from_step?: number; to_step?: number },
       ctx: ServerContext,
     ): Promise<CallToolResult> =>
       safeToolCall("swarm_replay", async () => {
@@ -670,10 +725,9 @@ export const aiOrchestratorTools: StandaloneToolDefinition[] = [
         slicedLogs.forEach((log, i) => {
           const stepNum = startIdx + i;
           const errorMarker = log.isError ? " [ERROR]" : "";
-          text +=
-            `**Step ${stepNum}**${errorMarker}\n  Action: ${log.action}\n  Type: ${log.actionType}\n  Time: ${log.createdAt.toISOString()}\n  Duration: ${
-              log.durationMs ?? 0
-            }ms\n`;
+          text += `**Step ${stepNum}**${errorMarker}\n  Action: ${log.action}\n  Type: ${log.actionType}\n  Time: ${log.createdAt.toISOString()}\n  Duration: ${
+            log.durationMs ?? 0
+          }ms\n`;
           if (log.input) {
             const metaStr = JSON.stringify(log.input);
             text += `  Input: ${metaStr.slice(0, 120)}${metaStr.length > 120 ? "..." : ""}\n`;
@@ -712,7 +766,9 @@ export const aiOrchestratorTools: StandaloneToolDefinition[] = [
           orderBy: { lastSeenAt: "desc" },
         });
         if (agents.length === 0) return textResult("No active agents.");
-        let aliveCount = 0, stuckCount = 0, erroredCount = 0;
+        let aliveCount = 0,
+          stuckCount = 0,
+          erroredCount = 0;
         let text = `**Swarm Health (${agents.length} agents)**\n\n`;
         for (const a of agents) {
           let health: string;

@@ -57,7 +57,7 @@ export interface SystemStateView {
   id: string;
   name: string;
   clockType: ClockType;
-  processes: Array<{ id: string; clock: LogicalClock; }>;
+  processes: Array<{ id: string; clock: LogicalClock }>;
   events: CausalEvent[];
 }
 

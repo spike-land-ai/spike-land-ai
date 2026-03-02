@@ -60,7 +60,7 @@ export default {
           "0%": { transform: "rotate(0deg)" },
           "100%": { transform: "rotate(360deg)" },
         },
-        "float": {
+        float: {
           "0%, 100%": { transform: "translateY(0px)" },
           "50%": { transform: "translateY(-12px)" },
         },
@@ -96,7 +96,7 @@ export default {
         "pulse-glow": "pulse-glow 2s ease-in-out infinite",
         "float-up": "float-up 0.3s ease-out forwards",
         "spin-slow": "spin-slow 8s linear infinite",
-        "float": "float 3s ease-in-out infinite",
+        float: "float 3s ease-in-out infinite",
         "fade-in-up": "fade-in-up 0.5s ease-out forwards",
         "scale-in": "scale-in 0.3s ease-out forwards",
         "border-flow": "border-flow 3s ease infinite",

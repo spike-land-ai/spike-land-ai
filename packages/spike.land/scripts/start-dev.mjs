@@ -20,9 +20,7 @@ mkdirSync(LOG_DIR, { recursive: true });
 
 // Open log file stream
 const logStream = createWriteStream(LOG_FILE);
-logStream.write(
-  `\n=== Dev server started at ${new Date().toISOString()} ===\n\n`,
-);
+logStream.write(`\n=== Dev server started at ${new Date().toISOString()} ===\n\n`);
 
 /** Poll URL until it responds with 2xx or 3xx */
 async function waitForServer(url, timeoutMs) {
@@ -36,7 +34,7 @@ async function waitForServer(url, timeoutMs) {
     } catch {
       // Server not ready yet
     }
-    await new Promise(r => setTimeout(r, POLL_INTERVAL_MS));
+    await new Promise((r) => setTimeout(r, POLL_INTERVAL_MS));
   }
   throw new Error(`Server at ${url} did not respond within ${timeoutMs}ms`);
 }
@@ -48,17 +46,17 @@ const devServer = spawn("yarn", ["dev"], {
 });
 
 // Tee stdout/stderr to both console and log file
-devServer.stdout.on("data", chunk => {
+devServer.stdout.on("data", (chunk) => {
   process.stdout.write(chunk);
   logStream.write(chunk);
 });
 
-devServer.stderr.on("data", chunk => {
+devServer.stderr.on("data", (chunk) => {
   process.stderr.write(chunk);
   logStream.write(chunk);
 });
 
-devServer.on("error", err => {
+devServer.on("error", (err) => {
   console.error("Failed to start dev server:", err.message);
   logStream.write(`[ERROR] Failed to start: ${err.message}\n`);
   process.exit(1);
@@ -108,35 +106,31 @@ if (process.env.FILE_GUARD === "1") {
     stdio: ["ignore", "pipe", "pipe"],
     cwd: process.cwd(),
   });
-  fileGuard.stdout.on("data", chunk => {
+  fileGuard.stdout.on("data", (chunk) => {
     logStream.write(`[file-guard] ${chunk}`);
   });
-  fileGuard.stderr.on("data", chunk => {
+  fileGuard.stderr.on("data", (chunk) => {
     logStream.write(`[file-guard:err] ${chunk}`);
   });
-  fileGuard.on("error", err => {
+  fileGuard.on("error", (err) => {
     console.error("File guard failed:", err.message);
   });
 }
 
 // Launch Claude Code
-const claude = spawn(
-  "claude",
-  ["--dangerously-skip-permissions", "--model", "opus"],
-  {
-    stdio: "inherit",
-    cwd: process.cwd(),
-  },
-);
+const claude = spawn("claude", ["--dangerously-skip-permissions", "--model", "opus"], {
+  stdio: "inherit",
+  cwd: process.cwd(),
+});
 
-claude.on("error", err => {
+claude.on("error", (err) => {
   console.error("Failed to start Claude:", err.message);
   devServer.kill();
   fileGuard?.kill();
   process.exit(1);
 });
 
-claude.on("exit", code => {
+claude.on("exit", (code) => {
   devServer.kill();
   fileGuard?.kill();
   logStream.write(`\n=== Session ended at ${new Date().toISOString()} ===\n`);

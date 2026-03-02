@@ -59,7 +59,7 @@ export function createMockRegistry(tools: StandaloneToolDefinition[]): {
     },
 
     getToolsByCategory(category: string): StandaloneToolDefinition[] {
-      return tools.filter(t => t.category === category);
+      return tools.filter((t) => t.category === category);
     },
   };
 }

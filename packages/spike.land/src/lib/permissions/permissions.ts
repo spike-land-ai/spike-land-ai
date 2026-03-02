@@ -153,10 +153,7 @@ const PERMISSION_MATRIX: Record<WorkspaceAction, WorkspaceRole> = {
  * hasPermission("MEMBER", "workspace:delete") // false
  * ```
  */
-export function hasPermission(
-  role: WorkspaceRole,
-  action: WorkspaceAction,
-): boolean {
+export function hasPermission(role: WorkspaceRole, action: WorkspaceAction): boolean {
   const requiredRole = PERMISSION_MATRIX[action];
   return ROLE_HIERARCHY[role] >= ROLE_HIERARCHY[requiredRole];
 }
@@ -168,13 +165,8 @@ export function hasPermission(
  * @returns Array of permitted actions
  */
 export function getPermittedActions(role: WorkspaceRole): WorkspaceAction[] {
-  return (Object.entries(PERMISSION_MATRIX) as [
-    WorkspaceAction,
-    WorkspaceRole,
-  ][])
-    .filter(
-      ([, requiredRole]) => ROLE_HIERARCHY[role] >= ROLE_HIERARCHY[requiredRole],
-    )
+  return (Object.entries(PERMISSION_MATRIX) as [WorkspaceAction, WorkspaceRole][])
+    .filter(([, requiredRole]) => ROLE_HIERARCHY[role] >= ROLE_HIERARCHY[requiredRole])
     .map(([action]) => action);
 }
 
@@ -263,10 +255,7 @@ export function canModifyRole(
  * @param role2 - Second role
  * @returns positive if role1 > role2, negative if role1 < role2, 0 if equal
  */
-export function compareRoles(
-  role1: WorkspaceRole,
-  role2: WorkspaceRole,
-): number {
+export function compareRoles(role1: WorkspaceRole, role2: WorkspaceRole): number {
   return ROLE_HIERARCHY[role1] - ROLE_HIERARCHY[role2];
 }
 
@@ -277,9 +266,6 @@ export function compareRoles(
  * @param minimumRole - The minimum required role
  * @returns true if role is at or above minimum
  */
-export function isAtLeast(
-  role: WorkspaceRole,
-  minimumRole: WorkspaceRole,
-): boolean {
+export function isAtLeast(role: WorkspaceRole, minimumRole: WorkspaceRole): boolean {
   return ROLE_HIERARCHY[role] >= ROLE_HIERARCHY[minimumRole];
 }

@@ -11,12 +11,7 @@ import type { ReactNode } from "react";
  * Supports multiple animation presets and customizable delays for staggered reveals.
  */
 
-type AnimationPreset =
-  | "fadeUp"
-  | "fadeIn"
-  | "slideLeft"
-  | "slideRight"
-  | "scale";
+type AnimationPreset = "fadeUp" | "fadeIn" | "slideLeft" | "slideRight" | "scale";
 
 interface ScrollRevealProps {
   children: ReactNode;
@@ -143,11 +138,7 @@ interface StaggerItemProps {
   preset?: AnimationPreset;
 }
 
-export function StaggerItem({
-  children,
-  className,
-  preset = "fadeUp",
-}: StaggerItemProps) {
+export function StaggerItem({ children, className, preset = "fadeUp" }: StaggerItemProps) {
   return (
     <motion.div
       className={cn(className)}

@@ -3,8 +3,7 @@
  * Used by clean-scanner and clean-verify MCP tools.
  */
 
-export const ROOM_ANALYSIS_PROMPT =
-  `You are a cleaning assessment robot. Analyze this photo and identify specific cleaning tasks.
+export const ROOM_ANALYSIS_PROMPT = `You are a cleaning assessment robot. Analyze this photo and identify specific cleaning tasks.
 
 Return a JSON object with:
 {
@@ -30,8 +29,7 @@ CRITICAL RULES:
 - Be specific about what the object IS and where it IS
 - Every item must have a clear, completable action`;
 
-export const VERIFICATION_PROMPT_TEMPLATE =
-  `Determine if this cleaning task was completed based on the photo:
+export const VERIFICATION_PROMPT_TEMPLATE = `Determine if this cleaning task was completed based on the photo:
 
 Task: "{description}"
 

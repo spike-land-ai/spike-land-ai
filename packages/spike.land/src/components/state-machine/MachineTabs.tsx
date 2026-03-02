@@ -20,7 +20,7 @@ export function MachineTabs({
 }: MachineTabsProps) {
   return (
     <div className="flex items-center gap-1.5 px-3 py-2 bg-zinc-950/80 backdrop-blur-md border-b border-zinc-800/80 overflow-x-auto custom-scrollbar">
-      {machines.map(machine => {
+      {machines.map((machine) => {
         const isActive = machine.id === activeMachineId;
         return (
           <button
@@ -35,9 +35,7 @@ export function MachineTabs({
             }`}
             id={`machine-tab-${machine.id}`}
           >
-            <span className="truncate max-w-[140px] tracking-wide">
-              {machine.name}
-            </span>
+            <span className="truncate max-w-[140px] tracking-wide">{machine.name}</span>
             <span
               className={`inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-md text-[10px] font-bold ${
                 isActive
@@ -53,11 +51,11 @@ export function MachineTabs({
             <span
               role="button"
               tabIndex={0}
-              onClick={e => {
+              onClick={(e) => {
                 e.stopPropagation();
                 onClose(machine.id);
               }}
-              onKeyDown={e => {
+              onKeyDown={(e) => {
                 if (e.key === "Enter" || e.key === " ") {
                   e.stopPropagation();
                   onClose(machine.id);

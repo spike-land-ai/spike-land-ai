@@ -23,8 +23,7 @@ export function parseTranspileError(rawError: string): StructuredError {
 
   // Missing import / module not found
   if (
-    /(?:Cannot find module|Could not resolve|Module not found|is not exported from)/i
-      .test(rawError)
+    /(?:Cannot find module|Could not resolve|Module not found|is not exported from)/i.test(rawError)
   ) {
     error.type = "import";
     const moduleMatch = rawError.match(/['"]([^'"]+)['"]/);
@@ -33,19 +32,16 @@ export function parseTranspileError(rawError: string): StructuredError {
     }
   } // Type errors
   else if (
-    /(?:Type '.*' is not assignable|Property '.*' does not exist|Expected \d+ arguments)/i
-      .test(rawError)
+    /(?:Type '.*' is not assignable|Property '.*' does not exist|Expected \d+ arguments)/i.test(
+      rawError,
+    )
   ) {
     error.type = "type";
   } // JSX/syntax errors
-  else if (
-    /(?:Unexpected token|Unterminated|Expected|Parse error)/i.test(rawError)
-  ) {
+  else if (/(?:Unexpected token|Unterminated|Expected|Parse error)/i.test(rawError)) {
     error.type = "transpile";
   } // Undefined variable / runtime errors
-  else if (
-    /(?:is not defined|Cannot read propert)/i.test(rawError)
-  ) {
+  else if (/(?:is not defined|Cannot read propert)/i.test(rawError)) {
     error.type = "runtime";
     const varMatch = rawError.match(/['"]?(\w+)['"]?\s+is not defined/);
     if (varMatch?.[1] !== undefined) {
@@ -66,9 +62,7 @@ export function parseTranspileError(rawError: string): StructuredError {
   }
 
   // Extract suggestion if error message contains one
-  const sugMatch = rawError.match(
-    /(?:Did you mean|Try|Suggestion|Consider)[:\s]+(.+?)(?:\.|$)/i,
-  );
+  const sugMatch = rawError.match(/(?:Did you mean|Try|Suggestion|Consider)[:\s]+(.+?)(?:\.|$)/i);
   if (sugMatch) {
     error.suggestion = sugMatch[1]!.trim();
   }
@@ -115,8 +109,9 @@ function classifyErrorSeverity(error: StructuredError): {
     case "import":
       // Environmental: library doesn't exist on CDN — no point patching
       if (
-        error.library && !error.library.startsWith("@/")
-        && !KNOWN_CDN_LIBRARIES.has(error.library)
+        error.library &&
+        !error.library.startsWith("@/") &&
+        !KNOWN_CDN_LIBRARIES.has(error.library)
       ) {
         return { severity: "environmental", fixStrategy: "regenerate" };
       }
@@ -148,7 +143,7 @@ function classifyErrorSeverity(error: StructuredError): {
  */
 export function isUnrecoverableError(
   error: StructuredError,
-  previousErrors: Array<{ error: string; }>,
+  previousErrors: Array<{ error: string }>,
 ): boolean {
   // Environmental errors: unknown library not on CDN
   if (error.severity === "environmental") {

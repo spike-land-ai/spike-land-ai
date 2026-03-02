@@ -16,12 +16,12 @@ describe("onboarding personas", () => {
     });
 
     it("has unique ids from 1-16", () => {
-      const ids = PERSONAS.map(p => p.id).sort((a, b) => a - b);
+      const ids = PERSONAS.map((p) => p.id).sort((a, b) => a - b);
       expect(ids).toEqual(Array.from({ length: 16 }, (_, i) => i + 1));
     });
 
     it("has unique slugs", () => {
-      const slugs = PERSONAS.map(p => p.slug);
+      const slugs = PERSONAS.map((p) => p.slug);
       expect(new Set(slugs).size).toBe(16);
     });
 
@@ -38,8 +38,8 @@ describe("onboarding personas", () => {
     });
 
     it("has valid next references", () => {
-      const questionIds = new Set(ONBOARDING_TREE.map(q => q.id));
-      const personaIds = new Set(PERSONAS.map(p => p.id));
+      const questionIds = new Set(ONBOARDING_TREE.map((q) => q.id));
+      const personaIds = new Set(PERSONAS.map((p) => p.id));
 
       for (const q of ONBOARDING_TREE) {
         for (const next of [q.yesNext, q.noNext]) {
@@ -165,15 +165,16 @@ describe("onboarding personas", () => {
       },
     ];
 
-    it.each(ALL_PATHS)(
-      "answers $answers -> persona #$expectedId ($expectedSlug)",
-      ({ answers, expectedId, expectedSlug }) => {
-        const persona = getPersonaFromAnswers(answers);
-        expect(persona).not.toBeNull();
-        expect(persona!.id).toBe(expectedId);
-        expect(persona!.slug).toBe(expectedSlug);
-      },
-    );
+    it.each(ALL_PATHS)("answers $answers -> persona #$expectedId ($expectedSlug)", ({
+      answers,
+      expectedId,
+      expectedSlug,
+    }) => {
+      const persona = getPersonaFromAnswers(answers);
+      expect(persona).not.toBeNull();
+      expect(persona!.id).toBe(expectedId);
+      expect(persona!.slug).toBe(expectedSlug);
+    });
 
     it("covers all 16 personas", () => {
       const reachedIds = new Set(
@@ -251,30 +252,17 @@ describe("onboarding personas", () => {
     });
 
     it("matches creative + content + audience to content-creator", () => {
-      const slug = derivePersonaSlugFromTags([
-        "creative",
-        "content",
-        "audience",
-        "creator",
-      ]);
+      const slug = derivePersonaSlugFromTags(["creative", "content", "audience", "creator"]);
       expect(slug).toBe("content-creator");
     });
 
     it("matches gaming + multiplayer to social-gamer", () => {
-      const slug = derivePersonaSlugFromTags([
-        "gaming",
-        "multiplayer",
-        "social",
-      ]);
+      const slug = derivePersonaSlugFromTags(["gaming", "multiplayer", "social"]);
       expect(slug).toBe("social-gamer");
     });
 
     it("matches business + growth + marketing to growth-leader", () => {
-      const slug = derivePersonaSlugFromTags([
-        "business",
-        "growth",
-        "marketing",
-      ]);
+      const slug = derivePersonaSlugFromTags(["business", "growth", "marketing"]);
       expect(slug).toBe("growth-leader");
     });
 
@@ -285,13 +273,7 @@ describe("onboarding personas", () => {
 
     it("returns the best match when multiple tags match different personas", () => {
       // "developer" matches many, but "ai" + "ml" + "production" + "model" narrows to ml-engineer
-      const slug = derivePersonaSlugFromTags([
-        "developer",
-        "ai",
-        "ml",
-        "production",
-        "model",
-      ]);
+      const slug = derivePersonaSlugFromTags(["developer", "ai", "ml", "production", "model"]);
       expect(slug).toBe("ml-engineer");
     });
 

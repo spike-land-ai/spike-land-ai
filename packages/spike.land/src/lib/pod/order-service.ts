@@ -9,12 +9,7 @@ import prisma from "@/lib/prisma";
 import { tryCatch } from "@/lib/try-catch";
 import type { Prisma } from "@prisma/client";
 import { prodigiProvider } from "./prodigi/client";
-import type {
-  PodOrderRequest,
-  PodOrderResult,
-  PodProvider,
-  ShippingAddress,
-} from "./types";
+import type { PodOrderRequest, PodOrderResult, PodProvider, ShippingAddress } from "./types";
 import { logger } from "@/lib/logger";
 
 /**
@@ -41,9 +36,7 @@ interface SubmitOrderResult {
  * Submit an order to the POD provider.
  * This should be called after payment is authorized.
  */
-export async function submitOrderToPod(
-  orderId: string,
-): Promise<SubmitOrderResult> {
+export async function submitOrderToPod(orderId: string): Promise<SubmitOrderResult> {
   // Fetch the order with all items
   const { data: order, error: fetchError } = await tryCatch(
     prisma.merchOrder.findUnique({
@@ -100,7 +93,7 @@ export async function submitOrderToPod(
       ...(order.customerEmail !== undefined ? { email: order.customerEmail } : {}),
     },
     shippingMethod: "Standard",
-    items: prodigiItems.map(item => {
+    items: prodigiItems.map((item) => {
       const customText = item.customText ?? undefined;
       return {
         sku: item.variant?.providerSku || item.product.providerSku,
@@ -148,7 +141,7 @@ export async function submitOrderToPod(
 
   // Update order items with POD order ID
   const { error: updateError } = await tryCatch(
-    prisma.$transaction(async tx => {
+    prisma.$transaction(async (tx) => {
       // Update all items with the provider order ID
       for (const item of prodigiItems) {
         await tx.merchOrderItem.update({
@@ -215,9 +208,7 @@ export async function updateOrderFromWebhook(
 
   const firstItem = items[0];
   if (!firstItem) {
-    logger.warn(
-      `No order items found for provider order ID: ${providerOrderId}`,
-    );
+    logger.warn(`No order items found for provider order ID: ${providerOrderId}`);
     return;
   }
 
@@ -226,7 +217,7 @@ export async function updateOrderFromWebhook(
   // Map provider status to our status
   const orderStatus = mapProviderStatusToOrderStatus(status);
 
-  await prisma.$transaction(async tx => {
+  await prisma.$transaction(async (tx) => {
     // Update items
     for (const item of items) {
       await tx.merchOrderItem.update({
@@ -242,10 +233,7 @@ export async function updateOrderFromWebhook(
     });
 
     // Create/update shipment if we have tracking info
-    if (
-      trackingNumber
-      && (orderStatus === "SHIPPED" || orderStatus === "DELIVERED")
-    ) {
+    if (trackingNumber && (orderStatus === "SHIPPED" || orderStatus === "DELIVERED")) {
       const existingShipment = await tx.merchShipment.findFirst({
         where: { orderId, provider },
       });
@@ -258,9 +246,7 @@ export async function updateOrderFromWebhook(
             ...(trackingUrl !== undefined ? { trackingUrl } : {}),
             ...(carrier !== undefined ? { carrier } : {}),
             status: orderStatus === "SHIPPED" ? "SHIPPED" : "DELIVERED",
-            shippedAt: orderStatus === "SHIPPED"
-              ? new Date()
-              : existingShipment.shippedAt,
+            shippedAt: orderStatus === "SHIPPED" ? new Date() : existingShipment.shippedAt,
             ...(orderStatus === "DELIVERED" ? { deliveredAt: new Date() } : {}),
           },
         });
@@ -324,7 +310,7 @@ function mapProviderStatusToOrderStatus(
  * Get a shipping quote for cart items.
  */
 export async function getShippingQuote(
-  items: { productId: string; variantId?: string; quantity: number; }[],
+  items: { productId: string; variantId?: string; quantity: number }[],
   address: ShippingAddress,
 ): Promise<{
   itemsCost: number;
@@ -335,21 +321,19 @@ export async function getShippingQuote(
   // Fetch products to get SKUs
   const products = await prisma.merchProduct.findMany({
     where: {
-      id: { in: items.map(i => i.productId) },
+      id: { in: items.map((i) => i.productId) },
     },
     include: { variants: true },
   });
 
-  const productMap = new Map(products.map(p => [p.id, p]));
+  const productMap = new Map(products.map((p) => [p.id, p]));
 
   // Build quote items
-  const quoteItems = items.map(item => {
+  const quoteItems = items.map((item) => {
     const product = productMap.get(item.productId);
     if (!product) throw new Error(`Product not found: ${item.productId}`);
 
-    const variant = item.variantId
-      ? product.variants.find(v => v.id === item.variantId)
-      : null;
+    const variant = item.variantId ? product.variants.find((v) => v.id === item.variantId) : null;
 
     return {
       sku: variant?.providerSku || product.providerSku,
@@ -395,9 +379,10 @@ async function recordOrderEvent(
  */
 export function generateOrderNumber(): string {
   const date = new Date();
-  const dateStr = date.getFullYear().toString()
-    + (date.getMonth() + 1).toString().padStart(2, "0")
-    + date.getDate().toString().padStart(2, "0");
+  const dateStr =
+    date.getFullYear().toString() +
+    (date.getMonth() + 1).toString().padStart(2, "0") +
+    date.getDate().toString().padStart(2, "0");
 
   // Generate 4 character alphanumeric suffix
   const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; // Excluded I, O, 0, 1 for clarity

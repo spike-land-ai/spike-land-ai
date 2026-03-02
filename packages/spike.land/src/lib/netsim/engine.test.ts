@@ -58,13 +58,15 @@ describe("netsim engine", () => {
     });
 
     it("should reject node count < 2", () => {
-      expect(() => createTopology({ userId, name: "bad", nodeCount: 1 }))
-        .toThrow("Node count must be between 2 and 20");
+      expect(() => createTopology({ userId, name: "bad", nodeCount: 1 })).toThrow(
+        "Node count must be between 2 and 20",
+      );
     });
 
     it("should reject node count > 20", () => {
-      expect(() => createTopology({ userId, name: "bad", nodeCount: 21 }))
-        .toThrow("Node count must be between 2 and 20");
+      expect(() => createTopology({ userId, name: "bad", nodeCount: 21 })).toThrow(
+        "Node count must be between 2 and 20",
+      );
     });
 
     it("should set all nodes as not partitioned", () => {
@@ -88,14 +90,7 @@ describe("netsim engine", () => {
         nodeCount: 3,
       });
 
-      const link = setLinkState(
-        topo.id,
-        userId,
-        "node-1",
-        "node-2",
-        "slow",
-        200,
-      );
+      const link = setLinkState(topo.id, userId, "node-1", "node-2", "slow", 200);
       expect(link.state).toBe("slow");
       expect(link.latencyMs).toBe(200);
     });
@@ -107,15 +102,7 @@ describe("netsim engine", () => {
         nodeCount: 2,
       });
 
-      const link = setLinkState(
-        topo.id,
-        userId,
-        "node-1",
-        "node-2",
-        "lossy",
-        undefined,
-        0.5,
-      );
+      const link = setLinkState(topo.id, userId, "node-1", "node-2", "lossy", undefined, 0.5);
       expect(link.state).toBe("lossy");
       expect(link.lossRate).toBe(0.5);
     });
@@ -139,8 +126,7 @@ describe("netsim engine", () => {
         nodeCount: 2,
       });
 
-      expect(() => setLinkState(topo.id, userId, "node-1", "node-99", "up"))
-        .toThrow("not found");
+      expect(() => setLinkState(topo.id, userId, "node-1", "node-99", "up")).toThrow("not found");
     });
   });
 
@@ -176,9 +162,7 @@ describe("netsim engine", () => {
         nodeCount: 2,
       });
 
-      expect(() => partitionNode(topo.id, userId, "node-99")).toThrow(
-        "not found",
-      );
+      expect(() => partitionNode(topo.id, userId, "node-99")).toThrow("not found");
     });
   });
 
@@ -247,13 +231,7 @@ describe("netsim engine", () => {
         nodeCount: 2,
       });
 
-      const msg = sendMessage(
-        topo.id,
-        userId,
-        "node-1",
-        "node-2",
-        "hello",
-      );
+      const msg = sendMessage(topo.id, userId, "node-1", "node-2", "hello");
 
       expect(msg.from).toBe("node-1");
       expect(msg.to).toBe("node-2");
@@ -284,8 +262,7 @@ describe("netsim engine", () => {
         nodeCount: 2,
       });
 
-      expect(() => sendMessage(topo.id, userId, "node-99", "node-1", "hello"))
-        .toThrow("not found");
+      expect(() => sendMessage(topo.id, userId, "node-99", "node-1", "hello")).toThrow("not found");
     });
 
     it("should throw for non-existent receiver", () => {
@@ -295,8 +272,7 @@ describe("netsim engine", () => {
         nodeCount: 2,
       });
 
-      expect(() => sendMessage(topo.id, userId, "node-1", "node-99", "hello"))
-        .toThrow("not found");
+      expect(() => sendMessage(topo.id, userId, "node-1", "node-99", "hello")).toThrow("not found");
     });
   });
 
@@ -500,9 +476,7 @@ describe("netsim engine", () => {
       setLinkState(topo.id, userId, "node-1", "node-2", "slow", 150);
       const view = inspect(topo.id, userId);
 
-      const slowLink = view.links.find(
-        l => l.from === "node-1" && l.to === "node-2",
-      );
+      const slowLink = view.links.find((l) => l.from === "node-1" && l.to === "node-2");
       expect(slowLink!.state).toBe("slow");
       expect(slowLink!.latencyMs).toBe(150);
     });
@@ -565,9 +539,7 @@ describe("netsim engine", () => {
         name: "acl-destroy",
         nodeCount: 2,
       });
-      expect(() => destroyTopology(topo.id, "other-user")).toThrow(
-        "Access denied",
-      );
+      expect(() => destroyTopology(topo.id, "other-user")).toThrow("Access denied");
     });
 
     it("should deny setLinkState from different userId", () => {
@@ -587,9 +559,7 @@ describe("netsim engine", () => {
         name: "acl-partition",
         nodeCount: 2,
       });
-      expect(() => partitionNode(topo.id, "other-user", "node-1")).toThrow(
-        "Access denied",
-      );
+      expect(() => partitionNode(topo.id, "other-user", "node-1")).toThrow("Access denied");
     });
 
     it("should deny healNode from different userId", () => {
@@ -598,9 +568,7 @@ describe("netsim engine", () => {
         name: "acl-heal",
         nodeCount: 2,
       });
-      expect(() => healNode(topo.id, "other-user", "node-1")).toThrow(
-        "Access denied",
-      );
+      expect(() => healNode(topo.id, "other-user", "node-1")).toThrow("Access denied");
     });
 
     it("should deny sendMessage from different userId", () => {
@@ -629,9 +597,7 @@ describe("netsim engine", () => {
         name: "acl-stats",
         nodeCount: 2,
       });
-      expect(() => getDeliveryStats(topo.id, "other-user")).toThrow(
-        "Access denied",
-      );
+      expect(() => getDeliveryStats(topo.id, "other-user")).toThrow("Access denied");
     });
   });
 
@@ -643,7 +609,7 @@ describe("netsim engine", () => {
 
       const list = listTopologies(userId);
       expect(list).toHaveLength(2);
-      expect(list.map(t => t.name).sort()).toEqual(["mine1", "mine2"]);
+      expect(list.map((t) => t.name).sort()).toEqual(["mine1", "mine2"]);
     });
 
     it("should include correct summary data", () => {
@@ -672,9 +638,7 @@ describe("netsim engine", () => {
     });
 
     it("should throw for non-existent topology", () => {
-      expect(() => destroyTopology("nonexistent", userId)).toThrow(
-        "not found",
-      );
+      expect(() => destroyTopology("nonexistent", userId)).toThrow("not found");
     });
   });
 
@@ -687,7 +651,7 @@ describe("netsim engine", () => {
       });
 
       // Set a filter that only allows messages from node-1
-      topo.messageFilter = msg => msg.from === "node-1";
+      topo.messageFilter = (msg) => msg.from === "node-1";
 
       sendMessage(topo.id, userId, "node-1", "node-2", "allowed");
       sendMessage(topo.id, userId, "node-2", "node-1", "blocked");
@@ -722,7 +686,7 @@ describe("netsim engine", () => {
       });
 
       // Filter that blocks messages containing "secret"
-      topo.messageFilter = msg => !msg.payload.includes("secret");
+      topo.messageFilter = (msg) => !msg.payload.includes("secret");
 
       sendMessage(topo.id, userId, "node-1", "node-2", "hello");
       sendMessage(topo.id, userId, "node-1", "node-2", "secret-data");

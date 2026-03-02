@@ -36,9 +36,7 @@ export function GenerateExplorer() {
 
     setLoading(true);
     try {
-      const res = await fetch(
-        `/api/create/generate?topic=${encodeURIComponent(topic)}`,
-      );
+      const res = await fetch(`/api/create/generate?topic=${encodeURIComponent(topic)}`);
       if (res.ok) {
         const data = await res.json();
         setResult(data);
@@ -62,7 +60,7 @@ export function GenerateExplorer() {
           className="pl-10 py-6 text-lg"
           placeholder="Type a topic (e.g. 'games/tetris', 'music player')"
           value={query}
-          onChange={e => setQuery(e.target.value)}
+          onChange={(e) => setQuery(e.target.value)}
         />
       </div>
 
@@ -70,24 +68,22 @@ export function GenerateExplorer() {
         <SkillsBar query={debouncedQuery} />
       </AnimatePresence>
 
-      {loading && (
-        <p className="text-sm text-muted-foreground animate-pulse">
-          Analyzing topic...
-        </p>
-      )}
+      {loading && <p className="text-sm text-muted-foreground animate-pulse">Analyzing topic...</p>}
 
       {result && !loading && (
         <div className="space-y-4">
           {/* Keywords */}
           <Card>
             <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium">
-                Extracted Keywords
-              </CardTitle>
+              <CardTitle className="text-sm font-medium">Extracted Keywords</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="flex flex-wrap gap-1.5">
-                {result.keywords.map(kw => <Badge key={kw} variant="secondary">{kw}</Badge>)}
+                {result.keywords.map((kw) => (
+                  <Badge key={kw} variant="secondary">
+                    {kw}
+                  </Badge>
+                ))}
               </div>
             </CardContent>
           </Card>
@@ -100,31 +96,24 @@ export function GenerateExplorer() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              {result.matchedSkills.length === 0
-                ? (
-                  <p className="text-sm text-muted-foreground">
-                    No skills matched — fallback libraries will be included.
-                  </p>
-                )
-                : (
-                  <div className="space-y-2">
-                    {result.matchedSkills.map(skill => (
-                      <div
-                        key={skill.id}
-                        className="flex items-center gap-2 text-sm"
-                      >
-                        <span>{skill.icon}</span>
-                        <span className="font-medium">{skill.name}</span>
-                        <span className="text-muted-foreground">
-                          — {skill.description}
-                        </span>
-                        <Badge variant="outline" className="ml-auto text-xs">
-                          {skill.categoryLabel}
-                        </Badge>
-                      </div>
-                    ))}
-                  </div>
-                )}
+              {result.matchedSkills.length === 0 ? (
+                <p className="text-sm text-muted-foreground">
+                  No skills matched — fallback libraries will be included.
+                </p>
+              ) : (
+                <div className="space-y-2">
+                  {result.matchedSkills.map((skill) => (
+                    <div key={skill.id} className="flex items-center gap-2 text-sm">
+                      <span>{skill.icon}</span>
+                      <span className="font-medium">{skill.name}</span>
+                      <span className="text-muted-foreground">— {skill.description}</span>
+                      <Badge variant="outline" className="ml-auto text-xs">
+                        {skill.categoryLabel}
+                      </Badge>
+                    </div>
+                  ))}
+                </div>
+              )}
             </CardContent>
           </Card>
 
@@ -132,20 +121,14 @@ export function GenerateExplorer() {
           <Card>
             <CardHeader className="pb-3">
               <div className="flex items-center justify-between">
-                <CardTitle className="text-sm font-medium">
-                  System Prompt
-                </CardTitle>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setShowSystem(!showSystem)}
-                >
-                  {showSystem
-                    ? <ChevronUp className="h-4 w-4" />
-                    : <ChevronDown className="h-4 w-4" />}
-                  <span className="ml-1">
-                    {showSystem ? "Collapse" : "Expand"}
-                  </span>
+                <CardTitle className="text-sm font-medium">System Prompt</CardTitle>
+                <Button variant="ghost" size="sm" onClick={() => setShowSystem(!showSystem)}>
+                  {showSystem ? (
+                    <ChevronUp className="h-4 w-4" />
+                  ) : (
+                    <ChevronDown className="h-4 w-4" />
+                  )}
+                  <span className="ml-1">{showSystem ? "Collapse" : "Expand"}</span>
                 </Button>
               </div>
             </CardHeader>
@@ -162,20 +145,14 @@ export function GenerateExplorer() {
           <Card>
             <CardHeader className="pb-3">
               <div className="flex items-center justify-between">
-                <CardTitle className="text-sm font-medium">
-                  User Prompt
-                </CardTitle>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setShowUser(!showUser)}
-                >
-                  {showUser
-                    ? <ChevronUp className="h-4 w-4" />
-                    : <ChevronDown className="h-4 w-4" />}
-                  <span className="ml-1">
-                    {showUser ? "Collapse" : "Expand"}
-                  </span>
+                <CardTitle className="text-sm font-medium">User Prompt</CardTitle>
+                <Button variant="ghost" size="sm" onClick={() => setShowUser(!showUser)}>
+                  {showUser ? (
+                    <ChevronUp className="h-4 w-4" />
+                  ) : (
+                    <ChevronDown className="h-4 w-4" />
+                  )}
+                  <span className="ml-1">{showUser ? "Collapse" : "Expand"}</span>
                 </Button>
               </div>
             </CardHeader>

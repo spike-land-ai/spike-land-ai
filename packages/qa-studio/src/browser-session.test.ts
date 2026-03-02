@@ -68,6 +68,7 @@ beforeEach(async () => {
 
 afterEach(async () => {
   await cleanup();
+  vi.useRealTimers();
   delete process.env.NODE_ENV;
 });
 
@@ -143,6 +144,12 @@ describe("browser-session", () => {
       await getOrCreateTab();
 
       expect(mockChromiumLaunch).toHaveBeenCalledOnce();
+    });
+
+    it("prevents double-launch when called in parallel", async () => {
+      const [t1, t2] = await Promise.all([getOrCreateTab(), getOrCreateTab()]);
+      expect(mockChromiumLaunch).toHaveBeenCalledOnce();
+      expect(t1.page).not.toBe(t2.page);
     });
   });
 
@@ -326,6 +333,21 @@ describe("browser-session", () => {
       expect(mockPageClose).not.toHaveBeenCalled();
       expect(mockBrowserClose).toHaveBeenCalledOnce();
     });
+
+    it("triggers cleanup after idle timeout", async () => {
+      vi.useFakeTimers();
+      await getOrCreateTab();
+
+      // Fast forward 5 minutes
+      vi.advanceTimersByTime(5 * 60 * 1000 + 100);
+
+      // Wait for any pending async operations (void cleanup() call)
+      await Promise.resolve();
+      await Promise.resolve();
+
+      expect(mockBrowserClose).toHaveBeenCalledOnce();
+      vi.useRealTimers();
+    });
   });
 
   describe("page event listeners", () => {
@@ -333,9 +355,7 @@ describe("browser-session", () => {
       const { entry } = await getOrCreateTab();
 
       // Find and invoke the 'console' listener registered via page.on
-      const consoleCall = mockPageOn.mock.calls.find(
-        (c: unknown[]) => c[0] === "console",
-      );
+      const consoleCall = mockPageOn.mock.calls.find((c: unknown[]) => c[0] === "console");
       expect(consoleCall).toBeDefined();
       const consoleHandler = consoleCall![1] as (msg: unknown) => void;
 
@@ -357,9 +377,7 @@ describe("browser-session", () => {
     it("records multiple console messages", async () => {
       const { entry } = await getOrCreateTab();
 
-      const consoleCall = mockPageOn.mock.calls.find(
-        (c: unknown[]) => c[0] === "console",
-      );
+      const consoleCall = mockPageOn.mock.calls.find((c: unknown[]) => c[0] === "console");
       const consoleHandler = consoleCall![1] as (msg: unknown) => void;
 
       consoleHandler({
@@ -381,9 +399,7 @@ describe("browser-session", () => {
     it("records network requests via requestfinished listener", async () => {
       const { entry } = await getOrCreateTab();
 
-      const reqCall = mockPageOn.mock.calls.find(
-        (c: unknown[]) => c[0] === "requestfinished",
-      );
+      const reqCall = mockPageOn.mock.calls.find((c: unknown[]) => c[0] === "requestfinished");
       expect(reqCall).toBeDefined();
       const reqHandler = reqCall![1] as (req: unknown) => void;
 
@@ -399,7 +415,7 @@ describe("browser-session", () => {
       });
 
       // Wait for async response() to resolve
-      await new Promise(resolve => setTimeout(resolve, 0));
+      await new Promise((resolve) => setTimeout(resolve, 0));
 
       expect(entry.networkRequests).toHaveLength(1);
       expect(entry.networkRequests[0]).toEqual({
@@ -414,9 +430,7 @@ describe("browser-session", () => {
     it("records network request with null response (status 0, contentLength '0')", async () => {
       const { entry } = await getOrCreateTab();
 
-      const reqCall = mockPageOn.mock.calls.find(
-        (c: unknown[]) => c[0] === "requestfinished",
-      );
+      const reqCall = mockPageOn.mock.calls.find((c: unknown[]) => c[0] === "requestfinished");
       const reqHandler = reqCall![1] as (req: unknown) => void;
 
       reqHandler({
@@ -426,7 +440,7 @@ describe("browser-session", () => {
         response: () => Promise.resolve(null),
       });
 
-      await new Promise(resolve => setTimeout(resolve, 0));
+      await new Promise((resolve) => setTimeout(resolve, 0));
 
       expect(entry.networkRequests[0]).toMatchObject({
         status: 0,
@@ -437,9 +451,7 @@ describe("browser-session", () => {
     it("records network request with missing content-length header (defaults to '0')", async () => {
       const { entry } = await getOrCreateTab();
 
-      const reqCall = mockPageOn.mock.calls.find(
-        (c: unknown[]) => c[0] === "requestfinished",
-      );
+      const reqCall = mockPageOn.mock.calls.find((c: unknown[]) => c[0] === "requestfinished");
       const reqHandler = reqCall![1] as (req: unknown) => void;
 
       reqHandler({
@@ -453,7 +465,7 @@ describe("browser-session", () => {
           }),
       });
 
-      await new Promise(resolve => setTimeout(resolve, 0));
+      await new Promise((resolve) => setTimeout(resolve, 0));
 
       expect(entry.networkRequests[0]).toMatchObject({
         status: 304,

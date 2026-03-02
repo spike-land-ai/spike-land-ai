@@ -16,12 +16,8 @@ const ListPostsSchema = z.object({
   category: z.string().optional().describe("Filter by category."),
   tag: z.string().optional().describe("Filter by tag."),
   featured: z.boolean().optional().describe("Filter featured posts only."),
-  limit: z.number().int().min(1).max(100).optional().describe(
-    "Max results (default 20).",
-  ),
-  offset: z.number().int().min(0).optional().describe(
-    "Offset for pagination (default 0).",
-  ),
+  limit: z.number().int().min(1).max(100).optional().describe("Max results (default 20)."),
+  offset: z.number().int().min(0).optional().describe("Offset for pagination (default 0)."),
 });
 
 const GetPostSchema = z.object({
@@ -31,29 +27,24 @@ const GetPostSchema = z.object({
 const BlogCreateDraftSchema = z.object({
   title: z.string().min(1).max(300).describe("Blog post title."),
   content: z.string().min(1).describe("Blog post body content (Markdown)."),
-  tags: z.array(z.string().min(1).max(50)).max(20).optional().describe(
-    "Optional list of tags.",
-  ),
-  category: z.string().min(1).max(100).optional().describe(
-    "Optional category name.",
-  ),
+  tags: z.array(z.string().min(1).max(50)).max(20).optional().describe("Optional list of tags."),
+  category: z.string().min(1).max(100).optional().describe("Optional category name."),
 });
 
 const BlogUpdatePostSchema = z.object({
   post_id: z.string().min(1).describe("Blog post ID."),
   title: z.string().min(1).max(300).optional().describe("New title."),
-  content: z.string().min(1).optional().describe(
-    "New body content (Markdown).",
-  ),
-  tags: z.array(z.string().min(1).max(50)).max(20).optional().describe(
-    "New tag list (replaces existing tags).",
-  ),
-  category: z.string().min(1).max(100).optional().describe(
-    "New category name.",
-  ),
-  status: z.enum(["draft", "scheduled", "published"]).optional().describe(
-    "New status. Changing to 'draft' reverts publication/scheduling.",
-  ),
+  content: z.string().min(1).optional().describe("New body content (Markdown)."),
+  tags: z
+    .array(z.string().min(1).max(50))
+    .max(20)
+    .optional()
+    .describe("New tag list (replaces existing tags)."),
+  category: z.string().min(1).max(100).optional().describe("New category name."),
+  status: z
+    .enum(["draft", "scheduled", "published"])
+    .optional()
+    .describe("New status. Changing to 'draft' reverts publication/scheduling."),
 });
 
 const BlogPublishPostSchema = z.object({
@@ -62,16 +53,18 @@ const BlogPublishPostSchema = z.object({
 
 const BlogGetAnalyticsSchema = z.object({
   post_id: z.string().min(1).describe("Blog post ID."),
-  period: z.enum(["7d", "30d", "90d", "all"]).optional().describe(
-    "Analytics time period (default: 30d).",
-  ),
+  period: z
+    .enum(["7d", "30d", "90d", "all"])
+    .optional()
+    .describe("Analytics time period (default: 30d)."),
 });
 
 const BlogSchedulePostSchema = z.object({
   post_id: z.string().min(1).describe("Blog post ID to schedule."),
-  publish_at: z.string().min(1).describe(
-    "ISO 8601 datetime for future publication (e.g. 2025-12-31T09:00:00Z).",
-  ),
+  publish_at: z
+    .string()
+    .min(1)
+    .describe("ISO 8601 datetime for future publication (e.g. 2025-12-31T09:00:00Z)."),
 });
 
 const BlogRevertToDraftSchema = z.object({
@@ -89,15 +82,16 @@ export const contentHubTools: StandaloneToolDefinition[] = [
     inputSchema: ListPostsSchema.shape,
     handler: async (input: never, _ctx: ServerContext): Promise<CallToolResult> =>
       safeToolCall("blog_list_posts", async () => {
-        const { category, tag, featured, limit = 20, offset = 0 } = input as z.infer<
-          typeof ListPostsSchema
-        >;
         const {
-          getAllPosts,
-          getPostsByCategory,
-          getPostsByTag,
-          getFeaturedPosts,
-        } = await import("@/lib/blog/get-posts");
+          category,
+          tag,
+          featured,
+          limit = 20,
+          offset = 0,
+        } = input as z.infer<typeof ListPostsSchema>;
+        const { getAllPosts, getPostsByCategory, getPostsByTag, getFeaturedPosts } = await import(
+          "@/lib/blog/get-posts"
+        );
 
         let posts;
         if (category) {
@@ -115,14 +109,13 @@ export const contentHubTools: StandaloneToolDefinition[] = [
 
         let text = `**Blog Posts (${paginated.length} of ${posts.length}):**\n\n`;
         for (const post of paginated) {
-          text += `- **${post.frontmatter.title}** (${post.slug})\n`
-            + `  ${post.frontmatter.description}\n`
-            + `  Category: ${post.frontmatter.category} | Tags: ${
-              post.frontmatter.tags.join(", ")
-            } | ${post.readingTime}\n`
-            + `  Date: ${post.frontmatter.date}${
-              post.frontmatter.featured ? " | Featured" : ""
-            }\n\n`;
+          text +=
+            `- **${post.frontmatter.title}** (${post.slug})\n` +
+            `  ${post.frontmatter.description}\n` +
+            `  Category: ${post.frontmatter.category} | Tags: ${post.frontmatter.tags.join(
+              ", ",
+            )} | ${post.readingTime}\n` +
+            `  Date: ${post.frontmatter.date}${post.frontmatter.featured ? " | Featured" : ""}\n\n`;
         }
         return textResult(text);
       }),
@@ -140,22 +133,20 @@ export const contentHubTools: StandaloneToolDefinition[] = [
         const { getPostBySlug } = await import("@/lib/blog/get-posts");
         const post = getPostBySlug(slug);
         if (!post) {
-          return textResult(
-            "**Error: NOT_FOUND**\nBlog post not found.\n**Retryable:** false",
-          );
+          return textResult("**Error: NOT_FOUND**\nBlog post not found.\n**Retryable:** false");
         }
 
         return textResult(
-          `**${post.frontmatter.title}**\n\n`
-            + `**Slug:** ${post.slug}\n`
-            + `**Author:** ${post.frontmatter.author}\n`
-            + `**Date:** ${post.frontmatter.date}\n`
-            + `**Category:** ${post.frontmatter.category}\n`
-            + `**Tags:** ${post.frontmatter.tags.join(", ")}\n`
-            + `**Reading Time:** ${post.readingTime}\n`
-            + `**Featured:** ${post.frontmatter.featured ? "Yes" : "No"}\n`
-            + `**Excerpt:** ${post.frontmatter.description}\n\n`
-            + `---\n\n${post.content}`,
+          `**${post.frontmatter.title}**\n\n` +
+            `**Slug:** ${post.slug}\n` +
+            `**Author:** ${post.frontmatter.author}\n` +
+            `**Date:** ${post.frontmatter.date}\n` +
+            `**Category:** ${post.frontmatter.category}\n` +
+            `**Tags:** ${post.frontmatter.tags.join(", ")}\n` +
+            `**Reading Time:** ${post.readingTime}\n` +
+            `**Featured:** ${post.frontmatter.featured ? "Yes" : "No"}\n` +
+            `**Excerpt:** ${post.frontmatter.description}\n\n` +
+            `---\n\n${post.content}`,
         );
       }),
   },
@@ -184,13 +175,13 @@ export const contentHubTools: StandaloneToolDefinition[] = [
         });
 
         return textResult(
-          `**Draft Created!**\n\n`
-            + `**Post ID:** ${post.id}\n`
-            + `**Title:** ${post.title}\n`
-            + `**Status:** draft\n`
-            + `**Tags:** ${(post.tags as string[]).join(", ") || "none"}\n`
-            + `**Category:** ${post.category ?? "none"}\n`
-            + `**Created:** ${post.createdAt.toISOString()}`,
+          `**Draft Created!**\n\n` +
+            `**Post ID:** ${post.id}\n` +
+            `**Title:** ${post.title}\n` +
+            `**Status:** draft\n` +
+            `**Tags:** ${(post.tags as string[]).join(", ") || "none"}\n` +
+            `**Category:** ${post.category ?? "none"}\n` +
+            `**Created:** ${post.createdAt.toISOString()}`,
         );
       }),
   },
@@ -214,9 +205,7 @@ export const contentHubTools: StandaloneToolDefinition[] = [
         });
 
         if (!existing) {
-          return textResult(
-            "**Error: NOT_FOUND**\nBlog post not found.\n**Retryable:** false",
-          );
+          return textResult("**Error: NOT_FOUND**\nBlog post not found.\n**Retryable:** false");
         }
 
         if (existing.userId !== ctx.userId) {
@@ -238,9 +227,7 @@ export const contentHubTools: StandaloneToolDefinition[] = [
         }
 
         if (Object.keys(updateData).length === 0) {
-          return textResult(
-            "**No changes specified.** Provide at least one field to update.",
-          );
+          return textResult("**No changes specified.** Provide at least one field to update.");
         }
 
         const updated = await prisma.blogPost.update({
@@ -249,13 +236,13 @@ export const contentHubTools: StandaloneToolDefinition[] = [
         });
 
         return textResult(
-          `**Post Updated**\n\n`
-            + `**Post ID:** ${updated.id}\n`
-            + `**Title:** ${updated.title}\n`
-            + `**Status:** ${updated.status}\n`
-            + `**Tags:** ${(updated.tags as string[]).join(", ") || "none"}\n`
-            + `**Category:** ${updated.category ?? "none"}\n`
-            + `**Updated:** ${updated.updatedAt.toISOString()}`,
+          `**Post Updated**\n\n` +
+            `**Post ID:** ${updated.id}\n` +
+            `**Title:** ${updated.title}\n` +
+            `**Status:** ${updated.status}\n` +
+            `**Tags:** ${(updated.tags as string[]).join(", ") || "none"}\n` +
+            `**Category:** ${updated.category ?? "none"}\n` +
+            `**Updated:** ${updated.updatedAt.toISOString()}`,
         );
       }),
   },
@@ -277,9 +264,7 @@ export const contentHubTools: StandaloneToolDefinition[] = [
         });
 
         if (!existing) {
-          return textResult(
-            "**Error: NOT_FOUND**\nBlog post not found.\n**Retryable:** false",
-          );
+          return textResult("**Error: NOT_FOUND**\nBlog post not found.\n**Retryable:** false");
         }
 
         if (existing.userId !== ctx.userId) {
@@ -304,11 +289,11 @@ export const contentHubTools: StandaloneToolDefinition[] = [
         const url = `https://spike.land/blog/${slug}`;
 
         return textResult(
-          `**Post Published!**\n\n`
-            + `**Post ID:** ${published.id}\n`
-            + `**Title:** ${published.title}\n`
-            + `**URL:** ${url}\n`
-            + `**Published At:** ${publishedAt.toISOString()}`,
+          `**Post Published!**\n\n` +
+            `**Post ID:** ${published.id}\n` +
+            `**Title:** ${published.title}\n` +
+            `**URL:** ${url}\n` +
+            `**Published At:** ${publishedAt.toISOString()}`,
         );
       }),
   },
@@ -331,9 +316,7 @@ export const contentHubTools: StandaloneToolDefinition[] = [
         });
 
         if (!post) {
-          return textResult(
-            "**Error: NOT_FOUND**\nBlog post not found.\n**Retryable:** false",
-          );
+          return textResult("**Error: NOT_FOUND**\nBlog post not found.\n**Retryable:** false");
         }
 
         if (post.userId !== ctx.userId) {
@@ -346,12 +329,10 @@ export const contentHubTools: StandaloneToolDefinition[] = [
           "7d": 7,
           "30d": 30,
           "90d": 90,
-          "all": null,
+          all: null,
         };
         const days = periodDays[period] ?? 30;
-        const since = days !== null
-          ? new Date(Date.now() - days * 24 * 60 * 60 * 1000)
-          : null;
+        const since = days !== null ? new Date(Date.now() - days * 24 * 60 * 60 * 1000) : null;
 
         const slug = post.slug ?? post_id;
         const postPath = `/blog/${slug}`;
@@ -376,23 +357,19 @@ export const contentHubTools: StandaloneToolDefinition[] = [
         ]);
 
         const uniqueVisitors = referralRows.length;
-        const avgReadTimeSecs = Math.round(
-          avgTimeRows._avg.timeOnPage ?? 0,
-        );
-        const bounceCount = referralRows.filter(r => r._count.sessionId === 1)
-          .length;
-        const bounceRate = uniqueVisitors > 0
-          ? ((bounceCount / uniqueVisitors) * 100).toFixed(1)
-          : "0.0";
+        const avgReadTimeSecs = Math.round(avgTimeRows._avg.timeOnPage ?? 0);
+        const bounceCount = referralRows.filter((r) => r._count.sessionId === 1).length;
+        const bounceRate =
+          uniqueVisitors > 0 ? ((bounceCount / uniqueVisitors) * 100).toFixed(1) : "0.0";
 
         return textResult(
-          `**Analytics: ${post.title}**\n`
-            + `**Period:** ${period}\n\n`
-            + `**Views:** ${totalViews}\n`
-            + `**Unique Visitors:** ${uniqueVisitors}\n`
-            + `**Avg Read Time:** ${avgReadTimeSecs}s\n`
-            + `**Bounce Rate:** ${bounceRate}%\n`
-            + `**Referral Sources:** tracked via session data`,
+          `**Analytics: ${post.title}**\n` +
+            `**Period:** ${period}\n\n` +
+            `**Views:** ${totalViews}\n` +
+            `**Unique Visitors:** ${uniqueVisitors}\n` +
+            `**Avg Read Time:** ${avgReadTimeSecs}s\n` +
+            `**Bounce Rate:** ${bounceRate}%\n` +
+            `**Referral Sources:** tracked via session data`,
         );
       }),
   },
@@ -428,9 +405,7 @@ export const contentHubTools: StandaloneToolDefinition[] = [
         });
 
         if (!existing) {
-          return textResult(
-            "**Error: NOT_FOUND**\nBlog post not found.\n**Retryable:** false",
-          );
+          return textResult("**Error: NOT_FOUND**\nBlog post not found.\n**Retryable:** false");
         }
 
         if (existing.userId !== ctx.userId) {
@@ -451,11 +426,11 @@ export const contentHubTools: StandaloneToolDefinition[] = [
         });
 
         return textResult(
-          `**Post Scheduled!**\n\n`
-            + `**Post ID:** ${scheduled.id}\n`
-            + `**Title:** ${scheduled.title}\n`
-            + `**Status:** scheduled\n`
-            + `**Scheduled For:** ${publishDate.toISOString()}`,
+          `**Post Scheduled!**\n\n` +
+            `**Post ID:** ${scheduled.id}\n` +
+            `**Title:** ${scheduled.title}\n` +
+            `**Status:** scheduled\n` +
+            `**Scheduled For:** ${publishDate.toISOString()}`,
         );
       }),
   },
@@ -478,9 +453,7 @@ export const contentHubTools: StandaloneToolDefinition[] = [
         });
 
         if (!existing) {
-          return textResult(
-            "**Error: NOT_FOUND**\nBlog post not found.\n**Retryable:** false",
-          );
+          return textResult("**Error: NOT_FOUND**\nBlog post not found.\n**Retryable:** false");
         }
 
         if (existing.userId !== ctx.userId) {
@@ -501,11 +474,11 @@ export const contentHubTools: StandaloneToolDefinition[] = [
         });
 
         return textResult(
-          `**Post Reverted to Draft**\n\n`
-            + `**Post ID:** ${reverted.id}\n`
-            + `**Title:** ${reverted.title}\n`
-            + `**Previous Status:** ${existing.status}\n`
-            + `**Status:** draft`,
+          `**Post Reverted to Draft**\n\n` +
+            `**Post ID:** ${reverted.id}\n` +
+            `**Title:** ${reverted.title}\n` +
+            `**Previous Status:** ${existing.status}\n` +
+            `**Status:** draft`,
         );
       }),
   },

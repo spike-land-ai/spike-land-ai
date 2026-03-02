@@ -25,9 +25,7 @@ vi.mock("@/lib/logger", () => ({
 }));
 
 const { callClaude } = await import("@/lib/create/agent-client");
-const { selectByElo, getOrCreateAgentElo } = await import(
-  "@/lib/generate/elo-tracker"
-);
+const { selectByElo, getOrCreateAgentElo } = await import("@/lib/generate/elo-tracker");
 const { getSession } = await import("@/lib/codespace/session-service");
 
 const mockCallClaude = vi.mocked(callClaude);
@@ -136,9 +134,7 @@ describe("runAiReview", () => {
   });
 
   it("returns failure when no code available", async () => {
-    mockGetSession.mockResolvedValue(
-      null as Awaited<ReturnType<typeof getSession>>,
-    );
+    mockGetSession.mockResolvedValue(null as Awaited<ReturnType<typeof getSession>>);
 
     const result = await runAiReview("app-123", "codespace-1");
 
@@ -153,9 +149,7 @@ describe("runAiReview", () => {
 
     // Both reviewers fail, both auto-approve
     expect(result.passed).toBe(true);
-    expect(
-      result.reviews.every(r => r.feedback === "Review failed, auto-approved"),
-    ).toBe(true);
+    expect(result.reviews.every((r) => r.feedback === "Review failed, auto-approved")).toBe(true);
   });
 
   it("calls Claude with sonnet model", async () => {

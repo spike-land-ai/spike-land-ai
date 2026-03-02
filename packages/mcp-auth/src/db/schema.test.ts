@@ -11,7 +11,7 @@ describe("mcp-auth Drizzle schema", () => {
 
     it("has updatedAt column with correct column name", () => {
       const config = getTableConfig(user);
-      const updatedAtCol = config.columns.find(c => c.name === "updatedAt");
+      const updatedAtCol = config.columns.find((c) => c.name === "updatedAt");
       expect(updatedAtCol).toBeDefined();
       // Ensure updatedAt is NOT accidentally mapped to "createdAt"
       expect(updatedAtCol!.name).toBe("updatedAt");
@@ -19,7 +19,7 @@ describe("mcp-auth Drizzle schema", () => {
 
     it("has all required columns", () => {
       const config = getTableConfig(user);
-      const columnNames = config.columns.map(c => c.name);
+      const columnNames = config.columns.map((c) => c.name);
       expect(columnNames).toContain("id");
       expect(columnNames).toContain("name");
       expect(columnNames).toContain("email");
@@ -38,14 +38,14 @@ describe("mcp-auth Drizzle schema", () => {
 
     it("has updatedAt column with correct column name", () => {
       const config = getTableConfig(session);
-      const updatedAtCol = config.columns.find(c => c.name === "updatedAt");
+      const updatedAtCol = config.columns.find((c) => c.name === "updatedAt");
       expect(updatedAtCol).toBeDefined();
       expect(updatedAtCol!.name).toBe("updatedAt");
     });
 
     it("has token column with unique constraint", () => {
       const config = getTableConfig(session);
-      const tokenCol = config.columns.find(c => c.name === "token");
+      const tokenCol = config.columns.find((c) => c.name === "token");
       expect(tokenCol).toBeDefined();
       expect(tokenCol!.isUnique).toBe(true);
     });
@@ -59,14 +59,14 @@ describe("mcp-auth Drizzle schema", () => {
 
     it("has updatedAt column with correct column name", () => {
       const config = getTableConfig(account);
-      const updatedAtCol = config.columns.find(c => c.name === "updatedAt");
+      const updatedAtCol = config.columns.find((c) => c.name === "updatedAt");
       expect(updatedAtCol).toBeDefined();
       expect(updatedAtCol!.name).toBe("updatedAt");
     });
 
     it("has all required columns for Better Auth", () => {
       const config = getTableConfig(account);
-      const columnNames = config.columns.map(c => c.name);
+      const columnNames = config.columns.map((c) => c.name);
       expect(columnNames).toContain("accountId");
       expect(columnNames).toContain("providerId");
       expect(columnNames).toContain("userId");
@@ -82,7 +82,7 @@ describe("mcp-auth Drizzle schema", () => {
 
     it("has updatedAt column with correct column name", () => {
       const config = getTableConfig(verification);
-      const updatedAtCol = config.columns.find(c => c.name === "updatedAt");
+      const updatedAtCol = config.columns.find((c) => c.name === "updatedAt");
       expect(updatedAtCol).toBeDefined();
       expect(updatedAtCol!.name).toBe("updatedAt");
     });

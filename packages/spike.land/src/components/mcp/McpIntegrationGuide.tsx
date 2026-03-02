@@ -50,18 +50,13 @@ export function McpIntegrationGuide() {
       <div className="absolute inset-0 bg-gradient-to-b from-transparent via-cyan-950/5 to-transparent pointer-events-none" />
 
       <div className="relative text-center space-y-4 mb-12">
-        <h2 className="text-3xl sm:text-5xl font-bold tracking-tight text-white">
-          Get Connected
-        </h2>
+        <h2 className="text-3xl sm:text-5xl font-bold tracking-tight text-white">Get Connected</h2>
         <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
           Integrate spike.land MCP with your favorite AI tools in seconds.
         </p>
       </div>
 
-      <Tabs
-        defaultValue="claude-desktop"
-        className="max-w-3xl mx-auto relative z-10"
-      >
+      <Tabs defaultValue="claude-desktop" className="max-w-3xl mx-auto relative z-10">
         <div className="flex justify-center mb-8 overflow-x-auto pb-2 sm:pb-0">
           <TabsList className="bg-black/20 backdrop-blur-xl border border-white/10 p-1.5 h-auto rounded-full inline-flex gap-1 [&_.glass-edge]:hidden">
             <TabsTrigger

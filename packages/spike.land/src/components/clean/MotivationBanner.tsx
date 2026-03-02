@@ -30,7 +30,7 @@ const CONTEXT_MESSAGES: Record<Exclude<MotivationContext, "idle">, string[]> = {
 
 const CONTEXT_STYLES: Record<
   Exclude<MotivationContext, "idle">,
-  { bg: string; border: string; icon: string; dot: string; }
+  { bg: string; border: string; icon: string; dot: string }
 > = {
   starting: {
     bg: "bg-emerald-500/10",
@@ -112,9 +112,7 @@ export function MotivationBanner({
       role="status"
       aria-live="polite"
     >
-      <div
-        className={`h-2 w-2 rounded-full shrink-0 animate-pulse ${styles.dot}`}
-      />
+      <div className={`h-2 w-2 rounded-full shrink-0 animate-pulse ${styles.dot}`} />
       <p className={`flex-1 text-sm font-medium ${styles.icon}`}>{message}</p>
       {dismissable && (
         <Button

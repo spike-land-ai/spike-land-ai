@@ -3,9 +3,7 @@ import { GeneratedRouteStatus } from "@prisma/client";
 import prisma from "@/lib/prisma";
 import logger from "@/lib/logger";
 
-export async function getRouteBySlug(
-  slug: string,
-): Promise<GeneratedRoute | null> {
+export async function getRouteBySlug(slug: string): Promise<GeneratedRoute | null> {
   return prisma.generatedRoute.findUnique({ where: { slug } });
 }
 
@@ -59,9 +57,7 @@ export async function updateRouteStatus(
     where: { slug },
     data: {
       status,
-      ...(status === GeneratedRouteStatus.PUBLISHED
-        ? { publishedAt: new Date() }
-        : {}),
+      ...(status === GeneratedRouteStatus.PUBLISHED ? { publishedAt: new Date() } : {}),
       ...data,
     },
   });

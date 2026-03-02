@@ -46,9 +46,7 @@ const DEFAULT_SETTINGS: SmartRoutingSettings = {
 // Key for storing settings in Workspace.settings JSON field
 const SETTINGS_KEY = "inboxRouting";
 
-export async function getSmartRoutingSettings(
-  workspaceId: string,
-): Promise<SmartRoutingSettings> {
+export async function getSmartRoutingSettings(workspaceId: string): Promise<SmartRoutingSettings> {
   const workspace = await prisma.workspace.findUnique({
     where: { id: workspaceId },
     select: { settings: true },
@@ -56,17 +54,15 @@ export async function getSmartRoutingSettings(
 
   if (!workspace?.settings) return DEFAULT_SETTINGS;
 
-  const settings = (workspace.settings as Record<string, unknown>)
-    ?.[SETTINGS_KEY];
+  const settings = (workspace.settings as Record<string, unknown>)?.[SETTINGS_KEY];
   if (!settings) return DEFAULT_SETTINGS;
 
   // Validate and parse, falling back to defaults for missing fields
   const result = SmartRoutingSettingsSchema.safeParse(settings);
   if (!result.success) {
-    logger.warn(
-      "Invalid smart routing settings found, using defaults",
-      { errors: result.error.issues },
-    );
+    logger.warn("Invalid smart routing settings found, using defaults", {
+      errors: result.error.issues,
+    });
     return DEFAULT_SETTINGS;
   }
 
@@ -97,8 +93,8 @@ export async function updateSmartRoutingSettings(
     select: { settings: true },
   });
 
-  const fullSettings: Record<string, unknown> = (workspace?.settings as Record<string, unknown>)
-    || {};
+  const fullSettings: Record<string, unknown> =
+    (workspace?.settings as Record<string, unknown>) || {};
   fullSettings[SETTINGS_KEY] = newSettings;
 
   await prisma.workspace.update({

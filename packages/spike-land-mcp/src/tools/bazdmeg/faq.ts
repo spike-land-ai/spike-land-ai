@@ -25,12 +25,15 @@ export function registerBazdmegFaqTools(
   registry.registerBuilt(
     t
       .tool("bazdmeg_faq_list", "List BAZDMEG FAQ entries, optionally filtered by category.", {
-        category: z.string().optional().describe(
-          "Filter by category (e.g., 'general', 'methodology', 'testing').",
-        ),
-        include_unpublished: z.boolean().optional().default(false).describe(
-          "Include unpublished entries (admin only).",
-        ),
+        category: z
+          .string()
+          .optional()
+          .describe("Filter by category (e.g., 'general', 'methodology', 'testing')."),
+        include_unpublished: z
+          .boolean()
+          .optional()
+          .default(false)
+          .describe("Include unpublished entries (admin only)."),
       })
       .meta({ category: "bazdmeg", tier: "free" })
       .handler(async ({ input }) => {
@@ -39,21 +42,23 @@ export function registerBazdmegFaqTools(
           if (input.category) params.set("category", input.category);
           if (input.include_unpublished) params.set("include_unpublished", "true");
 
-          const entries = await apiRequest<Array<{
-            id: string;
-            question: string;
-            answer: string;
-            category: string;
-            isPublished: boolean;
-            helpfulCount: number;
-          }>>(`/api/bazdmeg/faq?${params.toString()}`);
+          const entries = await apiRequest<
+            Array<{
+              id: string;
+              question: string;
+              answer: string;
+              category: string;
+              isPublished: boolean;
+              helpfulCount: number;
+            }>
+          >(`/api/bazdmeg/faq?${params.toString()}`);
 
           if (entries.length === 0) {
             return textResult("No FAQ entries found.");
           }
 
           const lines = entries.map(
-            e =>
+            (e) =>
               `**${e.question}**\n${e.answer}\n*Category: ${e.category} | Published: ${e.isPublished} | Helpful: ${e.helpfulCount} | ID: ${e.id}*`,
           );
 
@@ -70,9 +75,7 @@ export function registerBazdmegFaqTools(
       .tool("bazdmeg_faq_create", "Create a new BAZDMEG FAQ entry.", {
         question: z.string().min(1).describe("The FAQ question."),
         answer: z.string().min(1).describe("The FAQ answer."),
-        category: z.string().optional().default("general").describe(
-          "Category for grouping.",
-        ),
+        category: z.string().optional().default("general").describe("Category for grouping."),
         sort_order: z.number().optional().default(0).describe("Display sort order."),
       })
       .meta({ category: "bazdmeg", tier: "free" })
@@ -87,9 +90,7 @@ export function registerBazdmegFaqTools(
               sort_order: input.sort_order,
             }),
           });
-          return textResult(
-            `FAQ entry created: "${entry.question}" (ID: ${entry.id})`,
-          );
+          return textResult(`FAQ entry created: "${entry.question}" (ID: ${entry.id})`);
         });
       }),
   );
@@ -103,26 +104,25 @@ export function registerBazdmegFaqTools(
         answer: z.string().optional().describe("Updated answer text."),
         category: z.string().optional().describe("Updated category."),
         sort_order: z.number().optional().describe("Updated sort order."),
-        is_published: z.boolean().optional().describe(
-          "Whether the entry is published.",
-        ),
+        is_published: z.boolean().optional().describe("Whether the entry is published."),
       })
       .meta({ category: "bazdmeg", tier: "free" })
       .handler(async ({ input }) => {
         return safeToolCall("bazdmeg_faq_update", async () => {
-          const entry = await apiRequest<{ id: string; question: string }>(`/api/bazdmeg/faq/${input.id}`, {
-            method: "PATCH",
-            body: JSON.stringify({
-              question: input.question,
-              answer: input.answer,
-              category: input.category,
-              sort_order: input.sort_order,
-              is_published: input.is_published,
-            }),
-          });
-          return textResult(
-            `FAQ entry updated: "${entry.question}" (ID: ${entry.id})`,
+          const entry = await apiRequest<{ id: string; question: string }>(
+            `/api/bazdmeg/faq/${input.id}`,
+            {
+              method: "PATCH",
+              body: JSON.stringify({
+                question: input.question,
+                answer: input.answer,
+                category: input.category,
+                sort_order: input.sort_order,
+                is_published: input.is_published,
+              }),
+            },
           );
+          return textResult(`FAQ entry updated: "${entry.question}" (ID: ${entry.id})`);
         });
       }),
   );

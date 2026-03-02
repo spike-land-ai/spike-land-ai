@@ -6,16 +6,14 @@ import { Label } from "@/components/ui/label";
 import { useState } from "react";
 
 function getLuminance(r: number, g: number, b: number): number {
-  const [rs, gs, bs] = [r, g, b].map(c => {
+  const [rs, gs, bs] = [r, g, b].map((c) => {
     const sRGB = c / 255;
-    return sRGB <= 0.03928
-      ? sRGB / 12.92
-      : Math.pow((sRGB + 0.055) / 1.055, 2.4);
+    return sRGB <= 0.03928 ? sRGB / 12.92 : Math.pow((sRGB + 0.055) / 1.055, 2.4);
   }) as [number, number, number];
   return 0.2126 * rs + 0.7152 * gs + 0.0722 * bs;
 }
 
-function hexToRgb(hex: string): { r: number; g: number; b: number; } | null {
+function hexToRgb(hex: string): { r: number; g: number; b: number } | null {
   const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
   if (!result || !result[1] || !result[2] || !result[3]) return null;
   return {
@@ -56,14 +54,14 @@ export function ContrastCheckerDemo() {
               id="foreground"
               type="text"
               value={foreground}
-              onChange={e => setForeground(e.target.value)}
+              onChange={(e) => setForeground(e.target.value)}
               placeholder="#FFFFFF"
               className="font-mono"
             />
             <input
               type="color"
               value={foreground}
-              onChange={e => setForeground(e.target.value)}
+              onChange={(e) => setForeground(e.target.value)}
               className="w-12 h-10 rounded-lg cursor-pointer border border-border"
             />
           </div>
@@ -75,14 +73,14 @@ export function ContrastCheckerDemo() {
               id="background"
               type="text"
               value={background}
-              onChange={e => setBackground(e.target.value)}
+              onChange={(e) => setBackground(e.target.value)}
               placeholder="#08081C"
               className="font-mono"
             />
             <input
               type="color"
               value={background}
-              onChange={e => setBackground(e.target.value)}
+              onChange={(e) => setBackground(e.target.value)}
               className="w-12 h-10 rounded-lg cursor-pointer border border-border"
             />
           </div>
@@ -106,24 +104,18 @@ export function ContrastCheckerDemo() {
         <div className="grid grid-cols-2 gap-3">
           <div
             className={`p-3 rounded-lg border ${
-              passAA
-                ? "border-green-500 bg-green-500/10"
-                : "border-red-500 bg-red-500/10"
+              passAA ? "border-green-500 bg-green-500/10" : "border-red-500 bg-red-500/10"
             }`}
           >
             <div className="flex items-center justify-between">
               <span className="text-sm">WCAG AA (Normal)</span>
-              <Badge variant={passAA ? "default" : "destructive"}>
-                {passAA ? "Pass" : "Fail"}
-              </Badge>
+              <Badge variant={passAA ? "default" : "destructive"}>{passAA ? "Pass" : "Fail"}</Badge>
             </div>
             <p className="text-xs text-muted-foreground mt-1">Requires 4.5:1</p>
           </div>
           <div
             className={`p-3 rounded-lg border ${
-              passAALarge
-                ? "border-green-500 bg-green-500/10"
-                : "border-red-500 bg-red-500/10"
+              passAALarge ? "border-green-500 bg-green-500/10" : "border-red-500 bg-red-500/10"
             }`}
           >
             <div className="flex items-center justify-between">
@@ -136,9 +128,7 @@ export function ContrastCheckerDemo() {
           </div>
           <div
             className={`p-3 rounded-lg border ${
-              passAAA
-                ? "border-green-500 bg-green-500/10"
-                : "border-red-500 bg-red-500/10"
+              passAAA ? "border-green-500 bg-green-500/10" : "border-red-500 bg-red-500/10"
             }`}
           >
             <div className="flex items-center justify-between">
@@ -151,9 +141,7 @@ export function ContrastCheckerDemo() {
           </div>
           <div
             className={`p-3 rounded-lg border ${
-              passAAALarge
-                ? "border-green-500 bg-green-500/10"
-                : "border-red-500 bg-red-500/10"
+              passAAALarge ? "border-green-500 bg-green-500/10" : "border-red-500 bg-red-500/10"
             }`}
           >
             <div className="flex items-center justify-between">

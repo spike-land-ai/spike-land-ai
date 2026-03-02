@@ -24,11 +24,7 @@ export function expectedScore(playerElo: number, opponentElo: number): number {
  * @param won - 1 for win, 0 for loss, 0.5 for draw
  * @returns Integer ELO change (positive or negative)
  */
-export function calculateEloChange(
-  playerElo: number,
-  opponentElo: number,
-  won: number,
-): number {
+export function calculateEloChange(playerElo: number, opponentElo: number, won: number): number {
   const expected = expectedScore(playerElo, opponentElo);
   return Math.round(K_FACTOR * (won - expected));
 }
@@ -40,7 +36,7 @@ export function calculateEloChange(
  */
 export async function updateEloAfterScoring(
   submissionId: string,
-): Promise<{ newElo: number; eloChange: number; }> {
+): Promise<{ newElo: number; eloChange: number }> {
   const submission = await prisma.arenaSubmission.findUniqueOrThrow({
     where: { id: submissionId },
     select: { userId: true, challengeId: true, reviewScore: true },
@@ -96,22 +92,22 @@ export async function updateEloAfterScoring(
   }
 
   // Compare against average peer score
-  const avgPeerScore = peers.reduce((sum, p) => sum + (p.reviewScore ?? 0), 0)
-    / peers.length;
+  const avgPeerScore = peers.reduce((sum, p) => sum + (p.reviewScore ?? 0), 0) / peers.length;
 
   // Determine outcome: win if above average, loss if below, draw if close
   const diff = submission.reviewScore - avgPeerScore;
   const outcome = diff > 0.1 ? 1 : diff < -0.1 ? 0 : 0.5;
 
   // Use average peer ELO as opponent rating
-  const peerUserIds = peers.map(p => p.userId);
+  const peerUserIds = peers.map((p) => p.userId);
   const peerElos = await prisma.arenaElo.findMany({
     where: { userId: { in: peerUserIds } },
     select: { elo: true },
   });
-  const avgPeerElo = peerElos.length > 0
-    ? peerElos.reduce((sum, e) => sum + e.elo, 0) / peerElos.length
-    : DEFAULT_ELO;
+  const avgPeerElo =
+    peerElos.length > 0
+      ? peerElos.reduce((sum, e) => sum + e.elo, 0) / peerElos.length
+      : DEFAULT_ELO;
 
   const change = calculateEloChange(playerElo.elo, avgPeerElo, outcome);
   const newElo = playerElo.elo + change;
@@ -127,10 +123,14 @@ export async function updateEloAfterScoring(
       ...(isLoss ? { losses: { increment: 1 } } : {}),
       ...(outcome === 0.5 ? { draws: { increment: 1 } } : {}),
       streak: isWin
-        ? (playerElo.streak > 0 ? playerElo.streak + 1 : 1)
+        ? playerElo.streak > 0
+          ? playerElo.streak + 1
+          : 1
         : isLoss
-        ? (playerElo.streak < 0 ? playerElo.streak - 1 : -1)
-        : 0,
+          ? playerElo.streak < 0
+            ? playerElo.streak - 1
+            : -1
+          : 0,
       bestElo: Math.max(newElo, playerElo.bestElo),
     },
   });

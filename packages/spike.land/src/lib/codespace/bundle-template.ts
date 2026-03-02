@@ -13,10 +13,7 @@ export function buildBundleHtml(opts: {
   const safeHtml = (opts.html || "")
     .replace(/<script/gi, "&lt;script")
     .replace(/<\/script/gi, "&lt;/script");
-  const safeCodeSpace = (opts.codeSpace || "").replace(/</g, "&lt;").replace(
-    />/g,
-    "&gt;",
-  );
+  const safeCodeSpace = (opts.codeSpace || "").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
   return `<!DOCTYPE html>
 <html lang="en">

@@ -18,10 +18,7 @@ const complexityColor: Record<ComplexityLevel, string> = {
 
 export function ComplexityBadge({ level }: ComplexityBadgeProps) {
   return (
-    <Badge
-      variant="outline"
-      className={cn("text-xs font-mono", complexityColor[level])}
-    >
+    <Badge variant="outline" className={cn("text-xs font-mono", complexityColor[level])}>
       {level}
     </Badge>
   );

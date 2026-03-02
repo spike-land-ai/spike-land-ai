@@ -147,9 +147,7 @@ export function AppsNewPage() {
           >
             <span
               className={`flex h-6 w-6 items-center justify-center rounded-full text-xs ${
-                i < currentStep
-                  ? "bg-blue-600 text-white"
-                  : "bg-white/20"
+                i < currentStep ? "bg-blue-600 text-white" : "bg-white/20"
               }`}
             >
               {i < currentStep ? "\u2713" : i + 1}
@@ -163,9 +161,7 @@ export function AppsNewPage() {
       {buildStatus && (
         <div className="flex items-center gap-3 rounded-lg border border-blue-200 bg-blue-50 p-4">
           <div className="h-5 w-5 animate-spin rounded-full border-2 border-blue-600 border-t-transparent" />
-          <span className="text-sm font-medium text-blue-700">
-            Building your app...
-          </span>
+          <span className="text-sm font-medium text-blue-700">Building your app...</span>
           <StatusBadge status={buildStatus} />
         </div>
       )}
@@ -188,9 +184,7 @@ export function AppsNewPage() {
                   }`}
                   placeholder="My Awesome App"
                 />
-                {errors.name && (
-                  <p className="mt-1 text-xs text-red-500">{errors.name}</p>
-                )}
+                {errors.name && <p className="mt-1 text-xs text-red-500">{errors.name}</p>}
               </div>
               <div>
                 <label className="mb-1 block text-sm font-medium">Slug</label>
@@ -203,9 +197,7 @@ export function AppsNewPage() {
                   }`}
                   placeholder="my-awesome-app"
                 />
-                {errors.slug && (
-                  <p className="mt-1 text-xs text-red-500">{errors.slug}</p>
-                )}
+                {errors.slug && <p className="mt-1 text-xs text-red-500">{errors.slug}</p>}
               </div>
               <div>
                 <label className="mb-1 block text-sm font-medium">Description</label>
@@ -258,9 +250,7 @@ export function AppsNewPage() {
                   rows={8}
                   placeholder="I want an app that..."
                 />
-                {errors.prompt && (
-                  <p className="mt-1 text-xs text-red-500">{errors.prompt}</p>
-                )}
+                {errors.prompt && <p className="mt-1 text-xs text-red-500">{errors.prompt}</p>}
               </div>
             </div>
           )}

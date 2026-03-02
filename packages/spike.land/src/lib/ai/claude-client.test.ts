@@ -22,11 +22,12 @@ vi.mock("node:child_process", () => {
 
 vi.mock("@anthropic-ai/sdk", () => {
   const AnthropicMock = vi.fn();
-  (AnthropicMock as any).AuthenticationError = class AuthenticationError extends Error {
-    constructor() {
-      super("auth error");
-    }
-  };
+  (AnthropicMock as unknown as { AuthenticationError: typeof Error }).AuthenticationError =
+    class AuthenticationError extends Error {
+      constructor() {
+        super("auth error");
+      }
+    };
   return { default: AnthropicMock };
 });
 
@@ -54,7 +55,7 @@ describe("claude-client", () => {
 
   describe("getClaudeCliVersion", () => {
     it("returns semver if execFileSync succeeds", () => {
-      vi.mocked(cp.execFileSync).mockReturnValue("2.1.45 (Claude Code)" as any);
+      vi.mocked(cp.execFileSync).mockReturnValue("2.1.45 (Claude Code)" as unknown as Buffer);
       const v = getClaudeCliVersion();
       expect(v).toMatch(/2\.1\.\d+/); // It might cache previous test values, so just check it matches a semver
       // Actually it will cache it globally in the module scope.
@@ -75,9 +76,11 @@ describe("claude-client", () => {
       });
 
       const client = await getClaudeClient();
-      expect(Anthropic).toHaveBeenCalledWith(expect.objectContaining({
-        apiKey: "sk-claude-test",
-      }));
+      expect(Anthropic).toHaveBeenCalledWith(
+        expect.objectContaining({
+          apiKey: "sk-claude-test",
+        }),
+      );
       expect(client).toBeInstanceOf(Anthropic);
     });
 
@@ -92,10 +95,12 @@ describe("claude-client", () => {
     it("uses tokenPool if no API key config", async () => {
       vi.mocked(tokenPool.getPreferredToken).mockReturnValue("session-token");
       await getClaudeClient();
-      expect(Anthropic).toHaveBeenCalledWith(expect.objectContaining({
-        apiKey: null,
-        authToken: "session-token",
-      }));
+      expect(Anthropic).toHaveBeenCalledWith(
+        expect.objectContaining({
+          apiKey: null,
+          authToken: "session-token",
+        }),
+      );
     });
 
     it("throws if neither config is available", async () => {
@@ -122,7 +127,7 @@ describe("claude-client", () => {
 
     it("uses token fallback mechanism if no API key", async () => {
       const op = vi.fn().mockResolvedValue("success-fallback");
-      vi.mocked(tokenPool.withTokenFallback).mockImplementation(async cb => {
+      vi.mocked(tokenPool.withTokenFallback).mockImplementation(async (cb) => {
         return cb("fallback-token");
       });
 
@@ -140,19 +145,17 @@ describe("claude-client", () => {
       expect(
         isAuthError(
           new Anthropic.AuthenticationError(
-            "" as any,
-            "" as any,
-            "" as any,
-            "" as any,
+            "" as unknown as number,
+            "" as unknown as Response,
+            "" as unknown as string,
+            "" as unknown as Record<string, string>,
           ),
         ),
       ).toBe(true);
     });
 
     it("returns true for Error with authentication_error message", () => {
-      expect(isAuthError(new Error("something authentication_error bad"))).toBe(
-        true,
-      );
+      expect(isAuthError(new Error("something authentication_error bad"))).toBe(true);
     });
 
     it("returns true for Error with 401", () => {

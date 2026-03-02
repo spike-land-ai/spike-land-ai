@@ -6,12 +6,7 @@ import * as z from "zod";
 import { GitBranch, Plus } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import {
   Form,
   FormControl,
@@ -33,9 +28,7 @@ interface NewMachineDialogProps {
   onClose: () => void;
 }
 
-export function NewMachineDialog(
-  { isOpen, onSubmit, onClose }: NewMachineDialogProps,
-) {
+export function NewMachineDialog({ isOpen, onSubmit, onClose }: NewMachineDialogProps) {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -52,7 +45,7 @@ export function NewMachineDialog(
   return (
     <Dialog
       open={isOpen}
-      onOpenChange={open => {
+      onOpenChange={(open) => {
         if (!open) {
           onClose();
           form.reset();
@@ -70,10 +63,7 @@ export function NewMachineDialog(
         </DialogHeader>
         <div className="p-6">
           <Form {...form}>
-            <form
-              onSubmit={form.handleSubmit(handleSubmit)}
-              className="space-y-4"
-            >
+            <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
               <FormField
                 control={form.control}
                 name="name"

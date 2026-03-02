@@ -48,16 +48,11 @@ describe("device-auth-service", () => {
         id: "device-id",
       });
 
-      const result = await generateDeviceCode(
-        "client-1",
-        "https://spike.land",
-      );
+      const result = await generateDeviceCode("client-1", "https://spike.land");
 
       expect(result.deviceCode).toBeTruthy();
       expect(result.userCode).toMatch(/^[A-Z0-9]{4}-[A-Z0-9]{4}$/);
-      expect(result.verificationUri).toBe(
-        "https://spike.land/mcp/auth/device",
-      );
+      expect(result.verificationUri).toBe("https://spike.land/mcp/auth/device");
       expect(result.verificationUriComplete).toContain(result.userCode);
       expect(result.expiresIn).toBe(900); // 15 minutes
       expect(result.interval).toBe(5);
@@ -68,17 +63,10 @@ describe("device-auth-service", () => {
         id: "device-id",
       });
 
-      const result = await generateDeviceCode(
-        "client-1",
-        "https://spike.land",
-      );
-      const expectedHash = createHash("sha256")
-        .update(result.deviceCode)
-        .digest("hex");
+      const result = await generateDeviceCode("client-1", "https://spike.land");
+      const expectedHash = createHash("sha256").update(result.deviceCode).digest("hex");
 
-      expect(
-        mockPrisma.deviceAuthorizationCode.create,
-      ).toHaveBeenCalledWith({
+      expect(mockPrisma.deviceAuthorizationCode.create).toHaveBeenCalledWith({
         data: expect.objectContaining({
           deviceCodeHash: expectedHash,
           clientId: "client-1",
@@ -93,10 +81,7 @@ describe("device-auth-service", () => {
 
       // Generate multiple codes and check for ambiguous chars
       for (let i = 0; i < 20; i++) {
-        const result = await generateDeviceCode(
-          "client-1",
-          "https://spike.land",
-        );
+        const result = await generateDeviceCode("client-1", "https://spike.land");
         const rawCode = result.userCode.replace("-", "");
         expect(rawCode).not.toMatch(/[0OIL1]/);
       }
@@ -155,9 +140,7 @@ describe("device-auth-service", () => {
 
       const result = await approveDeviceCode("ABCD-EFGH", "user-1");
       expect(result).toBe(true);
-      expect(
-        mockPrisma.deviceAuthorizationCode.updateMany,
-      ).toHaveBeenCalledWith({
+      expect(mockPrisma.deviceAuthorizationCode.updateMany).toHaveBeenCalledWith({
         where: {
           userCode: "ABCD-EFGH",
           status: "PENDING",
@@ -251,9 +234,7 @@ describe("device-auth-service", () => {
       const result = await pollDeviceCode("device-code-123", "client-1");
       expect(result).toEqual({ status: "authorization_pending" });
       // Should have called update to set lastPolledAt (not slow_down update)
-      expect(
-        mockPrisma.deviceAuthorizationCode.update,
-      ).toHaveBeenCalledWith({
+      expect(mockPrisma.deviceAuthorizationCode.update).toHaveBeenCalledWith({
         where: { id: "device-id" },
         data: { lastPolledAt: expect.any(Date) },
       });
@@ -391,9 +372,7 @@ describe("device-auth-service", () => {
 
       const count = await cleanupExpiredDeviceCodes();
       expect(count).toBe(5);
-      expect(
-        mockPrisma.deviceAuthorizationCode.deleteMany,
-      ).toHaveBeenCalledWith({
+      expect(mockPrisma.deviceAuthorizationCode.deleteMany).toHaveBeenCalledWith({
         where: { expiresAt: { lt: expect.any(Date) } },
       });
     });

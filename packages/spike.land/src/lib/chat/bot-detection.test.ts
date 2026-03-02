@@ -8,26 +8,20 @@ describe("isBot", () => {
 
   it("returns false for normal browser user agent", () => {
     expect(
-      isBot(
-        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/120.0",
-      ),
+      isBot("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/120.0"),
     ).toBe(false);
   });
 
   it("detects Googlebot", () => {
-    expect(
-      isBot(
-        "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)",
-      ),
-    ).toBe(true);
+    expect(isBot("Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)")).toBe(
+      true,
+    );
   });
 
   it("detects Bingbot", () => {
-    expect(
-      isBot(
-        "Mozilla/5.0 (compatible; bingbot/2.0; +http://www.bing.com/bingbot.htm)",
-      ),
-    ).toBe(true);
+    expect(isBot("Mozilla/5.0 (compatible; bingbot/2.0; +http://www.bing.com/bingbot.htm)")).toBe(
+      true,
+    );
   });
 
   it("detects HeadlessChrome", () => {

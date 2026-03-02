@@ -10,16 +10,12 @@ describe("learnit/wiki-links", () => {
 
   it("should transform aliased wiki links", () => {
     const result = parseWikiLinks("Read more about [[Advanced React|React]].");
-    expect(result.content).toBe(
-      "Read more about [React](/learnit/advanced-react).",
-    );
+    expect(result.content).toBe("Read more about [React](/learnit/advanced-react).");
     expect(result.links).toEqual(["advanced-react"]);
   });
 
   it("should handle multiple wiki links", () => {
-    const result = parseWikiLinks(
-      "Compare [[React]] with [[Vue]] and [[Angular]].",
-    );
+    const result = parseWikiLinks("Compare [[React]] with [[Vue]] and [[Angular]].");
     expect(result.links).toEqual(["react", "vue", "angular"]);
     expect(result.content).toContain("[React](/learnit/react)");
     expect(result.content).toContain("[Vue](/learnit/vue)");
@@ -35,8 +31,6 @@ describe("learnit/wiki-links", () => {
   it("should handle wiki links with spaces", () => {
     const result = parseWikiLinks("Check [[TypeScript Generics]].");
     expect(result.links).toEqual(["typescript-generics"]);
-    expect(result.content).toContain(
-      "[TypeScript Generics](/learnit/typescript-generics)",
-    );
+    expect(result.content).toContain("[TypeScript Generics](/learnit/typescript-generics)");
   });
 });

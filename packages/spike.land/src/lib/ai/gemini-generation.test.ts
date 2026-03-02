@@ -26,8 +26,8 @@ vi.mock("./aspect-ratio", () => ({
   detectAspectRatio: vi.fn(),
 }));
 
-vi.mock("./gemini-models", async importOriginal => {
-  const actual = await importOriginal<any>();
+vi.mock("./gemini-models", async (importOriginal) => {
+  const actual = await importOriginal<Record<string, unknown>>();
   return {
     ...actual,
     supportsImageSize: vi.fn(),
@@ -40,7 +40,9 @@ describe("gemini-generation", () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    vi.mocked(getGeminiClient).mockResolvedValue(mockAi as any);
+    vi.mocked(getGeminiClient).mockResolvedValue(
+      mockAi as unknown as Awaited<ReturnType<typeof getGeminiClient>>,
+    );
     vi.mocked(processGeminiStream).mockResolvedValue(Buffer.from("mock-image"));
     vi.mocked(supportsImageSize).mockReturnValue(true);
     vi.mocked(detectAspectRatio).mockReturnValue("16:9");
@@ -56,23 +58,25 @@ describe("gemini-generation", () => {
       });
 
       expect(analyzeImage).not.toHaveBeenCalled();
-      expect(processGeminiStream).toHaveBeenCalledWith(expect.objectContaining({
-        contents: expect.arrayContaining([
-          expect.objectContaining({
-            parts: expect.arrayContaining([
-              expect.objectContaining({
-                text: expect.stringContaining("Make it brighter"),
-              }),
-            ]),
-          }),
-        ]),
-      }));
+      expect(processGeminiStream).toHaveBeenCalledWith(
+        expect.objectContaining({
+          contents: expect.arrayContaining([
+            expect.objectContaining({
+              parts: expect.arrayContaining([
+                expect.objectContaining({
+                  text: expect.stringContaining("Make it brighter"),
+                }),
+              ]),
+            }),
+          ]),
+        }),
+      );
     });
 
     it("analyzes image if no promptOverride provided", async () => {
-      vi.mocked(analyzeImage).mockResolvedValue(
-        { enhancementPrompt: "Auto-detected prompt" } as any,
-      );
+      vi.mocked(analyzeImage).mockResolvedValue({
+        enhancementPrompt: "Auto-detected prompt",
+      } as unknown as Awaited<ReturnType<typeof analyzeImage>>);
 
       await enhanceImageWithGemini({
         imageData: "base64data",
@@ -81,31 +85,31 @@ describe("gemini-generation", () => {
       });
 
       expect(analyzeImage).toHaveBeenCalledWith("base64data", "image/jpeg");
-      expect(processGeminiStream).toHaveBeenCalledWith(expect.objectContaining({
-        contents: expect.arrayContaining([
-          expect.objectContaining({
-            parts: expect.arrayContaining([
-              expect.objectContaining({
-                text: expect.stringContaining("Auto-detected prompt"),
-              }),
-            ]),
-          }),
-        ]),
-      }));
+      expect(processGeminiStream).toHaveBeenCalledWith(
+        expect.objectContaining({
+          contents: expect.arrayContaining([
+            expect.objectContaining({
+              parts: expect.arrayContaining([
+                expect.objectContaining({
+                  text: expect.stringContaining("Auto-detected prompt"),
+                }),
+              ]),
+            }),
+          ]),
+        }),
+      );
     });
 
     it("includes reference images if provided", async () => {
-      vi.mocked(analyzeImage).mockResolvedValue(
-        { enhancementPrompt: "foo" } as any,
-      );
+      vi.mocked(analyzeImage).mockResolvedValue({ enhancementPrompt: "foo" } as unknown as Awaited<
+        ReturnType<typeof analyzeImage>
+      >);
 
       await enhanceImageWithGemini({
         imageData: "base64data",
         mimeType: "image/jpeg",
         tier: "1K",
-        referenceImages: [
-          { imageData: "ref1", mimeType: "image/png" },
-        ],
+        referenceImages: [{ imageData: "ref1", mimeType: "image/png" }],
       });
 
       const callArg = vi.mocked(processGeminiStream).mock.calls[0]![0];

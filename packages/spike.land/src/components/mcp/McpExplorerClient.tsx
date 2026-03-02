@@ -14,7 +14,7 @@ import type { McpToolDef } from "@/components/mcp/mcp-tool-registry";
 import { MCP_TOOLS } from "@/components/mcp/mcp-tool-registry";
 import { useFavorites, useRecentTools } from "@/components/mcp/useMcpHistory";
 
-const toolMap = new Map(MCP_TOOLS.map(t => [t.name, t]));
+const toolMap = new Map(MCP_TOOLS.map((t) => [t.name, t]));
 
 export function McpExplorerClient() {
   const [search, setSearch] = useState("");
@@ -28,7 +28,7 @@ export function McpExplorerClient() {
   const recentTools = useMemo(
     () =>
       recent
-        .map(name => toolMap.get(name))
+        .map((name) => toolMap.get(name))
         .filter((t): t is McpToolDef => t !== undefined)
         .slice(0, 6),
     [recent],
@@ -75,12 +75,10 @@ export function McpExplorerClient() {
             <div className="flex items-center gap-2 mb-6">
               <Clock className="w-5 h-5 text-cyan-400" />
               <h2 className="text-xl font-black text-white">Recently Used</h2>
-              <span className="text-zinc-600 text-sm">
-                — pick up where you left off
-              </span>
+              <span className="text-zinc-600 text-sm">— pick up where you left off</span>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-              {recentTools.map(tool => (
+              {recentTools.map((tool) => (
                 <McpToolCard
                   key={tool.name}
                   tool={tool}
@@ -113,7 +111,7 @@ export function McpExplorerClient() {
         <div className="max-w-7xl mx-auto">
           <button
             type="button"
-            onClick={() => setAdvancedOpen(o => !o)}
+            onClick={() => setAdvancedOpen((o) => !o)}
             className="flex items-center gap-2 py-6 text-sm text-zinc-500 hover:text-zinc-300 transition-colors group w-full text-left"
           >
             <ChevronDown

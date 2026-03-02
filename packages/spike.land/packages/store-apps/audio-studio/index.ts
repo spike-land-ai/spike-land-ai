@@ -34,5 +34,5 @@ if (import.meta.url === `file://${process.argv[1]}`) {
     env: process.env as Record<string, string | undefined>,
     calledTools: new Set<string>(),
   };
-  createServer(ctx).then(server => connectStdio(server));
+  createServer(ctx).then((server) => connectStdio(server));
 }

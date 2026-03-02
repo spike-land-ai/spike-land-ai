@@ -125,9 +125,7 @@ function makeHealth(overrides: Partial<SocialAccountHealth> = {}): SocialAccount
   } as SocialAccountHealth;
 }
 
-function makeAlertConfig(
-  overrides: Partial<HealthAlertConfig> = {},
-): HealthAlertConfig {
+function makeAlertConfig(overrides: Partial<HealthAlertConfig> = {}): HealthAlertConfig {
   return {
     workspaceId: "ws-1",
     minSeverity: "WARNING",
@@ -695,10 +693,7 @@ describe("sendHealthAlerts", () => {
     } as never);
 
     // minSeverity = ERROR means WARNING accounts are skipped
-    const count = await sendHealthAlerts(
-      "ws-1",
-      makeAlertConfig({ minSeverity: "ERROR" }),
-    );
+    const count = await sendHealthAlerts("ws-1", makeAlertConfig({ minSeverity: "ERROR" }));
 
     expect(count).toBe(0);
     expect(sendEmail).not.toHaveBeenCalled();
@@ -779,9 +774,7 @@ describe("sendHealthAlerts", () => {
   });
 
   it("continues without throwing when in-app notification fails", async () => {
-    vi.mocked(prisma.notification.create).mockRejectedValueOnce(
-      new Error("Notification DB error"),
-    );
+    vi.mocked(prisma.notification.create).mockRejectedValueOnce(new Error("Notification DB error"));
 
     const account = makeSocialAccount();
     const health = makeHealth({ healthScore: 30 });

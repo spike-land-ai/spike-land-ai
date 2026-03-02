@@ -54,10 +54,7 @@ interface ErrorBoundaryState {
  * </ErrorBoundary>
  * ```
  */
-export class ErrorBoundary extends Component<
-  ErrorBoundaryProps,
-  ErrorBoundaryState
-> {
+export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
   constructor(props: ErrorBoundaryProps) {
     super(props);
     this.state = {
@@ -92,10 +89,10 @@ export class ErrorBoundary extends Component<
   override componentDidUpdate(prevProps: ErrorBoundaryProps): void {
     // Reset error state if resetKeys change
     if (
-      this.state.hasError
-      && this.props.resetKeys
-      && prevProps.resetKeys
-      && !this.areResetKeysEqual(prevProps.resetKeys, this.props.resetKeys)
+      this.state.hasError &&
+      this.props.resetKeys &&
+      prevProps.resetKeys &&
+      !this.areResetKeysEqual(prevProps.resetKeys, this.props.resetKeys)
     ) {
       this.resetError();
     }
@@ -130,9 +127,7 @@ export class ErrorBoundary extends Component<
             <CardHeader>
               <div className="flex items-center gap-2">
                 <AlertCircle className="h-5 w-5 text-destructive" />
-                <CardTitle className="text-destructive">
-                  {userFriendlyError.title}
-                </CardTitle>
+                <CardTitle className="text-destructive">{userFriendlyError.title}</CardTitle>
               </div>
               <CardDescription>{userFriendlyError.message}</CardDescription>
             </CardHeader>
@@ -140,13 +135,10 @@ export class ErrorBoundary extends Component<
               {userFriendlyError.suggestion && (
                 <Alert>
                   <AlertTitle>Suggestion</AlertTitle>
-                  <AlertDescription>
-                    {userFriendlyError.suggestion}
-                  </AlertDescription>
+                  <AlertDescription>{userFriendlyError.suggestion}</AlertDescription>
                 </Alert>
               )}
-              {this.props.showDetails
-                && process.env.NODE_ENV === "development" && (
+              {this.props.showDetails && process.env.NODE_ENV === "development" && (
                 <Alert variant="destructive">
                   <AlertTitle>Technical Details (Development Only)</AlertTitle>
                   <AlertDescription className="mt-2 space-y-2">
@@ -166,10 +158,7 @@ export class ErrorBoundary extends Component<
               <Button onClick={this.resetError} variant="default">
                 Try again
               </Button>
-              <Button
-                onClick={() => window.location.href = "/"}
-                variant="outline"
-              >
+              <Button onClick={() => (window.location.href = "/")} variant="outline">
                 Go home
               </Button>
             </CardFooter>

@@ -24,7 +24,7 @@ export function checkDependsOn(
   const deps = tool.dependencies?.dependsOn;
   if (!deps || deps.length === 0) return { ok: true, missing: [] };
 
-  const missing = deps.filter(d => !registeredNames.has(d));
+  const missing = deps.filter((d) => !registeredNames.has(d));
   return { ok: missing.length === 0, missing };
 }
 
@@ -38,7 +38,7 @@ export function checkRequires(
   const reqs = tool.dependencies?.requires;
   if (!reqs || reqs.length === 0) return { ok: true, missing: [] };
 
-  const missing = reqs.filter(r => !calledTools.has(r));
+  const missing = reqs.filter((r) => !calledTools.has(r));
   return { ok: missing.length === 0, missing };
 }
 

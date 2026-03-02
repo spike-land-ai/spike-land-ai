@@ -9,15 +9,10 @@ export interface AIConfig {
   config: Record<string, unknown> | null;
 }
 
-const configCache: Record<
-  string,
-  { config: AIConfig | null; timestamp: number; }
-> = {};
+const configCache: Record<string, { config: AIConfig | null; timestamp: number }> = {};
 const CACHE_TTL = 30 * 1000; // 30 seconds
 
-export async function resolveAIProviderConfig(
-  name: string,
-): Promise<AIConfig | null> {
+export async function resolveAIProviderConfig(name: string): Promise<AIConfig | null> {
   const now = Date.now();
   if (configCache[name] && now - configCache[name].timestamp < CACHE_TTL) {
     return configCache[name].config;

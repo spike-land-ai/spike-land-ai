@@ -73,9 +73,7 @@ export function SplashScreen({ onStart }: SplashScreenProps) {
 
           {/* Button content */}
           <div className="relative flex items-center gap-3">
-            <div
-              className={`transition-transform duration-300 ${isHovering ? "scale-110" : ""}`}
-            >
+            <div className={`transition-transform duration-300 ${isHovering ? "scale-110" : ""}`}>
               <Play className="w-6 h-6 fill-current" />
             </div>
             <span>Click to Start</span>
@@ -86,20 +84,14 @@ export function SplashScreen({ onStart }: SplashScreenProps) {
         </button>
 
         {/* Hint text */}
-        <p className="text-gray-500 text-sm">
-          Audio requires user interaction to play
-        </p>
+        <p className="text-gray-500 text-sm">Audio requires user interaction to play</p>
 
         {/* Keyboard shortcuts hint */}
         <div className="pt-4">
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-gray-800/50 rounded-full border border-gray-700/50">
             <span className="text-gray-400 text-sm">Press</span>
-            <kbd className="px-2 py-0.5 bg-gray-700 rounded text-xs text-gray-300 font-mono">
-              ?
-            </kbd>
-            <span className="text-gray-400 text-sm">
-              for keyboard shortcuts
-            </span>
+            <kbd className="px-2 py-0.5 bg-gray-700 rounded text-xs text-gray-300 font-mono">?</kbd>
+            <span className="text-gray-400 text-sm">for keyboard shortcuts</span>
           </div>
         </div>
       </div>

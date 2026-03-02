@@ -28,30 +28,22 @@ export function FeatureGridBlock({ content }: FeatureGridBlockProps) {
   return (
     <section className="w-full py-16 px-6 md:px-12 lg:px-24">
       <div className="max-w-6xl mx-auto">
-        {data.sectionTitle
-          ? (
-            <h2 className="text-3xl font-bold text-center mb-12">
-              {data.sectionTitle}
-            </h2>
-          )
-          : null}
+        {data.sectionTitle ? (
+          <h2 className="text-3xl font-bold text-center mb-12">{data.sectionTitle}</h2>
+        ) : null}
         <div className={`grid ${gridClass} gap-6`}>
           {data.features.map((feature, index) => (
             <div
               key={`${feature.title}-${index}`}
               className="rounded-lg border border-border bg-card p-6 transition-shadow hover:shadow-md"
             >
-              {feature.icon
-                ? (
-                  <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-md bg-primary/10 text-primary text-lg">
-                    {feature.icon}
-                  </div>
-                )
-                : null}
+              {feature.icon ? (
+                <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-md bg-primary/10 text-primary text-lg">
+                  {feature.icon}
+                </div>
+              ) : null}
               <h3 className="font-semibold mb-2">{feature.title}</h3>
-              <p className="text-sm text-muted-foreground">
-                {feature.description}
-              </p>
+              <p className="text-sm text-muted-foreground">{feature.description}</p>
             </div>
           ))}
         </div>

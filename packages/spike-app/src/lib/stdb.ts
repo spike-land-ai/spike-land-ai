@@ -21,8 +21,7 @@ function createStdbClient(): StdbClient {
   let retryTimer: ReturnType<typeof setTimeout> | null = null;
   const listeners = new Set<Listener>();
 
-  const baseUrl =
-    import.meta.env.VITE_STDB_URL ?? "ws://localhost:3000/stdb/ws";
+  const baseUrl = import.meta.env.VITE_STDB_URL ?? "ws://localhost:3000/stdb/ws";
 
   function notify() {
     for (const listener of listeners) {

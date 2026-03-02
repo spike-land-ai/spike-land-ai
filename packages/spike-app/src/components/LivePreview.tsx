@@ -72,10 +72,7 @@ export function LivePreview({ appId, edgeUrl = "https://edge.spike.land" }: Live
         {error && (
           <div className="absolute inset-0 flex flex-col items-center justify-center bg-white text-gray-400">
             <p className="text-sm">Failed to load preview</p>
-            <button
-              onClick={handleRefresh}
-              className="mt-2 text-sm text-blue-600 hover:underline"
-            >
+            <button onClick={handleRefresh} className="mt-2 text-sm text-blue-600 hover:underline">
               Retry
             </button>
           </div>

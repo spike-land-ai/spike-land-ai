@@ -1,8 +1,4 @@
-import type {
-  GeneratedRouteStatus,
-  ReviewDecision,
-  ReviewPhase,
-} from "@prisma/client";
+import type { GeneratedRouteStatus, ReviewDecision, ReviewPhase } from "@prisma/client";
 
 export type PipelinePhase =
   | "NEW"
@@ -47,29 +43,29 @@ export interface PipelineContext {
 }
 
 export type GenerationEvent =
-  | { type: "status"; phase: PipelinePhase; message: string; }
-  | { type: "plan_ready"; plan: Record<string, unknown>; }
+  | { type: "status"; phase: PipelinePhase; message: string }
+  | { type: "plan_ready"; plan: Record<string, unknown> }
   | {
-    type: "review_started";
-    phase: ReviewPhase;
-    reviewers: Array<{ agentId: string; elo: number; }>;
-  }
+      type: "review_started";
+      phase: ReviewPhase;
+      reviewers: Array<{ agentId: string; elo: number }>;
+    }
   | {
-    type: "review_complete";
-    phase: ReviewPhase;
-    results: ReviewResult[];
-    approved: boolean;
-  }
-  | { type: "code_generated"; codePreview: string; }
-  | { type: "transpile_result"; success: boolean; error?: string; }
+      type: "review_complete";
+      phase: ReviewPhase;
+      results: ReviewResult[];
+      approved: boolean;
+    }
+  | { type: "code_generated"; codePreview: string }
+  | { type: "transpile_result"; success: boolean; error?: string }
   | {
-    type: "complete";
-    slug: string;
-    codespaceUrl: string;
-    title: string;
-    description: string;
-  }
-  | { type: "error"; message: string; phase: PipelinePhase; }
-  | { type: "heartbeat"; timestamp: number; };
+      type: "complete";
+      slug: string;
+      codespaceUrl: string;
+      title: string;
+      description: string;
+    }
+  | { type: "error"; message: string; phase: PipelinePhase }
+  | { type: "heartbeat"; timestamp: number };
 
 export type { GeneratedRouteStatus, ReviewDecision, ReviewPhase };

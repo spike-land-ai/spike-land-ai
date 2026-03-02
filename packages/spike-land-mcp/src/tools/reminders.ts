@@ -51,9 +51,7 @@ export function registerRemindersTools(
         let text = `**Your Reminders (${rows.length})**\n\n`;
         for (const r of rows) {
           const status = r.completedAt ? "COMPLETED" : "ACTIVE";
-          const dueStr = r.dueAt
-            ? new Date(r.dueAt).toISOString()
-            : "No due date";
+          const dueStr = r.dueAt ? new Date(r.dueAt).toISOString() : "No due date";
           text += `- **${r.text}** [${status}]\n  Due: ${dueStr}\n  ID: \`${r.id}\`\n\n`;
         }
         return textResult(text);
@@ -64,11 +62,7 @@ export function registerRemindersTools(
     t
       .tool("reminders_create", "Create a new reminder.", {
         text: z.string().min(1).describe("Reminder text."),
-        due_date: z
-          .string()
-          .datetime()
-          .optional()
-          .describe("ISO 8601 due date."),
+        due_date: z.string().datetime().optional().describe("ISO 8601 due date."),
       })
       .meta({ category: "reminders", tier: "free" })
       .handler(async ({ input, ctx }) => {
@@ -79,16 +73,12 @@ export function registerRemindersTools(
           id,
           userId: ctx.userId,
           text: input.text,
-          dueAt: input.due_date
-            ? new Date(input.due_date).getTime()
-            : null,
+          dueAt: input.due_date ? new Date(input.due_date).getTime() : null,
           completedAt: null,
           createdAt: now,
         });
 
-        return textResult(
-          `**Reminder Created!**\n\nID: \`${id}\`\nText: ${input.text}`,
-        );
+        return textResult(`**Reminder Created!**\n\nID: \`${id}\`\nText: ${input.text}`);
       }),
   );
 
@@ -104,12 +94,7 @@ export function registerRemindersTools(
         const updated = await ctx.db
           .update(reminders)
           .set({ completedAt: now })
-          .where(
-            and(
-              eq(reminders.id, input.reminder_id),
-              eq(reminders.userId, ctx.userId),
-            ),
-          )
+          .where(and(eq(reminders.id, input.reminder_id), eq(reminders.userId, ctx.userId)))
           .returning({ id: reminders.id, text: reminders.text });
 
         if (updated.length === 0) {

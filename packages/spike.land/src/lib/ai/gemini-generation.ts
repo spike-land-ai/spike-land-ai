@@ -5,11 +5,7 @@ import logger from "@/lib/logger";
 import { type AspectRatio, detectAspectRatio } from "./aspect-ratio";
 import { analyzeImage } from "./gemini-analysis";
 import { getGeminiClient } from "./gemini-client";
-import {
-  DEFAULT_MODEL,
-  GEMINI_TIMEOUT_MS,
-  supportsImageSize,
-} from "./gemini-models";
+import { DEFAULT_MODEL, GEMINI_TIMEOUT_MS, supportsImageSize } from "./gemini-models";
 import { processGeminiStream } from "./gemini-stream";
 
 /**
@@ -55,11 +51,9 @@ export interface ModifyImageParams {
   aspectRatio?: AspectRatio;
 }
 
-const GENERATION_BASE_PROMPT =
-  `You are a professional photographer creating high-quality images. Generate the following image with perfect composition, lighting, and detail. Make it look like a professional photograph taken with a modern camera in 2025.`;
+const GENERATION_BASE_PROMPT = `You are a professional photographer creating high-quality images. Generate the following image with perfect composition, lighting, and detail. Make it look like a professional photograph taken with a modern camera in 2025.`;
 
-const MODIFICATION_BASE_PROMPT =
-  `Modify this image according to the following instructions while maintaining high quality, proper lighting, and professional appearance.`;
+const MODIFICATION_BASE_PROMPT = `Modify this image according to the following instructions while maintaining high quality, proper lighting, and professional appearance.`;
 
 /**
  * Enhances an image using Gemini's image generation API.
@@ -68,9 +62,7 @@ const MODIFICATION_BASE_PROMPT =
  * @returns Buffer containing the enhanced image data
  * @throws Error if API times out, no API key is configured, or no image data is received
  */
-export async function enhanceImageWithGemini(
-  params: EnhanceImageParams,
-): Promise<Buffer> {
+export async function enhanceImageWithGemini(params: EnhanceImageParams): Promise<Buffer> {
   const ai = await getGeminiClient();
 
   // Use promptOverride if provided, otherwise run analysis to generate prompt
@@ -94,9 +86,10 @@ export async function enhanceImageWithGemini(
   const modelToUse = params.model || DEFAULT_MODEL;
 
   // Detect aspect ratio from original dimensions to preserve orientation
-  const detectedAspectRatio = params.originalWidth && params.originalHeight
-    ? detectAspectRatio(params.originalWidth, params.originalHeight)
-    : undefined;
+  const detectedAspectRatio =
+    params.originalWidth && params.originalHeight
+      ? detectAspectRatio(params.originalWidth, params.originalHeight)
+      : undefined;
 
   // Build config based on model capabilities
   // gemini-2.5-flash-image doesn't support imageSize (always 1024px)
@@ -109,17 +102,16 @@ export async function enhanceImageWithGemini(
         ...(detectedAspectRatio && { aspectRatio: detectedAspectRatio }),
       },
     }),
-    ...(!supportsImageSize(modelToUse) && detectedAspectRatio && {
-      imageConfig: {
-        aspectRatio: detectedAspectRatio,
-      },
-    }),
+    ...(!supportsImageSize(modelToUse) &&
+      detectedAspectRatio && {
+        imageConfig: {
+          aspectRatio: detectedAspectRatio,
+        },
+      }),
   };
 
   // Build content parts - include reference images if provided
-  const parts: Array<
-    { text?: string; inlineData?: { mimeType: string; data: string; }; }
-  > = [];
+  const parts: Array<{ text?: string; inlineData?: { mimeType: string; data: string } }> = [];
 
   // Add the original image to enhance first
   parts.push({
@@ -131,12 +123,9 @@ export async function enhanceImageWithGemini(
 
   // Add reference images if provided (for style guidance)
   if (params.referenceImages && params.referenceImages.length > 0) {
-    logger.info(
-      `Including reference image(s) for style guidance`,
-      {
-        count: params.referenceImages.length,
-      },
-    );
+    logger.info(`Including reference image(s) for style guidance`, {
+      count: params.referenceImages.length,
+    });
     for (const refImg of params.referenceImages) {
       parts.push({
         inlineData: {
@@ -159,16 +148,13 @@ export async function enhanceImageWithGemini(
     },
   ];
 
-  logger.info(
-    `Generating enhanced image with Gemini API`,
-    {
-      model: modelToUse,
-      tier: params.tier,
-      resolution: resolutionMap[params.tier],
-      aspectRatio: detectedAspectRatio || "auto",
-      timeout: `${GEMINI_TIMEOUT_MS / 1000}s`,
-    },
-  );
+  logger.info(`Generating enhanced image with Gemini API`, {
+    model: modelToUse,
+    tier: params.tier,
+    resolution: resolutionMap[params.tier],
+    aspectRatio: detectedAspectRatio || "auto",
+    timeout: `${GEMINI_TIMEOUT_MS / 1000}s`,
+  });
 
   return processGeminiStream({
     ai,
@@ -186,9 +172,7 @@ export async function enhanceImageWithGemini(
  * @returns Buffer containing the generated image data
  * @throws Error if API times out, no API key is configured, or no image data is received
  */
-export async function generateImageWithGemini(
-  params: GenerateImageParams,
-): Promise<Buffer> {
+export async function generateImageWithGemini(params: GenerateImageParams): Promise<Buffer> {
   const ai = await getGeminiClient();
 
   const resolutionMap = {
@@ -207,17 +191,17 @@ export async function generateImageWithGemini(
         ...(params.aspectRatio && { aspectRatio: params.aspectRatio }),
       },
     }),
-    ...(!supportsImageSize(DEFAULT_MODEL) && params.aspectRatio && {
-      imageConfig: {
-        aspectRatio: params.aspectRatio,
-      },
-    }),
+    ...(!supportsImageSize(DEFAULT_MODEL) &&
+      params.aspectRatio && {
+        imageConfig: {
+          aspectRatio: params.aspectRatio,
+        },
+      }),
   };
 
-  let fullPrompt =
-    `${GENERATION_BASE_PROMPT}\n\nImage to generate: ${params.prompt}\n\nGenerate at ${
-      resolutionMap[params.tier]
-    } resolution.`;
+  let fullPrompt = `${GENERATION_BASE_PROMPT}\n\nImage to generate: ${params.prompt}\n\nGenerate at ${
+    resolutionMap[params.tier]
+  } resolution.`;
 
   if (params.negativePrompt) {
     fullPrompt += `\n\nAvoid: ${params.negativePrompt}`;
@@ -234,17 +218,14 @@ export async function generateImageWithGemini(
     },
   ];
 
-  logger.info(
-    `Generating image with Gemini API`,
-    {
-      model: DEFAULT_MODEL,
-      tier: params.tier,
-      resolution: resolutionMap[params.tier],
-      aspectRatio: params.aspectRatio || "1:1 (default)",
-      prompt: `${params.prompt.substring(0, 100)}...`,
-      timeout: `${GEMINI_TIMEOUT_MS / 1000}s`,
-    },
-  );
+  logger.info(`Generating image with Gemini API`, {
+    model: DEFAULT_MODEL,
+    tier: params.tier,
+    resolution: resolutionMap[params.tier],
+    aspectRatio: params.aspectRatio || "1:1 (default)",
+    prompt: `${params.prompt.substring(0, 100)}...`,
+    timeout: `${GEMINI_TIMEOUT_MS / 1000}s`,
+  });
 
   return processGeminiStream({
     ai,
@@ -262,9 +243,7 @@ export async function generateImageWithGemini(
  * @returns Buffer containing the modified image data
  * @throws Error if API times out, no API key is configured, or no image data is received
  */
-export async function modifyImageWithGemini(
-  params: ModifyImageParams,
-): Promise<Buffer> {
+export async function modifyImageWithGemini(params: ModifyImageParams): Promise<Buffer> {
   const ai = await getGeminiClient();
 
   const resolutionMap = {
@@ -283,17 +262,17 @@ export async function modifyImageWithGemini(
         ...(params.aspectRatio && { aspectRatio: params.aspectRatio }),
       },
     }),
-    ...(!supportsImageSize(DEFAULT_MODEL) && params.aspectRatio && {
-      imageConfig: {
-        aspectRatio: params.aspectRatio,
-      },
-    }),
+    ...(!supportsImageSize(DEFAULT_MODEL) &&
+      params.aspectRatio && {
+        imageConfig: {
+          aspectRatio: params.aspectRatio,
+        },
+      }),
   };
 
-  const fullPrompt =
-    `${MODIFICATION_BASE_PROMPT}\n\nModification instructions: ${params.prompt}\n\nGenerate at ${
-      resolutionMap[params.tier]
-    } resolution.`;
+  const fullPrompt = `${MODIFICATION_BASE_PROMPT}\n\nModification instructions: ${params.prompt}\n\nGenerate at ${
+    resolutionMap[params.tier]
+  } resolution.`;
 
   const contents = [
     {
@@ -312,17 +291,14 @@ export async function modifyImageWithGemini(
     },
   ];
 
-  logger.info(
-    `Modifying image with Gemini API`,
-    {
-      model: DEFAULT_MODEL,
-      tier: params.tier,
-      resolution: resolutionMap[params.tier],
-      aspectRatio: params.aspectRatio || "auto-detected",
-      prompt: `${params.prompt.substring(0, 100)}...`,
-      timeout: `${GEMINI_TIMEOUT_MS / 1000}s`,
-    },
-  );
+  logger.info(`Modifying image with Gemini API`, {
+    model: DEFAULT_MODEL,
+    tier: params.tier,
+    resolution: resolutionMap[params.tier],
+    aspectRatio: params.aspectRatio || "auto-detected",
+    prompt: `${params.prompt.substring(0, 100)}...`,
+    timeout: `${GEMINI_TIMEOUT_MS / 1000}s`,
+  });
 
   return processGeminiStream({
     ai,

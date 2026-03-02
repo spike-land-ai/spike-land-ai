@@ -12,7 +12,7 @@ const BASE_OPTS = {
 describe("buildWorkerDomHtml", () => {
   it("produces valid HTML with embed div", () => {
     const html = buildWorkerDomHtml(BASE_OPTS);
-    expect(html).toContain("<div id=\"embed\">");
+    expect(html).toContain('<div id="embed">');
     expect(html).toContain("<div>Hello</div>");
   });
 
@@ -35,14 +35,14 @@ describe("buildWorkerDomHtml", () => {
 
   it("includes error reporting via postMessage", () => {
     const html = buildWorkerDomHtml(BASE_OPTS);
-    expect(html).toContain("type: \"iframe-error\"");
-    expect(html).toContain("source: \"spike-land-worker-dom\"");
+    expect(html).toContain('type: "iframe-error"');
+    expect(html).toContain('source: "spike-land-worker-dom"');
     expect(html).toContain("parent.postMessage");
   });
 
   it("embeds the codeSpace in error reports", () => {
     const html = buildWorkerDomHtml({ ...BASE_OPTS, codeSpace: "my-space" });
-    expect(html).toContain("\"my-space\"");
+    expect(html).toContain('"my-space"');
   });
 
   it("inlines the worker and applier JS", () => {

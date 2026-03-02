@@ -63,24 +63,30 @@ function applyPattern(pattern: TestPattern, variables: Record<string, string>): 
 
 // ─── Registration ────────────────────────────────────────────────────────────
 
-export function registerTestgenTools(
-  registry: ToolRegistry,
-  userId: string,
-  db: DrizzleDB,
-): void {
+export function registerTestgenTools(registry: ToolRegistry, userId: string, db: DrizzleDB): void {
   registry.registerBuilt(
     freeTool(userId, db)
       .tool("testgen_from_spec", "Generate a test suite from a specification string.", {
         spec: z.string().describe("Specification to generate tests from."),
         target_path: z.string().describe("Target file path for tests."),
-        framework: z.enum(["vitest", "jest", "playwright"]).optional().describe("Test framework (default vitest)."),
+        framework: z
+          .enum(["vitest", "jest", "playwright"])
+          .optional()
+          .describe("Test framework (default vitest)."),
       })
       .meta({ category: "testgen", tier: "free" })
       .handler(async ({ input }) => {
         const id = crypto.randomUUID();
         const framework = input.framework ?? "vitest";
         const testCode = generateTestCode(input.spec, framework);
-        const suite: TestSuite = { id, targetPath: input.target_path, spec: input.spec, framework, testCode, createdAt: new Date().toISOString() };
+        const suite: TestSuite = {
+          id,
+          targetPath: input.target_path,
+          spec: input.spec,
+          framework,
+          testCode,
+          createdAt: new Date().toISOString(),
+        };
         suites.set(id, suite);
         return jsonResult(`Test suite generated from spec. ID: ${id}`, suite);
       }),
@@ -97,7 +103,14 @@ export function registerTestgenTools(
       .handler(async ({ input }) => {
         const id = crypto.randomUUID();
         const testCode = generateTestCode("Tests for provided source code", "vitest");
-        const suite: TestSuite = { id, targetPath: input.target_path, sourceCode: input.source_code, framework: "vitest", testCode, createdAt: new Date().toISOString() };
+        const suite: TestSuite = {
+          id,
+          targetPath: input.target_path,
+          sourceCode: input.source_code,
+          framework: "vitest",
+          testCode,
+          createdAt: new Date().toISOString(),
+        };
         suites.set(id, suite);
         return jsonResult(`Test suite generated from code. ID: ${id}`, suite);
       }),
@@ -114,7 +127,13 @@ export function registerTestgenTools(
       .meta({ category: "testgen", tier: "free" })
       .handler(async ({ input }) => {
         const id = crypto.randomUUID();
-        const pattern: TestPattern = { id, name: input.name, template: input.template, framework: input.framework, variables: input.variables };
+        const pattern: TestPattern = {
+          id,
+          name: input.name,
+          template: input.template,
+          framework: input.framework,
+          variables: input.variables,
+        };
         patterns.set(id, pattern);
         return jsonResult(`Test pattern created with ID: ${id}`, pattern);
       }),
@@ -132,7 +151,9 @@ export function registerTestgenTools(
         const pattern = patterns.get(input.pattern_id);
         if (!pattern) throw new Error(`Pattern ${input.pattern_id} not found`);
         const testCode = applyPattern(pattern, input.variables);
-        return jsonResult(`Pattern applied. Generated test code for ${input.target_path}`, { testCode });
+        return jsonResult(`Pattern applied. Generated test code for ${input.target_path}`, {
+          testCode,
+        });
       }),
   );
 

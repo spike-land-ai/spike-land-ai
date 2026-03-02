@@ -17,26 +17,23 @@ interface InteractiveChecklistProps {
   className?: string;
 }
 
-export function InteractiveChecklist(
-  { items: initialItems, title, className }: InteractiveChecklistProps,
-) {
+export function InteractiveChecklist({
+  items: initialItems,
+  title,
+  className,
+}: InteractiveChecklistProps) {
   const [items, setItems] = useState(initialItems);
 
   const toggleItem = (id: string) => {
-    setItems(prev => prev.map(item => item.id === id ? { ...item, checked: !item.checked } : item));
+    setItems((prev) =>
+      prev.map((item) => (item.id === id ? { ...item, checked: !item.checked } : item)),
+    );
   };
 
-  const progress = Math.round(
-    (items.filter(i => i.checked).length / items.length) * 100,
-  );
+  const progress = Math.round((items.filter((i) => i.checked).length / items.length) * 100);
 
   return (
-    <div
-      className={cn(
-        "p-6 rounded-xl bg-white/5 border border-white/10",
-        className,
-      )}
-    >
+    <div className={cn("p-6 rounded-xl bg-white/5 border border-white/10", className)}>
       <div className="flex items-center justify-between mb-6">
         {title && <h3 className="text-lg font-semibold">{title}</h3>}
         <div className="w-16">
@@ -50,11 +47,11 @@ export function InteractiveChecklist(
       </div>
 
       <div className="space-y-3">
-        {items.map(item => (
+        {items.map((item) => (
           <div
             key={item.id}
             onClick={() => toggleItem(item.id)}
-            onKeyDown={e => {
+            onKeyDown={(e) => {
               if (e.key === "Enter" || e.key === " ") {
                 e.preventDefault();
                 toggleItem(item.id);
@@ -73,9 +70,7 @@ export function InteractiveChecklist(
             <div
               className={cn(
                 "w-5 h-5 rounded flex items-center justify-center border transition-colors",
-                item.checked
-                  ? "bg-emerald-500 border-emerald-500"
-                  : "border-gray-500",
+                item.checked ? "bg-emerald-500 border-emerald-500" : "border-gray-500",
               )}
             >
               {item.checked && <Check size={14} className="text-white" />}

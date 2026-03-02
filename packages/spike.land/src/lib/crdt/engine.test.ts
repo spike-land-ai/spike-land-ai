@@ -30,11 +30,7 @@ describe("CRDT engine", () => {
       expect(set.replicaOrder).toHaveLength(3);
       expect(set.crdtType).toBe("g_counter");
       expect(set.userId).toBe(userId);
-      expect(set.replicaOrder).toEqual([
-        "replica-1",
-        "replica-2",
-        "replica-3",
-      ]);
+      expect(set.replicaOrder).toEqual(["replica-1", "replica-2", "replica-3"]);
     });
 
     it("should create a PN-Counter set", () => {
@@ -77,7 +73,7 @@ describe("CRDT engine", () => {
           name: "bad",
           replicaCount: 1,
           crdtType: "g_counter",
-        })
+        }),
       ).toThrow("Replica count must be between 2 and 7");
       expect(() =>
         createSet({
@@ -85,7 +81,7 @@ describe("CRDT engine", () => {
           name: "bad",
           replicaCount: 8,
           crdtType: "g_counter",
-        })
+        }),
       ).toThrow("Replica count must be between 2 and 7");
     });
   });
@@ -142,7 +138,7 @@ describe("CRDT engine", () => {
         crdtType: "g_counter",
       });
       expect(() => update(set.id, userId, "replica-1", "decrement")).toThrow(
-        "Invalid operation \"decrement\" for G-Counter",
+        'Invalid operation "decrement" for G-Counter',
       );
     });
   });
@@ -244,9 +240,7 @@ describe("CRDT engine", () => {
         replicaCount: 2,
         crdtType: "lww_register",
       });
-      expect(() => update(set.id, userId, "replica-1", "set")).toThrow(
-        "requires a value",
-      );
+      expect(() => update(set.id, userId, "replica-1", "set")).toThrow("requires a value");
     });
   });
 
@@ -306,9 +300,7 @@ describe("CRDT engine", () => {
         replicaCount: 2,
         crdtType: "or_set",
       });
-      expect(() => update(set.id, userId, "replica-1", "add")).toThrow(
-        "requires a value",
-      );
+      expect(() => update(set.id, userId, "replica-1", "add")).toThrow("requires a value");
     });
   });
 
@@ -481,8 +473,7 @@ describe("CRDT engine", () => {
         replicaCount: 2,
         crdtType: "g_counter",
       });
-      expect(() => update(set.id, "other-user", "replica-1", "increment"))
-        .toThrow("Access denied");
+      expect(() => update(set.id, "other-user", "replica-1", "increment")).toThrow("Access denied");
     });
   });
 
@@ -509,7 +500,7 @@ describe("CRDT engine", () => {
 
       const list = listSets(userId);
       expect(list).toHaveLength(2);
-      expect(list.map(s => s.name).sort()).toEqual(["mine1", "mine2"]);
+      expect(list.map((s) => s.name).sort()).toEqual(["mine1", "mine2"]);
     });
   });
 
@@ -522,11 +513,7 @@ describe("CRDT engine", () => {
         crdtType: "g_counter",
       });
 
-      const text = compareWithConsensus(
-        set.id,
-        userId,
-        "distributed page view counter",
-      );
+      const text = compareWithConsensus(set.id, userId, "distributed page view counter");
       expect(text).toContain("AP (CRDT) vs CP (Raft/Paxos)");
       expect(text).toContain("g_counter");
       expect(text).toContain("distributed page view counter");

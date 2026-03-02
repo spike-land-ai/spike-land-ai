@@ -31,12 +31,7 @@ describe("BFT engine", () => {
       expect(cluster.nodeOrder).toHaveLength(4);
       expect(cluster.userId).toBe(userId);
       expect(cluster.name).toBe("test-cluster");
-      expect(cluster.nodeOrder).toEqual([
-        "node-1",
-        "node-2",
-        "node-3",
-        "node-4",
-      ]);
+      expect(cluster.nodeOrder).toEqual(["node-1", "node-2", "node-3", "node-4"]);
     });
 
     it("should create all nodes as honest initially", () => {
@@ -59,7 +54,7 @@ describe("BFT engine", () => {
           userId,
           name: "too-small",
           nodeCount: 3,
-        })
+        }),
       ).toThrow("Node count must be at least 4");
     });
 
@@ -96,12 +91,7 @@ describe("BFT engine", () => {
       // f = floor((4-1)/3) = 1, so quorum = 2*1+1 = 3 honest needed
       // Making 2 nodes faulty leaves only 2 honest
       setBehavior(cluster.id, userId, "node-2", "silent");
-      const result = setBehavior(
-        cluster.id,
-        userId,
-        "node-3",
-        "equivocating",
-      );
+      const result = setBehavior(cluster.id, userId, "node-3", "equivocating");
 
       expect(result.warning).not.toBeNull();
       expect(result.warning).toContain("only 2 honest nodes remain");
@@ -113,8 +103,7 @@ describe("BFT engine", () => {
         name: "unknown-node",
         nodeCount: 4,
       });
-      expect(() => setBehavior(cluster.id, userId, "node-99", "silent"))
-        .toThrow("not found");
+      expect(() => setBehavior(cluster.id, userId, "node-99", "silent")).toThrow("not found");
     });
   });
 
@@ -169,9 +158,7 @@ describe("BFT engine", () => {
       expect(round.phase).toBe("prepare");
 
       // All 4 honest nodes should send prepare messages
-      const prepareMessages = round.messages.filter(
-        m => m.type === "prepare",
-      );
+      const prepareMessages = round.messages.filter((m) => m.type === "prepare");
       expect(prepareMessages).toHaveLength(4);
       for (const msg of prepareMessages) {
         expect(msg.value).toBe("value-A");
@@ -191,9 +178,7 @@ describe("BFT engine", () => {
 
       expect(round.phase).toBe("commit");
 
-      const commitMessages = round.messages.filter(
-        m => m.type === "commit",
-      );
+      const commitMessages = round.messages.filter((m) => m.type === "commit");
       // All 4 honest nodes should send commit (they all received 4 matching prepares >= quorum of 3)
       expect(commitMessages).toHaveLength(4);
     });
@@ -268,14 +253,12 @@ describe("BFT engine", () => {
       propose(cluster.id, userId, "value-D");
       const round = runPreparePhase(cluster.id, userId, 1);
 
-      const prepareMessages = round.messages.filter(
-        m => m.type === "prepare",
-      );
+      const prepareMessages = round.messages.filter((m) => m.type === "prepare");
       // 3 honest + 1 equivocating = 4 prepare messages
       expect(prepareMessages).toHaveLength(4);
 
       // Equivocating node should have sent a different value
-      const equivocMsg = prepareMessages.find(m => m.nodeId === "node-3");
+      const equivocMsg = prepareMessages.find((m) => m.nodeId === "node-3");
       expect(equivocMsg).toBeDefined();
       expect(equivocMsg!.value).not.toBe("value-D");
       expect(equivocMsg!.value).toContain("EQUIVOC");
@@ -450,9 +433,7 @@ describe("BFT engine", () => {
       expect(view.nodes).toHaveLength(4);
       expect(view.roundCount).toBe(0);
       expect(view.currentRound).toBeNull();
-      expect(view.faultTolerance).toBe(
-        "f=1 (tolerates 1 Byzantine node out of 4)",
-      );
+      expect(view.faultTolerance).toBe("f=1 (tolerates 1 Byzantine node out of 4)");
     });
 
     it("should show current round after proposal", () => {
@@ -481,8 +462,8 @@ describe("BFT engine", () => {
       setBehavior(cluster.id, userId, "node-3", "equivocating");
 
       const view = inspect(cluster.id, userId);
-      const node2 = view.nodes.find(n => n.id === "node-2");
-      const node3 = view.nodes.find(n => n.id === "node-3");
+      const node2 = view.nodes.find((n) => n.id === "node-2");
+      const node3 = view.nodes.find((n) => n.id === "node-3");
 
       expect(node2!.behavior).toBe("silent");
       expect(node3!.behavior).toBe("equivocating");
@@ -498,7 +479,7 @@ describe("BFT engine", () => {
       runFullRound(cluster.id, userId, "decided-val");
 
       const view = inspect(cluster.id, userId);
-      const honestNodes = view.nodes.filter(n => n.behavior === "honest");
+      const honestNodes = view.nodes.filter((n) => n.behavior === "honest");
       for (const node of honestNodes) {
         expect(node.decidedValue).toBe("decided-val");
         expect(node.phase).toBe("decided");
@@ -514,9 +495,7 @@ describe("BFT engine", () => {
 
       const view = inspect(cluster.id, userId);
       // f = floor((7-1)/3) = 2
-      expect(view.faultTolerance).toBe(
-        "f=2 (tolerates 2 Byzantine nodes out of 7)",
-      );
+      expect(view.faultTolerance).toBe("f=2 (tolerates 2 Byzantine nodes out of 7)");
     });
   });
 
@@ -538,9 +517,7 @@ describe("BFT engine", () => {
         nodeCount: 4,
       });
 
-      expect(() => propose(cluster.id, "other-user", "val")).toThrow(
-        "Access denied",
-      );
+      expect(() => propose(cluster.id, "other-user", "val")).toThrow("Access denied");
     });
 
     it("should deny setBehavior from different userId", () => {
@@ -550,8 +527,9 @@ describe("BFT engine", () => {
         nodeCount: 4,
       });
 
-      expect(() => setBehavior(cluster.id, "other-user", "node-1", "silent"))
-        .toThrow("Access denied");
+      expect(() => setBehavior(cluster.id, "other-user", "node-1", "silent")).toThrow(
+        "Access denied",
+      );
     });
 
     it("should deny destroy from different userId", () => {
@@ -561,9 +539,7 @@ describe("BFT engine", () => {
         nodeCount: 4,
       });
 
-      expect(() => destroyCluster(cluster.id, "other-user")).toThrow(
-        "Access denied",
-      );
+      expect(() => destroyCluster(cluster.id, "other-user")).toThrow("Access denied");
     });
 
     it("should deny checkSafety from different userId", () => {
@@ -573,9 +549,7 @@ describe("BFT engine", () => {
         nodeCount: 4,
       });
 
-      expect(() => checkSafety(cluster.id, "other-user")).toThrow(
-        "Access denied",
-      );
+      expect(() => checkSafety(cluster.id, "other-user")).toThrow("Access denied");
     });
   });
 
@@ -599,7 +573,7 @@ describe("BFT engine", () => {
 
       const list = listClusters(userId);
       expect(list).toHaveLength(2);
-      expect(list.map(c => c.name).sort()).toEqual(["mine-1", "mine-2"]);
+      expect(list.map((c) => c.name).sort()).toEqual(["mine-1", "mine-2"]);
     });
 
     it("should return correct cluster summary", () => {
@@ -652,9 +626,7 @@ describe("BFT engine", () => {
       runPreparePhase(cluster.id, userId, 1);
 
       // Already in prepare phase, can't run prepare again
-      expect(() => runPreparePhase(cluster.id, userId, 1)).toThrow(
-        "expected \"pre_prepare\"",
-      );
+      expect(() => runPreparePhase(cluster.id, userId, 1)).toThrow('expected "pre_prepare"');
     });
 
     it("should reject commit phase when not in prepare", () => {
@@ -667,9 +639,7 @@ describe("BFT engine", () => {
       propose(cluster.id, userId, "val");
 
       // Still in pre_prepare, can't run commit
-      expect(() => runCommitPhase(cluster.id, userId, 1)).toThrow(
-        "expected \"prepare\"",
-      );
+      expect(() => runCommitPhase(cluster.id, userId, 1)).toThrow('expected "prepare"');
     });
 
     it("should reject consensus check when not in commit", () => {
@@ -683,9 +653,7 @@ describe("BFT engine", () => {
       runPreparePhase(cluster.id, userId, 1);
 
       // Still in prepare, can't check consensus
-      expect(() => checkConsensus(cluster.id, userId, 1)).toThrow(
-        "expected \"commit\"",
-      );
+      expect(() => checkConsensus(cluster.id, userId, 1)).toThrow('expected "commit"');
     });
   });
 

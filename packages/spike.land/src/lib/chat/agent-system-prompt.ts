@@ -9,8 +9,8 @@ export function buildAgentSystemPrompt(context: AgentPromptContext): string {
   const userLine = context.userName
     ? `The user's name is **${context.userName}** and they are signed in.`
     : context.isAuthenticated
-    ? "The user is signed in (name unknown)."
-    : "The user is not signed in.";
+      ? "The user is signed in (name unknown)."
+      : "The user is not signed in.";
 
   const pageLine = context.pageTitle
     ? `They are currently on **${context.pageTitle}** (\`${context.route}\`).`

@@ -34,8 +34,7 @@ In the meantime, you can also:
 
 We'll get back to you as soon as possible.`,
 
-  feedback:
-    `**Thank you for your feedback!** Your suggestion has been saved and will be reviewed by the team.
+  feedback: `**Thank you for your feedback!** Your suggestion has been saved and will be reviewed by the team.
 
 We appreciate you taking the time to help improve spike.land!`,
 
@@ -104,10 +103,7 @@ async function saveMessageAsDM(
  * Uses the same protocol as the real agent loop so the UI works unchanged.
  */
 export function createFallbackBotStream(
-  options: Pick<
-    AgentLoopStreamOptions,
-    "question" | "sessionId" | "promptContext"
-  >,
+  options: Pick<AgentLoopStreamOptions, "question" | "sessionId" | "promptContext">,
 ): ReadableStream<Uint8Array> {
   const { question, sessionId, promptContext } = options;
   const encoder = new TextEncoder();

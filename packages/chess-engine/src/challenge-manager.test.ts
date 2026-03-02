@@ -59,10 +59,34 @@ describe("challenge-manager", () => {
     expect(result).toEqual(challenge);
   });
 
+  it("sendChallenge works without timeControl and senderColor", async () => {
+    mockPrisma.chessChallenge.create.mockResolvedValue({});
+    await sendChallenge("p1", "p2");
+    expect(mockPrisma.chessChallenge.create).toHaveBeenCalledWith({
+      data: expect.objectContaining({
+        timeControl: "BLITZ_5",
+        senderColor: null,
+      }),
+    });
+  });
+
+  it("acceptChallenge rejects if not found", async () => {
+    mockPrisma.chessChallenge.findUnique.mockResolvedValue(null);
+    await expect(acceptChallenge("c1", "p1")).rejects.toThrow("Challenge not found");
+  });
+
+  it("declineChallenge rejects if not found", async () => {
+    mockPrisma.chessChallenge.findUnique.mockResolvedValue(null);
+    await expect(declineChallenge("c1", "p1")).rejects.toThrow("Challenge not found");
+  });
+
+  it("cancelChallenge rejects if not found", async () => {
+    mockPrisma.chessChallenge.findUnique.mockResolvedValue(null);
+    await expect(cancelChallenge("c1", "p1")).rejects.toThrow("Challenge not found");
+  });
+
   it("sendChallenge rejects self-challenge", async () => {
-    await expect(sendChallenge("p1", "p1")).rejects.toThrow(
-      "Cannot challenge yourself",
-    );
+    await expect(sendChallenge("p1", "p1")).rejects.toThrow("Cannot challenge yourself");
     expect(mockPrisma.chessChallenge.create).not.toHaveBeenCalled();
   });
 
@@ -119,9 +143,7 @@ describe("challenge-manager", () => {
       status: "DECLINED",
     });
 
-    await expect(acceptChallenge("c1", "p2")).rejects.toThrow(
-      "Challenge is no longer pending",
-    );
+    await expect(acceptChallenge("c1", "p2")).rejects.toThrow("Challenge is no longer pending");
   });
 
   it("declineChallenge updates status to DECLINED", async () => {
@@ -319,5 +341,59 @@ describe("challenge-manager", () => {
     });
 
     randomSpy.mockRestore();
+  });
+
+  it("acceptChallenge with no senderColor picks randomly (other branch)", async () => {
+    mockPrisma.chessChallenge.findUnique.mockResolvedValue({
+      id: "c1",
+      senderId: "p1",
+      receiverId: "p2",
+      status: "PENDING",
+      senderColor: null,
+      timeControl: "BLITZ_5",
+    });
+    mockPrisma.chessGame.create.mockResolvedValue({ id: "g1" });
+    mockPrisma.chessChallenge.update.mockResolvedValue({
+      id: "c1",
+      status: "ACCEPTED",
+      gameId: "g1",
+    });
+
+    // Mock Math.random to return a deterministic value
+    const randomSpy = vi.spyOn(Math, "random").mockReturnValue(0.7);
+
+    await acceptChallenge("c1", "p2");
+
+    // With Math.random() = 0.7 (>= 0.5), receiver should be white
+    expect(mockPrisma.chessGame.create).toHaveBeenCalledWith({
+      data: expect.objectContaining({
+        whitePlayerId: "p2",
+        blackPlayerId: "p1",
+      }),
+    });
+
+    randomSpy.mockRestore();
+  });
+
+  it("acceptChallenge handles unknown time control", async () => {
+    mockPrisma.chessChallenge.findUnique.mockResolvedValue({
+      id: "c1",
+      senderId: "p1",
+      receiverId: "p2",
+      status: "PENDING",
+      senderColor: "white",
+      timeControl: "UNKNOWN",
+    });
+    mockPrisma.chessGame.create.mockResolvedValue({ id: "g1" });
+    mockPrisma.chessChallenge.update.mockResolvedValue({});
+
+    await acceptChallenge("c1", "p2");
+
+    expect(mockPrisma.chessGame.create).toHaveBeenCalledWith({
+      data: expect.objectContaining({
+        whiteTimeMs: 300_000, // Default fallback
+        blackTimeMs: 300_000,
+      }),
+    });
   });
 });

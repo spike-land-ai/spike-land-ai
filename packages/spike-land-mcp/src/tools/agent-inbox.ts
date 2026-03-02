@@ -26,15 +26,13 @@ export function registerAgentInboxTools(
     freeTool(userId, db)
       .tool(
         "agent_inbox_poll",
-        "Poll for new messages across your agents. "
-        + "Returns agents with message counts and latest message preview.",
+        "Poll for new messages across your agents. " +
+          "Returns agents with message counts and latest message preview.",
         {
           since: z
             .string()
             .optional()
-            .describe(
-              "ISO timestamp. Only return messages created after this time. Omit for all.",
-            ),
+            .describe("ISO timestamp. Only return messages created after this time. Omit for all."),
           agent_id: z
             .string()
             .optional()
@@ -57,18 +55,19 @@ export function registerAgentInboxTools(
 
         if (agents.length === 0) {
           const serverTime = new Date().toISOString();
-          return textResult(
-            `**No agents found.**\n\nserverTime: ${serverTime}`,
-          );
+          return textResult(`**No agents found.**\n\nserverTime: ${serverTime}`);
         }
 
         // Fetch messages for each agent
-        const agentMap = new Map<string, {
-          agentId: string;
-          agentName: string;
-          messageCount: number;
-          latestMessage: { id: string; content: string; role: string; createdAt: number };
-        }>();
+        const agentMap = new Map<
+          string,
+          {
+            agentId: string;
+            agentName: string;
+            messageCount: number;
+            latestMessage: { id: string; content: string; role: string; createdAt: number };
+          }
+        >();
 
         for (const agent of agents) {
           const sinceTs = since ? new Date(since).getTime() : 0;
@@ -86,9 +85,7 @@ export function registerAgentInboxTools(
             .orderBy(desc(agentMessages.createdAt))
             .limit(50);
 
-          const filtered = sinceTs > 0
-            ? msgs.filter(m => m.createdAt > sinceTs)
-            : msgs;
+          const filtered = sinceTs > 0 ? msgs.filter((m) => m.createdAt > sinceTs) : msgs;
 
           if (filtered.length > 0) {
             const latest = filtered[0]!;
@@ -134,10 +131,7 @@ export function registerAgentInboxTools(
         "agent_inbox_read",
         "Get full messages for an agent. Returns chronological messages with full content.",
         {
-          agent_id: z
-            .string()
-            .min(1)
-            .describe("Agent ID to read messages from."),
+          agent_id: z.string().min(1).describe("Agent ID to read messages from."),
           limit: z
             .number()
             .int()
@@ -157,16 +151,18 @@ export function registerAgentInboxTools(
 
         // Verify agent ownership
         const agentRows = await ctx.db
-          .select({ id: claudeCodeAgents.id, name: claudeCodeAgents.name, userId: claudeCodeAgents.userId })
+          .select({
+            id: claudeCodeAgents.id,
+            name: claudeCodeAgents.name,
+            userId: claudeCodeAgents.userId,
+          })
           .from(claudeCodeAgents)
           .where(eq(claudeCodeAgents.id, agent_id))
           .limit(1);
 
         const agent = agentRows[0];
         if (!agent || agent.userId !== ctx.userId) {
-          return textResult(
-            `**Error:** Agent not found or you don't own it (ID: ${agent_id}).`,
-          );
+          return textResult(`**Error:** Agent not found or you don't own it (ID: ${agent_id}).`);
         }
 
         const messages = await ctx.db
@@ -182,14 +178,10 @@ export function registerAgentInboxTools(
           .limit(limit || 20);
 
         const sinceTs = since ? new Date(since).getTime() : 0;
-        const filtered = sinceTs > 0
-          ? messages.filter(m => m.createdAt > sinceTs)
-          : messages;
+        const filtered = sinceTs > 0 ? messages.filter((m) => m.createdAt > sinceTs) : messages;
 
         if (filtered.length === 0) {
-          return textResult(
-            `**No messages found** for agent "${agent.name}".`,
-          );
+          return textResult(`**No messages found** for agent "${agent.name}".`);
         }
 
         let text = `**Messages for "${agent.name}" (${filtered.length}):**\n\n`;
@@ -209,14 +201,8 @@ export function registerAgentInboxTools(
         "agent_inbox_respond",
         "Send an agent response. Creates an assistant message for the agent.",
         {
-          agent_id: z
-            .string()
-            .min(1)
-            .describe("Agent ID to respond to."),
-          content: z
-            .string()
-            .min(1)
-            .describe("The agent's response content."),
+          agent_id: z.string().min(1).describe("Agent ID to respond to."),
+          content: z.string().min(1).describe("The agent's response content."),
         },
       )
       .meta({ category: "agent-inbox", tier: "free" })
@@ -225,16 +211,18 @@ export function registerAgentInboxTools(
 
         // Verify agent ownership
         const agentRows = await ctx.db
-          .select({ id: claudeCodeAgents.id, name: claudeCodeAgents.name, userId: claudeCodeAgents.userId })
+          .select({
+            id: claudeCodeAgents.id,
+            name: claudeCodeAgents.name,
+            userId: claudeCodeAgents.userId,
+          })
           .from(claudeCodeAgents)
           .where(eq(claudeCodeAgents.id, agent_id))
           .limit(1);
 
         const agent = agentRows[0];
         if (!agent || agent.userId !== ctx.userId) {
-          return textResult(
-            `**Error:** Agent not found or you don't own it (ID: ${agent_id}).`,
-          );
+          return textResult(`**Error:** Agent not found or you don't own it (ID: ${agent_id}).`);
         }
 
         const id = crypto.randomUUID();
@@ -247,9 +235,7 @@ export function registerAgentInboxTools(
         });
 
         return textResult(
-          `**Response sent.**\n\n`
-          + `**Message ID:** ${id}\n`
-          + `**Agent:** ${agent.name}`,
+          `**Response sent.**\n\n` + `**Message ID:** ${id}\n` + `**Agent:** ${agent.name}`,
         );
       }),
   );

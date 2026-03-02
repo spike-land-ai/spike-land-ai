@@ -43,7 +43,7 @@ vi.mock("./utm-capture", () => ({
   },
 }));
 
-vi.mock("./attribution-helpers", async importOriginal => {
+vi.mock("./attribution-helpers", async (importOriginal) => {
   const actual = await importOriginal<typeof import("./attribution-helpers")>();
   return {
     ...actual,
@@ -89,9 +89,7 @@ function makeSession(overrides: Record<string, unknown> = {}) {
   };
 }
 
-function makeAttribution(
-  overrides: Partial<CampaignAttribution> = {},
-): CampaignAttribution {
+function makeAttribution(overrides: Partial<CampaignAttribution> = {}): CampaignAttribution {
   return {
     id: "attr-1",
     userId: "user-1",
@@ -169,7 +167,7 @@ describe("createAttribution", () => {
     });
 
     const callArg = mockCampaignAttributionCreate.mock.calls[0]![0] as {
-      data: { platform: string; };
+      data: { platform: string };
     };
     expect(callArg.data.platform).toBe("GOOGLE_ADS");
   });
@@ -186,7 +184,7 @@ describe("createAttribution", () => {
     });
 
     const callArg = mockCampaignAttributionCreate.mock.calls[0]![0] as {
-      data: { platform: string; };
+      data: { platform: string };
     };
     expect(callArg.data.platform).toBe("DIRECT");
   });
@@ -341,7 +339,7 @@ describe("attributeConversion", () => {
     expect(mockCampaignAttributionCreate).toHaveBeenCalledTimes(5);
 
     const types = mockCampaignAttributionCreate.mock.calls.map(
-      call => (call[0] as { data: { attributionType: string; }; }).data.attributionType,
+      (call) => (call[0] as { data: { attributionType: string } }).data.attributionType,
     );
     expect(types).toContain("FIRST_TOUCH");
     expect(types).toContain("LAST_TOUCH");
@@ -358,7 +356,7 @@ describe("attributeConversion", () => {
     await attributeConversion("user-1", "PURCHASE", 100);
 
     const conversionIds = mockCampaignAttributionCreate.mock.calls.map(
-      call => (call[0] as { data: { conversionId: string; }; }).data.conversionId,
+      (call) => (call[0] as { data: { conversionId: string } }).data.conversionId,
     );
     const uniqueIds = new Set(conversionIds);
     // All 5 models share the same conversionId
@@ -381,14 +379,12 @@ describe("attributeConversion", () => {
     await attributeConversion("user-1", "ENHANCEMENT", 300);
 
     const linearCalls = mockCampaignAttributionCreate.mock.calls.filter(
-      call =>
-        (call[0] as { data: { attributionType: string; }; }).data
-          .attributionType === "LINEAR",
+      (call) =>
+        (call[0] as { data: { attributionType: string } }).data.attributionType === "LINEAR",
     );
     expect(linearCalls).toHaveLength(3);
     for (const call of linearCalls) {
-      const value = (call[0] as { data: { conversionValue: number; }; }).data
-        .conversionValue;
+      const value = (call[0] as { data: { conversionValue: number } }).data.conversionValue;
       expect(value).toBeCloseTo(100, 5); // 300 / 3 = 100
     }
   });
@@ -405,14 +401,14 @@ describe("attributeConversion", () => {
     await attributeConversion("user-1", "SIGNUP", 100);
 
     const positionCalls = mockCampaignAttributionCreate.mock.calls.filter(
-      call =>
-        (call[0] as { data: { attributionType: string; }; }).data
-          .attributionType === "POSITION_BASED",
+      (call) =>
+        (call[0] as { data: { attributionType: string } }).data.attributionType ===
+        "POSITION_BASED",
     );
     expect(positionCalls).toHaveLength(3);
 
     const values = positionCalls.map(
-      call => (call[0] as { data: { conversionValue: number; }; }).data.conversionValue,
+      (call) => (call[0] as { data: { conversionValue: number } }).data.conversionValue,
     );
     // First (40%) and last (40%) should have equal value, middle (20%) less
     expect(values[0]).toBeCloseTo(40, 5); // 40% of 100
@@ -423,9 +419,7 @@ describe("attributeConversion", () => {
   it("falls back to direct attribution when user has no sessions but exists in DB", async () => {
     mockVisitorSessionFindMany.mockResolvedValue([]);
     mockUserFindUnique.mockResolvedValue({ id: "user-direct" });
-    mockVisitorSessionCreate.mockResolvedValue(
-      makeSession({ id: "direct-session" }),
-    );
+    mockVisitorSessionCreate.mockResolvedValue(makeSession({ id: "direct-session" }));
     mockCampaignAttributionCreateMany.mockResolvedValue({ count: 5 });
 
     await attributeConversion("user-direct", "SIGNUP");
@@ -464,7 +458,7 @@ describe("attributeConversion", () => {
     expect(allCalls.length).toBeGreaterThan(0);
     // All created with undefined value
     for (const call of allCalls) {
-      const data = (call[0] as { data: { conversionValue: unknown; }; }).data;
+      const data = (call[0] as { data: { conversionValue: unknown } }).data;
       expect(data.conversionValue).toBeUndefined();
     }
   });
@@ -480,22 +474,16 @@ describe("attributeConversion", () => {
     await attributeConversion("user-1", "ENHANCEMENT");
 
     const firstTouchCall = mockCampaignAttributionCreate.mock.calls.find(
-      call =>
-        (call[0] as { data: { attributionType: string; }; }).data
-          .attributionType === "FIRST_TOUCH",
+      (call) =>
+        (call[0] as { data: { attributionType: string } }).data.attributionType === "FIRST_TOUCH",
     );
     const lastTouchCall = mockCampaignAttributionCreate.mock.calls.find(
-      call =>
-        (call[0] as { data: { attributionType: string; }; }).data
-          .attributionType === "LAST_TOUCH",
+      (call) =>
+        (call[0] as { data: { attributionType: string } }).data.attributionType === "LAST_TOUCH",
     );
 
-    expect(
-      (firstTouchCall![0] as { data: { sessionId: string; }; }).data.sessionId,
-    ).toBe("s-first");
-    expect(
-      (lastTouchCall![0] as { data: { sessionId: string; }; }).data.sessionId,
-    ).toBe("s-last");
+    expect((firstTouchCall![0] as { data: { sessionId: string } }).data.sessionId).toBe("s-first");
+    expect((lastTouchCall![0] as { data: { sessionId: string } }).data.sessionId).toBe("s-last");
   });
 });
 
@@ -509,11 +497,7 @@ describe("getCampaignAttributionSummary", () => {
   it("returns zero summary when no attributions found", async () => {
     mockCampaignAttributionFindMany.mockResolvedValue([]);
 
-    const result = await getCampaignAttributionSummary(
-      "summer-sale",
-      startDate,
-      endDate,
-    );
+    const result = await getCampaignAttributionSummary("summer-sale", startDate, endDate);
 
     expect(result.totalConversions).toBe(0);
     expect(result.firstTouchValue).toBe(0);
@@ -562,11 +546,7 @@ describe("getCampaignAttributionSummary", () => {
     ];
     mockCampaignAttributionFindMany.mockResolvedValue(attributions);
 
-    const result = await getCampaignAttributionSummary(
-      "summer-sale",
-      startDate,
-      endDate,
-    );
+    const result = await getCampaignAttributionSummary("summer-sale", startDate, endDate);
 
     expect(result.totalConversions).toBe(1);
     expect(result.firstTouchValue).toBe(100);
@@ -591,11 +571,7 @@ describe("getCampaignAttributionSummary", () => {
     ];
     mockCampaignAttributionFindMany.mockResolvedValue(attributions);
 
-    const result = await getCampaignAttributionSummary(
-      "campaign-x",
-      startDate,
-      endDate,
-    );
+    const result = await getCampaignAttributionSummary("campaign-x", startDate, endDate);
 
     expect(result.totalConversions).toBe(2);
     expect(result.conversionsByType.SIGNUP).toBe(1);
@@ -613,11 +589,7 @@ describe("getCampaignAttributionSummary", () => {
     ];
     mockCampaignAttributionFindMany.mockResolvedValue(attributions);
 
-    const result = await getCampaignAttributionSummary(
-      "free-campaign",
-      startDate,
-      endDate,
-    );
+    const result = await getCampaignAttributionSummary("free-campaign", startDate, endDate);
 
     expect(result.firstTouchValue).toBe(0);
     expect(result.lastTouchValue).toBe(0);
@@ -658,11 +630,7 @@ describe("getCampaignAttributionSummary", () => {
     ];
     mockCampaignAttributionFindMany.mockResolvedValue(attributions);
 
-    const result = await getCampaignAttributionSummary(
-      "any-campaign",
-      startDate,
-      endDate,
-    );
+    const result = await getCampaignAttributionSummary("any-campaign", startDate, endDate);
 
     expect(result.linearValue).toBeCloseTo(100, 1);
   });
@@ -744,13 +712,11 @@ describe("getGlobalAttributionSummary", () => {
 
   it("compares all attribution models in comparison array", async () => {
     mockCampaignAttributionCount.mockResolvedValue(10);
-    mockCampaignAttributionGroupBy
-      .mockResolvedValueOnce([])
-      .mockResolvedValueOnce([]);
+    mockCampaignAttributionGroupBy.mockResolvedValueOnce([]).mockResolvedValueOnce([]);
 
     const result = await getGlobalAttributionSummary(startDate, endDate);
 
-    const models = result.comparison.map(c => c.model);
+    const models = result.comparison.map((c) => c.model);
     expect(models).toContain("FIRST_TOUCH");
     expect(models).toContain("LAST_TOUCH");
     expect(models).toContain("LINEAR");
@@ -760,22 +726,18 @@ describe("getGlobalAttributionSummary", () => {
 
   it("maps platform breakdown with UNKNOWN for null platform", async () => {
     mockCampaignAttributionCount.mockResolvedValue(5);
-    mockCampaignAttributionGroupBy
-      .mockResolvedValueOnce([])
-      .mockResolvedValueOnce([
-        {
-          platform: null,
-          attributionType: "FIRST_TOUCH",
-          _sum: { conversionValue: 500 },
-          _count: { _all: 5 },
-        },
-      ]);
+    mockCampaignAttributionGroupBy.mockResolvedValueOnce([]).mockResolvedValueOnce([
+      {
+        platform: null,
+        attributionType: "FIRST_TOUCH",
+        _sum: { conversionValue: 500 },
+        _count: { _all: 5 },
+      },
+    ]);
 
     const result = await getGlobalAttributionSummary(startDate, endDate);
 
-    const unknownPlatform = result.platformBreakdown.find(
-      p => p.platform === "UNKNOWN",
-    );
+    const unknownPlatform = result.platformBreakdown.find((p) => p.platform === "UNKNOWN");
     expect(unknownPlatform).toBeDefined();
     expect(unknownPlatform!.conversionCount).toBe(5);
     expect(unknownPlatform!.value).toBe(500);
@@ -795,9 +757,7 @@ describe("getGlobalAttributionSummary", () => {
 
     const result = await getGlobalAttributionSummary(startDate, endDate);
 
-    const firstTouchComparison = result.comparison.find(
-      c => c.model === "FIRST_TOUCH",
-    );
+    const firstTouchComparison = result.comparison.find((c) => c.model === "FIRST_TOUCH");
     expect(firstTouchComparison!.conversionCount).toBe(42);
   });
 });
@@ -809,9 +769,7 @@ describe("direct attribution flow", () => {
   it("creates a visitor session with direct prefix when no sessions exist", async () => {
     mockVisitorSessionFindMany.mockResolvedValue([]);
     mockUserFindUnique.mockResolvedValue({ id: "user-new" });
-    mockVisitorSessionCreate.mockResolvedValue(
-      makeSession({ id: "direct-sess" }),
-    );
+    mockVisitorSessionCreate.mockResolvedValue(makeSession({ id: "direct-sess" }));
     mockCampaignAttributionCreateMany.mockResolvedValue({ count: 5 });
 
     await attributeConversion("user-new", "SIGNUP", 0);
@@ -831,21 +789,19 @@ describe("direct attribution flow", () => {
   it("creates 5 attribution types with DIRECT platform in bulk", async () => {
     mockVisitorSessionFindMany.mockResolvedValue([]);
     mockUserFindUnique.mockResolvedValue({ id: "user-new" });
-    mockVisitorSessionCreate.mockResolvedValue(
-      makeSession({ id: "direct-sess" }),
-    );
+    mockVisitorSessionCreate.mockResolvedValue(makeSession({ id: "direct-sess" }));
     mockCampaignAttributionCreateMany.mockResolvedValue({ count: 5 });
 
     await attributeConversion("user-new", "PURCHASE", 50);
 
     const createManyCall = mockCampaignAttributionCreateMany.mock.calls[0]![0] as {
-      data: Array<{ platform: string; attributionType: string; }>;
+      data: Array<{ platform: string; attributionType: string }>;
     };
     expect(createManyCall.data).toHaveLength(5);
     for (const record of createManyCall.data) {
       expect(record.platform).toBe("DIRECT");
     }
-    const types = createManyCall.data.map(r => r.attributionType);
+    const types = createManyCall.data.map((r) => r.attributionType);
     expect(types).toContain("FIRST_TOUCH");
     expect(types).toContain("LAST_TOUCH");
     expect(types).toContain("LINEAR");

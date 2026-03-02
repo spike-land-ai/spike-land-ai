@@ -12,22 +12,18 @@ function cacheKey(...parts: string[]): string {
   return `${CACHE_PREFIX}${parts.join(":")}`;
 }
 
-function getAdzunaCredentials(): { appId: string; appKey: string; } {
+function getAdzunaCredentials(): { appId: string; appKey: string } {
   const appId = process.env.ADZUNA_APP_ID;
   const appKey = process.env.ADZUNA_APP_KEY;
 
   if (!appId || !appKey) {
-    throw new Error(
-      "ADZUNA_APP_ID and ADZUNA_APP_KEY environment variables are required",
-    );
+    throw new Error("ADZUNA_APP_ID and ADZUNA_APP_KEY environment variables are required");
   }
 
   return { appId, appKey };
 }
 
-function mapAdzunaJob(
-  job: AdzunaSearchResponse["results"][number],
-): JobListing {
+function mapAdzunaJob(job: AdzunaSearchResponse["results"][number]): JobListing {
   return {
     id: job.id,
     title: job.title,
@@ -44,8 +40,27 @@ function mapAdzunaJob(
 }
 
 const VALID_COUNTRY_CODES = new Set([
-  "gb", "us", "au", "ca", "de", "fr", "nl", "nz", "pl", "ru",
-  "sg", "za", "br", "at", "be", "ch", "es", "in", "it", "mx", "se",
+  "gb",
+  "us",
+  "au",
+  "ca",
+  "de",
+  "fr",
+  "nl",
+  "nz",
+  "pl",
+  "ru",
+  "sg",
+  "za",
+  "br",
+  "at",
+  "be",
+  "ch",
+  "es",
+  "in",
+  "it",
+  "mx",
+  "se",
 ]);
 
 export async function searchJobs(
@@ -54,7 +69,7 @@ export async function searchJobs(
   countryCode = DEFAULT_COUNTRY_CODE,
   page = 1,
   limit = DEFAULT_RESULTS_LIMIT,
-): Promise<{ jobs: JobListing[]; total: number; }> {
+): Promise<{ jobs: JobListing[]; total: number }> {
   if (!VALID_COUNTRY_CODES.has(countryCode.toLowerCase())) {
     throw new Error(`Invalid country code: ${countryCode}`);
   }
@@ -63,15 +78,8 @@ export async function searchJobs(
     throw new Error(`Invalid page number: ${page}`);
   }
 
-  const key = cacheKey(
-    "jobs",
-    query,
-    location ?? "",
-    countryCode,
-    String(page),
-    String(limit),
-  );
-  const cached = await getCacheRaw<{ jobs: JobListing[]; total: number; }>(key);
+  const key = cacheKey("jobs", query, location ?? "", countryCode, String(page), String(limit));
+  const cached = await getCacheRaw<{ jobs: JobListing[]; total: number }>(key);
   if (cached) return cached;
 
   const { appId, appKey } = getAdzunaCredentials();
@@ -90,9 +98,7 @@ export async function searchJobs(
   const response = await fetch(url.toString());
 
   if (!response.ok) {
-    throw new Error(
-      `Adzuna API error: ${response.status} ${response.statusText}`,
-    );
+    throw new Error(`Adzuna API error: ${response.status} ${response.statusText}`);
   }
 
   const data = (await response.json()) as AdzunaSearchResponse;
@@ -132,17 +138,15 @@ export async function getSalaryEstimate(
   const response = await fetch(url.toString());
 
   if (!response.ok) {
-    throw new Error(
-      `Adzuna API error: ${response.status} ${response.statusText}`,
-    );
+    throw new Error(`Adzuna API error: ${response.status} ${response.statusText}`);
   }
 
   const data = (await response.json()) as AdzunaSearchResponse;
 
   // Extract salary data from results
   const salaries = data.results
-    .filter(j => j.salary_min !== null && j.salary_max !== null)
-    .map(j => ((j.salary_min ?? 0) + (j.salary_max ?? 0)) / 2)
+    .filter((j) => j.salary_min !== null && j.salary_max !== null)
+    .map((j) => ((j.salary_min ?? 0) + (j.salary_max ?? 0)) / 2)
     .sort((a, b) => a - b);
 
   if (salaries.length === 0) {

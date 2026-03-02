@@ -6,11 +6,7 @@
 "use client";
 
 import { useCallback, useReducer, useRef } from "react";
-import {
-  createTrackNodes,
-  generateWaveformData,
-  loadAudioFile,
-} from "../lib/audio-engine";
+import { createTrackNodes, generateWaveformData, loadAudioFile } from "../lib/audio-engine";
 import type { AudioTrack, TrackAction } from "../types";
 
 function generateId(): string {
@@ -45,78 +41,67 @@ function tracksReducer(state: AudioTrack[], action: TrackAction): AudioTrack[] {
         },
       ];
     case "REMOVE_TRACK":
-      return state.filter(track => track.id !== action.payload);
+      return state.filter((track) => track.id !== action.payload);
     case "UPDATE_TRACK":
-      return state.map(track =>
-        track.id === action.payload.id
-          ? { ...track, ...action.payload.updates }
-          : track
+      return state.map((track) =>
+        track.id === action.payload.id ? { ...track, ...action.payload.updates } : track,
       );
     case "SET_VOLUME":
-      return state.map(track =>
-        track.id === action.payload.id
-          ? { ...track, volume: action.payload.volume }
-          : track
+      return state.map((track) =>
+        track.id === action.payload.id ? { ...track, volume: action.payload.volume } : track,
       );
     case "SET_PAN":
-      return state.map(track =>
-        track.id === action.payload.id
-          ? { ...track, pan: action.payload.pan }
-          : track
+      return state.map((track) =>
+        track.id === action.payload.id ? { ...track, pan: action.payload.pan } : track,
       );
     case "SET_DELAY":
-      return state.map(track =>
+      return state.map((track) =>
         track.id === action.payload.id
           ? {
-            ...track,
-            delay: Math.max(-5, Math.min(10, action.payload.delay)),
-          }
-          : track
+              ...track,
+              delay: Math.max(-5, Math.min(10, action.payload.delay)),
+            }
+          : track,
       );
     case "SET_POSITION":
-      return state.map(track =>
+      return state.map((track) =>
         track.id === action.payload.id
           ? { ...track, position: Math.max(0, action.payload.position) }
-          : track
+          : track,
       );
     case "SET_TRIM":
-      return state.map(track =>
+      return state.map((track) =>
         track.id === action.payload.id
           ? {
-            ...track,
-            // Allow negative trimStart for lead-in silence (up to -30s)
-            trimStart: Math.max(-30, action.payload.trimStart),
-            trimEnd: Math.min(
-              track.duration || Infinity,
-              action.payload.trimEnd,
-            ),
-          }
-          : track
+              ...track,
+              // Allow negative trimStart for lead-in silence (up to -30s)
+              trimStart: Math.max(-30, action.payload.trimStart),
+              trimEnd: Math.min(track.duration || Infinity, action.payload.trimEnd),
+            }
+          : track,
       );
     case "TOGGLE_MUTE":
-      return state.map(track =>
-        track.id === action.payload ? { ...track, muted: !track.muted } : track
+      return state.map((track) =>
+        track.id === action.payload ? { ...track, muted: !track.muted } : track,
       );
     case "TOGGLE_SOLO":
-      return state.map(track =>
-        track.id === action.payload ? { ...track, solo: !track.solo } : track
+      return state.map((track) =>
+        track.id === action.payload ? { ...track, solo: !track.solo } : track,
       );
     case "PLAY_TRACK":
-      return state.map(track =>
-        track.id === action.payload ? { ...track, isPlaying: true } : track
+      return state.map((track) =>
+        track.id === action.payload ? { ...track, isPlaying: true } : track,
       );
     case "STOP_TRACK":
-      return state.map(track =>
-        track.id === action.payload
-          ? { ...track, isPlaying: false, currentTime: 0 }
-          : track
+      return state.map((track) =>
+        track.id === action.payload ? { ...track, isPlaying: false, currentTime: 0 } : track,
       );
     case "REORDER_TRACKS": {
       const orderMap = new Map(action.payload.map((id, index) => [id, index]));
       return [...state].sort((a, b) => (orderMap.get(a.id) ?? 0) - (orderMap.get(b.id) ?? 0));
     }
     case "RESTORE_TRACKS":
-      return action.payload.map(trackData => ({
+      return action.payload.map((trackData) => ({
         id: trackData.id || generateId(),
         name: trackData.name || "Restored Track",
         source: null,
@@ -252,7 +237,7 @@ export function useAudioTracks() {
       if (activeGain) {
         activeGain.gain.value = volume;
       } else {
-        const track = tracks.find(t => t.id === id);
+        const track = tracks.find((t) => t.id === id);
         if (track?.gainNode) {
           track.gainNode.gain.value = volume;
         }
@@ -264,7 +249,7 @@ export function useAudioTracks() {
 
   const toggleMute = useCallback(
     (id: string) => {
-      const track = tracks.find(t => t.id === id);
+      const track = tracks.find((t) => t.id === id);
       if (track) {
         const gainNode = activeGainRefs.current.get(id) ?? track.gainNode;
         if (gainNode) {
@@ -282,11 +267,11 @@ export function useAudioTracks() {
 
       // Immediately update active gain nodes for live solo changes
       // Compute the new solo state after the toggle
-      const toggledTrack = tracks.find(t => t.id === id);
+      const toggledTrack = tracks.find((t) => t.id === id);
       if (!toggledTrack) return;
 
       const newSoloValue = !toggledTrack.solo;
-      const hasSoloAfter = tracks.some(t => t.id === id ? newSoloValue : t.solo);
+      const hasSoloAfter = tracks.some((t) => (t.id === id ? newSoloValue : t.solo));
 
       for (const track of tracks) {
         const gain = activeGainRefs.current.get(track.id);
@@ -313,12 +298,9 @@ export function useAudioTracks() {
     dispatch({ type: "SET_POSITION", payload: { id, position } });
   }, []);
 
-  const setTrim = useCallback(
-    (id: string, trimStart: number, trimEnd: number) => {
-      dispatch({ type: "SET_TRIM", payload: { id, trimStart, trimEnd } });
-    },
-    [],
-  );
+  const setTrim = useCallback((id: string, trimStart: number, trimEnd: number) => {
+    dispatch({ type: "SET_TRIM", payload: { id, trimStart, trimEnd } });
+  }, []);
 
   const reorderTracks = useCallback((newOrder: string[]) => {
     dispatch({ type: "REORDER_TRACKS", payload: newOrder });
@@ -329,13 +311,8 @@ export function useAudioTracks() {
   }, []);
 
   const playTrack = useCallback(
-    (
-      id: string,
-      context: AudioContext,
-      masterGain: GainNode,
-      startFromTime: number = 0,
-    ) => {
-      const track = tracks.find(t => t.id === id);
+    (id: string, context: AudioContext, masterGain: GainNode, startFromTime: number = 0) => {
+      const track = tracks.find((t) => t.id === id);
       if (!track?.buffer) return;
 
       // Stop existing playback
@@ -371,9 +348,7 @@ export function useAudioTracks() {
       };
 
       const trackPosition = track.position ?? track.delay ?? 0;
-      const effectiveTrimEnd = track.trimEnd > 0
-        ? track.trimEnd
-        : track.duration;
+      const effectiveTrimEnd = track.trimEnd > 0 ? track.trimEnd : track.duration;
 
       // Calculate relative start time
       // This is how far into the timeline play has started
@@ -382,8 +357,10 @@ export function useAudioTracks() {
 
       // Check if the track has already finished playing at this point
       // If we start playing at time X, and the track ends before X, skip it
-      const trackEnd = trackPosition + (effectiveTrimEnd - track.trimStart)
-        + (track.trimStart < 0 ? Math.abs(track.trimStart) : 0);
+      const trackEnd =
+        trackPosition +
+        (effectiveTrimEnd - track.trimStart) +
+        (track.trimStart < 0 ? Math.abs(track.trimStart) : 0);
 
       if (startFromTime >= trackEnd) {
         return;
@@ -399,11 +376,7 @@ export function useAudioTracks() {
           const silenceDuration = Math.abs(track.trimStart);
           const totalPreDelay = waitTime + silenceDuration;
 
-          source.start(
-            context.currentTime + totalPreDelay,
-            0,
-            effectiveTrimEnd,
-          );
+          source.start(context.currentTime + totalPreDelay, 0, effectiveTrimEnd);
         } else {
           // Normal start
           source.start(
@@ -423,21 +396,13 @@ export function useAudioTracks() {
           if (transform < silenceDuration) {
             // We are still within the silence period
             const remainingSilence = silenceDuration - transform;
-            source.start(
-              context.currentTime + remainingSilence,
-              0,
-              effectiveTrimEnd,
-            );
+            source.start(context.currentTime + remainingSilence, 0, effectiveTrimEnd);
           } else {
             // We are past the silence period, into the audio
             const audioOffset = transform - silenceDuration;
             const duration = Math.max(0, effectiveTrimEnd - audioOffset);
             if (duration <= 0) return;
-            source.start(
-              context.currentTime,
-              audioOffset,
-              duration,
-            );
+            source.start(context.currentTime, audioOffset, duration);
           }
         } else {
           // Normal start: we are `transform` seconds into the track
@@ -445,11 +410,7 @@ export function useAudioTracks() {
           const startOffset = track.trimStart + transform;
           const duration = Math.max(0, effectiveTrimEnd - startOffset);
           if (duration <= 0) return;
-          source.start(
-            context.currentTime,
-            startOffset,
-            duration,
-          );
+          source.start(context.currentTime, startOffset, duration);
         }
       }
 
@@ -480,7 +441,7 @@ export function useAudioTracks() {
 
   const stopAllTracks = useCallback(() => {
     onAllEndedRef.current = null;
-    tracks.forEach(track => {
+    tracks.forEach((track) => {
       stopTrack(track.id);
     });
   }, [tracks, stopTrack]);
@@ -493,9 +454,9 @@ export function useAudioTracks() {
       onComplete?: () => void,
     ) => {
       onAllEndedRef.current = onComplete ?? null;
-      const hasSolo = tracks.some(t => t.solo);
+      const hasSolo = tracks.some((t) => t.solo);
 
-      tracks.forEach(track => {
+      tracks.forEach((track) => {
         if (track.buffer) {
           const shouldPlay = hasSolo ? track.solo : !track.muted;
           if (shouldPlay) {

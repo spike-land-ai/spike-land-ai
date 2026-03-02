@@ -34,9 +34,7 @@ type Result<T, E = Error> = Success<T> | Failure<E>;
  * @param promise - The promise to wrap
  * @returns Result object with { data, error }
  */
-export async function tryCatch<T, E = Error>(
-  promise: Promise<T>,
-): Promise<Result<T, E>> {
+export async function tryCatch<T, E = Error>(promise: Promise<T>): Promise<Result<T, E>> {
   try {
     const data = await promise;
     return { data, error: null };

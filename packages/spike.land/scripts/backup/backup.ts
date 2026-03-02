@@ -93,18 +93,16 @@ export function createS3Client(config: BackupConfig): S3Client {
 /**
  * Check if pg_dump is available on the system
  */
-export async function checkPgDumpAvailable(): Promise<
-  { success: boolean; error?: string; }
-> {
-  return new Promise(resolve => {
+export async function checkPgDumpAvailable(): Promise<{ success: boolean; error?: string }> {
+  return new Promise((resolve) => {
     const proc = spawn("pg_dump", ["--version"], {
       stdio: ["ignore", "pipe", "pipe"],
     });
     let stderr = "";
-    proc.stderr?.on("data", data => {
+    proc.stderr?.on("data", (data) => {
       stderr += data.toString();
     });
-    proc.on("close", code => {
+    proc.on("close", (code) => {
       if (code === 0) {
         resolve({ success: true });
       } else {
@@ -114,7 +112,7 @@ export async function checkPgDumpAvailable(): Promise<
         });
       }
     });
-    proc.on("error", err => {
+    proc.on("error", (err) => {
       resolve({ success: false, error: `pg_dump not found: ${err.message}` });
     });
   });
@@ -126,7 +124,7 @@ export async function checkPgDumpAvailable(): Promise<
 export async function checkR2Connectivity(
   s3Client: S3Client,
   bucketName: string,
-): Promise<{ success: boolean; error?: string; }> {
+): Promise<{ success: boolean; error?: string }> {
   try {
     await s3Client.send(new HeadBucketCommand({ Bucket: bucketName }));
     return { success: true };
@@ -142,10 +140,8 @@ export async function checkR2Connectivity(
 /**
  * Check database connectivity using pg_isready
  */
-export async function checkDatabaseConnectivity(): Promise<
-  { success: boolean; error?: string; }
-> {
-  return new Promise(resolve => {
+export async function checkDatabaseConnectivity(): Promise<{ success: boolean; error?: string }> {
+  return new Promise((resolve) => {
     const databaseUrl = process.env.DATABASE_URL;
     if (!databaseUrl) {
       resolve({ success: false, error: "DATABASE_URL not set" });
@@ -170,14 +166,14 @@ export async function checkDatabaseConnectivity(): Promise<
 
     let stdout = "";
     let stderr = "";
-    proc.stdout?.on("data", data => {
+    proc.stdout?.on("data", (data) => {
       stdout += data.toString();
     });
-    proc.stderr?.on("data", data => {
+    proc.stderr?.on("data", (data) => {
       stderr += data.toString();
     });
 
-    proc.on("close", code => {
+    proc.on("close", (code) => {
       if (code === 0) {
         resolve({ success: true });
       } else {
@@ -190,7 +186,7 @@ export async function checkDatabaseConnectivity(): Promise<
       }
     });
 
-    proc.on("error", err => {
+    proc.on("error", (err) => {
       // pg_isready not found - fall back to assuming connection is okay
       // The actual pg_dump will fail with a clearer error if DB is unreachable
       console.log(
@@ -207,8 +203,8 @@ export async function checkDatabaseConnectivity(): Promise<
 export async function runPreflightChecks(
   s3Client: S3Client,
   config: BackupConfig,
-  options: { maxRetries?: number; initialDelayMs?: number; } = {},
-): Promise<{ success: boolean; errors: string[]; }> {
+  options: { maxRetries?: number; initialDelayMs?: number } = {},
+): Promise<{ success: boolean; errors: string[] }> {
   const { maxRetries = 3, initialDelayMs = 1000 } = options;
   const errors: string[] = [];
 
@@ -261,7 +257,7 @@ export async function runPreflightChecks(
  * Sleep for a specified number of milliseconds
  */
 export function sleep(ms: number): Promise<void> {
-  return new Promise(resolve => setTimeout(resolve, ms));
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 /**
@@ -293,9 +289,7 @@ export async function withRetry<T>(
     }
   }
 
-  throw new Error(
-    `${operationName} failed after ${maxRetries} attempts: ${lastError?.message}`,
-  );
+  throw new Error(`${operationName} failed after ${maxRetries} attempts: ${lastError?.message}`);
 }
 
 /**
@@ -340,10 +334,10 @@ async function cleanupFiles(files: string[]): Promise<void> {
  * Filters and validates backup objects from S3 listing
  */
 export function filterValidBackups(
-  contents: { Key?: string; LastModified?: Date; }[] | undefined,
-): { Key: string; LastModified: Date; }[] {
+  contents: { Key?: string; LastModified?: Date }[] | undefined,
+): { Key: string; LastModified: Date }[] {
   return (contents || []).filter(
-    (obj): obj is { Key: string; LastModified: Date; } =>
+    (obj): obj is { Key: string; LastModified: Date } =>
       !!obj.Key && !!obj.LastModified && obj.Key.endsWith(".sql.gz"),
   );
 }
@@ -368,9 +362,7 @@ export async function runBackup(
   console.log("Running pre-flight checks...");
   const preflightResult = await runPreflightChecks(s3Client, config);
   if (!preflightResult.success) {
-    throw new Error(
-      `Pre-flight checks failed:\n  - ${preflightResult.errors.join("\n  - ")}`,
-    );
+    throw new Error(`Pre-flight checks failed:\n  - ${preflightResult.errors.join("\n  - ")}`);
   }
   console.log("Pre-flight checks passed.\n");
 
@@ -384,22 +376,20 @@ export async function runBackup(
     // pg_dump with retry logic
     console.log("Starting database backup...");
     if (dryRun) {
-      console.log(
-        `[DRY-RUN] Would execute: pg_dump --format=p --file=${filepath}`,
-      );
+      console.log(`[DRY-RUN] Would execute: pg_dump --format=p --file=${filepath}`);
     } else {
       await withRetry(
         () =>
           new Promise<void>((resolve, reject) => {
-            const proc = spawn("pg_dump", [
-              "--format=p",
-              `--file=${filepath}`,
-              process.env.DATABASE_URL!,
-            ], {
-              stdio: "inherit",
-              env: process.env,
-            });
-            proc.on("close", code => {
+            const proc = spawn(
+              "pg_dump",
+              ["--format=p", `--file=${filepath}`, process.env.DATABASE_URL!],
+              {
+                stdio: "inherit",
+                env: process.env,
+              },
+            );
+            proc.on("close", (code) => {
               if (code === 0) resolve();
               else reject(new Error(`pg_dump exited with code ${code}`));
             });
@@ -417,9 +407,7 @@ export async function runBackup(
     // Compress backup
     console.log("Compressing backup file...");
     if (dryRun) {
-      console.log(
-        `[DRY-RUN] Would compress: ${filepath} -> ${compressedFilepath}`,
-      );
+      console.log(`[DRY-RUN] Would compress: ${filepath} -> ${compressedFilepath}`);
     } else {
       const source = createReadStream(filepath);
       const destination = createWriteStream(compressedFilepath);
@@ -473,9 +461,7 @@ export async function runBackup(
 
     if (validBackups.length > 7) {
       const sortedBackups = [...validBackups].sort(
-        (a, b) =>
-          new Date(a.LastModified).getTime()
-          - new Date(b.LastModified).getTime(),
+        (a, b) => new Date(a.LastModified).getTime() - new Date(b.LastModified).getTime(),
       );
       const backupsToDelete = sortedBackups.slice(0, sortedBackups.length - 7);
       for (const backup of backupsToDelete) {
@@ -505,9 +491,7 @@ export async function runBackup(
 /**
  * Main entry point that reads config from environment
  */
-export async function main(
-  args: string[] = process.argv.slice(2),
-): Promise<void> {
+export async function main(args: string[] = process.argv.slice(2)): Promise<void> {
   const options = parseArgs(args);
 
   console.log("===========================================");
@@ -520,9 +504,7 @@ export async function main(
 
   // Environment variable diagnostics
   console.log("Environment check:");
-  console.log(
-    `- DATABASE_URL: ${process.env.DATABASE_URL ? "[SET]" : "[MISSING]"}`,
-  );
+  console.log(`- DATABASE_URL: ${process.env.DATABASE_URL ? "[SET]" : "[MISSING]"}`);
   console.log(
     `- CLOUDFLARE_R2_BUCKET_NAME: ${process.env.CLOUDFLARE_R2_BUCKET_NAME ? "[SET]" : "[MISSING]"}`,
   );

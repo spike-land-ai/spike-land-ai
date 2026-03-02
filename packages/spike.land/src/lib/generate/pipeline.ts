@@ -1,16 +1,9 @@
 import { GeneratedRouteStatus } from "@prisma/client";
 import { classifyInput } from "@/lib/create/slug-classifier";
 import { agentGenerateApp } from "@/lib/create/agent-loop";
-import {
-  generateCodespaceId,
-  getCodespaceUrl,
-} from "@/lib/create/codespace-service";
+import { generateCodespaceId, getCodespaceUrl } from "@/lib/create/codespace-service";
 import logger from "@/lib/logger";
-import {
-  getOrCreateRoute,
-  incrementAttempts,
-  updateRouteStatus,
-} from "./route-cache";
+import { getOrCreateRoute, incrementAttempts, updateRouteStatus } from "./route-cache";
 import { reviewCode, runReviewConsensus } from "./reviewer";
 import { settleReviewElo } from "./elo-tracker";
 import { createGenerationTicket, updateTicketStatus } from "./ticket-service";
@@ -66,10 +59,7 @@ export async function* generateRoute(
     }
 
     // If already generating, emit status
-    if (
-      route.status !== GeneratedRouteStatus.NEW
-      && route.status !== GeneratedRouteStatus.FAILED
-    ) {
+    if (route.status !== GeneratedRouteStatus.NEW && route.status !== GeneratedRouteStatus.FAILED) {
       yield {
         type: "status",
         phase: route.status as PipelinePhase,
@@ -101,9 +91,7 @@ export async function* generateRoute(
       status: string;
     } | null = null;
     try {
-      classification = await classifyInput(
-        slug.replace(/-/g, " ").replace(/\//g, " "),
-      );
+      classification = await classifyInput(slug.replace(/-/g, " ").replace(/\//g, " "));
     } catch {
       logger.warn("Classification failed, proceeding without category", {
         slug,
@@ -151,22 +139,20 @@ export async function* generateRoute(
     let planRetries = 0;
 
     while (!planApproved && planRetries < MAX_PLAN_RETRIES) {
-      const { results: planReviews, approved } = await runReviewConsensus(
-        async reviewer => {
-          const result = await reviewPlan(plan, reviewer);
-          // Patch routeId into reviews that were created with empty routeId
-          if (result.reviewerAgentId) {
-            await prisma.routeReview.updateMany({
-              where: {
-                reviewerAgentId: result.reviewerAgentId,
-                routeId: "",
-              },
-              data: { routeId: ctx.routeId },
-            });
-          }
-          return result;
-        },
-      );
+      const { results: planReviews, approved } = await runReviewConsensus(async (reviewer) => {
+        const result = await reviewPlan(plan, reviewer);
+        // Patch routeId into reviews that were created with empty routeId
+        if (result.reviewerAgentId) {
+          await prisma.routeReview.updateMany({
+            where: {
+              reviewerAgentId: result.reviewerAgentId,
+              routeId: "",
+            },
+            data: { routeId: ctx.routeId },
+          });
+        }
+        return result;
+      });
 
       yield {
         type: "review_complete",
@@ -202,11 +188,7 @@ export async function* generateRoute(
     }
 
     // === Create tickets ===
-    const tickets = await createGenerationTicket(
-      slug,
-      originalUrl,
-      ctx.category,
-    );
+    const tickets = await createGenerationTicket(slug, originalUrl, ctx.category);
     ctx.githubIssueNumber = tickets.githubIssueNumber;
     await updateRouteStatus(slug, GeneratedRouteStatus.PLAN_REVIEW, {
       githubIssueNumber: tickets.githubIssueNumber,
@@ -218,8 +200,7 @@ export async function* generateRoute(
     await incrementAttempts(slug);
 
     let generationSucceeded = false;
-    let finalTitle = slug.split("/").pop()?.replace(/-/g, " ")
-      ?? "Generated App";
+    let finalTitle = slug.split("/").pop()?.replace(/-/g, " ") ?? "Generated App";
     let finalDescription = "Generated application";
     let finalCodespaceUrl = "";
     let finalCodespaceId = "";
@@ -266,7 +247,7 @@ export async function* generateRoute(
       },
     });
     for (const review of planReviews) {
-      await settleReviewElo(review.id, generationSucceeded).catch(err => {
+      await settleReviewElo(review.id, generationSucceeded).catch((err) => {
         logger.warn("ELO settlement failed", {
           reviewId: review.id,
           error: err,
@@ -283,10 +264,7 @@ export async function* generateRoute(
       await updateRouteStatus(slug, GeneratedRouteStatus.FAILED, {
         lastError: "Agent loop failed to produce working code",
       });
-      await updateTicketStatus(
-        ctx.githubIssueNumber,
-        "FAILED",
-      );
+      await updateTicketStatus(ctx.githubIssueNumber, "FAILED");
       return;
     }
 
@@ -311,7 +289,7 @@ export async function* generateRoute(
 
       if (session?.code) {
         const { results: codeReviews, approved: codeApproved } = await runReviewConsensus(
-          async reviewer => reviewCode(session.code, reviewer, ctx.routeId),
+          async (reviewer) => reviewCode(session.code, reviewer, ctx.routeId),
         );
 
         yield {
@@ -322,10 +300,7 @@ export async function* generateRoute(
         };
 
         if (!codeApproved) {
-          logger.warn(
-            "Code review rejected but transpile succeeded, publishing anyway",
-            { slug },
-          );
+          logger.warn("Code review rejected but transpile succeeded, publishing anyway", { slug });
         }
       }
     }
@@ -364,10 +339,7 @@ export async function* generateRoute(
       await updateRouteStatus(slug, GeneratedRouteStatus.FAILED, {
         lastError: error instanceof Error ? error.message : "Unknown error",
       });
-      await updateTicketStatus(
-        ctx.githubIssueNumber,
-        "FAILED",
-      );
+      await updateTicketStatus(ctx.githubIssueNumber, "FAILED");
     } catch {
       // Ignore DB errors during error handling
     }

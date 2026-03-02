@@ -10,9 +10,7 @@ interface WaitlistInlineFormProps {
   className?: string;
 }
 
-export function WaitlistInlineForm(
-  { source = "waitlist", className }: WaitlistInlineFormProps,
-) {
+export function WaitlistInlineForm({ source = "waitlist", className }: WaitlistInlineFormProps) {
   const [email, setEmail] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
@@ -53,15 +51,12 @@ export function WaitlistInlineForm(
   }
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className={`flex items-start gap-2 ${className ?? ""}`}
-    >
+    <form onSubmit={handleSubmit} className={`flex items-start gap-2 ${className ?? ""}`}>
       <Input
         type="email"
         placeholder="Enter your email"
         value={email}
-        onChange={e => setEmail(e.target.value)}
+        onChange={(e) => setEmail(e.target.value)}
         required
         className="bg-white/5 border-white/10 text-white placeholder:text-muted-foreground/60"
       />

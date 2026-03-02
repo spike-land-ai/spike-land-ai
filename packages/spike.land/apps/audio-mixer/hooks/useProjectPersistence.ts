@@ -90,8 +90,7 @@ export function useProjectPersistence(
 ): [ProjectPersistenceState, ProjectPersistenceActions] {
   const [projectId, setProjectId] = useState<string>(() => {
     if (typeof window === "undefined") return generateProjectId();
-    return localStorage.getItem(LOCAL_STORAGE_PROJECT_ID_KEY)
-      || generateProjectId();
+    return localStorage.getItem(LOCAL_STORAGE_PROJECT_ID_KEY) || generateProjectId();
   });
 
   const [isLoading, setIsLoading] = useState(true);

@@ -18,12 +18,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Slider } from "@/components/ui/slider";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import {
   Check,
@@ -54,10 +49,7 @@ import {
   useTimeline,
 } from "../hooks";
 import { blobToAudioBuffer, mixTracksToBlob } from "../lib/audio-engine";
-import {
-  KeyboardShortcutsPanel,
-  ShortcutToast,
-} from "./KeyboardShortcutsPanel";
+import { KeyboardShortcutsPanel, ShortcutToast } from "./KeyboardShortcutsPanel";
 import { RecordingPanel } from "./RecordingPanel";
 import { SplashScreen } from "./SplashScreen";
 import { Timeline } from "./Timeline";
@@ -70,9 +62,7 @@ export function AudioMixer() {
   const [isExporting, setIsExporting] = useState(false);
   const [showShortcuts, setShowShortcuts] = useState(false);
   const [shortcutToast, setShortcutToast] = useState<string | null>(null);
-  const [soloPreviewTrackId, setSoloPreviewTrackId] = useState<string | null>(
-    null,
-  );
+  const [soloPreviewTrackId, setSoloPreviewTrackId] = useState<string | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const recordingStartTimeRef = useRef<number>(0);
@@ -136,7 +126,7 @@ export function AudioMixer() {
 
       // Restore tracks with audio data from OPFS
       const restoredTracks = await Promise.all(
-        savedProject.tracks.map(async track => {
+        savedProject.tracks.map(async (track) => {
           let buffer: AudioBuffer | null = null;
 
           // Try to load audio from OPFS if path exists
@@ -152,10 +142,7 @@ export function AudioMixer() {
                 buffer = await context.decodeAudioData(arrayBuffer);
               }
             } catch (error) {
-              console.warn(
-                `Failed to load audio for track ${track.name}:`,
-                error,
-              );
+              console.warn(`Failed to load audio for track ${track.name}:`, error);
             }
           }
 
@@ -178,11 +165,11 @@ export function AudioMixer() {
             buffer,
             gainNode: buffer
               ? (() => {
-                const gainNode = context.createGain();
-                gainNode.gain.value = track.muted ? 0 : track.volume;
-                gainNode.connect(masterGain);
-                return gainNode;
-              })()
+                  const gainNode = context.createGain();
+                  gainNode.gain.value = track.muted ? 0 : track.volume;
+                  gainNode.connect(masterGain);
+                  return gainNode;
+                })()
               : null,
           };
         }),
@@ -229,12 +216,8 @@ export function AudioMixer() {
           if (opfsSupported) {
             try {
               const arrayBuffer = await file.arrayBuffer();
-              opfsPath =
-                `audio-mixer/projects/${persistenceState.projectId}/tracks/${Date.now()}-${file.name}`;
-              await audioStorage.saveTrackToPath(
-                opfsPath,
-                new Uint8Array(arrayBuffer),
-              );
+              opfsPath = `audio-mixer/projects/${persistenceState.projectId}/tracks/${Date.now()}-${file.name}`;
+              await audioStorage.saveTrackToPath(opfsPath, new Uint8Array(arrayBuffer));
             } catch (error) {
               console.warn("Failed to save track to OPFS:", error);
               opfsPath = undefined;
@@ -251,13 +234,7 @@ export function AudioMixer() {
         fileInputRef.current.value = "";
       }
     },
-    [
-      handleInitialize,
-      audioContext,
-      trackManager,
-      audioStorage,
-      persistenceState.projectId,
-    ],
+    [handleInitialize, audioContext, trackManager, audioStorage, persistenceState.projectId],
   );
 
   // Handle recording
@@ -273,7 +250,7 @@ export function AudioMixer() {
 
     if (blob) {
       const buffer = await blobToAudioBuffer(context, blob);
-      const recordingNumber = trackManager.tracks.filter(t => t.type === "recording").length + 1;
+      const recordingNumber = trackManager.tracks.filter((t) => t.type === "recording").length + 1;
       const recordingName = `Recording ${recordingNumber}`;
 
       // Save recording to OPFS for persistence
@@ -282,13 +259,11 @@ export function AudioMixer() {
       if (opfsSupported) {
         try {
           const arrayBuffer = await blob.arrayBuffer();
-          opfsPath = `audio-mixer/projects/${persistenceState.projectId}/recordings/${Date.now()}-${
-            recordingName.replace(/\s+/g, "-")
-          }.webm`;
-          await audioStorage.saveTrackToPath(
-            opfsPath,
-            new Uint8Array(arrayBuffer),
-          );
+          opfsPath = `audio-mixer/projects/${persistenceState.projectId}/recordings/${Date.now()}-${recordingName.replace(
+            /\s+/g,
+            "-",
+          )}.webm`;
+          await audioStorage.saveTrackToPath(opfsPath, new Uint8Array(arrayBuffer));
         } catch (error) {
           console.warn("Failed to save recording to OPFS:", error);
           opfsPath = undefined;
@@ -304,28 +279,17 @@ export function AudioMixer() {
         recordingStartTimeRef.current,
       );
     }
-  }, [
-    audioContext,
-    recording,
-    trackManager,
-    audioStorage,
-    persistenceState.projectId,
-  ]);
+  }, [audioContext, recording, trackManager, audioStorage, persistenceState.projectId]);
 
   // Play all tracks
   const handlePlayAll = useCallback(async () => {
     setSoloPreviewTrackId(null);
     const { context, masterGain } = await audioContext.initialize();
-    trackManager.playAllTracks(
-      context,
-      masterGain,
-      timeline.state.playheadTime,
-      () => {
-        // All tracks finished — stop playback state
-        setIsPlaying(false);
-        timeline.stopPlayheadAnimation();
-      },
-    );
+    trackManager.playAllTracks(context, masterGain, timeline.state.playheadTime, () => {
+      // All tracks finished — stop playback state
+      setIsPlaying(false);
+      timeline.stopPlayheadAnimation();
+    });
     setIsPlaying(true);
     // Start playhead animation from current position, synced to AudioContext clock
     timeline.startPlayheadAnimation(timeline.state.playheadTime, context);
@@ -387,16 +351,14 @@ export function AudioMixer() {
       const { context, masterGain } = await audioContext.initialize();
 
       // Play a short snippet from each track at the scrub position
-      const hasSolo = trackManager.tracks.some(t => t.solo);
+      const hasSolo = trackManager.tracks.some((t) => t.solo);
 
-      trackManager.tracks.forEach(track => {
+      trackManager.tracks.forEach((track) => {
         if (!track.buffer || track.muted) return;
         if (hasSolo && !track.solo) return;
 
         const trackPosition = track.position ?? track.delay ?? 0;
-        const effectiveTrimEnd = track.trimEnd > 0
-          ? track.trimEnd
-          : track.duration;
+        const effectiveTrimEnd = track.trimEnd > 0 ? track.trimEnd : track.duration;
 
         // Position within track's timeline
         const timelinePosition = time - trackPosition;
@@ -436,7 +398,7 @@ export function AudioMixer() {
   // Solo preview — click a track block to play only that track
   const handleSoloPreview = useCallback(
     async (trackId: string) => {
-      const track = trackManager.tracks.find(t => t.id === trackId);
+      const track = trackManager.tracks.find((t) => t.id === trackId);
       if (!track?.buffer) return;
 
       // Stop any current playback
@@ -447,17 +409,11 @@ export function AudioMixer() {
 
       const { context, masterGain } = await audioContext.initialize();
 
-      trackManager.playSoloTrack(
-        trackId,
-        context,
-        masterGain,
-        timeline.state.playheadTime,
-        () => {
-          setIsPlaying(false);
-          setSoloPreviewTrackId(null);
-          timeline.stopPlayheadAnimation();
-        },
-      );
+      trackManager.playSoloTrack(trackId, context, masterGain, timeline.state.playheadTime, () => {
+        setIsPlaying(false);
+        setSoloPreviewTrackId(null);
+        timeline.stopPlayheadAnimation();
+      });
 
       setIsPlaying(true);
       setSoloPreviewTrackId(trackId);
@@ -475,14 +431,8 @@ export function AudioMixer() {
 
     try {
       const { context } = await audioContext.initialize();
-      const maxDuration = Math.max(
-        ...trackManager.tracks.map(t => t.duration),
-      );
-      const blob = await mixTracksToBlob(
-        context,
-        trackManager.tracks,
-        maxDuration,
-      );
+      const maxDuration = Math.max(...trackManager.tracks.map((t) => t.duration));
+      const blob = await mixTracksToBlob(context, trackManager.tracks, maxDuration);
 
       // Download
       const url = URL.createObjectURL(blob);
@@ -509,10 +459,7 @@ export function AudioMixer() {
 
     const handleKeyDown = (e: KeyboardEvent) => {
       // Ignore if typing in an input
-      if (
-        e.target instanceof HTMLInputElement
-        || e.target instanceof HTMLTextAreaElement
-      ) {
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) {
         return;
       }
 
@@ -522,7 +469,7 @@ export function AudioMixer() {
       // Toggle shortcuts panel
       if (key === "?" || (key === "/" && e.shiftKey)) {
         e.preventDefault();
-        setShowShortcuts(prev => !prev);
+        setShowShortcuts((prev) => !prev);
         return;
       }
 
@@ -562,10 +509,9 @@ export function AudioMixer() {
       if (key === "end") {
         e.preventDefault();
         const maxTime = Math.max(
-          ...trackManager.tracks.map(t => {
+          ...trackManager.tracks.map((t) => {
             const effectiveTrimEnd = t.trimEnd > 0 ? t.trimEnd : t.duration;
-            return (t.position ?? t.delay ?? 0) + effectiveTrimEnd
-              - t.trimStart;
+            return (t.position ?? t.delay ?? 0) + effectiveTrimEnd - t.trimStart;
           }),
           0,
         );
@@ -597,7 +543,7 @@ export function AudioMixer() {
         const tracks = trackManager.tracks;
         if (tracks.length === 0) return;
         const currentIndex = timeline.state.selectedTrackId
-          ? tracks.findIndex(t => t.id === timeline.state.selectedTrackId)
+          ? tracks.findIndex((t) => t.id === timeline.state.selectedTrackId)
           : tracks.length;
         const newIndex = Math.max(0, currentIndex - 1);
         const nextTrack = tracks[newIndex];
@@ -613,7 +559,7 @@ export function AudioMixer() {
         const tracks = trackManager.tracks;
         if (tracks.length === 0) return;
         const currentIndex = timeline.state.selectedTrackId
-          ? tracks.findIndex(t => t.id === timeline.state.selectedTrackId)
+          ? tracks.findIndex((t) => t.id === timeline.state.selectedTrackId)
           : -1;
         const newIndex = Math.min(tracks.length - 1, currentIndex + 1);
         const nextTrack = tracks[newIndex];
@@ -626,7 +572,7 @@ export function AudioMixer() {
 
       // Track controls (require selected track)
       const selectedTrack = timeline.state.selectedTrackId
-        ? trackManager.tracks.find(t => t.id === timeline.state.selectedTrackId)
+        ? trackManager.tracks.find((t) => t.id === timeline.state.selectedTrackId)
         : null;
 
       if (key === "m" && !isMeta) {
@@ -714,9 +660,7 @@ export function AudioMixer() {
       if (key === "g") {
         e.preventDefault();
         timeline.setSnapEnabled(!timeline.state.snapEnabled);
-        showToast(
-          timeline.state.snapEnabled ? "Grid snap off" : "Grid snap on",
-        );
+        showToast(timeline.state.snapEnabled ? "Grid snap off" : "Grid snap on");
         return;
       }
 
@@ -779,22 +723,22 @@ export function AudioMixer() {
           <div className="flex items-center gap-3">
             {/* Project Dropdown */}
             <DropdownMenu
-              onOpenChange={open => {
+              onOpenChange={(open) => {
                 if (open) projectManager.loadProjectList();
               }}
             >
               <DropdownMenuTrigger asChild>
                 <button className="flex items-center gap-1.5 text-sm font-bold text-white/80 hover:text-white transition-colors">
-                  {projectManager.projects.find(p => p.id === projectManager.currentProjectId)?.name
-                    ?? "Audio Mixer"}
+                  {projectManager.projects.find((p) => p.id === projectManager.currentProjectId)
+                    ?.name ?? "Audio Mixer"}
                   <ChevronDown className="w-3 h-3 opacity-60" />
                 </button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="start" className="w-64">
                 {/* Active project */}
                 {projectManager.projects
-                  .filter(p => p.id === projectManager.currentProjectId)
-                  .map(project => (
+                  .filter((p) => p.id === projectManager.currentProjectId)
+                  .map((project) => (
                     <DropdownMenuItem
                       key={project.id}
                       className="bg-primary/10 font-medium"
@@ -802,10 +746,7 @@ export function AudioMixer() {
                     >
                       <Music className="w-4 h-4 mr-2 text-primary" />
                       {project.name}
-                      <Badge
-                        variant="outline"
-                        className="ml-auto text-[9px] h-4 px-1.5"
-                      >
+                      <Badge variant="outline" className="ml-auto text-[9px] h-4 px-1.5">
                         Active
                       </Badge>
                     </DropdownMenuItem>
@@ -813,8 +754,8 @@ export function AudioMixer() {
 
                 {/* Other projects */}
                 {projectManager.projects
-                  .filter(p => p.id !== projectManager.currentProjectId)
-                  .map(project => (
+                  .filter((p) => p.id !== projectManager.currentProjectId)
+                  .map((project) => (
                     <DropdownMenuSub key={project.id}>
                       <DropdownMenuSubTrigger className="flex items-center">
                         <Music className="w-4 h-4 mr-2 opacity-60" />
@@ -840,12 +781,12 @@ export function AudioMixer() {
                             <div className="px-2 py-1.5 text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
                               Tracks (drag to timeline)
                             </div>
-                            {project.tracks.map(track => (
+                            {project.tracks.map((track) => (
                               <DropdownMenuItem
                                 key={track.id}
                                 className="text-xs cursor-grab"
                                 draggable
-                                onDragStart={e => {
+                                onDragStart={(e) => {
                                   e.dataTransfer.setData(
                                     "application/x-audio-track",
                                     JSON.stringify({
@@ -860,9 +801,8 @@ export function AudioMixer() {
                                 <Music className="w-3 h-3 mr-2 opacity-40" />
                                 <span className="truncate">{track.name}</span>
                                 <span className="ml-auto text-[10px] text-muted-foreground font-mono">
-                                  {Math.floor(track.duration / 60)}:{String(
-                                    Math.floor(track.duration % 60),
-                                  ).padStart(2, "0")}
+                                  {Math.floor(track.duration / 60)}:
+                                  {String(Math.floor(track.duration % 60)).padStart(2, "0")}
                                 </span>
                               </DropdownMenuItem>
                             ))}
@@ -880,8 +820,7 @@ export function AudioMixer() {
                     </DropdownMenuSub>
                   ))}
 
-                {projectManager.projects.length > 0
-                  && <DropdownMenuSeparator />}
+                {projectManager.projects.length > 0 && <DropdownMenuSeparator />}
 
                 {/* New Project */}
                 <DropdownMenuItem
@@ -916,25 +855,25 @@ export function AudioMixer() {
                 Saving
               </Badge>
             )}
-            {!persistenceState.isSaving && persistenceState.lastSavedAt
-              && !persistenceState.hasUnsavedChanges && (
-              <Badge
-                variant="outline"
-                className="flex items-center gap-1 h-5 px-2 text-[10px] glass-1 border-white/10 text-green-400"
-              >
-                <Check className="w-3 h-3" />
-                Saved
-              </Badge>
-            )}
-            {!persistenceState.isSaving && persistenceState.hasUnsavedChanges
-              && (
+            {!persistenceState.isSaving &&
+              persistenceState.lastSavedAt &&
+              !persistenceState.hasUnsavedChanges && (
                 <Badge
                   variant="outline"
-                  className="h-5 px-2 text-[10px] glass-1 border-white/10 text-yellow-400"
+                  className="flex items-center gap-1 h-5 px-2 text-[10px] glass-1 border-white/10 text-green-400"
                 >
-                  Unsaved
+                  <Check className="w-3 h-3" />
+                  Saved
                 </Badge>
               )}
+            {!persistenceState.isSaving && persistenceState.hasUnsavedChanges && (
+              <Badge
+                variant="outline"
+                className="h-5 px-2 text-[10px] glass-1 border-white/10 text-yellow-400"
+              >
+                Unsaved
+              </Badge>
+            )}
           </div>
           <div className="flex items-center gap-4">
             {/* Master Volume */}
@@ -946,7 +885,7 @@ export function AudioMixer() {
                   max={1}
                   step={0.01}
                   value={[masterVolume]}
-                  onValueChange={vals => setMasterVolume(vals[0] ?? 0.8)}
+                  onValueChange={(vals) => setMasterVolume(vals[0] ?? 0.8)}
                   aria-label="Master volume"
                 />
               </div>
@@ -972,9 +911,7 @@ export function AudioMixer() {
                   <HelpCircle className="w-4 h-4" />
                 </button>
               </TooltipTrigger>
-              <TooltipContent side="bottom">
-                Keyboard Shortcuts (?)
-              </TooltipContent>
+              <TooltipContent side="bottom">Keyboard Shortcuts (?)</TooltipContent>
             </Tooltip>
           </div>
         </div>
@@ -1007,14 +944,10 @@ export function AudioMixer() {
                   disabled={trackManager.tracks.length === 0}
                   className={cn(
                     "h-8 w-8 p-0 rounded-lg",
-                    isPlaying
-                      ? "bg-emerald-600 hover:bg-emerald-700"
-                      : "hover:bg-white/10",
+                    isPlaying ? "bg-emerald-600 hover:bg-emerald-700" : "hover:bg-white/10",
                   )}
                 >
-                  {isPlaying
-                    ? <Pause className="w-4 h-4" />
-                    : <Play className="w-4 h-4" />}
+                  {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
                 </Button>
               </TooltipTrigger>
               <TooltipContent side="bottom">
@@ -1044,12 +977,9 @@ export function AudioMixer() {
                   variant="ghost"
                   onClick={() => {
                     const maxTime = Math.max(
-                      ...trackManager.tracks.map(t => {
-                        const effectiveTrimEnd = t.trimEnd > 0
-                          ? t.trimEnd
-                          : t.duration;
-                        return (t.position ?? t.delay ?? 0) + effectiveTrimEnd
-                          - t.trimStart;
+                      ...trackManager.tracks.map((t) => {
+                        const effectiveTrimEnd = t.trimEnd > 0 ? t.trimEnd : t.duration;
+                        return (t.position ?? t.delay ?? 0) + effectiveTrimEnd - t.trimStart;
                       }),
                       0,
                     );
@@ -1067,12 +997,9 @@ export function AudioMixer() {
 
           {/* Playhead Time */}
           <div className="px-3 py-1 bg-black/40 rounded-lg font-mono text-sm text-primary">
-            {Math.floor(timeline.state.playheadTime / 60)}:{String(
-              Math.floor(timeline.state.playheadTime % 60),
-            ).padStart(2, "0")}.{String(
-              Math.floor((timeline.state.playheadTime % 1) * 10),
-            )
-              .padStart(1, "0")}
+            {Math.floor(timeline.state.playheadTime / 60)}:
+            {String(Math.floor(timeline.state.playheadTime % 60)).padStart(2, "0")}.
+            {String(Math.floor((timeline.state.playheadTime % 1) * 10)).padStart(1, "0")}
           </div>
 
           {/* Solo Preview Indicator */}
@@ -1081,8 +1008,7 @@ export function AudioMixer() {
               variant="outline"
               className="h-5 px-2 text-[10px] glass-1 border-yellow-400/30 text-yellow-400"
             >
-              Solo: {trackManager.tracks.find(t => t.id === soloPreviewTrackId)
-                ?.name ?? "Track"}
+              Solo: {trackManager.tracks.find((t) => t.id === soloPreviewTrackId)?.name ?? "Track"}
             </Badge>
           )}
 
@@ -1141,7 +1067,9 @@ export function AudioMixer() {
                 disabled={trackManager.tracks.length === 0 || isExporting}
                 className="h-8 px-3 rounded-lg hover:bg-white/10"
               >
-                {isExporting ? <Loader2 className="w-4 h-4 animate-spin" /> : (
+                {isExporting ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
                   <>
                     <Download className="w-4 h-4 mr-1.5 text-purple-400" />
                     Export
@@ -1153,10 +1081,7 @@ export function AudioMixer() {
           </Tooltip>
 
           {/* Track Count */}
-          <Badge
-            variant="secondary"
-            className="h-6 px-2 text-xs glass-1 border-white/10"
-          >
+          <Badge variant="secondary" className="h-6 px-2 text-xs glass-1 border-white/10">
             {trackManager.tracks.length} {trackManager.tracks.length === 1 ? "Track" : "Tracks"}
           </Badge>
         </div>
@@ -1192,10 +1117,7 @@ export function AudioMixer() {
         </div>
 
         {/* Keyboard Shortcuts Panel */}
-        <KeyboardShortcutsPanel
-          isOpen={showShortcuts}
-          onClose={() => setShowShortcuts(false)}
-        />
+        <KeyboardShortcutsPanel isOpen={showShortcuts} onClose={() => setShowShortcuts(false)} />
 
         {/* Shortcut Toast */}
         <ShortcutToast action={shortcutToast} />

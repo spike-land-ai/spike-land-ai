@@ -1,12 +1,6 @@
 "use client";
 
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ContentStatusBadge } from "./ContentStatusBadge";
 import type { ContentStatus } from "./types";
@@ -34,20 +28,13 @@ export function ContentPostCard({
     <Card className="bg-zinc-900 border-zinc-800 hover:border-zinc-700 transition-colors h-full">
       <CardHeader className="pb-3">
         <div className="flex items-center gap-2 mb-2 flex-wrap">
-          <Badge
-            variant="outline"
-            className="text-xs text-zinc-400 border-zinc-700"
-          >
+          <Badge variant="outline" className="text-xs text-zinc-400 border-zinc-700">
             {category}
           </Badge>
           <ContentStatusBadge status={status} />
         </div>
-        <CardTitle className="text-lg text-zinc-100 line-clamp-2">
-          {title}
-        </CardTitle>
-        <CardDescription className="text-zinc-400 line-clamp-3">
-          {excerpt}
-        </CardDescription>
+        <CardTitle className="text-lg text-zinc-100 line-clamp-2">{title}</CardTitle>
+        <CardDescription className="text-zinc-400 line-clamp-3">{excerpt}</CardDescription>
       </CardHeader>
       <CardContent>
         <div className="flex items-center justify-between text-sm text-zinc-500">

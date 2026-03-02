@@ -50,12 +50,12 @@ export function RegenerateButton({ slug }: RegenerateButtonProps) {
       className="gap-1.5 text-muted-foreground hover:text-foreground h-auto py-1 px-2"
       title="Regenerate this content with AI"
     >
-      {loading
-        ? <Loader2 className="w-3.5 h-3.5 animate-spin" />
-        : <RefreshCw className="w-3.5 h-3.5" />}
-      <span className="text-xs">
-        {loading ? "Regenerating..." : "Regenerate"}
-      </span>
+      {loading ? (
+        <Loader2 className="w-3.5 h-3.5 animate-spin" />
+      ) : (
+        <RefreshCw className="w-3.5 h-3.5" />
+      )}
+      <span className="text-xs">{loading ? "Regenerating..." : "Regenerate"}</span>
     </Button>
   );
 }

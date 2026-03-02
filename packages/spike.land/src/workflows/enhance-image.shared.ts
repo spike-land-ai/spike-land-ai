@@ -188,7 +188,7 @@ export class WorkflowStageError extends Error {
   static fromError(
     error: unknown,
     stage: WorkflowStage,
-    options?: { isRecoverable?: boolean; retryable?: boolean; },
+    options?: { isRecoverable?: boolean; retryable?: boolean },
   ): WorkflowStageError {
     const message = error instanceof Error ? error.message : String(error);
     const cause = error instanceof Error ? error : undefined;
@@ -218,7 +218,7 @@ export class WorkflowStageError extends Error {
       /unauthorized/i,
     ];
 
-    return permanentPatterns.some(pattern => pattern.test(message));
+    return permanentPatterns.some((pattern) => pattern.test(message));
   }
 }
 
@@ -256,10 +256,7 @@ export function createWorkflowContext(jobId: string): WorkflowContext {
 /**
  * Records a successful stage completion
  */
-export function recordStageSuccess(
-  context: WorkflowContext,
-  stage: WorkflowStage,
-): void {
+export function recordStageSuccess(context: WorkflowContext, stage: WorkflowStage): void {
   context.completedStages.push(stage);
 }
 
@@ -353,12 +350,7 @@ export function validateEnhanceImageInput(input: EnhanceImageInput): void {
     throw new Error("Invalid originalR2Key: must be a non-empty string");
   }
 
-  const validTiers: EnhancementTier[] = [
-    "FREE",
-    "TIER_1K",
-    "TIER_2K",
-    "TIER_4K",
-  ];
+  const validTiers: EnhancementTier[] = ["FREE", "TIER_1K", "TIER_2K", "TIER_4K"];
   if (!validTiers.includes(input.tier)) {
     throw new Error(`Invalid tier: must be one of ${validTiers.join(", ")}`);
   }
@@ -369,27 +361,20 @@ export function validateEnhanceImageInput(input: EnhanceImageInput): void {
 
   // sourceImageR2Key is optional, but if provided must be a string
   if (
-    input.sourceImageR2Key !== undefined
-    && input.sourceImageR2Key !== null
-    && typeof input.sourceImageR2Key !== "string"
+    input.sourceImageR2Key !== undefined &&
+    input.sourceImageR2Key !== null &&
+    typeof input.sourceImageR2Key !== "string"
   ) {
     throw new Error("Invalid sourceImageR2Key: must be a string or null");
   }
 
   // blendSource is optional, but if provided must have base64 and mimeType
   if (input.blendSource !== undefined && input.blendSource !== null) {
-    if (
-      typeof input.blendSource.base64 !== "string" || !input.blendSource.base64
-    ) {
+    if (typeof input.blendSource.base64 !== "string" || !input.blendSource.base64) {
       throw new Error("Invalid blendSource.base64: must be a non-empty string");
     }
-    if (
-      typeof input.blendSource.mimeType !== "string"
-      || !input.blendSource.mimeType
-    ) {
-      throw new Error(
-        "Invalid blendSource.mimeType: must be a non-empty string",
-      );
+    if (typeof input.blendSource.mimeType !== "string" || !input.blendSource.mimeType) {
+      throw new Error("Invalid blendSource.mimeType: must be a non-empty string");
     }
   }
 }
@@ -484,10 +469,7 @@ export function calculateTargetDimensions(
 /**
  * Generate R2 key for enhanced image from original key
  */
-export function generateEnhancedR2Key(
-  originalR2Key: string,
-  jobId: string,
-): string {
+export function generateEnhancedR2Key(originalR2Key: string, jobId: string): string {
   const withEnhancedPath = originalR2Key.replace("/originals/", `/enhanced/`);
   // Check if there's an extension to replace
   if (/\.[^./]+$/.test(withEnhancedPath)) {
@@ -502,20 +484,20 @@ export function generateEnhancedR2Key(
  */
 export function validateCropDimensions(crop: CropDimensions): boolean {
   return (
-    typeof crop.x === "number"
-    && typeof crop.y === "number"
-    && typeof crop.width === "number"
-    && typeof crop.height === "number"
-    && crop.x >= 0
-    && crop.x <= 1
-    && crop.y >= 0
-    && crop.y <= 1
-    && crop.width > 0
-    && crop.width <= 1
-    && crop.height > 0
-    && crop.height <= 1
-    && crop.x + crop.width <= 1.01 // Small tolerance for floating point
-    && crop.y + crop.height <= 1.01
+    typeof crop.x === "number" &&
+    typeof crop.y === "number" &&
+    typeof crop.width === "number" &&
+    typeof crop.height === "number" &&
+    crop.x >= 0 &&
+    crop.x <= 1 &&
+    crop.y >= 0 &&
+    crop.y <= 1 &&
+    crop.width > 0 &&
+    crop.width <= 1 &&
+    crop.height > 0 &&
+    crop.height <= 1 &&
+    crop.x + crop.width <= 1.01 && // Small tolerance for floating point
+    crop.y + crop.height <= 1.01
   );
 }
 

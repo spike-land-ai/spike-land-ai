@@ -37,12 +37,7 @@ interface UseJobStreamOptions {
  * Replaces polling with SSE for instant status updates.
  * Automatically reconnects on connection loss.
  */
-export function useJobStream({
-  jobId,
-  onComplete,
-  onError,
-  onStatusChange,
-}: UseJobStreamOptions) {
+export function useJobStream({ jobId, onComplete, onError, onStatusChange }: UseJobStreamOptions) {
   const [job, setJob] = useState<Job | null>(null);
   const [isConnected, setIsConnected] = useState(false);
   const [connectionError, setConnectionError] = useState<string | null>(null);

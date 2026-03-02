@@ -6,12 +6,7 @@
  */
 
 import type { Prisma } from "@/generated/prisma";
-import type {
-  AnswerPathEntry,
-  AnswerResult,
-  TraversalResult,
-  UserProfile,
-} from "./types";
+import type { AnswerPathEntry, AnswerResult, TraversalResult, UserProfile } from "./types";
 
 /**
  * Start a profiling traversal for a user.
@@ -53,9 +48,7 @@ export async function startTraversal(
 
   // If tree has no root, user is the first — create an internal node at root
   if (!tree.rootNodeId) {
-    const { generateDifferentiatingQuestion } = await import(
-      "./question-generator"
-    );
+    const { generateDifferentiatingQuestion } = await import("./question-generator");
 
     // Generate a broad starting question
     const generated = await generateDifferentiatingQuestion(
@@ -168,11 +161,7 @@ export async function startTraversal(
         status: "IN_PROGRESS",
       },
     });
-    const collisionResult = await handleCollision(
-      session.id,
-      rootNode.assignedUserId,
-      userId,
-    );
+    const collisionResult = await handleCollision(session.id, rootNode.assignedUserId, userId);
     // Returning the newly generated question to the new user
     return {
       sessionId: session.id,
@@ -347,9 +336,7 @@ export async function answerQuestion(
   // Navigate to the appropriate child
   const nextNodeId = answer ? currentNode.yesChildId : currentNode.noChildId;
   if (!nextNodeId) {
-    throw new Error(
-      `Node ${currentNode.id} has no ${answer ? "yes" : "no"} child`,
-    );
+    throw new Error(`Node ${currentNode.id} has no ${answer ? "yes" : "no"} child`);
   }
 
   const nextNode = await prisma.avlProfileNode.findUniqueOrThrow({
@@ -401,11 +388,7 @@ export async function answerQuestion(
 
   const { handleCollision } = await import("./insertion");
 
-  const collisionResult = await handleCollision(
-    sessionId,
-    nextNode.assignedUserId,
-    userId,
-  );
+  const collisionResult = await handleCollision(sessionId, nextNode.assignedUserId, userId);
 
   // Ask the newly generated collision question
   return {
@@ -420,9 +403,7 @@ export async function answerQuestion(
 /**
  * Get a user's AVL profile.
  */
-export async function getUserProfile(
-  userId: string,
-): Promise<UserProfile | null> {
+export async function getUserProfile(userId: string): Promise<UserProfile | null> {
   const prisma = (await import("@/lib/prisma")).default;
 
   const profile = await prisma.avlUserProfile.findUnique({
@@ -461,7 +442,7 @@ export async function resetUserProfile(userId: string): Promise<void> {
 
   if (!profile && !assignedNode) return;
 
-  await prisma.$transaction(async tx => {
+  await prisma.$transaction(async (tx) => {
     if (assignedNode || profile) {
       // Free the leaf node
       await tx.avlProfileNode.updateMany({
@@ -501,12 +482,10 @@ async function assignUserToLeaf(
   round = 0,
 ): Promise<AnswerResult> {
   const prisma = (await import("@/lib/prisma")).default;
-  const { deriveTagsFromAnswerPath, buildProfileVector } = await import(
-    "./personalization"
-  );
+  const { deriveTagsFromAnswerPath, buildProfileVector } = await import("./personalization");
 
   // Collect all tags from the answer path for the profile vector
-  const allTags = [...new Set(answerPath.flatMap(a => a.questionTags))];
+  const allTags = [...new Set(answerPath.flatMap((a) => a.questionTags))];
 
   // Ensure user is not assigned to any other node first
   await prisma.avlProfileNode.updateMany({

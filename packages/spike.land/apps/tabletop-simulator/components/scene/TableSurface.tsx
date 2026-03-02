@@ -5,25 +5,22 @@ import { useMemo } from "react";
 import * as THREE from "three";
 
 export function TableSurface() {
-  const [feltAlbedo, feltNormal, woodAlbedo, woodNormal] = useLoader(
-    THREE.TextureLoader,
-    [
-      "/textures/table/felt_albedo.png",
-      "/textures/table/felt_normal.png",
-      "/textures/table/wood_albedo.png",
-      "/textures/table/wood_normal.png",
-    ],
-  );
+  const [feltAlbedo, feltNormal, woodAlbedo, woodNormal] = useLoader(THREE.TextureLoader, [
+    "/textures/table/felt_albedo.png",
+    "/textures/table/felt_normal.png",
+    "/textures/table/wood_albedo.png",
+    "/textures/table/wood_normal.png",
+  ]);
 
   // Configure texture repeating
   useMemo(() => {
-    [feltAlbedo, feltNormal].forEach(t => {
+    [feltAlbedo, feltNormal].forEach((t) => {
       if (t) {
         t.wrapS = t.wrapT = THREE.RepeatWrapping;
         t.repeat.set(16, 16);
       }
     });
-    [woodAlbedo, woodNormal].forEach(t => {
+    [woodAlbedo, woodNormal].forEach((t) => {
       if (t) {
         t.wrapS = t.wrapT = THREE.RepeatWrapping;
         t.repeat.set(16, 2);
@@ -34,11 +31,7 @@ export function TableSurface() {
   return (
     <RigidBody type="fixed" friction={0.7} restitution={0.2} colliders={false}>
       {/* Table Top with felt texture */}
-      <mesh
-        receiveShadow
-        rotation={[-Math.PI / 2, 0, 0]}
-        position={[0, -0.05, 0]}
-      >
+      <mesh receiveShadow rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.05, 0]}>
         <boxGeometry args={[12, 12, 0.1]} />
         <meshStandardMaterial
           {...(woodAlbedo ? { map: woodAlbedo } : {})}

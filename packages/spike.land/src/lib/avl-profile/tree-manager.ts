@@ -74,10 +74,7 @@ export async function getOrCreateTree(name = "default") {
  *
  * Returns the root node ID.
  */
-export async function initializeTree(
-  name: string,
-  seedQuestions: SeedQuestion[],
-): Promise<string> {
+export async function initializeTree(name: string, seedQuestions: SeedQuestion[]): Promise<string> {
   const prisma = (await import("@/lib/prisma")).default;
 
   const tree = await prisma.avlProfileTree.findUniqueOrThrow({
@@ -111,11 +108,7 @@ export async function initializeTree(
    * Recursively build the tree structure in memory before persisting.
    * Returns the node ID of the subtree root.
    */
-  function buildSubtree(
-    questions: SeedQuestion[],
-    depth: number,
-    parentId: string | null,
-  ): string {
+  function buildSubtree(questions: SeedQuestion[], depth: number, parentId: string | null): string {
     // Base case: no questions left — create a leaf node
     if (questions.length === 0) {
       const leafId = generateId();
@@ -166,8 +159,8 @@ export async function initializeTree(
     const noChildId = buildSubtree(rightQuestions, depth + 1, nodeId);
 
     // Calculate height from children
-    const yesChild = nodesToCreate.find(n => n.id === yesChildId)!;
-    const noChild = nodesToCreate.find(n => n.id === noChildId)!;
+    const yesChild = nodesToCreate.find((n) => n.id === yesChildId)!;
+    const noChild = nodesToCreate.find((n) => n.id === noChildId)!;
     const height = Math.max(yesChild.height, noChild.height) + 1;
     const balanceFactor = yesChild.height - noChild.height;
 
@@ -190,10 +183,10 @@ export async function initializeTree(
   const rootNodeId = buildSubtree(seedQuestions, 0, null);
 
   // Find max depth across all nodes
-  const maxDepth = Math.max(...nodesToCreate.map(n => n.depth));
+  const maxDepth = Math.max(...nodesToCreate.map((n) => n.depth));
 
   // Persist everything in a transaction
-  await prisma.$transaction(async tx => {
+  await prisma.$transaction(async (tx) => {
     // Create all nodes
     for (const node of nodesToCreate) {
       await tx.avlProfileNode.create({
@@ -245,10 +238,10 @@ export async function getTreeStats(name = "default"): Promise<TreeStats> {
     },
   });
 
-  const internalNodes = nodes.filter(n => n.nodeType === "INTERNAL").length;
-  const leafNodes = nodes.filter(n => n.nodeType === "LEAF").length;
+  const internalNodes = nodes.filter((n) => n.nodeType === "INTERNAL").length;
+  const leafNodes = nodes.filter((n) => n.nodeType === "LEAF").length;
   const occupiedLeaves = nodes.filter(
-    n => n.nodeType === "LEAF" && n.assignedUserId !== null,
+    (n) => n.nodeType === "LEAF" && n.assignedUserId !== null,
   ).length;
   const emptyLeaves = leafNodes - occupiedLeaves;
 

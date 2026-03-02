@@ -20,9 +20,7 @@ export function useApiKeys() {
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [newKeyName, setNewKeyName] = useState("");
   const [isCreating, setIsCreating] = useState(false);
-  const [newlyCreatedKey, setNewlyCreatedKey] = useState<NewApiKey | null>(
-    null,
-  );
+  const [newlyCreatedKey, setNewlyCreatedKey] = useState<NewApiKey | null>(null);
   const [copiedKeyId, setCopiedKeyId] = useState<string | null>(null);
   const [revokingKeyId, setRevokingKeyId] = useState<string | null>(null);
 

@@ -66,7 +66,7 @@ async function backfill() {
 }
 
 backfill()
-  .catch(e => {
+  .catch((e) => {
     console.error("Backfill failed:", e);
     process.exit(1);
   })

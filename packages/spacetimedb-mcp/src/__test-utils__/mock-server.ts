@@ -11,10 +11,7 @@ type ToolHandler = (args: Record<string, unknown>) => Promise<CallToolResult>;
 export interface MockMcpServer {
   tool: ReturnType<typeof vi.fn>;
   handlers: Map<string, ToolHandler>;
-  call: (
-    name: string,
-    args: Record<string, unknown>,
-  ) => Promise<CallToolResult>;
+  call: (name: string, args: Record<string, unknown>) => Promise<CallToolResult>;
 }
 
 export function createMockServer(): MockMcpServer {

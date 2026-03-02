@@ -169,7 +169,7 @@ describe("getZScore", () => {
   });
 
   it("returns ~1.645 for 90% confidence", () => {
-    expect(getZScore(0.90)).toBeCloseTo(1.645, 1);
+    expect(getZScore(0.9)).toBeCloseTo(1.645, 1);
   });
 });
 

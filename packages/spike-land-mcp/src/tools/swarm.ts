@@ -16,35 +16,20 @@ import { freeTool, textResult } from "../procedures/index";
 import { claudeCodeAgents, agentMessages } from "../db/schema";
 import type { DrizzleDB } from "../db/index";
 
-export function registerSwarmTools(
-  registry: ToolRegistry,
-  userId: string,
-  db: DrizzleDB,
-): void {
+export function registerSwarmTools(registry: ToolRegistry, userId: string, db: DrizzleDB): void {
   const t = freeTool(userId, db);
 
   // swarm_list_agents
   registry.registerBuilt(
     t
-      .tool(
-        "swarm_list_agents",
-        "List all AI agents with their status, tasks, and session info.",
-        {
-          status: z
-            .enum(["active", "idle", "stopped", "all"])
-            .optional()
-            .default("all")
-            .describe("Filter by agent status."),
-          limit: z
-            .number()
-            .int()
-            .min(1)
-            .max(100)
-            .optional()
-            .default(20)
-            .describe("Max results."),
-        },
-      )
+      .tool("swarm_list_agents", "List all AI agents with their status, tasks, and session info.", {
+        status: z
+          .enum(["active", "idle", "stopped", "all"])
+          .optional()
+          .default("all")
+          .describe("Filter by agent status."),
+        limit: z.number().int().min(1).max(100).optional().default(20).describe("Max results."),
+      })
       .meta({ category: "swarm", tier: "free" })
       .handler(async ({ input, ctx }) => {
         const { status = "all", limit = 20 } = input;
@@ -83,9 +68,7 @@ export function registerSwarmTools(
         let text = `**Swarm Agents (${filtered.length}):**\n\n`;
         for (const a of filtered) {
           const statusLabel = a.status.toUpperCase();
-          const lastSeen = a.lastActiveAt
-            ? new Date(a.lastActiveAt).toISOString()
-            : "never";
+          const lastSeen = a.lastActiveAt ? new Date(a.lastActiveAt).toISOString() : "never";
           text +=
             `- **${a.name}** [${statusLabel}]\n` +
             `  Last seen: ${lastSeen}\n` +
@@ -165,9 +148,7 @@ export function registerSwarmTools(
           createdAt: now,
         });
 
-        return textResult(
-          `**Agent spawned!**\n\nID: ${id}\nName: ${display_name}`,
-        );
+        return textResult(`**Agent spawned!**\n\nID: ${id}\nName: ${display_name}`);
       }),
   );
 
@@ -278,21 +259,14 @@ export function registerSwarmTools(
   // swarm_send_message
   registry.registerBuilt(
     t
-      .tool(
-        "swarm_send_message",
-        "Send a direct message to a specific agent in the swarm.",
-        {
-          target_agent_id: z
-            .string()
-            .min(1)
-            .describe("ID of the agent to send the message to."),
-          content: z.string().min(1).max(10000).describe("Message content."),
-          metadata: z
-            .record(z.string(), z.unknown())
-            .optional()
-            .describe("Optional metadata (JSON object) attached to the message."),
-        },
-      )
+      .tool("swarm_send_message", "Send a direct message to a specific agent in the swarm.", {
+        target_agent_id: z.string().min(1).describe("ID of the agent to send the message to."),
+        content: z.string().min(1).max(10000).describe("Message content."),
+        metadata: z
+          .record(z.string(), z.unknown())
+          .optional()
+          .describe("Optional metadata (JSON object) attached to the message."),
+      })
       .meta({ category: "swarm", tier: "free" })
       .handler(async ({ input, ctx }) => {
         const { target_agent_id, content, metadata } = input;
@@ -331,21 +305,17 @@ export function registerSwarmTools(
   // swarm_read_messages
   registry.registerBuilt(
     t
-      .tool(
-        "swarm_read_messages",
-        "Read messages from an agent's inbox.",
-        {
-          agent_id: z.string().min(1).describe("ID of the agent whose inbox to read."),
-          limit: z
-            .number()
-            .int()
-            .min(1)
-            .max(100)
-            .optional()
-            .default(20)
-            .describe("Max messages to return."),
-        },
-      )
+      .tool("swarm_read_messages", "Read messages from an agent's inbox.", {
+        agent_id: z.string().min(1).describe("ID of the agent whose inbox to read."),
+        limit: z
+          .number()
+          .int()
+          .min(1)
+          .max(100)
+          .optional()
+          .default(20)
+          .describe("Max messages to return."),
+      })
       .meta({ category: "swarm", tier: "free" })
       .handler(async ({ input, ctx }) => {
         const { agent_id, limit = 20 } = input;
@@ -395,10 +365,7 @@ export function registerSwarmTools(
         "swarm_delegate_task",
         "Delegate a task to another agent in the swarm. Creates a task message in the target agent's inbox with priority and context.",
         {
-          target_agent_id: z
-            .string()
-            .min(1)
-            .describe("ID of the agent to delegate the task to."),
+          target_agent_id: z.string().min(1).describe("ID of the agent to delegate the task to."),
           task_description: z
             .string()
             .min(1)

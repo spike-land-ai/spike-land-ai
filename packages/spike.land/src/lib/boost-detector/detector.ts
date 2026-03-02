@@ -12,12 +12,7 @@ import type {
 } from "@/generated/prisma";
 import prisma from "@/lib/prisma";
 import { calculateBoostScore, predictROI } from "./scoring";
-import type {
-  BoostDetectorConfig,
-  BoostScore,
-  ROIPrediction,
-  TargetAudience,
-} from "./types";
+import type { BoostDetectorConfig, BoostScore, ROIPrediction, TargetAudience } from "./types";
 
 /**
  * Detect boost opportunities for a workspace
@@ -56,7 +51,7 @@ export async function detectBoostOpportunities(
   });
 
   // Filter by thresholds
-  const qualifiedPosts = performances.filter(p => {
+  const qualifiedPosts = performances.filter((p) => {
     const meetsEngagementThreshold = p.engagementRate >= config.engagementThreshold;
     const meetsVelocityThreshold = p.engagementVelocity >= config.velocityThreshold;
 
@@ -93,10 +88,7 @@ export async function detectBoostOpportunities(
       const recommendation = await generateRecommendation(performance, ownerId);
       recommendations.push(recommendation);
     } catch (error) {
-      console.error(
-        `Failed to generate recommendation for post ${performance.postId}:`,
-        error,
-      );
+      console.error(`Failed to generate recommendation for post ${performance.postId}:`, error);
       // Continue with next post
     }
   }
@@ -132,9 +124,7 @@ export async function generateRecommendation(
   const suggestedBudget = calculateSuggestedBudget(postPerformance);
 
   // Get available marketing platforms for workspace
-  const availablePlatforms = await getAvailableMarketingPlatforms(
-    postPerformance.workspaceId,
-  );
+  const availablePlatforms = await getAvailableMarketingPlatforms(postPerformance.workspaceId);
 
   if (availablePlatforms.length === 0) {
     throw new Error("No marketing accounts connected for this workspace");
@@ -142,18 +132,10 @@ export async function generateRecommendation(
 
   // Predict ROI for primary platform (use first available)
   const primaryPlatform = availablePlatforms[0] as MarketingPlatform;
-  const roiPrediction = await predictROI(
-    postPerformance,
-    suggestedBudget,
-    primaryPlatform,
-  );
+  const roiPrediction = await predictROI(postPerformance, suggestedBudget, primaryPlatform);
 
   // Generate reasoning text
-  const reasoning = generateReasoningText(
-    postPerformance,
-    boostScore,
-    roiPrediction,
-  );
+  const reasoning = generateReasoningText(postPerformance, boostScore, roiPrediction);
 
   // Generate target audience suggestions
   const targetAudience = generateTargetAudience(postPerformance);
@@ -196,19 +178,14 @@ function calculateSuggestedBudget(performance: PostPerformance): number {
   // Increase budget for high-performing posts
   if (performance.engagementRate > 0.1 || performance.engagementVelocity > 50) {
     return 200;
-  } else if (
-    performance.engagementRate > 0.05
-    || performance.engagementVelocity > 25
-  ) {
+  } else if (performance.engagementRate > 0.05 || performance.engagementVelocity > 25) {
     return 100;
   }
 
   return baseBudget;
 }
 
-async function getAvailableMarketingPlatforms(
-  workspaceId: string,
-): Promise<MarketingPlatform[]> {
+async function getAvailableMarketingPlatforms(workspaceId: string): Promise<MarketingPlatform[]> {
   // Get workspace members
   const workspace = await prisma.workspace.findUnique({
     where: { id: workspaceId },
@@ -238,7 +215,7 @@ async function getAvailableMarketingPlatforms(
     distinct: ["platform"],
   });
 
-  return accounts.map(a => a.platform);
+  return accounts.map((a) => a.platform);
 }
 
 function generateReasoningText(
@@ -251,34 +228,32 @@ function generateReasoningText(
   // Engagement velocity reason
   if (boostScore.factors.engagementVelocity > 70) {
     reasons.push(
-      `This post is gaining momentum with ${
-        performance.engagementVelocity.toFixed(1)
-      } engagements per hour.`,
+      `This post is gaining momentum with ${performance.engagementVelocity.toFixed(
+        1,
+      )} engagements per hour.`,
     );
   }
 
   // Engagement rate reason
   if (performance.engagementRate > 0.05) {
     reasons.push(
-      `Strong audience resonance with ${
-        (performance.engagementRate * 100).toFixed(1)
-      }% engagement rate.`,
+      `Strong audience resonance with ${(performance.engagementRate * 100).toFixed(
+        1,
+      )}% engagement rate.`,
     );
   }
 
   // Conversion reason
   if (performance.conversions > 0) {
-    reasons.push(
-      `Already generating ${performance.conversions} conversions organically.`,
-    );
+    reasons.push(`Already generating ${performance.conversions} conversions organically.`);
   }
 
   // ROI prediction
   if (prediction.estimatedROI > 1) {
     reasons.push(
-      `Predicted ${
-        (prediction.estimatedROI * 100).toFixed(0)
-      }% ROI with ${prediction.estimatedConversions} estimated conversions.`,
+      `Predicted ${(prediction.estimatedROI * 100).toFixed(
+        0,
+      )}% ROI with ${prediction.estimatedConversions} estimated conversions.`,
     );
   }
 

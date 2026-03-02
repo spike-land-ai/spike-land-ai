@@ -6,18 +6,16 @@ export interface StreamMetadata {
   peerId: string;
   streamType: "video" | "audio" | "screen";
   isActive: boolean;
-  videoSettings?: {
-    width: number;
-    height: number;
-    frameRate: number;
-  } | undefined;
+  videoSettings?:
+    | {
+        width: number;
+        height: number;
+        frameRate: number;
+      }
+    | undefined;
 }
 
-export type WebRTCError =
-  | "permission-denied"
-  | "network-error"
-  | "not-supported"
-  | "unknown";
+export type WebRTCError = "permission-denied" | "network-error" | "not-supported" | "unknown";
 
 export interface WebRTCErrorInfo {
   type: WebRTCError;
@@ -28,12 +26,14 @@ export interface WebRTCErrorInfo {
 export interface PeerConfig {
   peerId?: string | undefined;
   role: "host" | "client";
-  serverConfig?: {
-    host: string;
-    port: number;
-    path: string;
-    secure: boolean;
-  } | undefined;
+  serverConfig?:
+    | {
+        host: string;
+        port: number;
+        path: string;
+        secure: boolean;
+      }
+    | undefined;
 }
 
 export interface ClientMetadata {

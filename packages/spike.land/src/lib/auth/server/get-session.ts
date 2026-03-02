@@ -91,8 +91,10 @@ export async function getSession(): Promise<AuthSession | null> {
       image: session.user.image || null,
       role: (session.user as unknown as { role?: string }).role || "USER",
     },
-    expires: typeof session.session.expiresAt === "string"
-      ? session.session.expiresAt
-      : session.session.expiresAt?.toISOString?.() || new Date(Date.now() + 86400000).toISOString(),
+    expires:
+      typeof session.session.expiresAt === "string"
+        ? session.session.expiresAt
+        : session.session.expiresAt?.toISOString?.() ||
+          new Date(Date.now() + 86400000).toISOString(),
   } as unknown as AuthSession;
 }

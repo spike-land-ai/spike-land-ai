@@ -19,10 +19,7 @@ export const ARENA_KEYS = {
 /**
  * Set submission state in Redis with 5min TTL.
  */
-export async function setSubmissionState(
-  submissionId: string,
-  state: string,
-): Promise<void> {
+export async function setSubmissionState(submissionId: string, state: string): Promise<void> {
   await redis.set(ARENA_KEYS.SUBMISSION_STATE(submissionId), state, {
     ex: 300,
   });
@@ -31,9 +28,7 @@ export async function setSubmissionState(
 /**
  * Get submission state from Redis.
  */
-export async function getSubmissionState(
-  submissionId: string,
-): Promise<string | null> {
+export async function getSubmissionState(submissionId: string): Promise<string | null> {
   return redis.get<string>(ARENA_KEYS.SUBMISSION_STATE(submissionId));
 }
 
@@ -56,9 +51,7 @@ export async function setSubmissionWorking(
 /**
  * Check if a submission is currently being processed.
  */
-export async function isSubmissionWorking(
-  submissionId: string,
-): Promise<boolean> {
+export async function isSubmissionWorking(submissionId: string): Promise<boolean> {
   const value = await redis.get(ARENA_KEYS.SUBMISSION_WORKING(submissionId));
   return value === "1";
 }
@@ -79,10 +72,7 @@ export async function publishArenaEvent(
 /**
  * Get arena SSE events after a timestamp.
  */
-export async function getArenaEvents(
-  submissionId: string,
-  afterTimestamp: number,
-) {
+export async function getArenaEvents(submissionId: string, afterTimestamp: number) {
   return getSSEEvents(`arena:${submissionId}`, afterTimestamp);
 }
 

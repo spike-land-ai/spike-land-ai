@@ -15,15 +15,13 @@ interface McpToolCardProps {
   onToggleFavorite?: (toolName: string) => void;
 }
 
-const categoryMap = new Map(MCP_CATEGORIES.map(c => [c.id, c]));
+const categoryMap = new Map(MCP_CATEGORIES.map((c) => [c.id, c]));
 
-export function McpToolCard(
-  { tool, onTryIt, isFavorite, onToggleFavorite }: McpToolCardProps,
-) {
+export function McpToolCard({ tool, onTryIt, isFavorite, onToggleFavorite }: McpToolCardProps) {
   const cat = categoryMap.get(tool.category);
-  const Icon = (cat?.icon ? ICON_MAP[cat.icon] : null) as
-    | React.ComponentType<{ className?: string; }>
-    | null;
+  const Icon = (cat?.icon ? ICON_MAP[cat.icon] : null) as React.ComponentType<{
+    className?: string;
+  }> | null;
 
   const handleToggleFavorite = useCallback(
     (e: React.MouseEvent) => {
@@ -40,17 +38,17 @@ export function McpToolCard(
         <button
           type="button"
           onClick={handleToggleFavorite}
-          aria-label={isFavorite
-            ? `Remove ${tool.displayName} from favorites`
-            : `Add ${tool.displayName} to favorites`}
+          aria-label={
+            isFavorite
+              ? `Remove ${tool.displayName} from favorites`
+              : `Add ${tool.displayName} to favorites`
+          }
           aria-pressed={isFavorite}
           className="absolute top-3 right-3 p-1.5 rounded-lg transition-all hover:bg-white/[0.06]"
         >
           <Star
             className={`w-4 h-4 transition-colors ${
-              isFavorite
-                ? "fill-amber-400 text-amber-400"
-                : "text-zinc-600 hover:text-zinc-400"
+              isFavorite ? "fill-amber-400 text-amber-400" : "text-zinc-600 hover:text-zinc-400"
             }`}
           />
         </button>
@@ -59,13 +57,11 @@ export function McpToolCard(
       {/* Icon + name row */}
       <div className="flex items-start gap-3 pr-8">
         <div className="w-10 h-10 rounded-xl bg-cyan-500/10 border border-cyan-400/20 flex items-center justify-center shrink-0">
-          {Icon
-            ? <Icon className="w-5 h-5 text-cyan-400" />
-            : (
-              <span className="text-cyan-400 text-xs font-bold">
-                {tool.displayName[0]}
-              </span>
-            )}
+          {Icon ? (
+            <Icon className="w-5 h-5 text-cyan-400" />
+          ) : (
+            <span className="text-cyan-400 text-xs font-bold">{tool.displayName[0]}</span>
+          )}
         </div>
         <div className="flex-1 min-w-0">
           <p className="font-mono text-sm text-white font-semibold leading-tight truncate">

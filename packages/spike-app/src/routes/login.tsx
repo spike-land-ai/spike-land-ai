@@ -47,9 +47,7 @@ export function LoginPage() {
             S
           </div>
           <h1 className="text-2xl font-bold">Sign in to Spike Platform</h1>
-          <p className="mt-2 text-sm text-gray-500">
-            Choose your preferred sign-in method
-          </p>
+          <p className="mt-2 text-sm text-gray-500">Choose your preferred sign-in method</p>
         </div>
 
         {error && (
@@ -87,10 +85,7 @@ export function LoginPage() {
         </div>
 
         <div className="text-center">
-          <Link
-            to="/"
-            className="text-sm text-gray-500 hover:text-gray-700 hover:underline"
-          >
+          <Link to="/" className="text-sm text-gray-500 hover:text-gray-700 hover:underline">
             Continue as guest
           </Link>
           <p className="mt-1 text-xs text-gray-400">Limited features</p>

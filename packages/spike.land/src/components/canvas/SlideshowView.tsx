@@ -6,11 +6,7 @@ import {
   calculateHeroTransform,
   clearHeroTransformStyles,
 } from "@/lib/canvas/animations";
-import type {
-  CanvasRotation,
-  GalleryImage,
-  GalleryTransition,
-} from "@/lib/canvas/types";
+import type { CanvasRotation, GalleryImage, GalleryTransition } from "@/lib/canvas/types";
 import { cn } from "@/lib/utils";
 import { ChevronLeft, ChevronRight, RotateCcw, RotateCw } from "lucide-react";
 import Image from "next/image";
@@ -52,10 +48,7 @@ export function SlideshowView({
 
   // Handle hero animation on mount
   useEffect(() => {
-    if (
-      !transitionState.isActive || !transitionState.originRect
-      || !containerRef.current
-    ) {
+    if (!transitionState.isActive || !transitionState.originRect || !containerRef.current) {
       return;
     }
 
@@ -111,9 +104,7 @@ export function SlideshowView({
   }, []);
 
   // Calculate rotation transform
-  const rotationTransform = rotation !== 0
-    ? `rotate(${rotation}deg)`
-    : undefined;
+  const rotationTransform = rotation !== 0 ? `rotate(${rotation}deg)` : undefined;
 
   // Check if we should reduce motion (hydration-safe)
   const prefersReducedMotion = useReducedMotion();
@@ -143,10 +134,7 @@ export function SlideshowView({
     >
       {/* Image container */}
       <div className="relative w-full h-full flex items-center justify-center">
-        <div
-          className="relative w-full h-full"
-          style={{ transform: rotationTransform }}
-        >
+        <div className="relative w-full h-full" style={{ transform: rotationTransform }}>
           <Image
             src={displayUrl}
             alt={currentImage.name}
@@ -168,12 +156,7 @@ export function SlideshowView({
       </div>
 
       {/* Image counter and announcement for screen readers */}
-      <div
-        className="sr-only"
-        role="status"
-        aria-live="polite"
-        aria-atomic="true"
-      >
+      <div className="sr-only" role="status" aria-live="polite" aria-atomic="true">
         Image {currentIndex + 1} of {images.length}: {currentImage.name}
         {isPeeking ? " (showing original)" : ""}
       </div>

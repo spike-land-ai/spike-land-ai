@@ -10,16 +10,13 @@ export function SkillInput() {
   const [query, setQuery] = useState("");
   const [isOpen, setIsOpen] = useState(false);
   const { suggestions, isLoading } = useSkillAutocomplete(query);
-  const addSkill = useCareerStore(s => s.addSkill);
-  const userSkills = useCareerStore(s => s.userSkills);
+  const addSkill = useCareerStore((s) => s.addSkill);
+  const userSkills = useCareerStore((s) => s.userSkills);
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
-      if (
-        containerRef.current
-        && !containerRef.current.contains(event.target as Node)
-      ) {
+      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
         setIsOpen(false);
       }
     }
@@ -27,16 +24,14 @@ export function SkillInput() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const filteredSuggestions = suggestions.filter(
-    s => !userSkills.some(us => us.uri === s.uri),
-  );
+  const filteredSuggestions = suggestions.filter((s) => !userSkills.some((us) => us.uri === s.uri));
 
   return (
     <div ref={containerRef} className="relative">
       <Input
         placeholder="Search skills (e.g., JavaScript, project management, data analysis)..."
         value={query}
-        onChange={e => {
+        onChange={(e) => {
           setQuery(e.target.value);
           setIsOpen(true);
         }}
@@ -47,11 +42,9 @@ export function SkillInput() {
         <div className="absolute z-50 w-full mt-1 bg-zinc-800 border border-white/[0.06] rounded-lg shadow-xl max-h-60 overflow-auto">
           {isLoading && <div className="px-3 py-2 text-sm text-zinc-500">Searching...</div>}
           {!isLoading && filteredSuggestions.length === 0 && (
-            <div className="px-3 py-2 text-sm text-zinc-500">
-              No skills found
-            </div>
+            <div className="px-3 py-2 text-sm text-zinc-500">No skills found</div>
           )}
-          {filteredSuggestions.map(skill => (
+          {filteredSuggestions.map((skill) => (
             <button
               key={skill.uri}
               type="button"

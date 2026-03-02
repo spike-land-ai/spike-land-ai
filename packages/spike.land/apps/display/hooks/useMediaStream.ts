@@ -51,7 +51,7 @@ export function useMediaStream(peerId: string) {
   const startStream = useCallback(
     async (type: StreamType = "camera", constraints?: MediaConstraints) => {
       try {
-        setState(prev => ({ ...prev, error: null }));
+        setState((prev) => ({ ...prev, error: null }));
 
         // Stop any existing stream first
         if (streamRef.current) {
@@ -78,7 +78,7 @@ export function useMediaStream(peerId: string) {
 
         // Monitor stream health
         cleanupMonitorRef.current = monitorStreamHealth(stream, () => {
-          setState(prev => ({ ...prev, isActive: false }));
+          setState((prev) => ({ ...prev, isActive: false }));
         });
 
         setState({
@@ -90,10 +90,9 @@ export function useMediaStream(peerId: string) {
 
         return stream;
       } catch (error) {
-        const errorMessage = error instanceof Error
-          ? error.message
-          : "Failed to start media stream";
-        setState(prev => ({
+        const errorMessage =
+          error instanceof Error ? error.message : "Failed to start media stream";
+        setState((prev) => ({
           ...prev,
           error: errorMessage,
         }));
@@ -128,20 +127,16 @@ export function useMediaStream(peerId: string) {
   /**
    * Toggle a specific track on/off
    */
-  const toggleTrack = useCallback(
-    (kind: "audio" | "video", enabled?: boolean) => {
-      if (!streamRef.current) return;
+  const toggleTrack = useCallback((kind: "audio" | "video", enabled?: boolean) => {
+    if (!streamRef.current) return;
 
-      const tracks = kind === "audio"
-        ? streamRef.current.getAudioTracks()
-        : streamRef.current.getVideoTracks();
+    const tracks =
+      kind === "audio" ? streamRef.current.getAudioTracks() : streamRef.current.getVideoTracks();
 
-      tracks.forEach(track => {
-        track.enabled = enabled !== undefined ? enabled : !track.enabled;
-      });
-    },
-    [],
-  );
+    tracks.forEach((track) => {
+      track.enabled = enabled !== undefined ? enabled : !track.enabled;
+    });
+  }, []);
 
   /**
    * Check if a specific track type is enabled
@@ -149,11 +144,10 @@ export function useMediaStream(peerId: string) {
   const isTrackEnabled = useCallback((kind: "audio" | "video"): boolean => {
     if (!streamRef.current) return false;
 
-    const tracks = kind === "audio"
-      ? streamRef.current.getAudioTracks()
-      : streamRef.current.getVideoTracks();
+    const tracks =
+      kind === "audio" ? streamRef.current.getAudioTracks() : streamRef.current.getVideoTracks();
 
-    return tracks.some(track => track.enabled);
+    return tracks.some((track) => track.enabled);
   }, []);
 
   /**
@@ -171,7 +165,7 @@ export function useMediaStream(peerId: string) {
 
       if (!streamRef.current) {
         streamRef.current = newStream;
-        setState(prev => ({
+        setState((prev) => ({
           ...prev,
           stream: newStream,
           isActive: true,
@@ -183,7 +177,7 @@ export function useMediaStream(peerId: string) {
       const oldVideoTracks = streamRef.current.getVideoTracks();
       const newVideoTrack = newStream.getVideoTracks()[0];
 
-      oldVideoTracks.forEach(track => {
+      oldVideoTracks.forEach((track) => {
         streamRef.current?.removeTrack(track);
         track.stop();
       });
@@ -192,15 +186,13 @@ export function useMediaStream(peerId: string) {
         streamRef.current.addTrack(newVideoTrack);
       }
 
-      setState(prev => ({
+      setState((prev) => ({
         ...prev,
         stream: streamRef.current,
       }));
     } catch (error) {
-      const errorMessage = error instanceof Error
-        ? error.message
-        : "Failed to replace video track";
-      setState(prev => ({
+      const errorMessage = error instanceof Error ? error.message : "Failed to replace video track";
+      setState((prev) => ({
         ...prev,
         error: errorMessage,
       }));

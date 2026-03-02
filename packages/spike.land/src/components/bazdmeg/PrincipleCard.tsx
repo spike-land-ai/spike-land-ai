@@ -1,13 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
-import {
-  motion,
-  useMotionTemplate,
-  useMotionValue,
-  useSpring,
-  useTransform,
-} from "framer-motion";
+import { motion, useMotionTemplate, useMotionValue, useSpring, useTransform } from "framer-motion";
 import { ScrollReveal } from "@/components/infographic/shared/ScrollReveal";
 import type { LucideIcon } from "lucide-react";
 
@@ -50,15 +44,11 @@ export function PrincipleCard({ principle, index }: PrincipleCardProps) {
   const rotateY = useTransform(mouseXSpring, [-0.5, 0.5], ["-15deg", "15deg"]);
 
   // Spotlight gradient background
-  const spotlightBackground =
-    useMotionTemplate`radial-gradient(circle at ${spotlightX}px ${spotlightY}px, ${principle.color}30 0%, transparent 60%)`;
+  const spotlightBackground = useMotionTemplate`radial-gradient(circle at ${spotlightX}px ${spotlightY}px, ${principle.color}30 0%, transparent 60%)`;
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!ref.current) return;
-    if (
-      typeof window !== "undefined"
-      && window.matchMedia("(pointer: coarse)").matches
-    ) return; // Ignore tilt on touch devices
+    if (typeof window !== "undefined" && window.matchMedia("(pointer: coarse)").matches) return; // Ignore tilt on touch devices
 
     const rect = ref.current.getBoundingClientRect();
     const width = rect.width;
@@ -116,9 +106,7 @@ export function PrincipleCard({ principle, index }: PrincipleCardProps) {
         <div
           className="h-full p-8 flex flex-col gap-6 relative overflow-hidden group rounded-[28px] bg-white/[0.03] border backdrop-blur-xl transition-colors duration-300"
           style={{
-            borderColor: isHovered
-              ? `${principle.color}50`
-              : "rgba(255, 255, 255, 0.05)",
+            borderColor: isHovered ? `${principle.color}50` : "rgba(255, 255, 255, 0.05)",
             boxShadow: "inset 0 0 20px rgba(255, 255, 255, 0.01)",
           }}
         >
@@ -131,9 +119,7 @@ export function PrincipleCard({ principle, index }: PrincipleCardProps) {
           {/* Shimmer Light Sweep */}
           <motion.div
             initial={{ x: "-100%", opacity: 0 }}
-            animate={isHovered
-              ? { x: "200%", opacity: 0.15 }
-              : { x: "-100%", opacity: 0 }}
+            animate={isHovered ? { x: "200%", opacity: 0.15 } : { x: "-100%", opacity: 0 }}
             transition={{
               duration: 1.5,
               ease: "easeInOut",

@@ -21,7 +21,7 @@ export async function submitReview(params: {
   score: number;
   approved: boolean;
   comment?: string;
-}): Promise<{ reviewId: string; scoringTriggered: boolean; }> {
+}): Promise<{ reviewId: string; scoringTriggered: boolean }> {
   const { submissionId, reviewerId, bugs, score, approved, comment } = params;
 
   // Verify submission exists and is in REVIEWING status
@@ -31,9 +31,7 @@ export async function submitReview(params: {
   });
 
   if (submission.status !== "REVIEWING") {
-    throw new Error(
-      `Submission is not in REVIEWING status (current: ${submission.status})`,
-    );
+    throw new Error(`Submission is not in REVIEWING status (current: ${submission.status})`);
   }
 
   if (submission.userId === reviewerId) {
@@ -76,9 +74,7 @@ export async function submitReview(params: {
  * Check if a submission has enough reviews to be scored.
  * Returns true if scoring was triggered.
  */
-export async function checkApprovalThreshold(
-  submissionId: string,
-): Promise<boolean> {
+export async function checkApprovalThreshold(submissionId: string): Promise<boolean> {
   const reviewCount = await prisma.arenaReview.count({
     where: { submissionId },
   });
@@ -105,8 +101,7 @@ export async function scoreSubmission(submissionId: string): Promise<void> {
   }
 
   // Average review scores
-  const avgScore = reviews.reduce((sum, r) => sum + r.score, 0)
-    / reviews.length;
+  const avgScore = reviews.reduce((sum, r) => sum + r.score, 0) / reviews.length;
 
   // Update submission status and score
   await prisma.arenaSubmission.update({

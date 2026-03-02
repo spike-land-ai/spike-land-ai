@@ -73,9 +73,7 @@ vi.mock("@/lib/logger", () => ({
   default: { info: vi.fn(), warn: vi.fn(), error: vi.fn() },
 }));
 
-const { callClaude, parseGenerationResponse } = await import(
-  "@/lib/create/agent-client"
-);
+const { callClaude, parseGenerationResponse } = await import("@/lib/create/agent-client");
 const { updateCodespace } = await import("@/lib/create/codespace-service");
 
 const mockCallClaude = vi.mocked(callClaude);
@@ -86,10 +84,8 @@ beforeEach(() => {
   vi.clearAllMocks();
 });
 
-async function collectEvents(
-  gen: AsyncGenerator<{ type: string; [key: string]: unknown; }>,
-) {
-  const events: Array<{ type: string; [key: string]: unknown; }> = [];
+async function collectEvents(gen: AsyncGenerator<{ type: string; [key: string]: unknown }>) {
+  const events: Array<{ type: string; [key: string]: unknown }> = [];
   for await (const event of gen) {
     events.push(event);
   }
@@ -110,16 +106,14 @@ describe("agentGenerateApp", () => {
     mockParseGeneration.mockReturnValue({
       title: "Test App",
       description: "A test",
-      code: "import React from \"react\";\nexport default function App() { return <div />; }",
+      code: 'import React from "react";\nexport default function App() { return <div />; }',
       relatedApps: [],
     });
 
     mockUpdateCodespace.mockResolvedValue({ success: true });
 
     const { agentGenerateApp } = await import("./agent-loop");
-    const events = await collectEvents(
-      agentGenerateApp("test-app", ["test-app"], "user-1"),
-    );
+    const events = await collectEvents(agentGenerateApp("test-app", ["test-app"], "user-1"));
 
     // Verify callClaude was called with "sonnet" for generation
     expect(mockCallClaude).toHaveBeenCalledWith(
@@ -129,13 +123,11 @@ describe("agentGenerateApp", () => {
     );
 
     // Verify generation phase mentions Sonnet
-    const genPhase = events.find(
-      e => e.type === "phase" && e.phase === "GENERATING",
-    );
+    const genPhase = events.find((e) => e.type === "phase" && e.phase === "GENERATING");
     expect(genPhase?.message).toContain("Sonnet");
 
     // Verify completion
-    const complete = events.find(e => e.type === "complete");
+    const complete = events.find((e) => e.type === "complete");
     expect(complete).toBeDefined();
     expect(complete?.title).toBe("Test App");
   });
@@ -164,15 +156,13 @@ describe("agentGenerateApp", () => {
     mockParseGeneration.mockReturnValue({
       title: "Test App",
       description: "A test",
-      code: "import React from \"react\";\nexport default function App() { return <div />; }",
+      code: 'import React from "react";\nexport default function App() { return <div />; }',
       relatedApps: [],
     });
 
-    const { extractCodeFromResponse } = await import(
-      "@/lib/create/agent-client"
-    );
+    const { extractCodeFromResponse } = await import("@/lib/create/agent-client");
     vi.mocked(extractCodeFromResponse).mockReturnValue(
-      "import React from \"react\";\nexport default function App() { return <div>fixed</div>; }",
+      'import React from "react";\nexport default function App() { return <div>fixed</div>; }',
     );
 
     // First transpile fails, second succeeds
@@ -184,9 +174,7 @@ describe("agentGenerateApp", () => {
       .mockResolvedValueOnce({ success: true });
 
     const { agentGenerateApp } = await import("./agent-loop");
-    const events = await collectEvents(
-      agentGenerateApp("test-app", ["test-app"], "user-1"),
-    );
+    const events = await collectEvents(agentGenerateApp("test-app", ["test-app"], "user-1"));
 
     // The fix call should use sonnet
     expect(mockCallClaude).toHaveBeenCalledTimes(2);
@@ -194,7 +182,7 @@ describe("agentGenerateApp", () => {
       model: "sonnet",
     });
 
-    const complete = events.find(e => e.type === "complete");
+    const complete = events.find((e) => e.type === "complete");
     expect(complete).toBeDefined();
   });
 
@@ -211,16 +199,14 @@ describe("agentGenerateApp", () => {
     mockParseGeneration.mockReturnValue({
       title: "Test App",
       description: "A test",
-      code: "import React from \"react\";\nexport default function App() { return <div />; }",
+      code: 'import React from "react";\nexport default function App() { return <div />; }',
       relatedApps: [],
     });
 
     const { agentGenerateApp } = await import("./agent-loop");
 
     await expect(async () => {
-      await collectEvents(
-        agentGenerateApp("test-app", ["test-app"], "user-1"),
-      );
+      await collectEvents(agentGenerateApp("test-app", ["test-app"], "user-1"));
     }).rejects.toThrow("Token budget exceeded");
   });
 });

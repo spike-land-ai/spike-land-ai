@@ -51,25 +51,17 @@ describe("getUserAnalytics", () => {
 
   it("formats daily registrations correctly", async () => {
     const testDate = new Date("2025-06-15T00:00:00.000Z");
-    mockPrisma.$queryRaw.mockReturnValue(
-      Promise.resolve([{ date: testDate, count: BigInt(7) }]),
-    );
+    mockPrisma.$queryRaw.mockReturnValue(Promise.resolve([{ date: testDate, count: BigInt(7) }]));
     mockPrisma.user.count.mockReturnValue(Promise.resolve(0));
 
     const result = await getUserAnalytics();
 
-    expect(result.dailyRegistrations).toEqual([
-      { date: "2025-06-15", count: 7 },
-    ]);
+    expect(result.dailyRegistrations).toEqual([{ date: "2025-06-15", count: 7 }]);
   });
 
   it("handles individual query failures gracefully", async () => {
-    mockPrisma.$queryRaw.mockReturnValue(
-      Promise.reject(new Error("DB connection failed")),
-    );
-    mockPrisma.user.count.mockReturnValue(
-      Promise.reject(new Error("DB connection failed")),
-    );
+    mockPrisma.$queryRaw.mockReturnValue(Promise.reject(new Error("DB connection failed")));
+    mockPrisma.user.count.mockReturnValue(Promise.reject(new Error("DB connection failed")));
 
     const result = await getUserAnalytics();
 

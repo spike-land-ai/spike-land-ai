@@ -106,9 +106,7 @@ describe("generateUserData", () => {
     });
 
     it("installs cloudflared from the official GitHub release", () => {
-      expect(decoded).toContain(
-        "github.com/cloudflare/cloudflared/releases/latest/download",
-      );
+      expect(decoded).toContain("github.com/cloudflare/cloudflared/releases/latest/download");
     });
 
     it("runs cloudflared service install", () => {
@@ -128,7 +126,7 @@ describe("generateUserData", () => {
       const token = "cloudflare-tunnel-jwt-abc123";
       const decoded = decodeBase64(generateUserData(SECRET, token));
       expect(decoded).toContain(`printf '%s' '${token}' > /etc/cloudflared-token`);
-      expect(decoded).toContain("cloudflared service install \"$(cat /etc/cloudflared-token)\"");
+      expect(decoded).toContain('cloudflared service install "$(cat /etc/cloudflared-token)"');
     });
 
     it("places vncTokenSecret only in the Environment= line, not elsewhere verbatim", () => {

@@ -122,7 +122,7 @@ export function ThreePillarsSection() {
           viewport={{ once: true, margin: "-100px" }}
           className="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-10 max-w-7xl mx-auto"
         >
-          {pillars.map(pillar => (
+          {pillars.map((pillar) => (
             <motion.div
               key={pillar.title}
               variants={itemVariants}

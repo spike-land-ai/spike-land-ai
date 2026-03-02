@@ -9,10 +9,7 @@ import { BookOpen, Code2, FileText, Terminal } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 
-const typeIconMap: Record<
-  DocsSearchEntry["type"],
-  React.ComponentType<{ className?: string; }>
-> = {
+const typeIconMap: Record<DocsSearchEntry["type"], React.ComponentType<{ className?: string }>> = {
   tool: Terminal,
   api: Code2,
   page: BookOpen,
@@ -79,7 +76,7 @@ export function CommandPalette() {
     function handleKeyDown(e: KeyboardEvent) {
       if ((e.metaKey || e.ctrlKey) && e.key === "k") {
         e.preventDefault();
-        setOpen(prev => !prev);
+        setOpen((prev) => !prev);
       }
     }
 
@@ -118,10 +115,10 @@ export function CommandPalette() {
     (e: React.KeyboardEvent) => {
       if (e.key === "ArrowDown") {
         e.preventDefault();
-        setSelectedIndex(prev => (prev < results.length - 1 ? prev + 1 : 0));
+        setSelectedIndex((prev) => (prev < results.length - 1 ? prev + 1 : 0));
       } else if (e.key === "ArrowUp") {
         e.preventDefault();
-        setSelectedIndex(prev => (prev > 0 ? prev - 1 : results.length - 1));
+        setSelectedIndex((prev) => (prev > 0 ? prev - 1 : results.length - 1));
       } else if (e.key === "Enter" && results[selectedIndex]) {
         e.preventDefault();
         navigateToResult(results[selectedIndex]);
@@ -140,22 +137,14 @@ export function CommandPalette() {
   }, [selectedIndex]);
 
   // Group results by type
-  const groupedResults = results.reduce<Record<string, DocsSearchEntry[]>>(
-    (acc, entry) => {
-      const key = entry.type;
-      if (!acc[key]) acc[key] = [];
-      acc[key].push(entry);
-      return acc;
-    },
-    {},
-  );
+  const groupedResults = results.reduce<Record<string, DocsSearchEntry[]>>((acc, entry) => {
+    const key = entry.type;
+    if (!acc[key]) acc[key] = [];
+    acc[key].push(entry);
+    return acc;
+  }, {});
 
-  const groupOrder: DocsSearchEntry["type"][] = [
-    "tool",
-    "api",
-    "page",
-    "guide",
-  ];
+  const groupOrder: DocsSearchEntry["type"][] = ["tool", "api", "page", "guide"];
   let flatIndex = 0;
 
   return (
@@ -172,7 +161,7 @@ export function CommandPalette() {
           <Input
             ref={inputRef}
             value={query}
-            onChange={e => setQuery(e.target.value)}
+            onChange={(e) => setQuery(e.target.value)}
             placeholder="Search tools, APIs, pages, guides..."
             className="h-12 border-none bg-transparent pl-2 pr-0 text-base rounded-l-none focus-visible:ring-0 placeholder:text-muted-foreground/40"
           />
@@ -205,7 +194,7 @@ export function CommandPalette() {
             </div>
           )}
 
-          {groupOrder.map(type => {
+          {groupOrder.map((type) => {
             const entries = groupedResults[type];
             if (!entries || entries.length === 0) return null;
 
@@ -214,7 +203,7 @@ export function CommandPalette() {
                 <div className="px-4 py-1.5 text-[10px] font-bold uppercase tracking-[0.15em] text-muted-foreground/40">
                   {typeLabelMap[type]}s
                 </div>
-                {entries.map(entry => {
+                {entries.map((entry) => {
                   const currentIndex = flatIndex;
                   flatIndex++;
                   const isSelected = currentIndex === selectedIndex;
@@ -241,9 +230,7 @@ export function CommandPalette() {
                       />
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
-                          <span className="font-medium text-sm truncate">
-                            {entry.title}
-                          </span>
+                          <span className="font-medium text-sm truncate">{entry.title}</span>
                           <span
                             className={cn(
                               "inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-semibold border uppercase tracking-wider shrink-0",

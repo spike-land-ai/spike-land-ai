@@ -174,7 +174,9 @@ describe("removeTransition", () => {
     const { machine, id } = buildToggleMachine();
     const transitionId = machine.definition.transitions[0]!.id;
     removeTransition(id, transitionId);
-    expect(getMachine(id).definition.transitions.find((t) => t.id === transitionId)).toBeUndefined();
+    expect(
+      getMachine(id).definition.transitions.find((t) => t.id === transitionId),
+    ).toBeUndefined();
   });
 
   it("throws when transition ID does not exist", () => {
@@ -394,7 +396,9 @@ describe("validateMachine", () => {
     addState(id, { id: "orphan", type: "atomic" }); // no incoming transitions
     const issues = validateMachine(id);
     expect(
-      issues.some((i) => i.stateId === "orphan" && i.level === "warning" && i.message.includes("unreachable")),
+      issues.some(
+        (i) => i.stateId === "orphan" && i.level === "warning" && i.message.includes("unreachable"),
+      ),
     ).toBe(true);
   });
 
@@ -417,11 +421,15 @@ describe("validateMachine", () => {
     const id = machine.definition.id;
     addState(id, { id: "a", type: "atomic" });
     addState(id, { id: "done", type: "final" });
-    addTransition(id, { source: "a", target: "done", event: "FINISH", actions: [], internal: false });
+    addTransition(id, {
+      source: "a",
+      target: "done",
+      event: "FINISH",
+      actions: [],
+      internal: false,
+    });
     const issues = validateMachine(id);
-    expect(
-      issues.some((i) => i.stateId === "done" && i.message.includes("dead-end")),
-    ).toBe(false);
+    expect(issues.some((i) => i.stateId === "done" && i.message.includes("dead-end"))).toBe(false);
   });
 });
 
@@ -761,7 +769,7 @@ describe("circular reference detection", () => {
         },
         transitions: [],
         context: {},
-      })
+      }),
     ).toThrow("Circular initial reference detected");
   });
 });

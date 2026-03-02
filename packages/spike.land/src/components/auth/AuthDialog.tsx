@@ -11,24 +11,12 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { signIn } from "@/lib/auth/client/actions";
 import { useSession } from "@/lib/auth/client/hooks";
 import { QRCodeSVG } from "qrcode.react";
 import { toast } from "sonner";
-import {
-  ArrowLeft,
-  CheckCircle,
-  ChevronDown,
-  Loader2,
-  Mail,
-  QrCode,
-  Zap,
-} from "lucide-react";
+import { ArrowLeft, CheckCircle, ChevronDown, Loader2, Mail, QrCode, Zap } from "lucide-react";
 
 function useIsMobile(): boolean {
   const [isMobile, setIsMobile] = useState(false);
@@ -43,13 +31,7 @@ function useIsMobile(): boolean {
 
 type EmailState = "input" | "sending" | "sent";
 
-type QrStatus =
-  | "idle"
-  | "loading"
-  | "display"
-  | "polling"
-  | "authenticated"
-  | "expired";
+type QrStatus = "idle" | "loading" | "display" | "polling" | "authenticated" | "expired";
 
 interface QrInitiateResponse {
   token: string;
@@ -67,7 +49,7 @@ export interface AuthDialogProps {
   callbackUrl?: string | undefined;
 }
 
-function GoogleIcon({ className }: { className?: string; }) {
+function GoogleIcon({ className }: { className?: string }) {
   return (
     <svg className={className} viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
       <path
@@ -90,7 +72,7 @@ function GoogleIcon({ className }: { className?: string; }) {
   );
 }
 
-function GitHubIcon({ className }: { className?: string; }) {
+function GitHubIcon({ className }: { className?: string }) {
   return (
     <svg
       className={className}
@@ -103,7 +85,7 @@ function GitHubIcon({ className }: { className?: string; }) {
   );
 }
 
-function AppleIcon({ className }: { className?: string; }) {
+function AppleIcon({ className }: { className?: string }) {
   return (
     <svg
       className={className}
@@ -174,7 +156,7 @@ export function AuthDialog({ open, onOpenChange, callbackUrl }: AuthDialogProps)
   // Resend countdown timer
   useEffect(() => {
     if (resendCountdown <= 0) return;
-    const timer = setTimeout(() => setResendCountdown(c => c - 1), 1000);
+    const timer = setTimeout(() => setResendCountdown((c) => c - 1), 1000);
     return () => clearTimeout(timer);
   }, [resendCountdown]);
 
@@ -296,7 +278,7 @@ export function AuthDialog({ open, onOpenChange, callbackUrl }: AuthDialogProps)
 
       // Start expiry countdown
       expiryIntervalRef.current = setInterval(() => {
-        setQrExpiry(prev => {
+        setQrExpiry((prev) => {
           if (prev <= 1) {
             setQrStatus("expired");
             if (pollIntervalRef.current) clearInterval(pollIntervalRef.current);
@@ -324,9 +306,10 @@ export function AuthDialog({ open, onOpenChange, callbackUrl }: AuthDialogProps)
     return `${m}:${s.toString().padStart(2, "0")}`;
   };
 
-  const qrUrl = qrToken && typeof window !== "undefined"
-    ? `${window.location.origin}/auth/qr-verify?token=${qrToken}`
-    : "";
+  const qrUrl =
+    qrToken && typeof window !== "undefined"
+      ? `${window.location.origin}/auth/qr-verify?token=${qrToken}`
+      : "";
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -384,7 +367,7 @@ export function AuthDialog({ open, onOpenChange, callbackUrl }: AuthDialogProps)
                     type="email"
                     placeholder="name@example.com"
                     value={email}
-                    onChange={e => setEmail(e.target.value)}
+                    onChange={(e) => setEmail(e.target.value)}
                     required
                     className="h-12"
                     autoComplete="email"
@@ -430,9 +413,7 @@ export function AuthDialog({ open, onOpenChange, callbackUrl }: AuthDialogProps)
                     disabled={resendCountdown > 0}
                     className="text-sm rounded-full"
                   >
-                    {resendCountdown > 0
-                      ? `Resend in ${resendCountdown}s`
-                      : "Resend link"}
+                    {resendCountdown > 0 ? `Resend in ${resendCountdown}s` : "Resend link"}
                   </Button>
                   <Button
                     variant="ghost"
@@ -457,21 +438,14 @@ export function AuthDialog({ open, onOpenChange, callbackUrl }: AuthDialogProps)
                   {(qrStatus === "idle" || qrStatus === "loading") && (
                     <>
                       <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-                      <p className="text-sm text-muted-foreground">
-                        Generating QR code...
-                      </p>
+                      <p className="text-sm text-muted-foreground">Generating QR code...</p>
                     </>
                   )}
 
                   {qrStatus === "display" && (
                     <>
                       <div className="rounded-xl border border-border bg-white p-4">
-                        <QRCodeSVG
-                          value={qrUrl}
-                          size={200}
-                          level="M"
-                          includeMargin={false}
-                        />
+                        <QRCodeSVG value={qrUrl} size={200} level="M" includeMargin={false} />
                       </div>
                       <div className="text-center">
                         <p className="text-sm font-medium text-foreground">Scan with your phone</p>
@@ -488,18 +462,11 @@ export function AuthDialog({ open, onOpenChange, callbackUrl }: AuthDialogProps)
                   {qrStatus === "polling" && (
                     <>
                       <div className="rounded-xl border border-border bg-white p-4 opacity-50">
-                        <QRCodeSVG
-                          value={qrUrl}
-                          size={200}
-                          level="M"
-                          includeMargin={false}
-                        />
+                        <QRCodeSVG value={qrUrl} size={200} level="M" includeMargin={false} />
                       </div>
                       <div className="flex items-center gap-2">
                         <Loader2 className="h-4 w-4 animate-spin text-primary" />
-                        <p className="text-sm text-muted-foreground">
-                          Waiting for approval...
-                        </p>
+                        <p className="text-sm text-muted-foreground">Waiting for approval...</p>
                       </div>
                     </>
                   )}

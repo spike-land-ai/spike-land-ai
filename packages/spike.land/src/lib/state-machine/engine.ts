@@ -42,9 +42,10 @@ function resolveEntry(
 ): string[] {
   if (visited.has(stateId)) {
     throw new Error(
-      `Circular initial reference detected in machine "${machineId}": state "${stateId}" was already visited (cycle: ${
-        [...visited, stateId].join(" -> ")
-      })`,
+      `Circular initial reference detected in machine "${machineId}": state "${stateId}" was already visited (cycle: ${[
+        ...visited,
+        stateId,
+      ].join(" -> ")})`,
     );
   }
   visited.add(stateId);
@@ -62,9 +63,7 @@ function resolveEntry(
 
     case "compound": {
       if (!state.initial) {
-        throw new Error(
-          `Compound state "${stateId}" has no initial child state`,
-        );
+        throw new Error(`Compound state "${stateId}" has no initial child state`);
       }
       return [stateId, ...resolveEntry(machineId, state.initial, new Set(visited))];
     }
@@ -72,13 +71,13 @@ function resolveEntry(
     case "parallel":
       return [
         stateId,
-        ...state.children.flatMap(childId => resolveEntry(machineId, childId, new Set(visited))),
+        ...state.children.flatMap((childId) => resolveEntry(machineId, childId, new Set(visited))),
       ];
 
     case "history": {
       const remembered = instance.history[stateId];
       if (remembered && remembered.length > 0) {
-        return remembered.flatMap(id => resolveEntry(machineId, id, new Set(visited)));
+        return remembered.flatMap((id) => resolveEntry(machineId, id, new Set(visited)));
       }
       // Fall back to initial of parent
       if (state.parent) {
@@ -105,14 +104,11 @@ function executeActions(
       case "assign": {
         for (const [key, value] of Object.entries(action.params)) {
           if (
-            typeof value === "string"
-            && (value.includes("context.") || /[\+\-\*\/\(\)]/.test(value))
+            typeof value === "string" &&
+            (value.includes("context.") || /[\+\-\*\/\(\)]/.test(value))
           ) {
             try {
-              instance.context[key] = evaluateExpression(
-                value,
-                instance.context,
-              );
+              instance.context[key] = evaluateExpression(value, instance.context);
             } catch {
               instance.context[key] = value;
             }
@@ -167,7 +163,7 @@ export function getMachine(machineId: string): MachineInstance {
 
 /** Create a new machine with the given definition. */
 export function createMachine(
-  def: Partial<MachineDefinition> & { name: string; userId: string; },
+  def: Partial<MachineDefinition> & { name: string; userId: string },
 ): MachineInstance {
   const id = def.id ?? randomUUID();
 
@@ -261,37 +257,33 @@ export function removeState(machineId: string, stateId: string): void {
   const instance = getMachine(machineId);
   const state = instance.definition.states[stateId];
   if (!state) {
-    throw new Error(
-      `State "${stateId}" not found in machine "${machineId}"`,
-    );
+    throw new Error(`State "${stateId}" not found in machine "${machineId}"`);
   }
 
   // Remove from parent's children array
   if (state.parent) {
     const parent = instance.definition.states[state.parent];
     if (parent) {
-      parent.children = parent.children.filter(id => id !== stateId);
+      parent.children = parent.children.filter((id) => id !== stateId);
     }
   }
 
   // Remove all transitions referencing this state
   instance.definition.transitions = instance.definition.transitions.filter(
-    t => t.source !== stateId && t.target !== stateId,
+    (t) => t.source !== stateId && t.target !== stateId,
   );
 
   // Remove the state
   delete instance.definition.states[stateId];
 
   // Remove from active states if present
-  instance.currentStates = instance.currentStates.filter(
-    id => id !== stateId,
-  );
+  instance.currentStates = instance.currentStates.filter((id) => id !== stateId);
 }
 
 /** Add a transition to a machine. */
 export function addTransition(
   machineId: string,
-  transition: Omit<Transition, "id"> & { id?: string; },
+  transition: Omit<Transition, "id"> & { id?: string },
 ): Transition {
   const instance = getMachine(machineId);
 
@@ -313,27 +305,19 @@ export function addTransition(
 }
 
 /** Remove a transition by ID. */
-export function removeTransition(
-  machineId: string,
-  transitionId: string,
-): void {
+export function removeTransition(machineId: string, transitionId: string): void {
   const instance = getMachine(machineId);
   const before = instance.definition.transitions.length;
   instance.definition.transitions = instance.definition.transitions.filter(
-    t => t.id !== transitionId,
+    (t) => t.id !== transitionId,
   );
   if (instance.definition.transitions.length === before) {
-    throw new Error(
-      `Transition "${transitionId}" not found in machine "${machineId}"`,
-    );
+    throw new Error(`Transition "${transitionId}" not found in machine "${machineId}"`);
   }
 }
 
 /** Merge context values into the machine's current context. */
-export function setContext(
-  machineId: string,
-  context: Record<string, unknown>,
-): void {
+export function setContext(machineId: string, context: Record<string, unknown>): void {
   const instance = getMachine(machineId);
   Object.assign(instance.context, context);
 }
@@ -354,7 +338,7 @@ export function sendEvent(
 
   // Find matching transitions from any active state
   const candidateTransitions = instance.definition.transitions.filter(
-    t => t.event === event && activeSet.has(t.source),
+    (t) => t.event === event && activeSet.has(t.source),
   );
 
   // Evaluate guards and pick first matching
@@ -396,7 +380,7 @@ export function sendEvent(
         const parent = instance.definition.states[state.parent];
         if (parent) {
           // For each parent, remember its direct active children
-          const activeChildren = instance.currentStates.filter(id => {
+          const activeChildren = instance.currentStates.filter((id) => {
             const s = instance.definition.states[id];
             return s?.parent === state.parent;
           });
@@ -511,14 +495,8 @@ export function resetMachine(machineId: string): void {
   instance.transitionLog = [];
 
   // Re-enter initial state
-  if (
-    instance.definition.initial
-    && instance.definition.states[instance.definition.initial]
-  ) {
-    instance.currentStates = resolveEntry(
-      machineId,
-      instance.definition.initial,
-    );
+  if (instance.definition.initial && instance.definition.states[instance.definition.initial]) {
+    instance.currentStates = resolveEntry(machineId, instance.definition.initial);
     // Execute entry actions for all entered states
     const pendingEvents: string[] = [];
     for (const stateId of instance.currentStates) {
@@ -567,8 +545,7 @@ export function validateMachine(machineId: string): ValidationIssue[] {
       } else if (!stateIds.has(state.initial)) {
         issues.push({
           level: "error",
-          message:
-            `Compound state "${stateId}" initial child "${state.initial}" does not exist in states`,
+          message: `Compound state "${stateId}" initial child "${state.initial}" does not exist in states`,
           stateId,
         });
       }
@@ -609,7 +586,7 @@ export function validateMachine(machineId: string): ValidationIssue[] {
   }
 
   // Check for unreachable states (no incoming transitions and not initial)
-  const targetedStates = new Set(transitions.map(t => t.target));
+  const targetedStates = new Set(transitions.map((t) => t.target));
   const initialStates = new Set<string>();
   if (instance.definition.initial) {
     initialStates.add(instance.definition.initial);
@@ -628,30 +605,25 @@ export function validateMachine(machineId: string): ValidationIssue[] {
 
   for (const stateId of stateIds) {
     const state = states[stateId]!;
-    if (
-      !targetedStates.has(stateId)
-      && !initialStates.has(stateId)
-      && state.type !== "history"
-    ) {
+    if (!targetedStates.has(stateId) && !initialStates.has(stateId) && state.type !== "history") {
       issues.push({
         level: "warning",
-        message:
-          `State "${stateId}" is unreachable (no incoming transitions and not an initial state)`,
+        message: `State "${stateId}" is unreachable (no incoming transitions and not an initial state)`,
         stateId,
       });
     }
   }
 
   // Check for dead-end states (no outgoing transitions and not final)
-  const sourceStates = new Set(transitions.map(t => t.source));
+  const sourceStates = new Set(transitions.map((t) => t.source));
   for (const stateId of stateIds) {
     const state = states[stateId]!;
     if (
-      !sourceStates.has(stateId)
-      && state.type !== "final"
-      && state.type !== "history"
-      && state.type !== "parallel"
-      && state.children.length === 0
+      !sourceStates.has(stateId) &&
+      state.type !== "final" &&
+      state.type !== "history" &&
+      state.type !== "parallel" &&
+      state.children.length === 0
     ) {
       issues.push({
         level: "warning",
@@ -684,13 +656,13 @@ export async function shareMachine(
 ): Promise<string> {
   const instance = machineData
     ? {
-      definition: machineData.definition,
-      currentStates: machineData.currentStates,
-      context: machineData.context,
-      history: machineData.history,
-      transitionLog: machineData.transitionLog,
-      initialContext: machineData.context,
-    }
+        definition: machineData.definition,
+        currentStates: machineData.currentStates,
+        context: machineData.context,
+        history: machineData.history,
+        transitionLog: machineData.transitionLog,
+        initialContext: machineData.context,
+      }
     : getMachine(machineId);
   const prisma = (await import("@/lib/prisma")).default;
   const { randomBytes } = await import("node:crypto");
@@ -744,15 +716,11 @@ export async function getSharedMachine(token: string): Promise<MachineExport> {
   }
 
   return {
-    definition: JSON.parse(
-      JSON.stringify(shared.definition),
-    ) as MachineDefinition,
+    definition: JSON.parse(JSON.stringify(shared.definition)) as MachineDefinition,
     currentStates: shared.currentStates,
     context: (shared.context ?? {}) as Record<string, unknown>,
     history: (shared.history ?? {}) as Record<string, string[]>,
-    transitionLog: JSON.parse(
-      JSON.stringify(shared.transitionLog ?? []),
-    ) as TransitionLogEntry[],
+    transitionLog: JSON.parse(JSON.stringify(shared.transitionLog ?? [])) as TransitionLogEntry[],
   };
 }
 

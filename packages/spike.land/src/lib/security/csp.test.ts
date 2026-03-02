@@ -28,7 +28,7 @@ describe("Middleware CSP", () => {
     vi.stubEnv("NODE_ENV", "development");
     const request = new NextRequest("http://localhost:3000/profile", {
       headers: {
-        "origin": "http://localhost:3000",
+        origin: "http://localhost:3000",
       },
     });
     const response = await proxy(request);
@@ -46,7 +46,7 @@ describe("Middleware CSP", () => {
     vi.stubEnv("NODE_ENV", "production");
     const request = new NextRequest("http://localhost:3000/profile", {
       headers: {
-        "origin": "http://localhost:3000",
+        origin: "http://localhost:3000",
       },
     });
     const response = await proxy(request);

@@ -157,9 +157,7 @@ function applyGCounter(
   value?: string,
 ): void {
   if (operation !== "increment") {
-    throw new Error(
-      `Invalid operation "${operation}" for G-Counter. Use "increment".`,
-    );
+    throw new Error(`Invalid operation "${operation}" for G-Counter. Use "increment".`);
   }
   const amount = value ? parseInt(value, 10) : 1;
   if (isNaN(amount) || amount < 1) {
@@ -198,12 +196,10 @@ function applyLWWRegister(
   timestamp: number,
 ): void {
   if (operation !== "set") {
-    throw new Error(
-      `Invalid operation "${operation}" for LWW-Register. Use "set".`,
-    );
+    throw new Error(`Invalid operation "${operation}" for LWW-Register. Use "set".`);
   }
   if (value === undefined) {
-    throw new Error("LWW-Register \"set\" operation requires a value");
+    throw new Error('LWW-Register "set" operation requires a value');
   }
   state.value = value;
   state.timestamp = timestamp;
@@ -217,9 +213,7 @@ function applyORSet(
   tag: string,
 ): void {
   if (operation !== "add" && operation !== "remove") {
-    throw new Error(
-      `Invalid operation "${operation}" for OR-Set. Use "add" or "remove".`,
-    );
+    throw new Error(`Invalid operation "${operation}" for OR-Set. Use "add" or "remove".`);
   }
   if (value === undefined) {
     throw new Error(`OR-Set "${operation}" operation requires a value`);
@@ -240,54 +234,27 @@ function applyORSet(
 // CRDT merge
 // ---------------------------------------------------------------------------
 
-function mergeGCounter(
-  target: GCounterState,
-  source: GCounterState,
-): void {
-  const allKeys = new Set([
-    ...Object.keys(target.counts),
-    ...Object.keys(source.counts),
-  ]);
+function mergeGCounter(target: GCounterState, source: GCounterState): void {
+  const allKeys = new Set([...Object.keys(target.counts), ...Object.keys(source.counts)]);
   for (const key of allKeys) {
-    target.counts[key] = Math.max(
-      target.counts[key] ?? 0,
-      source.counts[key] ?? 0,
-    );
+    target.counts[key] = Math.max(target.counts[key] ?? 0, source.counts[key] ?? 0);
   }
 }
 
-function mergePNCounter(
-  target: PNCounterState,
-  source: PNCounterState,
-): void {
+function mergePNCounter(target: PNCounterState, source: PNCounterState): void {
   // Merge positive
-  const posKeys = new Set([
-    ...Object.keys(target.positive),
-    ...Object.keys(source.positive),
-  ]);
+  const posKeys = new Set([...Object.keys(target.positive), ...Object.keys(source.positive)]);
   for (const key of posKeys) {
-    target.positive[key] = Math.max(
-      target.positive[key] ?? 0,
-      source.positive[key] ?? 0,
-    );
+    target.positive[key] = Math.max(target.positive[key] ?? 0, source.positive[key] ?? 0);
   }
   // Merge negative
-  const negKeys = new Set([
-    ...Object.keys(target.negative),
-    ...Object.keys(source.negative),
-  ]);
+  const negKeys = new Set([...Object.keys(target.negative), ...Object.keys(source.negative)]);
   for (const key of negKeys) {
-    target.negative[key] = Math.max(
-      target.negative[key] ?? 0,
-      source.negative[key] ?? 0,
-    );
+    target.negative[key] = Math.max(target.negative[key] ?? 0, source.negative[key] ?? 0);
   }
 }
 
-function mergeLWWRegister(
-  target: LWWRegisterState,
-  source: LWWRegisterState,
-): void {
+function mergeLWWRegister(target: LWWRegisterState, source: LWWRegisterState): void {
   if (source.timestamp > target.timestamp) {
     target.value = source.value;
     target.timestamp = source.timestamp;
@@ -295,10 +262,7 @@ function mergeLWWRegister(
 }
 
 function mergeORSet(target: ORSetState, source: ORSetState): void {
-  const allValues = new Set([
-    ...Object.keys(target.elements),
-    ...Object.keys(source.elements),
-  ]);
+  const allValues = new Set([...Object.keys(target.elements), ...Object.keys(source.elements)]);
   for (const val of allValues) {
     const targetTags = target.elements[val] ?? [];
     const sourceTags = source.elements[val] ?? [];
@@ -411,7 +375,7 @@ export function update(
   replicaId: string,
   operation: string,
   value?: string,
-): { replica: ReplicaView; opLog: OperationLog; } {
+): { replica: ReplicaView; opLog: OperationLog } {
   const set = getSet(setId, userId);
   const replica = getReplica(set, replicaId);
 
@@ -424,13 +388,7 @@ export function update(
       break;
     case "lww_register": {
       set.timestampCounter++;
-      applyLWWRegister(
-        replica.state,
-        replicaId,
-        operation,
-        value,
-        set.timestampCounter,
-      );
+      applyLWWRegister(replica.state, replicaId, operation, value, set.timestampCounter);
       break;
     }
     case "or_set": {
@@ -465,7 +423,7 @@ export function syncPair(
   userId: string,
   fromReplicaId: string,
   toReplicaId: string,
-): { from: ReplicaView; to: ReplicaView; } {
+): { from: ReplicaView; to: ReplicaView } {
   const set = getSet(setId, userId);
   const fromReplica = getReplica(set, fromReplicaId);
   const toReplica = getReplica(set, toReplicaId);
@@ -492,13 +450,11 @@ export function syncPair(
 export function syncAll(
   setId: string,
   userId: string,
-): { replicas: ReplicaView[]; converged: boolean; } {
+): { replicas: ReplicaView[]; converged: boolean } {
   const set = getSet(setId, userId);
 
   // Gather all states, merge them all into a single merged state
-  const allStates = set.replicaOrder.map(
-    rid => set.replicas.get(rid)!.state,
-  );
+  const allStates = set.replicaOrder.map((rid) => set.replicas.get(rid)!.state);
 
   // Create a merged state by cloning the first and merging all others
   const merged = cloneState(allStates[0]!);
@@ -512,7 +468,7 @@ export function syncAll(
     replica.state = cloneState(merged);
   }
 
-  const replicas: ReplicaView[] = set.replicaOrder.map(rid => {
+  const replicas: ReplicaView[] = set.replicaOrder.map((rid) => {
     const replica = set.replicas.get(rid)!;
     return {
       id: replica.id,
@@ -524,15 +480,11 @@ export function syncAll(
   return { replicas, converged: true };
 }
 
-export function inspect(
-  setId: string,
-  userId: string,
-  replicaId?: string,
-): SetStateView {
+export function inspect(setId: string, userId: string, replicaId?: string): SetStateView {
   const set = getSet(setId, userId);
 
   const replicaIds = replicaId ? [replicaId] : set.replicaOrder;
-  const replicas: ReplicaView[] = replicaIds.map(rid => {
+  const replicas: ReplicaView[] = replicaIds.map((rid) => {
     const replica = getReplica(set, rid);
     return {
       id: replica.id,
@@ -550,18 +502,14 @@ export function inspect(
   };
 }
 
-export function checkConvergence(
-  setId: string,
-  userId: string,
-): ConvergenceResult {
+export function checkConvergence(setId: string, userId: string): ConvergenceResult {
   const set = getSet(setId, userId);
   const diffs: ConvergenceDiff[] = [];
 
-  const replicaValues: Array<{ id: string; value: string; }> = set.replicaOrder
-    .map(rid => {
-      const replica = set.replicas.get(rid)!;
-      return { id: rid, value: resolveValue(replica.state) };
-    });
+  const replicaValues: Array<{ id: string; value: string }> = set.replicaOrder.map((rid) => {
+    const replica = set.replicas.get(rid)!;
+    return { id: rid, value: resolveValue(replica.state) };
+  });
 
   // Compare all pairs
   for (let i = 0; i < replicaValues.length; i++) {
@@ -591,26 +539,27 @@ export function compareWithConsensus(
   const convergence = checkConvergence(setId, userId);
 
   const typeDescriptions: Record<CrdtType, string> = {
-    g_counter: "G-Counter (Grow-only Counter) uses per-replica counters merged via max. "
-      + "It is an AP data structure: every replica can increment independently without coordination. "
-      + "In a CP system like Raft, a counter would require leader-mediated writes, "
-      + "ensuring a single total order but requiring availability sacrifices during network partitions.",
+    g_counter:
+      "G-Counter (Grow-only Counter) uses per-replica counters merged via max. " +
+      "It is an AP data structure: every replica can increment independently without coordination. " +
+      "In a CP system like Raft, a counter would require leader-mediated writes, " +
+      "ensuring a single total order but requiring availability sacrifices during network partitions.",
     pn_counter:
-      "PN-Counter (Positive-Negative Counter) extends G-Counter with a separate decrement counter. "
-      + "Both halves merge independently via max, making it fully AP. "
-      + "A CP counter would serialize increments and decrements through a leader, "
-      + "preventing any temporary divergence but blocking writes during partitions.",
+      "PN-Counter (Positive-Negative Counter) extends G-Counter with a separate decrement counter. " +
+      "Both halves merge independently via max, making it fully AP. " +
+      "A CP counter would serialize increments and decrements through a leader, " +
+      "preventing any temporary divergence but blocking writes during partitions.",
     lww_register:
-      "LWW-Register (Last-Writer-Wins Register) resolves conflicts by choosing the value with the highest timestamp. "
-      + "It is AP: concurrent writes are both accepted, and the latest timestamp wins on merge. "
-      + "In a CP system, writes would be serialized through a leader using a replicated log, "
-      + "giving strong consistency but requiring a quorum for every write.",
+      "LWW-Register (Last-Writer-Wins Register) resolves conflicts by choosing the value with the highest timestamp. " +
+      "It is AP: concurrent writes are both accepted, and the latest timestamp wins on merge. " +
+      "In a CP system, writes would be serialized through a leader using a replicated log, " +
+      "giving strong consistency but requiring a quorum for every write.",
     or_set:
-      "OR-Set (Observed-Remove Set) uses unique tags per add operation, and remove deletes only known tags. "
-      + "Concurrent add and remove of the same element results in the element being present (add wins). "
-      + "This is AP: no coordination needed for add/remove. "
-      + "A CP set would use a replicated log to serialize add/remove operations, "
-      + "ensuring a single consistent view but requiring leader availability.",
+      "OR-Set (Observed-Remove Set) uses unique tags per add operation, and remove deletes only known tags. " +
+      "Concurrent add and remove of the same element results in the element being present (add wins). " +
+      "This is AP: no coordination needed for add/remove. " +
+      "A CP set would use a replicated log to serialize add/remove operations, " +
+      "ensuring a single consistent view but requiring leader availability.",
   };
 
   const currentState = convergence.converged
@@ -618,29 +567,29 @@ export function compareWithConsensus(
     : `Replicas have **not converged** yet. There are ${convergence.diffs.length} difference(s) between replica pairs.`;
 
   return (
-    `## AP (CRDT) vs CP (Raft/Paxos) Comparison\n\n`
-    + `**CRDT Type:** ${set.crdtType}\n`
-    + `**Scenario:** ${scenarioDescription}\n`
-    + `**Current State:** ${currentState}\n\n`
-    + `### How this CRDT works\n\n`
-    + `${typeDescriptions[set.crdtType]}\n\n`
-    + `### Tradeoffs for this scenario\n\n`
-    + `**AP (this CRDT):**\n`
-    + `- Every replica can accept writes independently (high availability)\n`
-    + `- Replicas may temporarily disagree (eventual consistency)\n`
-    + `- Merge function guarantees convergence without coordination\n`
-    + `- No single point of failure\n\n`
-    + `**CP (Raft consensus):**\n`
-    + `- All reads return the latest committed value (strong consistency)\n`
-    + `- Writes require a leader and majority quorum\n`
-    + `- Unavailable during network partitions that prevent quorum\n`
-    + `- Total ordering of all operations\n\n`
-    + `### Recommendation\n\n`
-    + `For "${scenarioDescription}": `
-    + (set.crdtType === "lww_register"
+    `## AP (CRDT) vs CP (Raft/Paxos) Comparison\n\n` +
+    `**CRDT Type:** ${set.crdtType}\n` +
+    `**Scenario:** ${scenarioDescription}\n` +
+    `**Current State:** ${currentState}\n\n` +
+    `### How this CRDT works\n\n` +
+    `${typeDescriptions[set.crdtType]}\n\n` +
+    `### Tradeoffs for this scenario\n\n` +
+    `**AP (this CRDT):**\n` +
+    `- Every replica can accept writes independently (high availability)\n` +
+    `- Replicas may temporarily disagree (eventual consistency)\n` +
+    `- Merge function guarantees convergence without coordination\n` +
+    `- No single point of failure\n\n` +
+    `**CP (Raft consensus):**\n` +
+    `- All reads return the latest committed value (strong consistency)\n` +
+    `- Writes require a leader and majority quorum\n` +
+    `- Unavailable during network partitions that prevent quorum\n` +
+    `- Total ordering of all operations\n\n` +
+    `### Recommendation\n\n` +
+    `For "${scenarioDescription}": ` +
+    (set.crdtType === "lww_register"
       ? "If conflict resolution by last-write-wins is acceptable, the CRDT approach provides higher availability. If exact ordering matters, prefer CP."
       : set.crdtType === "or_set"
-      ? "If add-wins semantics for concurrent add/remove are acceptable, use the CRDT. If remove must be authoritative, prefer CP with serialized operations."
-      : "If temporary divergence between replicas is acceptable, the CRDT provides better availability and partition tolerance. If exact agreement at all times is required, prefer CP.")
+        ? "If add-wins semantics for concurrent add/remove are acceptable, use the CRDT. If remove must be authoritative, prefer CP with serialized operations."
+        : "If temporary divergence between replicas is acceptable, the CRDT provides better availability and partition tolerance. If exact agreement at all times is required, prefer CP.")
   );
 }

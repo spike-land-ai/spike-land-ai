@@ -121,9 +121,7 @@ export function registerOrchestratorTools(
           for (const st of subtaskList) {
             for (const dep of st.dependencies) {
               if (!validIds.has(dep)) {
-                throw new Error(
-                  `Subtask "${st.id}" references unknown dependency "${dep}"`,
-                );
+                throw new Error(`Subtask "${st.id}" references unknown dependency "${dep}"`);
               }
             }
           }
@@ -146,9 +144,7 @@ export function registerOrchestratorTools(
           text += `- **Subtasks:** ${subtaskList.length}\n\n`;
           for (const st of subtaskList) {
             const deps =
-              st.dependencies.length > 0
-                ? ` (depends on: ${st.dependencies.join(", ")})`
-                : "";
+              st.dependencies.length > 0 ? ` (depends on: ${st.dependencies.join(", ")})` : "";
             text += `- \`${st.id}\`: ${st.description} [${st.status}]${deps}\n`;
           }
 
@@ -185,9 +181,7 @@ export function registerOrchestratorTools(
           const dispatched: string[] = [];
           for (const st of plan.subtasks) {
             if (st.status !== "pending") continue;
-            const allDepsCompleted = st.dependencies.every((dep) =>
-              completedIds.has(dep),
-            );
+            const allDepsCompleted = st.dependencies.every((dep) => completedIds.has(dep));
             if (allDepsCompleted) {
               st.status = "dispatched";
               st.dispatchedAt = Date.now();
@@ -283,9 +277,7 @@ export function registerOrchestratorTools(
 
           const subtask = plan.subtasks.find((s) => s.id === subtask_id);
           if (!subtask) {
-            throw new Error(
-              `Subtask "${subtask_id}" not found in plan "${plan_id}"`,
-            );
+            throw new Error(`Subtask "${subtask_id}" not found in plan "${plan_id}"`);
           }
 
           subtask.status = status;

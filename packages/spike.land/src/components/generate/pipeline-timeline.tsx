@@ -26,7 +26,7 @@ interface PipelineTimelineProps {
   reviews?: Review[] | undefined;
 }
 
-const PHASES: { key: Phase; label: string; }[] = [
+const PHASES: { key: Phase; label: string }[] = [
   { key: "PLANNING", label: "Planning" },
   { key: "PLAN_REVIEW", label: "Plan Review" },
   { key: "CODING", label: "Coding" },
@@ -35,7 +35,7 @@ const PHASES: { key: Phase; label: string; }[] = [
   { key: "PUBLISHED", label: "Published" },
 ];
 
-const PHASE_ORDER = PHASES.map(p => p.key);
+const PHASE_ORDER = PHASES.map((p) => p.key);
 
 function getPhaseStatus(
   phase: Phase,
@@ -57,9 +57,7 @@ function getPhaseStatus(
   return "pending";
 }
 
-function PhaseIcon(
-  { status }: { status: "done" | "active" | "pending" | "failed"; },
-) {
+function PhaseIcon({ status }: { status: "done" | "active" | "pending" | "failed" }) {
   switch (status) {
     case "done":
       return <Check className="w-4 h-4 text-green-500" />;
@@ -72,9 +70,7 @@ function PhaseIcon(
   }
 }
 
-export function PipelineTimeline(
-  { currentPhase, message, reviews }: PipelineTimelineProps,
-) {
+export function PipelineTimeline({ currentPhase, message, reviews }: PipelineTimelineProps) {
   return (
     <div className="space-y-3">
       {PHASES.map(({ key, label }) => {
@@ -109,26 +105,26 @@ export function PipelineTimeline(
             )}
 
             {/* Show reviewer badges for review phases */}
-            {(key === "PLAN_REVIEW" || key === "CODE_REVIEW")
-              && status === "done"
-              && reviews
-              && reviews.length > 0 && (
-              <div className="ml-auto flex gap-1">
-                {reviews.map(r => (
-                  <span
-                    key={r.reviewerAgentId}
-                    className={cn(
-                      "text-[10px] px-1.5 py-0.5 rounded-full font-mono",
-                      r.decision === "APPROVED"
-                        ? "bg-green-500/10 text-green-600"
-                        : "bg-red-500/10 text-red-600",
-                    )}
-                  >
-                    {r.reviewerAgentId.slice(-4)} ({r.eloAtReview})
-                  </span>
-                ))}
-              </div>
-            )}
+            {(key === "PLAN_REVIEW" || key === "CODE_REVIEW") &&
+              status === "done" &&
+              reviews &&
+              reviews.length > 0 && (
+                <div className="ml-auto flex gap-1">
+                  {reviews.map((r) => (
+                    <span
+                      key={r.reviewerAgentId}
+                      className={cn(
+                        "text-[10px] px-1.5 py-0.5 rounded-full font-mono",
+                        r.decision === "APPROVED"
+                          ? "bg-green-500/10 text-green-600"
+                          : "bg-red-500/10 text-red-600",
+                      )}
+                    >
+                      {r.reviewerAgentId.slice(-4)} ({r.eloAtReview})
+                    </span>
+                  ))}
+                </div>
+              )}
           </div>
         );
       })}

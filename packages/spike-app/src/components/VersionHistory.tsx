@@ -14,20 +14,13 @@ export function VersionHistory({ versions }: VersionHistoryProps) {
   const latest = sorted[0]?.version;
 
   if (sorted.length === 0) {
-    return (
-      <div className="py-8 text-center text-sm text-gray-400">
-        No versions yet.
-      </div>
-    );
+    return <div className="py-8 text-center text-sm text-gray-400">No versions yet.</div>;
   }
 
   return (
     <div className="space-y-3">
       {sorted.map((v) => (
-        <div
-          key={v.version}
-          className="flex items-start gap-3 rounded-lg border p-4"
-        >
+        <div key={v.version} className="flex items-start gap-3 rounded-lg border p-4">
           <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-blue-100 text-xs font-bold text-blue-700">
             v{v.version}
           </span>

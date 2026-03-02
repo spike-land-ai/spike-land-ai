@@ -35,11 +35,7 @@ export function McpTerminal({ onToolSelected }: McpTerminalProps) {
     async function init() {
       if (!containerRef.current) return;
 
-      const [
-        { Terminal },
-        { FitAddon },
-        { WebLinksAddon },
-      ] = await Promise.all([
+      const [{ Terminal }, { FitAddon }, { WebLinksAddon }] = await Promise.all([
         import("@xterm/xterm"),
         import("@xterm/addon-fit"),
         import("@xterm/addon-web-links"),
@@ -96,7 +92,7 @@ export function McpTerminal({ onToolSelected }: McpTerminalProps) {
       // Create shell
       const shell = new TerminalShell(
         {
-          write: data => term.write(data),
+          write: (data) => term.write(data),
           clear: () => {
             term.clear();
             term.write(PROMPT);
@@ -112,14 +108,11 @@ export function McpTerminal({ onToolSelected }: McpTerminalProps) {
             const data = await res.json();
             if (!res.ok) {
               const body = data as Record<string, unknown>;
-              throw new Error(
-                (body.error as string)
-                  || `Request failed with status ${res.status}`,
-              );
+              throw new Error((body.error as string) || `Request failed with status ${res.status}`);
             }
             return data;
           },
-          onImageUrl: url => setImageUrl(url),
+          onImageUrl: (url) => setImageUrl(url),
         },
         {
           tools: MCP_TOOLS,
@@ -135,7 +128,7 @@ export function McpTerminal({ onToolSelected }: McpTerminalProps) {
       term.write(PROMPT);
 
       // Wire input
-      term.onData(data => shell.handleInput(data));
+      term.onData((data) => shell.handleInput(data));
 
       setLoaded(true);
     }
@@ -192,16 +185,11 @@ export function McpTerminal({ onToolSelected }: McpTerminalProps) {
             <div className="w-3 h-3 rounded-full bg-[#ffbd2e]" />
             <div className="w-3 h-3 rounded-full bg-[#27c93f]" />
           </div>
-          <div className="ml-4 text-xs text-gray-400 font-mono">
-            spike.land MCP Terminal
-          </div>
+          <div className="ml-4 text-xs text-gray-400 font-mono">spike.land MCP Terminal</div>
         </div>
 
         {/* Terminal container */}
-        <div
-          ref={containerRef}
-          className="h-[500px] lg:h-[600px] bg-[#0a0f1a] px-2 py-1"
-        />
+        <div ref={containerRef} className="h-[500px] lg:h-[600px] bg-[#0a0f1a] px-2 py-1" />
       </div>
 
       {/* Image preview (below terminal) */}

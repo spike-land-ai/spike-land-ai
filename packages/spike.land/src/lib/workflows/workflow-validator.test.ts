@@ -4,9 +4,7 @@ import { validateForPublish, validateWorkflow } from "./workflow-validator";
 
 import type { WorkflowStepData } from "@/types/workflow";
 
-function makeStep(
-  overrides: Partial<WorkflowStepData> & { name: string; },
-): WorkflowStepData {
+function makeStep(overrides: Partial<WorkflowStepData> & { name: string }): WorkflowStepData {
   const { name, id, type, config, ...rest } = overrides;
   return {
     id: id ?? `step-${name}`,
@@ -42,12 +40,10 @@ describe("validateWorkflow", () => {
   });
 
   it("reports missing step name", () => {
-    const steps: WorkflowStepData[] = [
-      makeStep({ name: "", type: "TRIGGER" }),
-    ];
+    const steps: WorkflowStepData[] = [makeStep({ name: "", type: "TRIGGER" })];
     const result = validateWorkflow(steps);
     expect(result.valid).toBe(false);
-    expect(result.errors.some(e => e.code === "MISSING_NAME")).toBe(true);
+    expect(result.errors.some((e) => e.code === "MISSING_NAME")).toBe(true);
   });
 
   it("reports invalid step type", () => {
@@ -59,16 +55,14 @@ describe("validateWorkflow", () => {
     ];
     const result = validateWorkflow(steps);
     expect(result.valid).toBe(false);
-    expect(result.errors.some(e => e.code === "INVALID_TYPE")).toBe(true);
+    expect(result.errors.some((e) => e.code === "INVALID_TYPE")).toBe(true);
   });
 
   it("reports invalid sequence (negative)", () => {
-    const steps: WorkflowStepData[] = [
-      makeStep({ name: "Step", type: "ACTION", sequence: -1 }),
-    ];
+    const steps: WorkflowStepData[] = [makeStep({ name: "Step", type: "ACTION", sequence: -1 })];
     const result = validateWorkflow(steps);
     expect(result.valid).toBe(false);
-    expect(result.errors.some(e => e.code === "INVALID_SEQUENCE")).toBe(true);
+    expect(result.errors.some((e) => e.code === "INVALID_SEQUENCE")).toBe(true);
   });
 
   it("reports invalid config (non-object)", () => {
@@ -81,7 +75,7 @@ describe("validateWorkflow", () => {
     ];
     const result = validateWorkflow(steps);
     expect(result.valid).toBe(false);
-    expect(result.errors.some(e => e.code === "INVALID_CONFIG")).toBe(true);
+    expect(result.errors.some((e) => e.code === "INVALID_CONFIG")).toBe(true);
   });
 
   it("reports branch without parent", () => {
@@ -94,27 +88,19 @@ describe("validateWorkflow", () => {
     ];
     const result = validateWorkflow(steps);
     expect(result.valid).toBe(false);
-    expect(result.errors.some(e => e.code === "BRANCH_WITHOUT_PARENT")).toBe(
-      true,
-    );
+    expect(result.errors.some((e) => e.code === "BRANCH_WITHOUT_PARENT")).toBe(true);
   });
 
   it("warns about condition with no branches", () => {
-    const steps: WorkflowStepData[] = [
-      makeStep({ name: "Cond", type: "CONDITION" }),
-    ];
+    const steps: WorkflowStepData[] = [makeStep({ name: "Cond", type: "CONDITION" })];
     const result = validateWorkflow(steps);
-    expect(result.warnings.some(w => w.code === "CONDITION_NO_BRANCHES")).toBe(
-      true,
-    );
+    expect(result.warnings.some((w) => w.code === "CONDITION_NO_BRANCHES")).toBe(true);
   });
 
   it("warns when no trigger exists", () => {
-    const steps: WorkflowStepData[] = [
-      makeStep({ name: "Action", type: "ACTION" }),
-    ];
+    const steps: WorkflowStepData[] = [makeStep({ name: "Action", type: "ACTION" })];
     const result = validateWorkflow(steps);
-    expect(result.warnings.some(w => w.code === "NO_TRIGGER")).toBe(true);
+    expect(result.warnings.some((w) => w.code === "NO_TRIGGER")).toBe(true);
   });
 
   it("detects missing dependency", () => {
@@ -127,7 +113,7 @@ describe("validateWorkflow", () => {
     ];
     const result = validateWorkflow(steps);
     expect(result.valid).toBe(false);
-    expect(result.errors.some(e => e.code === "MISSING_DEPENDENCY")).toBe(true);
+    expect(result.errors.some((e) => e.code === "MISSING_DEPENDENCY")).toBe(true);
   });
 
   it("detects missing parent reference", () => {
@@ -141,7 +127,7 @@ describe("validateWorkflow", () => {
     ];
     const result = validateWorkflow(steps);
     expect(result.valid).toBe(false);
-    expect(result.errors.some(e => e.code === "MISSING_PARENT")).toBe(true);
+    expect(result.errors.some((e) => e.code === "MISSING_PARENT")).toBe(true);
   });
 
   it("detects cycle in dependencies", () => {
@@ -151,7 +137,7 @@ describe("validateWorkflow", () => {
     ];
     const result = validateWorkflow(steps);
     expect(result.valid).toBe(false);
-    expect(result.errors.some(e => e.code === "CYCLE_DETECTED")).toBe(true);
+    expect(result.errors.some((e) => e.code === "CYCLE_DETECTED")).toBe(true);
   });
 
   it("warns about orphan steps", () => {
@@ -166,7 +152,7 @@ describe("validateWorkflow", () => {
       makeStep({ name: "Orphan", type: "ACTION", id: "orphan" }),
     ];
     const result = validateWorkflow(steps);
-    expect(result.warnings.some(w => w.code === "ORPHAN_STEP")).toBe(true);
+    expect(result.warnings.some((w) => w.code === "ORPHAN_STEP")).toBe(true);
   });
 
   it("validates child steps recursively", () => {
@@ -184,15 +170,13 @@ describe("validateWorkflow", () => {
     ];
     const result = validateWorkflow(steps);
     expect(result.valid).toBe(false);
-    expect(result.errors.some(e => e.code === "MISSING_NAME")).toBe(true);
+    expect(result.errors.some((e) => e.code === "MISSING_NAME")).toBe(true);
   });
 
   it("accepts valid sequence of 0", () => {
-    const steps: WorkflowStepData[] = [
-      makeStep({ name: "Step", type: "ACTION", sequence: 0 }),
-    ];
+    const steps: WorkflowStepData[] = [makeStep({ name: "Step", type: "ACTION", sequence: 0 })];
     const result = validateWorkflow(steps);
-    const seqErrors = result.errors.filter(e => e.code === "INVALID_SEQUENCE");
+    const seqErrors = result.errors.filter((e) => e.code === "INVALID_SEQUENCE");
     expect(seqErrors).toHaveLength(0);
   });
 });
@@ -205,29 +189,21 @@ describe("validateForPublish", () => {
   it("rejects empty workflow", () => {
     const result = validateForPublish([]);
     expect(result.valid).toBe(false);
-    expect(result.errors.some(e => e.code === "EMPTY_WORKFLOW")).toBe(true);
+    expect(result.errors.some((e) => e.code === "EMPTY_WORKFLOW")).toBe(true);
   });
 
   it("rejects workflow without trigger", () => {
-    const steps: WorkflowStepData[] = [
-      makeStep({ name: "Action", type: "ACTION" }),
-    ];
+    const steps: WorkflowStepData[] = [makeStep({ name: "Action", type: "ACTION" })];
     const result = validateForPublish(steps);
     expect(result.valid).toBe(false);
-    expect(result.errors.some(e => e.code === "NO_TRIGGER_FOR_PUBLISH")).toBe(
-      true,
-    );
+    expect(result.errors.some((e) => e.code === "NO_TRIGGER_FOR_PUBLISH")).toBe(true);
   });
 
   it("rejects workflow without action", () => {
-    const steps: WorkflowStepData[] = [
-      makeStep({ name: "Trigger", type: "TRIGGER" }),
-    ];
+    const steps: WorkflowStepData[] = [makeStep({ name: "Trigger", type: "TRIGGER" })];
     const result = validateForPublish(steps);
     expect(result.valid).toBe(false);
-    expect(result.errors.some(e => e.code === "NO_ACTION_FOR_PUBLISH")).toBe(
-      true,
-    );
+    expect(result.errors.some((e) => e.code === "NO_ACTION_FOR_PUBLISH")).toBe(true);
   });
 
   it("accepts valid publishable workflow", () => {
@@ -254,6 +230,6 @@ describe("validateForPublish", () => {
     ];
     const result = validateForPublish(steps);
     expect(result.valid).toBe(false);
-    expect(result.errors.some(e => e.code === "MISSING_NAME")).toBe(true);
+    expect(result.errors.some((e) => e.code === "MISSING_NAME")).toBe(true);
   });
 });

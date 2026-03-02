@@ -74,7 +74,11 @@ export async function getPlayersByUser(userId: string): Promise<ChessPlayer[]> {
 export async function updatePlayer(
   playerId: string,
   userId: string,
-  data: { name?: string | undefined; avatar?: string | undefined; soundEnabled?: boolean | undefined; },
+  data: {
+    name?: string | undefined;
+    avatar?: string | undefined;
+    soundEnabled?: boolean | undefined;
+  },
 ): Promise<ChessPlayer> {
   const prisma = (await import("@/lib/prisma")).default;
   try {
@@ -91,10 +95,7 @@ export async function updatePlayer(
   }
 }
 
-export async function deletePlayer(
-  playerId: string,
-  userId: string,
-): Promise<void> {
+export async function deletePlayer(playerId: string, userId: string): Promise<void> {
   const prisma = (await import("@/lib/prisma")).default;
   try {
     await prisma.chessPlayer.delete({ where: { id: playerId, userId } });
@@ -103,10 +104,7 @@ export async function deletePlayer(
   }
 }
 
-export async function setPlayerOnline(
-  playerId: string,
-  isOnline: boolean,
-): Promise<void> {
+export async function setPlayerOnline(playerId: string, isOnline: boolean): Promise<void> {
   const prisma = (await import("@/lib/prisma")).default;
   await prisma.chessPlayer.update({
     where: { id: playerId },

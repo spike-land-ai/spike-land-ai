@@ -5,11 +5,7 @@
  */
 
 import prisma from "@/lib/prisma";
-import type {
-  CreateWebhookInput,
-  UpdateWebhookInput,
-  WorkflowWebhookData,
-} from "@/types/workflow";
+import type { CreateWebhookInput, UpdateWebhookInput, WorkflowWebhookData } from "@/types/workflow";
 import crypto from "crypto";
 import { safeEncryptToken } from "@/lib/crypto/token-encryption";
 
@@ -91,9 +87,7 @@ export async function updateWebhookTrigger(
   }
 
   if (input.secret !== undefined) {
-    updateData.secretEncrypted = input.secret
-      ? safeEncryptToken(input.secret)
-      : null;
+    updateData.secretEncrypted = input.secret ? safeEncryptToken(input.secret) : null;
     updateData.secretHash = null; // Ensure hash is cleared when updating secret
   }
 
@@ -167,19 +161,15 @@ export async function getWorkflowWebhooks(
 /**
  * Find a webhook by its token
  */
-export async function findWebhookByToken(
-  token: string,
-): Promise<
-  {
-    webhookId: string;
-    workflowId: string;
-    workspaceId: string;
-    secretHash: string | null;
-    secretEncrypted: string | null;
-    isActive: boolean;
-    workflowStatus: string;
-  } | null
-> {
+export async function findWebhookByToken(token: string): Promise<{
+  webhookId: string;
+  workflowId: string;
+  workspaceId: string;
+  secretHash: string | null;
+  secretEncrypted: string | null;
+  isActive: boolean;
+  workflowStatus: string;
+} | null> {
   const webhook = await prisma.workflowWebhook.findUnique({
     where: { webhookToken: token },
     include: {
@@ -288,11 +278,7 @@ export function generateSignature(payload: string, secret: string): string {
 /**
  * Verify an HMAC-SHA256 signature using timing-safe comparison
  */
-export function verifySignature(
-  payload: string,
-  signature: string,
-  secret: string,
-): boolean {
+export function verifySignature(payload: string, signature: string, secret: string): boolean {
   const expected = generateSignature(payload, secret);
   const sigBuf = Buffer.from(signature, "hex");
   const expectedBuf = Buffer.from(expected, "hex");

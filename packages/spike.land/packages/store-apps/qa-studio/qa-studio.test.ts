@@ -78,9 +78,7 @@ vi.mock("@/lib/qa-studio/browser-session", () => ({
       ],
     },
   }),
-  listTabs: vi.fn().mockResolvedValue([
-    { index: 0, title: "Tab 1", url: "https://example.com" },
-  ]),
+  listTabs: vi.fn().mockResolvedValue([{ index: 0, title: "Tab 1", url: "https://example.com" }]),
   closeTab: vi.fn().mockResolvedValue(true),
 }));
 
@@ -105,39 +103,27 @@ describe("qa-studio standalone tools", () => {
 
   describe("qa_navigate", () => {
     it("navigates to a URL", async () => {
-      const result = await registry.call(
-        "qa_navigate",
-        { url: "https://example.com" },
-        ctx,
-      );
+      const result = await registry.call("qa_navigate", { url: "https://example.com" }, ctx);
       expect(result.isError).toBeFalsy();
-      const text = (result.content[0] as { text: string; }).text;
+      const text = (result.content[0] as { text: string }).text;
       expect(text).toContain("Navigation Complete");
     });
   });
 
   describe("qa_screenshot", () => {
     it("captures a screenshot", async () => {
-      const result = await registry.call(
-        "qa_screenshot",
-        { fullPage: false },
-        ctx,
-      );
+      const result = await registry.call("qa_screenshot", { fullPage: false }, ctx);
       expect(result.isError).toBeFalsy();
-      const text = (result.content[0] as { text: string; }).text;
+      const text = (result.content[0] as { text: string }).text;
       expect(text).toContain("Screenshot Captured");
     });
   });
 
   describe("qa_accessibility", () => {
     it("runs an audit", async () => {
-      const result = await registry.call(
-        "qa_accessibility",
-        { standard: "wcag2aa" },
-        ctx,
-      );
+      const result = await registry.call("qa_accessibility", { standard: "wcag2aa" }, ctx);
       expect(result.isError).toBeFalsy();
-      const text = (result.content[0] as { text: string; }).text;
+      const text = (result.content[0] as { text: string }).text;
       expect(text).toContain("Accessibility Audit");
       expect(text).toContain("Score");
     });
@@ -145,13 +131,9 @@ describe("qa-studio standalone tools", () => {
 
   describe("qa_console", () => {
     it("captures console messages", async () => {
-      const result = await registry.call(
-        "qa_console",
-        { level: "error" },
-        ctx,
-      );
+      const result = await registry.call("qa_console", { level: "error" }, ctx);
       expect(result.isError).toBeFalsy();
-      const text = (result.content[0] as { text: string; }).text;
+      const text = (result.content[0] as { text: string }).text;
       expect(text).toContain("Console Messages");
       expect(text).toContain("test error");
     });
@@ -159,26 +141,18 @@ describe("qa-studio standalone tools", () => {
 
   describe("qa_network", () => {
     it("shows network requests", async () => {
-      const result = await registry.call(
-        "qa_network",
-        { includeStatic: false },
-        ctx,
-      );
+      const result = await registry.call("qa_network", { includeStatic: false }, ctx);
       expect(result.isError).toBeFalsy();
-      const text = (result.content[0] as { text: string; }).text;
+      const text = (result.content[0] as { text: string }).text;
       expect(text).toContain("Network Requests");
     });
   });
 
   describe("qa_viewport", () => {
     it("sets viewport with preset", async () => {
-      const result = await registry.call(
-        "qa_viewport",
-        { preset: "mobile" },
-        ctx,
-      );
+      const result = await registry.call("qa_viewport", { preset: "mobile" }, ctx);
       expect(result.isError).toBeFalsy();
-      const text = (result.content[0] as { text: string; }).text;
+      const text = (result.content[0] as { text: string }).text;
       expect(text).toContain("Viewport Updated");
       expect(text).toContain("375x812");
     });
@@ -186,50 +160,34 @@ describe("qa-studio standalone tools", () => {
 
   describe("qa_evaluate", () => {
     it("evaluates JavaScript", async () => {
-      const result = await registry.call(
-        "qa_evaluate",
-        { expression: "document.title" },
-        ctx,
-      );
+      const result = await registry.call("qa_evaluate", { expression: "document.title" }, ctx);
       expect(result.isError).toBeFalsy();
-      const text = (result.content[0] as { text: string; }).text;
+      const text = (result.content[0] as { text: string }).text;
       expect(text).toContain("Evaluate Result");
     });
   });
 
   describe("qa_tabs", () => {
     it("lists tabs", async () => {
-      const result = await registry.call(
-        "qa_tabs",
-        { action: "list" },
-        ctx,
-      );
+      const result = await registry.call("qa_tabs", { action: "list" }, ctx);
       expect(result.isError).toBeFalsy();
-      const text = (result.content[0] as { text: string; }).text;
+      const text = (result.content[0] as { text: string }).text;
       expect(text).toContain("Browser Tabs");
     });
   });
 
   describe("qa_test_run", () => {
     it("rejects invalid paths", async () => {
-      const result = await registry.call(
-        "qa_test_run",
-        { target: "../../../etc/passwd" },
-        ctx,
-      );
+      const result = await registry.call("qa_test_run", { target: "../../../etc/passwd" }, ctx);
       expect(result.isError).toBe(true);
     });
   });
 
   describe("qa_lighthouse", () => {
     it("returns audit scores for a URL", async () => {
-      const result = await registry.call(
-        "qa_lighthouse",
-        { url: "https://example.com" },
-        ctx,
-      );
+      const result = await registry.call("qa_lighthouse", { url: "https://example.com" }, ctx);
       expect(result.isError).toBeFalsy();
-      const text = (result.content[0] as { text: string; }).text;
+      const text = (result.content[0] as { text: string }).text;
       expect(text).toContain("Lighthouse Audit");
       expect(text).toContain("Core Web Vitals");
     });
@@ -237,13 +195,9 @@ describe("qa-studio standalone tools", () => {
 
   describe("qa_visual_diff", () => {
     it("creates a new baseline when no baseline_id provided", async () => {
-      const result = await registry.call(
-        "qa_visual_diff",
-        { url: "https://example.com" },
-        ctx,
-      );
+      const result = await registry.call("qa_visual_diff", { url: "https://example.com" }, ctx);
       expect(result.isError).toBeFalsy();
-      const text = (result.content[0] as { text: string; }).text;
+      const text = (result.content[0] as { text: string }).text;
       expect(text).toContain("Visual Baseline Created");
       expect(text).toContain("Baseline ID");
     });
@@ -255,7 +209,7 @@ describe("qa-studio standalone tools", () => {
         ctx,
       );
       expect(result.isError).toBeFalsy();
-      const text = (result.content[0] as { text: string; }).text;
+      const text = (result.content[0] as { text: string }).text;
       expect(text).toContain("Baseline Not Found");
     });
   });
@@ -268,7 +222,7 @@ describe("qa-studio standalone tools", () => {
         ok: true,
         status: 200,
         statusText: "OK",
-        text: vi.fn().mockResolvedValue("{\"hello\":\"world\"}"),
+        text: vi.fn().mockResolvedValue('{"hello":"world"}'),
         headers: new Headers({ "content-type": "application/json" }),
       }) as unknown as typeof fetch;
 
@@ -279,7 +233,7 @@ describe("qa-studio standalone tools", () => {
           ctx,
         );
         expect(result.isError).toBeFalsy();
-        const text = (result.content[0] as { text: string; }).text;
+        const text = (result.content[0] as { text: string }).text;
         expect(text).toContain("API Test Result");
         expect(text).toContain("PASS");
       } finally {
@@ -296,7 +250,7 @@ describe("qa-studio standalone tools", () => {
         ctx,
       );
       expect(result.isError).toBeFalsy();
-      const text = (result.content[0] as { text: string; }).text;
+      const text = (result.content[0] as { text: string }).text;
       expect(text).toContain("Test Plan");
       expect(text).toContain("Test Case");
     });
@@ -308,7 +262,7 @@ describe("qa-studio standalone tools", () => {
         ctx,
       );
       expect(result.isError).toBeFalsy();
-      const text = (result.content[0] as { text: string; }).text;
+      const text = (result.content[0] as { text: string }).text;
       expect(text).toContain("ACCESSIBILITY");
     });
   });

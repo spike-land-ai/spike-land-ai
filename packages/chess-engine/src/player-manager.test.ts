@@ -111,9 +111,7 @@ describe("player-manager", () => {
   });
 
   it("updatePlayer throws if not owner (Prisma record not found)", async () => {
-    mockPrisma.chessPlayer.update.mockRejectedValue(
-      new Error("Record not found"),
-    );
+    mockPrisma.chessPlayer.update.mockRejectedValue(new Error("Record not found"));
 
     await expect(updatePlayer("p1", "u1", { name: "Hacked" })).rejects.toThrow(
       "Not authorized to update this player",
@@ -131,13 +129,9 @@ describe("player-manager", () => {
   });
 
   it("deletePlayer throws if not owner (Prisma record not found)", async () => {
-    mockPrisma.chessPlayer.delete.mockRejectedValue(
-      new Error("Record not found"),
-    );
+    mockPrisma.chessPlayer.delete.mockRejectedValue(new Error("Record not found"));
 
-    await expect(deletePlayer("p1", "u1")).rejects.toThrow(
-      "Not authorized to delete this player",
-    );
+    await expect(deletePlayer("p1", "u1")).rejects.toThrow("Not authorized to delete this player");
   });
 
   it("setPlayerOnline updates status and lastSeenAt", async () => {
@@ -203,6 +197,12 @@ describe("player-manager", () => {
     expect(stats.winRate).toBe(0);
   });
 
+  it("getPlayerStats throws if player not found", async () => {
+    mockPrisma.chessPlayer.findUnique.mockResolvedValue(null);
+
+    await expect(getPlayerStats("p1")).rejects.toThrow("Player not found");
+  });
+
   it("updatePlayerElo executes atomic SQL for win", async () => {
     mockPrisma.$executeRaw.mockResolvedValue(1);
 
@@ -230,8 +230,6 @@ describe("player-manager", () => {
   it("updatePlayerElo throws when player not found (0 rows affected)", async () => {
     mockPrisma.$executeRaw.mockResolvedValue(0);
 
-    await expect(updatePlayerElo("p1", 1220, "win")).rejects.toThrow(
-      "Player not found",
-    );
+    await expect(updatePlayerElo("p1", 1220, "win")).rejects.toThrow("Player not found");
   });
 });

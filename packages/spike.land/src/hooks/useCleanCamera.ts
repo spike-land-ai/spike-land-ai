@@ -2,11 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 
-export type CameraErrorKind =
-  | "permission-denied"
-  | "no-camera"
-  | "not-supported"
-  | "unknown";
+export type CameraErrorKind = "permission-denied" | "no-camera" | "not-supported" | "unknown";
 export type PermissionState = "prompt" | "granted" | "denied" | null;
 
 interface UseCleanCameraReturn {
@@ -21,14 +17,8 @@ interface UseCleanCameraReturn {
   stopCamera: () => void;
 }
 
-function classifyError(
-  err: unknown,
-): { message: string; kind: CameraErrorKind; } {
-  const name = err instanceof DOMException
-    ? err.name
-    : err instanceof Error
-    ? err.name
-    : null;
+function classifyError(err: unknown): { message: string; kind: CameraErrorKind } {
+  const name = err instanceof DOMException ? err.name : err instanceof Error ? err.name : null;
 
   if (!name) {
     return { message: "Camera access denied", kind: "unknown" };
@@ -78,9 +68,7 @@ export function useCleanCamera(): UseCleanCameraReturn {
     setErrorKind(null);
 
     // Check if mediaDevices API is available (requires HTTPS)
-    if (
-      typeof navigator === "undefined" || !navigator.mediaDevices?.getUserMedia
-    ) {
+    if (typeof navigator === "undefined" || !navigator.mediaDevices?.getUserMedia) {
       setError("Camera requires a secure connection (HTTPS)");
       setErrorKind("not-supported");
       return;

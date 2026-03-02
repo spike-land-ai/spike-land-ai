@@ -56,12 +56,15 @@ export function GameSidebar({
     }
   }, [messageInput, onSendMessage]);
 
-  const handleKeyPress = useCallback((e: React.KeyboardEvent) => {
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault();
-      handleSendMessage();
-    }
-  }, [handleSendMessage]);
+  const handleKeyPress = useCallback(
+    (e: React.KeyboardEvent) => {
+      if (e.key === "Enter" && !e.shiftKey) {
+        e.preventDefault();
+        handleSendMessage();
+      }
+    },
+    [handleSendMessage],
+  );
 
   if (!isOpen) return null;
 
@@ -115,11 +118,7 @@ export function GameSidebar({
             localPlayerId={localPlayerId}
           />
         )}
-        {activeTab === "library" && (
-          <LibraryTab
-            onSpawnObject={onSpawnObject}
-          />
-        )}
+        {activeTab === "library" && <LibraryTab onSpawnObject={onSpawnObject} />}
       </div>
     </div>
   );
@@ -167,52 +166,41 @@ export function GameSidebar({
 }
 
 // Players Tab
-function PlayersTab(
-  { players, localPlayerId }: {
-    players: Player[];
-    localPlayerId: string | null;
-  },
-) {
+function PlayersTab({
+  players,
+  localPlayerId,
+}: {
+  players: Player[];
+  localPlayerId: string | null;
+}) {
   return (
     <div className="space-y-2">
-      {players.length === 0
-        ? (
-          <p className="text-white/50 text-sm text-center py-4">
-            No players connected
-          </p>
-        )
-        : (
-          players.map((player, index) => {
-            const isLocal = player.id === localPlayerId
-              || player.peerId === localPlayerId;
-            const color = PLAYER_COLORS[index % PLAYER_COLORS.length];
+      {players.length === 0 ? (
+        <p className="text-white/50 text-sm text-center py-4">No players connected</p>
+      ) : (
+        players.map((player, index) => {
+          const isLocal = player.id === localPlayerId || player.peerId === localPlayerId;
+          const color = PLAYER_COLORS[index % PLAYER_COLORS.length];
 
-            return (
-              <div
-                key={player.id || player.peerId}
-                className={`flex items-center gap-3 p-3 rounded-lg ${
-                  isLocal
-                    ? "bg-cyan-500/20 border border-cyan-500/30"
-                    : "bg-white/5"
-                }`}
-              >
-                <div
-                  className="w-3 h-3 rounded-full"
-                  style={{ backgroundColor: color }}
-                />
-                <div className="flex-1">
-                  <p className="text-white font-medium text-sm">
-                    {player.name || `Player ${index + 1}`}
-                    {isLocal && <span className="text-cyan-400 ml-2">(You)</span>}
-                  </p>
-                  <p className="text-white/50 text-xs">
-                    {player.cardCount} cards in hand
-                  </p>
-                </div>
+          return (
+            <div
+              key={player.id || player.peerId}
+              className={`flex items-center gap-3 p-3 rounded-lg ${
+                isLocal ? "bg-cyan-500/20 border border-cyan-500/30" : "bg-white/5"
+              }`}
+            >
+              <div className="w-3 h-3 rounded-full" style={{ backgroundColor: color }} />
+              <div className="flex-1">
+                <p className="text-white font-medium text-sm">
+                  {player.name || `Player ${index + 1}`}
+                  {isLocal && <span className="text-cyan-400 ml-2">(You)</span>}
+                </p>
+                <p className="text-white/50 text-xs">{player.cardCount} cards in hand</p>
               </div>
-            );
-          })
-        )}
+            </div>
+          );
+        })
+      )}
     </div>
   );
 }
@@ -239,52 +227,44 @@ function ChatTab({
     <div className="flex flex-col h-full">
       {/* Messages list */}
       <div className="flex-1 overflow-y-auto space-y-2 mb-4">
-        {messages.length === 0
-          ? (
-            <p className="text-white/50 text-sm text-center py-4">
-              No messages yet
-            </p>
-          )
-          : (
-            messages.map(msg => {
-              const isLocal = msg.playerId === localPlayerId;
-              const isEvent = msg.type === "event";
+        {messages.length === 0 ? (
+          <p className="text-white/50 text-sm text-center py-4">No messages yet</p>
+        ) : (
+          messages.map((msg) => {
+            const isLocal = msg.playerId === localPlayerId;
+            const isEvent = msg.type === "event";
 
-              return (
-                <div
-                  key={msg.id}
-                  className={`p-2 rounded-lg ${
-                    isEvent
-                      ? "bg-yellow-500/10 border border-yellow-500/20"
-                      : isLocal
+            return (
+              <div
+                key={msg.id}
+                className={`p-2 rounded-lg ${
+                  isEvent
+                    ? "bg-yellow-500/10 border border-yellow-500/20"
+                    : isLocal
                       ? "bg-cyan-500/20"
                       : "bg-white/5"
-                  }`}
-                >
-                  <div className="flex items-center gap-2 mb-1">
-                    <span
-                      className="w-2 h-2 rounded-full"
-                      style={{ backgroundColor: msg.playerColor }}
-                    />
-                    <span className="text-white/70 text-xs font-medium">
-                      {msg.playerName}
-                    </span>
-                    <span className="text-white/30 text-xs">
-                      {new Date(msg.timestamp).toLocaleTimeString([], {
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })}
-                    </span>
-                  </div>
-                  <p
-                    className={`text-sm ${isEvent ? "text-yellow-200" : "text-white/90"}`}
-                  >
-                    {isEvent ? `🎲 ${msg.content}` : msg.content}
-                  </p>
+                }`}
+              >
+                <div className="flex items-center gap-2 mb-1">
+                  <span
+                    className="w-2 h-2 rounded-full"
+                    style={{ backgroundColor: msg.playerColor }}
+                  />
+                  <span className="text-white/70 text-xs font-medium">{msg.playerName}</span>
+                  <span className="text-white/30 text-xs">
+                    {new Date(msg.timestamp).toLocaleTimeString([], {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
+                  </span>
                 </div>
-              );
-            })
-          )}
+                <p className={`text-sm ${isEvent ? "text-yellow-200" : "text-white/90"}`}>
+                  {isEvent ? `🎲 ${msg.content}` : msg.content}
+                </p>
+              </div>
+            );
+          })
+        )}
         <div ref={messagesEndRef} />
       </div>
 
@@ -293,7 +273,7 @@ function ChatTab({
         <input
           type="text"
           value={messageInput}
-          onChange={e => onMessageChange(e.target.value)}
+          onChange={(e) => onMessageChange(e.target.value)}
           onKeyPress={onKeyPress}
           placeholder="Type a message..."
           className="flex-1 px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white text-sm placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-cyan-500/50"
@@ -311,11 +291,11 @@ function ChatTab({
 }
 
 // Library Tab
-function LibraryTab(
-  { onSpawnObject }: {
-    onSpawnObject: (type: "deck" | "d6" | "d20" | "token") => void;
-  },
-) {
+function LibraryTab({
+  onSpawnObject,
+}: {
+  onSpawnObject: (type: "deck" | "d6" | "d20" | "token") => void;
+}) {
   const items = [
     {
       type: "deck" as const,
@@ -345,19 +325,15 @@ function LibraryTab(
 
   return (
     <div className="grid grid-cols-2 gap-3">
-      {items.map(item => (
+      {items.map((item) => (
         <button
           key={item.type}
           onClick={() => onSpawnObject(item.type)}
           className="flex flex-col items-center gap-2 p-4 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 rounded-lg transition-all group"
         >
-          <span className="text-3xl group-hover:scale-110 transition-transform">
-            {item.icon}
-          </span>
+          <span className="text-3xl group-hover:scale-110 transition-transform">{item.icon}</span>
           <span className="text-white font-medium text-sm">{item.label}</span>
-          <span className="text-white/50 text-xs text-center">
-            {item.description}
-          </span>
+          <span className="text-white/50 text-xs text-center">{item.description}</span>
         </button>
       ))}
     </div>

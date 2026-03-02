@@ -17,14 +17,8 @@ export const agentConnectSchema = z.object({
     .string()
     .min(8, "sessionId must be at least 8 characters")
     .max(64, "sessionId must be at most 64 characters"),
-  displayName: z
-    .string()
-    .max(100, "displayName must be at most 100 characters")
-    .optional(),
-  projectPath: z
-    .string()
-    .max(500, "projectPath must be at most 500 characters")
-    .optional(),
+  displayName: z.string().max(100, "displayName must be at most 100 characters").optional(),
+  projectPath: z.string().max(500, "projectPath must be at most 500 characters").optional(),
   workingDirectory: z
     .string()
     .max(500, "workingDirectory must be at most 500 characters")
@@ -85,9 +79,7 @@ export type SendTaskRequest = z.infer<typeof sendTaskSchema>;
  * Schema for agent list query parameters
  */
 export const agentListQuerySchema = z.object({
-  status: z.enum(["online", "sleeping", "offline", "all"]).optional().default(
-    "all",
-  ),
+  status: z.enum(["online", "sleeping", "offline", "all"]).optional().default("all"),
   limit: z.coerce.number().int().min(1).max(100).optional().default(50),
   offset: z.coerce.number().int().min(0).optional().default(0),
 });
@@ -169,20 +161,18 @@ export interface SendTaskResponse {
 /**
  * Validate agent connect request
  */
-export function validateAgentConnect(
-  body: unknown,
-): { success: true; data: AgentConnectRequest; } | {
-  success: false;
-  error: string;
-} {
+export function validateAgentConnect(body: unknown):
+  | { success: true; data: AgentConnectRequest }
+  | {
+      success: false;
+      error: string;
+    } {
   const result = agentConnectSchema.safeParse(body);
   if (!result.success) {
     const issues = result.error.issues;
     const firstIssue = issues[0];
     const path = firstIssue?.path.join(".") || "";
-    const message = path
-      ? `${path}: ${firstIssue?.message}`
-      : firstIssue?.message;
+    const message = path ? `${path}: ${firstIssue?.message}` : firstIssue?.message;
     return { success: false, error: message || "Invalid request" };
   }
   return { success: true, data: result.data };
@@ -191,20 +181,18 @@ export function validateAgentConnect(
 /**
  * Validate agent heartbeat request
  */
-export function validateAgentHeartbeat(
-  body: unknown,
-): { success: true; data: AgentHeartbeatRequest; } | {
-  success: false;
-  error: string;
-} {
+export function validateAgentHeartbeat(body: unknown):
+  | { success: true; data: AgentHeartbeatRequest }
+  | {
+      success: false;
+      error: string;
+    } {
   const result = agentHeartbeatSchema.safeParse(body);
   if (!result.success) {
     const issues = result.error.issues;
     const firstIssue = issues[0];
     const path = firstIssue?.path.join(".") || "";
-    const message = path
-      ? `${path}: ${firstIssue?.message}`
-      : firstIssue?.message;
+    const message = path ? `${path}: ${firstIssue?.message}` : firstIssue?.message;
     return { success: false, error: message || "Invalid request" };
   }
   return { success: true, data: result.data };
@@ -213,20 +201,18 @@ export function validateAgentHeartbeat(
 /**
  * Validate send task request
  */
-export function validateSendTask(
-  body: unknown,
-): { success: true; data: SendTaskRequest; } | {
-  success: false;
-  error: string;
-} {
+export function validateSendTask(body: unknown):
+  | { success: true; data: SendTaskRequest }
+  | {
+      success: false;
+      error: string;
+    } {
   const result = sendTaskSchema.safeParse(body);
   if (!result.success) {
     const issues = result.error.issues;
     const firstIssue = issues[0];
     const path = firstIssue?.path.join(".") || "";
-    const message = path
-      ? `${path}: ${firstIssue?.message}`
-      : firstIssue?.message;
+    const message = path ? `${path}: ${firstIssue?.message}` : firstIssue?.message;
     return { success: false, error: message || "Invalid request" };
   }
   return { success: true, data: result.data };
@@ -242,9 +228,7 @@ export function generateAgentId(machineId: string, sessionId: string): string {
 /**
  * Parse agent ID into components
  */
-export function parseAgentId(
-  agentId: string,
-): { machineId: string; sessionId: string; } | null {
+export function parseAgentId(agentId: string): { machineId: string; sessionId: string } | null {
   const parts = agentId.split(":");
   if (parts.length !== 2 || !parts[0] || !parts[1]) {
     return null;
@@ -269,14 +253,8 @@ export const connectionRequestSchema = z.object({
     .string()
     .min(8, "sessionId must be at least 8 characters")
     .max(64, "sessionId must be at most 64 characters"),
-  displayName: z
-    .string()
-    .max(100, "displayName must be at most 100 characters")
-    .optional(),
-  projectPath: z
-    .string()
-    .max(500, "projectPath must be at most 500 characters")
-    .optional(),
+  displayName: z.string().max(100, "displayName must be at most 100 characters").optional(),
+  projectPath: z.string().max(500, "projectPath must be at most 500 characters").optional(),
 });
 
 export type ConnectionRequestInput = z.infer<typeof connectionRequestSchema>;
@@ -284,20 +262,18 @@ export type ConnectionRequestInput = z.infer<typeof connectionRequestSchema>;
 /**
  * Validate connection request
  */
-export function validateConnectionRequest(
-  body: unknown,
-): { success: true; data: ConnectionRequestInput; } | {
-  success: false;
-  error: string;
-} {
+export function validateConnectionRequest(body: unknown):
+  | { success: true; data: ConnectionRequestInput }
+  | {
+      success: false;
+      error: string;
+    } {
   const result = connectionRequestSchema.safeParse(body);
   if (!result.success) {
     const issues = result.error.issues;
     const firstIssue = issues[0];
     const path = firstIssue?.path.join(".") || "";
-    const message = path
-      ? `${path}: ${firstIssue?.message}`
-      : firstIssue?.message;
+    const message = path ? `${path}: ${firstIssue?.message}` : firstIssue?.message;
     return { success: false, error: message || "Invalid request" };
   }
   return { success: true, data: result.data };
@@ -341,20 +317,18 @@ export type AgentMessageInput = z.infer<typeof agentMessageSchema>;
 /**
  * Validate agent message
  */
-export function validateAgentMessage(
-  body: unknown,
-): { success: true; data: AgentMessageInput; } | {
-  success: false;
-  error: string;
-} {
+export function validateAgentMessage(body: unknown):
+  | { success: true; data: AgentMessageInput }
+  | {
+      success: false;
+      error: string;
+    } {
   const result = agentMessageSchema.safeParse(body);
   if (!result.success) {
     const issues = result.error.issues;
     const firstIssue = issues[0];
     const path = firstIssue?.path.join(".") || "";
-    const message = path
-      ? `${path}: ${firstIssue?.message}`
-      : firstIssue?.message;
+    const message = path ? `${path}: ${firstIssue?.message}` : firstIssue?.message;
     return { success: false, error: message || "Invalid request" };
   }
   return { success: true, data: result.data };

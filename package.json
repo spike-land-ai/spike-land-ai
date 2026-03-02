@@ -10,10 +10,13 @@
     "test": "yarn workspaces foreach -Ap run test",
     "typecheck": "yarn workspaces foreach -Apt run typecheck",
     "lint": "yarn workspaces foreach -Ap run lint",
+    "format": "biome format --write .",
+    "format:check": "biome format .",
     "changeset": "changeset",
     "release": "changeset publish"
   },
   "devDependencies": {
+    "@biomejs/biome": "^2.4.4",
     "@changesets/cli": "2.29.8",
     "@types/node": "25.3.2",
     "@vitest/coverage-v8": "4.0.18",
@@ -27,6 +30,7 @@
   "resolutions": {
     "eslint": "10.0.2",
     "typescript": "5.9.3",
-    "@modelcontextprotocol/sdk": "1.27.1"
+    "@modelcontextprotocol/sdk": "1.27.1",
+    "zod": "3.24.4"
   }
 }

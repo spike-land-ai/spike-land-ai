@@ -287,7 +287,7 @@ export class AuditLogger {
       action: AuditAction;
       metadata: JsonValue;
       createdAt: Date;
-      user: { email: string | null; name: string | null; };
+      user: { email: string | null; name: string | null };
     }>
   > {
     return prisma.auditLog.findMany({
@@ -313,9 +313,7 @@ export class AuditLogger {
   /**
    * Get recent audit logs for admin dashboard
    */
-  static async getRecentLogs(
-    limit = 100,
-  ): Promise<
+  static async getRecentLogs(limit = 100): Promise<
     Array<{
       id: string;
       userId: string;
@@ -323,7 +321,7 @@ export class AuditLogger {
       targetId: string | null;
       metadata: JsonValue;
       createdAt: Date;
-      user: { email: string | null; name: string | null; };
+      user: { email: string | null; name: string | null };
     }>
   > {
     return prisma.auditLog.findMany({

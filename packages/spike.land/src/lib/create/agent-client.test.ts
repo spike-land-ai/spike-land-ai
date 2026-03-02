@@ -148,9 +148,9 @@ describe("callClaude", () => {
     const mockClient = {
       messages: {
         stream: vi.fn().mockReturnValue({
-          finalMessage: vi.fn().mockRejectedValue(
-            Object.assign(new Error("Server error"), { status: 500 }),
-          ),
+          finalMessage: vi
+            .fn()
+            .mockRejectedValue(Object.assign(new Error("Server error"), { status: 500 })),
         }),
       },
     };
@@ -174,9 +174,9 @@ describe("callClaude", () => {
     const mockClient = {
       messages: {
         stream: vi.fn().mockReturnValue({
-          finalMessage: vi.fn().mockRejectedValue(
-            Object.assign(new Error("Server error"), { status: 500 }),
-          ),
+          finalMessage: vi
+            .fn()
+            .mockRejectedValue(Object.assign(new Error("Server error"), { status: 500 })),
         }),
       },
     };
@@ -199,9 +199,9 @@ describe("callClaude", () => {
     const mockClient = {
       messages: {
         stream: vi.fn().mockReturnValue({
-          finalMessage: vi.fn().mockRejectedValue(
-            Object.assign(new Error("Server error"), { status: 500 }),
-          ),
+          finalMessage: vi
+            .fn()
+            .mockRejectedValue(Object.assign(new Error("Server error"), { status: 500 })),
         }),
       },
     };

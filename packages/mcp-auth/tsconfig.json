@@ -1,31 +1,19 @@
 {
-    "extends": "@spike-land-ai/tsconfig/tsconfig.worker.json",
-    "compilerOptions": {
-        "target": "es2022",
-        "lib": [
-            "es2022",
-            "webworker"
-        ],
-        "module": "es2022",
-        "moduleResolution": "bundler",
-        "types": [
-            "@cloudflare/workers-types/2023-07-01"
-        ],
-        "resolveJsonModule": true,
-        "allowJs": true,
-        "checkJs": false,
-        "noEmit": true,
-        "isolatedModules": true,
-        "allowSyntheticDefaultImports": true,
-        "forceConsistentCasingInFileNames": true,
-        "strict": true,
-        "skipLibCheck": true
-    },
-    "include": [
-        "src"
-    ],
-    "exclude": [
-        "node_modules",
-        "dist"
-    ]
+  "extends": "@spike-land-ai/tsconfig/tsconfig.worker.json",
+  "compilerOptions": {
+    "target": "es2022",
+    "lib": ["es2022", "webworker"],
+    "module": "es2022",
+    "moduleResolution": "bundler",
+    "types": ["@cloudflare/workers-types/2023-07-01"],
+    "resolveJsonModule": true,
+    "noEmit": true,
+    "isolatedModules": true,
+    "allowSyntheticDefaultImports": true,
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
+    "skipLibCheck": true
+  },
+  "include": ["src"],
+  "exclude": ["node_modules", "dist"]
 }

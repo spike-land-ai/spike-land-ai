@@ -10,13 +10,7 @@ const EscalationLevelDefinitionSchema = z.object({
 });
 
 const RoutingConditionSchema = z.object({
-  field: z.enum([
-    "sentiment",
-    "priority",
-    "platform",
-    "content",
-    "sender_followers",
-  ]),
+  field: z.enum(["sentiment", "priority", "platform", "content", "sender_followers"]),
   operator: z.enum(["equals", "contains", "greater_than", "less_than"]),
   value: z.union([z.string(), z.number()]),
 });

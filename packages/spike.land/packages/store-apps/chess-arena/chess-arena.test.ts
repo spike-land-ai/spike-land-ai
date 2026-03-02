@@ -14,7 +14,7 @@ describe("chess-arena tools", () => {
   });
 
   it("has unique tool names", () => {
-    const names = chessArenaTools.map(t => t.name);
+    const names = chessArenaTools.map((t) => t.name);
     expect(new Set(names).size).toBe(names.length);
   });
 
@@ -71,17 +71,15 @@ describe("chess-arena tools", () => {
 
   describe("dependency chains", () => {
     it("chess_create_game enables join, move, and resign", () => {
-      const tool = chessArenaTools.find(t => t.name === "chess_create_game");
+      const tool = chessArenaTools.find((t) => t.name === "chess_create_game");
       expect(tool?.dependencies?.enables).toEqual(
         expect.arrayContaining(["chess_join_game", "chess_make_move", "chess_resign"]),
       );
     });
 
     it("chess_join_game enables make_move", () => {
-      const tool = chessArenaTools.find(t => t.name === "chess_join_game");
-      expect(tool?.dependencies?.enables).toEqual(
-        expect.arrayContaining(["chess_make_move"]),
-      );
+      const tool = chessArenaTools.find((t) => t.name === "chess_join_game");
+      expect(tool?.dependencies?.enables).toEqual(expect.arrayContaining(["chess_make_move"]));
     });
   });
 
@@ -103,7 +101,7 @@ describe("chess-arena tools", () => {
       ];
 
       for (const name of readOnlyNames) {
-        const tool = chessArenaTools.find(t => t.name === name);
+        const tool = chessArenaTools.find((t) => t.name === name);
         expect(tool?.annotations?.readOnlyHint, `${name} should have readOnlyHint`).toBe(true);
       }
     });

@@ -74,16 +74,11 @@ export function BlogPreviewSection() {
           {/* Header */}
           <div className="flex flex-col md:flex-row items-end justify-between mb-16 gap-6">
             <div className="max-w-2xl">
-              <motion.div
-                variants={itemVariants}
-                className="flex items-center gap-2 mb-4"
-              >
+              <motion.div variants={itemVariants} className="flex items-center gap-2 mb-4">
                 <span className="p-2 rounded-lg bg-background/5 border border-border text-cyan-400">
                   <Newspaper className="w-5 h-5" />
                 </span>
-                <span className="text-sm font-medium text-cyan-400">
-                  Latest Updates
-                </span>
+                <span className="text-sm font-medium text-cyan-400">Latest Updates</span>
               </motion.div>
 
               <motion.h2
@@ -96,10 +91,7 @@ export function BlogPreviewSection() {
                 </span>
               </motion.h2>
 
-              <motion.p
-                variants={itemVariants}
-                className="text-lg text-muted-foreground"
-              >
+              <motion.p variants={itemVariants} className="text-lg text-muted-foreground">
                 Engineering deep-dives, tutorials, and platform updates.
               </motion.p>
             </div>
@@ -121,11 +113,7 @@ export function BlogPreviewSection() {
           {/* Cards Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {posts.map((post, index) => (
-              <motion.div
-                key={index}
-                variants={itemVariants}
-                className="group relative h-full"
-              >
+              <motion.div key={index} variants={itemVariants} className="group relative h-full">
                 {/* Glow behind the card on hover */}
                 <div className="absolute -inset-4 bg-gradient-to-r from-cyan-500/0 via-cyan-500/20 to-purple-500/0 opacity-0 group-hover:opacity-100 blur-2xl transition-opacity duration-700 z-0" />
 

@@ -62,11 +62,7 @@ describe("createEngagementCollector", () => {
       collector.addSection("hero");
       collector.addSection("features");
       collector.addSection("pricing");
-      expect(collector.data.sectionsViewed).toEqual([
-        "hero",
-        "features",
-        "pricing",
-      ]);
+      expect(collector.data.sectionsViewed).toEqual(["hero", "features", "pricing"]);
     });
   });
 
@@ -165,10 +161,7 @@ describe("flushEngagement", () => {
     flushEngagement(data);
 
     expect(mockSendBeacon).toHaveBeenCalledTimes(1);
-    expect(mockSendBeacon).toHaveBeenCalledWith(
-      "/api/bazdmeg/engagement",
-      expect.anything(),
-    );
+    expect(mockSendBeacon).toHaveBeenCalledWith("/api/bazdmeg/engagement", expect.anything());
 
     // Verify blob content
     const blob = mockSendBeacon.mock.calls[0]![1] as Blob;

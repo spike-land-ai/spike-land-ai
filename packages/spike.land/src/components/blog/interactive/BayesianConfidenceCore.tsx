@@ -35,8 +35,9 @@ export type BayesianConfidenceCoreProps = {
 // Simple approximation of beta distribution PDF
 function betaPdf(x: number, alpha: number, beta: number): number {
   if (x === 0 || x === 1) return 0;
-  const maxVal = Math.pow((alpha - 1) / (alpha + beta - 2), alpha - 1)
-    * Math.pow((beta - 1) / (alpha + beta - 2), beta - 1);
+  const maxVal =
+    Math.pow((alpha - 1) / (alpha + beta - 2), alpha - 1) *
+    Math.pow((beta - 1) / (alpha + beta - 2), beta - 1);
   const val = Math.pow(x, alpha - 1) * Math.pow(1 - x, beta - 1);
   return maxVal > 0 ? val / maxVal : val;
 }
@@ -90,9 +91,7 @@ export const BayesianConfidenceCore: FC<BayesianConfidenceCoreProps> = ({
 
   const isHighConfidence = mean > 0.7;
   const isLowConfidence = mean < 0.4 && total > 2;
-  const themeColor = isHighConfidence
-    ? "#10b981"
-    : (isLowConfidence ? "#ef4444" : "#3b82f6");
+  const themeColor = isHighConfidence ? "#10b981" : isLowConfidence ? "#ef4444" : "#3b82f6";
 
   return (
     <svg
@@ -108,20 +107,8 @@ export const BayesianConfidenceCore: FC<BayesianConfidenceCoreProps> = ({
       }}
     >
       <defs>
-        <pattern
-          id={`grid-${id}`}
-          x="0"
-          y="0"
-          width="40"
-          height="40"
-          patternUnits="userSpaceOnUse"
-        >
-          <path
-            d="M 40 0 L 0 0 0 40"
-            fill="none"
-            stroke={COLORS.textMuted}
-            strokeOpacity={0.05}
-          />
+        <pattern id={`grid-${id}`} x="0" y="0" width="40" height="40" patternUnits="userSpaceOnUse">
+          <path d="M 40 0 L 0 0 0 40" fill="none" stroke={COLORS.textMuted} strokeOpacity={0.05} />
         </pattern>
 
         <linearGradient id={`curveGrad-${id}`} x1="0" y1="0" x2="0" y2="1">
@@ -136,13 +123,7 @@ export const BayesianConfidenceCore: FC<BayesianConfidenceCoreProps> = ({
             <feMergeNode in="SourceGraphic" />
           </feMerge>
         </filter>
-        <filter
-          id={`strongGlow-${id}`}
-          x="-50%"
-          y="-50%"
-          width="200%"
-          height="200%"
-        >
+        <filter id={`strongGlow-${id}`} x="-50%" y="-50%" width="200%" height="200%">
           <feGaussianBlur stdDeviation="30" result="blur" />
           <feMerge>
             <feMergeNode in="blur" />
@@ -164,11 +145,8 @@ export const BayesianConfidenceCore: FC<BayesianConfidenceCoreProps> = ({
           opacity={0.5}
         />
 
-        {[0, 0.25, 0.5, 0.75, 1].map(tick => (
-          <g
-            key={`tick-${tick}`}
-            transform={`translate(${startX + tick * graphWidth}, ${baseY})`}
-          >
+        {[0, 0.25, 0.5, 0.75, 1].map((tick) => (
+          <g key={`tick-${tick}`} transform={`translate(${startX + tick * graphWidth}, ${baseY})`}>
             <line
               x1={0}
               y1={0}

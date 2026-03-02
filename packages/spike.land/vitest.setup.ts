@@ -1,10 +1,8 @@
 import * as matchers from "@testing-library/jest-dom/matchers";
 import { expect } from "vitest";
 import "@testing-library/jest-dom/vitest";
-import { mcpMatchers } from "./src/lib/mcp/server/__test-utils__/matchers";
 
 expect.extend(matchers);
-expect.extend(mcpMatchers);
 
 import { cleanup } from "@testing-library/react";
 import { afterEach, vi } from "vitest";
@@ -14,18 +12,18 @@ process.env.DATABASE_URL = "postgresql://mock:5432/mock";
 
 // Polyfill for jsdom - missing pointer capture methods and scrollIntoView
 if (typeof Element !== "undefined") {
-  Element.prototype.hasPointerCapture = Element.prototype.hasPointerCapture
-    || function() {
+  Element.prototype.hasPointerCapture =
+    Element.prototype.hasPointerCapture ||
+    function () {
       return false;
     };
-  Element.prototype.setPointerCapture = Element.prototype.setPointerCapture
-    || function() {};
-  Element.prototype.releasePointerCapture = Element.prototype.releasePointerCapture
-    || function() {};
-  Element.prototype.scrollIntoView = Element.prototype.scrollIntoView
-    || function() {};
-  Element.prototype.animate = Element.prototype.animate
-    || function() {
+  Element.prototype.setPointerCapture = Element.prototype.setPointerCapture || function () {};
+  Element.prototype.releasePointerCapture =
+    Element.prototype.releasePointerCapture || function () {};
+  Element.prototype.scrollIntoView = Element.prototype.scrollIntoView || function () {};
+  Element.prototype.animate =
+    Element.prototype.animate ||
+    function () {
       return {
         finished: Promise.resolve(),
         cancel: () => {},
@@ -57,7 +55,7 @@ global.ResizeObserver = class ResizeObserver {
 if (typeof window !== "undefined") {
   Object.defineProperty(window, "matchMedia", {
     writable: true,
-    value: vi.fn().mockImplementation(query => ({
+    value: vi.fn().mockImplementation((query) => ({
       matches: false,
       media: query,
       onchange: null,

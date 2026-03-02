@@ -62,7 +62,7 @@ function getApiKey(): string {
 async function julesRequest<T>(
   endpoint: string,
   options: RequestInit = {},
-): Promise<{ data: T | null; error: string | null; }> {
+): Promise<{ data: T | null; error: string | null }> {
   const apiKey = getApiKey();
   const url = `${JULES_BASE_URL}${endpoint}`;
 
@@ -112,8 +112,11 @@ async function julesRequest<T>(
 /**
  * List all available sources (GitHub repositories)
  */
-export async function listSources(pageSize = 50, pageToken?: string): Promise<{
-  data: { sources: JulesSource[]; nextPageToken?: string; } | null;
+export async function listSources(
+  pageSize = 50,
+  pageToken?: string,
+): Promise<{
+  data: { sources: JulesSource[]; nextPageToken?: string } | null;
   error: string | null;
 }> {
   const params = new URLSearchParams();
@@ -121,9 +124,7 @@ export async function listSources(pageSize = 50, pageToken?: string): Promise<{
   if (pageToken) params.set("pageToken", pageToken);
 
   const query = params.toString();
-  return julesRequest<ListSourcesResponse>(
-    `/sources${query ? `?${query}` : ""}`,
-  );
+  return julesRequest<ListSourcesResponse>(`/sources${query ? `?${query}` : ""}`);
 }
 
 /**
@@ -131,7 +132,7 @@ export async function listSources(pageSize = 50, pageToken?: string): Promise<{
  */
 export async function getSource(
   name: string,
-): Promise<{ data: JulesSource | null; error: string | null; }> {
+): Promise<{ data: JulesSource | null; error: string | null }> {
   return julesRequest<JulesSource>(`/${name}`);
 }
 
@@ -142,8 +143,11 @@ export async function getSource(
 /**
  * List all sessions with optional pagination
  */
-export async function listSessions(pageSize = 20, pageToken?: string): Promise<{
-  data: { sessions: JulesSession[]; nextPageToken?: string; } | null;
+export async function listSessions(
+  pageSize = 20,
+  pageToken?: string,
+): Promise<{
+  data: { sessions: JulesSession[]; nextPageToken?: string } | null;
   error: string | null;
 }> {
   const params = new URLSearchParams();
@@ -151,9 +155,7 @@ export async function listSessions(pageSize = 20, pageToken?: string): Promise<{
   if (pageToken) params.set("pageToken", pageToken);
 
   const query = params.toString();
-  return julesRequest<ListSessionsResponse>(
-    `/sessions${query ? `?${query}` : ""}`,
-  );
+  return julesRequest<ListSessionsResponse>(`/sessions${query ? `?${query}` : ""}`);
 }
 
 /**
@@ -161,11 +163,9 @@ export async function listSessions(pageSize = 20, pageToken?: string): Promise<{
  */
 export async function getSession(
   sessionName: string,
-): Promise<{ data: JulesSession | null; error: string | null; }> {
+): Promise<{ data: JulesSession | null; error: string | null }> {
   validateSessionId(sessionName);
-  const name = sessionName.startsWith("sessions/")
-    ? sessionName
-    : `sessions/${sessionName}`;
+  const name = sessionName.startsWith("sessions/") ? sessionName : `sessions/${sessionName}`;
   return julesRequest<JulesSession>(`/${name}`);
 }
 
@@ -174,7 +174,7 @@ export async function getSession(
  */
 export async function createSession(
   request: CreateSessionRequest,
-): Promise<{ data: JulesSession | null; error: string | null; }> {
+): Promise<{ data: JulesSession | null; error: string | null }> {
   return julesRequest<JulesSession>("/sessions", {
     method: "POST",
     body: JSON.stringify(request),
@@ -186,11 +186,9 @@ export async function createSession(
  */
 export async function approvePlan(
   sessionName: string,
-): Promise<{ data: JulesSession | null; error: string | null; }> {
+): Promise<{ data: JulesSession | null; error: string | null }> {
   validateSessionId(sessionName);
-  const name = sessionName.startsWith("sessions/")
-    ? sessionName
-    : `sessions/${sessionName}`;
+  const name = sessionName.startsWith("sessions/") ? sessionName : `sessions/${sessionName}`;
   return julesRequest<JulesSession>(`/${name}:approvePlan`, {
     method: "POST",
   });
@@ -202,11 +200,9 @@ export async function approvePlan(
 export async function sendMessage(
   sessionName: string,
   message: string,
-): Promise<{ data: JulesSession | null; error: string | null; }> {
+): Promise<{ data: JulesSession | null; error: string | null }> {
   validateSessionId(sessionName);
-  const name = sessionName.startsWith("sessions/")
-    ? sessionName
-    : `sessions/${sessionName}`;
+  const name = sessionName.startsWith("sessions/") ? sessionName : `sessions/${sessionName}`;
   return julesRequest<JulesSession>(`/${name}:sendMessage`, {
     method: "POST",
     body: JSON.stringify({ prompt: message }),
@@ -225,21 +221,17 @@ export async function listActivities(
   pageSize = 50,
   pageToken?: string,
 ): Promise<{
-  data: { activities: JulesActivity[]; nextPageToken?: string; } | null;
+  data: { activities: JulesActivity[]; nextPageToken?: string } | null;
   error: string | null;
 }> {
   validateSessionId(sessionName);
-  const name = sessionName.startsWith("sessions/")
-    ? sessionName
-    : `sessions/${sessionName}`;
+  const name = sessionName.startsWith("sessions/") ? sessionName : `sessions/${sessionName}`;
   const params = new URLSearchParams();
   if (pageSize) params.set("pageSize", String(pageSize));
   if (pageToken) params.set("pageToken", pageToken);
 
   const query = params.toString();
-  return julesRequest<ListActivitiesResponse>(
-    `/${name}/activities${query ? `?${query}` : ""}`,
-  );
+  return julesRequest<ListActivitiesResponse>(`/${name}/activities${query ? `?${query}` : ""}`);
 }
 
 /**
@@ -247,7 +239,7 @@ export async function listActivities(
  */
 export async function getActivity(
   activityName: string,
-): Promise<{ data: JulesActivity | null; error: string | null; }> {
+): Promise<{ data: JulesActivity | null; error: string | null }> {
   return julesRequest<JulesActivity>(`/${activityName}`);
 }
 

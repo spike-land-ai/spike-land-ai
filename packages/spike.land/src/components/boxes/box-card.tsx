@@ -10,12 +10,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import type { Box, BoxStatus, BoxTier } from "@prisma/client";
 import { BoxActionType } from "@prisma/client";
 import { Copy, Monitor, Play, RefreshCw, Square, Trash2 } from "lucide-react";
@@ -23,7 +18,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 
-type BoxWithTier = Box & { tier: BoxTier; };
+type BoxWithTier = Box & { tier: BoxTier };
 
 interface BoxCardProps {
   box: BoxWithTier;
@@ -74,10 +69,7 @@ export function BoxCard({ box }: BoxCardProps) {
   };
 
   const handleClone = async () => {
-    const newName = prompt(
-      `Enter name for clone of ${box.name}:`,
-      `Clone of ${box.name}`,
-    );
+    const newName = prompt(`Enter name for clone of ${box.name}:`, `Clone of ${box.name}`);
     if (newName === null) return; // Cancelled
 
     setIsLoading(true);
@@ -96,9 +88,7 @@ export function BoxCard({ box }: BoxCardProps) {
       toast.success("Box cloned successfully");
       router.refresh();
     } catch (error) {
-      toast.error(
-        error instanceof Error ? error.message : "Failed to clone box",
-      );
+      toast.error(error instanceof Error ? error.message : "Failed to clone box");
       console.error(error);
     } finally {
       setIsLoading(false);

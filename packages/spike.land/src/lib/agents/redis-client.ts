@@ -137,9 +137,7 @@ export async function processHeartbeat(
 
   // Update agent data if needed
   if (updates?.projectPath || updates?.workingDirectory) {
-    const existingData = await redis.get<string>(
-      AGENT_KEYS.AGENT_DATA(agentId),
-    );
+    const existingData = await redis.get<string>(AGENT_KEYS.AGENT_DATA(agentId));
     if (existingData) {
       const data = JSON.parse(existingData) as AgentRedisData;
       if (updates.projectPath) data.projectPath = updates.projectPath;
@@ -156,13 +154,9 @@ export async function processHeartbeat(
   // Update tool usage stats with TTL refresh to prevent orphaned hash keys
   if (updates?.toolUsage) {
     for (const [tool, count] of Object.entries(updates.toolUsage)) {
-      promises.push(
-        redis.hincrby(AGENT_KEYS.AGENT_TOOL_STATS(agentId), tool, count),
-      );
+      promises.push(redis.hincrby(AGENT_KEYS.AGENT_TOOL_STATS(agentId), tool, count));
     }
-    promises.push(
-      redis.expire(AGENT_KEYS.AGENT_TOOL_STATS(agentId), TOOL_STATS_TTL),
-    );
+    promises.push(redis.expire(AGENT_KEYS.AGENT_TOOL_STATS(agentId), TOOL_STATS_TTL));
   }
 
   // Log activity if provided
@@ -176,10 +170,7 @@ export async function processHeartbeat(
 /**
  * Log agent activity
  */
-export async function logAgentActivity(
-  agentId: string,
-  activity: AgentActivity,
-): Promise<void> {
+export async function logAgentActivity(agentId: string, activity: AgentActivity): Promise<void> {
   const key = AGENT_KEYS.AGENT_ACTIVITY(agentId);
   await Promise.all([
     redis.lpush(key, JSON.stringify(activity)),
@@ -191,16 +182,9 @@ export async function logAgentActivity(
 /**
  * Get agent activity log
  */
-export async function getAgentActivity(
-  agentId: string,
-  limit = 50,
-): Promise<AgentActivity[]> {
-  const items = await redis.lrange<string>(
-    AGENT_KEYS.AGENT_ACTIVITY(agentId),
-    0,
-    limit - 1,
-  );
-  return items.map(item => JSON.parse(item) as AgentActivity);
+export async function getAgentActivity(agentId: string, limit = 50): Promise<AgentActivity[]> {
+  const items = await redis.lrange<string>(AGENT_KEYS.AGENT_ACTIVITY(agentId), 0, limit - 1);
+  return items.map((item) => JSON.parse(item) as AgentActivity);
 }
 
 /**
@@ -214,9 +198,7 @@ export async function getAgentStatus(agentId: string): Promise<AgentStatus> {
 /**
  * Get agent data
  */
-export async function getAgentData(
-  agentId: string,
-): Promise<AgentRedisData | null> {
+export async function getAgentData(agentId: string): Promise<AgentRedisData | null> {
   const data = await redis.get<string>(AGENT_KEYS.AGENT_DATA(agentId));
   return data ? (JSON.parse(data) as AgentRedisData) : null;
 }
@@ -226,35 +208,26 @@ export async function getAgentData(
  */
 export async function getUserAgents(
   userId: string,
-): Promise<Array<AgentRedisData & { status: AgentStatus; }>> {
+): Promise<Array<AgentRedisData & { status: AgentStatus }>> {
   const agentIds = await redis.smembers(AGENT_KEYS.USER_AGENTS(userId));
 
   if (agentIds.length === 0) return [];
 
   const results = await Promise.all(
-    agentIds.map(async agentId => {
-      const [data, status] = await Promise.all([
-        getAgentData(agentId),
-        getAgentStatus(agentId),
-      ]);
+    agentIds.map(async (agentId) => {
+      const [data, status] = await Promise.all([getAgentData(agentId), getAgentStatus(agentId)]);
       return data ? { ...data, status } : null;
     }),
   );
 
-  return results.filter(Boolean) as Array<
-    AgentRedisData & { status: AgentStatus; }
-  >;
+  return results.filter(Boolean) as Array<AgentRedisData & { status: AgentStatus }>;
 }
 
 /**
  * Get tool usage statistics for an agent
  */
-export async function getAgentToolStats(
-  agentId: string,
-): Promise<Record<string, number>> {
-  const stats = await redis.hgetall<Record<string, string>>(
-    AGENT_KEYS.AGENT_TOOL_STATS(agentId),
-  );
+export async function getAgentToolStats(agentId: string): Promise<Record<string, number>> {
+  const stats = await redis.hgetall<Record<string, string>>(AGENT_KEYS.AGENT_TOOL_STATS(agentId));
   if (!stats) return {};
 
   const result: Record<string, number> = {};
@@ -267,10 +240,7 @@ export async function getAgentToolStats(
 /**
  * Disconnect an agent (mark as offline)
  */
-export async function disconnectAgent(
-  agentId: string,
-  userId: string,
-): Promise<void> {
+export async function disconnectAgent(agentId: string, userId: string): Promise<void> {
   await Promise.all([
     // Remove status key (will show as offline)
     redis.del(AGENT_KEYS.AGENT_STATUS(agentId)),
@@ -293,10 +263,7 @@ export async function disconnectAgent(
 /**
  * Permanently remove an agent
  */
-export async function removeAgent(
-  agentId: string,
-  userId: string,
-): Promise<void> {
+export async function removeAgent(agentId: string, userId: string): Promise<void> {
   await Promise.all([
     redis.del(AGENT_KEYS.AGENT_DATA(agentId)),
     redis.del(AGENT_KEYS.AGENT_STATUS(agentId)),
@@ -317,24 +284,17 @@ export async function sendTaskToAgent(
   const fullTask: AgentTask = { ...task, status: "pending" };
   const key = AGENT_KEYS.AGENT_TASK_QUEUE(agentId);
 
-  await Promise.all([
-    redis.lpush(key, JSON.stringify(fullTask)),
-    redis.expire(key, TASK_TTL),
-  ]);
+  await Promise.all([redis.lpush(key, JSON.stringify(fullTask)), redis.expire(key, TASK_TTL)]);
 }
 
 /**
  * Get pending tasks for an agent (called by agent during heartbeat)
  */
 export async function getPendingTasks(agentId: string): Promise<AgentTask[]> {
-  const items = await redis.lrange<string>(
-    AGENT_KEYS.AGENT_TASK_QUEUE(agentId),
-    0,
-    -1,
-  );
+  const items = await redis.lrange<string>(AGENT_KEYS.AGENT_TASK_QUEUE(agentId), 0, -1);
   return items
-    .map(item => JSON.parse(item) as AgentTask)
-    .filter(task => task.status === "pending");
+    .map((item) => JSON.parse(item) as AgentTask)
+    .filter((task) => task.status === "pending");
 }
 
 /**
@@ -348,17 +308,14 @@ export async function popTask(agentId: string): Promise<AgentTask | null> {
 /**
  * Publish SSE event for agent updates
  */
-export async function publishAgentEvent(
-  userId: string,
-  event: AgentSSEEvent,
-): Promise<void> {
+export async function publishAgentEvent(userId: string, event: AgentSSEEvent): Promise<void> {
   const channel = `sse:agents:${userId}`;
   const key = AGENT_KEYS.SSE_AGENT_EVENTS(userId);
   const payload = JSON.stringify(event);
 
   await Promise.all([
     // Publish to Pub/Sub for real-time delivery
-    redis.publish(channel, payload).catch(err => {
+    redis.publish(channel, payload).catch((err) => {
       logger.error(`[Agent SSE] Failed to publish to channel ${channel}:`, err);
     }),
     // Store in List for reliable delivery
@@ -366,7 +323,7 @@ export async function publishAgentEvent(
       await redis.lpush(key, payload);
       await redis.expire(key, SSE_EVENT_TTL);
       await redis.ltrim(key, 0, 49); // Keep last 50 events
-    })().catch(err => {
+    })().catch((err) => {
       logger.error("[Agent SSE] Failed to store event in list:", err);
     }),
   ]);
@@ -397,15 +354,13 @@ export async function getAgentSSEEvents(
 
   try {
     const events = (await redis.eval(script, [key], [afterTimestamp])) as string[];
-    return events
-      .map(e => JSON.parse(e) as AgentSSEEvent)
-      .reverse(); // Oldest first
+    return events.map((e) => JSON.parse(e) as AgentSSEEvent).reverse(); // Oldest first
   } catch {
     // Fallback to client-side filtering if Lua script fails
     const events = await redis.lrange<string>(key, 0, -1);
     return events
-      .map(e => JSON.parse(e) as AgentSSEEvent)
-      .filter(e => e.timestamp > afterTimestamp)
+      .map((e) => JSON.parse(e) as AgentSSEEvent)
+      .filter((e) => e.timestamp > afterTimestamp)
       .reverse();
   }
 }

@@ -1,10 +1,5 @@
 import { describe, expect, it } from "vitest";
-import {
-  formatBytes,
-  formatPrice,
-  getStatusBadgeVariant,
-  getStatusColor,
-} from "./formatters";
+import { formatBytes, formatPrice, getStatusBadgeVariant, getStatusColor } from "./formatters";
 
 describe("formatBytes", () => {
   it("returns '0 B' for zero bytes", () => {

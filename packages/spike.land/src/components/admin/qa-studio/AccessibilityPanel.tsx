@@ -9,10 +9,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Accessibility, Loader2 } from "lucide-react";
 import { qaAccessibility } from "@/lib/qa-studio/actions";
-import {
-  isActionError,
-  type QaAccessibilityResult,
-} from "@/lib/qa-studio/types";
+import { isActionError, type QaAccessibilityResult } from "@/lib/qa-studio/types";
 
 type PanelStatus = "idle" | "loading" | "success" | "error";
 
@@ -27,9 +24,7 @@ function getScoreVariant(score: number): "success" | "warning" | "destructive" {
   return "destructive";
 }
 
-function getImpactBadgeVariant(
-  impact: string,
-): "destructive" | "warning" | "default" | "outline" {
+function getImpactBadgeVariant(impact: string): "destructive" | "warning" | "default" | "outline" {
   switch (impact.toLowerCase()) {
     case "critical":
       return "destructive";
@@ -77,9 +72,7 @@ export function AccessibilityPanel() {
       setResult(data);
       setStatus("success");
     } catch (err: unknown) {
-      const message = err instanceof Error
-        ? err.message
-        : "Accessibility scan failed";
+      const message = err instanceof Error ? err.message : "Accessibility scan failed";
       setError(message);
       setStatus("error");
     }
@@ -95,15 +88,8 @@ export function AccessibilityPanel() {
             <Accessibility className="h-4 w-4 text-primary" />
             Accessibility
           </CardTitle>
-          <Button
-            size="sm"
-            onClick={handleScan}
-            disabled={status === "loading"}
-            className="h-7"
-          >
-            {status === "loading"
-              ? <Loader2 className="h-3 w-3 animate-spin mr-1.5" />
-              : null}
+          <Button size="sm" onClick={handleScan} disabled={status === "loading"} className="h-7">
+            {status === "loading" ? <Loader2 className="h-3 w-3 animate-spin mr-1.5" /> : null}
             Scan
           </Button>
         </div>
@@ -128,62 +114,46 @@ export function AccessibilityPanel() {
             {/* Score display */}
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <span className="text-xs text-muted-foreground">
-                  Score ({result.standard})
-                </span>
+                <span className="text-xs text-muted-foreground">Score ({result.standard})</span>
                 <span className="text-lg font-bold tabular-nums">
                   {result.score}
-                  <span className="text-xs text-muted-foreground font-normal">
-                    /100
-                  </span>
+                  <span className="text-xs text-muted-foreground font-normal">/100</span>
                 </span>
               </div>
-              <Progress
-                value={result.score}
-                variant={scoreVariant}
-                glow
-                className="h-2.5"
-              />
+              <Progress value={result.score} variant={scoreVariant} glow className="h-2.5" />
             </div>
 
             {/* Violations list */}
-            {result.violations.length === 0
-              ? (
-                <div className="rounded-lg border border-green-500/30 bg-green-500/5 p-3 text-xs text-green-400 text-center">
-                  No accessibility violations found
-                </div>
-              )
-              : (
-                <ScrollArea className="h-[180px]">
-                  <div className="space-y-2">
-                    <p className="text-xs text-muted-foreground">
-                      {result.violations.length}{" "}
-                      violation{result.violations.length !== 1 ? "s" : ""} found
-                    </p>
-                    {result.violations.map((
-                      violation: Violation,
-                      idx: number,
-                    ) => (
-                      <div
-                        key={`${violation.impact}-${idx}`}
-                        className={`rounded-lg border p-3 ${getImpactColor(violation.impact)}`}
-                      >
-                        <div className="flex items-start gap-2">
-                          <Badge
-                            variant={getImpactBadgeVariant(violation.impact)}
-                            className="text-[10px] px-1.5 py-0 shrink-0 mt-0.5"
-                          >
-                            {violation.impact}
-                          </Badge>
-                          <span className="text-xs text-foreground/80">
-                            {violation.issue}
-                          </span>
-                        </div>
+            {result.violations.length === 0 ? (
+              <div className="rounded-lg border border-green-500/30 bg-green-500/5 p-3 text-xs text-green-400 text-center">
+                No accessibility violations found
+              </div>
+            ) : (
+              <ScrollArea className="h-[180px]">
+                <div className="space-y-2">
+                  <p className="text-xs text-muted-foreground">
+                    {result.violations.length} violation{result.violations.length !== 1 ? "s" : ""}{" "}
+                    found
+                  </p>
+                  {result.violations.map((violation: Violation, idx: number) => (
+                    <div
+                      key={`${violation.impact}-${idx}`}
+                      className={`rounded-lg border p-3 ${getImpactColor(violation.impact)}`}
+                    >
+                      <div className="flex items-start gap-2">
+                        <Badge
+                          variant={getImpactBadgeVariant(violation.impact)}
+                          className="text-[10px] px-1.5 py-0 shrink-0 mt-0.5"
+                        >
+                          {violation.impact}
+                        </Badge>
+                        <span className="text-xs text-foreground/80">{violation.issue}</span>
                       </div>
-                    ))}
-                  </div>
-                </ScrollArea>
-              )}
+                    </div>
+                  ))}
+                </div>
+              </ScrollArea>
+            )}
           </div>
         )}
 

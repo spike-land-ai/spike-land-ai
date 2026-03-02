@@ -81,9 +81,7 @@ function makeBox(overrides: Partial<BoxRecord> = {}): BoxRecord {
     userId: "user-1",
     tier: null,
     user: {
-      workspaceMembers: [
-        { workspace: makeWorkspace({ isPersonal: true }) },
-      ],
+      workspaceMembers: [{ workspace: makeWorkspace({ isPersonal: true }) }],
     },
     ...overrides,
   };
@@ -129,9 +127,7 @@ describe("triggerBoxProvisioning", () => {
 
       await triggerBoxProvisioning("missing-box");
 
-      expect(mockLogger.error).toHaveBeenCalledWith(
-        "[BoxProvisioning] Box missing-box not found",
-      );
+      expect(mockLogger.error).toHaveBeenCalledWith("[BoxProvisioning] Box missing-box not found");
       expect(mockPrisma.box.update).not.toHaveBeenCalled();
     });
   });
@@ -346,18 +342,12 @@ describe("triggerBoxProvisioning", () => {
             status: "ACTIVE",
           },
         });
-        expect(mockTriggerWorkflowManually).toHaveBeenCalledWith(
-          "wf-abc",
-          "ws-personal",
-          {
-            boxId: "box-1",
-            userId: "user-1",
-            tier: null,
-          },
-        );
-        expect(mockLogger.info).toHaveBeenCalledWith(
-          expect.stringContaining("Triggered workflow"),
-        );
+        expect(mockTriggerWorkflowManually).toHaveBeenCalledWith("wf-abc", "ws-personal", {
+          boxId: "box-1",
+          userId: "user-1",
+          tier: null,
+        });
+        expect(mockLogger.info).toHaveBeenCalledWith(expect.stringContaining("Triggered workflow"));
         expect(mockPrisma.box.update).not.toHaveBeenCalled();
       });
     });
@@ -366,9 +356,7 @@ describe("triggerBoxProvisioning", () => {
       it("uses the first workspace member when no personal workspace exists", async () => {
         const box = makeBox({
           user: {
-            workspaceMembers: [
-              { workspace: makeWorkspace({ id: "ws-team", isPersonal: false }) },
-            ],
+            workspaceMembers: [{ workspace: makeWorkspace({ id: "ws-team", isPersonal: false }) }],
           },
         });
         const workflow = makeWorkflow({ workspaceId: "ws-team" });
@@ -429,9 +417,7 @@ describe("triggerBoxProvisioning", () => {
       it("calls failBox with 'No provisioning mechanism' message", async () => {
         const box = makeBox({
           user: {
-            workspaceMembers: [
-              { workspace: makeWorkspace({ id: "ws-1", isPersonal: true }) },
-            ],
+            workspaceMembers: [{ workspace: makeWorkspace({ id: "ws-1", isPersonal: true }) }],
           },
         });
         mockPrisma.box.findUnique.mockResolvedValue(box);

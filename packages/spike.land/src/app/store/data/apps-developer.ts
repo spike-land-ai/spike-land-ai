@@ -289,14 +289,7 @@ export const DEVELOPER_APPS: StoreApp[] = [
     isFirstParty: true,
     isCodespaceNative: false,
     toolCount: 20,
-    tags: [
-      "state-machine",
-      "statechart",
-      "workflow",
-      "fsm",
-      "visualization",
-      "ai",
-    ],
+    tags: ["state-machine", "statechart", "workflow", "fsm", "visualization", "ai"],
     color: "purple",
     mcpTools: [
       {
@@ -451,13 +444,7 @@ export const DEVELOPER_APPS: StoreApp[] = [
     isFeatured: true,
     isFirstParty: true,
     toolCount: 12,
-    tags: [
-      "mcp",
-      "developer-tools",
-      "playground",
-      "api-explorer",
-      "interactive",
-    ],
+    tags: ["mcp", "developer-tools", "playground", "api-explorer", "interactive"],
     color: "blue",
     mcpTools: [
       {

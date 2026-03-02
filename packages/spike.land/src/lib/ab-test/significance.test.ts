@@ -22,9 +22,7 @@ describe("testSignificance", () => {
   });
 
   it("should handle single variant gracefully", () => {
-    const result = testSignificance([
-      { variantId: "a", conversions: 50, sampleSize: 100 },
-    ]);
+    const result = testSignificance([{ variantId: "a", conversions: 50, sampleSize: 100 }]);
     expect(result.isSignificant).toBe(false);
     expect(result.metrics).toHaveLength(1);
   });

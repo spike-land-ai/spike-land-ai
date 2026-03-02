@@ -23,9 +23,7 @@ vi.mock("@/lib/logger", () => ({
   },
 }));
 
-const { handleMcpRequest, allTools, WRITE_TOOL_NAMES } = await import(
-  "./mcp-tools"
-);
+const { handleMcpRequest, allTools, WRITE_TOOL_NAMES } = await import("./mcp-tools");
 
 // ---------------------------------------------------------------------------
 // Tests
@@ -50,15 +48,15 @@ describe("handleMcpRequest", () => {
 
   describe("initialize", () => {
     it("should return server info and capabilities", async () => {
-      const response = await handleMcpRequest(
+      const response = (await handleMcpRequest(
         { jsonrpc: "2.0", id: 1, method: "initialize" },
         "test-cs",
-      ) as unknown as {
+      )) as unknown as {
         jsonrpc: string;
         id: number;
         result: {
-          serverInfo: { name: string; };
-          capabilities: { tools: unknown; };
+          serverInfo: { name: string };
+          capabilities: { tools: unknown };
         };
       };
 
@@ -72,10 +70,10 @@ describe("handleMcpRequest", () => {
 
   describe("tools/list", () => {
     it("should return all available tools", async () => {
-      const response = await handleMcpRequest(
+      const response = (await handleMcpRequest(
         { jsonrpc: "2.0", id: 2, method: "tools/list" },
         "test-cs",
-      ) as unknown as { result: { tools: unknown[]; }; };
+      )) as unknown as { result: { tools: unknown[] } };
 
       expect(response.result.tools).toBeDefined();
       expect(Array.isArray(response.result.tools)).toBe(true);
@@ -96,10 +94,10 @@ describe("handleMcpRequest", () => {
 
   describe("unknown method", () => {
     it("should return method not found error", async () => {
-      const response = await handleMcpRequest(
+      const response = (await handleMcpRequest(
         { jsonrpc: "2.0", id: 4, method: "unknown/method" },
         "test-cs",
-      ) as unknown as { error: { code: number; }; };
+      )) as unknown as { error: { code: number } };
 
       expect(response.error).toBeDefined();
       expect(response.error.code).toBe(-32601);
@@ -112,7 +110,7 @@ describe("handleMcpRequest", () => {
 
   describe("tools/call - read_code", () => {
     it("should return current code", async () => {
-      const response = await handleMcpRequest(
+      const response = (await handleMcpRequest(
         {
           jsonrpc: "2.0",
           id: 5,
@@ -120,7 +118,7 @@ describe("handleMcpRequest", () => {
           params: { name: "read_code", arguments: {} },
         },
         "test-cs",
-      ) as unknown as { result: { content: { type: string; text: string; }[]; }; };
+      )) as unknown as { result: { content: { type: string; text: string }[] } };
 
       expect(response.result).toBeDefined();
       expect(response.result.content).toBeDefined();
@@ -133,7 +131,7 @@ describe("handleMcpRequest", () => {
 
   describe("tools/call - read_session", () => {
     it("should return session data", async () => {
-      const response = await handleMcpRequest(
+      const response = (await handleMcpRequest(
         {
           jsonrpc: "2.0",
           id: 6,
@@ -141,7 +139,7 @@ describe("handleMcpRequest", () => {
           params: { name: "read_session", arguments: {} },
         },
         "test-cs",
-      ) as unknown as { result: { content: { type: string; text: string; }[]; }; };
+      )) as unknown as { result: { content: { type: string; text: string }[] } };
 
       expect(response.result).toBeDefined();
       const text = response.result.content[0]!.text;
@@ -152,7 +150,7 @@ describe("handleMcpRequest", () => {
 
   describe("tools/call - find_lines", () => {
     it("should find matching lines", async () => {
-      const response = await handleMcpRequest(
+      const response = (await handleMcpRequest(
         {
           jsonrpc: "2.0",
           id: 7,
@@ -160,7 +158,7 @@ describe("handleMcpRequest", () => {
           params: { name: "find_lines", arguments: { pattern: "const" } },
         },
         "test-cs",
-      ) as unknown as { result: { content: { type: string; text: string; }[]; }; };
+      )) as unknown as { result: { content: { type: string; text: string }[] } };
 
       expect(response.result).toBeDefined();
       const text = response.result.content[0]!.text;
@@ -170,7 +168,7 @@ describe("handleMcpRequest", () => {
 
   describe("tools/call - read_html", () => {
     it("should return current html", async () => {
-      const response = await handleMcpRequest(
+      const response = (await handleMcpRequest(
         {
           jsonrpc: "2.0",
           id: 10,
@@ -178,7 +176,7 @@ describe("handleMcpRequest", () => {
           params: { name: "read_html", arguments: {} },
         },
         "test-cs",
-      ) as unknown as { result: { content: { type: string; text: string; }[]; }; };
+      )) as unknown as { result: { content: { type: string; text: string }[] } };
 
       expect(response.result).toBeDefined();
       const text = response.result.content[0]!.text;
@@ -188,7 +186,7 @@ describe("handleMcpRequest", () => {
 
   describe("tools/call - update_code", () => {
     it("should update code successfully", async () => {
-      const response = await handleMcpRequest(
+      const response = (await handleMcpRequest(
         {
           jsonrpc: "2.0",
           id: 11,
@@ -196,7 +194,7 @@ describe("handleMcpRequest", () => {
           params: { name: "update_code", arguments: { code: "const y = 2;" } },
         },
         "test-cs",
-      ) as unknown as { result: { content: { type: string; text: string; }[]; }; };
+      )) as unknown as { result: { content: { type: string; text: string }[] } };
 
       expect(response.result).toBeDefined();
       const text = response.result.content[0]!.text;
@@ -204,7 +202,7 @@ describe("handleMcpRequest", () => {
     });
 
     it("should return error when code param missing", async () => {
-      const response = await handleMcpRequest(
+      const response = (await handleMcpRequest(
         {
           jsonrpc: "2.0",
           id: 12,
@@ -212,7 +210,7 @@ describe("handleMcpRequest", () => {
           params: { name: "update_code", arguments: {} },
         },
         "test-cs",
-      ) as unknown as { error: { code: number; }; };
+      )) as unknown as { error: { code: number } };
 
       expect(response.error).toBeDefined();
       expect(response.error.code).toBe(-32603);
@@ -221,7 +219,7 @@ describe("handleMcpRequest", () => {
 
   describe("tools/call - edit_code", () => {
     it("should return error when edits param missing", async () => {
-      const response = await handleMcpRequest(
+      const response = (await handleMcpRequest(
         {
           jsonrpc: "2.0",
           id: 13,
@@ -229,7 +227,7 @@ describe("handleMcpRequest", () => {
           params: { name: "edit_code", arguments: {} },
         },
         "test-cs",
-      ) as unknown as { error: { code: number; }; };
+      )) as unknown as { error: { code: number } };
 
       expect(response.error).toBeDefined();
       expect(response.error.code).toBe(-32603);
@@ -238,7 +236,7 @@ describe("handleMcpRequest", () => {
 
   describe("tools/call - search_and_replace", () => {
     it("should return error when search param missing", async () => {
-      const response = await handleMcpRequest(
+      const response = (await handleMcpRequest(
         {
           jsonrpc: "2.0",
           id: 14,
@@ -246,14 +244,14 @@ describe("handleMcpRequest", () => {
           params: { name: "search_and_replace", arguments: { replace: "y" } },
         },
         "test-cs",
-      ) as unknown as { error: { code: number; }; };
+      )) as unknown as { error: { code: number } };
 
       expect(response.error).toBeDefined();
       expect(response.error.code).toBe(-32603);
     });
 
     it("should return error when replace param missing", async () => {
-      const response = await handleMcpRequest(
+      const response = (await handleMcpRequest(
         {
           jsonrpc: "2.0",
           id: 15,
@@ -261,7 +259,7 @@ describe("handleMcpRequest", () => {
           params: { name: "search_and_replace", arguments: { search: "x" } },
         },
         "test-cs",
-      ) as unknown as { error: { code: number; }; };
+      )) as unknown as { error: { code: number } };
 
       expect(response.error).toBeDefined();
       expect(response.error.code).toBe(-32603);
@@ -270,7 +268,7 @@ describe("handleMcpRequest", () => {
 
   describe("tools/call - find_lines with missing pattern", () => {
     it("should return error when pattern param missing", async () => {
-      const response = await handleMcpRequest(
+      const response = (await handleMcpRequest(
         {
           jsonrpc: "2.0",
           id: 16,
@@ -278,7 +276,7 @@ describe("handleMcpRequest", () => {
           params: { name: "find_lines", arguments: {} },
         },
         "test-cs",
-      ) as unknown as { error: { code: number; }; };
+      )) as unknown as { error: { code: number } };
 
       expect(response.error).toBeDefined();
       expect(response.error.code).toBe(-32603);
@@ -287,7 +285,7 @@ describe("handleMcpRequest", () => {
 
   describe("tools/call - missing tool name", () => {
     it("should return error for missing tool name", async () => {
-      const response = await handleMcpRequest(
+      const response = (await handleMcpRequest(
         {
           jsonrpc: "2.0",
           id: 8,
@@ -295,7 +293,7 @@ describe("handleMcpRequest", () => {
           params: { arguments: {} },
         },
         "test-cs",
-      ) as unknown as { error: { code: number; }; };
+      )) as unknown as { error: { code: number } };
 
       expect(response.error).toBeDefined();
       expect(response.error.code).toBe(-32603);
@@ -304,7 +302,7 @@ describe("handleMcpRequest", () => {
 
   describe("tools/call - unknown tool", () => {
     it("should return error for unknown tool", async () => {
-      const response = await handleMcpRequest(
+      const response = (await handleMcpRequest(
         {
           jsonrpc: "2.0",
           id: 9,
@@ -312,7 +310,7 @@ describe("handleMcpRequest", () => {
           params: { name: "nonexistent_tool", arguments: {} },
         },
         "test-cs",
-      ) as unknown as { error: { code: number; }; };
+      )) as unknown as { error: { code: number } };
 
       expect(response.error).toBeDefined();
       expect(response.error.code).toBe(-32603);
@@ -321,7 +319,7 @@ describe("handleMcpRequest", () => {
 
   describe("tools/call - custom origin", () => {
     it("should accept custom origin parameter", async () => {
-      const response = await handleMcpRequest(
+      const response = (await handleMcpRequest(
         {
           jsonrpc: "2.0",
           id: 17,
@@ -330,7 +328,7 @@ describe("handleMcpRequest", () => {
         },
         "test-cs",
         "https://custom-origin.example.com",
-      ) as unknown as { result: { content: { type: string; text: string; }[]; }; };
+      )) as unknown as { result: { content: { type: string; text: string }[] } };
 
       expect(response.result).toBeDefined();
     });

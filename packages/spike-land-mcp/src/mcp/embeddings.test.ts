@@ -148,7 +148,10 @@ describe("buildQueryVector", () => {
 
 describe("cosineSimilarity", () => {
   it("returns 1.0 for identical unit vectors", () => {
-    const vec = new Map([["a", 0.6], ["b", 0.8]]);
+    const vec = new Map([
+      ["a", 0.6],
+      ["b", 0.8],
+    ]);
     const result = cosineSimilarity(vec, vec);
     expect(result).toBeCloseTo(1.0, 5);
   });
@@ -166,14 +169,26 @@ describe("cosineSimilarity", () => {
   });
 
   it("is commutative", () => {
-    const a = new Map([["x", 0.7], ["y", 0.3]]);
-    const b = new Map([["x", 0.5], ["z", 0.5]]);
+    const a = new Map([
+      ["x", 0.7],
+      ["y", 0.3],
+    ]);
+    const b = new Map([
+      ["x", 0.5],
+      ["z", 0.5],
+    ]);
     expect(cosineSimilarity(a, b)).toBeCloseTo(cosineSimilarity(b, a), 10);
   });
 
   it("returns partial similarity for overlapping vectors", () => {
-    const a = new Map([["shared", 0.6], ["only_a", 0.8]]);
-    const b = new Map([["shared", 0.8], ["only_b", 0.6]]);
+    const a = new Map([
+      ["shared", 0.6],
+      ["only_a", 0.8],
+    ]);
+    const b = new Map([
+      ["shared", 0.8],
+      ["only_b", 0.6],
+    ]);
     const sim = cosineSimilarity(a, b);
     expect(sim).toBeGreaterThan(0);
     expect(sim).toBeLessThan(1);
@@ -208,7 +223,7 @@ describe("ToolEmbeddingIndex", () => {
 
     const results = idx.search("quantum entanglement");
     // Should return empty or very low scores
-    expect(results.filter(r => r.score > 0.1)).toHaveLength(0);
+    expect(results.filter((r) => r.score > 0.1)).toHaveLength(0);
   });
 
   it("removes a tool", () => {

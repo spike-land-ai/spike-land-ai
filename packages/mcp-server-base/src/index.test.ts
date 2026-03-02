@@ -195,12 +195,7 @@ describe("createMockServer", () => {
   it("captures tool handler and invokes it via call()", async () => {
     const server = createMockServer();
 
-    server.tool(
-      "ping",
-      "Says pong",
-      {},
-      async () => textResult("pong"),
-    );
+    server.tool("ping", "Says pong", {}, async () => textResult("pong"));
 
     const result = await server.call("ping");
     expect(getText(result)).toBe("pong");
@@ -208,20 +203,13 @@ describe("createMockServer", () => {
 
   it("throws when calling a tool that was never registered", async () => {
     const server = createMockServer();
-    await expect(server.call("nonexistent")).rejects.toThrow(
-      'Tool "nonexistent" not registered',
-    );
+    await expect(server.call("nonexistent")).rejects.toThrow('Tool "nonexistent" not registered');
   });
 
   it("passes arguments through to the handler", async () => {
     const server = createMockServer();
 
-    server.tool(
-      "echo",
-      "Echoes the input",
-      {},
-      async (args) => textResult(String(args["msg"])),
-    );
+    server.tool("echo", "Echoes the input", {}, async (args) => textResult(String(args["msg"])));
 
     const result = await server.call("echo", { msg: "hello world" });
     expect(getText(result)).toBe("hello world");
@@ -237,8 +225,7 @@ describe("createMockRegistry", () => {
     registry.register({
       name: "greet",
       description: "Greet",
-      handler: async ({ name }: { name: string }) =>
-        textResult(`Hello, ${name}!`),
+      handler: async ({ name }: { name: string }) => textResult(`Hello, ${name}!`),
     });
 
     const result = await registry.call("greet", { name: "World" });

@@ -13,9 +13,7 @@ export function JobListingCard({ job }: JobListingCardProps) {
       <CardContent className="p-4">
         <div className="flex items-start justify-between gap-2">
           <div className="min-w-0">
-            <h3 className="text-sm font-medium text-white truncate">
-              {job.title}
-            </h3>
+            <h3 className="text-sm font-medium text-white truncate">{job.title}</h3>
             <p className="text-xs text-zinc-400">{job.company}</p>
             <p className="text-xs text-zinc-500 mt-1">{job.location}</p>
           </div>
@@ -30,23 +28,17 @@ export function JobListingCard({ job }: JobListingCardProps) {
         </div>
         {(job.salary_min !== null || job.salary_max !== null) && (
           <div className="mt-2">
-            <Badge
-              variant="outline"
-              className="text-xs text-emerald-400 border-emerald-500/20"
-            >
+            <Badge variant="outline" className="text-xs text-emerald-400 border-emerald-500/20">
               {job.salary_min && job.salary_max
                 ? `${job.currency}${job.salary_min.toLocaleString()} - ${job.currency}${job.salary_max.toLocaleString()}`
                 : job.salary_min
-                ? `From ${job.currency}${job.salary_min.toLocaleString()}`
-                : `Up to ${job.currency}${(job.salary_max ?? 0).toLocaleString()}`}
+                  ? `From ${job.currency}${job.salary_min.toLocaleString()}`
+                  : `Up to ${job.currency}${(job.salary_max ?? 0).toLocaleString()}`}
             </Badge>
           </div>
         )}
         {job.category && (
-          <Badge
-            variant="outline"
-            className="mt-2 text-xs text-zinc-400 border-white/[0.06]"
-          >
+          <Badge variant="outline" className="mt-2 text-xs text-zinc-400 border-white/[0.06]">
             {job.category}
           </Badge>
         )}

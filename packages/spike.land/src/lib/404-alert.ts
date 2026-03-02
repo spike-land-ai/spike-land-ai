@@ -6,11 +6,7 @@
  */
 
 import { redis } from "@/lib/upstash/client";
-import {
-  createIssue,
-  isGitHubAvailable,
-  listIssues,
-} from "@/lib/agents/github-issues";
+import { createIssue, isGitHubAvailable, listIssues } from "@/lib/agents/github-issues";
 import { tryCatch } from "@/lib/try-catch";
 import { logger } from "@/lib/logger";
 
@@ -23,7 +19,7 @@ const DEDUP_TTL_SECONDS = 48 * 60 * 60; // 48 hours
 export async function triggerGitHubAlert(
   url: string,
   date: string,
-): Promise<{ created: boolean; reason?: string; }> {
+): Promise<{ created: boolean; reason?: string }> {
   if (!isGitHubAvailable()) {
     return { created: false, reason: "github_unavailable" };
   }
@@ -47,7 +43,7 @@ export async function triggerGitHubAlert(
     limit: 50,
   });
 
-  if (issues?.some(issue => issue.title === issueTitle)) {
+  if (issues?.some((issue) => issue.title === issueTitle)) {
     return { created: false, reason: "issue_exists" };
   }
 

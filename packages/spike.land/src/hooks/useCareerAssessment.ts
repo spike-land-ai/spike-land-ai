@@ -27,7 +27,7 @@ export function useCareerAssessment() {
         throw new Error("Assessment failed");
       }
 
-      const data = (await response.json()) as { results: MatchResult[]; };
+      const data = (await response.json()) as { results: MatchResult[] };
       setResults(data.results);
       setAssessmentResults({
         userSkills,

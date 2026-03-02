@@ -81,23 +81,21 @@ export function SiteNav() {
           <div className="flex items-center gap-2">
             {!isLoading && (
               <>
-                {isAuthenticated
-                  ? (
-                    <Link href="/my-apps">
-                      <Button variant="outline" size="sm">
-                        Dashboard
-                      </Button>
-                    </Link>
-                  )
-                  : (
-                    <button
-                      onClick={() => openAuthDialog()}
-                      className="hidden sm:inline-flex px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-                      aria-label="Sign in to spike.land"
-                    >
-                      Sign In
-                    </button>
-                  )}
+                {isAuthenticated ? (
+                  <Link href="/my-apps">
+                    <Button variant="outline" size="sm">
+                      Dashboard
+                    </Button>
+                  </Link>
+                ) : (
+                  <button
+                    onClick={() => openAuthDialog()}
+                    className="hidden sm:inline-flex px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+                    aria-label="Sign in to spike.land"
+                  >
+                    Sign In
+                  </button>
+                )}
                 <Link href="/my-apps/create">
                   <Button size="sm" variant="default">
                     <Zap className="h-3.5 w-3.5" aria-hidden="true" />
@@ -110,14 +108,16 @@ export function SiteNav() {
             {/* Mobile menu toggle */}
             <button
               className="md:hidden inline-flex items-center justify-center h-9 w-9 rounded-md text-muted-foreground hover:text-foreground hover:bg-white/5 transition-colors"
-              onClick={() => setMobileOpen(prev => !prev)}
+              onClick={() => setMobileOpen((prev) => !prev)}
               aria-label={mobileOpen ? "Close menu" : "Open menu"}
               aria-expanded={mobileOpen}
               aria-controls="mobile-nav"
             >
-              {mobileOpen
-                ? <X className="h-5 w-5" aria-hidden="true" />
-                : <Menu className="h-5 w-5" aria-hidden="true" />}
+              {mobileOpen ? (
+                <X className="h-5 w-5" aria-hidden="true" />
+              ) : (
+                <Menu className="h-5 w-5" aria-hidden="true" />
+              )}
             </button>
           </div>
         </nav>

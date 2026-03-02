@@ -64,8 +64,8 @@ describe("aspect-ratio", () => {
         expect(STANDARD_1K_DIMENSIONS[ratio].height).toBeGreaterThan(0);
 
         // Ensure the dimensions roughly match the theoretical ratio
-        const actualRatio = STANDARD_1K_DIMENSIONS[ratio].width
-          / STANDARD_1K_DIMENSIONS[ratio].height;
+        const actualRatio =
+          STANDARD_1K_DIMENSIONS[ratio].width / STANDARD_1K_DIMENSIONS[ratio].height;
         const expectedRatio = getAspectRatioValue(ratio);
         // within ~5% tolerance due to pixel rounding
         expect(Math.abs(actualRatio - expectedRatio)).toBeLessThan(0.05);

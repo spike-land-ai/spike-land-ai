@@ -23,7 +23,7 @@ export async function POST(request: NextRequest) {
   // Bot detection
   if (isBot(userAgent)) {
     const { data: body } = await tryCatch(request.json());
-    const route = (body as { route?: string; })?.route || "/";
+    const route = (body as { route?: string })?.route || "/";
     return NextResponse.json({
       type: "scripted",
       content: getScriptedResponse(route),
@@ -41,10 +41,7 @@ export async function POST(request: NextRequest) {
     ? { maxRequests: 20, windowMs: 60000 }
     : { maxRequests: 5, windowMs: 60000 };
 
-  const { isLimited } = await checkRateLimit(
-    `agent-loop:${ip}`,
-    rateLimitConfig,
-  );
+  const { isLimited } = await checkRateLimit(`agent-loop:${ip}`, rateLimitConfig);
 
   if (isLimited) {
     return NextResponse.json(
@@ -64,22 +61,20 @@ export async function POST(request: NextRequest) {
     sessionId?: string;
     route?: string;
     pageTitle?: string;
-    attachments?: { type: string; data: string; name: string; }[];
+    attachments?: { type: string; data: string; name: string }[];
   };
 
-  if (
-    !question || typeof question !== "string" || question.trim().length === 0
-  ) {
-    return NextResponse.json({ error: "question is required" }, {
-      status: 400,
-    });
+  if (!question || typeof question !== "string" || question.trim().length === 0) {
+    return NextResponse.json(
+      { error: "question is required" },
+      {
+        status: 400,
+      },
+    );
   }
 
   if (question.length > 4000) {
-    return NextResponse.json(
-      { error: "Question too long (max 4000 characters)" },
-      { status: 400 },
-    );
+    return NextResponse.json({ error: "Question too long (max 4000 characters)" }, { status: 400 });
   }
 
   // Get or create the user's ServerManager (pooled)

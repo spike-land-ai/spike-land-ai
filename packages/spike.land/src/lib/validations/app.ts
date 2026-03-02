@@ -27,10 +27,7 @@ export const appCreationSchema = z.object({
     .string()
     .min(3, "App name must be at least 3 characters")
     .max(50, "App name must be less than 50 characters")
-    .regex(
-      /^[a-zA-Z0-9\s-]+$/,
-      "App name can only contain letters, numbers, spaces, and hyphens",
-    ),
+    .regex(/^[a-zA-Z0-9\s-]+$/, "App name can only contain letters, numbers, spaces, and hyphens"),
   description: z
     .string()
     .min(10, "Description must be at least 10 characters")
@@ -73,10 +70,7 @@ export const appPromptCreationSchema = z.object({
 
 // Schema for app message creation
 export const appMessageCreateSchema = z.object({
-  content: z
-    .string()
-    .min(1, "Message cannot be empty")
-    .max(10000, "Message is too long"),
+  content: z.string().min(1, "Message cannot be empty").max(10000, "Message is too long"),
   imageIds: z.array(z.string()).optional(),
 });
 
@@ -92,15 +86,9 @@ export const appSettingsUpdateSchema = z.object({
     .string()
     .min(3, "App name must be at least 3 characters")
     .max(50, "App name must be less than 50 characters")
-    .regex(
-      /^[a-zA-Z0-9\s-]+$/,
-      "App name can only contain letters, numbers, spaces, and hyphens",
-    )
+    .regex(/^[a-zA-Z0-9\s-]+$/, "App name can only contain letters, numbers, spaces, and hyphens")
     .optional(),
-  description: z
-    .string()
-    .max(500, "Description must be less than 500 characters")
-    .optional(),
+  description: z.string().max(500, "Description must be less than 500 characters").optional(),
   isPublic: z.boolean().optional(),
   codespaceId: z
     .string()
@@ -130,10 +118,7 @@ export const agentAppUpdateSchema = z.object({
     .min(3, "App name must be at least 3 characters")
     .max(50, "App name must be less than 50 characters")
     .optional(),
-  description: z
-    .string()
-    .max(500, "Description must be less than 500 characters")
-    .optional(),
+  description: z.string().max(500, "Description must be less than 500 characters").optional(),
   status: z.enum(APP_BUILD_STATUSES).optional(),
   statusMessage: z.string().max(1000).optional(),
   codespaceId: z

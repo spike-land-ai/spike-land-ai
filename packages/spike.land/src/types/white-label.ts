@@ -16,11 +16,7 @@ import { z } from "zod";
 // Re-export Prisma Types
 // =============================================================================
 
-export type {
-  DomainVerificationStatus,
-  SslCertificateStatus,
-  WorkspaceWhiteLabelConfig,
-};
+export type { DomainVerificationStatus, SslCertificateStatus, WorkspaceWhiteLabelConfig };
 
 // =============================================================================
 // Validation Schemas
@@ -78,14 +74,7 @@ export const whiteLabelConfigSchema = z.object({
     .enum(["PENDING", "VERIFYING", "VERIFIED", "FAILED", "EXPIRED"])
     .optional(),
   sslCertificateStatus: z
-    .enum([
-      "PENDING",
-      "PROVISIONING",
-      "ACTIVE",
-      "EXPIRING_SOON",
-      "EXPIRED",
-      "FAILED",
-    ])
+    .enum(["PENDING", "PROVISIONING", "ACTIVE", "EXPIRING_SOON", "EXPIRED", "FAILED"])
     .optional(),
   sslCertificateIssuedAt: z.string().datetime().optional().nullable(),
   sslCertificateExpiresAt: z.string().datetime().optional().nullable(),
@@ -133,9 +122,7 @@ export const whiteLabelConfigPatchSchema = whiteLabelConfigSchema.partial();
 /**
  * Type for partial white-label configuration updates
  */
-export type WhiteLabelConfigPatchInput = z.infer<
-  typeof whiteLabelConfigPatchSchema
->;
+export type WhiteLabelConfigPatchInput = z.infer<typeof whiteLabelConfigPatchSchema>;
 
 // =============================================================================
 // Upload Types
@@ -144,11 +131,7 @@ export type WhiteLabelConfigPatchInput = z.infer<
 /**
  * Supported image formats for logo upload
  */
-export const LOGO_FORMATS = [
-  "image/png",
-  "image/jpeg",
-  "image/svg+xml",
-] as const;
+export const LOGO_FORMATS = ["image/png", "image/jpeg", "image/svg+xml"] as const;
 export type LogoFormat = (typeof LOGO_FORMATS)[number];
 
 /**
@@ -160,11 +143,7 @@ export type FaviconFormat = (typeof FAVICON_FORMATS)[number];
 /**
  * Supported formats for background image upload
  */
-export const BACKGROUND_FORMATS = [
-  "image/png",
-  "image/jpeg",
-  "image/webp",
-] as const;
+export const BACKGROUND_FORMATS = ["image/png", "image/jpeg", "image/webp"] as const;
 export type BackgroundFormat = (typeof BACKGROUND_FORMATS)[number];
 
 /**
@@ -189,10 +168,7 @@ export const logoUploadSchema = z.object({
 export const faviconUploadSchema = z.object({
   file: z.instanceof(File),
   mimeType: z.enum(FAVICON_FORMATS),
-  size: z.number().max(
-    MAX_FAVICON_SIZE,
-    "Favicon file size must not exceed 100KB",
-  ),
+  size: z.number().max(MAX_FAVICON_SIZE, "Favicon file size must not exceed 100KB"),
 });
 
 /**
@@ -201,10 +177,7 @@ export const faviconUploadSchema = z.object({
 export const backgroundUploadSchema = z.object({
   file: z.instanceof(File),
   mimeType: z.enum(BACKGROUND_FORMATS),
-  size: z.number().max(
-    MAX_BACKGROUND_SIZE,
-    "Background image file size must not exceed 10MB",
-  ),
+  size: z.number().max(MAX_BACKGROUND_SIZE, "Background image file size must not exceed 10MB"),
 });
 
 // =============================================================================

@@ -74,9 +74,7 @@ describe("getMerchMetrics", () => {
       .mockResolvedValueOnce(0)
       .mockResolvedValueOnce(0)
       .mockResolvedValueOnce(0);
-    mockPrisma.merchProduct.count
-      .mockResolvedValueOnce(0)
-      .mockResolvedValueOnce(0);
+    mockPrisma.merchProduct.count.mockResolvedValueOnce(0).mockResolvedValueOnce(0);
     mockPrisma.merchOrder.aggregate.mockResolvedValueOnce({
       _sum: { totalAmount: null },
     });
@@ -96,9 +94,7 @@ describe("getMerchMetrics", () => {
       .mockResolvedValueOnce(0)
       .mockResolvedValueOnce(0)
       .mockResolvedValueOnce(0);
-    mockPrisma.merchProduct.count
-      .mockResolvedValueOnce(1)
-      .mockResolvedValueOnce(1);
+    mockPrisma.merchProduct.count.mockResolvedValueOnce(1).mockResolvedValueOnce(1);
     mockPrisma.merchOrder.aggregate.mockResolvedValueOnce({
       _sum: { totalAmount: 500 },
     });
@@ -128,9 +124,7 @@ describe("getMerchMetrics", () => {
       .mockResolvedValueOnce(0)
       .mockResolvedValueOnce(0)
       .mockResolvedValueOnce(0);
-    mockPrisma.merchProduct.count
-      .mockResolvedValueOnce(1)
-      .mockResolvedValueOnce(1);
+    mockPrisma.merchProduct.count.mockResolvedValueOnce(1).mockResolvedValueOnce(1);
     mockPrisma.merchOrder.aggregate.mockResolvedValueOnce({
       _sum: { totalAmount: 300 },
     });

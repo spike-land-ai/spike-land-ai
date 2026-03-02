@@ -78,8 +78,8 @@ export interface ErrorStats {
   last24h: number;
   previous24h: number;
   trend: ErrorTrend;
-  topFiles: Array<{ file: string | null; count: number; }>;
-  topErrors: Array<{ type: string | null; count: number; }>;
+  topFiles: Array<{ file: string | null; count: number }>;
+  topErrors: Array<{ type: string | null; count: number }>;
   byEnvironment: Record<string, number>;
   timestamp: string;
 }
@@ -134,16 +134,16 @@ export async function getErrorStats(): Promise<ErrorStats> {
     last24h,
     previous24h,
     trend: calculateTrend(last24h, previous24h),
-    topFiles: topFiles.map(f => ({
+    topFiles: topFiles.map((f) => ({
       file: f.sourceFile,
       count: f._count.sourceFile,
     })),
-    topErrors: topErrors.map(e => ({
+    topErrors: topErrors.map((e) => ({
       type: e.errorType,
       count: e._count.errorType,
     })),
     byEnvironment: Object.fromEntries(
-      byEnvironment.map(e => [e.environment, e._count.environment]),
+      byEnvironment.map((e) => [e.environment, e._count.environment]),
     ),
     timestamp: new Date().toISOString(),
   };

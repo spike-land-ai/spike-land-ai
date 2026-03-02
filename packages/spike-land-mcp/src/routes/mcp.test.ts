@@ -88,7 +88,7 @@ describe("POST /mcp (mcpRoute handler)", () => {
     );
 
     expect(res.status).toBe(401);
-    const body = await res.json() as Record<string, unknown>;
+    const body = (await res.json()) as Record<string, unknown>;
     expect(body.error).toBe("Unauthorized");
   });
 
@@ -129,7 +129,7 @@ describe("POST /mcp (mcpRoute handler)", () => {
     );
 
     expect(res.status).toBe(200);
-    const body = await res.json() as { jsonrpc: string; result: { tools: unknown[] } };
+    const body = (await res.json()) as { jsonrpc: string; result: { tools: unknown[] } };
     expect(body.jsonrpc).toBe("2.0");
     expect(body.result.tools).toHaveLength(5);
   });
@@ -156,7 +156,7 @@ describe("POST /mcp (mcpRoute handler)", () => {
     );
 
     expect(res.status).toBe(429);
-    const body = await res.json() as { error: { message: string } };
+    const body = (await res.json()) as { error: { message: string } };
     expect(body.error.message).toBe("Rate limit exceeded");
     expect(res.headers.get("Retry-After")).toBeTruthy();
   });
@@ -178,7 +178,7 @@ describe("POST /mcp (mcpRoute handler)", () => {
     );
 
     expect(res.status).toBe(400);
-    const body = await res.json() as { error: { code: number } };
+    const body = (await res.json()) as { error: { code: number } };
     expect(body.error.code).toBe(-32700);
   });
 });

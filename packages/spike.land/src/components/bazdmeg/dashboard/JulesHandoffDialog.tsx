@@ -70,19 +70,17 @@ export function JulesHandoffDialog({
             disabled={isLoading}
             className="bg-amber-500 hover:bg-amber-600 text-black"
           >
-            {isLoading
-              ? (
-                <>
-                  <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                  Sending...
-                </>
-              )
-              : (
-                <>
-                  <Rocket className="h-4 w-4 mr-2" />
-                  Send to Jules
-                </>
-              )}
+            {isLoading ? (
+              <>
+                <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                Sending...
+              </>
+            ) : (
+              <>
+                <Rocket className="h-4 w-4 mr-2" />
+                Send to Jules
+              </>
+            )}
           </Button>
         </DialogFooter>
       </DialogContent>

@@ -1,13 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
@@ -30,7 +24,7 @@ interface EnhancementSettingsProps {
   onEnhance: (tier: EnhancementTier) => Promise<void>;
   currentBalance: number;
   isProcessing: boolean;
-  completedVersions: Array<{ tier: EnhancementTier; url: string; }>;
+  completedVersions: Array<{ tier: EnhancementTier; url: string }>;
   asCard?: boolean;
   // New props for dialog mode
   imageUrl?: string;
@@ -93,7 +87,7 @@ export function EnhancementSettings({
   };
 
   // Check if a version already exists for the selected tier
-  const versionExists = completedVersions.some(v => v.tier === selectedTier);
+  const versionExists = completedVersions.some((v) => v.tier === selectedTier);
 
   // Check if user has enough tokens for the selected tier
   const tierCost = TIER_DISPLAY_INFO[selectedTier].cost;
@@ -116,22 +110,12 @@ export function EnhancementSettings({
           )}
           <div className="flex-1 space-y-2">
             <div>
-              <p className="text-sm font-medium text-foreground">
-                Selected Image
-              </p>
-              <Label
-                htmlFor="image-name"
-                className="text-xs text-muted-foreground"
-              >
+              <p className="text-sm font-medium text-foreground">Selected Image</p>
+              <Label htmlFor="image-name" className="text-xs text-muted-foreground">
                 Image Name
               </Label>
             </div>
-            <Input
-              id="image-name"
-              value={imageName || ""}
-              readOnly
-              className="bg-white/10"
-            />
+            <Input id="image-name" value={imageName || ""} readOnly className="bg-white/10" />
           </div>
         </div>
       )}
@@ -153,20 +137,13 @@ export function EnhancementSettings({
           <div className="flex items-start gap-2 mb-2">
             <AlertTriangle className="h-4 w-4 text-destructive mt-0.5" />
             <div className="flex-1">
-              <p className="text-sm font-medium text-destructive">
-                Insufficient Credits
-              </p>
+              <p className="text-sm font-medium text-destructive">Insufficient Credits</p>
               <p className="text-sm text-muted-foreground">
                 You need {tierCost} credits but only have {currentBalance}
               </p>
             </div>
           </div>
-          <Button
-            asChild
-            size="sm"
-            variant="destructive"
-            className="w-full mt-2"
-          >
+          <Button asChild size="sm" variant="destructive" className="w-full mt-2">
             <Link href="/pricing">
               <Sparkles className="mr-2 h-4 w-4" />
               Upgrade Plan
@@ -177,15 +154,13 @@ export function EnhancementSettings({
 
       {/* Tier Selection */}
       <div>
-        <Label className="text-sm font-medium mb-3 block">
-          Enhancement Level
-        </Label>
+        <Label className="text-sm font-medium mb-3 block">Enhancement Level</Label>
         <RadioGroup
           value={selectedTier}
-          onValueChange={value => setSelectedTier(value as EnhancementTier)}
+          onValueChange={(value) => setSelectedTier(value as EnhancementTier)}
           className="grid grid-cols-1 sm:grid-cols-3 gap-3"
         >
-          {TIER_ORDER.map(tier => {
+          {TIER_ORDER.map((tier) => {
             const info = TIER_DISPLAY_INFO[tier];
             const canAfford = currentBalance >= info.cost;
             const isSelected = selectedTier === tier;
@@ -203,8 +178,8 @@ export function EnhancementSettings({
                   className={cn(
                     "flex flex-col items-center justify-center p-4 rounded-xl border cursor-pointer transition-all duration-200",
                     "border-white/10 bg-white/10 hover:bg-white/15",
-                    isSelected
-                      && "border-primary bg-primary/10 shadow-[0_0_20px_rgba(0,229,255,0.3)]",
+                    isSelected &&
+                      "border-primary bg-primary/10 shadow-[0_0_20px_rgba(0,229,255,0.3)]",
                     !canAfford && "opacity-50 cursor-not-allowed",
                   )}
                 >
@@ -219,9 +194,7 @@ export function EnhancementSettings({
                     />
                     <span className="font-medium">{info.name}</span>
                   </div>
-                  <p className="text-xs text-muted-foreground text-center">
-                    {info.tagline}
-                  </p>
+                  <p className="text-xs text-muted-foreground text-center">{info.tagline}</p>
                 </Label>
               </div>
             );
@@ -232,46 +205,43 @@ export function EnhancementSettings({
       {/* Version exists warning */}
       {versionExists && (
         <p className="text-sm text-muted-foreground">
-          Note: A {TIER_DISPLAY_INFO[selectedTier].name}{" "}
-          version already exists. Creating another will use additional credits.
+          Note: A {TIER_DISPLAY_INFO[selectedTier].name} version already exists. Creating another
+          will use additional credits.
         </p>
       )}
 
       {/* Action buttons - different layout for dialog vs card */}
-      {trigger
-        ? (
-          // Dialog mode - buttons in footer
-          null
-        )
-        : (
-          // Card mode - single button
-          <Button
-            onClick={handleEnhance}
-            disabled={isProcessing || !hasEnoughTokens}
-            className="w-full"
-          >
-            {isProcessing
-              ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Enhancing...
-                </>
-              )
-              : (
-                <>
-                  <Sparkles className="mr-2 h-4 w-4" />
-                  Start Enhancement ({TIER_DISPLAY_INFO[selectedTier].cost} credits)
-                </>
-              )}
-          </Button>
-        )}
+      {trigger ? // Dialog mode - buttons in footer
+      null : (
+        // Card mode - single button
+        <Button
+          onClick={handleEnhance}
+          disabled={isProcessing || !hasEnoughTokens}
+          className="w-full"
+        >
+          {isProcessing ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Enhancing...
+            </>
+          ) : (
+            <>
+              <Sparkles className="mr-2 h-4 w-4" />
+              Start Enhancement ({TIER_DISPLAY_INFO[selectedTier].cost} credits)
+            </>
+          )}
+        </Button>
+      )}
     </div>
   );
 
   // Dialog mode - render with Dialog wrapper
   if (trigger) {
     return (
-      <Dialog {...(open !== undefined ? { open } : {})} {...(onOpenChange !== undefined ? { onOpenChange } : {})}>
+      <Dialog
+        {...(open !== undefined ? { open } : {})}
+        {...(onOpenChange !== undefined ? { onOpenChange } : {})}
+      >
         <DialogTrigger asChild>{trigger}</DialogTrigger>
         <DialogContent className="sm:max-w-lg">
           <DialogHeader>
@@ -279,30 +249,21 @@ export function EnhancementSettings({
           </DialogHeader>
           {content}
           <DialogFooter className="gap-2 sm:gap-0">
-            <Button
-              variant="outline"
-              onClick={handleCancel}
-              disabled={isProcessing}
-            >
+            <Button variant="outline" onClick={handleCancel} disabled={isProcessing}>
               Cancel
             </Button>
-            <Button
-              onClick={handleEnhance}
-              disabled={isProcessing || !hasEnoughTokens}
-            >
-              {isProcessing
-                ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Enhancing...
-                  </>
-                )
-                : (
-                  <>
-                    <Sparkles className="mr-2 h-4 w-4" />
-                    Start Enhancement
-                  </>
-                )}
+            <Button onClick={handleEnhance} disabled={isProcessing || !hasEnoughTokens}>
+              {isProcessing ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Enhancing...
+                </>
+              ) : (
+                <>
+                  <Sparkles className="mr-2 h-4 w-4" />
+                  Start Enhancement
+                </>
+              )}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -324,9 +285,7 @@ export function EnhancementSettings({
     <Card>
       <CardHeader>
         <CardTitle>Enhancement Settings</CardTitle>
-        <CardDescription>
-          Choose the quality tier for AI enhancement
-        </CardDescription>
+        <CardDescription>Choose the quality tier for AI enhancement</CardDescription>
       </CardHeader>
       <CardContent>{content}</CardContent>
     </Card>

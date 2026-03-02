@@ -44,7 +44,7 @@ const TEST_CASES: TestCase[] = [
     name: "color-picker",
     prompt:
       "Build a color picker that shows the selected color in a large preview box with hex code",
-    verifyElements: ["input[type=\"color\"]"],
+    verifyElements: ['input[type="color"]'],
   },
   {
     name: "quote-generator",
@@ -110,7 +110,7 @@ async function waitForAgentResponse(
       }
 
       // Check for agent message with role="AGENT"
-      const agentMessages = page.locator("[data-role=\"AGENT\"]");
+      const agentMessages = page.locator('[data-role="AGENT"]');
       const msgCount = await agentMessages.count();
       if (msgCount > 0) {
         console.log(`  ✅ Agent message found (${msgCount} messages)`);
@@ -133,11 +133,7 @@ async function waitForAgentResponse(
   }
 }
 
-async function testApp(
-  page: Page,
-  testCase: TestCase,
-  testIndex: number,
-): Promise<TestResult> {
+async function testApp(page: Page, testCase: TestCase, testIndex: number): Promise<TestResult> {
   const result: TestResult = {
     testName: testCase.name,
     prompt: testCase.prompt,
@@ -171,10 +167,7 @@ async function testApp(
     console.log(`  🔗 URL: ${result.codespaceUrl}`);
 
     // Take initial screenshot
-    const initialScreenshot = await captureScreenshot(
-      page,
-      `${testCase.name}-initial`,
-    );
+    const initialScreenshot = await captureScreenshot(page, `${testCase.name}-initial`);
     console.log(`  📸 Initial screenshot: ${initialScreenshot}`);
 
     // Find the chat textarea
@@ -188,29 +181,21 @@ async function testApp(
 
     // Find and click send button
     console.log(`  📤 Sending message...`);
-    const sendButton = page.locator("button[type=\"submit\"]").first();
+    const sendButton = page.locator('button[type="submit"]').first();
     await sendButton.click();
 
     // Start timer for agent response
     const startTime = Date.now();
 
     // Wait for agent response
-    const responseReceived = await waitForAgentResponse(
-      page,
-      codespaceId,
-      MAX_WAIT_TIME,
-    );
+    const responseReceived = await waitForAgentResponse(page, codespaceId, MAX_WAIT_TIME);
 
     if (responseReceived) {
       result.agentResponseTime = Date.now() - startTime;
-      console.log(
-        `\n  ⏱️  Agent responded in ${(result.agentResponseTime / 1000).toFixed(1)}s`,
-      );
+      console.log(`\n  ⏱️  Agent responded in ${(result.agentResponseTime / 1000).toFixed(1)}s`);
 
       // Check if preview is visible
-      const previewIframe = page.locator(
-        "iframe[src*=\"testing.spike.land/live\"]",
-      ).first();
+      const previewIframe = page.locator('iframe[src*="testing.spike.land/live"]').first();
       const previewCount = await previewIframe.count();
       result.previewVisible = previewCount > 0;
 
@@ -218,10 +203,7 @@ async function testApp(
         console.log(`  ✅ Preview iframe is visible`);
 
         // Take screenshot of the response
-        const responseScreenshot = await captureScreenshot(
-          page,
-          `${testCase.name}-response`,
-        );
+        const responseScreenshot = await captureScreenshot(page, `${testCase.name}-response`);
         result.screenshotPath = responseScreenshot;
         console.log(`  📸 Response screenshot: ${responseScreenshot}`);
 
@@ -240,10 +222,7 @@ async function testApp(
 
     // Take error screenshot
     try {
-      const errorScreenshot = await captureScreenshot(
-        page,
-        `${testCase.name}-error`,
-      );
+      const errorScreenshot = await captureScreenshot(page, `${testCase.name}-error`);
       result.screenshotPath = errorScreenshot;
       console.log(`  📸 Error screenshot: ${errorScreenshot}`);
     } catch (screenshotError) {
@@ -282,7 +261,7 @@ async function runTests() {
     const page = await context.newPage();
 
     // Log browser console messages
-    page.on("console", msg => {
+    page.on("console", (msg) => {
       const type = msg.type();
       if (type === "error" || type === "warning") {
         console.log(`  [Browser ${type}]: ${msg.text()}`);
@@ -324,24 +303,20 @@ async function runTests() {
     console.log("📊 TEST SUMMARY");
     console.log("=".repeat(70) + "\n");
 
-    const passed = results.filter(r => r.success).length;
-    const failed = results.filter(r => !r.success).length;
+    const passed = results.filter((r) => r.success).length;
+    const failed = results.filter((r) => !r.success).length;
 
     console.log(`Total Tests: ${results.length}`);
     console.log(`✅ Passed: ${passed}`);
     console.log(`❌ Failed: ${failed}`);
-    console.log(
-      `Success Rate: ${((passed / results.length) * 100).toFixed(1)}%\n`,
-    );
+    console.log(`Success Rate: ${((passed / results.length) * 100).toFixed(1)}%\n`);
 
     // Print individual results
     results.forEach((result, i) => {
       const status = result.success ? "✅" : "❌";
       console.log(`${status} ${i + 1}. ${result.testName}`);
       if (result.success) {
-        console.log(
-          `   Response time: ${(result.agentResponseTime! / 1000).toFixed(1)}s`,
-        );
+        console.log(`   Response time: ${(result.agentResponseTime! / 1000).toFixed(1)}s`);
         console.log(`   Codespace: ${result.codespaceId}`);
         console.log(`   URL: ${result.codespaceUrl}`);
       } else {
@@ -372,7 +347,7 @@ async function runTests() {
 }
 
 // Run the tests
-runTests().catch(error => {
+runTests().catch((error) => {
   console.error("Unhandled error:", error);
   process.exit(1);
 });

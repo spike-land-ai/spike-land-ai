@@ -138,9 +138,7 @@ describe("encouragement", () => {
 
     it("each STREAK_MESSAGES tier has at least one message", () => {
       for (const [tier, messages] of Object.entries(STREAK_MESSAGES)) {
-        expect(messages.length, `${tier} should have messages`).toBeGreaterThan(
-          0,
-        );
+        expect(messages.length, `${tier} should have messages`).toBeGreaterThan(0);
         for (const msg of messages) {
           expect(typeof msg).toBe("string");
           expect(msg.length).toBeGreaterThan(0);

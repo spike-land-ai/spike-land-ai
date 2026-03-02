@@ -34,10 +34,8 @@ export async function recordSkillUsage(data: SkillUsageData): Promise<void> {
         outcome: data.outcome,
         durationMs: data.durationMs,
         metadata: {
-          input: data
-            .input as unknown as import("@/generated/prisma").Prisma.InputJsonValue,
-          ...(data.errorMessage !== undefined
-            && { errorMessage: data.errorMessage }),
+          input: data.input as unknown as import("@/generated/prisma").Prisma.InputJsonValue,
+          ...(data.errorMessage !== undefined && { errorMessage: data.errorMessage }),
           ...(data.tokensUsed !== undefined && { tokensUsed: data.tokensUsed }),
         },
       },

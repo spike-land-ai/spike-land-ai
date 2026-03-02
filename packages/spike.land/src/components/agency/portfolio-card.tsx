@@ -46,26 +46,22 @@ export function PortfolioCard({ item, className }: PortfolioCardProps) {
 
       {/* Screenshot/Thumbnail */}
       <div className="relative aspect-video bg-muted overflow-hidden">
-        {hasScreenshot && item.screenshots[0]
-          ? (
-            <Image
-              src={item.screenshots[0]}
-              alt={item.name}
-              fill
-              className="object-cover transition-transform duration-300 group-hover:scale-105"
-              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-            />
-          )
-          : (
-            <div className="absolute inset-0 flex items-center justify-center text-muted-foreground">
-              <div className="text-center">
-                <div className="text-4xl font-bold opacity-20">
-                  {item.name[0]}
-                </div>
-                <div className="text-xs mt-1">No preview</div>
-              </div>
+        {hasScreenshot && item.screenshots[0] ? (
+          <Image
+            src={item.screenshots[0]}
+            alt={item.name}
+            fill
+            className="object-cover transition-transform duration-300 group-hover:scale-105"
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+          />
+        ) : (
+          <div className="absolute inset-0 flex items-center justify-center text-muted-foreground">
+            <div className="text-center">
+              <div className="text-4xl font-bold opacity-20">{item.name[0]}</div>
+              <div className="text-xs mt-1">No preview</div>
             </div>
-          )}
+          </div>
+        )}
       </div>
 
       {/* Content */}
@@ -88,14 +84,12 @@ export function PortfolioCard({ item, className }: PortfolioCardProps) {
         </h3>
 
         {/* Description */}
-        <p className="text-sm text-muted-foreground line-clamp-3 mb-4">
-          {item.description}
-        </p>
+        <p className="text-sm text-muted-foreground line-clamp-3 mb-4">{item.description}</p>
 
         {/* Technologies */}
         {item.technologies.length > 0 && (
           <div className="flex flex-wrap gap-1.5 mb-4">
-            {item.technologies.slice(0, 4).map(tech => (
+            {item.technologies.slice(0, 4).map((tech) => (
               <span
                 key={tech}
                 className="px-2 py-0.5 text-xs rounded bg-muted text-muted-foreground"
@@ -159,30 +153,26 @@ export function PortfolioCardCompact({ item, className }: PortfolioCardProps) {
       <div className="flex items-start gap-3">
         {/* Thumbnail */}
         <div className="relative w-16 h-16 rounded-md bg-muted overflow-hidden flex-shrink-0">
-          {item.screenshots[0]
-            ? (
-              <Image
-                src={item.screenshots[0]}
-                alt={item.name}
-                fill
-                className="object-cover"
-                sizes="64px"
-              />
-            )
-            : (
-              <div className="absolute inset-0 flex items-center justify-center text-2xl font-bold text-muted-foreground/20">
-                {item.name[0]}
-              </div>
-            )}
+          {item.screenshots[0] ? (
+            <Image
+              src={item.screenshots[0]}
+              alt={item.name}
+              fill
+              className="object-cover"
+              sizes="64px"
+            />
+          ) : (
+            <div className="absolute inset-0 flex items-center justify-center text-2xl font-bold text-muted-foreground/20">
+              {item.name[0]}
+            </div>
+          )}
         </div>
 
         <div className="flex-1 min-w-0">
           <h4 className="font-medium truncate group-hover:text-primary transition-colors">
             {item.name}
           </h4>
-          <p className="text-sm text-muted-foreground line-clamp-2 mt-0.5">
-            {item.description}
-          </p>
+          <p className="text-sm text-muted-foreground line-clamp-2 mt-0.5">{item.description}</p>
         </div>
 
         <ExternalLink className="w-4 h-4 text-muted-foreground flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity" />

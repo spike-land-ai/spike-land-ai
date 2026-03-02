@@ -111,7 +111,7 @@ export function removeConnection(
  */
 export async function broadcastToCodespace(
   codeSpace: string,
-  event: { type: CodespaceSSEEventType; data: unknown; },
+  event: { type: CodespaceSSEEventType; data: unknown },
 ): Promise<void> {
   const fullEvent: CodespaceSSEEventWithSource = {
     ...event,
@@ -125,17 +125,14 @@ export async function broadcastToCodespace(
 
   // 1 & 2. Publish to Redis (Pub/Sub + List) in parallel
   await Promise.all([
-    redis.publish(channel, payload).catch(err => {
-      logger.error(
-        `[Codespace SSE] Failed to publish to channel ${channel}:`,
-        err,
-      );
+    redis.publish(channel, payload).catch((err) => {
+      logger.error(`[Codespace SSE] Failed to publish to channel ${channel}:`, err);
     }),
     (async () => {
       await redis.lpush(key, payload);
       await redis.expire(key, 60); // 60s TTL
       await redis.ltrim(key, 0, 99); // Keep last 100 events
-    })().catch(err => {
+    })().catch((err) => {
       logger.error(`[Codespace SSE] Failed to store event in list:`, err);
     }),
   ]);
@@ -174,14 +171,12 @@ export async function getCodespaceSSEEvents(
   const events = await redis.lrange<string>(key, 0, -1);
 
   return events
-    .map(e => {
+    .map((e) => {
       if (typeof e === "string") {
         return JSON.parse(e) as CodespaceSSEEventWithSource;
       }
       return e as unknown as CodespaceSSEEventWithSource;
     })
-    .filter(
-      e => e.timestamp > afterTimestamp && e.sourceInstanceId !== INSTANCE_ID,
-    )
+    .filter((e) => e.timestamp > afterTimestamp && e.sourceInstanceId !== INSTANCE_ID)
     .reverse(); // Oldest first for replay
 }

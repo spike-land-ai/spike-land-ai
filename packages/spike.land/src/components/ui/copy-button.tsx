@@ -31,12 +31,7 @@ export function CopyButton({ text, className }: CopyButtonProps) {
   };
 
   return (
-    <Button
-      variant="outline"
-      size="sm"
-      onClick={handleCopy}
-      className={className}
-    >
+    <Button variant="outline" size="sm" onClick={handleCopy} className={className}>
       {state === "copied" && (
         <>
           <Check className="h-4 w-4 mr-1" />

@@ -9,7 +9,7 @@ describe("templates/index", () => {
     });
 
     it("should have the expected template IDs", () => {
-      const ids = templates.map(t => t.id);
+      const ids = templates.map((t) => t.id);
       expect(ids).toContain("link-in-bio");
       expect(ids).toContain("campaign-landing");
       expect(ids).toContain("interactive-poll");
@@ -33,7 +33,7 @@ describe("templates/index", () => {
     });
 
     it("should have unique IDs across all templates", () => {
-      const ids = templates.map(t => t.id);
+      const ids = templates.map((t) => t.id);
       const uniqueIds = new Set(ids);
       expect(uniqueIds.size).toBe(ids.length);
     });

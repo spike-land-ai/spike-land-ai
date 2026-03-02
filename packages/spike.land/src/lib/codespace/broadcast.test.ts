@@ -190,15 +190,8 @@ describe("broadcast", () => {
         "codespace:broadcast-test:events",
         expect.any(String),
       );
-      expect(redis.expire).toHaveBeenCalledWith(
-        "codespace:broadcast-test:events",
-        60,
-      );
-      expect(redis.ltrim).toHaveBeenCalledWith(
-        "codespace:broadcast-test:events",
-        0,
-        99,
-      );
+      expect(redis.expire).toHaveBeenCalledWith("codespace:broadcast-test:events", 60);
+      expect(redis.ltrim).toHaveBeenCalledWith("codespace:broadcast-test:events", 0, 99);
     });
 
     it("should broadcast to local connections", async () => {
@@ -240,9 +233,7 @@ describe("broadcast", () => {
 
     it("should handle Redis publish errors gracefully", async () => {
       const { redis } = await import("@/lib/upstash");
-      vi.mocked(redis.publish).mockRejectedValueOnce(
-        new Error("Redis connection lost"),
-      );
+      vi.mocked(redis.publish).mockRejectedValueOnce(new Error("Redis connection lost"));
 
       // Should not throw
       await broadcastToCodespace("broadcast-err", {
@@ -253,9 +244,7 @@ describe("broadcast", () => {
 
     it("should handle Redis list errors gracefully", async () => {
       const { redis } = await import("@/lib/upstash");
-      vi.mocked(redis.lpush).mockRejectedValueOnce(
-        new Error("Redis write error"),
-      );
+      vi.mocked(redis.lpush).mockRejectedValueOnce(new Error("Redis write error"));
 
       // Should not throw
       await broadcastToCodespace("broadcast-list-err", {

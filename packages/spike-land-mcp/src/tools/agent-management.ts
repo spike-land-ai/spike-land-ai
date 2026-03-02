@@ -20,9 +20,7 @@ export function registerAgentManagementTools(
   registry.registerBuilt(
     freeTool(userId, db)
       .tool("agents_list", "List your connected agents with status and stats.", {
-        limit: z.number().int().min(1).max(50).optional().describe(
-          "Max results (default 20).",
-        ),
+        limit: z.number().int().min(1).max(50).optional().describe("Max results (default 20)."),
       })
       .meta({ category: "agents", tier: "free" })
       .handler(async ({ input, ctx }) => {
@@ -45,12 +43,9 @@ export function registerAgentManagementTools(
 
         let text = `**Agents (${agents.length}):**\n\n`;
         for (const a of agents) {
-          const lastSeen = a.lastActiveAt
-            ? new Date(a.lastActiveAt).toISOString()
-            : "never";
-          text += `- **${a.name}** [${a.status}]\n`
-            + `  Last seen: ${lastSeen}\n`
-            + `  ID: ${a.id}\n\n`;
+          const lastSeen = a.lastActiveAt ? new Date(a.lastActiveAt).toISOString() : "never";
+          text +=
+            `- **${a.name}** [${a.status}]\n` + `  Last seen: ${lastSeen}\n` + `  ID: ${a.id}\n\n`;
         }
         return textResult(text);
       }),
@@ -72,21 +67,19 @@ export function registerAgentManagementTools(
 
         const agent = results[0];
         if (!agent || agent.userId !== ctx.userId) {
-          return textResult(
-            "**Error: NOT_FOUND**\nAgent not found.\n**Retryable:** false",
-          );
+          return textResult("**Error: NOT_FOUND**\nAgent not found.\n**Retryable:** false");
         }
 
         const meta = JSON.parse(agent.metadata ?? "{}") as Record<string, unknown>;
         return textResult(
-          `**Agent**\n\n`
-          + `**ID:** ${agent.id}\n`
-          + `**Name:** ${agent.name}\n`
-          + `**Status:** ${agent.status}\n`
-          + `**Workspace:** ${agent.workspaceId || "(none)"}\n`
-          + `**Metadata:** ${JSON.stringify(meta)}\n`
-          + `**Last Active:** ${agent.lastActiveAt ? new Date(agent.lastActiveAt).toISOString() : "never"}\n`
-          + `**Created:** ${new Date(agent.createdAt).toISOString()}`,
+          `**Agent**\n\n` +
+            `**ID:** ${agent.id}\n` +
+            `**Name:** ${agent.name}\n` +
+            `**Status:** ${agent.status}\n` +
+            `**Workspace:** ${agent.workspaceId || "(none)"}\n` +
+            `**Metadata:** ${JSON.stringify(meta)}\n` +
+            `**Last Active:** ${agent.lastActiveAt ? new Date(agent.lastActiveAt).toISOString() : "never"}\n` +
+            `**Created:** ${new Date(agent.createdAt).toISOString()}`,
         );
       }),
   );
@@ -109,9 +102,7 @@ export function registerAgentManagementTools(
 
         const agent = agentRows[0];
         if (!agent) {
-          return textResult(
-            "**Error: NOT_FOUND**\nAgent not found.\n**Retryable:** false",
-          );
+          return textResult("**Error: NOT_FOUND**\nAgent not found.\n**Retryable:** false");
         }
         if (agent.userId !== ctx.userId) {
           return textResult(
@@ -134,17 +125,16 @@ export function registerAgentManagementTools(
           .limit(50);
 
         if (messages.length === 0) {
-          return textResult(
-            `No messages for agent **${agent.name}**.`,
-          );
+          return textResult(`No messages for agent **${agent.name}**.`);
         }
 
         let text = `**Messages for ${agent.name} (${messages.length}):**\n\n`;
         for (const msg of messages) {
           const preview = msg.content.substring(0, 150);
           const ellipsis = msg.content.length > 150 ? "..." : "";
-          text += `- **[${msg.role}]** ${preview}${ellipsis}\n`
-            + `  ID: ${msg.id} | ${new Date(msg.createdAt).toISOString()}\n\n`;
+          text +=
+            `- **[${msg.role}]** ${preview}${ellipsis}\n` +
+            `  ID: ${msg.id} | ${new Date(msg.createdAt).toISOString()}\n\n`;
         }
         return textResult(text);
       }),
@@ -154,9 +144,7 @@ export function registerAgentManagementTools(
     freeTool(userId, db)
       .tool("agents_send_message", "Send a message to an agent.", {
         agent_id: z.string().min(1).describe("Agent ID to send message to."),
-        content: z.string().min(1).max(10000).describe(
-          "Message content (max 10000 chars).",
-        ),
+        content: z.string().min(1).max(10000).describe("Message content (max 10000 chars)."),
       })
       .meta({ category: "agents", tier: "free" })
       .handler(async ({ input, ctx }) => {
@@ -171,9 +159,7 @@ export function registerAgentManagementTools(
 
         const agent = agentRows[0];
         if (!agent) {
-          return textResult(
-            "**Error: NOT_FOUND**\nAgent not found.\n**Retryable:** false",
-          );
+          return textResult("**Error: NOT_FOUND**\nAgent not found.\n**Retryable:** false");
         }
         if (agent.userId !== ctx.userId) {
           return textResult(
@@ -193,10 +179,10 @@ export function registerAgentManagementTools(
         const preview = content.substring(0, 100);
         const ellipsis = content.length > 100 ? "..." : "";
         return textResult(
-          `**Message Sent!**\n\n`
-          + `**ID:** ${id}\n`
-          + `**To:** ${agent.name}\n`
-          + `**Content:** ${preview}${ellipsis}`,
+          `**Message Sent!**\n\n` +
+            `**ID:** ${id}\n` +
+            `**To:** ${agent.name}\n` +
+            `**Content:** ${preview}${ellipsis}`,
         );
       }),
   );

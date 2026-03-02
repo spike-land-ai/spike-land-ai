@@ -6,7 +6,7 @@ import dynamic from "next/dynamic";
 // This wrapper owns the dynamic import so the Server Component page can import it safely.
 const ReadAloudArticle = dynamic(
   () =>
-    import("./ReadAloudArticle").then(mod => ({
+    import("./ReadAloudArticle").then((mod) => ({
       default: mod.ReadAloudArticle,
     })),
   { ssr: false },

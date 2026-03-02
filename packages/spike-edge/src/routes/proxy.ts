@@ -29,7 +29,7 @@ proxy.post("/proxy/stripe", async (c) => {
   const response = await fetch(body.url, {
     method: body.method ?? "POST",
     headers: {
-      "Authorization": `Bearer ${c.env.STRIPE_SECRET_KEY}`,
+      Authorization: `Bearer ${c.env.STRIPE_SECRET_KEY}`,
       "Content-Type": "application/x-www-form-urlencoded",
       ...body.headers,
     },
@@ -51,7 +51,7 @@ proxy.post("/proxy/ai", async (c) => {
   const response = await fetch(body.url, {
     method: body.method ?? "POST",
     headers: {
-      "Authorization": `Bearer ${c.env.AI_API_KEY}`,
+      Authorization: `Bearer ${c.env.AI_API_KEY}`,
       "Content-Type": "application/json",
       ...body.headers,
     },
@@ -77,8 +77,8 @@ proxy.post("/proxy/github", async (c) => {
   const response = await fetch(body.url, {
     method: body.method ?? "GET",
     headers: {
-      "Authorization": `Bearer ${c.env.GITHUB_TOKEN}`,
-      "Accept": "application/vnd.github+json",
+      Authorization: `Bearer ${c.env.GITHUB_TOKEN}`,
+      Accept: "application/vnd.github+json",
       "User-Agent": "spike-edge",
       ...body.headers,
     },

@@ -25,11 +25,7 @@ export function PlatformHero() {
 
           {/* CTA Buttons */}
           <div className="flex flex-col gap-5 sm:flex-row sm:justify-center">
-            <Button
-              asChild
-              size="lg"
-              className="text-lg font-semibold px-10 py-6"
-            >
+            <Button asChild size="lg" className="text-lg font-semibold px-10 py-6">
               <Link href="/waitlist">
                 <Rocket className="mr-2 h-5 w-5" />
                 Get Started Free

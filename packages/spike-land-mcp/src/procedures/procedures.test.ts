@@ -19,9 +19,15 @@ function createMockMcpServer(): McpServer {
     registerTool: vi.fn((_name: string, _config: unknown, handler: unknown): RegisteredTool => {
       let isEnabled = true;
       return {
-        enable: () => { isEnabled = true; },
-        disable: () => { isEnabled = false; },
-        get enabled() { return isEnabled; },
+        enable: () => {
+          isEnabled = true;
+        },
+        disable: () => {
+          isEnabled = false;
+        },
+        get enabled() {
+          return isEnabled;
+        },
         update: vi.fn(),
         remove: vi.fn(),
         handler: handler as RegisteredTool["handler"],

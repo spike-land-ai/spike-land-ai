@@ -16,7 +16,7 @@ async function fetchOccupations(
   );
   if (!response.ok) return [];
 
-  const data = await response.json() as { occupations: Occupation[]; };
+  const data = (await response.json()) as { occupations: Occupation[] };
   return data.occupations;
 }
 
@@ -45,7 +45,7 @@ export function useOccupations(pageSize = 20) {
 
   const loadMore = useCallback(() => {
     setAccumulated(occupations);
-    setOffset(prev => prev + pageSize);
+    setOffset((prev) => prev + pageSize);
   }, [occupations, pageSize]);
 
   return {

@@ -12,7 +12,7 @@ const MAX_POLL_ATTEMPTS = 60;
 const POLL_INTERVAL_MS = 5000;
 
 function sleep(ms: number): Promise<void> {
-  return new Promise(resolve => setTimeout(resolve, ms));
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 interface BoxForProvisioning {
@@ -26,7 +26,7 @@ interface BoxForProvisioning {
  */
 async function createCloudflareTunnel(
   boxId: string,
-): Promise<{ tunnelToken: string; tunnelUrl: string; } | null> {
+): Promise<{ tunnelToken: string; tunnelUrl: string } | null> {
   const accountId = process.env.CLOUDFLARE_ACCOUNT_ID;
   const apiToken = process.env.CLOUDFLARE_API_TOKEN;
 
@@ -44,20 +44,17 @@ async function createCloudflareTunnel(
 
   // Create tunnel via Cloudflare API
   const { data: createResp, error: createErr } = await tryCatch(
-    fetch(
-      `https://api.cloudflare.com/client/v4/accounts/${accountId}/cfd_tunnel`,
-      {
-        method: "POST",
-        headers: {
-          "Authorization": `Bearer ${apiToken}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          name: tunnelName,
-          tunnel_secret: tunnelSecret,
-        }),
+    fetch(`https://api.cloudflare.com/client/v4/accounts/${accountId}/cfd_tunnel`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${apiToken}`,
+        "Content-Type": "application/json",
       },
-    ),
+      body: JSON.stringify({
+        name: tunnelName,
+        tunnel_secret: tunnelSecret,
+      }),
+    }),
   );
 
   if (createErr || !createResp.ok) {
@@ -68,8 +65,8 @@ async function createCloudflareTunnel(
     return null;
   }
 
-  const createBody = await createResp.json() as {
-    result: { id: string; token: string; };
+  const createBody = (await createResp.json()) as {
+    result: { id: string; token: string };
   };
 
   const tunnelId = createBody.result.id;
@@ -82,7 +79,7 @@ async function createCloudflareTunnel(
       {
         method: "PUT",
         headers: {
-          "Authorization": `Bearer ${apiToken}`,
+          Authorization: `Bearer ${apiToken}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({

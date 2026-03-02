@@ -64,8 +64,9 @@ describe("MCP_ERROR_MESSAGES", () => {
 
 describe("safeToolCall", () => {
   it("returns handler result on success", async () => {
-    const result = await safeToolCall("my_tool", async () =>
-      ({ content: [{ type: "text" as const, text: "ok" }] }));
+    const result = await safeToolCall("my_tool", async () => ({
+      content: [{ type: "text" as const, text: "ok" }],
+    }));
     expect(result.isError).toBeUndefined();
     expect(result.content[0]).toEqual({ type: "text", text: "ok" });
   });
@@ -166,7 +167,7 @@ describe("safeToolCall", () => {
       "slow_tool",
       async () =>
         new Promise<never>((_, reject) =>
-          setTimeout(() => reject(new Error("timed out after")), 500)
+          setTimeout(() => reject(new Error("timed out after")), 500),
         ),
       { timeoutMs: 50 },
     );
@@ -247,8 +248,9 @@ describe("apiRequest", () => {
 
     await apiRequest("/api/secure", {}, "my-token");
     const [, options] = mockFetch.mock.calls[0]!;
-    expect((options as RequestInit & { headers: Record<string, string> }).headers.Authorization)
-      .toBe("Bearer my-token");
+    expect(
+      (options as RequestInit & { headers: Record<string, string> }).headers.Authorization,
+    ).toBe("Bearer my-token");
   });
 
   it("throws McpError with PERMISSION_DENIED on 401", async () => {
@@ -260,7 +262,7 @@ describe("apiRequest", () => {
     } as Response);
 
     await expect(apiRequest("/api/secure")).rejects.toBeInstanceOf(McpError);
-    const caught = await apiRequest("/api/secure").catch(e => e as McpError);
+    const caught = await apiRequest("/api/secure").catch((e) => e as McpError);
     expect(caught.code).toBe(McpErrorCode.PERMISSION_DENIED);
   });
 
@@ -272,7 +274,7 @@ describe("apiRequest", () => {
       text: async () => "Forbidden",
     } as Response);
 
-    const err = await apiRequest("/api/secure").catch(e => e as McpError);
+    const err = await apiRequest("/api/secure").catch((e) => e as McpError);
     expect(err.code).toBe(McpErrorCode.PERMISSION_DENIED);
     expect(err.retryable).toBe(false);
   });
@@ -285,7 +287,7 @@ describe("apiRequest", () => {
       text: async () => "Conflict",
     } as Response);
 
-    const err = await apiRequest("/api/resource").catch(e => e as McpError);
+    const err = await apiRequest("/api/resource").catch((e) => e as McpError);
     expect(err.code).toBe(McpErrorCode.CONFLICT);
   });
 
@@ -297,7 +299,7 @@ describe("apiRequest", () => {
       text: async () => "Too Many Requests",
     } as Response);
 
-    const err = await apiRequest("/api/resource").catch(e => e as McpError);
+    const err = await apiRequest("/api/resource").catch((e) => e as McpError);
     expect(err.code).toBe(McpErrorCode.RATE_LIMITED);
     expect(err.retryable).toBe(true);
   });
@@ -310,7 +312,7 @@ describe("apiRequest", () => {
       text: async () => "Bad Request",
     } as Response);
 
-    const err = await apiRequest("/api/resource").catch(e => e as McpError);
+    const err = await apiRequest("/api/resource").catch((e) => e as McpError);
     expect(err.code).toBe(McpErrorCode.VALIDATION_ERROR);
   });
 
@@ -322,7 +324,7 @@ describe("apiRequest", () => {
       text: async () => "Not Found",
     } as Response);
 
-    const err = await apiRequest("/api/resource").catch(e => e as McpError);
+    const err = await apiRequest("/api/resource").catch((e) => e as McpError);
     expect(err.code).toBe(McpErrorCode.UPSTREAM_SERVICE_ERROR);
     expect(err.retryable).toBe(false);
   });
@@ -335,7 +337,7 @@ describe("apiRequest", () => {
       text: async () => "Internal Server Error",
     } as Response);
 
-    const err = await apiRequest("/api/resource").catch(e => e as McpError);
+    const err = await apiRequest("/api/resource").catch((e) => e as McpError);
     expect(err.code).toBe(McpErrorCode.UPSTREAM_SERVICE_ERROR);
     expect(err.retryable).toBe(true);
   });
@@ -356,12 +358,11 @@ describe("apiRequest", () => {
 
 describe("resolveWorkspace", () => {
   it("throws McpError with WORKSPACE_NOT_FOUND when no results returned", async () => {
-    const db = createDb(
-      createMockD1(() => ({ results: [], success: true, meta: {} })),
-    );
+    const db = createDb(createMockD1(() => ({ results: [], success: true, meta: {} })));
 
-    await expect(resolveWorkspace(db, "user-1", "unknown-workspace"))
-      .rejects.toBeInstanceOf(McpError);
+    await expect(resolveWorkspace(db, "user-1", "unknown-workspace")).rejects.toBeInstanceOf(
+      McpError,
+    );
 
     try {
       await resolveWorkspace(db, "user-1", "unknown-workspace");
@@ -374,9 +375,7 @@ describe("resolveWorkspace", () => {
   });
 
   it("throws McpError when workspace slug is in error message", async () => {
-    const db = createDb(
-      createMockD1(() => ({ results: [], success: true, meta: {} })),
-    );
+    const db = createDb(createMockD1(() => ({ results: [], success: true, meta: {} })));
 
     try {
       await resolveWorkspace(db, "user-1", "my-project");
@@ -391,9 +390,7 @@ describe("resolveWorkspace", () => {
 
 describe("getVaultSecret", () => {
   it("returns undefined when secret not found in db", async () => {
-    const db = createDb(
-      createMockD1(() => ({ results: [], success: true, meta: {} })),
-    );
+    const db = createDb(createMockD1(() => ({ results: [], success: true, meta: {} })));
 
     const result = await getVaultSecret(db, "user-1", "MY_SECRET");
     expect(result).toBeUndefined();

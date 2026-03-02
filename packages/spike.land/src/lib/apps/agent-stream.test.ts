@@ -7,22 +7,18 @@ vi.stubGlobal("fetch", mockFetch);
 
 describe("parseAgentStreamLine", () => {
   it("parses a chunk event", () => {
-    const result = parseAgentStreamLine(
-      "data: {\"type\":\"chunk\",\"content\":\"Hello\"}",
-    );
+    const result = parseAgentStreamLine('data: {"type":"chunk","content":"Hello"}');
     expect(result).toEqual({ type: "chunk", content: "Hello" });
   });
 
   it("parses a stage event", () => {
-    const result = parseAgentStreamLine(
-      "data: {\"type\":\"stage\",\"stage\":\"processing\"}",
-    );
+    const result = parseAgentStreamLine('data: {"type":"stage","stage":"processing"}');
     expect(result).toEqual({ type: "stage", stage: "processing" });
   });
 
   it("parses a stage event with tool", () => {
     const result = parseAgentStreamLine(
-      "data: {\"type\":\"stage\",\"stage\":\"tool_use\",\"tool\":\"code_edit\"}",
+      'data: {"type":"stage","stage":"tool_use","tool":"code_edit"}',
     );
     expect(result).toEqual({
       type: "stage",
@@ -32,16 +28,12 @@ describe("parseAgentStreamLine", () => {
   });
 
   it("parses a status event", () => {
-    const result = parseAgentStreamLine(
-      "data: {\"type\":\"status\",\"content\":\"queued\"}",
-    );
+    const result = parseAgentStreamLine('data: {"type":"status","content":"queued"}');
     expect(result).toEqual({ type: "status", content: "queued" });
   });
 
   it("parses an error event", () => {
-    const result = parseAgentStreamLine(
-      "data: {\"type\":\"error\",\"content\":\"Something failed\"}",
-    );
+    const result = parseAgentStreamLine('data: {"type":"error","content":"Something failed"}');
     expect(result).toEqual({ type: "error", content: "Something failed" });
   });
 
@@ -56,9 +48,7 @@ describe("parseAgentStreamLine", () => {
   });
 
   it("returns null for unknown event type", () => {
-    expect(
-      parseAgentStreamLine("data: {\"type\":\"unknown\",\"content\":\"x\"}"),
-    ).toBeNull();
+    expect(parseAgentStreamLine('data: {"type":"unknown","content":"x"}')).toBeNull();
   });
 });
 
@@ -70,9 +60,9 @@ describe("streamAgentResponse", () => {
   it("yields events from a streaming response", async () => {
     const encoder = new TextEncoder();
     const chunks = [
-      "data: {\"type\":\"stage\",\"stage\":\"initialize\"}\n\n",
-      "data: {\"type\":\"chunk\",\"content\":\"Hello \"}\n\n",
-      "data: {\"type\":\"chunk\",\"content\":\"world\"}\n\n",
+      'data: {"type":"stage","stage":"initialize"}\n\n',
+      'data: {"type":"chunk","content":"Hello "}\n\n',
+      'data: {"type":"chunk","content":"world"}\n\n',
     ];
 
     let chunkIndex = 0;
@@ -128,9 +118,7 @@ describe("streamAgentResponse", () => {
     // Send a chunk that doesn't end with \n, so it stays in buffer
     const stream = new ReadableStream<Uint8Array>({
       start(controller) {
-        controller.enqueue(
-          encoder.encode("data: {\"type\":\"chunk\",\"content\":\"buffered\"}"),
-        );
+        controller.enqueue(encoder.encode('data: {"type":"chunk","content":"buffered"}'));
         controller.close();
       },
     });
@@ -151,9 +139,7 @@ describe("streamAgentResponse", () => {
     // Send data that ends with \n so buffer is empty after processing
     const stream = new ReadableStream<Uint8Array>({
       start(controller) {
-        controller.enqueue(
-          encoder.encode("data: {\"type\":\"chunk\",\"content\":\"done\"}\n"),
-        );
+        controller.enqueue(encoder.encode('data: {"type":"chunk","content":"done"}\n'));
         controller.close();
       },
     });
@@ -179,12 +165,7 @@ describe("streamAgentResponse", () => {
     mockFetch.mockResolvedValue({ ok: true, body: stream });
 
     const controller = new AbortController();
-    const gen = streamAgentResponse(
-      "app-1",
-      "test",
-      ["img-1", "img-2"],
-      controller.signal,
-    );
+    const gen = streamAgentResponse("app-1", "test", ["img-1", "img-2"], controller.signal);
 
     // Exhaust the generator
     const results = [];

@@ -32,10 +32,7 @@ interface SignOutOptions {
 /**
  * Trigger a sign-in flow.
  */
-export async function signIn(
-  provider?: SignInProvider,
-  options?: SignInOptions,
-) {
+export async function signIn(provider?: SignInProvider, options?: SignInOptions) {
   return nextAuthSignIn(provider || "email", options);
 }
 

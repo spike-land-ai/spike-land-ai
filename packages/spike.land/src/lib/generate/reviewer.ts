@@ -5,8 +5,7 @@ import logger from "@/lib/logger";
 import { getOrCreateAgentElo, selectByElo } from "./elo-tracker";
 import type { AgentIdentity, ReviewResult } from "./types";
 
-const PLAN_REVIEW_SYSTEM =
-  `You are a senior software architect reviewing a plan for generating a React component.
+const PLAN_REVIEW_SYSTEM = `You are a senior software architect reviewing a plan for generating a React component.
 
 Your job is to evaluate whether the plan is clear, feasible, and will produce a working React component with Tailwind CSS styling.
 
@@ -29,16 +28,12 @@ Your job is to evaluate whether the code will:
 Respond with EXACTLY this JSON format (no markdown fences):
 {"decision": "APPROVED" | "REJECTED", "feedback": "brief reason", "score": 0.0-1.0}`;
 
-export async function selectReviewers(
-  count = 2,
-): Promise<AgentIdentity[]> {
+export async function selectReviewers(count = 2): Promise<AgentIdentity[]> {
   const agents = await selectByElo(count);
-  return agents.map(a => ({
+  return agents.map((a) => ({
     agentId: a.agentId,
     model: a.agentModel,
-    systemPrompt: a.agentModel === "haiku"
-      ? PLAN_REVIEW_SYSTEM
-      : PLAN_REVIEW_SYSTEM,
+    systemPrompt: a.agentModel === "haiku" ? PLAN_REVIEW_SYSTEM : PLAN_REVIEW_SYSTEM,
     elo: a.elo,
   }));
 }
@@ -104,9 +99,7 @@ export async function reviewCode(
   reviewer: AgentIdentity,
   routeId: string,
 ): Promise<ReviewResult> {
-  const codePreview = code.length > 8000
-    ? code.slice(0, 8000) + "\n// ... truncated"
-    : code;
+  const codePreview = code.length > 8000 ? code.slice(0, 8000) + "\n// ... truncated" : code;
   const userPrompt = `Review this generated React component:\n\n\`\`\`tsx\n${codePreview}\n\`\`\``;
 
   try {
@@ -164,10 +157,10 @@ export async function reviewCode(
  */
 export async function runReviewConsensus(
   reviewFn: (reviewer: AgentIdentity) => Promise<ReviewResult>,
-): Promise<{ results: ReviewResult[]; approved: boolean; }> {
+): Promise<{ results: ReviewResult[]; approved: boolean }> {
   const reviewers = await selectReviewers(2);
   const results = await Promise.all(reviewers.map(reviewFn));
-  const approved = results.every(r => r.decision === "APPROVED");
+  const approved = results.every((r) => r.decision === "APPROVED");
   return { results, approved };
 }
 

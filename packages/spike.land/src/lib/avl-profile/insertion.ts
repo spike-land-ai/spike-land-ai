@@ -33,13 +33,9 @@ export async function handleCollision(
   question: string;
 }> {
   const prisma = (await import("@/lib/prisma")).default;
-  const { generateDifferentiatingQuestion } = await import(
-    "./question-generator"
-  );
+  const { generateDifferentiatingQuestion } = await import("./question-generator");
   const { rebalanceUpward } = await import("./avl-rotations");
-  const { deriveTagsFromAnswerPath, buildProfileVector } = await import(
-    "./personalization"
-  );
+  const { deriveTagsFromAnswerPath, buildProfileVector } = await import("./personalization");
 
   // Load session to get answer path context
   const session = await prisma.avlTraversalSession.findUniqueOrThrow({
@@ -57,19 +53,16 @@ export async function handleCollision(
 
   // Collect used questions to avoid duplicates
   const usedQuestions = [
-    ...newUserAnswers.map(a => a.question),
-    ...occupantAnswers.map(a => a.question),
+    ...newUserAnswers.map((a) => a.question),
+    ...occupantAnswers.map((a) => a.question),
   ];
 
   // Generate a differentiating question
-  const generated = await generateDifferentiatingQuestion(
-    newUserAnswers,
-    usedQuestions,
-  );
+  const generated = await generateDifferentiatingQuestion(newUserAnswers, usedQuestions);
 
   // Run the collision resolution in a serializable transaction
   return prisma.$transaction(
-    async tx => {
+    async (tx) => {
       const collisionNode = await tx.avlProfileNode.findUniqueOrThrow({
         where: { id: session.currentNodeId },
       });

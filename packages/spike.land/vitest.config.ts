@@ -23,12 +23,7 @@ export default defineConfig({
       "src/middleware.{test,spec}.{ts,tsx}",
       "apps/**/*.{test,spec}.{ts,tsx}",
     ],
-    exclude: [
-      "**/node_modules/**",
-      "**/dist/**",
-      "**/.git/**",
-      "**/mcp-explorer.spec.ts",
-    ],
+    exclude: ["**/node_modules/**", "**/dist/**", "**/.git/**", "**/mcp-explorer.spec.ts"],
     // Use forks pool for better memory isolation in CI
     // Each test file runs in separate process with fresh memory
     pool: "forks",
@@ -40,11 +35,9 @@ export default defineConfig({
     // When VITEST_COVERAGE is set, also use the coverage mapper for intelligent caching
     reporters: process.env.CI
       ? [
-        "github-actions",
-        ...(process.env.VITEST_COVERAGE
-          ? ["./scripts/vitest-coverage-mapper-reporter.ts"]
-          : []),
-      ]
+          "github-actions",
+          ...(process.env.VITEST_COVERAGE ? ["./scripts/vitest-coverage-mapper-reporter.ts"] : []),
+        ]
       : ["default"],
     coverage: {
       provider: "v8",
@@ -59,10 +52,10 @@ export default defineConfig({
         "node_modules/**",
       ],
       thresholds: {
-        lines: 80,
-        functions: 80,
-        branches: 75,
-        statements: 80,
+        lines: 96,
+        functions: 96,
+        branches: 96,
+        statements: 96,
       },
     },
   },

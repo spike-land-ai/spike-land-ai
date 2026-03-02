@@ -48,7 +48,14 @@ const GetJobsSchema = z.object({
   location: z.string().optional().describe("Location filter"),
   countryCode: z.string().optional().default("gb").describe("ISO country code (default 'gb')"),
   page: z.number().int().min(1).optional().default(1).describe("Page number (default 1)"),
-  limit: z.number().int().min(1).max(50).optional().default(10).describe("Results per page (default 10)"),
+  limit: z
+    .number()
+    .int()
+    .min(1)
+    .max(50)
+    .optional()
+    .default(10)
+    .describe("Results per page (default 10)"),
 });
 
 export function registerCareerTools(
@@ -69,13 +76,15 @@ export function registerCareerTools(
       .meta({ category: "career", tier: "free" })
       .handler(async ({ input }) => {
         return safeToolCall("career_assess_skills", async () => {
-          const results = await apiRequest<Array<{
-            occupation: { title: string };
-            score: number;
-            matchedSkills: number;
-            totalRequired: number;
-            gaps: Array<{ skill: { title: string }; priority: string }>;
-          }>>("/api/career/assess", {
+          const results = await apiRequest<
+            Array<{
+              occupation: { title: string };
+              score: number;
+              matchedSkills: number;
+              totalRequired: number;
+              gaps: Array<{ skill: { title: string }; priority: string }>;
+            }>
+          >("/api/career/assess", {
             method: "POST",
             body: JSON.stringify({ skills: input.skills, limit: input.limit }),
           });
@@ -88,9 +97,12 @@ export function registerCareerTools(
           for (const match of results) {
             text += `- **${match.occupation.title}** — Score: ${match.score}%\n`;
             text += `  Matched: ${match.matchedSkills}/${match.totalRequired} skills\n`;
-            const highGaps = match.gaps.filter(g => g.priority === "high");
+            const highGaps = match.gaps.filter((g) => g.priority === "high");
             if (highGaps.length > 0) {
-              text += `  Key gaps: ${highGaps.slice(0, 3).map(g => g.skill.title).join(", ")}\n`;
+              text += `  Key gaps: ${highGaps
+                .slice(0, 3)
+                .map((g) => g.skill.title)
+                .join(", ")}\n`;
             }
             text += "\n";
           }
@@ -160,8 +172,8 @@ export function registerCareerTools(
             return textResult("**Error: NOT_FOUND**\nOccupation not found.\n**Retryable:** false");
           }
 
-          const essentialSkills = occupation.skills.filter(s => s.skillType === "essential");
-          const optionalSkills = occupation.skills.filter(s => s.skillType === "optional");
+          const essentialSkills = occupation.skills.filter((s) => s.skillType === "essential");
+          const optionalSkills = occupation.skills.filter((s) => s.skillType === "optional");
 
           let text = `**${occupation.title}**\n\n`;
           text += `**URI:** ${occupation.uri}\n`;
@@ -264,11 +276,11 @@ export function registerCareerTools(
           }
 
           return textResult(
-            `**Salary: ${input.occupationTitle}** (${salary.location})\n\n`
-            + `**Median:** ${salary.currency}${salary.median.toLocaleString()}\n`
-            + `**25th Percentile:** ${salary.currency}${salary.p25.toLocaleString()}\n`
-            + `**75th Percentile:** ${salary.currency}${salary.p75.toLocaleString()}\n`
-            + `**Source:** ${salary.source}`,
+            `**Salary: ${input.occupationTitle}** (${salary.location})\n\n` +
+              `**Median:** ${salary.currency}${salary.median.toLocaleString()}\n` +
+              `**25th Percentile:** ${salary.currency}${salary.p25.toLocaleString()}\n` +
+              `**75th Percentile:** ${salary.currency}${salary.p75.toLocaleString()}\n` +
+              `**Source:** ${salary.source}`,
           );
         });
       }),
@@ -315,11 +327,12 @@ export function registerCareerTools(
             text += `- **${job.title}** at ${job.company}\n`;
             text += `  Location: ${job.location}\n`;
             if (job.salary_min !== null || job.salary_max !== null) {
-              const salary = job.salary_min && job.salary_max
-                ? `${job.currency}${job.salary_min.toLocaleString()} - ${job.currency}${job.salary_max.toLocaleString()}`
-                : job.salary_min
-                  ? `From ${job.currency}${job.salary_min.toLocaleString()}`
-                  : `Up to ${job.currency}${job.salary_max!.toLocaleString()}`;
+              const salary =
+                job.salary_min && job.salary_max
+                  ? `${job.currency}${job.salary_min.toLocaleString()} - ${job.currency}${job.salary_max.toLocaleString()}`
+                  : job.salary_min
+                    ? `From ${job.currency}${job.salary_min.toLocaleString()}`
+                    : `Up to ${job.currency}${job.salary_max!.toLocaleString()}`;
               text += `  Salary: ${salary}\n`;
             }
             text += `  [Apply](${job.url})\n\n`;

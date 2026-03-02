@@ -17,9 +17,7 @@ describe("canvas animations", () => {
     });
 
     it("should have hero durations equal", () => {
-      expect(ANIMATION_DURATIONS.heroExpand).toBe(
-        ANIMATION_DURATIONS.heroCollapse,
-      );
+      expect(ANIMATION_DURATIONS.heroExpand).toBe(ANIMATION_DURATIONS.heroCollapse);
     });
   });
 

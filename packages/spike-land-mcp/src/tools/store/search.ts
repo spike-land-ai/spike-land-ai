@@ -20,18 +20,24 @@ export function registerStoreSearchTools(
 
   registry.registerBuilt(
     t
-      .tool("store_list_apps_with_tools", "List all store apps with their MCP tool names for CLI tool grouping.", {})
+      .tool(
+        "store_list_apps_with_tools",
+        "List all store apps with their MCP tool names for CLI tool grouping.",
+        {},
+      )
       .meta({ category: "store-search", tier: "free" })
       .handler(async () => {
         return safeToolCall("store_list_apps_with_tools", async () => {
-          const apps = await apiRequest<Array<{
-            slug: string;
-            name: string;
-            icon: string;
-            category: string;
-            tagline: string;
-            toolNames: string[];
-          }>>("/api/store/apps/with-tools");
+          const apps = await apiRequest<
+            Array<{
+              slug: string;
+              name: string;
+              icon: string;
+              category: string;
+              tagline: string;
+              toolNames: string[];
+            }>
+          >("/api/store/apps/with-tools");
 
           return textResult(JSON.stringify(apps));
         });
@@ -40,15 +46,25 @@ export function registerStoreSearchTools(
 
   registry.registerBuilt(
     t
-      .tool("store_search", "Score-ranked search across app names, taglines, descriptions, and tags.", {
-        query: z.string().min(1).describe(
-          "Search query to match against app names, taglines, descriptions, and tags",
-        ),
-        category: z.string().optional().describe("Optional category filter"),
-        limit: z.number().int().min(1).max(20).optional().default(10).describe(
-          "Max results to return (default 10)",
-        ),
-      })
+      .tool(
+        "store_search",
+        "Score-ranked search across app names, taglines, descriptions, and tags.",
+        {
+          query: z
+            .string()
+            .min(1)
+            .describe("Search query to match against app names, taglines, descriptions, and tags"),
+          category: z.string().optional().describe("Optional category filter"),
+          limit: z
+            .number()
+            .int()
+            .min(1)
+            .max(20)
+            .optional()
+            .default(10)
+            .describe("Max results to return (default 10)"),
+        },
+      )
       .meta({ category: "store-search", tier: "free" })
       .handler(async ({ input }) => {
         return safeToolCall("store_search", async () => {
@@ -56,17 +72,21 @@ export function registerStoreSearchTools(
           if (input.category) params.set("category", input.category);
           if (input.limit !== undefined) params.set("limit", String(input.limit));
 
-          const results = await apiRequest<Array<{
-            name: string;
-            tagline: string;
-            slug: string;
-          }>>(`/api/store/search?${params.toString()}`);
+          const results = await apiRequest<
+            Array<{
+              name: string;
+              tagline: string;
+              slug: string;
+            }>
+          >(`/api/store/search?${params.toString()}`);
 
           if (results.length === 0) {
             return textResult(`No apps found matching "${input.query}".`);
           }
 
-          const list = results.map(a => `- **${a.name}** — ${a.tagline} (\`${a.slug}\`)`).join("\n");
+          const list = results
+            .map((a) => `- **${a.name}** — ${a.tagline} (\`${a.slug}\`)`)
+            .join("\n");
           return textResult(`## Search Results for "${input.query}"\n\n${list}`);
         });
       }),
@@ -75,24 +95,27 @@ export function registerStoreSearchTools(
   registry.registerBuilt(
     t
       .tool("store_browse_category", "Browse all apps in a given store category.", {
-        category: z.string().min(1).describe(
-          "Category to browse (e.g. developer, creative, productivity)",
-        ),
+        category: z
+          .string()
+          .min(1)
+          .describe("Category to browse (e.g. developer, creative, productivity)"),
       })
       .meta({ category: "store-search", tier: "free" })
       .handler(async ({ input }) => {
         return safeToolCall("store_browse_category", async () => {
-          const apps = await apiRequest<Array<{
-            name: string;
-            tagline: string;
-            slug: string;
-          }>>(`/api/store/category/${input.category}`);
+          const apps = await apiRequest<
+            Array<{
+              name: string;
+              tagline: string;
+              slug: string;
+            }>
+          >(`/api/store/category/${input.category}`);
 
           if (apps.length === 0) {
             return textResult(`No apps found in category "${input.category}".`);
           }
 
-          const list = apps.map(a => `- **${a.name}** — ${a.tagline} (\`${a.slug}\`)`).join("\n");
+          const list = apps.map((a) => `- **${a.name}** — ${a.tagline} (\`${a.slug}\`)`).join("\n");
           return textResult(`## ${input.category} Apps\n\n${list}`);
         });
       }),
@@ -104,17 +127,20 @@ export function registerStoreSearchTools(
       .meta({ category: "store-search", tier: "free" })
       .handler(async () => {
         return safeToolCall("store_featured_apps", async () => {
-          const apps = await apiRequest<Array<{
-            name: string;
-            tagline: string;
-            slug: string;
-          }>>("/api/store/featured");
+          const apps =
+            await apiRequest<
+              Array<{
+                name: string;
+                tagline: string;
+                slug: string;
+              }>
+            >("/api/store/featured");
 
           if (apps.length === 0) {
             return textResult("No featured apps at the moment.");
           }
 
-          const list = apps.map(a => `- **${a.name}** — ${a.tagline} (\`${a.slug}\`)`).join("\n");
+          const list = apps.map((a) => `- **${a.name}** — ${a.tagline} (\`${a.slug}\`)`).join("\n");
           return textResult(`## Featured Apps\n\n${list}`);
         });
       }),
@@ -126,17 +152,20 @@ export function registerStoreSearchTools(
       .meta({ category: "store-search", tier: "free" })
       .handler(async () => {
         return safeToolCall("store_new_apps", async () => {
-          const apps = await apiRequest<Array<{
-            name: string;
-            tagline: string;
-            slug: string;
-          }>>("/api/store/new");
+          const apps =
+            await apiRequest<
+              Array<{
+                name: string;
+                tagline: string;
+                slug: string;
+              }>
+            >("/api/store/new");
 
           if (apps.length === 0) {
             return textResult("No new apps at the moment.");
           }
 
-          const list = apps.map(a => `- **${a.name}** — ${a.tagline} (\`${a.slug}\`)`).join("\n");
+          const list = apps.map((a) => `- **${a.name}** — ${a.tagline} (\`${a.slug}\`)`).join("\n");
           return textResult(`## New Apps\n\n${list}`);
         });
       }),
@@ -166,9 +195,7 @@ export function registerStoreSearchTools(
             return textResult(`App "${input.slug}" not found.`);
           }
 
-          const tags = app.tags.length > 0
-            ? app.tags.map(t => `\`${t}\``).join(", ")
-            : "None";
+          const tags = app.tags.length > 0 ? app.tags.map((t) => `\`${t}\``).join(", ") : "None";
 
           const card = [
             `## ${app.name}`,

@@ -8,11 +8,7 @@ import {
   geminiScoreResponseSchema,
   transformGeminiResponse,
 } from "@/lib/validations/brand-score";
-import type {
-  BrandGuardrail,
-  BrandProfile,
-  BrandVocabulary,
-} from "@/types/brand-brain";
+import type { BrandGuardrail, BrandProfile, BrandVocabulary } from "@/types/brand-brain";
 import { formatGuardrails, formatVocabulary } from "./prompt-formatters";
 
 // ============================================
@@ -141,9 +137,7 @@ Score this content against the brand guidelines and return your analysis as JSON
  * @returns Content score response
  * @throws Error if scoring fails
  */
-export async function scoreContent(
-  params: ScoreContentParams,
-): Promise<ContentScoreResponse> {
+export async function scoreContent(params: ScoreContentParams): Promise<ContentScoreResponse> {
   const systemPrompt = buildBrandScoringSystemPrompt(params);
   const userPrompt = buildUserPrompt(params.content, params.contentType);
 

@@ -19,9 +19,7 @@ interface CreateGeminiChatStreamParams {
  * - `{type: "done", usage: {model: "gemini-3-flash-preview"}}` on completion
  * - `{type: "error", error: "friendly message"}` on any failure
  */
-export function createGeminiChatStream(
-  params: CreateGeminiChatStreamParams,
-): ReadableStream {
+export function createGeminiChatStream(params: CreateGeminiChatStreamParams): ReadableStream {
   const { question, systemPrompt, maxTokens = 512, onComplete } = params;
   let cancelled = false;
 
@@ -45,7 +43,9 @@ export function createGeminiChatStream(
         if (cancelled) return;
         try {
           controller.close();
-        } catch { /* already closed */ }
+        } catch {
+          /* already closed */
+        }
       };
 
       try {
@@ -87,9 +87,7 @@ export function createGeminiChatStream(
         if (cancelled) return;
         const msg = error instanceof Error ? error.message : String(error);
         if (/aborted|cancel|ECONNRESET/i.test(msg)) {
-          logger.debug(
-            "[Gemini stream] Client disconnected, ending gracefully",
-          );
+          logger.debug("[Gemini stream] Client disconnected, ending gracefully");
           return;
         }
         logger.error("Gemini chat stream error", { error: msg });

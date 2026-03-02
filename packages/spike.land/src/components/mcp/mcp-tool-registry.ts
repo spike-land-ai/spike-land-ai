@@ -82,12 +82,7 @@ const TAXONOMY: Record<string, TaxonomySuperDef> = {
       {
         name: "Discovery & Config",
         icon: "Compass",
-        categoryIds: [
-          "gateway-meta",
-          "mcp-registry",
-          "capabilities",
-          "settings",
-        ],
+        categoryIds: ["gateway-meta", "mcp-registry", "capabilities", "settings"],
       },
       {
         name: "Auth & Security",
@@ -138,12 +133,7 @@ const TAXONOMY: Record<string, TaxonomySuperDef> = {
       {
         name: "Image Processing",
         icon: "ImagePlus",
-        categoryIds: [
-          "image",
-          "batch-enhance",
-          "enhancement-jobs",
-          "pipelines",
-        ],
+        categoryIds: ["image", "batch-enhance", "enhancement-jobs", "pipelines"],
       },
       { name: "Audio & Speech", icon: "Music", categoryIds: ["audio", "tts"] },
       {
@@ -228,12 +218,7 @@ const TAXONOMY: Record<string, TaxonomySuperDef> = {
       {
         name: "Chess Arena",
         icon: "Crown",
-        categoryIds: [
-          "chess-challenge",
-          "chess-game",
-          "chess-player",
-          "chess-replay",
-        ],
+        categoryIds: ["chess-challenge", "chess-game", "chess-player", "chess-replay"],
       },
       {
         name: "CleanSweep",
@@ -285,10 +270,7 @@ const TAXONOMY: Record<string, TaxonomySuperDef> = {
 
 type CategoryColor = McpCategory["color"];
 
-const CATEGORY_META: Record<
-  string,
-  { displayName: string; icon: string; color: CategoryColor; }
-> = {
+const CATEGORY_META: Record<string, { displayName: string; icon: string; color: CategoryColor }> = {
   "gateway-meta": { displayName: "Discovery", icon: "Compass", color: "blue" },
   image: { displayName: "Image AI", icon: "ImagePlus", color: "fuchsia" },
   codespace: { displayName: "Codespace", icon: "Code2", color: "green" },
@@ -349,25 +331,19 @@ const CATEGORY_META: Record<
 };
 
 // Tools whose response renders as an image in the playground
-const IMAGE_TOOLS = new Set([
-  "generate_image",
-  "modify_image",
-  "codespace_screenshot",
-]);
+const IMAGE_TOOLS = new Set(["generate_image", "modify_image", "codespace_screenshot"]);
 
 // ── Derive display name from snake_case tool name ───────────────────
 function toDisplayName(name: string): string {
   return name
     .split("_")
-    .map(w => w.charAt(0).toUpperCase() + w.slice(1))
+    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
     .join(" ");
 }
 
 // ── Build categories from manifest ──────────────────────────────────
 export const MCP_CATEGORIES: McpCategory[] = toolsManifest.categories.map(
-  (
-    cat: { name: string; description: string; toolCount: number; tier: string; },
-  ) => {
+  (cat: { name: string; description: string; toolCount: number; tier: string }) => {
     const meta = CATEGORY_META[cat.name];
     return {
       id: cat.name,
@@ -382,35 +358,32 @@ export const MCP_CATEGORIES: McpCategory[] = toolsManifest.categories.map(
 );
 
 // ── Build tools from manifest ───────────────────────────────────────
-export const MCP_TOOLS: McpToolDef[] = toolsManifest.tools.map((tool: {
-  name: string;
-  description: string;
-  category: string;
-  tier: string;
-  parameters: Array<
-    { name: string; type: string; description: string; required: boolean; }
-  >;
-}) => ({
-  name: tool.name,
-  displayName: toDisplayName(tool.name),
-  description: tool.description,
-  category: tool.category,
-  tier: tool.tier as "free" | "workspace",
-  ...(tool.category === "gateway-meta" ? { alwaysEnabled: true as const } : {}),
-  responseType: IMAGE_TOOLS.has(tool.name) ? "image" as const : "json" as const,
-  params: tool.parameters.map(p => ({
-    name: p.name,
-    type: p.type as McpToolParam["type"],
-    description: p.description,
-    required: p.required,
-  })),
-}));
+export const MCP_TOOLS: McpToolDef[] = toolsManifest.tools.map(
+  (tool: {
+    name: string;
+    description: string;
+    category: string;
+    tier: string;
+    parameters: Array<{ name: string; type: string; description: string; required: boolean }>;
+  }) => ({
+    name: tool.name,
+    displayName: toDisplayName(tool.name),
+    description: tool.description,
+    category: tool.category,
+    tier: tool.tier as "free" | "workspace",
+    ...(tool.category === "gateway-meta" ? { alwaysEnabled: true as const } : {}),
+    responseType: IMAGE_TOOLS.has(tool.name) ? ("image" as const) : ("json" as const),
+    params: tool.parameters.map((p) => ({
+      name: p.name,
+      type: p.type as McpToolParam["type"],
+      description: p.description,
+      required: p.required,
+    })),
+  }),
+);
 
 // ── Keywords & example payloads for top tools ───────────────────────
-const TOOL_EXTRAS: Record<
-  string,
-  { keywords?: string[]; example?: Record<string, unknown>; }
-> = {
+const TOOL_EXTRAS: Record<string, { keywords?: string[]; example?: Record<string, unknown> }> = {
   search_tools: {
     keywords: ["find", "discover", "lookup", "browse"],
     example: { query: "image" },
@@ -500,43 +473,42 @@ for (const tool of MCP_TOOLS) {
 }
 
 // ── Category lookup map ─────────────────────────────────────────────
-const categoryMap = new Map(MCP_CATEGORIES.map(c => [c.id, c]));
+const categoryMap = new Map(MCP_CATEGORIES.map((c) => [c.id, c]));
 
 // ── Build 3-level hierarchy ─────────────────────────────────────────
 export const MCP_SUPER_CATEGORIES: McpSuperCategory[] = Object.entries(TAXONOMY)
-  .map(
-    ([superId, superDef]) => {
-      const subcategories: McpSubcategory[] = superDef.subcategories.map(
-        subDef => {
-          const categories = subDef.categoryIds
-            .map(id => categoryMap.get(id))
-            .filter((c): c is McpCategory => c !== undefined && c.toolCount > 0);
-          const toolCount = categories.reduce((sum, c) => sum + c.toolCount, 0);
+  .map(([superId, superDef]) => {
+    const subcategories: McpSubcategory[] = superDef.subcategories
+      .map((subDef) => {
+        const categories = subDef.categoryIds
+          .map((id) => categoryMap.get(id))
+          .filter((c): c is McpCategory => c !== undefined && c.toolCount > 0);
+        const toolCount = categories.reduce((sum, c) => sum + c.toolCount, 0);
 
-          return {
-            id: subDef.categoryIds.join("-"),
-            name: subDef.name,
-            icon: subDef.icon,
-            categoryIds: subDef.categoryIds,
-            categories,
-            toolCount,
-          };
-        },
-      ).filter(sub => sub.toolCount > 0);
+        return {
+          id: subDef.categoryIds.join("-"),
+          name: subDef.name,
+          icon: subDef.icon,
+          categoryIds: subDef.categoryIds,
+          categories,
+          toolCount,
+        };
+      })
+      .filter((sub) => sub.toolCount > 0);
 
-      const toolCount = subcategories.reduce((sum, s) => sum + s.toolCount, 0);
+    const toolCount = subcategories.reduce((sum, s) => sum + s.toolCount, 0);
 
-      return {
-        id: superId,
-        name: superDef.name,
-        description: superDef.description,
-        icon: superDef.icon,
-        color: superDef.color,
-        subcategories,
-        toolCount,
-      };
-    },
-  ).filter(s => s.toolCount > 0);
+    return {
+      id: superId,
+      name: superDef.name,
+      description: superDef.description,
+      icon: superDef.icon,
+      color: superDef.color,
+      subcategories,
+      toolCount,
+    };
+  })
+  .filter((s) => s.toolCount > 0);
 
 // ── Reverse lookup: category ID → super category ────────────────────
 const categoryToSuper = new Map<string, string>();
@@ -552,15 +524,15 @@ for (const sup of MCP_SUPER_CATEGORIES) {
 
 // ── Helpers (same API as before) ────────────────────────────────────
 export function getToolsByCategory(category: string): McpToolDef[] {
-  return MCP_TOOLS.filter(t => t.category === category);
+  return MCP_TOOLS.filter((t) => t.category === category);
 }
 
 export function getCategoryById(id: string): McpCategory | undefined {
-  return MCP_CATEGORIES.find(c => c.id === id);
+  return MCP_CATEGORIES.find((c) => c.id === id);
 }
 
 export function getActiveCategories(): McpCategory[] {
-  return MCP_CATEGORIES.filter(c => c.toolCount > 0);
+  return MCP_CATEGORIES.filter((c) => c.toolCount > 0);
 }
 
 export function getAllCategories(): McpCategory[] {
@@ -573,29 +545,27 @@ export function getSuperCategories(): McpSuperCategory[] {
 }
 
 export function getSuperCategoryById(id: string): McpSuperCategory | undefined {
-  return MCP_SUPER_CATEGORIES.find(s => s.id === id);
+  return MCP_SUPER_CATEGORIES.find((s) => s.id === id);
 }
 
-export function getSuperCategoryForCategory(
-  categoryId: string,
-): string | undefined {
+export function getSuperCategoryForCategory(categoryId: string): string | undefined {
   return categoryToSuper.get(categoryId);
 }
 
-export function getSubcategoryForCategory(
-  categoryId: string,
-): string | undefined {
+export function getSubcategoryForCategory(categoryId: string): string | undefined {
   return categoryToSub.get(categoryId);
 }
 
 export function findSuperBySlug(slug: string): McpSuperCategory | undefined {
   const q = slug.toLowerCase();
   return MCP_SUPER_CATEGORIES.find(
-    s =>
-      s.id === q
-      || s.name.toLowerCase().replace(/\s+&\s+/g, "-").replace(/\s+/g, "-")
-        === q
-      || s.name.toLowerCase() === q,
+    (s) =>
+      s.id === q ||
+      s.name
+        .toLowerCase()
+        .replace(/\s+&\s+/g, "-")
+        .replace(/\s+/g, "-") === q ||
+      s.name.toLowerCase() === q,
   );
 }
 
@@ -603,10 +573,12 @@ export function findSubBySlug(slug: string): McpSubcategory | undefined {
   const q = slug.toLowerCase();
   for (const sup of MCP_SUPER_CATEGORIES) {
     const found = sup.subcategories.find(
-      s =>
-        s.name.toLowerCase() === q
-        || s.name.toLowerCase().replace(/\s+&\s+/g, "-").replace(/\s+/g, "-")
-          === q,
+      (s) =>
+        s.name.toLowerCase() === q ||
+        s.name
+          .toLowerCase()
+          .replace(/\s+&\s+/g, "-")
+          .replace(/\s+/g, "-") === q,
     );
     if (found) return found;
   }
@@ -624,15 +596,12 @@ for (const tool of MCP_TOOLS) {
   toolSearchIndex.embed(tool.name, tool.category, tool.description);
 }
 
-export function searchToolsSemantic(
-  query: string,
-  limit = 20,
-): ToolSearchResult[] {
+export function searchToolsSemantic(query: string, limit = 20): ToolSearchResult[] {
   const results = toolSearchIndex.search(query, limit, 0.02);
-  const toolMap = new Map(MCP_TOOLS.map(t => [t.name, t]));
+  const toolMap = new Map(MCP_TOOLS.map((t) => [t.name, t]));
 
   return results
-    .map(r => {
+    .map((r) => {
       const tool = toolMap.get(r.name);
       if (!tool) return null;
       return { tool, score: r.score };
@@ -642,6 +611,6 @@ export function searchToolsSemantic(
 
 export const TOTAL_TOOL_COUNT = MCP_TOOLS.length;
 export const TOTAL_CATEGORY_COUNT = MCP_CATEGORIES.length;
-export const GATEWAY_TOOL_COUNT = MCP_TOOLS.filter(t => t.alwaysEnabled).length;
-export const ACTIVE_CATEGORY_COUNT = MCP_CATEGORIES.filter(c => c.toolCount > 0).length;
+export const GATEWAY_TOOL_COUNT = MCP_TOOLS.filter((t) => t.alwaysEnabled).length;
+export const ACTIVE_CATEGORY_COUNT = MCP_CATEGORIES.filter((c) => c.toolCount > 0).length;
 export const SUPER_CATEGORY_COUNT = MCP_SUPER_CATEGORIES.length;

@@ -32,7 +32,7 @@ export function getClaudeCliVersion(): string {
 
 /** Default headers shared across all Claude API calls. */
 const DEFAULT_HEADERS = {
-  "accept": "application/json",
+  accept: "application/json",
   "anthropic-beta": "claude-code-20250219,oauth-2025-04-20,fine-grained-tool-streaming-2025-05-14",
   "user-agent": `claude-cli/${FALLBACK_CLI_VERSION} (external, cli)`,
   "x-app": "cli",
@@ -70,8 +70,7 @@ export async function getClaudeClient(): Promise<Anthropic> {
     try {
       authToken = getPreferredToken();
     } catch {
-      apiKey = process.env.CLAUDE_API_KEY
-        || process.env.ANTHROPIC_API_KEY;
+      apiKey = process.env.CLAUDE_API_KEY || process.env.ANTHROPIC_API_KEY;
     }
 
     if (apiKey) {
@@ -98,8 +97,7 @@ export async function getClaudeClient(): Promise<Anthropic> {
 export async function withClaudeClient<T>(
   operation: (anthropic: Anthropic) => Promise<T>,
 ): Promise<T> {
-  const apiKey = process.env.CLAUDE_API_KEY
-    || process.env.ANTHROPIC_API_KEY;
+  const apiKey = process.env.CLAUDE_API_KEY || process.env.ANTHROPIC_API_KEY;
 
   if (apiKey) {
     const c = new Anthropic({
@@ -111,7 +109,7 @@ export async function withClaudeClient<T>(
     return operation(c);
   }
 
-  const result = await withTokenFallback(async authToken => {
+  const result = await withTokenFallback(async (authToken) => {
     const c = buildClient(authToken);
     return operation(c);
   });
@@ -126,8 +124,7 @@ export async function withClaudeClient<T>(
 export function isAuthError(error: unknown): boolean {
   if (error instanceof Anthropic.AuthenticationError) return true;
   if (error instanceof Error) {
-    return error.message.includes("authentication_error")
-      || error.message.includes("401");
+    return error.message.includes("authentication_error") || error.message.includes("401");
   }
   return false;
 }
@@ -137,9 +134,7 @@ export function isAuthError(error: unknown): boolean {
  */
 export function isTransientError(error: unknown): boolean {
   const message = error instanceof Error ? error.message : String(error);
-  return /ECONNRESET|ECONNREFUSED|ETIMEDOUT|socket hang up|network/i.test(
-    message,
-  );
+  return /ECONNRESET|ECONNREFUSED|ETIMEDOUT|socket hang up|network/i.test(message);
 }
 
 export async function isClaudeConfigured(): Promise<boolean> {

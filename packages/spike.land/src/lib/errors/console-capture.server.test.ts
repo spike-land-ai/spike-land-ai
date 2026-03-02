@@ -6,17 +6,14 @@ vi.mock("server-only", () => ({}));
 const mockFetch = vi.hoisted(() => vi.fn(() => Promise.resolve({ ok: true })));
 vi.stubGlobal("fetch", mockFetch);
 
-import {
-  _resetForTesting,
-  initializeServerConsoleCapture,
-} from "./console-capture.server";
+import { _resetForTesting, initializeServerConsoleCapture } from "./console-capture.server";
 
 function getLastFetchBody(): {
-  errors: Array<{ message: string; errorType?: string; environment?: string; }>;
+  errors: Array<{ message: string; errorType?: string; environment?: string }>;
 } {
   const lastCall = mockFetch.mock.lastCall;
   expect(lastCall).toBeDefined();
-  const body = (lastCall as unknown as [string, { body: string; }])[1].body;
+  const body = (lastCall as unknown as [string, { body: string }])[1].body;
   return JSON.parse(body) as ReturnType<typeof getLastFetchBody>;
 }
 
@@ -91,9 +88,7 @@ describe("Server Console Capture → ErrorLog pipeline", () => {
 
     expect(mockFetch).toHaveBeenCalled();
     const body = getLastFetchBody();
-    const dupes = body.errors.filter(
-      e => e.message === "duplicate error",
-    );
+    const dupes = body.errors.filter((e) => e.message === "duplicate error");
     expect(dupes).toHaveLength(1);
   });
 });

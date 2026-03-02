@@ -24,14 +24,7 @@ export function LiveAppCard({
   const [isHealthy, setIsHealthy] = useState(true);
 
   if (!codespaceId || !isHealthy) {
-    return (
-      <AppCard
-        title={title}
-        description={description}
-        slug={slug}
-        viewCount={viewCount}
-      />
-    );
+    return <AppCard title={title} description={description} slug={slug} viewCount={viewCount} />;
   }
 
   return (
@@ -58,17 +51,13 @@ export function LiveAppCard({
 
       {/* Metadata row */}
       <div className="px-4 pt-3 pb-2 flex items-start justify-between gap-3">
-        <h3 className="text-zinc-100 font-semibold text-base leading-snug truncate">
-          {title}
-        </h3>
+        <h3 className="text-zinc-100 font-semibold text-base leading-snug truncate">{title}</h3>
         <ExternalLink className="w-4 h-4 text-zinc-500 shrink-0 mt-0.5" />
       </div>
 
       {/* Description + view count */}
       <div className="px-4 pb-4">
-        <p className="text-zinc-400 text-sm line-clamp-2 leading-relaxed">
-          {description}
-        </p>
+        <p className="text-zinc-400 text-sm line-clamp-2 leading-relaxed">{description}</p>
         {viewCount !== undefined && (
           <span className="inline-flex items-center gap-1 text-zinc-500 text-xs mt-2">
             <Eye className="w-3 h-3" />

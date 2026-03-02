@@ -21,12 +21,7 @@ interface SendTaskDialogProps {
   onSend: (agentId: string, prompt: string) => Promise<void>;
 }
 
-export function SendTaskDialog({
-  agent,
-  open,
-  onOpenChange,
-  onSend,
-}: SendTaskDialogProps) {
+export function SendTaskDialog({ agent, open, onOpenChange, onSend }: SendTaskDialogProps) {
   const [prompt, setPrompt] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -65,7 +60,7 @@ export function SendTaskDialog({
             <Textarea
               placeholder="Enter your task prompt..."
               value={prompt}
-              onChange={e => setPrompt(e.target.value)}
+              onChange={(e) => setPrompt(e.target.value)}
               rows={5}
               className="resize-none"
               disabled={isLoading}
@@ -82,13 +77,12 @@ export function SendTaskDialog({
             >
               Cancel
             </Button>
-            <Button
-              type="submit"
-              disabled={!prompt.trim() || isLoading}
-            >
-              {isLoading
-                ? <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                : <Send className="mr-2 h-4 w-4" />}
+            <Button type="submit" disabled={!prompt.trim() || isLoading}>
+              {isLoading ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <Send className="mr-2 h-4 w-4" />
+              )}
               Send Task
             </Button>
           </DialogFooter>

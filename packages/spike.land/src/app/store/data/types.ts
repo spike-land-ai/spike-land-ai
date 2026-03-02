@@ -21,13 +21,7 @@ export type AppCategory =
   | "lifestyle"
   | "ai-agents";
 
-export type CardVariant =
-  | "blue"
-  | "fuchsia"
-  | "green"
-  | "purple"
-  | "orange"
-  | "pink";
+export type CardVariant = "blue" | "fuchsia" | "green" | "purple" | "orange" | "pink";
 
 export type PricingModel = "free" | "freemium" | "paid";
 

@@ -3,7 +3,11 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
+  "main": "src/lib.ts",
   "dependencies": {
     "spacetimedb": "^2.0.2"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.3"
   }
 }

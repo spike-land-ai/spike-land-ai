@@ -10,9 +10,7 @@ interface Props {
   onClose: () => void;
 }
 
-export function StateEditor(
-  { stateId, machine, machineId, sm, onClose }: Props,
-) {
+export function StateEditor({ stateId, machine, machineId, sm, onClose }: Props) {
   const [newEvent, setNewEvent] = useState("");
   const [newTarget, setNewTarget] = useState("");
   const stateNode = machine.definition.states[stateId];
@@ -41,9 +39,7 @@ export function StateEditor(
           <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500/20 to-purple-500/20 border border-indigo-500/30 flex items-center justify-center shadow-inner shadow-indigo-500/10">
             <Zap className="w-4 h-4 text-indigo-400" />
           </div>
-          <h3 className="font-semibold text-white tracking-tight text-lg">
-            {stateId}
-          </h3>
+          <h3 className="font-semibold text-white tracking-tight text-lg">{stateId}</h3>
         </div>
         <button
           onClick={onClose}
@@ -72,22 +68,17 @@ export function StateEditor(
                   Initial State
                 </span>
                 <span className="relative flex h-2.5 w-2.5">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75">
-                  </span>
-                  <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-indigo-500 shadow-[0_0_8px_rgba(99,102,241,0.8)]">
-                  </span>
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-indigo-500 shadow-[0_0_8px_rgba(99,102,241,0.8)]"></span>
                 </span>
               </div>
             )}
 
             {machine.currentStates.includes(stateId) && (
               <div className="flex justify-between items-center mt-3 pt-3 border-t border-zinc-800">
-                <span className="text-sm text-emerald-400 font-medium">
-                  Currently Active
-                </span>
+                <span className="text-sm text-emerald-400 font-medium">Currently Active</span>
                 <span className="relative flex h-2 w-2">
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.8)]">
-                  </span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.8)]"></span>
                 </span>
               </div>
             )}
@@ -103,7 +94,7 @@ export function StateEditor(
 
           <div className="space-y-3">
             {machine.definition.transitions
-              .filter(t => t.source === stateId)
+              .filter((t) => t.source === stateId)
               .map((t, idx) => (
                 <div
                   key={idx}
@@ -115,9 +106,7 @@ export function StateEditor(
                     </span>
                     <div className="flex items-center gap-2 mt-1">
                       <span className="text-xs text-zinc-500">Target:</span>
-                      <span className="text-sm text-zinc-200 font-medium">
-                        {t.target}
-                      </span>
+                      <span className="text-sm text-zinc-200 font-medium">{t.target}</span>
                     </div>
                   </div>
                   <button
@@ -131,8 +120,7 @@ export function StateEditor(
                 </div>
               ))}
 
-            {machine.definition.transitions.filter(t => t.source === stateId)
-                  .length === 0 && (
+            {machine.definition.transitions.filter((t) => t.source === stateId).length === 0 && (
               <div className="text-center py-6 border border-dashed border-zinc-800 rounded-xl text-zinc-500 text-sm">
                 No transitions defined
               </div>
@@ -140,23 +128,21 @@ export function StateEditor(
           </div>
 
           <div className="mt-5 bg-zinc-900/40 p-4 rounded-xl border border-indigo-500/20 border-dashed backdrop-blur-sm">
-            <h5 className="text-xs text-indigo-400 font-medium mb-3">
-              Add New Transition
-            </h5>
+            <h5 className="text-xs text-indigo-400 font-medium mb-3">Add New Transition</h5>
             <div className="space-y-2.5">
               <input
                 type="text"
                 placeholder="Event name (e.g. TICK)"
                 className="w-full bg-zinc-950 border border-zinc-800 rounded-lg pl-3 py-2 text-sm focus:outline-none focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/50 transition-all placeholder:text-zinc-600"
                 value={newEvent}
-                onChange={e => setNewEvent(e.target.value)}
+                onChange={(e) => setNewEvent(e.target.value)}
               />
               <input
                 type="text"
                 placeholder="Target state ID"
                 className="w-full bg-zinc-950 border border-zinc-800 rounded-lg pl-3 py-2 text-sm focus:outline-none focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/50 transition-all placeholder:text-zinc-600"
                 value={newTarget}
-                onChange={e => setNewTarget(e.target.value)}
+                onChange={(e) => setNewTarget(e.target.value)}
               />
               <button
                 onClick={handleAddTransition}

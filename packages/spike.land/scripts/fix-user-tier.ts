@@ -27,14 +27,12 @@ async function main() {
 
   if (!email || !tierArg) {
     console.error("Usage: npx tsx scripts/fix-user-tier.ts <email> <tier>");
-    console.error(
-      "Example: npx tsx scripts/fix-user-tier.ts user@example.com BASIC",
-    );
+    console.error("Example: npx tsx scripts/fix-user-tier.ts user@example.com BASIC");
     process.exit(1);
   }
 
   const validTiers = ["FREE", "BASIC", "STANDARD", "PREMIUM"] as const;
-  if (!validTiers.includes(tierArg as typeof validTiers[number])) {
+  if (!validTiers.includes(tierArg as (typeof validTiers)[number])) {
     console.error(`Invalid tier: ${tierArg}`);
     console.error(`Valid tiers: ${validTiers.join(", ")}`);
     process.exit(1);
@@ -115,9 +113,7 @@ async function main() {
   });
 
   console.log("\n✅ Tier updated successfully!");
-  console.log(
-    `User ${email} is now on ${tier} tier with well capacity ${wellCapacity}`,
-  );
+  console.log(`User ${email} is now on ${tier} tier with well capacity ${wellCapacity}`);
 
   // Verify the update
   const finalUser = await prisma.user.findUnique({
@@ -131,13 +127,11 @@ async function main() {
   console.log("\nFinal state:");
   console.log(`  Tier: ${finalUser?.tokenBalance?.tier}`);
   console.log(`  Balance: ${finalUser?.tokenBalance?.balance}`);
-  console.log(
-    `  Subscription status: ${finalUser?.subscription?.status || "none"}`,
-  );
+  console.log(`  Subscription status: ${finalUser?.subscription?.status || "none"}`);
 }
 
 main()
-  .catch(e => {
+  .catch((e) => {
     console.error("Error:", e);
     process.exit(1);
   })

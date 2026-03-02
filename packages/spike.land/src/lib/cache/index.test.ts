@@ -18,13 +18,7 @@ vi.mock("@/lib/logger", () => ({
   },
 }));
 
-import {
-  cachedPrismaQuery,
-  getCache,
-  getCacheRaw,
-  invalidateCache,
-  setCacheRaw,
-} from "./index";
+import { cachedPrismaQuery, getCache, getCacheRaw, invalidateCache, setCacheRaw } from "./index";
 
 describe("cache utilities", () => {
   beforeEach(() => {
@@ -79,7 +73,7 @@ describe("cache utilities", () => {
       const data = { users: [1, 2, 3] };
       mockRedis.get.mockResolvedValueOnce(data);
 
-      const result = await getCacheRaw<{ users: number[]; }>("raw-key");
+      const result = await getCacheRaw<{ users: number[] }>("raw-key");
 
       expect(result).toEqual(data);
     });

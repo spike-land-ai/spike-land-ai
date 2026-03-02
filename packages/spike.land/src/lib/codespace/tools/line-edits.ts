@@ -19,9 +19,7 @@ const MAX_REGEX_LENGTH = 500;
  */
 export function safeRegExp(pattern: string, flags?: string): RegExp {
   if (pattern.length > MAX_REGEX_LENGTH) {
-    throw new Error(
-      `Regex pattern too long (${pattern.length} chars, max ${MAX_REGEX_LENGTH})`,
-    );
+    throw new Error(`Regex pattern too long (${pattern.length} chars, max ${MAX_REGEX_LENGTH})`);
   }
   // Reject nested quantifiers that cause catastrophic backtracking
   // Matches patterns like (x+)+, (x*)+, (x+)*, (x{n,})+, etc.
@@ -40,7 +38,7 @@ export function safeRegExp(pattern: string, flags?: string): RegExp {
 export function applyLineEdits(
   originalCode: string,
   edits: LineEdit[],
-): { newCode: string; diff: string; } {
+): { newCode: string; diff: string } {
   const originalLines = originalCode.split("\n");
   const editsCopy = [...edits].sort((a, b) => b.startLine - a.startLine);
 
@@ -100,11 +98,7 @@ export function applyLineEdits(
       diffLines.push(`+${line}`);
     }
 
-    for (
-      let i = endIdx + 1;
-      i <= Math.min(contextEnd, modifiedLines.length - 1);
-      i++
-    ) {
+    for (let i = endIdx + 1; i <= Math.min(contextEnd, modifiedLines.length - 1); i++) {
       diffLines.push(` ${modifiedLines[i]}`);
     }
 
@@ -114,9 +108,7 @@ export function applyLineEdits(
   }
 
   const newCode = modifiedLines.join("\n");
-  const diff = diffParts.length > 0
-    ? diffParts.join("\n\n")
-    : "No changes made";
+  const diff = diffParts.length > 0 ? diffParts.join("\n\n") : "No changes made";
 
   return { newCode, diff };
 }

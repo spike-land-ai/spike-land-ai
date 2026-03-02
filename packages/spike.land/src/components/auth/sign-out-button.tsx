@@ -10,21 +10,13 @@ interface SignOutButtonProps {
   callbackUrl?: string;
 }
 
-export function SignOutButton({
-  children,
-  className,
-  callbackUrl = "/",
-}: SignOutButtonProps) {
+export function SignOutButton({ children, className, callbackUrl = "/" }: SignOutButtonProps) {
   const handleSignOut = () => {
     signOut({ callbackUrl });
   };
 
   return (
-    <Button
-      onClick={handleSignOut}
-      variant="outline"
-      className={className}
-    >
+    <Button onClick={handleSignOut} variant="outline" className={className}>
       {children || (
         <>
           <LogOut className="mr-2 h-4 w-4" />

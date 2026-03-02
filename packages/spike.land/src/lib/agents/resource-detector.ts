@@ -53,9 +53,7 @@ async function checkDevServer(): Promise<ResourceStatus["devServer"]> {
 async function getMcpServers(): Promise<ResourceStatus["mcpServers"]> {
   const mcpConfigPath = path.join(process.cwd(), ".mcp.json");
 
-  const { data: content, error } = await tryCatch(
-    fs.readFile(mcpConfigPath, "utf-8"),
-  );
+  const { data: content, error } = await tryCatch(fs.readFile(mcpConfigPath, "utf-8"));
 
   if (error || !content) {
     return [];

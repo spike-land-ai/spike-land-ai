@@ -11,7 +11,7 @@ import { UserRole } from "../core/types";
 /**
  * Known test email → ID mappings for E2E test consistency.
  */
-const TEST_USER_MAP: Record<string, { id: string; role?: UserRole; }> = {
+const TEST_USER_MAP: Record<string, { id: string; role?: UserRole }> = {
   "admin@example.com": { id: "admin-user-id", role: UserRole.ADMIN },
   "newuser@example.com": { id: "new-user-id" },
   "no-orders@example.com": { id: "new-user-id" },

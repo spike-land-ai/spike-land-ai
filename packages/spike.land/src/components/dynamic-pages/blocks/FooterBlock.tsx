@@ -18,24 +18,20 @@ export function FooterBlock({ content }: FooterBlockProps) {
   return (
     <footer className="w-full border-t border-border py-8 px-6 md:px-12 lg:px-24">
       <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
-        {data.copyright
-          ? <p className="text-sm text-muted-foreground">{data.copyright}</p>
-          : null}
-        {links.length > 0
-          ? (
-            <nav className="flex flex-wrap gap-6">
-              {links.map((link, index) => (
-                <a
-                  key={`${link.label}-${index}`}
-                  href={link.url}
-                  className="text-sm text-muted-foreground transition-colors hover:text-foreground"
-                >
-                  {link.label}
-                </a>
-              ))}
-            </nav>
-          )
-          : null}
+        {data.copyright ? <p className="text-sm text-muted-foreground">{data.copyright}</p> : null}
+        {links.length > 0 ? (
+          <nav className="flex flex-wrap gap-6">
+            {links.map((link, index) => (
+              <a
+                key={`${link.label}-${index}`}
+                href={link.url}
+                className="text-sm text-muted-foreground transition-colors hover:text-foreground"
+              >
+                {link.label}
+              </a>
+            ))}
+          </nav>
+        ) : null}
       </div>
     </footer>
   );

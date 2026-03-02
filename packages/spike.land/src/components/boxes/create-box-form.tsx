@@ -24,9 +24,7 @@ interface CreateBoxFormProps {
 
 export function CreateBoxForm({ tiers }: CreateBoxFormProps) {
   const router = useRouter();
-  const [selectedTierId, setSelectedTierId] = useState<string>(
-    tiers[0]?.id || "",
-  );
+  const [selectedTierId, setSelectedTierId] = useState<string>(tiers[0]?.id || "");
   const [name, setName] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
@@ -63,7 +61,7 @@ export function CreateBoxForm({ tiers }: CreateBoxFormProps) {
       <div className="space-y-4">
         <h2 className="text-xl font-semibold">1. Select a Tier</h2>
         <div className="grid gap-4 md:grid-cols-3">
-          {tiers.map(tier => {
+          {tiers.map((tier) => {
             const isSelected = selectedTierId === tier.id;
             return (
               <Card
@@ -88,16 +86,12 @@ export function CreateBoxForm({ tiers }: CreateBoxFormProps) {
                   <div className="text-sm font-medium">
                     {tier.cpu} vCPU • {tier.ram / 1024}GB RAM
                   </div>
-                  <div className="text-sm text-muted-foreground mt-1">
-                    {tier.storage}GB Storage
-                  </div>
+                  <div className="text-sm text-muted-foreground mt-1">{tier.storage}GB Storage</div>
                 </CardContent>
                 <CardFooter>
                   <div className="text-lg font-bold">
                     {tier.pricePerHour}{" "}
-                    <span className="text-sm font-normal text-muted-foreground">
-                      tokens/hr
-                    </span>
+                    <span className="text-sm font-normal text-muted-foreground">tokens/hr</span>
                   </div>
                 </CardFooter>
               </Card>
@@ -115,7 +109,7 @@ export function CreateBoxForm({ tiers }: CreateBoxFormProps) {
             id="name"
             placeholder="e.g. Chrome Research Agent"
             value={name}
-            onChange={e => setName(e.target.value)}
+            onChange={(e) => setName(e.target.value)}
             required
             minLength={3}
             maxLength={50}
@@ -124,11 +118,7 @@ export function CreateBoxForm({ tiers }: CreateBoxFormProps) {
       </div>
 
       <div className="pt-4">
-        <Button
-          type="submit"
-          size="lg"
-          disabled={isLoading || !selectedTierId || !name}
-        >
+        <Button type="submit" size="lg" disabled={isLoading || !selectedTierId || !name}>
           {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
           Create Box
         </Button>

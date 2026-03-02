@@ -20,9 +20,7 @@ interface CleanSkipDialogProps {
   onCancel: () => void;
 }
 
-export function CleanSkipDialog(
-  { open, task, onConfirm, onCancel }: CleanSkipDialogProps,
-) {
+export function CleanSkipDialog({ open, task, onConfirm, onCancel }: CleanSkipDialogProps) {
   const [reason, setReason] = useState("");
 
   const handleConfirm = () => {
@@ -36,10 +34,7 @@ export function CleanSkipDialog(
   };
 
   return (
-    <Dialog
-      open={open}
-      onOpenChange={isOpen => !isOpen && handleCancel()}
-    >
+    <Dialog open={open} onOpenChange={(isOpen) => !isOpen && handleCancel()}>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Skip this task?</DialogTitle>
@@ -55,7 +50,7 @@ export function CleanSkipDialog(
         <Textarea
           placeholder="Reason (optional) - e.g., need supplies, too tired right now..."
           value={reason}
-          onChange={e => setReason(e.target.value)}
+          onChange={(e) => setReason(e.target.value)}
           rows={2}
         />
         <DialogFooter>

@@ -27,9 +27,7 @@ export class WorkspaceAuditLogger {
   /**
    * Create a workspace audit log entry
    */
-  static async log(
-    options: CreateWorkspaceAuditLogOptions,
-  ): Promise<string | null> {
+  static async log(options: CreateWorkspaceAuditLogOptions): Promise<string | null> {
     const { data, error } = await tryCatch(
       prisma.workspaceAuditLog.create({
         data: {
@@ -177,10 +175,7 @@ export class WorkspaceAuditLogger {
   static async logIntegrationAction(
     workspaceId: string,
     userId: string,
-    action:
-      | "INTEGRATION_CONNECT"
-      | "INTEGRATION_DISCONNECT"
-      | "INTEGRATION_SYNC",
+    action: "INTEGRATION_CONNECT" | "INTEGRATION_DISCONNECT" | "INTEGRATION_SYNC",
     integrationId: string,
     integrationType: string,
     metadata?: Record<string, unknown>,
@@ -276,7 +271,7 @@ export class WorkspaceAuditLogger {
     ]);
 
     return {
-      data: logs.map(log => ({
+      data: logs.map((log) => ({
         id: log.id,
         workspaceId: log.workspaceId,
         userId: log.userId,
@@ -302,10 +297,7 @@ export class WorkspaceAuditLogger {
   /**
    * Get a single audit log entry by ID
    */
-  static async getById(
-    id: string,
-    workspaceId?: string,
-  ): Promise<WorkspaceAuditLogEntry | null> {
+  static async getById(id: string, workspaceId?: string): Promise<WorkspaceAuditLogEntry | null> {
     const where: Prisma.WorkspaceAuditLogWhereInput = { id };
     if (workspaceId) {
       where.workspaceId = workspaceId;
@@ -391,14 +383,14 @@ export class WorkspaceAuditLogger {
     });
 
     // Get user names
-    const userIds = userCounts.map(u => u.userId);
+    const userIds = userCounts.map((u) => u.userId);
     const users = await prisma.user.findMany({
       where: { id: { in: userIds } },
       select: { id: true, name: true },
     });
 
-    const userMap = new Map(users.map(u => [u.id, u.name]));
-    const logsByUser = userCounts.map(item => {
+    const userMap = new Map(users.map((u) => [u.id, u.name]));
+    const logsByUser = userCounts.map((item) => {
       const userName = userMap.get(item.userId) || undefined;
       return {
         userId: item.userId,
@@ -411,23 +403,17 @@ export class WorkspaceAuditLogger {
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
-    const dailyLogs = await prisma.$queryRaw<
-      Array<{ date: Date; count: bigint; }>
-    >`
+    const dailyLogs = await prisma.$queryRaw<Array<{ date: Date; count: bigint }>>`
       SELECT DATE(created_at) as date, COUNT(*) as count
       FROM workspace_audit_logs
       WHERE workspace_id = ${workspaceId}
         AND created_at >= ${startDate || thirtyDaysAgo}
-        ${
-      endDate
-        ? prisma.$queryRaw`AND created_at <= ${endDate}`
-        : prisma.$queryRaw``
-    }
+        ${endDate ? prisma.$queryRaw`AND created_at <= ${endDate}` : prisma.$queryRaw``}
       GROUP BY DATE(created_at)
       ORDER BY date DESC
     `.catch(() => []);
 
-    const logsByDay = dailyLogs.map(item => ({
+    const logsByDay = dailyLogs.map((item) => ({
       date: item.date.toISOString().split("T")[0] ?? "",
       count: Number(item.count),
     }));

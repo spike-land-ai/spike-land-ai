@@ -16,26 +16,15 @@ import { CleanTaskList } from "./CleanTaskList";
 import { CleanVerificationView } from "./CleanVerificationView";
 
 export function CleanSessionView() {
-  const {
-    session,
-    loading,
-    error,
-    startSession,
-    endSession,
-    completeTask,
-    skipTask,
-  } = useCleanSession();
+  const { session, loading, error, startSession, endSession, completeTask, skipTask } =
+    useCleanSession();
 
   const [state, setState] = useState<SessionState>(SessionState.IDLE);
-  const [skipDialogTask, setSkipDialogTask] = useState<CleaningTask | null>(
-    null,
-  );
-  const [newAchievement, setNewAchievement] = useState<
-    CleaningAchievement | null
-  >(null);
+  const [skipDialogTask, setSkipDialogTask] = useState<CleaningTask | null>(null);
+  const [newAchievement, setNewAchievement] = useState<CleaningAchievement | null>(null);
 
   const tasks = useMemo(() => session?.tasks ?? [], [session?.tasks]);
-  const pendingTasks = tasks.filter(t => t.status === "PENDING");
+  const pendingTasks = tasks.filter((t) => t.status === "PENDING");
   const currentTask = pendingTasks[0] ?? null;
 
   const handlePhotoCapture = useCallback(
@@ -57,9 +46,7 @@ export function CleanSessionView() {
       const result = await completeTask(session.id, taskId);
       if (result) {
         // Check if there are more pending tasks
-        const remaining = tasks.filter(
-          t => t.id !== taskId && t.status === "PENDING",
-        );
+        const remaining = tasks.filter((t) => t.id !== taskId && t.status === "PENDING");
         if (remaining.length === 0) {
           // All done - end session
           await endSession(session.id);
@@ -72,7 +59,7 @@ export function CleanSessionView() {
 
   const handleSkipTask = useCallback(
     (taskId: string) => {
-      const task = tasks.find(t => t.id === taskId);
+      const task = tasks.find((t) => t.id === taskId);
       if (task) setSkipDialogTask(task);
     },
     [tasks],
@@ -84,9 +71,7 @@ export function CleanSessionView() {
       await skipTask(session.id, skipDialogTask.id, reason);
       setSkipDialogTask(null);
 
-      const remaining = tasks.filter(
-        t => t.id !== skipDialogTask.id && t.status === "PENDING",
-      );
+      const remaining = tasks.filter((t) => t.id !== skipDialogTask.id && t.status === "PENDING");
       if (remaining.length === 0) {
         await endSession(session.id);
         setState(SessionState.COMPLETE);
@@ -117,11 +102,7 @@ export function CleanSessionView() {
               Take a photo of the room you want to clean. AI will analyze it and create a
               personalized task list for you.
             </p>
-            <Button
-              size="lg"
-              className="w-full"
-              onClick={() => setState(SessionState.SCANNING)}
-            >
+            <Button size="lg" className="w-full" onClick={() => setState(SessionState.SCANNING)}>
               Scan Room
             </Button>
           </CardContent>
@@ -134,13 +115,8 @@ export function CleanSessionView() {
   if (state === SessionState.SCANNING) {
     return (
       <div className="space-y-4">
-        <h2 className="text-lg font-semibold text-center">
-          Take a photo of your room
-        </h2>
-        <CleanCamera
-          onCapture={handlePhotoCapture}
-          onCancel={() => setState(SessionState.IDLE)}
-        />
+        <h2 className="text-lg font-semibold text-center">Take a photo of your room</h2>
+        <CleanCamera onCapture={handlePhotoCapture} onCancel={() => setState(SessionState.IDLE)} />
       </div>
     );
   }
@@ -151,9 +127,7 @@ export function CleanSessionView() {
       <div className="flex flex-col items-center justify-center gap-4 py-16">
         <Loader2 className="h-12 w-12 animate-spin text-primary" />
         <p className="text-lg font-medium">Analyzing your room...</p>
-        <p className="text-sm text-muted-foreground">
-          Creating your personalized task list
-        </p>
+        <p className="text-sm text-muted-foreground">Creating your personalized task list</p>
       </div>
     );
   }
@@ -171,7 +145,7 @@ export function CleanSessionView() {
 
   // COMPLETE state
   if (state === SessionState.COMPLETE) {
-    const completedCount = tasks.filter(t => t.status === "COMPLETED").length;
+    const completedCount = tasks.filter((t) => t.status === "COMPLETED").length;
     return (
       <div className="space-y-6">
         {newAchievement && (

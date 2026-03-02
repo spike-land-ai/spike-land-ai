@@ -14,9 +14,7 @@ export interface Variant {
  * @param variants - An array of variants, each with visitors and conversions.
  * @returns The chi-squared statistic.
  */
-export function calculateChiSquared(
-  variants: { visitors: number; conversions: number; }[],
-) {
+export function calculateChiSquared(variants: { visitors: number; conversions: number }[]) {
   const totalVisitors = variants.reduce((sum, v) => sum + v.visitors, 0);
   const totalConversions = variants.reduce((sum, v) => sum + v.conversions, 0);
 
@@ -29,19 +27,17 @@ export function calculateChiSquared(
   let chiSquared = 0;
   for (const variant of variants) {
     const expectedConversions = variant.visitors * overallConversionRate;
-    const expectedNonConversions = variant.visitors
-      * (1 - overallConversionRate);
+    const expectedNonConversions = variant.visitors * (1 - overallConversionRate);
 
     const observedConversions = variant.conversions;
     const observedNonConversions = variant.visitors - variant.conversions;
 
     if (expectedConversions > 0) {
-      chiSquared += Math.pow(observedConversions - expectedConversions, 2)
-        / expectedConversions;
+      chiSquared += Math.pow(observedConversions - expectedConversions, 2) / expectedConversions;
     }
     if (expectedNonConversions > 0) {
-      chiSquared += Math.pow(observedNonConversions - expectedNonConversions, 2)
-        / expectedNonConversions;
+      chiSquared +=
+        Math.pow(observedNonConversions - expectedNonConversions, 2) / expectedNonConversions;
     }
   }
 
@@ -69,9 +65,7 @@ function chiSquaredToPValue(chiSquared: number, df: number = 1): number {
  * @param variants - An array of variants with their performance data.
  * @returns The p-value.
  */
-export function calculatePValue(
-  variants: { visitors: number; conversions: number; }[],
-): number {
+export function calculatePValue(variants: { visitors: number; conversions: number }[]): number {
   const chiSquared = calculateChiSquared(variants);
   const df = variants.length - 1;
   return chiSquaredToPValue(chiSquared, df);
@@ -85,7 +79,7 @@ export function calculatePValue(
  * @returns True if the result is statistically significant.
  */
 export function isStatisticallySignificant(
-  variants: { visitors: number; conversions: number; }[],
+  variants: { visitors: number; conversions: number }[],
   alpha: number = 0.05,
 ): boolean {
   const pValue = calculatePValue(variants);
@@ -107,11 +101,7 @@ export function calculateRequiredSampleSize(
   alpha: number = 0.05,
   power: number = 0.8,
 ): number {
-  if (
-    baselineConversionRate <= 0
-    || baselineConversionRate >= 1
-    || minimumDetectableEffect <= 0
-  ) {
+  if (baselineConversionRate <= 0 || baselineConversionRate >= 1 || minimumDetectableEffect <= 0) {
     return Infinity;
   }
 
@@ -120,8 +110,7 @@ export function calculateRequiredSampleSize(
   const p1 = baselineConversionRate;
   const p2 = baselineConversionRate * (1 + minimumDetectableEffect);
 
-  const n = ((zAlpha + zBeta) ** 2 * (p1 * (1 - p1) + p2 * (1 - p2)))
-    / (p2 - p1) ** 2;
+  const n = ((zAlpha + zBeta) ** 2 * (p1 * (1 - p1) + p2 * (1 - p2))) / (p2 - p1) ** 2;
 
   return Math.ceil(n);
 }
@@ -133,10 +122,7 @@ export function calculateRequiredSampleSize(
  * @param alpha - The significance level.
  * @returns The winning variant or null if there is no statistically significant winner.
  */
-export function getWinner(
-  variants: Variant[],
-  alpha: number = 0.05,
-): Variant | null {
+export function getWinner(variants: Variant[], alpha: number = 0.05): Variant | null {
   if (variants.length < 2) {
     return null;
   }
@@ -146,12 +132,8 @@ export function getWinner(
   }
 
   return variants.reduce((best, current) => {
-    const bestConversionRate = best.visitors > 0
-      ? best.conversions / best.visitors
-      : 0;
-    const currentConversionRate = current.visitors > 0
-      ? current.conversions / current.visitors
-      : 0;
+    const bestConversionRate = best.visitors > 0 ? best.conversions / best.visitors : 0;
+    const currentConversionRate = current.visitors > 0 ? current.conversions / current.visitors : 0;
     return currentConversionRate > bestConversionRate ? current : best;
   });
 }
@@ -174,7 +156,7 @@ export function calculateConfidenceInterval(
   successes: number,
   total: number,
   confidenceLevel: number = 0.95,
-): { lower: number; upper: number; } {
+): { lower: number; upper: number } {
   // Wilson score interval (more accurate for proportions)
   const z = getZScore(confidenceLevel);
   // Avoid division by zero
@@ -184,8 +166,7 @@ export function calculateConfidenceInterval(
   const denominator = 1 + (z * z) / total;
 
   const center = (p + (z * z) / (2 * total)) / denominator;
-  const margin = (z * Math.sqrt((p * (1 - p) + (z * z) / (4 * total)) / total))
-    / denominator;
+  const margin = (z * Math.sqrt((p * (1 - p) + (z * z) / (4 * total)) / total)) / denominator;
 
   return {
     lower: Math.max(0, center - margin),

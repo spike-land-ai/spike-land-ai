@@ -1,11 +1,5 @@
 import { useMemo } from "react";
-import ReactFlow, {
-  Background,
-  Controls,
-  type Edge,
-  MarkerType,
-  type Node,
-} from "reactflow";
+import ReactFlow, { Background, Controls, type Edge, MarkerType, type Node } from "reactflow";
 import "reactflow/dist/style.css";
 import type { MachineData } from "./use-state-machine";
 
@@ -16,39 +10,35 @@ interface Props {
 
 export function StateGraph({ machine, onNodeFocus }: Props) {
   const nodes: Node[] = useMemo(() => {
-    return Object.entries(machine.definition.states).map(
-      ([stateId, _stateNode], index) => {
-        const isActive = machine.currentStates.includes(stateId);
+    return Object.entries(machine.definition.states).map(([stateId, _stateNode], index) => {
+      const isActive = machine.currentStates.includes(stateId);
 
-        return {
-          id: stateId,
-          type: "default",
-          position: {
-            x: 250 + (index * 200),
-            y: 250 + (index % 2 === 0 ? 80 : -80),
-          }, // Basic auto layout
-          data: { label: stateId },
-          style: {
-            background: isActive
-              ? "rgba(79, 70, 229, 0.15)"
-              : "rgba(24, 24, 27, 0.8)",
-            color: isActive ? "#ffffff" : "#d4d4d8",
-            border: isActive
-              ? "2px solid rgba(99, 102, 241, 0.5)"
-              : "1px solid rgba(63, 63, 70, 0.5)",
-            borderRadius: "12px",
-            padding: "12px 20px",
-            fontSize: "14px",
-            fontWeight: isActive ? 600 : 500,
-            boxShadow: isActive
-              ? "0 0 30px rgba(99, 102, 241, 0.2), inset 0 0 20px rgba(99, 102, 241, 0.1)"
-              : "0 4px 6px -1px rgba(0, 0, 0, 0.4)",
-            transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
-            backdropFilter: "blur(8px)",
-          },
-        };
-      },
-    );
+      return {
+        id: stateId,
+        type: "default",
+        position: {
+          x: 250 + index * 200,
+          y: 250 + (index % 2 === 0 ? 80 : -80),
+        }, // Basic auto layout
+        data: { label: stateId },
+        style: {
+          background: isActive ? "rgba(79, 70, 229, 0.15)" : "rgba(24, 24, 27, 0.8)",
+          color: isActive ? "#ffffff" : "#d4d4d8",
+          border: isActive
+            ? "2px solid rgba(99, 102, 241, 0.5)"
+            : "1px solid rgba(63, 63, 70, 0.5)",
+          borderRadius: "12px",
+          padding: "12px 20px",
+          fontSize: "14px",
+          fontWeight: isActive ? 600 : 500,
+          boxShadow: isActive
+            ? "0 0 30px rgba(99, 102, 241, 0.2), inset 0 0 20px rgba(99, 102, 241, 0.1)"
+            : "0 4px 6px -1px rgba(0, 0, 0, 0.4)",
+          transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+          backdropFilter: "blur(8px)",
+        },
+      };
+    });
   }, [machine.definition.states, machine.currentStates]);
 
   const edges: Edge[] = useMemo(() => {
@@ -60,9 +50,7 @@ export function StateGraph({ machine, onNodeFocus }: Props) {
       label: t.event,
       animated: machine.currentStates.includes(t.source),
       style: {
-        stroke: machine.currentStates.includes(t.source)
-          ? "#818cf8"
-          : "#52525b",
+        stroke: machine.currentStates.includes(t.source) ? "#818cf8" : "#52525b",
         strokeWidth: 2,
         transition: "all 0.3s ease",
       },

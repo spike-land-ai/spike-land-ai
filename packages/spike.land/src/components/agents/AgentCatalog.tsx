@@ -32,9 +32,7 @@ export function AgentCatalog({ initialData }: AgentCatalogProps) {
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   // Dialog state
-  const [selectedAgent, setSelectedAgent] = useState<AgentResponse | null>(
-    null,
-  );
+  const [selectedAgent, setSelectedAgent] = useState<AgentResponse | null>(null);
   const [renameDialogOpen, setRenameDialogOpen] = useState(false);
   const [sendTaskDialogOpen, setSendTaskDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -44,7 +42,7 @@ export function AgentCatalog({ initialData }: AgentCatalogProps) {
   const fetchAgents = useCallback(async () => {
     setIsRefreshing(true);
     const { data: response, error } = await tryCatch(
-      fetch("/api/agents").then(r => r.json() as Promise<AgentListResponse>),
+      fetch("/api/agents").then((r) => r.json() as Promise<AgentListResponse>),
     );
 
     if (!error && response) {
@@ -54,16 +52,19 @@ export function AgentCatalog({ initialData }: AgentCatalogProps) {
   }, []);
 
   // Handle SSE events
-  const handleSSEEvent = useCallback((event: AgentSSEEvent) => {
-    // Refresh data on any agent event
-    if (
-      event.type === "agent_connected"
-      || event.type === "agent_disconnected"
-      || event.type === "agent_status_changed"
-    ) {
-      fetchAgents();
-    }
-  }, [fetchAgents]);
+  const handleSSEEvent = useCallback(
+    (event: AgentSSEEvent) => {
+      // Refresh data on any agent event
+      if (
+        event.type === "agent_connected" ||
+        event.type === "agent_disconnected" ||
+        event.type === "agent_status_changed"
+      ) {
+        fetchAgents();
+      }
+    },
+    [fetchAgents],
+  );
 
   // SSE connection
   const { isConnected } = useAgentSSE({
@@ -147,9 +148,7 @@ export function AgentCatalog({ initialData }: AgentCatalogProps) {
       await fetchAgents();
     } catch (err) {
       console.error("Failed to disconnect agent:", err);
-      toast.error(
-        err instanceof Error ? err.message : "Failed to disconnect agent",
-      );
+      toast.error(err instanceof Error ? err.message : "Failed to disconnect agent");
     }
   };
 
@@ -157,12 +156,9 @@ export function AgentCatalog({ initialData }: AgentCatalogProps) {
     if (!selectedAgent) return;
 
     try {
-      const response = await fetch(
-        `/api/agents/${selectedAgent.id}?permanent=true`,
-        {
-          method: "DELETE",
-        },
-      );
+      const response = await fetch(`/api/agents/${selectedAgent.id}?permanent=true`, {
+        method: "DELETE",
+      });
 
       if (!response.ok) {
         const error = await response.json();
@@ -174,9 +170,7 @@ export function AgentCatalog({ initialData }: AgentCatalogProps) {
       await fetchAgents();
     } catch (err) {
       console.error("Failed to delete agent:", err);
-      toast.error(
-        err instanceof Error ? err.message : "Failed to delete agent",
-      );
+      toast.error(err instanceof Error ? err.message : "Failed to delete agent");
     }
   };
 
@@ -186,9 +180,7 @@ export function AgentCatalog({ initialData }: AgentCatalogProps) {
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold">Connected Agents</h1>
-          <p className="text-muted-foreground">
-            Manage your Claude Code agents
-          </p>
+          <p className="text-muted-foreground">Manage your Claude Code agents</p>
         </div>
 
         <div className="flex items-center gap-2">
@@ -201,22 +193,13 @@ export function AgentCatalog({ initialData }: AgentCatalogProps) {
                 : "bg-muted text-muted-foreground",
             )}
           >
-            {isConnected
-              ? <Wifi className="h-3 w-3" />
-              : <WifiOff className="h-3 w-3" />}
+            {isConnected ? <Wifi className="h-3 w-3" /> : <WifiOff className="h-3 w-3" />}
             <span>{isConnected ? "Live" : "Polling"}</span>
           </div>
 
           {/* Refresh button */}
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={fetchAgents}
-            disabled={isRefreshing}
-          >
-            <RefreshCw
-              className={cn("h-4 w-4 mr-1", isRefreshing && "animate-spin")}
-            />
+          <Button variant="outline" size="sm" onClick={fetchAgents} disabled={isRefreshing}>
+            <RefreshCw className={cn("h-4 w-4 mr-1", isRefreshing && "animate-spin")} />
             Refresh
           </Button>
         </div>
@@ -226,33 +209,31 @@ export function AgentCatalog({ initialData }: AgentCatalogProps) {
       <AgentStatsCard stats={data.stats} />
 
       {/* Agent grid */}
-      {data.agents.length === 0
-        ? (
-          <div className="flex flex-col items-center justify-center py-16 text-center">
-            <div className="rounded-full bg-muted p-4 mb-4">
-              <Bot className="h-8 w-8 text-muted-foreground" />
-            </div>
-            <h3 className="text-lg font-semibold">No agents connected</h3>
-            <p className="text-sm text-muted-foreground max-w-sm mt-1">
-              Connect a Claude Code agent to see it here. Agents will appear automatically when they
-              call the connect endpoint.
-            </p>
+      {data.agents.length === 0 ? (
+        <div className="flex flex-col items-center justify-center py-16 text-center">
+          <div className="rounded-full bg-muted p-4 mb-4">
+            <Bot className="h-8 w-8 text-muted-foreground" />
           </div>
-        )
-        : (
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {data.agents.map(agent => (
-              <AgentCard
-                key={agent.id}
-                agent={agent}
-                onRename={handleRename}
-                onSendTask={handleSendTask}
-                onDisconnect={handleDisconnect}
-                onDelete={handleDelete}
-              />
-            ))}
-          </div>
-        )}
+          <h3 className="text-lg font-semibold">No agents connected</h3>
+          <p className="text-sm text-muted-foreground max-w-sm mt-1">
+            Connect a Claude Code agent to see it here. Agents will appear automatically when they
+            call the connect endpoint.
+          </p>
+        </div>
+      ) : (
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          {data.agents.map((agent) => (
+            <AgentCard
+              key={agent.id}
+              agent={agent}
+              onRename={handleRename}
+              onSendTask={handleSendTask}
+              onDisconnect={handleDisconnect}
+              onDelete={handleDelete}
+            />
+          ))}
+        </div>
+      )}
 
       {/* Dialogs */}
       <RenameAgentDialog
@@ -270,24 +251,18 @@ export function AgentCatalog({ initialData }: AgentCatalogProps) {
       />
 
       {/* Disconnect confirmation */}
-      <AlertDialog
-        open={disconnectDialogOpen}
-        onOpenChange={setDisconnectDialogOpen}
-      >
+      <AlertDialog open={disconnectDialogOpen} onOpenChange={setDisconnectDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Disconnect Agent?</AlertDialogTitle>
             <AlertDialogDescription>
-              This will disconnect{" "}
-              {selectedAgent?.displayName}. The agent can reconnect later by calling the connect
-              endpoint again.
+              This will disconnect {selectedAgent?.displayName}. The agent can reconnect later by
+              calling the connect endpoint again.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={disconnectAgent}>
-              Disconnect
-            </AlertDialogAction>
+            <AlertDialogAction onClick={disconnectAgent}>Disconnect</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
@@ -298,8 +273,8 @@ export function AgentCatalog({ initialData }: AgentCatalogProps) {
           <AlertDialogHeader>
             <AlertDialogTitle>Delete Agent?</AlertDialogTitle>
             <AlertDialogDescription>
-              This will permanently delete {selectedAgent?.displayName}{" "}
-              and all its history. This action cannot be undone.
+              This will permanently delete {selectedAgent?.displayName} and all its history. This
+              action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

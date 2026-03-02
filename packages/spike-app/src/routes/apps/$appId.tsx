@@ -128,11 +128,7 @@ export function AppDetailPage() {
       {/* Tab content */}
       <div className="min-h-0 flex-1 rounded-xl border bg-white">
         {activeTab === "Chat" && (
-          <ChatThread
-            messages={messages}
-            onSendMessage={handleSendMessage}
-            isLoading={isLoading}
-          />
+          <ChatThread messages={messages} onSendMessage={handleSendMessage} isLoading={isLoading} />
         )}
         {activeTab === "Versions" && (
           <div className="p-6">

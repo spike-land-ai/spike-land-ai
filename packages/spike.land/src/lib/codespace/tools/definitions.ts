@@ -182,11 +182,7 @@ const findLinesTool: McpTool = {
 // ---------------------------------------------------------------------------
 
 /** Tool names that mutate codespace state and require authentication */
-export const WRITE_TOOL_NAMES = new Set([
-  "update_code",
-  "edit_code",
-  "search_and_replace",
-]);
+export const WRITE_TOOL_NAMES = new Set(["update_code", "edit_code", "search_and_replace"]);
 
 /** All 7 MCP tool definitions */
 export const allTools: McpTool[] = [

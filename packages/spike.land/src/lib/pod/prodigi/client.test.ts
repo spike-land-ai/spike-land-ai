@@ -36,25 +36,19 @@ describe("prodigi/client", () => {
     it("should return error when width is too small", () => {
       const result = validateImageForProduct(500, 4000, 2000, 3000);
       expect(result.valid).toBe(false);
-      expect(result.errors).toContainEqual(
-        expect.stringContaining("width"),
-      );
+      expect(result.errors).toContainEqual(expect.stringContaining("width"));
     });
 
     it("should return error when height is too small", () => {
       const result = validateImageForProduct(3000, 500, 2000, 3000);
       expect(result.valid).toBe(false);
-      expect(result.errors).toContainEqual(
-        expect.stringContaining("height"),
-      );
+      expect(result.errors).toContainEqual(expect.stringContaining("height"));
     });
 
     it("should return error for low resolution images", () => {
       const result = validateImageForProduct(100, 100, 50, 50, 150);
       expect(result.valid).toBe(false);
-      expect(result.errors).toContainEqual(
-        expect.stringContaining("resolution"),
-      );
+      expect(result.errors).toContainEqual(expect.stringContaining("resolution"));
     });
 
     it("should return multiple errors for very small images", () => {
@@ -139,9 +133,7 @@ describe("prodigi/client", () => {
           status: 400,
           json: async () => ({
             statusCode: 400,
-            errors: [
-              { property: "items[0].sku", description: "Invalid SKU" },
-            ],
+            errors: [{ property: "items[0].sku", description: "Invalid SKU" }],
           }),
         });
 
@@ -201,9 +193,7 @@ describe("prodigi/client", () => {
 
         await prodigiProvider.createOrder(mockRequest);
 
-        const body = JSON.parse(
-          mockFetch.mock.calls[0]![1].body as string,
-        );
+        const body = JSON.parse(mockFetch.mock.calls[0]![1].body as string);
         expect(body.merchantReference).toBe("order-123");
         expect(body.recipient.name).toBe("Test User");
         expect(body.recipient.address.countryCode).toBe("GB");
@@ -286,10 +276,7 @@ describe("prodigi/client", () => {
         });
 
         await expect(
-          prodigiProvider.getQuote(
-            [{ sku: "INVALID", quantity: 1 }],
-            mockAddress,
-          ),
+          prodigiProvider.getQuote([{ sku: "INVALID", quantity: 1 }], mockAddress),
         ).rejects.toThrow("No quote available");
       });
     });
@@ -371,9 +358,7 @@ describe("prodigi/client", () => {
           }),
         });
 
-        await expect(
-          prodigiProvider.getOrderStatus("nonexistent"),
-        ).rejects.toThrow("not found");
+        await expect(prodigiProvider.getOrderStatus("nonexistent")).rejects.toThrow("not found");
       });
     });
 
@@ -431,9 +416,7 @@ describe("prodigi/client", () => {
             postalCode: "EC1A",
             countryCode: "GB",
           },
-          items: [
-            { sku: "test", quantity: 1, imageUrl: "https://example.com/img.png" },
-          ],
+          items: [{ sku: "test", quantity: 1, imageUrl: "https://example.com/img.png" }],
         });
 
         expect(result.success).toBe(false);

@@ -16,15 +16,9 @@ const statusStyles: Record<ContentStatus, string> = {
   archived: "bg-amber-500/10 text-amber-400 border-amber-500/20",
 };
 
-export function ContentStatusBadge({
-  status,
-  className,
-}: ContentStatusBadgeProps) {
+export function ContentStatusBadge({ status, className }: ContentStatusBadgeProps) {
   return (
-    <Badge
-      variant="outline"
-      className={cn("text-xs capitalize", statusStyles[status], className)}
-    >
+    <Badge variant="outline" className={cn("text-xs capitalize", statusStyles[status], className)}>
       {status}
     </Badge>
   );

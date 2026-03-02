@@ -34,10 +34,7 @@ export const SKIP_MESSAGES = [
 ];
 
 export const STREAK_MESSAGES: Record<string, string[]> = {
-  first: [
-    "Day 1! Every streak starts here.",
-    "You've planted the seed. Let's grow this streak!",
-  ],
+  first: ["Day 1! Every streak starts here.", "You've planted the seed. Let's grow this streak!"],
   building: [
     "Your streak is growing! Keep showing up.",
     "Consistency beats perfection. You're proving it!",

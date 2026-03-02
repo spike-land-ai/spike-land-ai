@@ -260,9 +260,10 @@ export const stateMachineTools: StandaloneToolDefinition[] = [
     inputSchema: {
       name: z.string().min(1).describe("Name for the state machine"),
       initial_state: z.string().optional().describe("Initial top-level state ID"),
-      context: z.record(z.string(), z.unknown()).optional().describe(
-        "Initial extended state context as key-value pairs",
-      ),
+      context: z
+        .record(z.string(), z.unknown())
+        .optional()
+        .describe("Initial extended state context as key-value pairs"),
     },
     handler: async (input: never, ctx: ServerContext): Promise<CallToolResult> => {
       return safeToolCall("sm_create", async () => {
@@ -304,20 +305,32 @@ export const stateMachineTools: StandaloneToolDefinition[] = [
       state_id: z.string().min(1).describe("Unique state identifier"),
       type: z.enum(["atomic", "compound", "parallel", "final", "history"]).describe("State type"),
       parent: z.string().optional().describe("Parent state ID for nesting"),
-      initial: z.string().optional().describe(
-        "Initial child state ID (required for compound states)",
-      ),
-      entry_actions: z.array(z.object({
-        type: z.enum(["assign", "log", "raise", "custom"]).describe("Action type"),
-        params: z.record(z.string(), z.unknown()).describe("Action parameters"),
-      })).optional().describe("Actions executed on entering this state"),
-      exit_actions: z.array(z.object({
-        type: z.enum(["assign", "log", "raise", "custom"]).describe("Action type"),
-        params: z.record(z.string(), z.unknown()).describe("Action parameters"),
-      })).optional().describe("Actions executed on exiting this state"),
-      history_type: z.enum(["shallow", "deep"]).optional().describe(
-        "History type (only for history states)",
-      ),
+      initial: z
+        .string()
+        .optional()
+        .describe("Initial child state ID (required for compound states)"),
+      entry_actions: z
+        .array(
+          z.object({
+            type: z.enum(["assign", "log", "raise", "custom"]).describe("Action type"),
+            params: z.record(z.string(), z.unknown()).describe("Action parameters"),
+          }),
+        )
+        .optional()
+        .describe("Actions executed on entering this state"),
+      exit_actions: z
+        .array(
+          z.object({
+            type: z.enum(["assign", "log", "raise", "custom"]).describe("Action type"),
+            params: z.record(z.string(), z.unknown()).describe("Action parameters"),
+          }),
+        )
+        .optional()
+        .describe("Actions executed on exiting this state"),
+      history_type: z
+        .enum(["shallow", "deep"])
+        .optional()
+        .describe("History type (only for history states)"),
     },
     handler: async (input: never): Promise<CallToolResult> => {
       return safeToolCall("sm_add_state", async () => {
@@ -336,12 +349,14 @@ export const stateMachineTools: StandaloneToolDefinition[] = [
           type: "atomic" | "compound" | "parallel" | "final" | "history";
           parent?: string;
           initial?: string;
-          entry_actions?: Array<
-            { type: "assign" | "log" | "raise" | "custom"; params: Record<string, unknown>; }
-          >;
-          exit_actions?: Array<
-            { type: "assign" | "log" | "raise" | "custom"; params: Record<string, unknown>; }
-          >;
+          entry_actions?: Array<{
+            type: "assign" | "log" | "raise" | "custom";
+            params: Record<string, unknown>;
+          }>;
+          exit_actions?: Array<{
+            type: "assign" | "log" | "raise" | "custom";
+            params: Record<string, unknown>;
+          }>;
           history_type?: "shallow" | "deep";
         };
         const { addState } = await import("@/lib/state-machine/engine");
@@ -385,7 +400,7 @@ export const stateMachineTools: StandaloneToolDefinition[] = [
     },
     handler: async (input: never): Promise<CallToolResult> => {
       return safeToolCall("sm_remove_state", async () => {
-        const { machine_id, state_id } = input as { machine_id: string; state_id: string; };
+        const { machine_id, state_id } = input as { machine_id: string; state_id: string };
         const { removeState } = await import("@/lib/state-machine/engine");
         removeState(machine_id, state_id);
         return textResult(`**State Removed:** \`${state_id}\` from machine \`${machine_id}\``);
@@ -404,16 +419,23 @@ export const stateMachineTools: StandaloneToolDefinition[] = [
       source: z.string().min(1).describe("Source state ID"),
       target: z.string().min(1).describe("Target state ID"),
       event: z.string().min(1).describe("Event name that triggers this transition"),
-      guard_expression: z.string().optional().describe(
-        "Guard expression string, e.g. 'context.count > 0'",
-      ),
-      actions: z.array(z.object({
-        type: z.enum(["assign", "log", "raise", "custom"]).describe("Action type"),
-        params: z.record(z.string(), z.unknown()).describe("Action parameters"),
-      })).optional().describe("Actions to execute during the transition"),
-      internal: z.boolean().optional().describe(
-        "Internal transition (no exit/re-entry of source state)",
-      ),
+      guard_expression: z
+        .string()
+        .optional()
+        .describe("Guard expression string, e.g. 'context.count > 0'"),
+      actions: z
+        .array(
+          z.object({
+            type: z.enum(["assign", "log", "raise", "custom"]).describe("Action type"),
+            params: z.record(z.string(), z.unknown()).describe("Action parameters"),
+          }),
+        )
+        .optional()
+        .describe("Actions to execute during the transition"),
+      internal: z
+        .boolean()
+        .optional()
+        .describe("Internal transition (no exit/re-entry of source state)"),
     },
     handler: async (input: never): Promise<CallToolResult> => {
       return safeToolCall("sm_add_transition", async () => {
@@ -424,9 +446,10 @@ export const stateMachineTools: StandaloneToolDefinition[] = [
             target: string;
             event: string;
             guard_expression?: string;
-            actions?: Array<
-              { type: "assign" | "log" | "raise" | "custom"; params: Record<string, unknown>; }
-            >;
+            actions?: Array<{
+              type: "assign" | "log" | "raise" | "custom";
+              params: Record<string, unknown>;
+            }>;
             internal?: boolean;
           };
         const { addTransition } = await import("@/lib/state-machine/engine");
@@ -486,9 +509,9 @@ export const stateMachineTools: StandaloneToolDefinition[] = [
     alwaysEnabled: true,
     inputSchema: {
       machine_id: z.string().min(1).describe("Machine ID"),
-      context: z.record(z.string(), z.unknown()).describe(
-        "Key-value pairs to merge into the context",
-      ),
+      context: z
+        .record(z.string(), z.unknown())
+        .describe("Key-value pairs to merge into the context"),
     },
     handler: async (input: never): Promise<CallToolResult> => {
       return safeToolCall("sm_set_context", async () => {
@@ -533,9 +556,9 @@ export const stateMachineTools: StandaloneToolDefinition[] = [
         text += `- **To:** ${logEntry.toStates.join(", ")}\n`;
         if (logEntry.guardEvaluated) text += `- **Guard Evaluated:** ${logEntry.guardEvaluated}\n`;
         if (logEntry.actionsExecuted.length > 0) {
-          text += `- **Actions Executed:** ${
-            logEntry.actionsExecuted.map(a => a.type).join(", ")
-          }\n`;
+          text += `- **Actions Executed:** ${logEntry.actionsExecuted
+            .map((a) => a.type)
+            .join(", ")}\n`;
         }
 
         return textResult(text);
@@ -554,7 +577,7 @@ export const stateMachineTools: StandaloneToolDefinition[] = [
     },
     handler: async (input: never): Promise<CallToolResult> => {
       return safeToolCall("sm_get_state", async () => {
-        const { machine_id } = input as { machine_id: string; };
+        const { machine_id } = input as { machine_id: string };
         const { getState } = await import("@/lib/state-machine/engine");
         const state = getState(machine_id);
 
@@ -577,13 +600,16 @@ export const stateMachineTools: StandaloneToolDefinition[] = [
     alwaysEnabled: true,
     inputSchema: {
       machine_id: z.string().min(1).describe("Machine ID"),
-      limit: z.number().int().min(1).optional().describe(
-        "Maximum number of log entries (default: 20)",
-      ),
+      limit: z
+        .number()
+        .int()
+        .min(1)
+        .optional()
+        .describe("Maximum number of log entries (default: 20)"),
     },
     handler: async (input: never): Promise<CallToolResult> => {
       return safeToolCall("sm_get_history", async () => {
-        const { machine_id, limit } = input as { machine_id: string; limit?: number; };
+        const { machine_id, limit } = input as { machine_id: string; limit?: number };
         const { getHistory } = await import("@/lib/state-machine/engine");
         const history = getHistory(machine_id);
         const maxEntries = limit ?? 20;
@@ -595,12 +621,12 @@ export const stateMachineTools: StandaloneToolDefinition[] = [
 
         let text = `**Transition History** (${entries.length} of ${history.length} entries)\n\n`;
         for (const entry of entries) {
-          text += `- **${entry.event}**: ${entry.fromStates.join(", ")} -> ${
-            entry.toStates.join(", ")
-          }`;
+          text += `- **${entry.event}**: ${entry.fromStates.join(", ")} -> ${entry.toStates.join(
+            ", ",
+          )}`;
           if (entry.guardEvaluated) text += ` [guard: ${entry.guardEvaluated}]`;
           if (entry.actionsExecuted.length > 0) {
-            text += ` (actions: ${entry.actionsExecuted.map(a => a.type).join(", ")})`;
+            text += ` (actions: ${entry.actionsExecuted.map((a) => a.type).join(", ")})`;
           }
           text += `\n`;
         }
@@ -621,7 +647,7 @@ export const stateMachineTools: StandaloneToolDefinition[] = [
     },
     handler: async (input: never): Promise<CallToolResult> => {
       return safeToolCall("sm_reset", async () => {
-        const { machine_id } = input as { machine_id: string; };
+        const { machine_id } = input as { machine_id: string };
         const { resetMachine, getState } = await import("@/lib/state-machine/engine");
         resetMachine(machine_id);
         const state = getState(machine_id);
@@ -648,7 +674,7 @@ export const stateMachineTools: StandaloneToolDefinition[] = [
     },
     handler: async (input: never): Promise<CallToolResult> => {
       return safeToolCall("sm_validate", async () => {
-        const { machine_id } = input as { machine_id: string; };
+        const { machine_id } = input as { machine_id: string };
         const { validateMachine } = await import("@/lib/state-machine/engine");
         const issues = validateMachine(machine_id);
 
@@ -680,13 +706,18 @@ export const stateMachineTools: StandaloneToolDefinition[] = [
     inputSchema: {
       machine_id: z.string().min(1).describe("Machine ID"),
       codespace_id: z.string().min(1).describe("Codespace ID to deploy the visualization to"),
-      interactive: z.boolean().optional().describe(
-        "Enable interactive event buttons (default: false)",
-      ),
+      interactive: z
+        .boolean()
+        .optional()
+        .describe("Enable interactive event buttons (default: false)"),
       autoplay: z.boolean().optional().describe("Enable autoplay (default: false)"),
-      autoplay_speed_ms: z.number().int().min(100).max(10000).optional().describe(
-        "Autoplay speed in ms (default: 1000)",
-      ),
+      autoplay_speed_ms: z
+        .number()
+        .int()
+        .min(100)
+        .max(10000)
+        .optional()
+        .describe("Autoplay speed in ms (default: 1000)"),
     },
     handler: async (input: never): Promise<CallToolResult> => {
       return safeToolCall("sm_visualize", async () => {
@@ -708,14 +739,11 @@ export const stateMachineTools: StandaloneToolDefinition[] = [
 
         let deployFailed = false;
         try {
-          const response = await fetch(
-            `https://testing.spike.land/live/${codespace_id}/api/code`,
-            {
-              method: "PUT",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ code }),
-            },
-          );
+          const response = await fetch(`https://testing.spike.land/live/${codespace_id}/api/code`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ code }),
+          });
           if (!response.ok) deployFailed = true;
         } catch {
           deployFailed = true;
@@ -739,8 +767,7 @@ export const stateMachineTools: StandaloneToolDefinition[] = [
           }
           let text = `**Visualization Fallback (Mermaid)**\n\n`;
           text += `The codespace service at \`testing.spike.land\` is unavailable. `;
-          text +=
-            `Here is a Mermaid stateDiagram you can render in any Mermaid-compatible viewer:\n\n`;
+          text += `Here is a Mermaid stateDiagram you can render in any Mermaid-compatible viewer:\n\n`;
           text += `\`\`\`mermaid\n${lines.join("\n")}\n\`\`\``;
           return textResult(text);
         }
@@ -770,7 +797,7 @@ export const stateMachineTools: StandaloneToolDefinition[] = [
     },
     handler: async (input: never): Promise<CallToolResult> => {
       return safeToolCall("sm_export", async () => {
-        const { machine_id } = input as { machine_id: string; };
+        const { machine_id } = input as { machine_id: string };
         const { exportMachine } = await import("@/lib/state-machine/engine");
         const machineExport = exportMachine(machine_id);
         return textResult(
@@ -798,8 +825,7 @@ export const stateMachineTools: StandaloneToolDefinition[] = [
 
         let text = `**Your Machines** (${machines.length})\n\n`;
         for (const m of machines) {
-          text +=
-            `- \`${m.id}\` **${m.name}** -- ${m.stateCount} states, ${m.transitionCount} transitions`;
+          text += `- \`${m.id}\` **${m.name}** -- ${m.stateCount} states, ${m.transitionCount} transitions`;
           if (m.currentStates.length > 0) text += ` (active: ${m.currentStates.join(", ")})`;
           text += `\n`;
         }
@@ -817,9 +843,10 @@ export const stateMachineTools: StandaloneToolDefinition[] = [
     alwaysEnabled: true,
     inputSchema: {
       machine_id: z.string().min(1).describe("Machine ID to share"),
-      machine_data: z.record(z.string(), z.unknown()).optional().describe(
-        "Full machine export data for client-side machines",
-      ),
+      machine_data: z
+        .record(z.string(), z.unknown())
+        .optional()
+        .describe("Full machine export data for client-side machines"),
     },
     handler: async (input: never, ctx: ServerContext): Promise<CallToolResult> => {
       return safeToolCall("sm_share", async () => {
@@ -856,7 +883,7 @@ export const stateMachineTools: StandaloneToolDefinition[] = [
     },
     handler: async (input: never): Promise<CallToolResult> => {
       return safeToolCall("sm_get_shared", async () => {
-        const { token } = input as { token: string; };
+        const { token } = input as { token: string };
         const { getSharedMachine } = await import("@/lib/state-machine/engine");
         const exported = await getSharedMachine(token);
         return textResult(JSON.stringify(exported));
@@ -875,14 +902,15 @@ export const stateMachineTools: StandaloneToolDefinition[] = [
     tier: "free",
     alwaysEnabled: true,
     inputSchema: {
-      category: z.enum(["auth", "cart", "workflow", "game", "iot", "ui"]).optional().describe(
-        "Filter templates by category",
-      ),
+      category: z
+        .enum(["auth", "cart", "workflow", "game", "iot", "ui"])
+        .optional()
+        .describe("Filter templates by category"),
     },
     handler: async (input: never): Promise<CallToolResult> => {
       return safeToolCall("sm_list_templates", async () => {
-        const { category } = input as { category?: string; };
-        const filtered = category ? TEMPLATES.filter(t => t.category === category) : TEMPLATES;
+        const { category } = input as { category?: string };
+        const filtered = category ? TEMPLATES.filter((t) => t.category === category) : TEMPLATES;
 
         if (filtered.length === 0) {
           return textResult(`No templates found for category "${category}".`);
@@ -916,8 +944,8 @@ export const stateMachineTools: StandaloneToolDefinition[] = [
     },
     handler: async (input: never, ctx: ServerContext): Promise<CallToolResult> => {
       return safeToolCall("sm_create_from_template", async () => {
-        const { template_id, name } = input as { template_id: string; name?: string; };
-        const tmpl = TEMPLATES.find(t => t.id === template_id);
+        const { template_id, name } = input as { template_id: string; name?: string };
+        const tmpl = TEMPLATES.find((t) => t.id === template_id);
         if (!tmpl) {
           throw new Error(
             `Template "${template_id}" not found. Use sm_list_templates to see available templates.`,
@@ -962,8 +990,9 @@ export const stateMachineTools: StandaloneToolDefinition[] = [
           });
         }
 
-        const stateList = tmpl.states.map(s => `\`${s.id}\``).join(", ");
-        const transitionList = tmpl.transitions.map(t => `${t.source} -[${t.event}]-> ${t.target}`)
+        const stateList = tmpl.states.map((s) => `\`${s.id}\``).join(", ");
+        const transitionList = tmpl.transitions
+          .map((t) => `${t.source} -[${t.event}]-> ${t.target}`)
           .join(", ");
 
         let text = `**Machine Created from Template: ${tmpl.name}**\n\n`;
@@ -989,13 +1018,14 @@ export const stateMachineTools: StandaloneToolDefinition[] = [
     alwaysEnabled: true,
     inputSchema: {
       machine_id: z.string().min(1).describe("Machine ID to generate code for"),
-      framework: z.enum(["xstate", "typescript", "mermaid"]).optional().describe(
-        "Target framework/format (default: typescript)",
-      ),
+      framework: z
+        .enum(["xstate", "typescript", "mermaid"])
+        .optional()
+        .describe("Target framework/format (default: typescript)"),
     },
     handler: async (input: never): Promise<CallToolResult> => {
       return safeToolCall("sm_generate_code", async () => {
-        const { machine_id, framework } = input as { machine_id: string; framework?: string; };
+        const { machine_id, framework } = input as { machine_id: string; framework?: string };
         const { exportMachine } = await import("@/lib/state-machine/engine");
         const exported = exportMachine(machine_id);
         const { definition } = exported;
@@ -1006,21 +1036,23 @@ export const stateMachineTools: StandaloneToolDefinition[] = [
         let code: string;
 
         if (target === "xstate") {
-          const statesBlock = stateIds.map(sid => {
-            const s = definition.states[sid]!;
-            const transitionsForState = definition.transitions.filter(t => t.source === sid);
-            const onBlock = transitionsForState.length > 0
-              ? `\n      on: {\n${
-                transitionsForState.map(t => `        ${t.event}: "${t.target}",`).join("\n")
-              }\n      },`
-              : "";
-            if (s.type === "final") return `    ${sid}: { type: "final" },`;
-            return `    ${sid}: {${onBlock}\n    },`;
-          }).join("\n");
+          const statesBlock = stateIds
+            .map((sid) => {
+              const s = definition.states[sid]!;
+              const transitionsForState = definition.transitions.filter((t) => t.source === sid);
+              const onBlock =
+                transitionsForState.length > 0
+                  ? `\n      on: {\n${transitionsForState
+                      .map((t) => `        ${t.event}: "${t.target}",`)
+                      .join("\n")}\n      },`
+                  : "";
+              if (s.type === "final") return `    ${sid}: { type: "final" },`;
+              return `    ${sid}: {${onBlock}\n    },`;
+            })
+            .join("\n");
 
           const safeName = definition.name.replace(/\W+/g, "_");
-          code =
-            `import { createMachine } from "xstate";\n\nconst ${safeName}Machine = createMachine({\n  id: "${definition.name}",\n  initial: "${definition.initial}",\n  states: {\n${statesBlock}\n  },\n});\n\nexport default ${safeName}Machine;\n`;
+          code = `import { createMachine } from "xstate";\n\nconst ${safeName}Machine = createMachine({\n  id: "${definition.name}",\n  initial: "${definition.initial}",\n  states: {\n${statesBlock}\n  },\n});\n\nexport default ${safeName}Machine;\n`;
         } else if (target === "mermaid") {
           const lines = [
             `stateDiagram-v2`,
@@ -1033,14 +1065,13 @@ export const stateMachineTools: StandaloneToolDefinition[] = [
           }
           code = lines.join("\n");
         } else {
-          const stateUnion = stateIds.map(s => `"${s}"`).join(" | ");
-          const eventNames = [...new Set(definition.transitions.map(t => t.event))];
-          const eventUnion = eventNames.map(e => `"${e}"`).join(" | ");
-          const transitionRows = definition.transitions.map(t =>
-            `  { from: "${t.source}", on: "${t.event}", to: "${t.target}" },`
-          ).join("\n");
-          code =
-            `// State machine: ${definition.name}\ntype State = ${stateUnion};\ntype Event = ${eventUnion};\n\ninterface Transition {\n  from: State;\n  on: Event;\n  to: State;\n}\n\nconst TRANSITIONS: Transition[] = [\n${transitionRows}\n];\n\nlet current: State = "${definition.initial}";\n\nfunction send(event: Event): void {\n  const match = TRANSITIONS.find(\n    (t) => t.from === current && t.on === event\n  );\n  if (!match) {\n    throw new Error(\`No transition from "\${current}" on "\${event}"\`);\n  }\n  current = match.to;\n}\n\nexport { State, Event, send, current };\n`;
+          const stateUnion = stateIds.map((s) => `"${s}"`).join(" | ");
+          const eventNames = [...new Set(definition.transitions.map((t) => t.event))];
+          const eventUnion = eventNames.map((e) => `"${e}"`).join(" | ");
+          const transitionRows = definition.transitions
+            .map((t) => `  { from: "${t.source}", on: "${t.event}", to: "${t.target}" },`)
+            .join("\n");
+          code = `// State machine: ${definition.name}\ntype State = ${stateUnion};\ntype Event = ${eventUnion};\n\ninterface Transition {\n  from: State;\n  on: Event;\n  to: State;\n}\n\nconst TRANSITIONS: Transition[] = [\n${transitionRows}\n];\n\nlet current: State = "${definition.initial}";\n\nfunction send(event: Event): void {\n  const match = TRANSITIONS.find(\n    (t) => t.from === current && t.on === event\n  );\n  if (!match) {\n    throw new Error(\`No transition from "\${current}" on "\${event}"\`);\n  }\n  current = match.to;\n}\n\nexport { State, Event, send, current };\n`;
         }
 
         const ext = target === "mermaid" ? "mmd" : "ts";
@@ -1065,7 +1096,7 @@ export const stateMachineTools: StandaloneToolDefinition[] = [
     },
     handler: async (input: never): Promise<CallToolResult> => {
       return safeToolCall("sm_simulate_sequence", async () => {
-        const { machine_id, events } = input as { machine_id: string; events: string[]; };
+        const { machine_id, events } = input as { machine_id: string; events: string[] };
         const { exportMachine, sendEvent } = await import("@/lib/state-machine/engine");
 
         const snapshot = exportMachine(machine_id);
@@ -1104,8 +1135,7 @@ export const stateMachineTools: StandaloneToolDefinition[] = [
         text += `**Steps:**\n`;
         for (const step of steps) {
           const status = step.rejected ? "REJECTED" : "OK";
-          text +=
-            `${step.step}. \`${step.event}\` [${status}]: ${step.fromState} -> ${step.toState}\n`;
+          text += `${step.step}. \`${step.event}\` [${status}]: ${step.fromState} -> ${step.toState}\n`;
         }
         text += `\n**Final State:** ${finalStates}\n`;
 

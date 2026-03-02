@@ -67,9 +67,7 @@ export const geminiDraftResponseSchema = z.object({
   messageAnalysis: messageAnalysisSchema,
 });
 
-export type GeminiDraftResponseValidated = z.infer<
-  typeof geminiDraftResponseSchema
->;
+export type GeminiDraftResponseValidated = z.infer<typeof geminiDraftResponseSchema>;
 
 // ============================================
 // API Request Schemas
@@ -81,9 +79,7 @@ export const generateDraftsRequestSchema = z.object({
   customInstructions: z.string().max(500).optional(),
 });
 
-export type GenerateDraftsRequestInput = z.input<
-  typeof generateDraftsRequestSchema
->;
+export type GenerateDraftsRequestInput = z.input<typeof generateDraftsRequestSchema>;
 
 export const saveDraftRequestSchema = z.object({
   inboxItemId: z.string().min(1),
@@ -119,6 +115,4 @@ export const regenerateDraftsRequestSchema = z.object({
   numDrafts: z.number().int().min(1).max(5).optional().default(3),
 });
 
-export type RegenerateDraftsRequestInput = z.input<
-  typeof regenerateDraftsRequestSchema
->;
+export type RegenerateDraftsRequestInput = z.input<typeof regenerateDraftsRequestSchema>;

@@ -108,9 +108,7 @@ describe("app-lookup", () => {
     });
 
     it("should NOT attempt cuid lookup for non-cuid identifiers", async () => {
-      mockFindFirst
-        .mockResolvedValueOnce(null)
-        .mockResolvedValueOnce(null);
+      mockFindFirst.mockResolvedValueOnce(null).mockResolvedValueOnce(null);
 
       const result = await findAppByIdentifier("regular-slug", userId);
 
@@ -141,9 +139,7 @@ describe("app-lookup", () => {
     });
 
     it("should fall back to slug", async () => {
-      mockFindFirst
-        .mockResolvedValueOnce(null)
-        .mockResolvedValueOnce({ id: "app-2" });
+      mockFindFirst.mockResolvedValueOnce(null).mockResolvedValueOnce({ id: "app-2" });
 
       const result = await findAppByIdentifierSimple("my-slug", userId);
 

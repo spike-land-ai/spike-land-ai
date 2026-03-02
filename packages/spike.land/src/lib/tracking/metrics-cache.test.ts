@@ -20,7 +20,7 @@ vi.mock("@/lib/try-catch", () => ({
     promise.then(
       (data: unknown) => ({ data, error: null }),
       (error: unknown) => ({ data: null, error }),
-    )
+    ),
   ),
 }));
 
@@ -72,7 +72,7 @@ describe("tracking/metrics-cache", () => {
         expiresAt: new Date(Date.now() + 60000),
       });
 
-      const result = await getCachedMetrics<{ views: number; }>("key-1");
+      const result = await getCachedMetrics<{ views: number }>("key-1");
       expect(result).toEqual({ views: 100 });
     });
 
@@ -97,9 +97,7 @@ describe("tracking/metrics-cache", () => {
     });
 
     it("should return null on database error", async () => {
-      mockPrisma.campaignMetricsCache.findUnique.mockRejectedValue(
-        new Error("DB error"),
-      );
+      mockPrisma.campaignMetricsCache.findUnique.mockRejectedValue(new Error("DB error"));
 
       const result = await getCachedMetrics("error-key");
       expect(result).toBeNull();
@@ -127,13 +125,9 @@ describe("tracking/metrics-cache", () => {
     });
 
     it("should not throw on database error", async () => {
-      mockPrisma.campaignMetricsCache.upsert.mockRejectedValue(
-        new Error("Write failed"),
-      );
+      mockPrisma.campaignMetricsCache.upsert.mockRejectedValue(new Error("Write failed"));
 
-      await expect(
-        setCachedMetrics("key-1", { data: 1 }),
-      ).resolves.toBeUndefined();
+      await expect(setCachedMetrics("key-1", { data: 1 })).resolves.toBeUndefined();
     });
   });
 
@@ -158,16 +152,12 @@ describe("tracking/metrics-cache", () => {
 
       const count = await invalidateCache();
 
-      expect(mockPrisma.campaignMetricsCache.deleteMany).toHaveBeenCalledWith(
-        {},
-      );
+      expect(mockPrisma.campaignMetricsCache.deleteMany).toHaveBeenCalledWith({});
       expect(count).toBe(10);
     });
 
     it("should return 0 on error", async () => {
-      mockPrisma.campaignMetricsCache.deleteMany.mockRejectedValue(
-        new Error("fail"),
-      );
+      mockPrisma.campaignMetricsCache.deleteMany.mockRejectedValue(new Error("fail"));
 
       const count = await invalidateCache("pattern");
       expect(count).toBe(0);
@@ -182,18 +172,14 @@ describe("tracking/metrics-cache", () => {
 
       const count = await cleanupExpiredCache();
 
-      expect(
-        mockPrisma.campaignMetricsCache.deleteMany,
-      ).toHaveBeenCalledWith({
+      expect(mockPrisma.campaignMetricsCache.deleteMany).toHaveBeenCalledWith({
         where: { expiresAt: { lt: expect.any(Date) } },
       });
       expect(count).toBe(5);
     });
 
     it("should return 0 on error", async () => {
-      mockPrisma.campaignMetricsCache.deleteMany.mockRejectedValue(
-        new Error("fail"),
-      );
+      mockPrisma.campaignMetricsCache.deleteMany.mockRejectedValue(new Error("fail"));
 
       const count = await cleanupExpiredCache();
       expect(count).toBe(0);

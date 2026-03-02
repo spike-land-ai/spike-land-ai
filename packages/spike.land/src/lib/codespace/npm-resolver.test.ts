@@ -3,22 +3,29 @@ import { npmResolverPlugin } from "./npm-resolver";
 import type { OnLoadArgs, OnResolveArgs, PluginBuild } from "@spike-land-ai/esbuild-wasm";
 
 function setupPlugin(mode?: "external" | "bundle", cache?: Map<string, string | Uint8Array>) {
-  const plugin = npmResolverPlugin({ ...(mode !== undefined ? { mode } : {}), ...(cache !== undefined ? { cache } : {}) });
-  const resolveCbs: Array<{ filter: RegExp; ns?: string; cb: (args: OnResolveArgs) => unknown; }> =
+  const plugin = npmResolverPlugin({
+    ...(mode !== undefined ? { mode } : {}),
+    ...(cache !== undefined ? { cache } : {}),
+  });
+  const resolveCbs: Array<{ filter: RegExp; ns?: string; cb: (args: OnResolveArgs) => unknown }> =
     [];
   const loadCbs: Array<(args: OnLoadArgs) => unknown> = [];
 
   const build = {
-    onResolve: vi.fn().mockImplementation(
-      (opts: { filter: RegExp; namespace?: string; }, cb: (args: OnResolveArgs) => unknown) => {
-        resolveCbs.push({ filter: opts.filter, ...(opts.namespace !== undefined ? { ns: opts.namespace } : {}), cb });
-      },
-    ),
-    onLoad: vi.fn().mockImplementation(
-      (_opts: unknown, cb: (args: OnLoadArgs) => unknown) => {
-        loadCbs.push(cb);
-      },
-    ),
+    onResolve: vi
+      .fn()
+      .mockImplementation(
+        (opts: { filter: RegExp; namespace?: string }, cb: (args: OnResolveArgs) => unknown) => {
+          resolveCbs.push({
+            filter: opts.filter,
+            ...(opts.namespace !== undefined ? { ns: opts.namespace } : {}),
+            cb,
+          });
+        },
+      ),
+    onLoad: vi.fn().mockImplementation((_opts: unknown, cb: (args: OnLoadArgs) => unknown) => {
+      loadCbs.push(cb);
+    }),
   } as unknown as PluginBuild;
 
   plugin.setup(build);
@@ -26,7 +33,7 @@ function setupPlugin(mode?: "external" | "bundle", cache?: Map<string, string | 
 }
 
 async function resolveAll(
-  cbs: Array<{ filter: RegExp; ns?: string; cb: (args: OnResolveArgs) => unknown; }>,
+  cbs: Array<{ filter: RegExp; ns?: string; cb: (args: OnResolveArgs) => unknown }>,
   args: Partial<OnResolveArgs>,
 ) {
   for (const { filter, ns, cb } of cbs) {
@@ -157,8 +164,8 @@ describe("npmResolverPlugin", () => {
       } as OnLoadArgs);
 
       expect(result).toBeDefined();
-      expect((result as { contents: string; }).contents).toBe("export default 42;");
-      expect((result as { loader: string; }).loader).toBe("js");
+      expect((result as { contents: string }).contents).toBe("export default 42;");
+      expect((result as { loader: string }).loader).toBe("js");
       expect(cache.has("https://esm.sh/test-pkg")).toBe(true);
     });
 
@@ -176,15 +183,13 @@ describe("npmResolverPlugin", () => {
       } as OnLoadArgs);
 
       expect(result).toBeDefined();
-      expect((result as { contents: string; }).contents).toBe("cached export;");
+      expect((result as { contents: string }).contents).toBe("cached export;");
     });
 
     it("throws on fetch failure", async () => {
       const { loadCbs } = setupPlugin("bundle");
 
-      vi.spyOn(globalThis, "fetch").mockRejectedValueOnce(
-        new Error("network failure"),
-      );
+      vi.spyOn(globalThis, "fetch").mockRejectedValueOnce(new Error("network failure"));
 
       await expect(
         loadCbs[0]!({

@@ -57,9 +57,7 @@ describe("insertion", () => {
     vi.clearAllMocks();
   });
 
-  const setupCollisionMocks = (
-    options?: { nodeType?: string; hasOccupantProfile?: boolean; },
-  ) => {
+  const setupCollisionMocks = (options?: { nodeType?: string; hasOccupantProfile?: boolean }) => {
     const nodeType = options?.nodeType ?? "LEAF";
     const hasOccupantProfile = options?.hasOccupantProfile ?? true;
 
@@ -75,14 +73,14 @@ describe("insertion", () => {
     mockPrisma.avlUserProfile.findUnique.mockResolvedValue(
       hasOccupantProfile
         ? {
-          id: "occupant-profile",
-          userId: "occupant-user",
-          treeId: "tree-1",
-          leafNodeId: "collision-node",
-          answerPath: [],
-          derivedTags: [],
-          profileVector: {},
-        }
+            id: "occupant-profile",
+            userId: "occupant-user",
+            treeId: "tree-1",
+            leafNodeId: "collision-node",
+            answerPath: [],
+            derivedTags: [],
+            profileVector: {},
+          }
         : null,
     );
 
@@ -123,11 +121,7 @@ describe("insertion", () => {
     it("splits leaf into internal + 2 leaves", async () => {
       setupCollisionMocks();
 
-      const result = await handleCollision(
-        "session-1",
-        "occupant-user",
-        "new-user",
-      );
+      const result = await handleCollision("session-1", "occupant-user", "new-user");
 
       expect(result.newQuestionNodeId).toBe("collision-node");
       expect(result.occupantLeafId).toBe("yes-leaf");
@@ -159,16 +153,10 @@ describe("insertion", () => {
     it("generates differentiating question", async () => {
       setupCollisionMocks();
 
-      const result = await handleCollision(
-        "session-1",
-        "occupant-user",
-        "new-user",
-      );
+      const result = await handleCollision("session-1", "occupant-user", "new-user");
 
       expect(result.question).toBe("Do you use TypeScript?");
-      expect(
-        mockQuestionGen.generateDifferentiatingQuestion,
-      ).toHaveBeenCalled();
+      expect(mockQuestionGen.generateDifferentiatingQuestion).toHaveBeenCalled();
     });
 
     it("updates occupant profile", async () => {
@@ -189,18 +177,15 @@ describe("insertion", () => {
 
       await handleCollision("session-1", "occupant-user", "new-user");
 
-      expect(mockRotations.rebalanceUpward).toHaveBeenCalledWith(
-        "collision-node",
-        mockPrisma,
-      );
+      expect(mockRotations.rebalanceUpward).toHaveBeenCalledWith("collision-node", mockPrisma);
     });
 
     it("throws RETRY_TRAVERSAL if node no longer leaf", async () => {
       setupCollisionMocks({ nodeType: "INTERNAL" });
 
-      await expect(
-        handleCollision("session-1", "occupant-user", "new-user"),
-      ).rejects.toThrow("RETRY_TRAVERSAL");
+      await expect(handleCollision("session-1", "occupant-user", "new-user")).rejects.toThrow(
+        "RETRY_TRAVERSAL",
+      );
     });
 
     it("creates occupant profile when occupant has no existing profile", async () => {

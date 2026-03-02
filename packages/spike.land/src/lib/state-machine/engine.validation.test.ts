@@ -44,10 +44,8 @@ describe("state machine engine - validation, sharing & guards", () => {
       });
 
       const issues = validateMachine("vm1");
-      const errors = issues.filter(i => i.level === "error");
-      expect(errors.some(e => e.message.includes("missing an initial"))).toBe(
-        true,
-      );
+      const errors = issues.filter((i) => i.level === "error");
+      expect(errors.some((e) => e.message.includes("missing an initial"))).toBe(true);
     });
 
     it("should warn about unreachable states", () => {
@@ -75,9 +73,9 @@ describe("state machine engine - validation, sharing & guards", () => {
       });
 
       const issues = validateMachine("vm2");
-      const warnings = issues.filter(i => i.level === "warning");
+      const warnings = issues.filter((i) => i.level === "warning");
       expect(
-        warnings.some(w => w.message.includes("\"orphan\"") && w.message.includes("unreachable")),
+        warnings.some((w) => w.message.includes('"orphan"') && w.message.includes("unreachable")),
       ).toBe(true);
     });
 
@@ -116,11 +114,9 @@ describe("state machine engine - validation, sharing & guards", () => {
       });
 
       const issues = validateMachine("vm3");
-      const warnings = issues.filter(i => i.level === "warning");
+      const warnings = issues.filter((i) => i.level === "warning");
       expect(
-        warnings.some(
-          w => w.message.includes("\"deadEnd\"") && w.message.includes("dead-end"),
-        ),
+        warnings.some((w) => w.message.includes('"deadEnd"') && w.message.includes("dead-end")),
       ).toBe(true);
     });
 
@@ -137,10 +133,8 @@ describe("state machine engine - validation, sharing & guards", () => {
       });
 
       const issues = validateMachine("vm4");
-      const errors = issues.filter(i => i.level === "error");
-      expect(
-        errors.some(e => e.message.includes("non-existent target")),
-      ).toBe(true);
+      const errors = issues.filter((i) => i.level === "error");
+      expect(errors.some((e) => e.message.includes("non-existent target"))).toBe(true);
     });
   });
 
@@ -187,9 +181,7 @@ describe("state machine engine - validation, sharing & guards", () => {
 
     it("should throw error if shared machine not found", async () => {
       mockPrisma.stateMachine.findUnique.mockResolvedValue(null);
-      await expect(getSharedMachine("invalid")).rejects.toThrow(
-        "Shared state machine not found",
-      );
+      await expect(getSharedMachine("invalid")).rejects.toThrow("Shared state machine not found");
     });
   });
 
@@ -198,10 +190,7 @@ describe("state machine engine - validation, sharing & guards", () => {
   // -----------------------------------------------------------------------
 
   describe("guard parser edge cases", () => {
-    function createGuardTestMachine(
-      guardExpr: string,
-      ctx: Record<string, unknown>,
-    ) {
+    function createGuardTestMachine(guardExpr: string, ctx: Record<string, unknown>) {
       createMachine({
         id: "gp",
         name: "GuardParser",
@@ -238,14 +227,14 @@ describe("state machine engine - validation, sharing & guards", () => {
       });
     }
 
-    it("should evaluate string comparison: context.name == \"hello\"", () => {
-      createGuardTestMachine("context.name == \"hello\"", { name: "hello" });
+    it('should evaluate string comparison: context.name == "hello"', () => {
+      createGuardTestMachine('context.name == "hello"', { name: "hello" });
       sendEvent("gp", "CHECK");
       expect(getState("gp").activeStates).toEqual(["end"]);
     });
 
     it("should reject string comparison when value does not match", () => {
-      createGuardTestMachine("context.name == \"hello\"", { name: "world" });
+      createGuardTestMachine('context.name == "hello"', { name: "world" });
       expect(() => sendEvent("gp", "CHECK")).toThrow("No matching transition");
     });
 
@@ -284,19 +273,21 @@ describe("state machine engine - validation, sharing & guards", () => {
     });
 
     it("should evaluate parentheses: (context.a || context.b) && context.c", () => {
-      createGuardTestMachine(
-        "(context.a || context.b) && context.c",
-        { a: false, b: true, c: true },
-      );
+      createGuardTestMachine("(context.a || context.b) && context.c", {
+        a: false,
+        b: true,
+        c: true,
+      });
       sendEvent("gp", "CHECK");
       expect(getState("gp").activeStates).toEqual(["end"]);
     });
 
     it("should block parenthesized expression when outer AND fails", () => {
-      createGuardTestMachine(
-        "(context.a || context.b) && context.c",
-        { a: true, b: false, c: false },
-      );
+      createGuardTestMachine("(context.a || context.b) && context.c", {
+        a: true,
+        b: false,
+        c: false,
+      });
       expect(() => sendEvent("gp", "CHECK")).toThrow("No matching transition");
     });
 
@@ -392,10 +383,8 @@ describe("state machine engine - validation, sharing & guards", () => {
 
       const issues = validateMachine(machineId);
       expect(
-        issues.some(i =>
-          i.message.includes(
-            "references non-existent target state \"nonexistent\"",
-          )
+        issues.some((i) =>
+          i.message.includes('references non-existent target state "nonexistent"'),
         ),
       ).toBe(true);
     });
@@ -430,7 +419,7 @@ describe("state machine engine - validation, sharing & guards", () => {
 
       const issues = validateMachine(machineId);
       expect(
-        issues.some(i => i.message.includes("references non-existent source state \"ghost\"")),
+        issues.some((i) => i.message.includes('references non-existent source state "ghost"')),
       ).toBe(true);
     });
 
@@ -478,9 +467,7 @@ describe("state machine engine - validation, sharing & guards", () => {
       });
 
       const issues = validateMachine(machineId);
-      expect(
-        issues.some(i => i.message.includes("Duplicate transition ID \"dup\"")),
-      ).toBe(true);
+      expect(issues.some((i) => i.message.includes('Duplicate transition ID "dup"'))).toBe(true);
     });
 
     it("should detect compound state missing initial child", () => {
@@ -503,10 +490,8 @@ describe("state machine engine - validation, sharing & guards", () => {
       // Manually mess with definition to bypass any createMachine checks if any
       const issues = validateMachine(machineId);
       expect(
-        issues.some(i =>
-          i.message.includes(
-            "Compound state \"parent\" is missing an initial child state",
-          )
+        issues.some((i) =>
+          i.message.includes('Compound state "parent" is missing an initial child state'),
         ),
       ).toBe(true);
     });
@@ -538,14 +523,13 @@ describe("state machine engine - validation, sharing & guards", () => {
 
       const issues = validateMachine(machineId);
       expect(
-        issues.some(i =>
-          i.level === "warning"
-          && i.message.includes("State \"lonely\" is unreachable")
+        issues.some(
+          (i) => i.level === "warning" && i.message.includes('State "lonely" is unreachable'),
         ),
       ).toBe(true);
-      expect(
-        issues.some(i => i.level === "warning" && i.message.includes("is a dead-end")),
-      ).toBe(true);
+      expect(issues.some((i) => i.level === "warning" && i.message.includes("is a dead-end"))).toBe(
+        true,
+      );
     });
 
     it("should error when machine initial state does not exist in states", () => {
@@ -568,10 +552,11 @@ describe("state machine engine - validation, sharing & guards", () => {
 
       const issues = validateMachine(machineId);
       expect(
-        issues.some(i =>
-          i.level === "error"
-          && i.message.includes("nonexistent")
-          && i.message.includes("does not exist")
+        issues.some(
+          (i) =>
+            i.level === "error" &&
+            i.message.includes("nonexistent") &&
+            i.message.includes("does not exist"),
         ),
       ).toBe(true);
     });
@@ -594,10 +579,11 @@ describe("state machine engine - validation, sharing & guards", () => {
 
       const issues = validateMachine(machineId);
       expect(
-        issues.some(i =>
-          i.level === "error"
-          && i.message.includes("missingChild")
-          && i.message.includes("does not exist")
+        issues.some(
+          (i) =>
+            i.level === "error" &&
+            i.message.includes("missingChild") &&
+            i.message.includes("does not exist"),
         ),
       ).toBe(true);
     });
@@ -638,10 +624,10 @@ describe("state machine engine - validation, sharing & guards", () => {
 
       const issues = validateMachine(machineId);
       expect(
-        issues.some(i => i.message.includes("regionA") && i.message.includes("unreachable")),
+        issues.some((i) => i.message.includes("regionA") && i.message.includes("unreachable")),
       ).toBe(false);
       expect(
-        issues.some(i => i.message.includes("regionB") && i.message.includes("unreachable")),
+        issues.some((i) => i.message.includes("regionB") && i.message.includes("unreachable")),
       ).toBe(false);
     });
   });
@@ -732,9 +718,7 @@ describe("state machine engine - validation, sharing & guards", () => {
 
     it("should throw for non-existent shared machine", async () => {
       mockPrisma.stateMachine.findUnique.mockResolvedValue(null);
-      await expect(getSharedMachine("nope")).rejects.toThrow(
-        "Shared state machine not found",
-      );
+      await expect(getSharedMachine("nope")).rejects.toThrow("Shared state machine not found");
     });
   });
 });

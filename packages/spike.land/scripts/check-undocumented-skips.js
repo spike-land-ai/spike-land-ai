@@ -23,15 +23,7 @@ const ACTION_PATTERN = /ACTION:/;
 const SKIP_CALL_PATTERN = /(it|describe|test)\.skip\(/;
 const CONTEXT_LINES = 10;
 
-const IGNORED_DIRS = [
-  "node_modules",
-  "dist",
-  "build",
-  ".next",
-  "coverage",
-  ".git",
-  ".yarn",
-];
+const IGNORED_DIRS = ["node_modules", "dist", "build", ".next", "coverage", ".git", ".yarn"];
 
 /**
  * Check if a skip call has all required documentation within context lines
@@ -165,7 +157,7 @@ async function main() {
   process.exit(1);
 }
 
-main().catch(error => {
+main().catch((error) => {
   console.error("Error:", error);
   process.exit(1);
 });

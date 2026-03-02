@@ -7,11 +7,7 @@
  * into a single entry point so the main page only needs one hook.
  */
 
-import type {
-  CleaningAchievement,
-  CleaningSession,
-  CleaningStreak,
-} from "@/lib/clean/types";
+import type { CleaningAchievement, CleaningSession, CleaningStreak } from "@/lib/clean/types";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 interface UseCleanSweepReturn {
@@ -51,9 +47,7 @@ async function fetchJson<T>(url: string, options?: RequestInit): Promise<T> {
   });
   if (!res.ok) {
     const body = await res.json().catch(() => ({ error: res.statusText }));
-    throw new Error(
-      (body as { error?: string; }).error ?? `Request failed: ${res.status}`,
-    );
+    throw new Error((body as { error?: string }).error ?? `Request failed: ${res.status}`);
   }
   return res.json() as Promise<T>;
 }
@@ -87,9 +81,7 @@ export function useCleanSweep(): UseCleanSweepReturn {
       const data = await fetchJson<CleaningStreak>("/api/clean/streaks");
       setStreak(data);
     } catch (err) {
-      setStreakError(
-        err instanceof Error ? err.message : "Failed to load streak",
-      );
+      setStreakError(err instanceof Error ? err.message : "Failed to load streak");
     } finally {
       setStreakLoading(false);
       fetchingStreak.current = false;
@@ -101,9 +93,7 @@ export function useCleanSweep(): UseCleanSweepReturn {
     fetchingRecent.current = true;
     setRecentLoading(true);
     try {
-      const data = await fetchJson<CleaningSession[]>(
-        "/api/clean/sessions?limit=5",
-      );
+      const data = await fetchJson<CleaningSession[]>("/api/clean/sessions?limit=5");
       setRecentSessions(data);
     } catch {
       // non-critical, silently ignore
@@ -118,9 +108,7 @@ export function useCleanSweep(): UseCleanSweepReturn {
     fetchingAchievements.current = true;
     setAchievementsLoading(true);
     try {
-      const data = await fetchJson<CleaningAchievement[]>(
-        "/api/clean/achievements",
-      );
+      const data = await fetchJson<CleaningAchievement[]>("/api/clean/achievements");
       setAchievements(data);
     } catch {
       // non-critical
@@ -142,19 +130,14 @@ export function useCleanSweep(): UseCleanSweepReturn {
       setSessionLoading(true);
       setSessionError(null);
       try {
-        const newSession = await fetchJson<CleaningSession>(
-          "/api/clean/sessions",
-          {
-            method: "POST",
-            body: JSON.stringify({ roomPhoto: roomPhotoBase64 }),
-          },
-        );
+        const newSession = await fetchJson<CleaningSession>("/api/clean/sessions", {
+          method: "POST",
+          body: JSON.stringify({ roomPhoto: roomPhotoBase64 }),
+        });
         setSession(newSession);
         return newSession;
       } catch (err) {
-        setSessionError(
-          err instanceof Error ? err.message : "Failed to start session",
-        );
+        setSessionError(err instanceof Error ? err.message : "Failed to start session");
         return null;
       } finally {
         setSessionLoading(false);
@@ -176,18 +159,16 @@ export function useCleanSweep(): UseCleanSweepReturn {
             body: JSON.stringify({ verificationPhoto }),
           },
         );
-        setSession(prev =>
+        setSession((prev) =>
           prev
             ? {
-              ...prev,
-              tasks: prev.tasks.map(t => (t.id === taskId ? updatedTask : t)),
-            }
-            : prev
+                ...prev,
+                tasks: prev.tasks.map((t) => (t.id === taskId ? updatedTask : t)),
+              }
+            : prev,
         );
       } catch (err) {
-        setSessionError(
-          err instanceof Error ? err.message : "Failed to complete task",
-        );
+        setSessionError(err instanceof Error ? err.message : "Failed to complete task");
       } finally {
         setSessionLoading(false);
       }
@@ -208,18 +189,16 @@ export function useCleanSweep(): UseCleanSweepReturn {
             body: JSON.stringify({ reason }),
           },
         );
-        setSession(prev =>
+        setSession((prev) =>
           prev
             ? {
-              ...prev,
-              tasks: prev.tasks.map(t => (t.id === taskId ? updatedTask : t)),
-            }
-            : prev
+                ...prev,
+                tasks: prev.tasks.map((t) => (t.id === taskId ? updatedTask : t)),
+              }
+            : prev,
         );
       } catch (err) {
-        setSessionError(
-          err instanceof Error ? err.message : "Failed to skip task",
-        );
+        setSessionError(err instanceof Error ? err.message : "Failed to skip task");
       } finally {
         setSessionLoading(false);
       }
@@ -237,9 +216,7 @@ export function useCleanSweep(): UseCleanSweepReturn {
       );
       setSession(updatedSession);
     } catch (err) {
-      setSessionError(
-        err instanceof Error ? err.message : "Failed to requeue tasks",
-      );
+      setSessionError(err instanceof Error ? err.message : "Failed to requeue tasks");
     } finally {
       setSessionLoading(false);
     }
@@ -256,15 +233,9 @@ export function useCleanSweep(): UseCleanSweepReturn {
       );
       setSession(completed);
       // Refresh streak and achievements after session ends
-      await Promise.all([
-        refreshStreak(),
-        fetchRecentSessions(),
-        fetchAchievements(),
-      ]);
+      await Promise.all([refreshStreak(), fetchRecentSessions(), fetchAchievements()]);
     } catch (err) {
-      setSessionError(
-        err instanceof Error ? err.message : "Failed to end session",
-      );
+      setSessionError(err instanceof Error ? err.message : "Failed to end session");
     } finally {
       setSessionLoading(false);
     }

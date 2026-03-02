@@ -36,8 +36,8 @@ export interface AppData {
   agentWorking: boolean;
   createdAt: string;
   updatedAt: string;
-  requirements: Array<{ id: string; content: string; }>;
-  monetizationModels: Array<{ id: string; model: string; }>;
+  requirements: Array<{ id: string; content: string }>;
+  monetizationModels: Array<{ id: string; model: string }>;
   statusHistory: Array<{
     id: string;
     status: string;

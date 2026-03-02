@@ -9,9 +9,7 @@ import { type LearningNote, NOTE_EXTRACTION_PROMPT } from "./agent-prompts";
  * Matches on libraries, tags, and universal notes.
  * Returns up to 20 notes sorted by confidence score.
  */
-export async function retrieveRelevantNotes(
-  path: string[],
-): Promise<LearningNote[]> {
+export async function retrieveRelevantNotes(path: string[]): Promise<LearningNote[]> {
   try {
     const keywords = extractKeywords(path.join("/"));
 
@@ -28,7 +26,7 @@ export async function retrieveRelevantNotes(
       take: 20,
     });
 
-    return notes.map(n => ({
+    return notes.map((n) => ({
       id: n.id,
       trigger: n.trigger,
       lesson: n.lesson,
@@ -46,9 +44,7 @@ export async function retrieveRelevantNotes(
  * Retrieve notes specifically relevant to an error message.
  * Matches against errorPatterns stored in notes for precise error-to-lesson lookup.
  */
-export async function retrieveNotesForError(
-  errorMessage: string,
-): Promise<LearningNote[]> {
+export async function retrieveNotesForError(errorMessage: string): Promise<LearningNote[]> {
   try {
     // Find notes whose errorPatterns overlap with the actual error text
     const errorLower = errorMessage.toLowerCase();
@@ -62,11 +58,11 @@ export async function retrieveNotesForError(
     });
 
     // Filter in-app: check if any errorPattern substring appears in the error message
-    const matched = notes.filter(n =>
-      n.errorPatterns.some(pattern => errorLower.includes(pattern.toLowerCase()))
+    const matched = notes.filter((n) =>
+      n.errorPatterns.some((pattern) => errorLower.includes(pattern.toLowerCase())),
     );
 
-    return matched.map(n => ({
+    return matched.map((n) => ({
       id: n.id,
       trigger: n.trigger,
       lesson: n.lesson,
@@ -94,7 +90,7 @@ export async function batchExtractAndSaveNotes(
 ): Promise<void> {
   // Deduplicate: only process unique errors where the fix succeeded
   const seen = new Set<string>();
-  const uniquePairs = errorFixPairs.filter(pair => {
+  const uniquePairs = errorFixPairs.filter((pair) => {
     if (!pair.fixed || !pair.fixedCode) return false;
     if (seen.has(pair.error)) return false;
     seen.add(pair.error);
@@ -126,9 +122,10 @@ export async function extractAndSaveNote(
   try {
     const response = await callClaude({
       systemPrompt: NOTE_EXTRACTION_PROMPT,
-      userPrompt: `Error: ${error}\n\nFailing code (excerpt):\n${
-        failingCode.slice(0, 2000)
-      }\n\nFixed code (excerpt):\n${fixedCode?.slice(0, 2000) || "N/A"}`,
+      userPrompt: `Error: ${error}\n\nFailing code (excerpt):\n${failingCode.slice(
+        0,
+        2000,
+      )}\n\nFixed code (excerpt):\n${fixedCode?.slice(0, 2000) || "N/A"}`,
       model: "haiku",
       maxTokens: 1024,
       temperature: 0.2,
@@ -194,12 +191,8 @@ function parseNoteFromAI(text: string): ParsedNote | null {
       trigger: String(parsed.trigger).slice(0, 200),
       triggerType: parsed.triggerType || "error_class",
       lesson: String(parsed.lesson).slice(0, 500),
-      libraries: Array.isArray(parsed.libraries)
-        ? parsed.libraries.map(String)
-        : [],
-      errorPatterns: Array.isArray(parsed.errorPatterns)
-        ? parsed.errorPatterns.map(String)
-        : [],
+      libraries: Array.isArray(parsed.libraries) ? parsed.libraries.map(String) : [],
+      errorPatterns: Array.isArray(parsed.errorPatterns) ? parsed.errorPatterns.map(String) : [],
       tags: Array.isArray(parsed.tags) ? parsed.tags.map(String) : [],
     };
   } catch {
@@ -207,9 +200,7 @@ function parseNoteFromAI(text: string): ParsedNote | null {
   }
 }
 
-async function findSimilarNote(
-  trigger: string,
-): Promise<{ id: string; } | null> {
+async function findSimilarNote(trigger: string): Promise<{ id: string } | null> {
   return prisma.agentLearningNote.findFirst({
     where: {
       trigger: { equals: trigger, mode: "insensitive" },
@@ -271,11 +262,10 @@ async function batchRecalculateConfidence(noteIds: string[]): Promise<void> {
 
   if (notes.length === 0) return;
 
-  const updates = notes.map(note => {
+  const updates = notes.map((note) => {
     const alpha = 1;
     const beta = 1;
-    const score = (note.helpCount + alpha)
-      / (note.helpCount + note.failCount + alpha + beta);
+    const score = (note.helpCount + alpha) / (note.helpCount + note.failCount + alpha + beta);
 
     let status = note.status;
 
@@ -307,7 +297,7 @@ export async function recordGenerationAttempt(params: {
   iterations: number;
   totalDurationMs: number;
   notesApplied: string[];
-  errors: Array<{ error: string; iteration: number; fixed: boolean; }>;
+  errors: Array<{ error: string; iteration: number; fixed: boolean }>;
   model: string;
   inputTokens: number;
   outputTokens: number;

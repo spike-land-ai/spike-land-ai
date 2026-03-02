@@ -146,9 +146,7 @@ describe("jules-types", () => {
         requirePlanApproval: true,
         automationMode: "AUTO_CREATE_PR",
       };
-      expect(req.sourceContext.githubRepoContext?.startingBranch).toBe(
-        "feature/auth-tests",
-      );
+      expect(req.sourceContext.githubRepoContext?.startingBranch).toBe("feature/auth-tests");
       expect(req.requirePlanApproval).toBe(true);
       expect(req.automationMode).toBe("AUTO_CREATE_PR");
     });
@@ -178,9 +176,7 @@ describe("jules-types", () => {
   describe("ListActivitiesResponse", () => {
     it("should create a response with activities", () => {
       const response: ListActivitiesResponse = {
-        activities: [
-          { name: "sessions/1/activities/a1" },
-        ],
+        activities: [{ name: "sessions/1/activities/a1" }],
       };
       expect(response.activities).toHaveLength(1);
       expect(response.nextPageToken).toBeUndefined();
@@ -198,9 +194,7 @@ describe("jules-types", () => {
   describe("ListSourcesResponse", () => {
     it("should create a response with sources", () => {
       const response: ListSourcesResponse = {
-        sources: [
-          { name: "sources/github/owner/repo" },
-        ],
+        sources: [{ name: "sources/github/owner/repo" }],
       };
       expect(response.sources).toHaveLength(1);
       expect(response.nextPageToken).toBeUndefined();

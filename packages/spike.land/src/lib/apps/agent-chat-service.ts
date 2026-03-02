@@ -12,12 +12,7 @@ import {
 import { getOrCreateSession } from "@/lib/codespace";
 import prisma from "@/lib/prisma";
 import { tryCatch } from "@/lib/try-catch";
-import {
-  enqueueMessage,
-  getCodeHash,
-  setAgentWorking,
-  setCodeHash,
-} from "@/lib/upstash/client";
+import { enqueueMessage, getCodeHash, setAgentWorking, setCodeHash } from "@/lib/upstash/client";
 import { query } from "@anthropic-ai/claude-agent-sdk";
 import { z } from "zod";
 
@@ -79,14 +74,14 @@ export async function processAgentChatQueue(id: string, userMessageId: string) {
     headers: {
       "Content-Type": "text/event-stream",
       "Cache-Control": "no-cache",
-      "Connection": "keep-alive",
+      Connection: "keep-alive",
     },
   });
 }
 
 export async function processAgentChatDirect(
   id: string,
-  app: { codespaceId: string; },
+  app: { codespaceId: string },
   content: string,
 ) {
   const codespaceServer = createCodespaceServer(app.codespaceId);
@@ -102,17 +97,14 @@ export async function processAgentChatDirect(
   let codeUnchanged = false;
   if (currentCode) {
     const crypto = await import("crypto");
-    const currentHash = crypto.createHash("sha256").update(currentCode).digest(
-      "hex",
-    );
+    const currentHash = crypto.createHash("sha256").update(currentCode).digest("hex");
     const previousHash = await getCodeHash(id);
 
     if (previousHash && previousHash === currentHash) {
       codeUnchanged = true;
-      logger.debug(
-        "[agent/chat] Code unchanged since last message, optimizing token usage",
-        { appId: id },
-      );
+      logger.debug("[agent/chat] Code unchanged since last message, optimizing token usage", {
+        appId: id,
+      });
     } else {
       await setCodeHash(id, currentHash);
     }
@@ -126,12 +118,13 @@ export async function processAgentChatDirect(
     route: "/api/apps/agent/chat",
   });
 
-  const systemPrompt = currentCode && !codeUnchanged
-    ? getSystemPromptWithCode(currentCode)
-    : CODESPACE_SYSTEM_PROMPT
-      + (codeUnchanged
-        ? "\n\nNote: Code is unchanged since your last response. Use read_code if you need to see it."
-        : "");
+  const systemPrompt =
+    currentCode && !codeUnchanged
+      ? getSystemPromptWithCode(currentCode)
+      : CODESPACE_SYSTEM_PROMPT +
+        (codeUnchanged
+          ? "\n\nNote: Code is unchanged since your last response. Use read_code if you need to see it."
+          : "");
 
   const stream = new ReadableStream({
     async start(controller) {
@@ -167,20 +160,20 @@ export async function processAgentChatDirect(
 
           if (message.type === "assistant") {
             const assistantMessage = message as {
-              message?: { content?: ContentPart[]; };
+              message?: { content?: ContentPart[] };
             };
             const betaMessage = assistantMessage.message;
             const contentArray = betaMessage?.content || [];
 
-            const textParts = contentArray.filter(c => c.type === "text");
-            const text = textParts.map(c => c.text || "").join("");
+            const textParts = contentArray.filter((c) => c.type === "text");
+            const text = textParts.map((c) => c.text || "").join("");
             if (text) {
               finalResponse += text;
               const data = JSON.stringify({ type: "chunk", content: text });
               controller.enqueue(new TextEncoder().encode(`data: ${data}\n\n`));
             }
 
-            const toolUseParts = contentArray.filter(c => c.type === "tool_use");
+            const toolUseParts = contentArray.filter((c) => c.type === "tool_use");
             for (const toolUse of toolUseParts) {
               const toolName = toolUse.name || "";
               emitStage(controller, "executing_tool", toolName || "tool");
@@ -188,9 +181,7 @@ export async function processAgentChatDirect(
                 type: "status",
                 content: `Executing ${toolName || "tool"}...`,
               });
-              controller.enqueue(
-                new TextEncoder().encode(`data: ${statusData}\n\n`),
-              );
+              controller.enqueue(new TextEncoder().encode(`data: ${statusData}\n\n`));
             }
           }
 
@@ -199,14 +190,12 @@ export async function processAgentChatDirect(
               subtype: message.subtype,
             });
             if (message.subtype !== "success") {
-              const resultMsg = message as { errors?: string[]; };
+              const resultMsg = message as { errors?: string[] };
               const errData = JSON.stringify({
                 type: "error",
                 content: resultMsg.errors?.join(", ") || "Unknown error",
               });
-              controller.enqueue(
-                new TextEncoder().encode(`data: ${errData}\n\n`),
-              );
+              controller.enqueue(new TextEncoder().encode(`data: ${errData}\n\n`));
             }
           }
         }
@@ -226,10 +215,9 @@ export async function processAgentChatDirect(
             agentMessageId = agentMessageResult.data.id;
           }
 
-          const isDefaultName = app.codespaceId
-            && app.codespaceId.includes("-");
+          const isDefaultName = app.codespaceId && app.codespaceId.includes("-");
           if (isDefaultName) {
-            generateAppDetails(id, finalResponse, content).catch(e => {
+            generateAppDetails(id, finalResponse, content).catch((e) => {
               logger.error(
                 "[agent/chat] Background generateAppDetails failed",
                 e instanceof Error ? e : undefined,
@@ -241,19 +229,13 @@ export async function processAgentChatDirect(
 
         emitStage(controller, "validating");
 
-        const { data: verifySession } = await tryCatch(
-          getOrCreateSession(app.codespaceId!),
-        );
+        const { data: verifySession } = await tryCatch(getOrCreateSession(app.codespaceId!));
 
         if (verifySession && verifySession.code !== currentCode) {
-          logger.info(
-            "[agent/chat] Code was updated, broadcasting to SSE clients",
-            { appId: id },
-          );
+          logger.info("[agent/chat] Code was updated, broadcasting to SSE clients", { appId: id });
 
           const crypto = await import("crypto");
-          const hash = crypto.createHash("sha256").update(verifySession.code)
-            .digest("hex");
+          const hash = crypto.createHash("sha256").update(verifySession.code).digest("hex");
 
           await tryCatch(
             prisma.appCodeVersion.create({
@@ -280,11 +262,9 @@ export async function processAgentChatDirect(
         emitStage(controller, "complete");
         controller.close();
       } catch (error) {
-        logger.error(
-          "[agent/chat] Streaming error",
-          error instanceof Error ? error : undefined,
-          { appId: id },
-        );
+        logger.error("[agent/chat] Streaming error", error instanceof Error ? error : undefined, {
+          appId: id,
+        });
         emitStage(controller, "error");
         const errData = JSON.stringify({
           type: "error",
@@ -300,7 +280,7 @@ export async function processAgentChatDirect(
     headers: {
       "Content-Type": "text/event-stream",
       "Cache-Control": "no-cache",
-      "Connection": "keep-alive",
+      Connection: "keep-alive",
     },
   });
 }
@@ -312,7 +292,7 @@ export async function processAgentChatDirect(
  */
 export async function streamAgentChat(
   id: string,
-  app: { codespaceId: string; },
+  app: { codespaceId: string },
   content: string,
 ): Promise<Response> {
   const { isMcpAgentActive } = await import("@/lib/upstash/client");
@@ -336,7 +316,7 @@ export async function streamAgentChat(
       headers: {
         "Content-Type": "text/event-stream",
         "Cache-Control": "no-cache",
-        "Connection": "keep-alive",
+        Connection: "keep-alive",
       },
     });
   }
@@ -348,16 +328,16 @@ export async function streamAgentChat(
     }),
   );
 
-  const isRecent = recentMessage
-    && (Date.now() - new Date(recentMessage.createdAt).getTime()) < 30000;
+  const isRecent =
+    recentMessage && Date.now() - new Date(recentMessage.createdAt).getTime() < 30000;
 
   const { data: userMessage, error: messageError } = isRecent
     ? { data: recentMessage, error: null }
     : await tryCatch(
-      prisma.appMessage.create({
-        data: { appId: id, role: "USER", content },
-      }),
-    );
+        prisma.appMessage.create({
+          data: { appId: id, role: "USER", content },
+        }),
+      );
 
   if (messageError || !userMessage) {
     logger.error(
@@ -365,9 +345,12 @@ export async function streamAgentChat(
       messageError instanceof Error ? messageError : undefined,
       { route: "/api/apps/agent/chat" },
     );
-    return Response.json({ error: "Failed to create message" }, {
-      status: 500,
-    });
+    return Response.json(
+      { error: "Failed to create message" },
+      {
+        status: 500,
+      },
+    );
   }
 
   if (USE_QUEUE_MODE) {
@@ -377,11 +360,7 @@ export async function streamAgentChat(
   return processAgentChatDirect(id, { codespaceId: app.codespaceId }, content);
 }
 
-export async function generateAppDetails(
-  appId: string,
-  agentResponse: string,
-  userPrompt: string,
-) {
+export async function generateAppDetails(appId: string, agentResponse: string, userPrompt: string) {
   const startTime = Date.now();
   const logContext = { appId, operation: "generateAppDetails" };
 
@@ -408,16 +387,22 @@ export async function generateAppDetails(
     for await (const message of result) {
       if (message.type === "assistant") {
         const assistantMessage = message as {
-          message?: { content?: ContentPart[]; };
+          message?: { content?: ContentPart[] };
         };
         const betaMessage = assistantMessage.message;
-        const text = betaMessage?.content?.filter(c => c.type === "text").map(c => c.text).join("")
-          || "";
+        const text =
+          betaMessage?.content
+            ?.filter((c) => c.type === "text")
+            .map((c) => c.text)
+            .join("") || "";
         jsonStr += text;
       }
     }
 
-    jsonStr = jsonStr.replace(/```json/g, "").replace(/```/g, "").trim();
+    jsonStr = jsonStr
+      .replace(/```json/g, "")
+      .replace(/```/g, "")
+      .trim();
 
     const appDetailsSchema = z.object({
       name: z.string().min(1).max(50),
@@ -450,10 +435,9 @@ export async function generateAppDetails(
     }
   } catch (e) {
     const durationMs = Date.now() - startTime;
-    logger.error(
-      "[agent/chat] generateAppDetails error",
-      e instanceof Error ? e : undefined,
-      { ...logContext, durationMs },
-    );
+    logger.error("[agent/chat] generateAppDetails error", e instanceof Error ? e : undefined, {
+      ...logContext,
+      durationMs,
+    });
   }
 }

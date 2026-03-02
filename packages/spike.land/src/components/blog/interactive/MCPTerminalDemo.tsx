@@ -16,34 +16,46 @@ const T = (l: string, req: object, res: object): TabData => ({
 });
 
 const TABS: TabData[] = [
-  T("search_tools", {
-    jsonrpc: "2.0",
-    method: "tools/call",
-    params: { name: "search_tools", arguments: { query: "chess" } },
-  }, {
-    result: {
-      tools: ["chess_new_game", "chess_send_challenge", "chess_get_board"],
-      total: 3,
+  T(
+    "search_tools",
+    {
+      jsonrpc: "2.0",
+      method: "tools/call",
+      params: { name: "search_tools", arguments: { query: "chess" } },
     },
-  }),
-  T("chess_send_challenge", {
-    jsonrpc: "2.0",
-    method: "tools/call",
-    params: {
-      name: "chess_send_challenge",
-      arguments: { opponent: "alice", timeControl: "5+0" },
+    {
+      result: {
+        tools: ["chess_new_game", "chess_send_challenge", "chess_get_board"],
+        total: 3,
+      },
     },
-  }, {
-    result: { challengeId: "ch_7x9k2m", status: "pending", expiresIn: 300 },
-  }),
-  T("gallery_showcase", {
-    jsonrpc: "2.0",
-    method: "tools/call",
-    params: {
-      name: "gallery_showcase",
-      arguments: { theme: "minimalist", limit: 6 },
+  ),
+  T(
+    "chess_send_challenge",
+    {
+      jsonrpc: "2.0",
+      method: "tools/call",
+      params: {
+        name: "chess_send_challenge",
+        arguments: { opponent: "alice", timeControl: "5+0" },
+      },
     },
-  }, { result: { items: 6, layout: "grid", generated: true } }),
+    {
+      result: { challengeId: "ch_7x9k2m", status: "pending", expiresIn: 300 },
+    },
+  ),
+  T(
+    "gallery_showcase",
+    {
+      jsonrpc: "2.0",
+      method: "tools/call",
+      params: {
+        name: "gallery_showcase",
+        arguments: { theme: "minimalist", limit: 6 },
+      },
+    },
+    { result: { items: 6, layout: "grid", generated: true } },
+  ),
 ];
 
 // Inline syntax highlighter — no external deps
@@ -64,27 +76,39 @@ function highlight(raw: string): React.ReactNode[] {
       if ((m = KEY.exec(rest))) {
         nodes.push(
           m[1],
-          <span key={`k${li}${i++}`} className="text-cyan-400">{m[2]}</span>,
-          <span key={`p${li}${i++}`} className="text-slate-400">{m[3]}</span>,
+          <span key={`k${li}${i++}`} className="text-cyan-400">
+            {m[2]}
+          </span>,
+          <span key={`p${li}${i++}`} className="text-slate-400">
+            {m[3]}
+          </span>,
         );
       } else if ((m = STR.exec(rest))) {
         nodes.push(
           m[1],
-          <span key={`s${li}${i++}`} className="text-green-400">{m[2]}</span>,
+          <span key={`s${li}${i++}`} className="text-green-400">
+            {m[2]}
+          </span>,
         );
       } else if ((m = NUM.exec(rest))) {
         nodes.push(
           m[1],
-          <span key={`n${li}${i++}`} className="text-yellow-400">{m[2]}</span>,
+          <span key={`n${li}${i++}`} className="text-yellow-400">
+            {m[2]}
+          </span>,
         );
       } else if ((m = BOOL.exec(rest))) {
         nodes.push(
           m[1],
-          <span key={`b${li}${i++}`} className="text-yellow-300">{m[2]}</span>,
+          <span key={`b${li}${i++}`} className="text-yellow-300">
+            {m[2]}
+          </span>,
         );
       } else if ((m = PUNC.exec(rest))) {
         nodes.push(
-          <span key={`br${li}${i++}`} className="text-slate-400">{m[1]}</span>,
+          <span key={`br${li}${i++}`} className="text-slate-400">
+            {m[1]}
+          </span>,
         );
       } else if ((m = WS.exec(rest))) nodes.push(m[1]);
       else {
@@ -94,7 +118,12 @@ function highlight(raw: string): React.ReactNode[] {
       }
       rest = rest.slice(m[0].length);
     }
-    return <span key={`l${li}`} className="block">{nodes}{"\n"}</span>;
+    return (
+      <span key={`l${li}`} className="block">
+        {nodes}
+        {"\n"}
+      </span>
+    );
   });
 }
 
@@ -139,10 +168,7 @@ export function MCPTerminalDemo() {
       const t = setTimeout(() => setShowResp(true), 400);
       return () => clearTimeout(t);
     }
-    const iv = setInterval(
-      () => setTyped(p => target.slice(0, p.length + 1)),
-      30,
-    );
+    const iv = setInterval(() => setTyped((p) => target.slice(0, p.length + 1)), 30);
     return () => clearInterval(iv);
   }, [playing, paused, typed, tab.request]);
 
@@ -161,21 +187,10 @@ export function MCPTerminalDemo() {
       >
         {/* Chrome bar */}
         <div className="flex items-center gap-2 px-4 py-3 bg-slate-800 border-b border-slate-700">
-          <span
-            className="w-3 h-3 rounded-full bg-red-500"
-            aria-hidden="true"
-          />
-          <span
-            className="w-3 h-3 rounded-full bg-yellow-400"
-            aria-hidden="true"
-          />
-          <span
-            className="w-3 h-3 rounded-full bg-green-500"
-            aria-hidden="true"
-          />
-          <span className="ml-3 text-xs text-slate-400 tracking-wide">
-            MCP JSON-RPC
-          </span>
+          <span className="w-3 h-3 rounded-full bg-red-500" aria-hidden="true" />
+          <span className="w-3 h-3 rounded-full bg-yellow-400" aria-hidden="true" />
+          <span className="w-3 h-3 rounded-full bg-green-500" aria-hidden="true" />
+          <span className="ml-3 text-xs text-slate-400 tracking-wide">MCP JSON-RPC</span>
         </div>
 
         {/* Tab bar */}
@@ -201,9 +216,7 @@ export function MCPTerminalDemo() {
         <div className="p-5 min-h-72 flex flex-col gap-5">
           {/* Request */}
           <div>
-            <div className="text-[10px] text-slate-500 mb-1 uppercase tracking-widest">
-              Request
-            </div>
+            <div className="text-[10px] text-slate-500 mb-1 uppercase tracking-widest">Request</div>
             <div className="text-slate-300 whitespace-pre leading-relaxed">
               {highlight(typed)}
               {playing && !paused && (

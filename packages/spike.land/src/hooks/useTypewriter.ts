@@ -24,9 +24,7 @@ interface UseTypewriterReturn {
   isTyping: boolean;
 }
 
-export function useTypewriter(
-  options?: UseTypewriterOptions,
-): UseTypewriterReturn {
+export function useTypewriter(options?: UseTypewriterOptions): UseTypewriterReturn {
   const {
     prompts = DEFAULT_PROMPTS,
     typeSpeed = 50,

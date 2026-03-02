@@ -8,6 +8,32 @@
 
 ## Decision Log
 
+### March 2026
+
+#### DEC-007: Agent AI Cost Optimization (Gemini / Claude Code OAuth)
+
+**Decision Date**: March 2, 2026 **Decision Maker**: Zoltan Erdos (CEO)
+**Status**: ACTIVE
+
+**Decision**: Agents and CLI tools shall NOT use the Anthropic API via standard `ANTHROPIC_API_KEY` for background or automated tasks due to high metered costs. Instead, agents must use either the Gemini API (e.g., `gemini-2.5-flash`, `gemini-2.5-pro`) via `GEMINI_API_KEY` or rely on local Claude Code OAuth sessions (`CLAUDE_CODE_OAUTH_TOKEN`).
+
+**Rationale**:
+
+- Using `ANTHROPIC_API_KEY` for automated agents like inline completion and chat quickly becomes prohibitively expensive.
+- Gemini models (like Flash) are extremely fast and often have a generous free tier or lower cost basis for high-volume automated tasks like inline autocomplete.
+- Where Claude is absolutely required, it must run through the `CLAUDE_CODE_OAUTH_TOKEN` mechanism established in DEC-004 to utilize the flat-rate subscription.
+
+**Impact**:
+
+- `spike agent` and inline completions in the Monaco editor now use the Gemini API (Google Generative AI).
+- Environment variable requirements for `spike agent` updated to prefer `GEMINI_API_KEY`.
+
+**Related Files Updated**:
+
+- `packages/spike-cli/src/commands/agent.ts` - Refactored to use `@google/genai` instead of `@anthropic-ai/sdk`.
+
+---
+
 ### February 2026
 
 #### DEC-006: Decorative Animations Policy

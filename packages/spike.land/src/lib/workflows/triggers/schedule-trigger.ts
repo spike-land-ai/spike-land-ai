@@ -25,10 +25,7 @@ const CRON_RANGES = {
 /**
  * Parse a cron field (supports *, numbers, ranges, steps, and lists)
  */
-function parseCronField(
-  field: string,
-  fieldName: keyof typeof CRON_RANGES,
-): number[] | null {
+function parseCronField(field: string, fieldName: keyof typeof CRON_RANGES): number[] | null {
   const range = CRON_RANGES[fieldName];
   const values: Set<number> = new Set();
 
@@ -119,7 +116,7 @@ export function parseCronExpression(expression: string): ParsedCron | null {
   }
 
   // Normalize day of week (7 -> 0 for Sunday)
-  const normalizedDaysOfWeek = daysOfWeek.map(d => (d === 7 ? 0 : d));
+  const normalizedDaysOfWeek = daysOfWeek.map((d) => (d === 7 ? 0 : d));
 
   return {
     minutes,
@@ -187,7 +184,7 @@ export function getNextRunTime(
     // Get parts in the target timezone
     const parts = formatter.formatToParts(current);
     const getPart = (type: string): number => {
-      const part = parts.find(p => p.type === type);
+      const part = parts.find((p) => p.type === type);
       return part ? parseInt(part.value, 10) : 0;
     };
 
@@ -451,8 +448,8 @@ export async function getDueSchedules(): Promise<
 
   // Filter to only active workflows
   return schedules
-    .filter(s => s.workflow.status === "ACTIVE")
-    .map(s => ({
+    .filter((s) => s.workflow.status === "ACTIVE")
+    .map((s) => ({
       scheduleId: s.id,
       workflowId: s.workflowId,
       workspaceId: s.workflow.workspaceId,

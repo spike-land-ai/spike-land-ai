@@ -7,12 +7,12 @@ describe("MCP tool definitions", () => {
   });
 
   it("should have unique tool names", () => {
-    const names = allTools.map(t => t.name);
+    const names = allTools.map((t) => t.name);
     expect(new Set(names).size).toBe(names.length);
   });
 
   it("should include all expected tools", () => {
-    const names = allTools.map(t => t.name);
+    const names = allTools.map((t) => t.name);
     expect(names).toContain("read_code");
     expect(names).toContain("read_html");
     expect(names).toContain("read_session");
@@ -32,11 +32,11 @@ describe("MCP tool definitions", () => {
   });
 
   it("should have required fields for write tools", () => {
-    const updateCode = allTools.find(t => t.name === "update_code")!;
+    const updateCode = allTools.find((t) => t.name === "update_code")!;
     expect(updateCode.inputSchema.required).toContain("codeSpace");
     expect(updateCode.inputSchema.required).toContain("code");
 
-    const editCode = allTools.find(t => t.name === "edit_code")!;
+    const editCode = allTools.find((t) => t.name === "edit_code")!;
     expect(editCode.inputSchema.required).toContain("codeSpace");
     expect(editCode.inputSchema.required).toContain("edits");
   });

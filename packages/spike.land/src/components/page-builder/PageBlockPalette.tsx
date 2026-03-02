@@ -17,19 +17,10 @@ interface PageBlockPaletteProps {
   className?: string;
 }
 
-export function PageBlockPalette({
-  blocks,
-  onAdd,
-  className,
-}: PageBlockPaletteProps) {
+export function PageBlockPalette({ blocks, onAdd, className }: PageBlockPaletteProps) {
   return (
-    <div
-      className={cn(
-        "grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3",
-        className,
-      )}
-    >
-      {blocks.map(block => {
+    <div className={cn("grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3", className)}>
+      {blocks.map((block) => {
         const Icon = block.icon;
         return (
           <Card
@@ -38,7 +29,7 @@ export function PageBlockPalette({
             onClick={() => onAdd?.(block.id)}
             role="button"
             tabIndex={0}
-            onKeyDown={e => {
+            onKeyDown={(e) => {
               if (e.key === "Enter" || e.key === " ") {
                 e.preventDefault();
                 onAdd?.(block.id);
@@ -50,9 +41,7 @@ export function PageBlockPalette({
               <div className="p-2 rounded-lg bg-zinc-800 border border-zinc-700">
                 <Icon className="h-5 w-5 text-zinc-300" />
               </div>
-              <span className="text-xs font-medium text-zinc-200 leading-tight">
-                {block.label}
-              </span>
+              <span className="text-xs font-medium text-zinc-200 leading-tight">{block.label}</span>
               <span className="text-[11px] text-zinc-500 leading-snug line-clamp-2">
                 {block.description}
               </span>

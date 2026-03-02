@@ -5,11 +5,7 @@ import type { DiffHunk, FileDiff } from "./types";
  * For production, this should use a library like 'diff'.
  * This simple version just handles full replacement for now.
  */
-export function computeDiff(
-  path: string,
-  base: string,
-  modified: string,
-): FileDiff {
+export function computeDiff(path: string, base: string, modified: string): FileDiff {
   if (base === modified) {
     return { path, type: "modified", hunks: [] };
   }
@@ -22,10 +18,7 @@ export function computeDiff(
     oldLines: baseLines.length,
     newStart: 1,
     newLines: modifiedLines.length,
-    lines: [
-      ...baseLines.map(l => "-" + l),
-      ...modifiedLines.map(l => "+" + l),
-    ],
+    lines: [...baseLines.map((l) => "-" + l), ...modifiedLines.map((l) => "+" + l)],
   };
 
   return {
@@ -65,8 +58,8 @@ export function parseUnifiedDiff(diffText: string): FileDiff[] {
         currentFile.hunks.push(currentHunk);
       }
     } else if (
-      currentHunk
-      && (line.startsWith("+") || line.startsWith("-") || line.startsWith(" "))
+      currentHunk &&
+      (line.startsWith("+") || line.startsWith("-") || line.startsWith(" "))
     ) {
       currentHunk.lines.push(line);
     }
@@ -122,7 +115,7 @@ export function threeWayMerge(
   base: string,
   ours: string,
   theirs: string,
-): { content: string; conflicts: boolean; } {
+): { content: string; conflicts: boolean } {
   if (ours === theirs) return { content: ours, conflicts: false };
   if (ours === base) return { content: theirs, conflicts: false };
   if (theirs === base) return { content: ours, conflicts: false };

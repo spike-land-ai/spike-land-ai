@@ -203,15 +203,9 @@ describe("capability-token-service", () => {
       await revokeCapabilityToken("tok-1", true);
 
       // Parent revoke + children cascade
-      expect(mockPrisma.agentCapabilityToken.updateMany).toHaveBeenCalledTimes(
-        2,
-      );
+      expect(mockPrisma.agentCapabilityToken.updateMany).toHaveBeenCalledTimes(2);
       const cascadeCall = mockPrisma.agentCapabilityToken.updateMany.mock.calls[1]![0];
-      expect(cascadeCall.where.id.in).toEqual([
-        "child-1",
-        "child-2",
-        "grandchild-1",
-      ]);
+      expect(cascadeCall.where.id.in).toEqual(["child-1", "child-2", "grandchild-1"]);
     });
   });
 
@@ -234,9 +228,7 @@ describe("capability-token-service", () => {
     };
 
     it("should create a child token with subset of parent tools", async () => {
-      mockPrisma.agentCapabilityToken.findUnique.mockResolvedValue(
-        activeParent,
-      );
+      mockPrisma.agentCapabilityToken.findUnique.mockResolvedValue(activeParent);
       mockPrisma.agentCapabilityToken.create.mockResolvedValue({
         id: "child-tok",
       });
@@ -288,9 +280,7 @@ describe("capability-token-service", () => {
     });
 
     it("should reject tools not in parent scope", async () => {
-      mockPrisma.agentCapabilityToken.findUnique.mockResolvedValue(
-        activeParent,
-      );
+      mockPrisma.agentCapabilityToken.findUnique.mockResolvedValue(activeParent);
 
       await expect(
         delegateToken("parent-tok", {
@@ -299,15 +289,11 @@ describe("capability-token-service", () => {
           allowedCategories: [],
           deniedTools: [],
         }),
-      ).rejects.toThrow(
-        "Tool \"vault_store_secret\" not in parent's allowed scope",
-      );
+      ).rejects.toThrow('Tool "vault_store_secret" not in parent\'s allowed scope');
     });
 
     it("should reject categories not in parent scope", async () => {
-      mockPrisma.agentCapabilityToken.findUnique.mockResolvedValue(
-        activeParent,
-      );
+      mockPrisma.agentCapabilityToken.findUnique.mockResolvedValue(activeParent);
 
       await expect(
         delegateToken("parent-tok", {
@@ -316,13 +302,11 @@ describe("capability-token-service", () => {
           allowedCategories: ["admin"],
           deniedTools: [],
         }),
-      ).rejects.toThrow("Category \"admin\" not in parent's allowed scope");
+      ).rejects.toThrow('Category "admin" not in parent\'s allowed scope');
     });
 
     it("should reject budget exceeding parent remaining", async () => {
-      mockPrisma.agentCapabilityToken.findUnique.mockResolvedValue(
-        activeParent,
-      );
+      mockPrisma.agentCapabilityToken.findUnique.mockResolvedValue(activeParent);
 
       await expect(
         delegateToken("parent-tok", {
@@ -353,9 +337,7 @@ describe("capability-token-service", () => {
     });
 
     it("should merge parent denied tools with child denied tools", async () => {
-      mockPrisma.agentCapabilityToken.findUnique.mockResolvedValue(
-        activeParent,
-      );
+      mockPrisma.agentCapabilityToken.findUnique.mockResolvedValue(activeParent);
       mockPrisma.agentCapabilityToken.create.mockResolvedValue({
         id: "child-tok",
       });

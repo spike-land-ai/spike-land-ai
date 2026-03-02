@@ -3,7 +3,7 @@ import type { NextRequest } from "next/server";
 
 // Mocks
 const mockAuth = vi.hoisted(() =>
-  vi.fn().mockResolvedValue({ user: { id: "user-1", name: "Test" } })
+  vi.fn().mockResolvedValue({ user: { id: "user-1", name: "Test" } }),
 );
 const mockIsBot = vi.hoisted(() => vi.fn().mockReturnValue(false));
 const mockGetScriptedResponse = vi.hoisted(() => vi.fn().mockReturnValue("bot response"));
@@ -14,13 +14,11 @@ const mockCreateAgentLoopStream = vi.hoisted(() =>
   vi.fn().mockReturnValue(
     new ReadableStream({
       start(controller) {
-        controller.enqueue(
-          new TextEncoder().encode("data: {\"type\":\"done\"}\n\n"),
-        );
+        controller.enqueue(new TextEncoder().encode('data: {"type":"done"}\n\n'));
         controller.close();
       },
     }),
-  )
+  ),
 );
 
 vi.mock("@/lib/auth", () => ({ auth: mockAuth }));
@@ -54,7 +52,7 @@ const { POST } = await import("@/app/api/agent-loop/route");
 function createRequest(body: Record<string, unknown>): NextRequest {
   return {
     headers: {
-      get: (name: string) => name === "user-agent" ? "Mozilla/5.0" : null,
+      get: (name: string) => (name === "user-agent" ? "Mozilla/5.0" : null),
     },
     json: () => Promise.resolve(body),
   } as unknown as NextRequest;

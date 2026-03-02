@@ -18,9 +18,10 @@ function findMatchingUserSkill(
   return userSkillsByUri.get(req.uri) ?? userSkillsByTitle.get(req.title.toLowerCase());
 }
 
-function buildUserSkillLookups(
-  userSkills: UserSkill[],
-): { byUri: Map<string, UserSkill>; byTitle: Map<string, UserSkill>; } {
+function buildUserSkillLookups(userSkills: UserSkill[]): {
+  byUri: Map<string, UserSkill>;
+  byTitle: Map<string, UserSkill>;
+} {
   const byUri = new Map<string, UserSkill>();
   const byTitle = new Map<string, UserSkill>();
   for (const s of userSkills) {
@@ -38,13 +39,10 @@ function getGapPriority(gap: number): "high" | "medium" | "low" {
   return "low";
 }
 
-function computeSkillGaps(
-  userSkills: UserSkill[],
-  occupation: Occupation,
-): SkillGap[] {
+function computeSkillGaps(userSkills: UserSkill[], occupation: Occupation): SkillGap[] {
   const { byUri, byTitle } = buildUserSkillLookups(userSkills);
 
-  return occupation.skills.map(req => {
+  return occupation.skills.map((req) => {
     const userSkill = findMatchingUserSkill(req, byUri, byTitle);
     const userProficiency = userSkill?.proficiency ?? 0;
     // Normalize required level: essential=5, optional=3
@@ -65,7 +63,7 @@ function computeScore(
   userSkills: UserSkill[],
   occupation: Occupation,
   gaps: SkillGap[],
-): { score: number; matchedSkills: number; } {
+): { score: number; matchedSkills: number } {
   if (occupation.skills.length === 0) {
     return { score: 0, matchedSkills: 0 };
   }
@@ -94,9 +92,7 @@ function computeScore(
   const normalizedGap = maxPossibleGap > 0 ? totalGap / maxPossibleGap : 0;
 
   // Combined score: 60% weighted jaccard + 40% (1 - normalized gap)
-  const score = Math.round(
-    (0.6 * weightedJaccard + 0.4 * (1 - normalizedGap)) * 100,
-  );
+  const score = Math.round((0.6 * weightedJaccard + 0.4 * (1 - normalizedGap)) * 100);
 
   return {
     score: Math.max(0, Math.min(100, score)),
@@ -104,10 +100,7 @@ function computeScore(
   };
 }
 
-export function compareSkills(
-  userSkills: UserSkill[],
-  occupation: Occupation,
-): MatchResult {
+export function compareSkills(userSkills: UserSkill[], occupation: Occupation): MatchResult {
   const gaps = computeSkillGaps(userSkills, occupation);
   const { score, matchedSkills } = computeScore(userSkills, occupation, gaps);
 
@@ -120,11 +113,8 @@ export function compareSkills(
   };
 }
 
-export function assessSkills(
-  userSkills: UserSkill[],
-  occupations: Occupation[],
-): MatchResult[] {
+export function assessSkills(userSkills: UserSkill[], occupations: Occupation[]): MatchResult[] {
   return occupations
-    .map(occupation => compareSkills(userSkills, occupation))
+    .map((occupation) => compareSkills(userSkills, occupation))
     .sort((a, b) => b.score - a.score);
 }

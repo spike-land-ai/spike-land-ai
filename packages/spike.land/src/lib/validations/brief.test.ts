@@ -1,9 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import {
-  campaignObjectivesSchema,
-  targetAudienceSchema,
-} from "./brief";
+import { campaignObjectivesSchema, targetAudienceSchema } from "./brief";
 
 describe("brief validations", () => {
   describe("targetAudienceSchema", () => {

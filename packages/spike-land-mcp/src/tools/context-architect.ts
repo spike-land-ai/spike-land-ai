@@ -83,12 +83,7 @@ function detectTechStack(files: FileEntry[]): string[] {
 
   if (paths.some((p) => p === "package.json")) stack.add("Node.js");
   if (
-    paths.some(
-      (p) =>
-        p === "next.config.js" ||
-        p === "next.config.ts" ||
-        p === "next.config.mjs",
-    )
+    paths.some((p) => p === "next.config.js" || p === "next.config.ts" || p === "next.config.mjs")
   )
     stack.add("Next.js");
   if (paths.some((p) => p === "vite.config.ts" || p === "vite.config.js")) {
@@ -100,11 +95,7 @@ function detectTechStack(files: FileEntry[]): string[] {
   if (paths.some((p) => p === "Dockerfile" || p === "docker-compose.yml")) {
     stack.add("Docker");
   }
-  if (
-    paths.some(
-      (p) => p === "tailwind.config.ts" || p === "tailwind.config.js",
-    )
-  )
+  if (paths.some((p) => p === "tailwind.config.ts" || p === "tailwind.config.js"))
     stack.add("Tailwind CSS");
 
   return Array.from(stack);
@@ -181,17 +172,7 @@ function scoreFile(file: FileEntry, keywords: string[]): number {
     }
   }
 
-  const codeExtensions = new Set([
-    "ts",
-    "tsx",
-    "js",
-    "jsx",
-    "py",
-    "rs",
-    "go",
-    "java",
-    "rb",
-  ]);
+  const codeExtensions = new Set(["ts", "tsx", "js", "jsx", "py", "rs", "go", "java", "rb"]);
   if (codeExtensions.has(file.type)) {
     score += 1;
   }
@@ -233,11 +214,7 @@ export function registerContextArchitectTools(
             .string()
             .url()
             .describe("GitHub repository URL (e.g. https://github.com/owner/repo)"),
-          branch: z
-            .string()
-            .optional()
-            .default("main")
-            .describe("Branch to index (default: main)"),
+          branch: z.string().optional().default("main").describe("Branch to index (default: main)"),
         },
       )
       .meta({ category: "orchestration", tier: "free" })
@@ -337,10 +314,7 @@ export function registerContextArchitectTools(
           "Scores files by keyword matching, boosts source directories, and penalizes test/config files. " +
           "Returns an ordered list of file paths with relevance scores.",
         {
-          repo_url: z
-            .string()
-            .url()
-            .describe("GitHub repository URL (must be indexed first)"),
+          repo_url: z.string().url().describe("GitHub repository URL (must be indexed first)"),
           task_description: z
             .string()
             .min(3)
@@ -409,9 +383,7 @@ export function registerContextArchitectTools(
         for (let i = 0; i < scored.length; i++) {
           const { file, score } = scored[i]!;
           const sizeStr =
-            file.size > 1024
-              ? `${(file.size / 1024).toFixed(1)} KB`
-              : `${file.size} B`;
+            file.size > 1024 ? `${(file.size / 1024).toFixed(1)} KB` : `${file.size} B`;
           text += `| ${i + 1} | ${score} | \`${file.path}\` | ${sizeStr} |\n`;
         }
 
@@ -428,10 +400,7 @@ export function registerContextArchitectTools(
           "Parses import/from statements and finds sibling files in the same directory. " +
           "The repository must be indexed first with context_index_repo.",
         {
-          repo_url: z
-            .string()
-            .url()
-            .describe("GitHub repository URL (must be indexed first)"),
+          repo_url: z.string().url().describe("GitHub repository URL (must be indexed first)"),
           file_path: z
             .string()
             .min(1)

@@ -74,9 +74,7 @@ export const MODEL_REGISTRY: AIModelInfo[] = [
 export function resolveModel(input: string): AIModelInfo | undefined {
   const lower = input.toLowerCase();
   return MODEL_REGISTRY.find(
-    m =>
-      m.id.toLowerCase() === lower
-      || m.aliases.some(a => a.toLowerCase() === lower),
+    (m) => m.id.toLowerCase() === lower || m.aliases.some((a) => a.toLowerCase() === lower),
   );
 }
 
@@ -84,10 +82,7 @@ export function resolveModel(input: string): AIModelInfo | undefined {
  * Determine the provider from a model name or explicit provider string.
  * Falls back to "anthropic" as the default provider.
  */
-export function resolveProvider(
-  model?: string,
-  provider?: string,
-): "anthropic" | "google" {
+export function resolveProvider(model?: string, provider?: string): "anthropic" | "google" {
   if (provider === "anthropic" || provider === "google") return provider;
   if (model) {
     const resolved = resolveModel(model);
@@ -103,14 +98,14 @@ export function resolveProvider(
  * Get all models for a given provider.
  */
 export function getModelsForProvider(provider: string): AIModelInfo[] {
-  return MODEL_REGISTRY.filter(m => m.provider === provider);
+  return MODEL_REGISTRY.filter((m) => m.provider === provider);
 }
 
 /**
  * Get all models that have a given capability.
  */
 export function getModelsByCapability(cap: string): AIModelInfo[] {
-  return MODEL_REGISTRY.filter(m =>
-    m.capabilities.includes(cap as AIModelInfo["capabilities"][number])
+  return MODEL_REGISTRY.filter((m) =>
+    m.capabilities.includes(cap as AIModelInfo["capabilities"][number]),
   );
 }

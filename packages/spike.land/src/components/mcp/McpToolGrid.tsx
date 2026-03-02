@@ -5,10 +5,7 @@ import { Clock, Heart, Search } from "lucide-react";
 import Fuse from "fuse.js";
 import { McpToolCard } from "@/components/mcp/McpToolCard";
 import type { McpToolDef } from "@/components/mcp/mcp-tool-registry";
-import {
-  MCP_SUPER_CATEGORIES,
-  MCP_TOOLS,
-} from "@/components/mcp/mcp-tool-registry";
+import { MCP_SUPER_CATEGORIES, MCP_TOOLS } from "@/components/mcp/mcp-tool-registry";
 import { useFavorites, useRecentTools } from "@/components/mcp/useMcpHistory";
 
 interface McpToolGridProps {
@@ -20,7 +17,7 @@ interface McpToolGridProps {
 
 const ALL_TABS = [
   { id: null, label: "All" },
-  ...MCP_SUPER_CATEGORIES.map(s => ({ id: s.id, label: s.name })),
+  ...MCP_SUPER_CATEGORIES.map((s) => ({ id: s.id, label: s.name })),
 ];
 
 const TIER_OPTIONS = [
@@ -43,15 +40,11 @@ const fuse = new Fuse(MCP_TOOLS, {
   minMatchCharLength: 2,
 });
 
-const toolMap = new Map(MCP_TOOLS.map(t => [t.name, t]));
+const toolMap = new Map(MCP_TOOLS.map((t) => [t.name, t]));
 
-export function McpToolGrid(
-  { search, onSearch, selectedCategory, onTryIt }: McpToolGridProps,
-) {
+export function McpToolGrid({ search, onSearch, selectedCategory, onTryIt }: McpToolGridProps) {
   const [activeSuper, setActiveSuper] = useState<string | null>(null);
-  const [tierFilter, setTierFilter] = useState<"all" | "free" | "workspace">(
-    "all",
-  );
+  const [tierFilter, setTierFilter] = useState<"all" | "free" | "workspace">("all");
   const [viewFilter, setViewFilter] = useState<ViewFilter>("all");
   const [visibleCount, setVisibleCount] = useState(18);
 
@@ -85,7 +78,7 @@ export function McpToolGrid(
   // Build set of category IDs for active super category
   const superCategoryIds = useMemo(() => {
     if (!effectiveSuper) return null;
-    const sup = MCP_SUPER_CATEGORIES.find(s => s.id === effectiveSuper);
+    const sup = MCP_SUPER_CATEGORIES.find((s) => s.id === effectiveSuper);
     if (!sup) return null;
     const ids = new Set<string>();
     for (const sub of sup.subcategories) {
@@ -103,11 +96,11 @@ export function McpToolGrid(
     let baseTools: McpToolDef[];
     if (viewFilter === "favorites") {
       baseTools = favorites
-        .map(name => toolMap.get(name))
+        .map((name) => toolMap.get(name))
         .filter((t): t is McpToolDef => t !== undefined);
     } else if (viewFilter === "recent") {
       baseTools = recent
-        .map(name => toolMap.get(name))
+        .map((name) => toolMap.get(name))
         .filter((t): t is McpToolDef => t !== undefined);
     } else {
       baseTools = MCP_TOOLS;
@@ -117,22 +110,22 @@ export function McpToolGrid(
     let searched: McpToolDef[];
     if (q && q.length >= 2 && viewFilter === "all") {
       const results = fuse.search(q);
-      searched = results.map(r => r.item);
+      searched = results.map((r) => r.item);
     } else if (q) {
       // Simple filter for favorites/recent views
       searched = baseTools.filter(
-        tool =>
-          tool.name.toLowerCase().includes(q)
-          || tool.displayName.toLowerCase().includes(q)
-          || tool.description.toLowerCase().includes(q)
-          || tool.category.toLowerCase().includes(q),
+        (tool) =>
+          tool.name.toLowerCase().includes(q) ||
+          tool.displayName.toLowerCase().includes(q) ||
+          tool.description.toLowerCase().includes(q) ||
+          tool.category.toLowerCase().includes(q),
       );
     } else {
       searched = baseTools;
     }
 
     // Apply super category and tier filters
-    return searched.filter(tool => {
+    return searched.filter((tool) => {
       if (superCategoryIds && !superCategoryIds.has(tool.category)) {
         return false;
       }
@@ -150,7 +143,7 @@ export function McpToolGrid(
             {filteredTools.length} Tool{filteredTools.length !== 1 ? "s" : ""}
             {effectiveSuper && (
               <span className="text-zinc-500 font-normal text-base ml-2">
-                in {MCP_SUPER_CATEGORIES.find(s => s.id === effectiveSuper)?.name}
+                in {MCP_SUPER_CATEGORIES.find((s) => s.id === effectiveSuper)?.name}
               </span>
             )}
           </h2>
@@ -182,9 +175,7 @@ export function McpToolGrid(
                 <Heart className="w-3 h-3" />
                 Favorites
                 {favorites.length > 0 && (
-                  <span className="text-[10px] opacity-60">
-                    ({favorites.length})
-                  </span>
+                  <span className="text-[10px] opacity-60">({favorites.length})</span>
                 )}
               </button>
               <button
@@ -204,7 +195,7 @@ export function McpToolGrid(
 
             {/* Tier filter */}
             <div className="flex items-center gap-1 bg-white/[0.03] border border-white/[0.06] rounded-xl p-1">
-              {TIER_OPTIONS.map(opt => (
+              {TIER_OPTIONS.map((opt) => (
                 <button
                   key={opt.id}
                   type="button"
@@ -229,7 +220,7 @@ export function McpToolGrid(
             role="tablist"
             aria-label="Tool categories"
           >
-            {ALL_TABS.map(tab => (
+            {ALL_TABS.map((tab) => (
               <button
                 key={String(tab.id)}
                 type="button"
@@ -256,7 +247,7 @@ export function McpToolGrid(
           <input
             type="text"
             value={search}
-            onChange={e => handleSearch(e.target.value)}
+            onChange={(e) => handleSearch(e.target.value)}
             placeholder="Filter tools..."
             aria-label="Filter tools"
             className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white/[0.03] border border-white/[0.06] text-white placeholder:text-zinc-600 focus:outline-none focus:border-cyan-500/40 focus:ring-2 focus:ring-cyan-500/20 transition-all text-sm"
@@ -264,40 +255,38 @@ export function McpToolGrid(
         </div>
 
         {/* Grid */}
-        {filteredTools.length === 0
-          ? (
-            <div className="text-center py-20 text-zinc-600">
-              <Search className="w-10 h-10 mx-auto mb-3 opacity-30" />
-              <p className="text-lg">No tools found</p>
-              <p className="text-sm mt-1">
-                {viewFilter === "favorites"
-                  ? "Star some tools to add them to favorites"
-                  : viewFilter === "recent"
+        {filteredTools.length === 0 ? (
+          <div className="text-center py-20 text-zinc-600">
+            <Search className="w-10 h-10 mx-auto mb-3 opacity-30" />
+            <p className="text-lg">No tools found</p>
+            <p className="text-sm mt-1">
+              {viewFilter === "favorites"
+                ? "Star some tools to add them to favorites"
+                : viewFilter === "recent"
                   ? "Try some tools to build your history"
                   : "Try a different search term or category"}
-              </p>
-            </div>
-          )
-          : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-              {filteredTools.slice(0, visibleCount).map(tool => (
-                <McpToolCard
-                  key={tool.name}
-                  tool={tool}
-                  onTryIt={onTryIt}
-                  isFavorite={isFavorite(tool.name)}
-                  onToggleFavorite={toggleFavorite}
-                />
-              ))}
-            </div>
-          )}
+            </p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            {filteredTools.slice(0, visibleCount).map((tool) => (
+              <McpToolCard
+                key={tool.name}
+                tool={tool}
+                onTryIt={onTryIt}
+                isFavorite={isFavorite(tool.name)}
+                onToggleFavorite={toggleFavorite}
+              />
+            ))}
+          </div>
+        )}
 
         {/* Load More Button */}
         {filteredTools.length > visibleCount && (
           <div className="mt-8 flex justify-center">
             <button
               type="button"
-              onClick={() => setVisibleCount(v => v + 18)}
+              onClick={() => setVisibleCount((v) => v + 18)}
               className="px-6 py-2.5 rounded-xl bg-white/[0.03] border border-white/[0.06] text-zinc-300 hover:text-white hover:bg-white/[0.06] transition-all text-sm font-medium"
             >
               Load More Tools ({filteredTools.length - visibleCount} remaining)

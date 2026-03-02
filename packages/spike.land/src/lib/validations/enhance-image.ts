@@ -17,7 +17,7 @@ const blendSourceSchema = z
     mimeType: z.string().optional(),
   })
   .refine(
-    data => {
+    (data) => {
       const hasImageId = !!data.imageId;
       const hasBase64 = !!data.base64;
       // XOR: exactly one must be present
@@ -28,7 +28,7 @@ const blendSourceSchema = z
     },
   )
   .refine(
-    data => {
+    (data) => {
       // If base64 is provided, mimeType must also be provided
       if (data.base64 && !data.mimeType) {
         return false;
@@ -83,9 +83,7 @@ export interface ValidationError {
  * @param body - The parsed JSON body
  * @returns Validation result with either data or error
  */
-export function validateEnhanceRequest(
-  body: unknown,
-): ValidationResult | ValidationError {
+export function validateEnhanceRequest(body: unknown): ValidationResult | ValidationError {
   const result = enhanceImageRequestSchema.safeParse(body);
 
   if (!result.success) {
@@ -108,9 +106,7 @@ export function validateEnhanceRequest(
     }
 
     const path = firstIssue.path.join(".");
-    const message = path
-      ? `${path}: ${firstIssue.message}`
-      : firstIssue.message;
+    const message = path ? `${path}: ${firstIssue.message}` : firstIssue.message;
 
     return {
       success: false,

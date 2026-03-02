@@ -6,10 +6,7 @@
  * 2. Installs a lightweight Node.js token-validating reverse proxy
  * 3. Installs cloudflared and creates a tunnel to the proxy
  */
-export function generateUserData(
-  vncTokenSecret: string,
-  tunnelToken: string,
-): string {
+export function generateUserData(vncTokenSecret: string, tunnelToken: string): string {
   const script = `#!/bin/bash
 set -euo pipefail
 

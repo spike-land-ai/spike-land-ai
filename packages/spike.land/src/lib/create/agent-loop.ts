@@ -22,11 +22,7 @@ import {
 } from "./agent-prompts";
 import { generateCodespaceId, updateCodespace } from "./codespace-service";
 import { cleanCode } from "./content-generator";
-import {
-  markAsGenerating,
-  updateAppContent,
-  updateAppStatus,
-} from "./content-service";
+import { markAsGenerating, updateAppContent, updateAppStatus } from "./content-service";
 import { isUnrecoverableError, parseTranspileError } from "./error-parser";
 import { runAutoReview } from "./auto-reviewer";
 import { runAiReview } from "./ai-reviewer";
@@ -65,11 +61,9 @@ interface AgentContext {
   title: string;
   description: string;
   relatedApps: string[];
-  errors: Array<{ error: string; iteration: number; fixed: boolean; }>;
+  errors: Array<{ error: string; iteration: number; fixed: boolean }>;
   /** Error/fix pairs collected for batch note extraction at the end. */
-  errorFixPairs: Array<
-    { error: string; code: string; fixedCode: string | null; fixed: boolean; }
-  >;
+  errorFixPairs: Array<{ error: string; code: string; fixedCode: string | null; fixed: boolean }>;
   /** IDs of notes retrieved for this generation (for metrics). */
   notesRetrieved: string[];
   notes: LearningNote[];
@@ -95,8 +89,7 @@ export async function* agentGenerateApp(
   imageUrls?: string[],
 ): AsyncGenerator<StreamEvent> {
   const codespaceId = generateCodespaceId(slug);
-  const componentUrl = process.env.SPIKE_LAND_COMPONENT_URL
-    ?? "https://testing.spike.land";
+  const componentUrl = process.env.SPIKE_LAND_COMPONENT_URL ?? "https://testing.spike.land";
   const codespaceUrl = `${componentUrl}/live/${codespaceId}/`;
   const maxIterations = Math.min(
     parseInt(process.env.AGENT_MAX_ITERATIONS || "3", 10),
@@ -151,7 +144,7 @@ export async function* agentGenerateApp(
       message: "Assembling context and learning notes...",
     };
     ctx.notes = await retrieveRelevantNotes(path);
-    ctx.notesRetrieved = ctx.notes.map(n => n.id);
+    ctx.notesRetrieved = ctx.notes.map((n) => n.id);
 
     const systemPrompt = buildAgentSystemPrompt(topic, ctx.notes);
     const userPrompt = buildAgentUserPrompt(path, imageUrls);
@@ -243,7 +236,7 @@ export async function* agentGenerateApp(
 
         // Batch learning: extract notes from error/fix pairs on success too
         if (ctx.errorFixPairs.length > 0) {
-          batchExtractAndSaveNotes(ctx.errorFixPairs, path).catch(err => {
+          batchExtractAndSaveNotes(ctx.errorFixPairs, path).catch((err) => {
             logger.warn("Batch note extraction failed", { error: err });
           });
         }
@@ -251,7 +244,7 @@ export async function* agentGenerateApp(
         // Attribution-gated confidence: only credit notes on fix success (iteration > 0),
         // and only notes relevant to the errors that were actually fixed.
         if (ctx.iteration > 0) {
-          const fixedErrors = ctx.errors.filter(e => e.fixed);
+          const fixedErrors = ctx.errors.filter((e) => e.fixed);
           const relevantNoteIds = getRelevantNoteIds(ctx.notes, fixedErrors);
           if (relevantNoteIds.length > 0) {
             await recordSuccess(relevantNoteIds);
@@ -275,9 +268,9 @@ export async function* agentGenerateApp(
         const autoFeedback = autoResult.passed
           ? undefined
           : Object.values(autoResult.checks)
-            .filter(c => !c.passed)
-            .map(c => `${c.name}: ${c.error}`)
-            .join("; ");
+              .filter((c) => !c.passed)
+              .map((c) => `${c.name}: ${c.error}`)
+              .join("; ");
         yield {
           type: "review_complete",
           phase: "AUTO_REVIEW" as const,
@@ -306,21 +299,19 @@ export async function* agentGenerateApp(
         await updateAppStatus(slug, CreatedAppStatus.AI_REVIEW);
 
         // We need the app ID for creating AppReview records
-        const appRecord = await import("./content-service").then(m => m.getCreatedApp(slug));
+        const appRecord = await import("./content-service").then((m) => m.getCreatedApp(slug));
         const appId = appRecord?.id ?? slug;
 
-        const aiResult = await runAiReview(
-          appId,
-          codespaceId,
-          ctx.currentCode!,
-        );
+        const aiResult = await runAiReview(appId, codespaceId, ctx.currentCode!);
 
         yield {
           type: "review_complete",
           phase: "AI_REVIEW" as const,
           approved: aiResult.passed,
           score: aiResult.averageScore,
-          ...(!aiResult.passed && aiResult.feedback !== undefined ? { feedback: aiResult.feedback } : {}),
+          ...(!aiResult.passed && aiResult.feedback !== undefined
+            ? { feedback: aiResult.feedback }
+            : {}),
         };
 
         if (!aiResult.passed) {
@@ -340,11 +331,7 @@ export async function* agentGenerateApp(
           message: "App published successfully!",
         };
 
-        await updateAppStatus(
-          slug,
-          CreatedAppStatus.PUBLISHED,
-          ctx.relatedApps,
-        );
+        await updateAppStatus(slug, CreatedAppStatus.PUBLISHED, ctx.relatedApps);
 
         // Record metrics (fire-and-forget)
         recordGenerationAttempt({
@@ -358,7 +345,7 @@ export async function* agentGenerateApp(
           inputTokens: ctx.totalInputTokens,
           outputTokens: ctx.totalOutputTokens,
           cachedTokens: ctx.totalCachedTokens,
-        }).catch(err => logger.error("[agent-loop] Failed to record generation attempt:", err));
+        }).catch((err) => logger.error("[agent-loop] Failed to record generation attempt:", err));
 
         yield {
           type: "complete",
@@ -419,12 +406,16 @@ export async function* agentGenerateApp(
       const fixUserPrompt = buildFixUserPrompt(
         ctx.currentCode!,
         errorMsg,
-        ctx.errors.map(e => ({ error: e.error, iteration: e.iteration })),
+        ctx.errors.map((e) => ({ error: e.error, iteration: e.iteration })),
         {
           type: structuredError.type,
           ...(structuredError.library !== undefined ? { library: structuredError.library } : {}),
-          ...(structuredError.lineNumber !== undefined ? { lineNumber: structuredError.lineNumber } : {}),
-          ...(structuredError.suggestion !== undefined ? { suggestion: structuredError.suggestion } : {}),
+          ...(structuredError.lineNumber !== undefined
+            ? { lineNumber: structuredError.lineNumber }
+            : {}),
+          ...(structuredError.suggestion !== undefined
+            ? { suggestion: structuredError.suggestion }
+            : {}),
         },
       );
 
@@ -434,7 +425,9 @@ export async function* agentGenerateApp(
         const fixResponse = await callClaude({
           systemPrompt: fixSystemPrompt.full,
           stablePrefix: fixSystemPrompt.stablePrefix,
-          ...(fixSystemPrompt.dynamicSuffix ? { dynamicSuffix: fixSystemPrompt.dynamicSuffix } : {}),
+          ...(fixSystemPrompt.dynamicSuffix
+            ? { dynamicSuffix: fixSystemPrompt.dynamicSuffix }
+            : {}),
           userPrompt: fixUserPrompt,
           model: "sonnet",
           maxTokens: FIX_MAX_TOKENS,
@@ -490,7 +483,7 @@ export async function* agentGenerateApp(
     // === EXHAUSTED ALL ITERATIONS ===
     // Batch learning: extract notes from all error/fix pairs (fire-and-forget)
     if (ctx.errorFixPairs.length > 0) {
-      batchExtractAndSaveNotes(ctx.errorFixPairs, path).catch(err => {
+      batchExtractAndSaveNotes(ctx.errorFixPairs, path).catch((err) => {
         logger.warn("Batch note extraction failed", { error: err });
       });
     }
@@ -512,7 +505,7 @@ export async function* agentGenerateApp(
       inputTokens: ctx.totalInputTokens,
       outputTokens: ctx.totalOutputTokens,
       cachedTokens: ctx.totalCachedTokens,
-    }).catch(err => logger.error("[agent-loop] Failed to record generation attempt:", err));
+    }).catch((err) => logger.error("[agent-loop] Failed to record generation attempt:", err));
 
     try {
       await updateAppStatus(slug, CreatedAppStatus.FAILED);
@@ -550,7 +543,7 @@ export async function* agentGenerateApp(
       inputTokens: ctx.totalInputTokens,
       outputTokens: ctx.totalOutputTokens,
       cachedTokens: ctx.totalCachedTokens,
-    }).catch(err => logger.error("[agent-loop] Failed to record generation attempt:", err));
+    }).catch((err) => logger.error("[agent-loop] Failed to record generation attempt:", err));
 
     // Propagate to caller for fallback handling
     throw error;
@@ -561,11 +554,8 @@ export async function* agentGenerateApp(
  * Merge two note arrays, deduplicating by ID.
  * Error-specific notes are appended after general notes.
  */
-function mergeNotes(
-  generalNotes: LearningNote[],
-  errorNotes: LearningNote[],
-): LearningNote[] {
-  const seenIds = new Set(generalNotes.map(n => n.id));
+function mergeNotes(generalNotes: LearningNote[], errorNotes: LearningNote[]): LearningNote[] {
+  const seenIds = new Set(generalNotes.map((n) => n.id));
   const merged = [...generalNotes];
   for (const note of errorNotes) {
     if (!seenIds.has(note.id)) {
@@ -582,26 +572,25 @@ function mergeNotes(
  */
 function getRelevantNoteIds(
   notes: LearningNote[],
-  errors: Array<{ error: string; iteration: number; fixed?: boolean; }>,
+  errors: Array<{ error: string; iteration: number; fixed?: boolean }>,
 ): string[] {
   if (notes.length === 0 || errors.length === 0) return [];
 
   // We need the full note data — retrieve from the original notes which have
   // id/trigger/lesson/confidenceScore. For pattern matching we check if any
   // error substring appears in the note's trigger or lesson.
-  const errorTexts = errors.map(e => e.error.toLowerCase());
+  const errorTexts = errors.map((e) => e.error.toLowerCase());
 
   return notes
-    .filter(note => {
+    .filter((note) => {
       const triggerLower = note.trigger.toLowerCase();
       const lessonLower = note.lesson.toLowerCase();
-      return errorTexts.some(
-        errText =>
-          errText.includes(triggerLower)
-          || triggerLower.includes(errText.slice(0, 50)),
-      ) || errorTexts.some(
-        errText => lessonLower.includes(errText.slice(0, 50)),
+      return (
+        errorTexts.some(
+          (errText) =>
+            errText.includes(triggerLower) || triggerLower.includes(errText.slice(0, 50)),
+        ) || errorTexts.some((errText) => lessonLower.includes(errText.slice(0, 50)))
       );
     })
-    .map(n => n.id);
+    .map((n) => n.id);
 }

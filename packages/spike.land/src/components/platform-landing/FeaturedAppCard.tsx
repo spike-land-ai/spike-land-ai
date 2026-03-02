@@ -1,13 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Link } from "@/components/ui/link";
 import { ArrowRight } from "lucide-react";
 import { type ReactNode } from "react";
@@ -46,14 +40,8 @@ export function FeaturedAppCard({
         >
           {icon}
         </div>
-        <CardTitle className={featured ? "text-2xl" : "text-lg"}>
-          {name}
-        </CardTitle>
-        {tagline && (
-          <span className="text-sm text-primary font-medium">
-            {tagline}
-          </span>
-        )}
+        <CardTitle className={featured ? "text-2xl" : "text-lg"}>{name}</CardTitle>
+        {tagline && <span className="text-sm text-primary font-medium">{tagline}</span>}
         {featured && (
           <span className="inline-flex items-center rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary w-fit">
             Featured
@@ -61,9 +49,7 @@ export function FeaturedAppCard({
         )}
       </CardHeader>
       <CardContent className={featured ? "space-y-4" : ""}>
-        <CardDescription
-          className={`leading-relaxed ${featured ? "text-base" : "text-sm"}`}
-        >
+        <CardDescription className={`leading-relaxed ${featured ? "text-base" : "text-sm"}`}>
           {description}
         </CardDescription>
         {featured && (

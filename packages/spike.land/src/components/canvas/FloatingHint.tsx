@@ -16,51 +16,44 @@ export interface FloatingHintProps {
  * Appears at the bottom of the screen with a smooth enter/exit animation.
  * Shows different text based on device type (touch vs desktop).
  */
-export function FloatingHint({
-  text,
-  icon,
-  isVisible,
-  isTouchDevice = false,
-}: FloatingHintProps) {
+export function FloatingHint({ text, icon, isVisible, isTouchDevice = false }: FloatingHintProps) {
   // Check if user prefers reduced motion (hydration-safe)
   const prefersReducedMotion = useReducedMotion();
 
   // Default icons based on device type
-  const defaultIcon = isTouchDevice
-    ? (
-      // Touch/tap icon
-      <svg
-        className="w-5 h-5"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-        aria-hidden="true"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M7 11.5V14m0-2.5v-6a1.5 1.5 0 113 0m-3 6a1.5 1.5 0 00-3 0v2a7.5 7.5 0 0015 0v-5a1.5 1.5 0 00-3 0m-6-3V11m0-5.5v-1a1.5 1.5 0 013 0v1m0 0V11m0-5.5a1.5 1.5 0 013 0v3m0 0V11"
-        />
-      </svg>
-    )
-    : (
-      // Keyboard icon
-      <svg
-        className="w-5 h-5"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-        aria-hidden="true"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"
-        />
-      </svg>
-    );
+  const defaultIcon = isTouchDevice ? (
+    // Touch/tap icon
+    <svg
+      className="w-5 h-5"
+      fill="none"
+      stroke="currentColor"
+      viewBox="0 0 24 24"
+      aria-hidden="true"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={2}
+        d="M7 11.5V14m0-2.5v-6a1.5 1.5 0 113 0m-3 6a1.5 1.5 0 00-3 0v2a7.5 7.5 0 0015 0v-5a1.5 1.5 0 00-3 0m-6-3V11m0-5.5v-1a1.5 1.5 0 013 0v1m0 0V11m0-5.5a1.5 1.5 0 013 0v3m0 0V11"
+      />
+    </svg>
+  ) : (
+    // Keyboard icon
+    <svg
+      className="w-5 h-5"
+      fill="none"
+      stroke="currentColor"
+      viewBox="0 0 24 24"
+      aria-hidden="true"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={2}
+        d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"
+      />
+    </svg>
+  );
 
   const displayIcon = icon ?? defaultIcon;
 
@@ -78,7 +71,9 @@ export function FloatingHint({
         "shadow-lg",
         "transition-all duration-300",
         isVisible
-          ? prefersReducedMotion ? "opacity-100" : "animate-float-up"
+          ? prefersReducedMotion
+            ? "opacity-100"
+            : "animate-float-up"
           : "opacity-0 pointer-events-none translate-y-full",
       )}
     >

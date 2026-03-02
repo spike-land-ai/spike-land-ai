@@ -55,9 +55,7 @@ declare module "@react-three/drei" {
 declare module "@react-spring/three" {
   import type { ReactNode } from "react";
 
-  export function useSpring<T extends Record<string, unknown>>(
-    props: T,
-  ): Record<string, unknown>;
+  export function useSpring<T extends Record<string, unknown>>(props: T): Record<string, unknown>;
   export const animated: {
     group: React.FC<Record<string, unknown> & { children?: ReactNode }>;
     mesh: React.FC<Record<string, unknown> & { children?: ReactNode }>;
@@ -109,11 +107,7 @@ declare module "yjs" {
     unobserve(fn: () => void): void;
   }
   export function encodeStateAsUpdate(doc: Doc): Uint8Array;
-  export function applyUpdate(
-    doc: Doc,
-    update: Uint8Array,
-    origin?: string,
-  ): void;
+  export function applyUpdate(doc: Doc, update: Uint8Array, origin?: string): void;
 }
 
 declare module "y-indexeddb" {

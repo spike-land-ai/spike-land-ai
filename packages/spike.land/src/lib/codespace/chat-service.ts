@@ -8,10 +8,7 @@
 
 import type Anthropic from "@anthropic-ai/sdk";
 import { getClaudeClient } from "@/lib/ai/claude-client";
-import {
-  getOrCreateSession,
-  upsertSession,
-} from "@/lib/codespace/session-service";
+import { getOrCreateSession, upsertSession } from "@/lib/codespace/session-service";
 import { transpileCode } from "@/lib/codespace/transpile";
 import { tryCatch } from "@/lib/try-catch";
 import logger from "@/lib/logger";
@@ -38,7 +35,7 @@ export interface ChatMessage {
 }
 
 export type ChatRequestBody = {
-  messages: Array<{ role: "user" | "assistant" | "system"; content: string; }>;
+  messages: Array<{ role: "user" | "assistant" | "system"; content: string }>;
   model?: string;
 };
 
@@ -174,9 +171,7 @@ export async function executeTool(
       const code = input.code as string;
       if (!code) return "Error: 'code' parameter is required";
 
-      const { data: transpiled, error: transpileError } = await tryCatch(
-        transpileCode(code),
-      );
+      const { data: transpiled, error: transpileError } = await tryCatch(transpileCode(code));
       if (transpileError) {
         return `Transpilation error: ${transpileError.message}`;
       }
@@ -217,9 +212,7 @@ export async function executeTool(
 
       const newCode = lines.join("\n");
 
-      const { data: transpiled, error: transpileError } = await tryCatch(
-        transpileCode(newCode),
-      );
+      const { data: transpiled, error: transpileError } = await tryCatch(transpileCode(newCode));
       if (transpileError) {
         return `Transpilation error: ${transpileError.message}`;
       }
@@ -260,9 +253,7 @@ export async function executeTool(
         newCode = session.code.split(search).join(replace);
       }
 
-      const { data: transpiled, error: transpileError } = await tryCatch(
-        transpileCode(newCode),
-      );
+      const { data: transpiled, error: transpileError } = await tryCatch(transpileCode(newCode));
       if (transpileError) {
         return `Transpilation error: ${transpileError.message}`;
       }
@@ -369,10 +360,7 @@ recharts, date-fns, zustand, react-hook-form, zod, sonner, react-markdown, canva
  * src/lib/claude-agent/prompts/codespace-system.ts but includes
  * the current code inline so the model can skip the read_code call.
  */
-export function buildSystemPrompt(
-  codeSpace: string,
-  currentCode: string,
-): string {
+export function buildSystemPrompt(codeSpace: string, currentCode: string): string {
   return `${SYSTEM_PROMPT}
 
 ## CURRENT CONTEXT
@@ -391,7 +379,7 @@ ${currentCode}
 
 export function validateMessages(
   messages: unknown,
-): { valid: true; messages: ChatMessage[]; } | { valid: false; error: string; } {
+): { valid: true; messages: ChatMessage[] } | { valid: false; error: string } {
   if (!messages || !Array.isArray(messages)) {
     return { valid: false, error: "messages must be a non-empty array" };
   }
@@ -431,8 +419,8 @@ export function validateMessages(
         text?: string;
       }>;
       textContent = parts
-        .filter(p => p.type === "text" && typeof p.text === "string")
-        .map(p => p.text!)
+        .filter((p) => p.type === "text" && typeof p.text === "string")
+        .map((p) => p.text!)
         .join("");
     } else {
       return {
@@ -456,13 +444,8 @@ export function validateMessages(
 
 const encoder = new TextEncoder();
 
-export function sseEvent(
-  type: string,
-  data: Record<string, unknown>,
-): Uint8Array {
-  return encoder.encode(
-    `data: ${JSON.stringify({ type, ...data })}\n\n`,
-  );
+export function sseEvent(type: string, data: Record<string, unknown>): Uint8Array {
+  return encoder.encode(`data: ${JSON.stringify({ type, ...data })}\n\n`);
 }
 
 // ---------------------------------------------------------------------------
@@ -475,7 +458,7 @@ export function sseEvent(
 export function streamCodespaceChat(
   codeSpace: string,
   model: string,
-  messages: Array<{ role: "user" | "assistant" | "system"; content: string; }>,
+  messages: Array<{ role: "user" | "assistant" | "system"; content: string }>,
   requestId: string,
   systemPrompt: string,
 ): ReadableStream {
@@ -489,12 +472,10 @@ export function streamCodespaceChat(
           throw new Error("Claude client is not configured");
         }
 
-        const anthropicMessages: Anthropic.MessageParam[] = messages.map(
-          msg => ({
-            role: msg.role === "system" ? "user" : msg.role, // Anthropic doesn't allow 'system' in messages array
-            content: msg.content,
-          }),
-        );
+        const anthropicMessages: Anthropic.MessageParam[] = messages.map((msg) => ({
+          role: msg.role === "system" ? "user" : msg.role, // Anthropic doesn't allow 'system' in messages array
+          content: msg.content,
+        }));
 
         let iteration = 0;
 
@@ -517,9 +498,7 @@ export function streamCodespaceChat(
             logger.error(`[chat][${requestId}] Anthropic API error:`, apiError);
             controller.enqueue(
               sseEvent("error", {
-                content: apiError instanceof Error
-                  ? apiError.message
-                  : "Claude API error",
+                content: apiError instanceof Error ? apiError.message : "Claude API error",
               }),
             );
             break;
@@ -536,9 +515,7 @@ export function streamCodespaceChat(
 
           for (const textBlock of textBlocks) {
             if (textBlock.text) {
-              controller.enqueue(
-                sseEvent("chunk", { content: textBlock.text }),
-              );
+              controller.enqueue(sseEvent("chunk", { content: textBlock.text }));
             }
           }
 
@@ -552,25 +529,17 @@ export function streamCodespaceChat(
           const toolResults: Anthropic.Messages.ToolResultBlockParam[] = [];
 
           for (const toolBlock of toolUseBlocks) {
-            logger.info(
-              `[chat][${requestId}] Executing tool: ${toolBlock.name}`,
-            );
+            logger.info(`[chat][${requestId}] Executing tool: ${toolBlock.name}`);
             controller.enqueue(
               sseEvent("stage", {
                 stage: "executing_tool",
                 tool: toolBlock.name,
               }),
             );
-            controller.enqueue(
-              sseEvent("status", { content: `Executing ${toolBlock.name}...` }),
-            );
+            controller.enqueue(sseEvent("status", { content: `Executing ${toolBlock.name}...` }));
 
             const { data: toolResult, error: toolError } = await tryCatch(
-              executeTool(
-                toolBlock.name,
-                toolBlock.input as Record<string, unknown>,
-                codeSpace,
-              ),
+              executeTool(toolBlock.name, toolBlock.input as Record<string, unknown>, codeSpace),
             );
 
             const resultText = toolError

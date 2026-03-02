@@ -18,12 +18,15 @@ interface BrandGuardrailsPanelProps {
   rules: BrandRule[];
 }
 
-const statusConfig: Record<RuleStatus, {
-  icon: React.ComponentType<{ className?: string; }>;
-  iconClass: string;
-  badgeClass: string;
-  label: string;
-}> = {
+const statusConfig: Record<
+  RuleStatus,
+  {
+    icon: React.ComponentType<{ className?: string }>;
+    iconClass: string;
+    badgeClass: string;
+    label: string;
+  }
+> = {
   pass: {
     icon: Check,
     iconClass: "text-green-400",
@@ -48,12 +51,10 @@ export function BrandGuardrailsPanel({ rules }: BrandGuardrailsPanelProps) {
   return (
     <Card className="bg-zinc-900 border-zinc-800 w-full">
       <CardHeader className="pb-3">
-        <CardTitle className="text-base text-zinc-100">
-          Brand Guardrails
-        </CardTitle>
+        <CardTitle className="text-base text-zinc-100">Brand Guardrails</CardTitle>
       </CardHeader>
       <CardContent className="space-y-2">
-        {rules.map(rule => {
+        {rules.map((rule) => {
           const config = statusConfig[rule.status];
           const Icon = config.icon;
           return (
@@ -61,21 +62,14 @@ export function BrandGuardrailsPanel({ rules }: BrandGuardrailsPanelProps) {
               key={rule.id}
               className="flex items-start gap-3 p-3 rounded-lg bg-zinc-800/50 border border-zinc-700/50"
             >
-              <Icon
-                className={cn("h-4 w-4 shrink-0 mt-0.5", config.iconClass)}
-              />
+              <Icon className={cn("h-4 w-4 shrink-0 mt-0.5", config.iconClass)} />
               <div className="flex-1 min-w-0">
                 <span className="text-sm text-zinc-200 block">{rule.rule}</span>
                 {rule.detail && (
-                  <span className="text-xs text-zinc-500 block mt-0.5">
-                    {rule.detail}
-                  </span>
+                  <span className="text-xs text-zinc-500 block mt-0.5">{rule.detail}</span>
                 )}
               </div>
-              <Badge
-                variant="outline"
-                className={cn("text-xs shrink-0", config.badgeClass)}
-              >
+              <Badge variant="outline" className={cn("text-xs shrink-0", config.badgeClass)}>
                 {config.label}
               </Badge>
             </div>

@@ -1,13 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import type {
-  AgentStage,
-  AppData,
-  AppMessage,
-  PageMode,
-  PendingFile,
-  PendingImage,
-} from "./types";
+import type { AgentStage, AppData, AppMessage, PageMode, PendingFile, PendingImage } from "./types";
 
 describe("apps/types", () => {
   describe("AppMessage", () => {

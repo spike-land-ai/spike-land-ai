@@ -98,9 +98,7 @@ describe("codespace-health", () => {
 
       await isCodespaceHealthy("fail-cs");
 
-      expect(healthCache.get("fail-cs")).toEqual(
-        expect.objectContaining({ healthy: false }),
-      );
+      expect(healthCache.get("fail-cs")).toEqual(expect.objectContaining({ healthy: false }));
     });
   });
 
@@ -141,7 +139,7 @@ describe("codespace-health", () => {
       const result = await filterHealthyCodespaces(items);
 
       expect(result).toHaveLength(2);
-      expect(result.map(r => r.codespaceId)).toEqual(["cs-1", "cs-3"]);
+      expect(result.map((r) => r.codespaceId)).toEqual(["cs-1", "cs-3"]);
     });
 
     it("should filter out items with null codespaceId", async () => {
@@ -150,9 +148,7 @@ describe("codespace-health", () => {
         { codespaceId: "cs-1", name: "Has CS" },
       ];
 
-      mockCheckSessionsHealth.mockResolvedValue(
-        new Map([["cs-1", true]]),
-      );
+      mockCheckSessionsHealth.mockResolvedValue(new Map([["cs-1", true]]));
 
       const result = await filterHealthyCodespaces(items);
 
@@ -164,9 +160,7 @@ describe("codespace-health", () => {
       // Pre-populate cache
       healthCache.set("cached-cs", { healthy: true, cachedAt: Date.now() });
 
-      mockCheckSessionsHealth.mockResolvedValue(
-        new Map([["uncached-cs", true]]),
-      );
+      mockCheckSessionsHealth.mockResolvedValue(new Map([["uncached-cs", true]]));
 
       const items = [
         { codespaceId: "cached-cs", name: "Cached" },
@@ -183,9 +177,7 @@ describe("codespace-health", () => {
     it("should mark items as unhealthy when batch check fails", async () => {
       mockCheckSessionsHealth.mockRejectedValue(new Error("DB error"));
 
-      const items = [
-        { codespaceId: "cs-1", name: "App 1" },
-      ];
+      const items = [{ codespaceId: "cs-1", name: "App 1" }];
 
       const result = await filterHealthyCodespaces(items);
 
@@ -195,9 +187,7 @@ describe("codespace-health", () => {
 
     it("should mark missing items from batch results as unhealthy", async () => {
       // Batch returns result for cs-1 but not cs-2
-      mockCheckSessionsHealth.mockResolvedValue(
-        new Map([["cs-1", true]]),
-      );
+      mockCheckSessionsHealth.mockResolvedValue(new Map([["cs-1", true]]));
 
       const items = [
         { codespaceId: "cs-1", name: "Found" },

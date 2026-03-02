@@ -65,14 +65,7 @@ export function PdMcpLogo({
       </defs>
 
       {/* Background */}
-      <rect
-        x="0"
-        y="0"
-        width="84"
-        height="60"
-        rx="8"
-        fill={`url(#${bgGradientId})`}
-      />
+      <rect x="0" y="0" width="84" height="60" rx="8" fill={`url(#${bgGradientId})`} />
       <rect
         x="0.5"
         y="0.5"
@@ -87,22 +80,8 @@ export function PdMcpLogo({
       {/* Progressive disclosure bars */}
       <g filter={`url(#${glowId})`}>
         <rect x="10" y="15" width="12" height="6" rx="3" fill="#00E5FF" />
-        <rect
-          x="10"
-          y="27"
-          width="20"
-          height="6"
-          rx="3"
-          fill={`url(#${bar2GradientId})`}
-        />
-        <rect
-          x="10"
-          y="39"
-          width="28"
-          height="6"
-          rx="3"
-          fill={`url(#${bar3GradientId})`}
-        />
+        <rect x="10" y="27" width="20" height="6" rx="3" fill={`url(#${bar2GradientId})`} />
+        <rect x="10" y="39" width="28" height="6" rx="3" fill={`url(#${bar3GradientId})`} />
       </g>
 
       {/* MCP text */}
@@ -122,13 +101,7 @@ export function PdMcpLogo({
   );
 
   const wordmark = (
-    <span
-      className={cn(
-        "font-heading font-bold tracking-tight",
-        text,
-        "text-foreground",
-      )}
-    >
+    <span className={cn("font-heading font-bold tracking-tight", text, "text-foreground")}>
       PD-MCP
     </span>
   );

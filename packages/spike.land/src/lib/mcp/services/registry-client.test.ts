@@ -54,9 +54,7 @@ describe("registry-client", () => {
       const results = await searchSmithery("test", 5);
 
       expect(results).toEqual(cachedData);
-      expect(mockRedis.get).toHaveBeenCalledWith(
-        "mcp-registry:smithery:test:5",
-      );
+      expect(mockRedis.get).toHaveBeenCalledWith("mcp-registry:smithery:test:5");
       expect(mockFetch).not.toHaveBeenCalled();
     });
 
@@ -102,11 +100,9 @@ describe("registry-client", () => {
         homepage: "https://example.com",
       });
 
-      expect(mockRedis.set).toHaveBeenCalledWith(
-        "mcp-registry:smithery:test:5",
-        results,
-        { ex: 3600 },
-      );
+      expect(mockRedis.set).toHaveBeenCalledWith("mcp-registry:smithery:test:5", results, {
+        ex: 3600,
+      });
     });
 
     it("should include Authorization header when SMITHERY_API_KEY is set", async () => {
@@ -269,9 +265,7 @@ describe("registry-client", () => {
       const results = await searchOfficialRegistry("test", 5);
 
       expect(results).toEqual(cachedData);
-      expect(mockRedis.get).toHaveBeenCalledWith(
-        "mcp-registry:official:test:5",
-      );
+      expect(mockRedis.get).toHaveBeenCalledWith("mcp-registry:official:test:5");
       expect(mockFetch).not.toHaveBeenCalled();
     });
 
@@ -296,9 +290,7 @@ describe("registry-client", () => {
 
       const results = await searchOfficialRegistry("test", 10);
 
-      expect(mockFetch).toHaveBeenCalledWith(
-        "https://official.test/v0.1/servers?q=test&count=10",
-      );
+      expect(mockFetch).toHaveBeenCalledWith("https://official.test/v0.1/servers?q=test&count=10");
 
       expect(results).toHaveLength(1);
       expect(results[0]).toEqual({
@@ -311,11 +303,9 @@ describe("registry-client", () => {
         envVarsRequired: [],
       });
 
-      expect(mockRedis.set).toHaveBeenCalledWith(
-        "mcp-registry:official:test:10",
-        results,
-        { ex: 3600 },
-      );
+      expect(mockRedis.set).toHaveBeenCalledWith("mcp-registry:official:test:10", results, {
+        ex: 3600,
+      });
     });
 
     it("should return empty array on API error", async () => {
@@ -443,11 +433,9 @@ describe("registry-client", () => {
         stars: 42,
       });
 
-      expect(mockRedis.set).toHaveBeenCalledWith(
-        "mcp-registry:glama:query:3",
-        results,
-        { ex: 3600 },
-      );
+      expect(mockRedis.set).toHaveBeenCalledWith("mcp-registry:glama:query:3", results, {
+        ex: 3600,
+      });
     });
 
     it("should return empty array on API error", async () => {
@@ -584,11 +572,7 @@ describe("registry-client", () => {
       const results = await searchAllRegistries("test", 10);
 
       expect(results).toHaveLength(3);
-      expect(results.map(r => r.source)).toEqual([
-        "smithery",
-        "official",
-        "glama",
-      ]);
+      expect(results.map((r) => r.source)).toEqual(["smithery", "official", "glama"]);
     });
 
     it("should deduplicate by name (case-insensitive)", async () => {
@@ -679,8 +663,8 @@ describe("registry-client", () => {
 
       // Should still return results from smithery and glama
       expect(results).toHaveLength(2);
-      expect(results.map(r => r.source)).toContain("smithery");
-      expect(results.map(r => r.source)).toContain("glama");
+      expect(results.map((r) => r.source)).toContain("smithery");
+      expect(results.map((r) => r.source)).toContain("glama");
     });
 
     it("should respect the limit parameter", async () => {
@@ -717,9 +701,7 @@ describe("registry-client", () => {
         .mockResolvedValueOnce({
           ok: true,
           json: async () => ({
-            servers: [
-              { id: "g1", name: "Server E", description: "e" },
-            ],
+            servers: [{ id: "g1", name: "Server E", description: "e" }],
           }),
         });
 
@@ -802,7 +784,7 @@ describe("registry-client", () => {
 
       expect(results).toHaveLength(2);
       // "SharedServer" from smithery should be kept, "sharedserver" from official discarded
-      const shared = results.find(r => r.name.toLowerCase() === "sharedserver");
+      const shared = results.find((r) => r.name.toLowerCase() === "sharedserver");
       expect(shared?.source).toBe("smithery");
     });
   });

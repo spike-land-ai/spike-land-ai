@@ -33,9 +33,10 @@ interface ErrorStats {
   byEnvironment: Record<string, number>;
 }
 
-export async function listErrorIssues(
-  options?: { query?: string; limit?: number; },
-): Promise<ErrorIssue[]> {
+export async function listErrorIssues(options?: {
+  query?: string;
+  limit?: number;
+}): Promise<ErrorIssue[]> {
   const prisma = (await import("@/lib/prisma")).default;
   const limit = options?.limit ?? 25;
 
@@ -54,7 +55,7 @@ export async function listErrorIssues(
       take: limit,
     });
 
-    return grouped.map(g => ({
+    return grouped.map((g) => ({
       message: g.message,
       count: g._count.id,
       lastSeen: g._max.timestamp?.toISOString() ?? "",
@@ -70,9 +71,7 @@ export async function listErrorIssues(
   }
 }
 
-export async function getErrorDetail(
-  errorId: string,
-): Promise<ErrorDetail | null> {
+export async function getErrorDetail(errorId: string): Promise<ErrorDetail | null> {
   const prisma = (await import("@/lib/prisma")).default;
 
   try {

@@ -16,7 +16,7 @@ interface ReviewIssueRowProps {
 
 const severityConfig: Record<
   IssueSeverity,
-  { color: string; badgeClass: string; icon: React.ComponentType<{ className?: string; }>; }
+  { color: string; badgeClass: string; icon: React.ComponentType<{ className?: string }> }
 > = {
   error: {
     color: "text-red-400",
@@ -63,10 +63,7 @@ export function ReviewIssueRow({
             {lineNumber !== undefined && <span className="text-zinc-500">:{lineNumber}</span>}
           </code>
           {ruleId && (
-            <Badge
-              variant="outline"
-              className="text-xs text-zinc-500 border-zinc-700 font-mono"
-            >
+            <Badge variant="outline" className="text-xs text-zinc-500 border-zinc-700 font-mono">
               {ruleId}
             </Badge>
           )}

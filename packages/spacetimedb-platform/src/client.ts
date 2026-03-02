@@ -67,7 +67,12 @@ export interface SpacetimePlatformClient {
   updateAppStatus(appId: bigint, status: string): Promise<void>;
   deleteApp(appId: bigint): Promise<void>;
   restoreApp(appId: bigint): Promise<void>;
-  createAppVersion(appId: bigint, version: string, codeHash: string, changeDescription: string): Promise<void>;
+  createAppVersion(
+    appId: bigint,
+    version: string,
+    codeHash: string,
+    changeDescription: string,
+  ): Promise<void>;
   listAppVersions(appId: bigint): AppVersion[];
   sendAppMessage(appId: bigint, role: string, content: string): Promise<void>;
   getAppMessages(appId: bigint): AppMessage[];
@@ -78,7 +83,12 @@ export interface SpacetimePlatformClient {
   getPage(slug: string): Page | undefined;
   updatePage(slug: string, fields: { title?: string; description?: string }): Promise<void>;
   deletePage(slug: string): Promise<void>;
-  createBlock(pageId: bigint, blockType: string, contentJson: string, sortOrder: number): Promise<void>;
+  createBlock(
+    pageId: bigint,
+    blockType: string,
+    contentJson: string,
+    sortOrder: number,
+  ): Promise<void>;
   updateBlock(blockId: bigint, fields: { contentJson?: string; sortOrder?: number }): Promise<void>;
   deleteBlock(blockId: bigint): Promise<void>;
   reorderBlocks(pageId: bigint, blockIds: bigint[]): Promise<void>;
@@ -106,7 +116,16 @@ export interface SpacetimePlatformClient {
 
   // ─── Analytics ───
 
-  recordEvent(source: string, eventType: string, metadataJson: string, userIdentity?: string): Promise<void>;
-  queryEvents(filters: { source?: string; eventType?: string; userIdentity?: string }): PlatformEvent[];
+  recordEvent(
+    source: string,
+    eventType: string,
+    metadataJson: string,
+    userIdentity?: string,
+  ): Promise<void>;
+  queryEvents(filters: {
+    source?: string;
+    eventType?: string;
+    userIdentity?: string;
+  }): PlatformEvent[];
   getHealthStatus(): HealthCheck[];
 }

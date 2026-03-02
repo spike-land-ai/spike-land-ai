@@ -29,10 +29,12 @@ export function registerEnvironmentTools(
           mcpVersion: "1.0.0",
         };
         return {
-          content: [{
-            type: "text" as const,
-            text: `**Environment:**\n\`\`\`json\n${JSON.stringify(info, null, 2)}\n\`\`\``,
-          }],
+          content: [
+            {
+              type: "text" as const,
+              text: `**Environment:**\n\`\`\`json\n${JSON.stringify(info, null, 2)}\n\`\`\``,
+            },
+          ],
         };
       }),
   );
@@ -45,10 +47,12 @@ export function registerEnvironmentTools(
       .meta({ category: "env", tier: "free" })
       .handler(async ({ input: _input, ctx: _ctx }) => {
         return {
-          content: [{
-            type: "text" as const,
-            text: "**Feature Flags:** All features enabled by default in CF Workers deployment.",
-          }],
+          content: [
+            {
+              type: "text" as const,
+              text: "**Feature Flags:** All features enabled by default in CF Workers deployment.",
+            },
+          ],
         };
       }),
   );

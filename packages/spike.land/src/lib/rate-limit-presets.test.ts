@@ -50,10 +50,10 @@ describe("checkGenerationRateLimit", () => {
     it("uses maxRequests=5 and windowMs=3600000 for anonymous", async () => {
       mockCheckRateLimit.mockResolvedValue({ isLimited: false, resetAt: 0 });
       await checkGenerationRateLimit("1.1.1.1", false);
-      expect(mockCheckRateLimit).toHaveBeenCalledWith(
-        expect.any(String),
-        { maxRequests: 5, windowMs: 3_600_000 },
-      );
+      expect(mockCheckRateLimit).toHaveBeenCalledWith(expect.any(String), {
+        maxRequests: 5,
+        windowMs: 3_600_000,
+      });
     });
   });
 
@@ -70,10 +70,10 @@ describe("checkGenerationRateLimit", () => {
     it("uses maxRequests=20 and windowMs=3600000 for authenticated", async () => {
       mockCheckRateLimit.mockResolvedValue({ isLimited: false, resetAt: 0 });
       await checkGenerationRateLimit("2.2.2.2", true);
-      expect(mockCheckRateLimit).toHaveBeenCalledWith(
-        expect.any(String),
-        { maxRequests: 20, windowMs: 3_600_000 },
-      );
+      expect(mockCheckRateLimit).toHaveBeenCalledWith(expect.any(String), {
+        maxRequests: 20,
+        windowMs: 3_600_000,
+      });
     });
   });
 

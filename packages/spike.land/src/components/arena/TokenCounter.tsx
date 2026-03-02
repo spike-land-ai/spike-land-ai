@@ -10,9 +10,5 @@ interface TokenCounterProps {
 export function TokenCounter({ text }: TokenCounterProps) {
   const estimatedTokens = Math.ceil(text.length / 4);
 
-  return (
-    <div className="text-xs text-zinc-500">
-      ~{estimatedTokens.toLocaleString()} tokens
-    </div>
-  );
+  return <div className="text-xs text-zinc-500">~{estimatedTokens.toLocaleString()} tokens</div>;
 }

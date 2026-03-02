@@ -11,10 +11,7 @@ async function main() {
     },
   });
 
-  const client = new Client(
-    { name: "antigravity-script", version: "1.0.0" },
-    { capabilities: {} },
-  );
+  const client = new Client({ name: "antigravity-script", version: "1.0.0" }, { capabilities: {} });
 
   console.log("Connecting to spike.land MCP...");
   await client.connect(transport);

@@ -1,9 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import {
-  detectFramework,
-  generateEsbuildConfig,
-  guessEntryPoint,
-} from "./framework-detector";
+import { detectFramework, generateEsbuildConfig, guessEntryPoint } from "./framework-detector";
 
 describe("framework-detector", () => {
   afterEach(() => {
@@ -17,12 +13,8 @@ describe("framework-detector", () => {
     });
 
     it("returns plain when fetch fails", async () => {
-      vi.spyOn(globalThis, "fetch").mockRejectedValueOnce(
-        new Error("network error"),
-      );
-      const framework = await detectFramework(
-        "https://github.com/user/repo",
-      );
+      vi.spyOn(globalThis, "fetch").mockRejectedValueOnce(new Error("network error"));
+      const framework = await detectFramework("https://github.com/user/repo");
       expect(framework).toBe("plain");
     });
 
@@ -31,9 +23,7 @@ describe("framework-detector", () => {
         ok: false,
         status: 404,
       } as Response);
-      const framework = await detectFramework(
-        "https://github.com/user/repo",
-      );
+      const framework = await detectFramework("https://github.com/user/repo");
       expect(framework).toBe("plain");
     });
 
@@ -42,9 +32,7 @@ describe("framework-detector", () => {
         ok: true,
         json: () => Promise.reject(new Error("invalid json")),
       } as unknown as Response);
-      const framework = await detectFramework(
-        "https://github.com/user/repo",
-      );
+      const framework = await detectFramework("https://github.com/user/repo");
       expect(framework).toBe("plain");
     });
 
@@ -56,9 +44,7 @@ describe("framework-detector", () => {
             dependencies: { next: "^14.0.0", react: "^18.0.0" },
           }),
       } as unknown as Response);
-      const framework = await detectFramework(
-        "https://github.com/user/repo",
-      );
+      const framework = await detectFramework("https://github.com/user/repo");
       expect(framework).toBe("next");
     });
 
@@ -70,9 +56,7 @@ describe("framework-detector", () => {
             dependencies: { "@remix-run/react": "2.0.0" },
           }),
       } as unknown as Response);
-      const framework = await detectFramework(
-        "https://github.com/user/repo",
-      );
+      const framework = await detectFramework("https://github.com/user/repo");
       expect(framework).toBe("remix");
     });
 
@@ -84,9 +68,7 @@ describe("framework-detector", () => {
             devDependencies: { vite: "^5.0.0" },
           }),
       } as unknown as Response);
-      const framework = await detectFramework(
-        "https://github.com/user/repo",
-      );
+      const framework = await detectFramework("https://github.com/user/repo");
       expect(framework).toBe("vite");
     });
 
@@ -98,9 +80,7 @@ describe("framework-detector", () => {
             dependencies: { "react-scripts": "5.0.0" },
           }),
       } as unknown as Response);
-      const framework = await detectFramework(
-        "https://github.com/user/repo",
-      );
+      const framework = await detectFramework("https://github.com/user/repo");
       expect(framework).toBe("cra");
     });
 
@@ -112,9 +92,7 @@ describe("framework-detector", () => {
             dependencies: { lodash: "^4.0.0" },
           }),
       } as unknown as Response);
-      const framework = await detectFramework(
-        "https://github.com/user/repo",
-      );
+      const framework = await detectFramework("https://github.com/user/repo");
       expect(framework).toBe("plain");
     });
 
@@ -126,13 +104,8 @@ describe("framework-detector", () => {
             dependencies: { next: "^14.0.0" },
           }),
       } as unknown as Response);
-      await detectFramework(
-        "https://github.com/user/repo",
-        "develop",
-      );
-      expect(fetchSpy).toHaveBeenCalledWith(
-        expect.stringContaining("develop"),
-      );
+      await detectFramework("https://github.com/user/repo", "develop");
+      expect(fetchSpy).toHaveBeenCalledWith(expect.stringContaining("develop"));
     });
   });
 
@@ -146,10 +119,7 @@ describe("framework-detector", () => {
       vi.spyOn(globalThis, "fetch").mockResolvedValueOnce({
         ok: true,
       } as Response);
-      const entry = await guessEntryPoint(
-        "https://github.com/user/repo",
-        "vite",
-      );
+      const entry = await guessEntryPoint("https://github.com/user/repo", "vite");
       expect(entry).toBe("src/main.tsx");
     });
 
@@ -157,10 +127,7 @@ describe("framework-detector", () => {
       vi.spyOn(globalThis, "fetch").mockResolvedValueOnce({
         ok: true,
       } as Response);
-      const entry = await guessEntryPoint(
-        "https://github.com/user/repo",
-        "cra",
-      );
+      const entry = await guessEntryPoint("https://github.com/user/repo", "cra");
       expect(entry).toBe("src/index.tsx");
     });
 
@@ -168,10 +135,7 @@ describe("framework-detector", () => {
       vi.spyOn(globalThis, "fetch").mockResolvedValueOnce({
         ok: true,
       } as Response);
-      const entry = await guessEntryPoint(
-        "https://github.com/user/repo",
-        "next",
-      );
+      const entry = await guessEntryPoint("https://github.com/user/repo", "next");
       expect(entry).toBe("app/layout.tsx");
     });
 
@@ -179,10 +143,7 @@ describe("framework-detector", () => {
       vi.spyOn(globalThis, "fetch").mockResolvedValueOnce({
         ok: true,
       } as Response);
-      const entry = await guessEntryPoint(
-        "https://github.com/user/repo",
-        "remix",
-      );
+      const entry = await guessEntryPoint("https://github.com/user/repo", "remix");
       expect(entry).toBe("app/entry.client.tsx");
     });
 
@@ -190,21 +151,15 @@ describe("framework-detector", () => {
       vi.spyOn(globalThis, "fetch").mockResolvedValueOnce({
         ok: true,
       } as Response);
-      const entry = await guessEntryPoint(
-        "https://github.com/user/repo",
-        "plain",
-      );
+      const entry = await guessEntryPoint("https://github.com/user/repo", "plain");
       expect(entry).toBe("index.ts");
     });
 
     it("falls back to first entry when none found", async () => {
       vi.spyOn(globalThis, "fetch").mockImplementation(() =>
-        Promise.resolve({ ok: false } as Response)
+        Promise.resolve({ ok: false } as Response),
       );
-      const entry = await guessEntryPoint(
-        "https://github.com/user/repo",
-        "vite",
-      );
+      const entry = await guessEntryPoint("https://github.com/user/repo", "vite");
       expect(entry).toBe("src/main.tsx");
     });
 
@@ -212,11 +167,7 @@ describe("framework-detector", () => {
       const fetchSpy = vi
         .spyOn(globalThis, "fetch")
         .mockResolvedValueOnce({ ok: true } as Response);
-      await guessEntryPoint(
-        "https://github.com/user/repo",
-        "vite",
-        "feature-branch",
-      );
+      await guessEntryPoint("https://github.com/user/repo", "vite", "feature-branch");
       expect(fetchSpy).toHaveBeenCalledWith(
         expect.stringContaining("feature-branch"),
         expect.objectContaining({ method: "HEAD" }),
@@ -259,9 +210,7 @@ describe("framework-detector", () => {
     it("includes NODE_ENV production define", () => {
       const config = generateEsbuildConfig("vite");
       expect(config.define).toBeDefined();
-      expect(config.define!["process.env.NODE_ENV"]).toBe(
-        JSON.stringify("production"),
-      );
+      expect(config.define!["process.env.NODE_ENV"]).toBe(JSON.stringify("production"));
     });
   });
 });

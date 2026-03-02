@@ -35,14 +35,7 @@ export const FeatureGridContentSchema = z.object({
     )
     .min(1)
     .describe("List of features to display."),
-  columns: z
-    .number()
-    .int()
-    .min(1)
-    .max(6)
-    .optional()
-    .default(3)
-    .describe("Number of grid columns."),
+  columns: z.number().int().min(1).max(6).optional().default(3).describe("Number of grid columns."),
 });
 
 export const FeatureListContentSchema = z.object({
@@ -67,10 +60,7 @@ export const CtaContentSchema = z.object({
       z.object({
         text: z.string().min(1),
         url: z.string(),
-        variant: z
-          .enum(["primary", "secondary", "outline", "ghost"])
-          .optional()
-          .default("primary"),
+        variant: z.enum(["primary", "secondary", "outline", "ghost"]).optional().default("primary"),
       }),
     )
     .min(1)
@@ -140,14 +130,7 @@ export const GalleryContentSchema = z.object({
     )
     .min(1)
     .describe("Gallery images."),
-  columns: z
-    .number()
-    .int()
-    .min(1)
-    .max(6)
-    .optional()
-    .default(3)
-    .describe("Number of grid columns."),
+  columns: z.number().int().min(1).max(6).optional().default(3).describe("Number of grid columns."),
 });
 
 export const FaqContentSchema = z.object({
@@ -206,9 +189,7 @@ export const AppGridContentSchema = z.object({
     )
     .min(1)
     .describe("Apps to display."),
-  categories: z.array(z.string()).optional().default([]).describe(
-    "Category filter tabs.",
-  ),
+  categories: z.array(z.string()).optional().default([]).describe("Category filter tabs."),
 });
 
 export const MarkdownContentSchema = z.object({
@@ -217,9 +198,7 @@ export const MarkdownContentSchema = z.object({
 
 export const CustomReactContentSchema = z.object({
   componentName: z.string().min(1).describe("Registered component name."),
-  props: z.record(z.string(), z.unknown()).optional().default({}).describe(
-    "Component props.",
-  ),
+  props: z.record(z.string(), z.unknown()).optional().default({}).describe("Component props."),
 });
 
 // ─── Schema Map ───────────────────────────────────────────────────────────────
@@ -248,7 +227,7 @@ export const BLOCK_CONTENT_SCHEMAS: Record<BlockType, z.ZodTypeAny> = {
 export function validateBlockContent(
   blockType: BlockType,
   content: unknown,
-): { success: true; data: unknown; } | { success: false; error: string; } {
+): { success: true; data: unknown } | { success: false; error: string } {
   const schema = BLOCK_CONTENT_SCHEMAS[blockType];
   if (!schema) {
     return { success: false, error: `Unknown block type: ${blockType}` };
@@ -259,9 +238,7 @@ export function validateBlockContent(
     return { success: true, data: result.data };
   }
 
-  const issues = result.error.issues
-    .map(i => `${i.path.join(".")}: ${i.message}`)
-    .join("; ");
+  const issues = result.error.issues.map((i) => `${i.path.join(".")}: ${i.message}`).join("; ");
   return { success: false, error: issues };
 }
 
@@ -300,9 +277,7 @@ export type ReservedSlug = (typeof RESERVED_SLUGS)[number];
  * Check if a slug is reserved (used by existing routes).
  */
 export function isReservedSlug(slug: string): boolean {
-  return (RESERVED_SLUGS as readonly string[]).includes(
-    slug.split("/")[0] ?? slug,
-  );
+  return (RESERVED_SLUGS as readonly string[]).includes(slug.split("/")[0] ?? slug);
 }
 
 /**

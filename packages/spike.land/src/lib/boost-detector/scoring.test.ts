@@ -16,11 +16,7 @@ vi.mock("@/lib/prisma", () => ({ default: mockPrisma }));
 
 import type { PostType } from "@/generated/prisma";
 
-import {
-  analyzeEngagementVelocity,
-  calculateBoostScore,
-  predictROI,
-} from "./scoring";
+import { analyzeEngagementVelocity, calculateBoostScore, predictROI } from "./scoring";
 
 describe("boost-detector/scoring", () => {
   beforeEach(() => {

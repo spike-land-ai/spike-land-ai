@@ -53,15 +53,12 @@ const indicatorVariants = cva(
 
 const Progress = React.forwardRef<
   React.ElementRef<typeof ProgressPrimitive.Root>,
-  & React.ComponentPropsWithoutRef<typeof ProgressPrimitive.Root>
-  & VariantProps<typeof indicatorVariants>
+  React.ComponentPropsWithoutRef<typeof ProgressPrimitive.Root> &
+    VariantProps<typeof indicatorVariants>
 >(({ className, value, variant, glow, ...props }, ref) => (
   <ProgressPrimitive.Root
     ref={ref}
-    className={cn(
-      "relative h-2 w-full overflow-hidden rounded-full bg-white/10",
-      className,
-    )}
+    className={cn("relative h-2 w-full overflow-hidden rounded-full bg-white/10", className)}
     aria-valuenow={value ?? 0}
     {...props}
   >

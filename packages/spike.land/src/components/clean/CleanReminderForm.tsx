@@ -16,20 +16,14 @@ interface CleanReminderFormProps {
   onCancel: () => void;
 }
 
-export function CleanReminderForm(
-  { reminder, onSave, onCancel }: CleanReminderFormProps,
-) {
+export function CleanReminderForm({ reminder, onSave, onCancel }: CleanReminderFormProps) {
   const [time, setTime] = useState(reminder?.time ?? "09:00");
   const [days, setDays] = useState<number[]>(reminder?.days ?? [1, 2, 3, 4, 5]);
-  const [message, setMessage] = useState(
-    reminder?.message ?? "Time to tidy up!",
-  );
+  const [message, setMessage] = useState(reminder?.message ?? "Time to tidy up!");
 
   const toggleDay = (dayIndex: number) => {
-    setDays(prev =>
-      prev.includes(dayIndex)
-        ? prev.filter(d => d !== dayIndex)
-        : [...prev, dayIndex].sort()
+    setDays((prev) =>
+      prev.includes(dayIndex) ? prev.filter((d) => d !== dayIndex) : [...prev, dayIndex].sort(),
     );
   };
 
@@ -41,9 +35,7 @@ export function CleanReminderForm(
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-lg">
-          {reminder ? "Edit Reminder" : "New Reminder"}
-        </CardTitle>
+        <CardTitle className="text-lg">{reminder ? "Edit Reminder" : "New Reminder"}</CardTitle>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -53,7 +45,7 @@ export function CleanReminderForm(
               id="reminder-time"
               type="time"
               value={time}
-              onChange={e => setTime(e.target.value)}
+              onChange={(e) => setTime(e.target.value)}
               required
             />
           </div>
@@ -62,14 +54,8 @@ export function CleanReminderForm(
             <Label>Days</Label>
             <div className="flex flex-wrap gap-3">
               {DAYS.map((dayName, idx) => (
-                <label
-                  key={dayName}
-                  className="flex items-center gap-1.5 cursor-pointer"
-                >
-                  <Checkbox
-                    checked={days.includes(idx)}
-                    onCheckedChange={() => toggleDay(idx)}
-                  />
+                <label key={dayName} className="flex items-center gap-1.5 cursor-pointer">
+                  <Checkbox checked={days.includes(idx)} onCheckedChange={() => toggleDay(idx)} />
                   <span className="text-sm">{dayName}</span>
                 </label>
               ))}
@@ -81,7 +67,7 @@ export function CleanReminderForm(
             <Input
               id="reminder-message"
               value={message}
-              onChange={e => setMessage(e.target.value)}
+              onChange={(e) => setMessage(e.target.value)}
               placeholder="Reminder message..."
               maxLength={200}
               required

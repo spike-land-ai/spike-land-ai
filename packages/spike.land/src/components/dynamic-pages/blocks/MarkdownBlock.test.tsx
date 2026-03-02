@@ -14,7 +14,7 @@ describe("MarkdownBlock", () => {
 
   it("sanitizes HTML input", () => {
     const content = {
-      content: "Hello <script data-testid=\"evil\">alert(1)</script>",
+      content: 'Hello <script data-testid="evil">alert(1)</script>',
     };
     render(<MarkdownBlock content={content} />);
 

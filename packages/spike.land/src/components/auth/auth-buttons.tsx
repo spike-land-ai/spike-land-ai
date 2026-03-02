@@ -7,13 +7,9 @@ import { signIn } from "@/lib/auth/client/actions";
 import { useEffect, useRef, useState } from "react";
 
 // Google "G" logo SVG
-function GoogleIcon({ className }: { className?: string; }) {
+function GoogleIcon({ className }: { className?: string }) {
   return (
-    <svg
-      className={className}
-      viewBox="0 0 24 24"
-      xmlns="http://www.w3.org/2000/svg"
-    >
+    <svg className={className} viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
       <path
         d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
         fill="#4285F4"
@@ -35,7 +31,7 @@ function GoogleIcon({ className }: { className?: string; }) {
 }
 
 // GitHub logo SVG
-function GitHubIcon({ className }: { className?: string; }) {
+function GitHubIcon({ className }: { className?: string }) {
   return (
     <svg
       className={className}
@@ -49,7 +45,7 @@ function GitHubIcon({ className }: { className?: string; }) {
 }
 
 // Apple logo SVG
-function AppleIcon({ className }: { className?: string; }) {
+function AppleIcon({ className }: { className?: string }) {
   return (
     <svg
       className={className}
@@ -83,7 +79,7 @@ export function AuthButtons({ className }: AuthButtonsProps) {
   const [error, setError] = useState<string | null>(null);
   const passwordInputRef = useRef<HTMLInputElement>(null);
   useEffect(() => {
-    // Better Auth doesn't need dynamic provider fetching, 
+    // Better Auth doesn't need dynamic provider fetching,
     // we use the ones we have configured in auth.ts
   }, []);
 
@@ -219,8 +215,8 @@ export function AuthButtons({ className }: AuthButtonsProps) {
 
       if (!signupResponse.ok) {
         setError(
-          signupData.error
-          || "Unable to create account. Please try signing in with Google or GitHub.",
+          signupData.error ||
+            "Unable to create account. Please try signing in with Google or GitHub.",
         );
         return;
       }
@@ -234,9 +230,7 @@ export function AuthButtons({ className }: AuthButtonsProps) {
 
       if (result?.error) {
         // Account was created but signin failed - unusual but handle it
-        setError(
-          "Account created but sign in failed. Please try signing in again.",
-        );
+        setError("Account created but sign in failed. Please try signing in again.");
       } else if (!result?.error) {
         const params = new URLSearchParams(window.location.search);
         const callbackUrl = params.get("callbackUrl") || "/";
@@ -267,18 +261,14 @@ export function AuthButtons({ className }: AuthButtonsProps) {
   };
 
   const renderEmailStep = () => (
-    <form
-      onSubmit={handleEmailContinue}
-      className="space-y-4"
-      autoComplete="off"
-    >
+    <form onSubmit={handleEmailContinue} className="space-y-4" autoComplete="off">
       <div className="space-y-2">
         <Input
           id="email"
           type="email"
           placeholder="name@example.com"
           value={email}
-          onChange={e => setEmail(e.target.value)}
+          onChange={(e) => setEmail(e.target.value)}
           required
           disabled={isCheckingEmail}
           className="h-12"
@@ -297,16 +287,14 @@ export function AuthButtons({ className }: AuthButtonsProps) {
         size="lg"
         disabled={isCheckingEmail || !email.trim()}
       >
-        {isCheckingEmail
-          ? (
-            <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Checking...
-            </>
-          )
-          : (
-            "Continue with email"
-          )}
+        {isCheckingEmail ? (
+          <>
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            Checking...
+          </>
+        ) : (
+          "Continue with email"
+        )}
       </Button>
     </form>
   );
@@ -314,13 +302,7 @@ export function AuthButtons({ className }: AuthButtonsProps) {
   const renderPasswordStep = () => (
     <form onSubmit={handleSignIn} className="space-y-4" autoComplete="off">
       <div className="space-y-2">
-        <Input
-          id="email-display"
-          type="email"
-          value={email}
-          disabled
-          className="h-12 bg-muted"
-        />
+        <Input id="email-display" type="email" value={email} disabled className="h-12 bg-muted" />
       </div>
 
       <div className="space-y-2">
@@ -329,8 +311,7 @@ export function AuthButtons({ className }: AuthButtonsProps) {
           type="password"
           placeholder="Enter your password"
           value={password}
-          onChange={e =>
-            setPassword(e.target.value)}
+          onChange={(e) => setPassword(e.target.value)}
           required
           disabled={isLoading}
           className="h-12"
@@ -347,16 +328,14 @@ export function AuthButtons({ className }: AuthButtonsProps) {
         size="lg"
         disabled={isLoading || !password}
       >
-        {isLoading
-          ? (
-            <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Signing in...
-            </>
-          )
-          : (
-            "Sign In"
-          )}
+        {isLoading ? (
+          <>
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            Signing in...
+          </>
+        ) : (
+          "Sign In"
+        )}
       </Button>
 
       <Button
@@ -374,18 +353,10 @@ export function AuthButtons({ className }: AuthButtonsProps) {
   const renderSignupStep = () => (
     <form onSubmit={handleSignUp} className="space-y-4" autoComplete="off">
       <div className="space-y-2">
-        <Input
-          id="email-display"
-          type="email"
-          value={email}
-          disabled
-          className="h-12 bg-muted"
-        />
+        <Input id="email-display" type="email" value={email} disabled className="h-12 bg-muted" />
       </div>
 
-      <p className="text-sm text-muted-foreground">
-        Create a password to set up your account.
-      </p>
+      <p className="text-sm text-muted-foreground">Create a password to set up your account.</p>
 
       <div className="space-y-2">
         <Input
@@ -393,8 +364,7 @@ export function AuthButtons({ className }: AuthButtonsProps) {
           type="password"
           placeholder="Create a password"
           value={password}
-          onChange={e =>
-            setPassword(e.target.value)}
+          onChange={(e) => setPassword(e.target.value)}
           required
           disabled={isLoading}
           className="h-12"
@@ -412,16 +382,14 @@ export function AuthButtons({ className }: AuthButtonsProps) {
         size="lg"
         disabled={isLoading || password.length < 8}
       >
-        {isLoading
-          ? (
-            <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Creating account...
-            </>
-          )
-          : (
-            "Create Account"
-          )}
+        {isLoading ? (
+          <>
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            Creating account...
+          </>
+        ) : (
+          "Create Account"
+        )}
       </Button>
 
       <Button
@@ -439,13 +407,7 @@ export function AuthButtons({ className }: AuthButtonsProps) {
   const renderOAuthOnlyStep = () => (
     <div className="space-y-4">
       <div className="space-y-2">
-        <Input
-          id="email-display"
-          type="email"
-          value={email}
-          disabled
-          className="h-12 bg-muted"
-        />
+        <Input id="email-display" type="email" value={email} disabled className="h-12 bg-muted" />
       </div>
 
       <p className="text-sm text-muted-foreground text-center">
@@ -455,12 +417,7 @@ export function AuthButtons({ className }: AuthButtonsProps) {
 
       {error && <p className="text-sm text-destructive">{error}</p>}
 
-      <Button
-        type="button"
-        variant="ghost"
-        className="w-full"
-        onClick={handleBack}
-      >
+      <Button type="button" variant="ghost" className="w-full" onClick={handleBack}>
         Use different email
       </Button>
     </div>
@@ -536,9 +493,7 @@ export function AuthButtons({ className }: AuthButtonsProps) {
             <span className="w-full border-t" />
           </div>
           <div className="relative flex justify-center text-sm">
-            <span className="bg-background px-4 text-muted-foreground">
-              or
-            </span>
+            <span className="bg-background px-4 text-muted-foreground">or</span>
           </div>
         </div>
       )}

@@ -38,15 +38,11 @@ registerStepHandler("trigger", async () => ({ output: {} }));
  * Condition evaluation handler
  */
 registerStepHandler("condition", async (step, context) => {
-  const { condition, leftOperand, rightOperand, operator } = step
-    .config as Record<string, unknown>;
+  const { condition, leftOperand, rightOperand, operator } = step.config as Record<string, unknown>;
 
   // Resolve operands (they might reference previous step outputs)
   const resolveValue = (value: unknown): unknown => {
-    if (
-      typeof value === "string" && value.startsWith("{{")
-      && value.endsWith("}}")
-    ) {
+    if (typeof value === "string" && value.startsWith("{{") && value.endsWith("}}")) {
       // Parse reference like {{stepId.outputField}}
       const ref = value.slice(2, -2).trim();
       const parts = ref.split(".");
@@ -109,12 +105,18 @@ registerStepHandler("condition", async (step, context) => {
       result = !String(left).includes(String(right));
       break;
     case "is_empty":
-      result = left === null || left === undefined || left === ""
-        || (Array.isArray(left) && left.length === 0);
+      result =
+        left === null ||
+        left === undefined ||
+        left === "" ||
+        (Array.isArray(left) && left.length === 0);
       break;
     case "is_not_empty":
-      result = left !== null && left !== undefined && left !== ""
-        && !(Array.isArray(left) && left.length === 0);
+      result =
+        left !== null &&
+        left !== undefined &&
+        left !== "" &&
+        !(Array.isArray(left) && left.length === 0);
       break;
     default:
       // Simple truthy check if no operator specified
@@ -138,12 +140,12 @@ registerStepHandler("log", async (step, context) => {
 /**
  * Delay handler
  */
-registerStepHandler("delay", async step => {
+registerStepHandler("delay", async (step) => {
   const duration = (step.config.durationMs as number) ?? 1000;
   const maxDuration = 30000; // Cap at 30 seconds for safety
   const actualDuration = Math.min(duration, maxDuration);
 
-  await new Promise(resolve => setTimeout(resolve, actualDuration));
+  await new Promise((resolve) => setTimeout(resolve, actualDuration));
 
   return { output: { delayed: actualDuration } };
 });
@@ -163,8 +165,7 @@ async function executeStep(
 
   try {
     // Get the action type from config
-    const actionType = (step.config.actionType as string)
-      ?? step.type.toLowerCase();
+    const actionType = (step.config.actionType as string) ?? step.type.toLowerCase();
     const handler = getStepHandler(actionType);
 
     if (!handler) {
@@ -216,12 +217,12 @@ function buildExecutionPlan(steps: WorkflowStepData[]): WorkflowStepData[] {
 
   // Get steps that can be executed (dependencies satisfied)
   const getReadySteps = (): WorkflowStepData[] => {
-    return steps.filter(step => {
+    return steps.filter((step) => {
       if (executed.has(step.id!)) return false;
 
       // Check dependencies
       const deps = step.dependencies ?? [];
-      if (deps.some(depId => !executed.has(depId))) return false;
+      if (deps.some((depId) => !executed.has(depId))) return false;
 
       // If has parent, check if parent is executed
       if (step.parentStepId && !executed.has(step.parentStepId)) return false;
@@ -369,9 +370,10 @@ export async function executeWorkflow(
           workflowRunId: run.id,
           ...(step.id !== undefined ? { stepId: step.id } : {}),
           stepStatus: result.status,
-          message: result.error
-            ?? `Step "${step.name}" ${result.status.toLowerCase()}`,
-          ...(result.output !== undefined ? { metadata: result.output as Prisma.InputJsonValue } : {}),
+          message: result.error ?? `Step "${step.name}" ${result.status.toLowerCase()}`,
+          ...(result.output !== undefined
+            ? { metadata: result.output as Prisma.InputJsonValue }
+            : {}),
         },
       });
 
@@ -381,12 +383,13 @@ export async function executeWorkflow(
         conditionResults.set(step.id!, conditionResult);
 
         // Find all child steps and mark non-matching branches for skipping
-        const childSteps = steps.filter(s => s.parentStepId === step.id);
+        const childSteps = steps.filter((s) => s.parentStepId === step.id);
 
         for (const childStep of childSteps) {
-          const shouldExecute = (conditionResult && childStep.branchType === "IF_TRUE")
-            || (!conditionResult && childStep.branchType === "IF_FALSE")
-            || childStep.branchType === "DEFAULT";
+          const shouldExecute =
+            (conditionResult && childStep.branchType === "IF_TRUE") ||
+            (!conditionResult && childStep.branchType === "IF_FALSE") ||
+            childStep.branchType === "DEFAULT";
 
           if (!shouldExecute) {
             // Mark this step and all its descendants for skipping
@@ -474,13 +477,13 @@ function markStepTreeForSkipping(
   skippedSteps.add(stepId);
 
   // Find child steps
-  const childSteps = allSteps.filter(s => s.parentStepId === stepId);
+  const childSteps = allSteps.filter((s) => s.parentStepId === stepId);
   for (const child of childSteps) {
     markStepTreeForSkipping(child.id!, allSteps, skippedSteps);
   }
 
   // Find steps that depend on this step
-  const dependentSteps = allSteps.filter(s => s.dependencies?.includes(stepId));
+  const dependentSteps = allSteps.filter((s) => s.dependencies?.includes(stepId));
   for (const dependent of dependentSteps) {
     markStepTreeForSkipping(dependent.id!, allSteps, skippedSteps);
   }

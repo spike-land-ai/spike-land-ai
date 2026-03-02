@@ -113,7 +113,9 @@ export async function createCapabilityToken(
       tokenHash,
       agentId: params.agentId,
       grantedByUserId: params.grantedByUserId,
-      ...(params.grantedByAgentId !== undefined ? { grantedByAgentId: params.grantedByAgentId } : {}),
+      ...(params.grantedByAgentId !== undefined
+        ? { grantedByAgentId: params.grantedByAgentId }
+        : {}),
       allowedTools: params.allowedTools,
       allowedCategories: params.allowedCategories,
       deniedTools: params.deniedTools,
@@ -122,8 +124,7 @@ export async function createCapabilityToken(
       maxApiCalls: params.maxApiCalls ?? 1000,
       ...(params.parentTokenId !== undefined ? { parentTokenId: params.parentTokenId } : {}),
       delegationDepth,
-      maxDelegationDepth: params.maxDelegationDepth
-        ?? DEFAULT_MAX_DELEGATION_DEPTH,
+      maxDelegationDepth: params.maxDelegationDepth ?? DEFAULT_MAX_DELEGATION_DEPTH,
       ...(params.expiresAt !== undefined ? { expiresAt: params.expiresAt } : {}),
     },
   });
@@ -194,10 +195,7 @@ export async function verifyCapabilityToken(
 /**
  * Revoke a capability token. Optionally cascade to all child tokens.
  */
-export async function revokeCapabilityToken(
-  tokenId: string,
-  cascade: boolean,
-): Promise<void> {
+export async function revokeCapabilityToken(tokenId: string, cascade: boolean): Promise<void> {
   const prisma = (await import("@/lib/prisma")).default;
   const now = new Date();
 
@@ -217,7 +215,7 @@ export async function revokeCapabilityToken(
         select: { id: true },
       });
 
-      const childIds = children.map(c => c.id);
+      const childIds = children.map((c) => c.id);
       if (childIds.length === 0) break;
 
       toRevoke.push(...childIds);
@@ -276,16 +274,11 @@ export async function delegateToken(
 
   // Check delegation depth
   if (parent.delegationDepth >= parent.maxDelegationDepth) {
-    throw new Error(
-      `Maximum delegation depth (${parent.maxDelegationDepth}) exceeded`,
-    );
+    throw new Error(`Maximum delegation depth (${parent.maxDelegationDepth}) exceeded`);
   }
 
   // Validate subset: child tools must be a subset of parent's allowed tools/categories
-  const parentAllowedSet = new Set([
-    ...parent.allowedTools,
-    ...parent.allowedCategories,
-  ]);
+  const parentAllowedSet = new Set([...parent.allowedTools, ...parent.allowedCategories]);
   for (const tool of subset.allowedTools) {
     if (!parent.allowedTools.includes(tool) && !parentAllowedSet.has(tool)) {
       throw new Error(`Tool "${tool}" not in parent's allowed scope`);
@@ -315,9 +308,7 @@ export async function delegateToken(
   }
 
   // Merge denied tools: child inherits parent's denials + its own
-  const mergedDenied = [
-    ...new Set([...parent.deniedTools, ...subset.deniedTools]),
-  ];
+  const mergedDenied = [...new Set([...parent.deniedTools, ...subset.deniedTools])];
 
   // Workspace constraint: child workspaces must be subset of parent's
   const parentWsSet = new Set(parent.workspaceIds);

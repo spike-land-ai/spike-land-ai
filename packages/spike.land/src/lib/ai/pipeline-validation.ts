@@ -108,72 +108,56 @@ interface ValidationResult<T> {
 /**
  * Validate analysis config
  */
-function validateAnalysisConfig(
-  data: unknown,
-): ValidationResult<AnalysisConfig> {
+function validateAnalysisConfig(data: unknown): ValidationResult<AnalysisConfig> {
   const result = AnalysisConfigSchema.safeParse(data);
   if (result.success) {
     return { success: true, data: result.data as AnalysisConfig };
   }
   return {
     success: false,
-    errors: result.error.issues.map(
-      e => `${e.path.join(".")}: ${e.message}`,
-    ),
+    errors: result.error.issues.map((e) => `${e.path.join(".")}: ${e.message}`),
   };
 }
 
 /**
  * Validate auto-crop config
  */
-function validateAutoCropConfig(
-  data: unknown,
-): ValidationResult<AutoCropConfig> {
+function validateAutoCropConfig(data: unknown): ValidationResult<AutoCropConfig> {
   const result = AutoCropConfigSchema.safeParse(data);
   if (result.success) {
     return { success: true, data: result.data as AutoCropConfig };
   }
   return {
     success: false,
-    errors: result.error.issues.map(
-      e => `${e.path.join(".")}: ${e.message}`,
-    ),
+    errors: result.error.issues.map((e) => `${e.path.join(".")}: ${e.message}`),
   };
 }
 
 /**
  * Validate prompt config
  */
-function validatePromptConfig(
-  data: unknown,
-): ValidationResult<PromptConfig> {
+function validatePromptConfig(data: unknown): ValidationResult<PromptConfig> {
   const result = PromptConfigSchema.safeParse(data);
   if (result.success) {
     return { success: true, data: result.data as PromptConfig };
   }
   return {
     success: false,
-    errors: result.error.issues.map(
-      e => `${e.path.join(".")}: ${e.message}`,
-    ),
+    errors: result.error.issues.map((e) => `${e.path.join(".")}: ${e.message}`),
   };
 }
 
 /**
  * Validate generation config
  */
-function validateGenerationConfig(
-  data: unknown,
-): ValidationResult<GenerationConfig> {
+function validateGenerationConfig(data: unknown): ValidationResult<GenerationConfig> {
   const result = GenerationConfigSchema.safeParse(data);
   if (result.success) {
     return { success: true, data: result.data as GenerationConfig };
   }
   return {
     success: false,
-    errors: result.error.issues.map(
-      e => `${e.path.join(".")}: ${e.message}`,
-    ),
+    errors: result.error.issues.map((e) => `${e.path.join(".")}: ${e.message}`),
   };
 }
 
@@ -224,8 +208,7 @@ export function validatePipelineConfigs(data: {
   if (data.generationConfig !== undefined) {
     const result = validateGenerationConfig(data.generationConfig);
     if (!result.success) {
-      errors.generationConfig = result.errors
-        ?? ["Invalid generation config"];
+      errors.generationConfig = result.errors ?? ["Invalid generation config"];
     } else if (result.data !== undefined) {
       validatedData.generationConfig = result.data;
     }

@@ -56,20 +56,24 @@ export function registerStoreAbTools(
         deployment_id: z.string().min(1).describe("Deployment ID."),
         variant_label: z.string().min(1).describe("Human-readable label for the variant."),
         codespace_id: z.string().min(1).describe("Codespace ID for this variant."),
-        dimension: z.enum(["layout", "theme", "interaction", "mobile", "minimal"])
+        dimension: z
+          .enum(["layout", "theme", "interaction", "mobile", "minimal"])
           .describe("Dimension being tested."),
       })
       .meta({ category: "store-ab", tier: "free" })
       .handler(async ({ input }) => {
         return safeToolCall("store_app_add_variant", async () => {
-          const variant = await apiRequest<{ id: string }>(`/api/store/deployments/${input.deployment_id}/variants`, {
-            method: "POST",
-            body: JSON.stringify({
-              variantLabel: input.variant_label,
-              codespaceId: input.codespace_id,
-              dimension: input.dimension,
-            }),
-          });
+          const variant = await apiRequest<{ id: string }>(
+            `/api/store/deployments/${input.deployment_id}/variants`,
+            {
+              method: "POST",
+              body: JSON.stringify({
+                variantLabel: input.variant_label,
+                codespaceId: input.codespace_id,
+                dimension: input.dimension,
+              }),
+            },
+          );
 
           let text = `**Variant Added**\n\n`;
           text += `**Variant ID:** \`${variant.id}\`\n`;
@@ -85,10 +89,14 @@ export function registerStoreAbTools(
   // store_app_assign_visitor
   registry.registerBuilt(
     t
-      .tool("store_app_assign_visitor", "Assign a visitor to a deployment variant using hash-based consistent assignment.", {
-        deployment_id: z.string().min(1).describe("Deployment ID."),
-        visitor_id: z.string().min(1).describe("Visitor ID to assign."),
-      })
+      .tool(
+        "store_app_assign_visitor",
+        "Assign a visitor to a deployment variant using hash-based consistent assignment.",
+        {
+          deployment_id: z.string().min(1).describe("Deployment ID."),
+          visitor_id: z.string().min(1).describe("Visitor ID to assign."),
+        },
+      )
       .meta({ category: "store-ab", tier: "free" })
       .handler(async ({ input }) => {
         return safeToolCall("store_app_assign_visitor", async () => {
@@ -115,20 +123,27 @@ export function registerStoreAbTools(
   // store_app_record_impression
   registry.registerBuilt(
     t
-      .tool("store_app_record_impression", "Atomically increment the impression counter for a store app variant.", {
-        variant_id: z.string().min(1).describe("Variant ID to record impression for."),
-      })
+      .tool(
+        "store_app_record_impression",
+        "Atomically increment the impression counter for a store app variant.",
+        {
+          variant_id: z.string().min(1).describe("Variant ID to record impression for."),
+        },
+      )
       .meta({ category: "store-ab", tier: "free" })
       .handler(async ({ input }) => {
         return safeToolCall("store_app_record_impression", async () => {
-          const result = await apiRequest<{ impressions: number }>(`/api/store/variants/${input.variant_id}/impression`, {
-            method: "POST",
-          });
+          const result = await apiRequest<{ impressions: number }>(
+            `/api/store/variants/${input.variant_id}/impression`,
+            {
+              method: "POST",
+            },
+          );
 
           return textResult(
-            `**Impression Recorded**\n\n`
-            + `**Variant:** \`${input.variant_id}\`\n`
-            + `**Total Impressions:** ${result.impressions}\n`,
+            `**Impression Recorded**\n\n` +
+              `**Variant:** \`${input.variant_id}\`\n` +
+              `**Total Impressions:** ${result.impressions}\n`,
           );
         });
       }),
@@ -137,20 +152,27 @@ export function registerStoreAbTools(
   // store_app_record_error
   registry.registerBuilt(
     t
-      .tool("store_app_record_error", "Atomically increment the error counter for a store app variant.", {
-        variant_id: z.string().min(1).describe("Variant ID to record error for."),
-      })
+      .tool(
+        "store_app_record_error",
+        "Atomically increment the error counter for a store app variant.",
+        {
+          variant_id: z.string().min(1).describe("Variant ID to record error for."),
+        },
+      )
       .meta({ category: "store-ab", tier: "free" })
       .handler(async ({ input }) => {
         return safeToolCall("store_app_record_error", async () => {
-          const result = await apiRequest<{ errorCount: number }>(`/api/store/variants/${input.variant_id}/error`, {
-            method: "POST",
-          });
+          const result = await apiRequest<{ errorCount: number }>(
+            `/api/store/variants/${input.variant_id}/error`,
+            {
+              method: "POST",
+            },
+          );
 
           return textResult(
-            `**Error Recorded**\n\n`
-            + `**Variant:** \`${input.variant_id}\`\n`
-            + `**Total Errors:** ${result.errorCount}\n`,
+            `**Error Recorded**\n\n` +
+              `**Variant:** \`${input.variant_id}\`\n` +
+              `**Total Errors:** ${result.errorCount}\n`,
           );
         });
       }),
@@ -159,9 +181,13 @@ export function registerStoreAbTools(
   // store_app_get_results
   registry.registerBuilt(
     t
-      .tool("store_app_get_results", "Get metrics for all variants of a store app deployment including impressions, engagements, errors, and winner status.", {
-        deployment_id: z.string().min(1).describe("Deployment ID."),
-      })
+      .tool(
+        "store_app_get_results",
+        "Get metrics for all variants of a store app deployment including impressions, engagements, errors, and winner status.",
+        {
+          deployment_id: z.string().min(1).describe("Deployment ID."),
+        },
+      )
       .meta({ category: "store-ab", tier: "free" })
       .handler(async ({ input }) => {
         return safeToolCall("store_app_get_results", async () => {
@@ -181,9 +207,7 @@ export function registerStoreAbTools(
           } | null>(`/api/store/deployments/${input.deployment_id}/results`);
 
           if (!deployment) {
-            return textResult(
-              "**Error: NOT_FOUND**\nDeployment not found.\n**Retryable:** false",
-            );
+            return textResult("**Error: NOT_FOUND**\nDeployment not found.\n**Retryable:** false");
           }
 
           let text = `**Deployment Results**\n\n`;
@@ -204,10 +228,14 @@ export function registerStoreAbTools(
   // store_app_declare_winner
   registry.registerBuilt(
     t
-      .tool("store_app_declare_winner", "Declare a winning variant for a store app deployment and set the deployment status to LIVE.", {
-        deployment_id: z.string().min(1).describe("Deployment ID."),
-        variant_id: z.string().min(1).describe("ID of the winning variant."),
-      })
+      .tool(
+        "store_app_declare_winner",
+        "Declare a winning variant for a store app deployment and set the deployment status to LIVE.",
+        {
+          deployment_id: z.string().min(1).describe("Deployment ID."),
+          variant_id: z.string().min(1).describe("ID of the winning variant."),
+        },
+      )
       .meta({ category: "store-ab", tier: "free" })
       .handler(async ({ input }) => {
         return safeToolCall("store_app_declare_winner", async () => {
@@ -228,9 +256,13 @@ export function registerStoreAbTools(
   // store_app_cleanup
   registry.registerBuilt(
     t
-      .tool("store_app_cleanup", "Remove a failed or archived store app deployment and all its variants.", {
-        deployment_id: z.string().min(1).describe("Deployment ID to clean up."),
-      })
+      .tool(
+        "store_app_cleanup",
+        "Remove a failed or archived store app deployment and all its variants.",
+        {
+          deployment_id: z.string().min(1).describe("Deployment ID to clean up."),
+        },
+      )
       .meta({ category: "store-ab", tier: "free" })
       .handler(async ({ input }) => {
         return safeToolCall("store_app_cleanup", async () => {

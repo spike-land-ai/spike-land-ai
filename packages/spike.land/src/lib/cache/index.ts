@@ -15,9 +15,7 @@ export async function getCache<T>(
   fetcher: () => Promise<T>,
 ): Promise<T> {
   // 1. Try to get from Redis
-  const { data: cached, error: redisError } = await tryCatch(
-    redis.get<T>(key),
-  );
+  const { data: cached, error: redisError } = await tryCatch(redis.get<T>(key));
 
   if (redisError) {
     logger.warn(`[Cache] Redis error fetching key "${key}", falling back to fetcher`, {
@@ -57,11 +55,7 @@ export async function getCacheRaw<T>(key: string): Promise<T | null> {
 /**
  * Set a cache value with a TTL.
  */
-export async function setCacheRaw(
-  key: string,
-  value: unknown,
-  ttlSeconds: number,
-): Promise<void> {
+export async function setCacheRaw(key: string, value: unknown, ttlSeconds: number): Promise<void> {
   const { error } = await tryCatch(redis.set(key, value, { ex: ttlSeconds }));
   if (error) {
     logger.warn(`[Cache] Failed to set raw key "${key}" in Redis`, { error });

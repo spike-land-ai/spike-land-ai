@@ -14,7 +14,8 @@ vi.mock("next/navigation", () => ({
   usePathname: () => "/test-path",
 }));
 vi.mock("next/image", () => ({
-  default: (props: ComponentProps<"img">) => createElement("img", { ...props, alt: props.alt ?? "" }),
+  default: (props: ComponentProps<"img">) =>
+    createElement("img", { ...props, alt: props.alt ?? "" }),
 }));
 vi.mock("@/components/auth/AuthDialogProvider", () => ({
   useAuthDialog: () => ({ openAuthDialog: vi.fn() }),
@@ -22,10 +23,12 @@ vi.mock("@/components/auth/AuthDialogProvider", () => ({
 
 // Mock child components to avoid complex rendering and focus on SiteChat logic
 vi.mock("./ChatMarkdown", () => ({
-  ChatMarkdown: ({ content }: { content: string; }) => <div data-testid="markdown">{content}</div>,
+  ChatMarkdown: ({ content }: { content: string }) => <div data-testid="markdown">{content}</div>,
 }));
 vi.mock("./ToolCallCard", () => ({
-  ToolCallCard: ({ block }: { block: { name: string }; }) => <div data-testid="tool-card">{block.name}</div>,
+  ToolCallCard: ({ block }: { block: { name: string } }) => (
+    <div data-testid="tool-card">{block.name}</div>
+  ),
 }));
 
 describe("SiteChat", () => {
@@ -45,7 +48,14 @@ describe("SiteChat", () => {
         role: "assistant" as const,
         blocks: [
           { type: "text" as const, content: "Thinking..." },
-          { type: "tool_call" as const, id: "tool1", name: "calculator", serverName: "test", status: "done" as const, input: {} },
+          {
+            type: "tool_call" as const,
+            id: "tool1",
+            name: "calculator",
+            serverName: "test",
+            status: "done" as const,
+            input: {},
+          },
           { type: "text" as const, content: "Result is 42" },
         ],
         timestamp: Date.now(),

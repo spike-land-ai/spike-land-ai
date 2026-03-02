@@ -88,9 +88,9 @@ describe("HypothesisAgent", () => {
     it("should throw when workspace not found", async () => {
       mockPrisma.workspace.findUnique.mockResolvedValue(null);
 
-      await expect(
-        agent.generateHypotheses({ workspaceId: "bad" }),
-      ).rejects.toThrow("Workspace not found");
+      await expect(agent.generateHypotheses({ workspaceId: "bad" })).rejects.toThrow(
+        "Workspace not found",
+      );
     });
 
     it("should return empty array for invalid JSON response", async () => {
@@ -114,7 +114,7 @@ describe("HypothesisAgent", () => {
         brandProfile: null,
       });
       mockPrisma.socialPost.findMany.mockResolvedValue([]);
-      mockGenerateContent.mockResolvedValue({ text: "{\"not\": \"array\"}" });
+      mockGenerateContent.mockResolvedValue({ text: '{"not": "array"}' });
 
       const result = await agent.generateHypotheses({ workspaceId: "ws-1" });
 
@@ -160,9 +160,7 @@ describe("HypothesisAgent", () => {
         workspace: { brandProfile: { toneDescriptors: ["bold"] } },
       });
       mockGenerateContent.mockResolvedValue({
-        text: JSON.stringify([
-          { content: "Hello! 👋", variationType: "emoji_heavy" },
-        ]),
+        text: JSON.stringify([{ content: "Hello! 👋", variationType: "emoji_heavy" }]),
       });
 
       const result = await agent.generateVariants({
@@ -217,7 +215,7 @@ describe("HypothesisAgent", () => {
         workspace: { brandProfile: null },
       });
       mockGenerateContent.mockResolvedValue({
-        text: "```json\n[{\"content\":\"variant\",\"variationType\":\"test\"}]\n```",
+        text: '```json\n[{"content":"variant","variationType":"test"}]\n```',
       });
 
       const result = await agent.generateVariants({
@@ -280,9 +278,9 @@ describe("HypothesisAgent", () => {
     it("should throw when experiment not found", async () => {
       mockPrisma.socialPostAbTest.findUnique.mockResolvedValue(null);
 
-      await expect(
-        agent.analyzeResults({ experimentId: "bad" }),
-      ).rejects.toThrow("Experiment not found");
+      await expect(agent.analyzeResults({ experimentId: "bad" })).rejects.toThrow(
+        "Experiment not found",
+      );
     });
 
     it("should throw when no variants", async () => {
@@ -292,9 +290,9 @@ describe("HypothesisAgent", () => {
         variants: [],
       });
 
-      await expect(
-        agent.analyzeResults({ experimentId: "exp-1" }),
-      ).rejects.toThrow("No variants found");
+      await expect(agent.analyzeResults({ experimentId: "exp-1" })).rejects.toThrow(
+        "No variants found",
+      );
     });
   });
 
@@ -387,7 +385,7 @@ describe("HypothesisAgent", () => {
         title: "Test",
         workspace: { brandProfile: null },
       });
-      mockGenerateContent.mockResolvedValue({ text: "{\"not\": \"an array\"}" });
+      mockGenerateContent.mockResolvedValue({ text: '{"not": "an array"}' });
       const result = await agent.generateVariants({
         hypothesisId: "h-1",
         originalContent: "test",

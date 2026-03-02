@@ -53,11 +53,7 @@ describe("events/event-bus", () => {
 
     it("should filter by workspace when specified", async () => {
       const handler = vi.fn();
-      bus.subscribe(
-        "MENTION_RECEIVED" as WorkflowEventType,
-        handler,
-        "ws-1",
-      );
+      bus.subscribe("MENTION_RECEIVED" as WorkflowEventType, handler, "ws-1");
 
       // Different workspace - should not fire
       await bus.emit({
@@ -82,10 +78,7 @@ describe("events/event-bus", () => {
 
     it("should unsubscribe correctly", async () => {
       const handler = vi.fn();
-      const subId = bus.subscribe(
-        "POST_PUBLISHED" as WorkflowEventType,
-        handler,
-      );
+      const subId = bus.subscribe("POST_PUBLISHED" as WorkflowEventType, handler);
 
       bus.unsubscribe(subId);
 
@@ -146,21 +139,9 @@ describe("events/event-bus", () => {
       bus.subscribe("POST_PUBLISHED" as WorkflowEventType, vi.fn());
 
       expect(bus.getSubscriptionCount()).toBe(3);
-      expect(
-        bus.getSubscriptionCountByType(
-          "MENTION_RECEIVED" as WorkflowEventType,
-        ),
-      ).toBe(2);
-      expect(
-        bus.getSubscriptionCountByType(
-          "POST_PUBLISHED" as WorkflowEventType,
-        ),
-      ).toBe(1);
-      expect(
-        bus.getSubscriptionCountByType(
-          "CRISIS_DETECTED" as WorkflowEventType,
-        ),
-      ).toBe(0);
+      expect(bus.getSubscriptionCountByType("MENTION_RECEIVED" as WorkflowEventType)).toBe(2);
+      expect(bus.getSubscriptionCountByType("POST_PUBLISHED" as WorkflowEventType)).toBe(1);
+      expect(bus.getSubscriptionCountByType("CRISIS_DETECTED" as WorkflowEventType)).toBe(0);
     });
 
     it("should clear all subscriptions", () => {
@@ -217,10 +198,7 @@ describe("events/event-bus", () => {
 
     it("emitEngagementThreshold should emit correct event type", async () => {
       const handler = vi.fn();
-      eventBus.subscribe(
-        "ENGAGEMENT_THRESHOLD" as WorkflowEventType,
-        handler,
-      );
+      eventBus.subscribe("ENGAGEMENT_THRESHOLD" as WorkflowEventType, handler);
 
       await emitEngagementThreshold("ws-1", {
         postId: "p-1",
@@ -235,10 +213,7 @@ describe("events/event-bus", () => {
 
     it("emitFollowerMilestone should emit correct event type", async () => {
       const handler = vi.fn();
-      eventBus.subscribe(
-        "FOLLOWER_MILESTONE" as WorkflowEventType,
-        handler,
-      );
+      eventBus.subscribe("FOLLOWER_MILESTONE" as WorkflowEventType, handler);
 
       await emitFollowerMilestone("ws-1", {
         accountId: "acc-1",
@@ -278,10 +253,7 @@ describe("events/event-bus", () => {
 
     it("emitInboxItemReceived should emit correct event type", async () => {
       const handler = vi.fn();
-      eventBus.subscribe(
-        "INBOX_ITEM_RECEIVED" as WorkflowEventType,
-        handler,
-      );
+      eventBus.subscribe("INBOX_ITEM_RECEIVED" as WorkflowEventType, handler);
 
       await emitInboxItemReceived("ws-1", {
         inboxItemId: "item-1",

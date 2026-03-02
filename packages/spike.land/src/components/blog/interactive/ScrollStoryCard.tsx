@@ -7,7 +7,7 @@ import { AnimatePresence, motion } from "framer-motion";
 export interface ScrollStoryCardProps {
   title: string;
   illustration: "restaurant" | "usb" | "embassy" | "brain";
-  mappings?: Array<{ left: string; right: string; }>;
+  mappings?: Array<{ left: string; right: string }>;
 }
 
 interface TerminalData {
@@ -15,7 +15,7 @@ interface TerminalData {
   args: Record<string, string>;
   toolName: string;
   serverName: string;
-  responseFields: Array<{ label: string; value: string; icon: string; }>;
+  responseFields: Array<{ label: string; value: string; icon: string }>;
   statusEmoji: string;
   statusText: string;
 }
@@ -180,25 +180,24 @@ function useTypingAnimation(text: string, active: boolean, speed = 40) {
 }
 
 /* ── Terminal + Tool Call Widget ──────────────────── */
-function TerminalToolCall(
-  { terminal, active, color }: {
-    terminal: TerminalData;
-    active: boolean;
-    color: string;
-  },
-) {
+function TerminalToolCall({
+  terminal,
+  active,
+  color,
+}: {
+  terminal: TerminalData;
+  active: boolean;
+  color: string;
+}) {
   const args = terminal.args;
   const serverArg = args.server ?? "";
-  const extraArgs = Object.entries(args).filter(([k]) =>
-    k !== "server" && k !== "tool" && k !== "transport"
-  ).map(([k, v]) => `--${k} ${v}`).join(" ");
+  const extraArgs = Object.entries(args)
+    .filter(([k]) => k !== "server" && k !== "tool" && k !== "transport")
+    .map(([k, v]) => `--${k} ${v}`)
+    .join(" ");
   const fullCommand = `${terminal.command} --server ${serverArg} ${extraArgs}`;
 
-  const { displayed, done: typingDone } = useTypingAnimation(
-    fullCommand,
-    active,
-    30,
-  );
+  const { displayed, done: typingDone } = useTypingAnimation(fullCommand, active, 30);
   const [enterPressed, setEnterPressed] = useState(false);
   const [showResponse, setShowResponse] = useState(false);
 
@@ -320,9 +319,7 @@ function TerminalToolCall(
                     {terminal.statusText}
                   </span>
                 </div>
-                <span
-                  className={`text-[9px] font-mono px-2 py-0.5 rounded-full border ${accent}`}
-                >
+                <span className={`text-[9px] font-mono px-2 py-0.5 rounded-full border ${accent}`}>
                   {terminal.toolName}
                 </span>
               </div>
@@ -342,9 +339,7 @@ function TerminalToolCall(
                       <p className="text-[10px] font-mono text-slate-500 uppercase tracking-wider leading-none mb-0.5">
                         {field.label}
                       </p>
-                      <p className="text-sm text-slate-200 font-semibold truncate">
-                        {field.value}
-                      </p>
+                      <p className="text-sm text-slate-200 font-semibold truncate">{field.value}</p>
                     </div>
                   </motion.div>
                 ))}
@@ -358,15 +353,11 @@ function TerminalToolCall(
 }
 
 /* ── Main Component ──────────────────────────────── */
-export function ScrollStoryCard(
-  { title, illustration, mappings }: ScrollStoryCardProps,
-) {
+export function ScrollStoryCard({ title, illustration, mappings }: ScrollStoryCardProps) {
   const { ref, progress } = useInViewProgress();
 
   const data = ILLUSTRATION_DATA[illustration];
-  const resolvedMappings = Array.isArray(mappings)
-    ? mappings
-    : data.defaultMappings;
+  const resolvedMappings = Array.isArray(mappings) ? mappings : data.defaultMappings;
 
   const isTerminalMode = progress > 0.55;
 
@@ -387,65 +378,59 @@ export function ScrollStoryCard(
             <span className="text-[10px] font-mono text-slate-500 uppercase tracking-[0.2em]">
               The Analogy
             </span>
-            <h3 className="text-2xl font-bold text-slate-100 tracking-tight">
-              {title}
-            </h3>
+            <h3 className="text-2xl font-bold text-slate-100 tracking-tight">{title}</h3>
           </div>
           <motion.div
             animate={{ rotate: isTerminalMode ? 180 : 0 }}
             className={`w-10 h-10 rounded-full bg-${data.color}-500/10 flex items-center justify-center border border-${data.color}-500/20`}
           >
-            <span className="text-xl">
-              {isTerminalMode ? "⚙️" : data.scene}
-            </span>
+            <span className="text-xl">{isTerminalMode ? "⚙️" : data.scene}</span>
           </motion.div>
         </div>
 
         {/* Main Area */}
         <div className="relative mb-12 min-h-[180px] flex items-center justify-center">
           <AnimatePresence mode="wait">
-            {!isTerminalMode
-              ? (
-                <motion.div
-                  key="analogy"
-                  initial={{ opacity: 0, scale: 0.9, y: 10 }}
-                  animate={{ opacity: 1, scale: 1, y: 0 }}
-                  exit={{ opacity: 0, scale: 0.95, y: -10 }}
-                  className="flex flex-col items-center gap-6"
-                >
-                  <div className="relative">
-                    <span className="text-7xl md:text-8xl leading-none drop-shadow-2xl grayscale-[0.2]">
-                      {data.scene}
-                    </span>
-                    <motion.span
-                      initial={{ y: 0 }}
-                      animate={{ y: [0, -5, 0] }}
-                      transition={{ repeat: Infinity, duration: 3 }}
-                      className="absolute -top-2 -right-4 text-3xl"
-                    >
-                      {data.subScene.substring(0, 2)}
-                    </motion.span>
-                  </div>
-                  <p className="text-slate-300 text-lg font-medium text-center max-w-sm leading-relaxed">
-                    {data.description}
-                  </p>
-                </motion.div>
-              )
-              : (
-                <motion.div
-                  key="terminal"
-                  initial={{ opacity: 0, scale: 1.05, y: 10 }}
-                  animate={{ opacity: 1, scale: 1, y: 0 }}
-                  exit={{ opacity: 0, scale: 0.95, y: -10 }}
-                  className="w-full"
-                >
-                  <TerminalToolCall
-                    terminal={data.terminal}
-                    active={isTerminalMode}
-                    color={data.color}
-                  />
-                </motion.div>
-              )}
+            {!isTerminalMode ? (
+              <motion.div
+                key="analogy"
+                initial={{ opacity: 0, scale: 0.9, y: 10 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.95, y: -10 }}
+                className="flex flex-col items-center gap-6"
+              >
+                <div className="relative">
+                  <span className="text-7xl md:text-8xl leading-none drop-shadow-2xl grayscale-[0.2]">
+                    {data.scene}
+                  </span>
+                  <motion.span
+                    initial={{ y: 0 }}
+                    animate={{ y: [0, -5, 0] }}
+                    transition={{ repeat: Infinity, duration: 3 }}
+                    className="absolute -top-2 -right-4 text-3xl"
+                  >
+                    {data.subScene.substring(0, 2)}
+                  </motion.span>
+                </div>
+                <p className="text-slate-300 text-lg font-medium text-center max-w-sm leading-relaxed">
+                  {data.description}
+                </p>
+              </motion.div>
+            ) : (
+              <motion.div
+                key="terminal"
+                initial={{ opacity: 0, scale: 1.05, y: 10 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.95, y: -10 }}
+                className="w-full"
+              >
+                <TerminalToolCall
+                  terminal={data.terminal}
+                  active={isTerminalMode}
+                  color={data.color}
+                />
+              </motion.div>
+            )}
           </AnimatePresence>
         </div>
 
@@ -469,9 +454,7 @@ export function ScrollStoryCard(
                   animate={{
                     opacity: active ? 1 : 0.2,
                     x: active ? 0 : -8,
-                    backgroundColor: active
-                      ? "rgba(30, 41, 59, 0.4)"
-                      : "rgba(30, 41, 59, 0)",
+                    backgroundColor: active ? "rgba(30, 41, 59, 0.4)" : "rgba(30, 41, 59, 0)",
                   }}
                   className={`grid grid-cols-2 items-center gap-4 px-4 py-3 rounded-xl border border-transparent transition-colors duration-500 ${
                     active ? "border-slate-700/50" : ""
@@ -490,16 +473,19 @@ export function ScrollStoryCard(
                   <div className="flex items-center justify-end md:justify-start">
                     <motion.span
                       initial={{ scale: 1, color: "#e2e8f0" }}
-                      animate={active
-                        ? {
-                          scale: [1, 1.05, 1],
-                          color: data.color === "cyan"
-                            ? "#22d3ee"
-                            : data.color === "blue"
-                            ? "#60a5fa"
-                            : "#a78bfa",
-                        }
-                        : {}}
+                      animate={
+                        active
+                          ? {
+                              scale: [1, 1.05, 1],
+                              color:
+                                data.color === "cyan"
+                                  ? "#22d3ee"
+                                  : data.color === "blue"
+                                    ? "#60a5fa"
+                                    : "#a78bfa",
+                            }
+                          : {}
+                      }
                       className="text-sm font-mono font-bold tracking-tight opacity-90 truncate"
                     >
                       {row.right}

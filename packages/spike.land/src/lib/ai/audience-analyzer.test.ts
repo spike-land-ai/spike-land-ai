@@ -17,11 +17,7 @@ vi.mock("@/lib/logger", () => ({
   },
 }));
 
-import {
-  analyzeAudience,
-  type AudienceAnalysisInput,
-  recommendBudget,
-} from "./audience-analyzer";
+import { analyzeAudience, type AudienceAnalysisInput, recommendBudget } from "./audience-analyzer";
 
 describe("audience-analyzer", () => {
   beforeEach(() => {
@@ -236,7 +232,7 @@ describe("audience-analyzer", () => {
       });
 
       const call = mockGenerateContent.mock.calls[0] as Array<{
-        contents: Array<{ parts: Array<{ text: string; }>; }>;
+        contents: Array<{ parts: Array<{ text: string }> }>;
       }>;
       const prompt = call[0]!.contents[0]!.parts[0]!.text;
       expect(prompt).toContain("Fashion");
@@ -306,20 +302,13 @@ describe("audience-analyzer", () => {
 
       expect(result.recommendedDurationDays).toBe(7);
       // total should be daily * 7
-      expect(result.totalCampaignBudgetUsd).toBeCloseTo(
-        result.dailyBudgetUsd * 7,
-        1,
-      );
+      expect(result.totalCampaignBudgetUsd).toBeCloseTo(result.dailyBudgetUsd * 7, 1);
     });
 
     it("should include campaign goal in heuristic rationale", async () => {
       mockIsGeminiConfigured.mockResolvedValue(false);
 
-      const result = await recommendBudget(
-        10_000,
-        "TWITTER",
-        "brand awareness",
-      );
+      const result = await recommendBudget(10_000, "TWITTER", "brand awareness");
 
       expect(result.rationale).toContain("brand awareness");
     });
@@ -337,9 +326,7 @@ describe("audience-analyzer", () => {
 
       const result = await recommendBudget(50_000, "INSTAGRAM");
 
-      expect(result.rationale).toBe(
-        "AI-powered budget advice for your campaign.",
-      );
+      expect(result.rationale).toBe("AI-powered budget advice for your campaign.");
       expect(mockGenerateContent).toHaveBeenCalledTimes(1);
     });
 
@@ -386,9 +373,7 @@ describe("audience-analyzer", () => {
       const result = await recommendBudget(12_345, "TWITTER");
 
       // Check rounding: value * 100 should be integer
-      expect(result.dailyBudgetUsd * 100).toBe(
-        Math.round(result.dailyBudgetUsd * 100),
-      );
+      expect(result.dailyBudgetUsd * 100).toBe(Math.round(result.dailyBudgetUsd * 100));
       expect(result.totalCampaignBudgetUsd * 100).toBe(
         Math.round(result.totalCampaignBudgetUsd * 100),
       );

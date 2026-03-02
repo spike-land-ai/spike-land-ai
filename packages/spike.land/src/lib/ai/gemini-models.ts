@@ -48,8 +48,7 @@ export const DEFAULT_TEMPERATURE: number | null = null; // Uses Gemini API defau
  * gemini-2.5-flash-image always outputs 1024px and doesn't accept imageSize.
  */
 export function supportsImageSize(model: string): boolean {
-  return model === "gemini-3-pro-image-preview"
-    || model === "gemini-3-flash-preview";
+  return model === "gemini-3-pro-image-preview" || model === "gemini-3-flash-preview";
 }
 
 // Timeout for Gemini API requests (configurable via env, default 10 minutes)

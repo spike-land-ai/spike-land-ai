@@ -16,18 +16,13 @@ const D6_FACES = [
   { dir: new THREE.Vector3(0, 0, -1), value: 5 }, // back
 ];
 
-export function getDiceFaceValue(
-  quaternion: THREE.Quaternion,
-  diceType: DiceType,
-): number {
+export function getDiceFaceValue(quaternion: THREE.Quaternion, diceType: DiceType): number {
   // For now, only d6 is properly implemented
   // Other dice types will return random values based on their max
   if (diceType !== "d6") {
     const maxValue = parseInt(diceType.slice(1), 10);
     // Use quaternion components to derive a pseudo-deterministic value
-    const hash = Math.abs(
-      quaternion.x + quaternion.y * 2 + quaternion.z * 3 + quaternion.w * 4,
-    );
+    const hash = Math.abs(quaternion.x + quaternion.y * 2 + quaternion.z * 3 + quaternion.w * 4);
     return Math.floor((hash % 1) * maxValue) + 1;
   }
 
@@ -50,10 +45,7 @@ export function getDiceFaceValue(
   return faceValue;
 }
 
-export function useDicePhysics(
-  dice: DiceState,
-  onSettle: (id: string, value: number) => void,
-) {
+export function useDicePhysics(dice: DiceState, onSettle: (id: string, value: number) => void) {
   const rigidBodyRef = useRef<RapierRigidBody | null>(null);
   const isRollingRef = useRef(false);
   const settledRef = useRef(false);
@@ -79,10 +71,13 @@ export function useDicePhysics(
       const ang = rigidBodyRef.current.angvel();
 
       // Check if settled (velocity near zero)
-      const isStill = Math.abs(vel.x) < 0.05 && Math.abs(vel.y) < 0.05
-        && Math.abs(vel.z) < 0.05
-        && Math.abs(ang.x) < 0.05 && Math.abs(ang.y) < 0.05
-        && Math.abs(ang.z) < 0.05;
+      const isStill =
+        Math.abs(vel.x) < 0.05 &&
+        Math.abs(vel.y) < 0.05 &&
+        Math.abs(vel.z) < 0.05 &&
+        Math.abs(ang.x) < 0.05 &&
+        Math.abs(ang.y) < 0.05 &&
+        Math.abs(ang.z) < 0.05;
 
       if (isStill) {
         settleFrameCount.current++;
@@ -93,12 +88,7 @@ export function useDicePhysics(
 
           // Get rotation quaternion from rigid body
           const rotation = rigidBodyRef.current.rotation();
-          const quaternion = new THREE.Quaternion(
-            rotation.x,
-            rotation.y,
-            rotation.z,
-            rotation.w,
-          );
+          const quaternion = new THREE.Quaternion(rotation.x, rotation.y, rotation.z, rotation.w);
 
           const faceValue = getDiceFaceValue(quaternion, dice.type);
           onSettle(dice.id, faceValue);

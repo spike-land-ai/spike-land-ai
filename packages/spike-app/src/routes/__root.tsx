@@ -62,12 +62,14 @@ export function RootLayout() {
       {/* Main content */}
       <div className="flex flex-1 flex-col overflow-hidden">
         <header className="flex h-16 items-center border-b bg-white px-6 lg:hidden">
-          <button
-            onClick={() => setSidebarOpen(true)}
-            className="rounded p-2 hover:bg-gray-100"
-          >
+          <button onClick={() => setSidebarOpen(true)} className="rounded p-2 hover:bg-gray-100">
             <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M4 6h16M4 12h16M4 18h16"
+              />
             </svg>
           </button>
           <span className="ml-4 flex-1 text-lg font-bold">Spike</span>

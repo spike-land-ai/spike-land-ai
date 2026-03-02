@@ -27,9 +27,7 @@ const LOG_LEVELS = [
 
 type LogLevel = "error" | "warning" | "info" | "debug";
 
-function getLogBadgeVariant(
-  type: string,
-): "destructive" | "warning" | "default" | "outline" {
+function getLogBadgeVariant(type: string): "destructive" | "warning" | "default" | "outline" {
   switch (type) {
     case "error":
       return "destructive";
@@ -79,9 +77,7 @@ export function ConsolePanel() {
       setMessages(result);
       setStatus("success");
     } catch (err: unknown) {
-      const message = err instanceof Error
-        ? err.message
-        : "Failed to fetch console messages";
+      const message = err instanceof Error ? err.message : "Failed to fetch console messages";
       setError(message);
       setStatus("error");
     }
@@ -108,27 +104,19 @@ export function ConsolePanel() {
             Console
           </CardTitle>
           <div className="flex items-center gap-2">
-            <Select
-              value={level}
-              onValueChange={v => setLevel(v as LogLevel)}
-            >
+            <Select value={level} onValueChange={(v) => setLevel(v as LogLevel)}>
               <SelectTrigger className="h-7 text-xs w-[100px]">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                {LOG_LEVELS.map(l => (
+                {LOG_LEVELS.map((l) => (
                   <SelectItem key={l.value} value={l.value}>
                     {l.label}
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={handleClear}
-              className="h-7 px-2"
-            >
+            <Button size="sm" variant="outline" onClick={handleClear} className="h-7 px-2">
               <Trash2 className="h-3 w-3" />
             </Button>
             <Button
@@ -137,11 +125,7 @@ export function ConsolePanel() {
               disabled={status === "loading"}
               className="h-7"
             >
-              {status === "loading"
-                ? <Loader2 className="h-3 w-3 animate-spin" />
-                : (
-                  "Fetch"
-                )}
+              {status === "loading" ? <Loader2 className="h-3 w-3 animate-spin" /> : "Fetch"}
             </Button>
           </div>
         </div>
@@ -157,9 +141,7 @@ export function ConsolePanel() {
           <div className="space-y-0.5 p-2 font-mono text-xs">
             {messages.length === 0 && status !== "loading" && (
               <div className="flex items-center justify-center h-full py-12 text-muted-foreground text-xs">
-                {status === "idle"
-                  ? "Click Fetch to load console messages"
-                  : "No console messages"}
+                {status === "idle" ? "Click Fetch to load console messages" : "No console messages"}
               </div>
             )}
             {messages.map((msg, idx) => (
@@ -173,11 +155,7 @@ export function ConsolePanel() {
                 >
                   {msg.type}
                 </Badge>
-                <span
-                  className={`flex-1 break-all ${getLogTextColor(msg.type)}`}
-                >
-                  {msg.text}
-                </span>
+                <span className={`flex-1 break-all ${getLogTextColor(msg.type)}`}>{msg.text}</span>
                 {msg.url && (
                   <span className="text-muted-foreground/50 text-[10px] shrink-0">
                     {msg.url.split("/").pop()}:{msg.line}

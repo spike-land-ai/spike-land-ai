@@ -1,10 +1,7 @@
 import type { LearnItContent } from "@/generated/prisma";
 import prisma from "@/lib/prisma";
 
-import {
-  createParentChildRelation,
-  createRelationsFromWikiLinks,
-} from "./relation-service";
+import { createParentChildRelation, createRelationsFromWikiLinks } from "./relation-service";
 import { parseWikiLinks } from "./wiki-links";
 import { logger } from "@/lib/logger";
 
@@ -19,9 +16,7 @@ export type CreateContentInput = {
   aiModel?: string;
 };
 
-export async function getLearnItContent(
-  slug: string,
-): Promise<LearnItContent | null> {
+export async function getLearnItContent(slug: string): Promise<LearnItContent | null> {
   const content = await prisma.learnItContent.findUnique({
     where: { slug },
   });
@@ -34,7 +29,7 @@ export async function getLearnItContent(
         data: { viewCount: { increment: 1 } },
       }),
       new Promise((_, reject) =>
-        setTimeout(() => reject(new Error("View count update timeout")), 5_000)
+        setTimeout(() => reject(new Error("View count update timeout")), 5_000),
       ),
     ]).catch(() => {
       // Silently discard — view count is non-critical
@@ -105,18 +100,14 @@ export async function createOrUpdateContent(input: CreateContentInput) {
     createParentChildRelation(content.id, input.parentSlug),
     // Create relationships from wiki links in content
     createRelationsFromWikiLinks(content.id, links),
-  ]).catch(error => {
+  ]).catch((error) => {
     logger.error("Failed to create relations for content:", error);
   });
 
   return content;
 }
 
-export async function markAsGenerating(
-  slug: string,
-  path: string[],
-  userId?: string,
-) {
+export async function markAsGenerating(slug: string, path: string[], userId?: string) {
   // Verify user exists to avoid FK constraint violation (P2003)
   // This can happen when handleSignIn() allows auth but fails to create the DB record
   let validUserId: string | undefined = undefined;
@@ -166,7 +157,7 @@ export async function getContentByTopicSlugs(
   return prisma.learnItContent.findMany({
     where: {
       status: "PUBLISHED",
-      OR: slugs.map(slug => ({
+      OR: slugs.map((slug) => ({
         slug: { contains: slug, mode: "insensitive" as const },
       })),
     },

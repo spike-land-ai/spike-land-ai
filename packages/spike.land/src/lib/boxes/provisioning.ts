@@ -36,9 +36,7 @@ export async function triggerBoxProvisioning(boxId: string): Promise<void> {
           data: { status: BoxStatus.ERROR },
         });
       } catch (dbError) {
-        logger.error(
-          `[BoxProvisioning] Failed to update box status to ERROR: ${dbError}`,
-        );
+        logger.error(`[BoxProvisioning] Failed to update box status to ERROR: ${dbError}`);
       }
     };
 
@@ -61,7 +59,7 @@ export async function triggerBoxProvisioning(boxId: string): Promise<void> {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            ...(secret ? { "Authorization": `Bearer ${secret}` } : {}),
+            ...(secret ? { Authorization: `Bearer ${secret}` } : {}),
           },
           body: JSON.stringify({
             boxId: box.id,
@@ -72,9 +70,7 @@ export async function triggerBoxProvisioning(boxId: string): Promise<void> {
         });
 
         if (!response.ok) {
-          await failBox(
-            `Webhook failed: ${response.status} ${response.statusText}`,
-          );
+          await failBox(`Webhook failed: ${response.status} ${response.statusText}`);
         } else {
           logger.info(
             `[BoxProvisioning] Successfully triggered provisioning webhook for box ${boxId}`,
@@ -89,10 +85,10 @@ export async function triggerBoxProvisioning(boxId: string): Promise<void> {
 
     // 2. Fallback to Workflow Trigger
     // Try to find a relevant workspace for the user to look for a provisioning workflow
-    const personalWorkspace = box.user.workspaceMembers.find(m => m.workspace.isPersonal)
-      ?.workspace;
-    const targetWorkspace = personalWorkspace
-      || box.user.workspaceMembers[0]?.workspace;
+    const personalWorkspace = box.user.workspaceMembers.find(
+      (m) => m.workspace.isPersonal,
+    )?.workspace;
+    const targetWorkspace = personalWorkspace || box.user.workspaceMembers[0]?.workspace;
 
     if (targetWorkspace) {
       // Check if there is a specific workflow for box provisioning in this workspace
@@ -124,9 +120,7 @@ export async function triggerBoxProvisioning(boxId: string): Promise<void> {
     }
 
     // 3. No mechanism found
-    await failBox(
-      `No provisioning mechanism (Webhook or Workflow) found for box ${boxId}`,
-    );
+    await failBox(`No provisioning mechanism (Webhook or Workflow) found for box ${boxId}`);
   } catch (error) {
     logger.error("[BoxProvisioning] Unhandled error during provisioning", {
       error,

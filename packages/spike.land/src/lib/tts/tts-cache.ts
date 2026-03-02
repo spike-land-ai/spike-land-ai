@@ -15,10 +15,7 @@ const TTS_KEY_PREFIX = "tts";
  */
 export function generateTTSCacheKey(text: string): string {
   const normalized = text.trim().toLowerCase();
-  const hash = crypto
-    .createHash("sha256")
-    .update(normalized)
-    .digest("hex");
+  const hash = crypto.createHash("sha256").update(normalized).digest("hex");
 
   return `${TTS_KEY_PREFIX}/${hash}.mp3`;
 }
@@ -27,9 +24,7 @@ export function generateTTSCacheKey(text: string): string {
  * Check if TTS audio for the given text already exists in R2.
  * Returns the public URL if cached, null otherwise.
  */
-export async function getCachedTTSUrl(
-  text: string,
-): Promise<string | null> {
+export async function getCachedTTSUrl(text: string): Promise<string | null> {
   const key = generateTTSCacheKey(text);
 
   const { data: metadata, error } = await tryCatch(getAudioMetadata(key));
@@ -43,9 +38,7 @@ export async function getCachedTTSUrl(
     return null;
   }
 
-  const { data: url, error: urlError } = await tryCatch(
-    Promise.resolve(getAudioPublicUrl(key)),
-  );
+  const { data: url, error: urlError } = await tryCatch(Promise.resolve(getAudioPublicUrl(key)));
 
   if (urlError) {
     logger.warn("[TTS_CACHE] Failed to get public URL", { error: urlError });
@@ -59,10 +52,7 @@ export async function getCachedTTSUrl(
  * Upload TTS audio to R2 cache.
  * Returns the public URL of the cached audio.
  */
-export async function cacheTTSAudio(
-  text: string,
-  buffer: Buffer,
-): Promise<string | null> {
+export async function cacheTTSAudio(text: string, buffer: Buffer): Promise<string | null> {
   const key = generateTTSCacheKey(text);
 
   const { data: result, error } = await tryCatch(

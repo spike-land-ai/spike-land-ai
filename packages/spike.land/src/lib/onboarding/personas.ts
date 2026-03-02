@@ -17,7 +17,7 @@ export interface OnboardingPersona {
   name: string;
   description: string;
   heroText: string;
-  cta: { label: string; href: string; };
+  cta: { label: string; href: string };
   recommendedAppSlugs: string[];
   defaultTheme: "light" | "dark" | "theme-soft-light" | "theme-deep-dark";
 }
@@ -175,12 +175,7 @@ export const PERSONAS: OnboardingPersona[] = [
     description: "Solo developer building AI-powered products",
     heroText: "Ship your AI product faster with tools built for indie builders.",
     cta: { label: "Start Building", href: "/store" },
-    recommendedAppSlugs: [
-      "ai-orchestrator",
-      "codespace",
-      "app-creator",
-      "ops-dashboard",
-    ],
+    recommendedAppSlugs: ["ai-orchestrator", "codespace", "app-creator", "ops-dashboard"],
     defaultTheme: "theme-deep-dark",
   },
   {
@@ -190,12 +185,7 @@ export const PERSONAS: OnboardingPersona[] = [
     description: "Solo developer building traditional apps",
     heroText: "From idea to launch — everything you need to ship your product.",
     cta: { label: "Ship It", href: "/store" },
-    recommendedAppSlugs: [
-      "codespace",
-      "app-creator",
-      "ops-dashboard",
-      "qa-studio",
-    ],
+    recommendedAppSlugs: ["codespace", "app-creator", "ops-dashboard", "qa-studio"],
     defaultTheme: "dark",
   },
   {
@@ -205,12 +195,7 @@ export const PERSONAS: OnboardingPersona[] = [
     description: "Freelancer or agency developer building for clients",
     heroText: "Deliver client projects faster with ready-made components and tools.",
     cta: { label: "Explore Tools", href: "/store" },
-    recommendedAppSlugs: [
-      "codespace",
-      "page-builder",
-      "qa-studio",
-      "brand-command",
-    ],
+    recommendedAppSlugs: ["codespace", "page-builder", "qa-studio", "brand-command"],
     defaultTheme: "light",
   },
   {
@@ -220,12 +205,7 @@ export const PERSONAS: OnboardingPersona[] = [
     description: "Developer employed at a company",
     heroText: "Level up your workflow with testing, ops, and collaboration tools.",
     cta: { label: "Get Started", href: "/store" },
-    recommendedAppSlugs: [
-      "codespace",
-      "qa-studio",
-      "ops-dashboard",
-      "state-machine",
-    ],
+    recommendedAppSlugs: ["codespace", "qa-studio", "ops-dashboard", "state-machine"],
     defaultTheme: "dark",
   },
   {
@@ -235,12 +215,7 @@ export const PERSONAS: OnboardingPersona[] = [
     description: "ML/AI engineer deploying models to production",
     heroText: "Orchestrate, test, and monitor your ML pipelines in one place.",
     cta: { label: "Start Orchestrating", href: "/store" },
-    recommendedAppSlugs: [
-      "ai-orchestrator",
-      "ops-dashboard",
-      "codespace",
-      "qa-studio",
-    ],
+    recommendedAppSlugs: ["ai-orchestrator", "ops-dashboard", "codespace", "qa-studio"],
     defaultTheme: "theme-deep-dark",
   },
   {
@@ -250,12 +225,7 @@ export const PERSONAS: OnboardingPersona[] = [
     description: "Developer exploring AI for fun and learning",
     heroText: "Explore the AI frontier with interactive tools and experiments.",
     cta: { label: "Start Exploring", href: "/store" },
-    recommendedAppSlugs: [
-      "ai-orchestrator",
-      "codespace",
-      "app-creator",
-      "state-machine",
-    ],
+    recommendedAppSlugs: ["ai-orchestrator", "codespace", "app-creator", "state-machine"],
     defaultTheme: "dark",
   },
   {
@@ -265,12 +235,7 @@ export const PERSONAS: OnboardingPersona[] = [
     description: "DevOps engineer in a large organization",
     heroText: "Enterprise-grade ops, testing, and orchestration for your team.",
     cta: { label: "Explore Platform", href: "/store" },
-    recommendedAppSlugs: [
-      "ops-dashboard",
-      "qa-studio",
-      "ai-orchestrator",
-      "state-machine",
-    ],
+    recommendedAppSlugs: ["ops-dashboard", "qa-studio", "ai-orchestrator", "state-machine"],
     defaultTheme: "theme-deep-dark",
   },
   {
@@ -280,12 +245,7 @@ export const PERSONAS: OnboardingPersona[] = [
     description: "DevOps engineer in a small team or startup",
     heroText: "Move fast without breaking things — ops tools built for startups.",
     cta: { label: "Get Started", href: "/store" },
-    recommendedAppSlugs: [
-      "ops-dashboard",
-      "codespace",
-      "qa-studio",
-      "app-creator",
-    ],
+    recommendedAppSlugs: ["ops-dashboard", "codespace", "qa-studio", "app-creator"],
     defaultTheme: "theme-deep-dark",
   },
   {
@@ -295,12 +255,7 @@ export const PERSONAS: OnboardingPersona[] = [
     description: "Tech-savvy solo founder building a business",
     heroText: "Build, brand, and market your business with AI-powered tools.",
     cta: { label: "Build Your Business", href: "/store" },
-    recommendedAppSlugs: [
-      "app-creator",
-      "brand-command",
-      "social-autopilot",
-      "ops-dashboard",
-    ],
+    recommendedAppSlugs: ["app-creator", "brand-command", "social-autopilot", "ops-dashboard"],
     defaultTheme: "light",
   },
   {
@@ -310,12 +265,7 @@ export const PERSONAS: OnboardingPersona[] = [
     description: "Non-tech solo founder who needs guided, no-code tools",
     heroText: "No code needed. Build pages, apps, and brand materials with AI assistance.",
     cta: { label: "Get Started", href: "/store" },
-    recommendedAppSlugs: [
-      "app-creator",
-      "page-builder",
-      "brand-command",
-      "social-autopilot",
-    ],
+    recommendedAppSlugs: ["app-creator", "page-builder", "brand-command", "social-autopilot"],
     defaultTheme: "theme-soft-light",
   },
   {
@@ -325,12 +275,7 @@ export const PERSONAS: OnboardingPersona[] = [
     description: "Business leader focused on scaling teams and revenue",
     heroText: "Grow your team's reach with social, content, and brand intelligence tools.",
     cta: { label: "Grow Your Reach", href: "/orbit" },
-    recommendedAppSlugs: [
-      "social-autopilot",
-      "brand-command",
-      "content-hub",
-      "career-navigator",
-    ],
+    recommendedAppSlugs: ["social-autopilot", "brand-command", "content-hub", "career-navigator"],
     defaultTheme: "light",
   },
   {
@@ -340,12 +285,7 @@ export const PERSONAS: OnboardingPersona[] = [
     description: "Business leader optimizing team operations",
     heroText: "Streamline your ops with dashboards, automation, and content workflows.",
     cta: { label: "Optimize Now", href: "/store" },
-    recommendedAppSlugs: [
-      "ops-dashboard",
-      "brand-command",
-      "social-autopilot",
-      "content-hub",
-    ],
+    recommendedAppSlugs: ["ops-dashboard", "brand-command", "social-autopilot", "content-hub"],
     defaultTheme: "dark",
   },
   {
@@ -355,12 +295,7 @@ export const PERSONAS: OnboardingPersona[] = [
     description: "Creator with an audience producing content",
     heroText: "Unleash your creativity with image, page, music, and audio tools.",
     cta: { label: "Start Creating", href: "/store" },
-    recommendedAppSlugs: [
-      "image-studio",
-      "page-builder",
-      "music-creator",
-      "audio-studio",
-    ],
+    recommendedAppSlugs: ["image-studio", "page-builder", "music-creator", "audio-studio"],
     defaultTheme: "theme-soft-light",
   },
   {
@@ -370,12 +305,7 @@ export const PERSONAS: OnboardingPersona[] = [
     description: "Person creating art, music, or content for personal enjoyment",
     heroText: "Create for the joy of it — art, music, and design tools at your fingertips.",
     cta: { label: "Start Creating", href: "/store" },
-    recommendedAppSlugs: [
-      "image-studio",
-      "music-creator",
-      "audio-studio",
-      "page-builder",
-    ],
+    recommendedAppSlugs: ["image-studio", "music-creator", "audio-studio", "page-builder"],
     defaultTheme: "theme-soft-light",
   },
   {
@@ -385,12 +315,7 @@ export const PERSONAS: OnboardingPersona[] = [
     description: "Person who enjoys multiplayer and social games",
     heroText: "Play chess, tabletop games, and more with friends online.",
     cta: { label: "Find a Game", href: "/apps/chess-arena" },
-    recommendedAppSlugs: [
-      "chess-arena",
-      "tabletop-sim",
-      "display-wall",
-      "music-creator",
-    ],
+    recommendedAppSlugs: ["chess-arena", "tabletop-sim", "display-wall", "music-creator"],
     defaultTheme: "dark",
   },
   {
@@ -400,19 +325,14 @@ export const PERSONAS: OnboardingPersona[] = [
     description: "Casual user exploring the platform for personal use",
     heroText: "Discover tools to organize your life, create art, and explore new hobbies.",
     cta: { label: "Start Exploring", href: "/store" },
-    recommendedAppSlugs: [
-      "cleansweep",
-      "image-studio",
-      "music-creator",
-      "career-navigator",
-    ],
+    recommendedAppSlugs: ["cleansweep", "image-studio", "music-creator", "career-navigator"],
     defaultTheme: "light",
   },
 ];
 
 // ── Tree Walker ────────────────────────────────────────────────────────────
 
-const questionMap = new Map(ONBOARDING_TREE.map(q => [q.id, q]));
+const questionMap = new Map(ONBOARDING_TREE.map((q) => [q.id, q]));
 
 /**
  * Get the sequence of questions a user will see based on their answers.
@@ -443,9 +363,7 @@ export function getQuestionSequence(answers: boolean[]): OnboardingQuestion[] {
  * Walk the decision tree with 4 boolean answers and return the matching persona.
  * Returns null if answers don't lead to a valid persona (e.g. wrong length).
  */
-export function getPersonaFromAnswers(
-  answers: boolean[],
-): OnboardingPersona | null {
+export function getPersonaFromAnswers(answers: boolean[]): OnboardingPersona | null {
   if (answers.length !== 4) return null;
 
   let currentId: string | number = "q1";
@@ -461,14 +379,14 @@ export function getPersonaFromAnswers(
 
   if (typeof currentId !== "number") return null;
 
-  return PERSONAS.find(p => p.id === currentId) ?? null;
+  return PERSONAS.find((p) => p.id === currentId) ?? null;
 }
 
 /**
  * Get a persona by its slug.
  */
 export function getPersonaBySlug(slug: string): OnboardingPersona | null {
-  return PERSONAS.find(p => p.slug === slug) ?? null;
+  return PERSONAS.find((p) => p.slug === slug) ?? null;
 }
 
 /**
@@ -483,11 +401,11 @@ export function getPersonaBySlug(slug: string): OnboardingPersona | null {
 export function derivePersonaSlugFromTags(tags: string[]): string | null {
   if (tags.length === 0) return null;
 
-  const tagSet = new Set(tags.map(t => t.toLowerCase()));
+  const tagSet = new Set(tags.map((t) => t.toLowerCase()));
 
   // Tag-to-persona keyword mapping.
   // Each persona slug is associated with keywords likely present in its AVL tags.
-  const personaKeywords: Array<{ slug: string; keywords: string[]; }> = [
+  const personaKeywords: Array<{ slug: string; keywords: string[] }> = [
     { slug: "ai-indie", keywords: ["developer", "ai", "startup", "indie"] },
     { slug: "classic-indie", keywords: ["developer", "product", "startup"] },
     {

@@ -8,11 +8,9 @@ const mockStripeInstance = {
   webhooks: { constructEvent: vi.fn() },
 };
 
-const MockStripeCtor = vi.fn(
-  function StripeMock(this: Record<string, unknown>) {
-    Object.assign(this, mockStripeInstance);
-  } as unknown as (...args: unknown[]) => typeof mockStripeInstance,
-);
+const MockStripeCtor = vi.fn(function StripeMock(this: Record<string, unknown>) {
+  Object.assign(this, mockStripeInstance);
+} as unknown as (...args: unknown[]) => typeof mockStripeInstance);
 
 vi.mock("stripe", () => ({
   default: MockStripeCtor,
@@ -173,24 +171,13 @@ describe("stripe/client", () => {
       ];
       expect(Object.keys(mod.TOKEN_PACKAGES)).toEqual(tokenKeys);
 
-      const subKeys: Array<keyof typeof mod.SUBSCRIPTION_PLANS> = [
-        "hobby",
-        "creator",
-        "studio",
-      ];
+      const subKeys: Array<keyof typeof mod.SUBSCRIPTION_PLANS> = ["hobby", "creator", "studio"];
       expect(Object.keys(mod.SUBSCRIPTION_PLANS)).toEqual(subKeys);
 
-      const tierKeys: Array<keyof typeof mod.TIER_SUBSCRIPTIONS> = [
-        "BASIC",
-        "STANDARD",
-        "PREMIUM",
-      ];
+      const tierKeys: Array<keyof typeof mod.TIER_SUBSCRIPTIONS> = ["BASIC", "STANDARD", "PREMIUM"];
       expect(Object.keys(mod.TIER_SUBSCRIPTIONS)).toEqual(tierKeys);
 
-      const wsKeys: Array<keyof typeof mod.WORKSPACE_TIER_PLANS> = [
-        "PRO",
-        "BUSINESS",
-      ];
+      const wsKeys: Array<keyof typeof mod.WORKSPACE_TIER_PLANS> = ["PRO", "BUSINESS"];
       expect(Object.keys(mod.WORKSPACE_TIER_PLANS)).toEqual(wsKeys);
     });
   });

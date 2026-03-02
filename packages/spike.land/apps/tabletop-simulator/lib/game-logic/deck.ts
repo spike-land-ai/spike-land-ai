@@ -3,21 +3,7 @@ import type { Card, Rank, Suit } from "../../types/card";
 import { DeterministicRandom } from "../physics/deterministic-random";
 
 const SUITS: Suit[] = ["hearts", "diamonds", "clubs", "spades"];
-const RANKS: Rank[] = [
-  "A",
-  "2",
-  "3",
-  "4",
-  "5",
-  "6",
-  "7",
-  "8",
-  "9",
-  "10",
-  "J",
-  "Q",
-  "K",
-];
+const RANKS: Rank[] = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"];
 
 export function createStandardDeck(): Card[] {
   const cards: Card[] = [];
@@ -62,9 +48,9 @@ export function dealCards(
   cards: Card[],
   count: number,
   playerId: string,
-): { dealt: Card[]; remaining: Card[]; } {
+): { dealt: Card[]; remaining: Card[] } {
   const remaining = [...cards];
-  const dealt = remaining.splice(0, count).map(card => ({
+  const dealt = remaining.splice(0, count).map((card) => ({
     ...card,
     ownerId: playerId,
     faceUp: false, // Hidden to others, visible to owner usually handled by client view or keeping faceUp false but allowing peek

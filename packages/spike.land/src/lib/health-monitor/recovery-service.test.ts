@@ -44,9 +44,7 @@ import type { RecoveryStep } from "./types";
 // Helpers
 // ---------------------------------------------------------------------------
 
-function makeDbGuidance(
-  overrides: Partial<RecoveryGuidance> = {},
-): RecoveryGuidance {
+function makeDbGuidance(overrides: Partial<RecoveryGuidance> = {}): RecoveryGuidance {
   return {
     id: "guid-1",
     platform: null,
@@ -220,10 +218,7 @@ describe("getAllRecoveryGuidance", () => {
     await getAllRecoveryGuidance();
 
     const findArg = vi.mocked(prisma.recoveryGuidance.findMany).mock.calls[0]?.[0];
-    expect(findArg?.orderBy).toEqual([
-      { severity: "desc" },
-      { issueType: "asc" },
-    ]);
+    expect(findArg?.orderBy).toEqual([{ severity: "desc" }, { issueType: "asc" }]);
   });
 
   it("formats steps correctly for all returned items", async () => {
@@ -371,9 +366,7 @@ describe("seedDefaultRecoveryGuidance", () => {
   it("seeds all 10 default guidance templates", async () => {
     // All findFirst calls return null (fresh DB), all creates succeed
     vi.mocked(prisma.recoveryGuidance.findFirst).mockResolvedValue(null);
-    vi.mocked(prisma.recoveryGuidance.create).mockResolvedValue(
-      makeDbGuidance() as never,
-    );
+    vi.mocked(prisma.recoveryGuidance.create).mockResolvedValue(makeDbGuidance() as never);
 
     await seedDefaultRecoveryGuidance();
 
@@ -382,16 +375,12 @@ describe("seedDefaultRecoveryGuidance", () => {
 
   it("seeds guidance covering key issue types", async () => {
     vi.mocked(prisma.recoveryGuidance.findFirst).mockResolvedValue(null);
-    vi.mocked(prisma.recoveryGuidance.create).mockResolvedValue(
-      makeDbGuidance() as never,
-    );
+    vi.mocked(prisma.recoveryGuidance.create).mockResolvedValue(makeDbGuidance() as never);
 
     await seedDefaultRecoveryGuidance();
 
     const createCalls = vi.mocked(prisma.recoveryGuidance.create).mock.calls;
-    const seededIssueTypes = createCalls.map(
-      call => call[0]?.data.issueType as AccountIssueType,
-    );
+    const seededIssueTypes = createCalls.map((call) => call[0]?.data.issueType as AccountIssueType);
 
     const expectedIssueTypes: AccountIssueType[] = [
       "TOKEN_EXPIRED",
@@ -414,9 +403,7 @@ describe("seedDefaultRecoveryGuidance", () => {
   it("updates existing guidance templates instead of duplicating", async () => {
     const existing = makeDbGuidance({ id: "existing-guid-1" });
     vi.mocked(prisma.recoveryGuidance.findFirst).mockResolvedValue(existing);
-    vi.mocked(prisma.recoveryGuidance.update).mockResolvedValue(
-      makeDbGuidance() as never,
-    );
+    vi.mocked(prisma.recoveryGuidance.update).mockResolvedValue(makeDbGuidance() as never);
 
     await seedDefaultRecoveryGuidance();
 
@@ -426,9 +413,7 @@ describe("seedDefaultRecoveryGuidance", () => {
 
   it("sets all guidance to generic platform (null)", async () => {
     vi.mocked(prisma.recoveryGuidance.findFirst).mockResolvedValue(null);
-    vi.mocked(prisma.recoveryGuidance.create).mockResolvedValue(
-      makeDbGuidance() as never,
-    );
+    vi.mocked(prisma.recoveryGuidance.create).mockResolvedValue(makeDbGuidance() as never);
 
     await seedDefaultRecoveryGuidance();
 
@@ -440,15 +425,13 @@ describe("seedDefaultRecoveryGuidance", () => {
 
   it("seeds ACCOUNT_SUSPENDED as CRITICAL severity", async () => {
     vi.mocked(prisma.recoveryGuidance.findFirst).mockResolvedValue(null);
-    vi.mocked(prisma.recoveryGuidance.create).mockResolvedValue(
-      makeDbGuidance() as never,
-    );
+    vi.mocked(prisma.recoveryGuidance.create).mockResolvedValue(makeDbGuidance() as never);
 
     await seedDefaultRecoveryGuidance();
 
     const createCalls = vi.mocked(prisma.recoveryGuidance.create).mock.calls;
     const suspendedCall = createCalls.find(
-      call => call[0]?.data.issueType === "ACCOUNT_SUSPENDED",
+      (call) => call[0]?.data.issueType === "ACCOUNT_SUSPENDED",
     );
     expect(suspendedCall?.[0]?.data.severity).toBe("CRITICAL");
     expect(suspendedCall?.[0]?.data.requiresAction).toBe(true);
@@ -457,31 +440,25 @@ describe("seedDefaultRecoveryGuidance", () => {
 
   it("seeds RATE_LIMITED as auto-recoverable", async () => {
     vi.mocked(prisma.recoveryGuidance.findFirst).mockResolvedValue(null);
-    vi.mocked(prisma.recoveryGuidance.create).mockResolvedValue(
-      makeDbGuidance() as never,
-    );
+    vi.mocked(prisma.recoveryGuidance.create).mockResolvedValue(makeDbGuidance() as never);
 
     await seedDefaultRecoveryGuidance();
 
     const createCalls = vi.mocked(prisma.recoveryGuidance.create).mock.calls;
-    const rateLimitCall = createCalls.find(
-      call => call[0]?.data.issueType === "RATE_LIMITED",
-    );
+    const rateLimitCall = createCalls.find((call) => call[0]?.data.issueType === "RATE_LIMITED");
     expect(rateLimitCall?.[0]?.data.autoRecoverable).toBe(true);
     expect(rateLimitCall?.[0]?.data.requiresAction).toBe(false);
   });
 
   it("seeds TOKEN_EXPIRED as requiring user action", async () => {
     vi.mocked(prisma.recoveryGuidance.findFirst).mockResolvedValue(null);
-    vi.mocked(prisma.recoveryGuidance.create).mockResolvedValue(
-      makeDbGuidance() as never,
-    );
+    vi.mocked(prisma.recoveryGuidance.create).mockResolvedValue(makeDbGuidance() as never);
 
     await seedDefaultRecoveryGuidance();
 
     const createCalls = vi.mocked(prisma.recoveryGuidance.create).mock.calls;
     const tokenExpiredCall = createCalls.find(
-      call => call[0]?.data.issueType === "TOKEN_EXPIRED",
+      (call) => call[0]?.data.issueType === "TOKEN_EXPIRED",
     );
     expect(tokenExpiredCall?.[0]?.data.requiresAction).toBe(true);
     expect(tokenExpiredCall?.[0]?.data.autoRecoverable).toBe(false);
@@ -604,7 +581,7 @@ describe("getUnresolvedIssues", () => {
     await getUnresolvedIssues("acc-1");
 
     const findArg = vi.mocked(prisma.accountHealthEvent.findMany).mock.calls[0]?.[0];
-    const eventTypes = (findArg?.where?.eventType as { in?: string[]; } | undefined)?.in ?? [];
+    const eventTypes = (findArg?.where?.eventType as { in?: string[] } | undefined)?.in ?? [];
     expect(eventTypes).toContain("ERROR_OCCURRED");
     expect(eventTypes).toContain("TOKEN_EXPIRED");
     expect(eventTypes).toContain("RATE_LIMIT_HIT");
@@ -646,9 +623,7 @@ describe("getUnresolvedIssues", () => {
   });
 
   it("propagates database errors", async () => {
-    vi.mocked(prisma.accountHealthEvent.findMany).mockRejectedValueOnce(
-      new Error("DB timeout"),
-    );
+    vi.mocked(prisma.accountHealthEvent.findMany).mockRejectedValueOnce(new Error("DB timeout"));
 
     await expect(getUnresolvedIssues("acc-1")).rejects.toThrow("DB timeout");
   });

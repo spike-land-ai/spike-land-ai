@@ -14,8 +14,7 @@ const REDIS_CONNECT_TIMEOUT_MS = 5_000;
 async function createRedisClient(): Promise<Redis> {
   // Upstash REST
   const url = process.env.UPSTASH_REDIS_REST_URL || process.env.KV_REST_API_URL;
-  const token = process.env.UPSTASH_REDIS_REST_TOKEN
-    || process.env.KV_REST_API_TOKEN;
+  const token = process.env.UPSTASH_REDIS_REST_TOKEN || process.env.KV_REST_API_TOKEN;
   if (url && token) {
     return new Redis({ url, token });
   }
@@ -48,7 +47,7 @@ function withConnectTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
   return Promise.race([
     promise,
     new Promise<T>((_, reject) =>
-      setTimeout(() => reject(new Error(`Redis client resolution timed out after ${ms}ms`)), ms)
+      setTimeout(() => reject(new Error(`Redis client resolution timed out after ${ms}ms`)), ms),
     ),
   ]);
 }
@@ -89,10 +88,7 @@ const INSTANCE_ID = crypto.randomUUID();
  * Add a message to the pending queue for an app
  * Called when a user sends a new message
  */
-export async function enqueueMessage(
-  appId: string,
-  messageId: string,
-): Promise<void> {
+export async function enqueueMessage(appId: string, messageId: string): Promise<void> {
   await Promise.all([
     // Add message to the app's pending queue (newest first)
     redis.lpush(KEYS.APP_PENDING_MESSAGES(appId), messageId),
@@ -153,10 +149,7 @@ export async function getPendingCount(appId: string): Promise<number> {
  * Mark an agent as working on an app (for UI indicator)
  * TTL of 5 minutes to auto-expire if agent crashes
  */
-export async function setAgentWorking(
-  appId: string,
-  isWorking: boolean,
-): Promise<void> {
+export async function setAgentWorking(appId: string, isWorking: boolean): Promise<void> {
   if (isWorking) {
     await redis.set(KEYS.AGENT_WORKING(appId), "1", { ex: 300 }); // 5 min TTL
   } else {
@@ -204,11 +197,10 @@ export async function getQueueStats(): Promise<{
   `;
 
   try {
-    const [appsCount, totalPending] = (await redis.eval(
-      script,
-      [KEYS.APPS_WITH_PENDING],
-      [],
-    )) as [number, number];
+    const [appsCount, totalPending] = (await redis.eval(script, [KEYS.APPS_WITH_PENDING], [])) as [
+      number,
+      number,
+    ];
 
     return {
       appsWithPending: appsCount,
@@ -216,10 +208,7 @@ export async function getQueueStats(): Promise<{
     };
   } catch (error) {
     // Fallback to client-side aggregation if Lua script fails
-    logger.error(
-      "[QueueStats] Lua script failed, falling back to client-side aggregation",
-      error,
-    );
+    logger.error("[QueueStats] Lua script failed, falling back to client-side aggregation", error);
 
     const appIds = await getAppsWithPending();
 
@@ -228,9 +217,7 @@ export async function getQueueStats(): Promise<{
     }
 
     // Use Promise.all to parallelize all llen calls instead of sequential N+1 loop
-    const counts = await Promise.all(
-      appIds.map(appId => getPendingCount(appId)),
-    );
+    const counts = await Promise.all(appIds.map((appId) => getPendingCount(appId)));
     const totalPendingMessages = counts.reduce((sum, c) => sum + c, 0);
 
     return {
@@ -252,10 +239,7 @@ export async function getCodeHash(appId: string): Promise<string | null> {
  * Set the code hash for an app (for token optimization)
  * TTL of 1 hour to auto-expire old hashes
  */
-export async function setCodeHash(
-  appId: string,
-  hash: string,
-): Promise<void> {
+export async function setCodeHash(appId: string, hash: string): Promise<void> {
   await redis.set(KEYS.APP_CODE_HASH(appId), hash, { ex: 3600 }); // 1 hour TTL
 }
 
@@ -283,7 +267,7 @@ export interface SSEEventWithSource {
  */
 export async function publishSSEEvent(
   appId: string,
-  event: { type: string; data: unknown; timestamp: number; },
+  event: { type: string; data: unknown; timestamp: number },
 ): Promise<void> {
   const eventWithSource: SSEEventWithSource = {
     ...event,
@@ -348,35 +332,24 @@ export async function getSSEEvents(
   `;
 
   try {
-    const events = (await redis.eval(
-      script,
-      [key],
-      [afterTimestamp, INSTANCE_ID],
-    )) as string[];
+    const events = (await redis.eval(script, [key], [afterTimestamp, INSTANCE_ID])) as string[];
 
     // Parse only the filtered events
-    return events
-      .map(e => JSON.parse(e) as SSEEventWithSource)
-      .reverse(); // Oldest first for replay
+    return events.map((e) => JSON.parse(e) as SSEEventWithSource).reverse(); // Oldest first for replay
   } catch (error) {
     // Fallback in case of Lua script failure (e.g. strict CSP or environment issues)
     // although cjson is standard in Redis.
-    logger.error(
-      "[SSE] Lua script failed, falling back to client-side filtering",
-      error,
-    );
+    logger.error("[SSE] Lua script failed, falling back to client-side filtering", error);
 
     const events = await redis.lrange<string>(key, 0, -1);
     return events
-      .map(e => {
+      .map((e) => {
         if (typeof e === "string") {
           return JSON.parse(e) as SSEEventWithSource;
         }
         return e as unknown as SSEEventWithSource;
       })
-      .filter(
-        e => e.timestamp > afterTimestamp && e.sourceInstanceId !== INSTANCE_ID,
-      )
+      .filter((e) => e.timestamp > afterTimestamp && e.sourceInstanceId !== INSTANCE_ID)
       .reverse();
   }
 }

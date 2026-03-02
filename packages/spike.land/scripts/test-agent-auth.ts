@@ -34,7 +34,7 @@ interface AuthTestResult {
 // Parse CLI arguments
 const args = process.argv.slice(2);
 const isProd = args.includes("--prod");
-const customUrlArg = args.find(a => a.startsWith("--url="));
+const customUrlArg = args.find((a) => a.startsWith("--url="));
 const verbose = args.includes("--verbose") || args.includes("-v");
 
 // Determine target URL
@@ -47,9 +47,7 @@ if (customUrlArg) {
   const urlValue = eqIndex !== -1 ? customUrlArg.slice(eqIndex + 1) : "";
 
   if (!urlValue) {
-    console.error(
-      "[ERROR] --url flag requires a value (e.g., --url=https://example.com)",
-    );
+    console.error("[ERROR] --url flag requires a value (e.g., --url=https://example.com)");
     process.exit(1);
   }
   targetUrl = urlValue;
@@ -59,9 +57,7 @@ if (customUrlArg) {
  * Mask an API key for safe display
  * Shows first 4 and last 4 characters
  */
-function maskKey(
-  key: string,
-): { prefix: string; suffix: string; full: string; } {
+function maskKey(key: string): { prefix: string; suffix: string; full: string } {
   if (!key || key.length < 12) {
     return {
       prefix: key?.substring(0, 4) || "????",
@@ -81,10 +77,7 @@ function maskKey(
 /**
  * Test authentication against /api/agent/queue endpoint
  */
-async function testAuth(
-  apiUrl: string,
-  apiKey: string,
-): Promise<AuthTestResult> {
+async function testAuth(apiUrl: string, apiKey: string): Promise<AuthTestResult> {
   const masked = maskKey(apiKey);
 
   console.log(`\nTesting authentication...`);
@@ -158,30 +151,24 @@ async function testAuth(
 /**
  * Test the respond endpoint (write operation)
  */
-async function testRespondEndpoint(
-  apiUrl: string,
-  apiKey: string,
-): Promise<AuthTestResult> {
+async function testRespondEndpoint(apiUrl: string, apiKey: string): Promise<AuthTestResult> {
   console.log(`\nTesting respond endpoint auth...`);
 
   const testAppId = "test-auth-check-" + Date.now();
 
   try {
-    const response = await fetch(
-      `${apiUrl}/api/agent/apps/${testAppId}/respond`,
-      {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${apiKey}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          content: "Auth test - this should fail with 404 if app doesn't exist",
-          codeUpdated: false,
-          processedMessageIds: [],
-        }),
+    const response = await fetch(`${apiUrl}/api/agent/apps/${testAppId}/respond`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        "Content-Type": "application/json",
       },
-    );
+      body: JSON.stringify({
+        content: "Auth test - this should fail with 404 if app doesn't exist",
+        codeUpdated: false,
+        processedMessageIds: [],
+      }),
+    });
 
     const body = await response.text();
     const masked = maskKey(apiKey);
@@ -269,10 +256,7 @@ async function main(): Promise<void> {
 
   if (allPassed) {
     console.log("[SUCCESS] All auth tests passed\n");
-    console.log(
-      "Your AGENT_API_KEY is correctly configured for",
-      isProd ? "production" : "local",
-    );
+    console.log("Your AGENT_API_KEY is correctly configured for", isProd ? "production" : "local");
 
     if (!isProd) {
       console.log("\nTo test production auth:");
@@ -282,9 +266,7 @@ async function main(): Promise<void> {
     console.error("[FAILED] Some auth tests failed\n");
 
     console.log("Troubleshooting steps:");
-    console.log(
-      "1. Verify AGENT_API_KEY in .env.local matches Vercel environment",
-    );
+    console.log("1. Verify AGENT_API_KEY in .env.local matches Vercel environment");
     console.log(
       "2. Check Vercel dashboard: https://vercel.com/[team]/spike.land/settings/environment-variables",
     );
@@ -302,9 +284,7 @@ function printResult(testName: string, result: AuthTestResult): void {
 
   if (verbose && result.details) {
     console.log(`  URL: ${result.details.url}`);
-    console.log(
-      `  Key: ${result.details.keyPrefix}...${result.details.keySuffix}`,
-    );
+    console.log(`  Key: ${result.details.keyPrefix}...${result.details.keySuffix}`);
     if (result.details.statusCode) {
       console.log(`  Status: ${result.details.statusCode}`);
     }

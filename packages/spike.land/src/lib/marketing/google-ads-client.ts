@@ -68,7 +68,7 @@ export class GoogleAdsClient implements IMarketingClient {
   // Cache for customer currency codes to avoid repeated API calls
   private customerCurrencyCache: Map<string, string> = new Map();
 
-  constructor(options?: { accessToken?: string; customerId?: string; }) {
+  constructor(options?: { accessToken?: string; customerId?: string }) {
     // Trim whitespace/newlines that may be added by environment variable management systems
     this.clientId = (process.env.GOOGLE_ID || "").trim();
     this.clientSecret = (process.env.GOOGLE_SECRET || "").trim();
@@ -81,9 +81,7 @@ export class GoogleAdsClient implements IMarketingClient {
     }
 
     if (!this.clientId || !this.clientSecret) {
-      throw new Error(
-        "Google OAuth credentials not configured. Set GOOGLE_ID and GOOGLE_SECRET.",
-      );
+      throw new Error("Google OAuth credentials not configured. Set GOOGLE_ID and GOOGLE_SECRET.");
     }
   }
 
@@ -123,18 +121,13 @@ export class GoogleAdsClient implements IMarketingClient {
   /**
    * Make authenticated request to Google Ads API
    */
-  private async request<T>(
-    endpoint: string,
-    options: RequestInit = {},
-  ): Promise<T> {
+  private async request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
     if (!this.accessToken) {
       throw new Error("Access token not set. Call setAccessToken() first.");
     }
 
     if (!this.developerToken) {
-      throw new Error(
-        "Google Ads Developer Token not configured. Set GOOGLE_ADS_DEVELOPER_TOKEN.",
-      );
+      throw new Error("Google Ads Developer Token not configured. Set GOOGLE_ADS_DEVELOPER_TOKEN.");
     }
 
     const url = `${GOOGLE_ADS_API_BASE}${endpoint}`;
@@ -160,24 +153,18 @@ export class GoogleAdsClient implements IMarketingClient {
     );
 
     if (fetchError || !response) {
-      throw new Error(
-        `Google Ads API Error: ${fetchError?.message || "Network error"}`,
-      );
+      throw new Error(`Google Ads API Error: ${fetchError?.message || "Network error"}`);
     }
 
     if (!response.ok) {
       const { data: errorData } = await tryCatch(response.json());
-      throw new Error(
-        `Google Ads API Error: ${errorData?.error?.message || response.statusText}`,
-      );
+      throw new Error(`Google Ads API Error: ${errorData?.error?.message || response.statusText}`);
     }
 
     const { data, error: jsonError } = await tryCatch<T>(response.json());
 
     if (jsonError || data === null || data === undefined) {
-      throw new Error(
-        `Google Ads API Error: ${jsonError?.message || "Invalid response"}`,
-      );
+      throw new Error(`Google Ads API Error: ${jsonError?.message || "Invalid response"}`);
     }
 
     return data;
@@ -186,11 +173,8 @@ export class GoogleAdsClient implements IMarketingClient {
   /**
    * Execute Google Ads Query Language (GAQL) query
    */
-  protected async query<T>(
-    customerId: string,
-    gaqlQuery: string,
-  ): Promise<T[]> {
-    const response = await this.request<{ results: T[]; }>(
+  protected async query<T>(customerId: string, gaqlQuery: string): Promise<T[]> {
+    const response = await this.request<{ results: T[] }>(
       `/customers/${customerId}/googleAds:searchStream`,
       {
         method: "POST",
@@ -220,10 +204,7 @@ export class GoogleAdsClient implements IMarketingClient {
   /**
    * Exchange authorization code for access tokens
    */
-  async exchangeCodeForTokens(
-    code: string,
-    redirectUri: string,
-  ): Promise<OAuthTokenResponse> {
+  async exchangeCodeForTokens(code: string, redirectUri: string): Promise<OAuthTokenResponse> {
     const { data: response, error: fetchError } = await tryCatch(
       fetch(GOOGLE_TOKEN_URL, {
         method: "POST",
@@ -241,9 +222,7 @@ export class GoogleAdsClient implements IMarketingClient {
     );
 
     if (fetchError || !response) {
-      throw new Error(
-        `Failed to exchange code: ${fetchError?.message || "Network error"}`,
-      );
+      throw new Error(`Failed to exchange code: ${fetchError?.message || "Network error"}`);
     }
 
     if (!response.ok) {
@@ -256,9 +235,7 @@ export class GoogleAdsClient implements IMarketingClient {
     const { data, error: jsonError } = await tryCatch(response.json());
 
     if (jsonError || !data) {
-      throw new Error(
-        `Failed to parse token response: ${jsonError?.message || "Invalid JSON"}`,
-      );
+      throw new Error(`Failed to parse token response: ${jsonError?.message || "Invalid JSON"}`);
     }
 
     const googleExpiresAt1 = data.expires_in
@@ -293,9 +270,7 @@ export class GoogleAdsClient implements IMarketingClient {
     );
 
     if (fetchError || !response) {
-      throw new Error(
-        `Failed to refresh token: ${fetchError?.message || "Network error"}`,
-      );
+      throw new Error(`Failed to refresh token: ${fetchError?.message || "Network error"}`);
     }
 
     if (!response.ok) {
@@ -308,9 +283,7 @@ export class GoogleAdsClient implements IMarketingClient {
     const { data, error: jsonError } = await tryCatch(response.json());
 
     if (jsonError || !data) {
-      throw new Error(
-        `Failed to parse token response: ${jsonError?.message || "Invalid JSON"}`,
-      );
+      throw new Error(`Failed to parse token response: ${jsonError?.message || "Invalid JSON"}`);
     }
 
     const googleExpiresAt2 = data.expires_in
@@ -329,16 +302,12 @@ export class GoogleAdsClient implements IMarketingClient {
    */
   async validateToken(accessToken: string): Promise<boolean> {
     const { data: response, error } = await tryCatch(
-      fetch(
-        `https://oauth2.googleapis.com/tokeninfo?access_token=${accessToken}`,
-      ),
+      fetch(`https://oauth2.googleapis.com/tokeninfo?access_token=${accessToken}`),
     );
     if (error || !response) {
       return false;
     }
-    const { data: tokenData, error: jsonError } = await tryCatch(
-      response.json(),
-    );
+    const { data: tokenData, error: jsonError } = await tryCatch(response.json());
     if (jsonError || !tokenData) {
       return false;
     }
@@ -350,7 +319,7 @@ export class GoogleAdsClient implements IMarketingClient {
    */
   async getAccounts(): Promise<MarketingAccountData[]> {
     // List accessible customers
-    const response = await this.request<{ resourceNames: string[]; }>(
+    const response = await this.request<{ resourceNames: string[] }>(
       "/customers:listAccessibleCustomers",
       { method: "GET" },
     );
@@ -359,9 +328,7 @@ export class GoogleAdsClient implements IMarketingClient {
 
     for (const resourceName of response.resourceNames || []) {
       const customerId = resourceName.replace("customers/", "");
-      const { data: customerData } = await tryCatch(
-        this.getCustomerInfo(customerId),
-      );
+      const { data: customerData } = await tryCatch(this.getCustomerInfo(customerId));
       // Skip inaccessible customers (when error occurs, customerData is null)
       if (customerData) {
         accounts.push({
@@ -383,11 +350,9 @@ export class GoogleAdsClient implements IMarketingClient {
   /**
    * Get customer info
    */
-  private async getCustomerInfo(
-    customerId: string,
-  ): Promise<GoogleAdsCustomer | null> {
+  private async getCustomerInfo(customerId: string): Promise<GoogleAdsCustomer | null> {
     const { data: results, error } = await tryCatch(
-      this.query<{ customer: GoogleAdsCustomer; }>(
+      this.query<{ customer: GoogleAdsCustomer }>(
         customerId,
         `SELECT customer.id, customer.descriptive_name, customer.currency_code, customer.time_zone FROM customer LIMIT 1`,
       ),
@@ -434,7 +399,7 @@ export class GoogleAdsClient implements IMarketingClient {
       this.getCustomerCurrency(customerId),
       this.query<{
         campaign: GoogleAdsCampaign;
-        campaignBudget?: { amountMicros: string; };
+        campaignBudget?: { amountMicros: string };
       }>(
         customerId,
         `SELECT
@@ -452,23 +417,15 @@ export class GoogleAdsClient implements IMarketingClient {
       ),
     ]);
 
-    return results.map(result =>
-      this.mapCampaign(
-        result.campaign,
-        customerId,
-        result.campaignBudget,
-        currency,
-      )
+    return results.map((result) =>
+      this.mapCampaign(result.campaign, customerId, result.campaignBudget, currency),
     );
   }
 
   /**
    * Get single campaign details
    */
-  async getCampaign(
-    accountId: string,
-    campaignId: string,
-  ): Promise<Campaign | null> {
+  async getCampaign(accountId: string, campaignId: string): Promise<Campaign | null> {
     this.validateAccountId(accountId);
     this.validateCampaignId(campaignId);
     const customerId = accountId.replace(/-/g, "");
@@ -479,7 +436,7 @@ export class GoogleAdsClient implements IMarketingClient {
       tryCatch(
         this.query<{
           campaign: GoogleAdsCampaign;
-          campaignBudget?: { amountMicros: string; };
+          campaignBudget?: { amountMicros: string };
         }>(
           customerId,
           `SELECT
@@ -506,12 +463,7 @@ export class GoogleAdsClient implements IMarketingClient {
     const result = results[0];
     if (!result) return null;
 
-    return this.mapCampaign(
-      result.campaign,
-      customerId,
-      result.campaignBudget,
-      currency,
-    );
+    return this.mapCampaign(result.campaign, customerId, result.campaignBudget, currency);
   }
 
   /**
@@ -526,14 +478,8 @@ export class GoogleAdsClient implements IMarketingClient {
     this.validateAccountId(accountId);
     this.validateCampaignId(campaignId);
     const customerId = accountId.replace(/-/g, "");
-    const startStr = (startDate.toISOString().split("T")[0] ?? "").replace(
-      /-/g,
-      "",
-    );
-    const endStr = (endDate.toISOString().split("T")[0] ?? "").replace(
-      /-/g,
-      "",
-    );
+    const startStr = (startDate.toISOString().split("T")[0] ?? "").replace(/-/g, "");
+    const endStr = (endDate.toISOString().split("T")[0] ?? "").replace(/-/g, "");
 
     // Fetch currency and metrics in parallel for better performance
     const [currency, results] = await Promise.all([
@@ -597,7 +543,7 @@ export class GoogleAdsClient implements IMarketingClient {
   private mapCampaign(
     ga: GoogleAdsCampaign,
     customerId: string,
-    budget?: { amountMicros: string; },
+    budget?: { amountMicros: string },
     currency: string = "USD",
   ): Campaign {
     const budgetMicros = parseInt(budget?.amountMicros || "0", 10);

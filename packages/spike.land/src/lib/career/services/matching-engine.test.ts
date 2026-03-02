@@ -21,9 +21,7 @@ const makeOccupation = (
 describe("matching-engine", () => {
   describe("compareSkills", () => {
     it("should return 0 score for occupation with no skills", () => {
-      const userSkills: UserSkill[] = [
-        { uri: "s1", title: "JavaScript", proficiency: 4 },
-      ];
+      const userSkills: UserSkill[] = [{ uri: "s1", title: "JavaScript", proficiency: 4 }];
       const occupation = makeOccupation([]);
 
       const result = compareSkills(userSkills, occupation);
@@ -34,9 +32,7 @@ describe("matching-engine", () => {
     });
 
     it("should match skills by URI", () => {
-      const userSkills: UserSkill[] = [
-        { uri: "s1", title: "JavaScript", proficiency: 5 },
-      ];
+      const userSkills: UserSkill[] = [{ uri: "s1", title: "JavaScript", proficiency: 5 }];
       const occupation = makeOccupation([
         { uri: "s1", title: "JS", skillType: "essential", importance: 1 },
       ]);
@@ -116,9 +112,7 @@ describe("matching-engine", () => {
       ]);
 
       const result = compareSkills(userSkills, occupation);
-      const gapBySkill = new Map(
-        result.gaps.map(g => [g.skill.uri, g]),
-      );
+      const gapBySkill = new Map(result.gaps.map((g) => [g.skill.uri, g]));
       expect(gapBySkill.get("s1")!.priority).toBe("high");
       expect(gapBySkill.get("s2")!.priority).toBe("medium");
       expect(gapBySkill.get("s3")!.priority).toBe("low");
@@ -162,9 +156,7 @@ describe("matching-engine", () => {
     it("should cap score between 0 and 100", () => {
       const result = compareSkills(
         [{ uri: "s1", title: "JS", proficiency: 5 }],
-        makeOccupation([
-          { uri: "s1", title: "JS", skillType: "essential", importance: 1 },
-        ]),
+        makeOccupation([{ uri: "s1", title: "JS", skillType: "essential", importance: 1 }]),
       );
       expect(result.score).toBeGreaterThanOrEqual(0);
       expect(result.score).toBeLessThanOrEqual(100);
@@ -173,13 +165,9 @@ describe("matching-engine", () => {
 
   describe("assessSkills", () => {
     it("should return results sorted by score descending", () => {
-      const userSkills: UserSkill[] = [
-        { uri: "s1", title: "JavaScript", proficiency: 5 },
-      ];
+      const userSkills: UserSkill[] = [{ uri: "s1", title: "JavaScript", proficiency: 5 }];
       const occupations = [
-        makeOccupation([
-          { uri: "s2", title: "Python", skillType: "essential", importance: 1 },
-        ]),
+        makeOccupation([{ uri: "s2", title: "Python", skillType: "essential", importance: 1 }]),
         makeOccupation([
           {
             uri: "s1",
@@ -196,10 +184,7 @@ describe("matching-engine", () => {
     });
 
     it("should return empty array for empty occupations", () => {
-      const results = assessSkills(
-        [{ uri: "s1", title: "JS", proficiency: 5 }],
-        [],
-      );
+      const results = assessSkills([{ uri: "s1", title: "JS", proficiency: 5 }], []);
       expect(results).toHaveLength(0);
     });
   });

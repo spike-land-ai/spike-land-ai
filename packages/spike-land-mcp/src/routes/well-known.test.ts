@@ -48,7 +48,7 @@ describe("GET /.well-known/oauth-authorization-server", () => {
       mockEnvObj,
     );
 
-    const body = await res.json() as Record<string, unknown>;
+    const body = (await res.json()) as Record<string, unknown>;
     expect(body.issuer).toBe("https://mcp.spike.land");
     expect(body.authorization_endpoint).toBeDefined();
     expect(body.token_endpoint).toBeDefined();
@@ -64,10 +64,8 @@ describe("GET /.well-known/oauth-authorization-server", () => {
       mockEnvObj,
     );
 
-    const body = await res.json() as { grant_types_supported: string[] };
-    expect(body.grant_types_supported).toContain(
-      "urn:ietf:params:oauth:grant-type:device_code",
-    );
+    const body = (await res.json()) as { grant_types_supported: string[] };
+    expect(body.grant_types_supported).toContain("urn:ietf:params:oauth:grant-type:device_code");
   });
 
   it("token_endpoint points to mcp.spike.land", async () => {
@@ -77,7 +75,7 @@ describe("GET /.well-known/oauth-authorization-server", () => {
       mockEnvObj,
     );
 
-    const body = await res.json() as { token_endpoint: string };
+    const body = (await res.json()) as { token_endpoint: string };
     expect(body.token_endpoint).toContain("mcp.spike.land");
   });
 
@@ -88,7 +86,7 @@ describe("GET /.well-known/oauth-authorization-server", () => {
       mockEnvObj,
     );
 
-    const body = await res.json() as { code_challenge_methods_supported: string[] };
+    const body = (await res.json()) as { code_challenge_methods_supported: string[] };
     expect(body.code_challenge_methods_supported).toContain("S256");
   });
 });
@@ -111,7 +109,7 @@ describe("GET /.well-known/oauth-protected-resource/mcp", () => {
       mockEnvObj,
     );
 
-    const body = await res.json() as Record<string, unknown>;
+    const body = (await res.json()) as Record<string, unknown>;
     expect(body.resource).toContain("mcp.spike.land");
     expect(body.authorization_servers).toBeInstanceOf(Array);
     expect(body.bearer_methods_supported).toBeInstanceOf(Array);
@@ -124,7 +122,7 @@ describe("GET /.well-known/oauth-protected-resource/mcp", () => {
       mockEnvObj,
     );
 
-    const body = await res.json() as { resource_documentation: string };
+    const body = (await res.json()) as { resource_documentation: string };
     expect(body.resource_documentation).toContain("spike.land");
   });
 
@@ -135,8 +133,8 @@ describe("GET /.well-known/oauth-protected-resource/mcp", () => {
       mockEnvObj,
     );
 
-    const body = await res.json() as { authorization_servers: string[] };
-    expect(body.authorization_servers.some(s => s.includes("mcp.spike.land"))).toBe(true);
+    const body = (await res.json()) as { authorization_servers: string[] };
+    expect(body.authorization_servers.some((s) => s.includes("mcp.spike.land"))).toBe(true);
   });
 });
 

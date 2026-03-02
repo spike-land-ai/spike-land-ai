@@ -37,18 +37,13 @@ const SERVERS: ServerNode[] = [
   },
 ];
 
-function AppBox({ active }: { active: boolean; }) {
+function AppBox({ active }: { active: boolean }) {
   return (
-    <motion.div
-      layout
-      className="flex flex-col items-center gap-2"
-    >
+    <motion.div layout className="flex flex-col items-center gap-2">
       <motion.div
         animate={{
           scale: active ? 1.05 : 1,
-          backgroundColor: active
-            ? "rgba(6, 182, 212, 0.1)"
-            : "rgba(30, 41, 59, 0.5)",
+          backgroundColor: active ? "rgba(6, 182, 212, 0.1)" : "rgba(30, 41, 59, 0.5)",
           borderColor: active ? "rgb(6, 182, 212)" : "rgb(51, 65, 85)",
           boxShadow: active ? "0 0 24px rgba(6, 182, 212, 0.3)" : "none",
           opacity: active ? 1 : 0.4,
@@ -66,18 +61,13 @@ function AppBox({ active }: { active: boolean; }) {
   );
 }
 
-function HubBox({ active }: { active: boolean; }) {
+function HubBox({ active }: { active: boolean }) {
   return (
-    <motion.div
-      layout
-      className="flex flex-col items-center gap-2"
-    >
+    <motion.div layout className="flex flex-col items-center gap-2">
       <motion.div
         animate={{
           scale: active ? 1.05 : 1,
-          backgroundColor: active
-            ? "rgba(139, 92, 246, 0.1)"
-            : "rgba(30, 41, 59, 0.5)",
+          backgroundColor: active ? "rgba(139, 92, 246, 0.1)" : "rgba(30, 41, 59, 0.5)",
           borderColor: active ? "rgb(167, 139, 250)" : "rgb(51, 65, 85)",
           boxShadow: active ? "0 0 30px rgba(139, 92, 246, 0.35)" : "none",
           opacity: active ? 1 : 0.4,
@@ -95,14 +85,9 @@ function HubBox({ active }: { active: boolean; }) {
   );
 }
 
-function ServerBox(
-  { server, active }: { server: ServerNode; active: boolean; },
-) {
+function ServerBox({ server, active }: { server: ServerNode; active: boolean }) {
   return (
-    <motion.div
-      layout
-      className="flex flex-col items-center gap-1.5"
-    >
+    <motion.div layout className="flex flex-col items-center gap-1.5">
       <motion.div
         animate={{
           scale: active ? 1.05 : 0.95,
@@ -116,9 +101,7 @@ function ServerBox(
         <span className="text-xs font-mono text-slate-200 font-bold tracking-tight">
           {server.label}
         </span>
-        <span className="text-[9px] font-mono text-slate-500 uppercase">
-          {server.sublabel}
-        </span>
+        <span className="text-[9px] font-mono text-slate-500 uppercase">{server.sublabel}</span>
       </motion.div>
       <AnimatePresence>
         {active && (
@@ -136,7 +119,7 @@ function ServerBox(
   );
 }
 
-function MobileConnectors({ progress }: { progress: number; }) {
+function MobileConnectors({ progress }: { progress: number }) {
   const leftLine = Math.min(Math.max((progress - 0) / 0.25, 0), 1);
   const fanLine = Math.min(Math.max((progress - 0.4) / 0.25, 0), 1);
 
@@ -144,19 +127,9 @@ function MobileConnectors({ progress }: { progress: number; }) {
 
   return (
     <div className="flex md:hidden flex-col items-center w-full">
-      <div
-        style={{ height: HEIGHT }}
-        className="relative w-full flex justify-center"
-      >
+      <div style={{ height: HEIGHT }} className="relative w-full flex justify-center">
         <svg width={2} height={HEIGHT} className="overflow-visible">
-          <line
-            x1={0}
-            y1={0}
-            x2={0}
-            y2={HEIGHT}
-            stroke="rgb(51 65 85)"
-            strokeWidth={1}
-          />
+          <line x1={0} y1={0} x2={0} y2={HEIGHT} stroke="rgb(51 65 85)" strokeWidth={1} />
           <motion.line
             x1={0}
             y1={0}
@@ -170,19 +143,9 @@ function MobileConnectors({ progress }: { progress: number; }) {
         </svg>
       </div>
       <div className="h-[2px]" />
-      <div
-        style={{ height: HEIGHT }}
-        className="relative w-full flex justify-center"
-      >
+      <div style={{ height: HEIGHT }} className="relative w-full flex justify-center">
         <svg width={2} height={HEIGHT} className="overflow-visible">
-          <line
-            x1={0}
-            y1={0}
-            x2={0}
-            y2={HEIGHT}
-            stroke="rgb(51 65 85)"
-            strokeWidth={1}
-          />
+          <line x1={0} y1={0} x2={0} y2={HEIGHT} stroke="rgb(51 65 85)" strokeWidth={1} />
           <motion.line
             x1={0}
             y1={0}
@@ -289,7 +252,7 @@ export function SpikeCliDemo() {
               />
 
               {/* Animated paths */}
-              {[0, 1, 2].map(i => {
+              {[0, 1, 2].map((i) => {
                 const delays = [0.3, 0.4, 0.5];
                 const delay = delays[i] || 0;
                 const p = Math.min(Math.max((progress - delay) / 0.2, 0), 1);
@@ -337,19 +300,9 @@ export function SpikeCliDemo() {
           <div className="w-full flex flex-col gap-4">
             {SERVERS.map((s, i) => (
               <div key={s.label} className="flex flex-col items-center">
-                <div
-                  style={{ height: 12 }}
-                  className="w-full flex justify-center"
-                >
+                <div style={{ height: 12 }} className="w-full flex justify-center">
                   <svg width={2} height={12} className="overflow-visible">
-                    <line
-                      x1={0}
-                      y1={0}
-                      x2={0}
-                      y2={12}
-                      stroke="rgb(51 65 85)"
-                      strokeWidth={1}
-                    />
+                    <line x1={0} y1={0} x2={0} y2={12} stroke="rgb(51 65 85)" strokeWidth={1} />
                     <motion.line
                       x1={0}
                       y1={0}

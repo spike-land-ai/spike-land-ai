@@ -7,8 +7,7 @@ export interface ChatConfig {
   allowTools: boolean;
 }
 
-const CREATE_ASSISTANT_PROMPT =
-  `You are the spike.land Code Assistant — a helpful AI embedded in the /create app builder.
+const CREATE_ASSISTANT_PROMPT = `You are the spike.land Code Assistant — a helpful AI embedded in the /create app builder.
 
 You help users understand, debug, and improve their apps built on the spike.land platform.
 
@@ -20,8 +19,7 @@ Your capabilities:
 
 Keep answers concise and code-focused. When suggesting code changes, show the minimal diff needed. Use markdown for formatting.`;
 
-const GENERAL_ASSISTANT_PROMPT =
-  `You are the spike.land assistant — a helpful AI that answers questions about the spike.land platform.
+const GENERAL_ASSISTANT_PROMPT = `You are the spike.land assistant — a helpful AI that answers questions about the spike.land platform.
 
 spike.land is an open-source AI-powered development platform. It features:
 - A real-time collaborative code editor (codespaces)
@@ -33,10 +31,7 @@ You help users navigate the platform, understand features, and get started with 
 
 Keep answers concise and helpful. If someone asks something unrelated to spike.land, briefly redirect them.`;
 
-export function getChatConfig(
-  pathname: string,
-  isLoggedIn: boolean,
-): ChatConfig {
+export function getChatConfig(pathname: string, isLoggedIn: boolean): ChatConfig {
   if (pathname.startsWith("/bazdmeg")) {
     return {
       systemPrompt: BAZDMEG_SYSTEM_PROMPT,

@@ -13,13 +13,13 @@ describe("Code Review Agent tools", () => {
   });
 
   it("covers review and review-pr categories", () => {
-    const categories = new Set(codeReviewAgentTools.map(t => t.category));
+    const categories = new Set(codeReviewAgentTools.map((t) => t.category));
     expect(categories).toContain("review");
     expect(categories).toContain("review-pr");
   });
 
   it("review-pr tools are free tier and always enabled", () => {
-    const prTools = codeReviewAgentTools.filter(t => t.category === "review-pr");
+    const prTools = codeReviewAgentTools.filter((t) => t.category === "review-pr");
     expect(prTools.length).toBe(4);
     for (const tool of prTools) {
       expect(tool.tier).toBe("free");
@@ -28,7 +28,7 @@ describe("Code Review Agent tools", () => {
   });
 
   it("convention review tools are workspace tier", () => {
-    const reviewTools = codeReviewAgentTools.filter(t => t.category === "review");
+    const reviewTools = codeReviewAgentTools.filter((t) => t.category === "review");
     expect(reviewTools.length).toBe(9);
     for (const tool of reviewTools) {
       expect(tool.tier).toBe("workspace");
@@ -36,7 +36,7 @@ describe("Code Review Agent tools", () => {
   });
 
   it("has expected tool names", () => {
-    const names = codeReviewAgentTools.map(t => t.name);
+    const names = codeReviewAgentTools.map((t) => t.name);
     expect(names).toContain("review_create_conventions");
     expect(names).toContain("review_code");
     expect(names).toContain("review_analyze_complexity");

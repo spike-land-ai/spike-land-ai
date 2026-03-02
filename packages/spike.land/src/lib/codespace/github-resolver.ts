@@ -11,9 +11,7 @@ export function parseGithubUrl(url: string, defaultRef = "main") {
   // Support URLs like:
   // - https://github.com/vitejs/vite
   // - https://github.com/vitejs/vite/tree/main/playground/react
-  const match = url.match(
-    /^https?:\/\/github\.com\/([^/]+)\/([^/]+)(?:\/tree\/([^/]+)\/?(.*))?/,
-  );
+  const match = url.match(/^https?:\/\/github\.com\/([^/]+)\/([^/]+)(?:\/tree\/([^/]+)\/?(.*))?/);
   if (!match) return null;
 
   const [, owner, repo, ref, path] = match;
@@ -45,21 +43,19 @@ export function githubResolverPlugin(options: GithubResolverOptions): Plugin {
   return {
     name: "github-resolver",
     setup(build) {
-      build.onResolve({ filter: /.*/ }, args => {
+      build.onResolve({ filter: /.*/ }, (args) => {
         if (!parsed) return;
 
         if (args.kind === "entry-point") {
-          const normalizedPath = args.path.replace(/^\.\//, "").replace(
-            /^\//,
-            "",
-          );
+          const normalizedPath = args.path.replace(/^\.\//, "").replace(/^\//, "");
           const url = new URL(normalizedPath, parsed.rawBaseUrl).href;
           return { path: url, namespace: "github-url" };
         }
 
         if (
-          !args.path.startsWith(".") && !args.path.startsWith("/")
-          && !args.path.startsWith("https://")
+          !args.path.startsWith(".") &&
+          !args.path.startsWith("/") &&
+          !args.path.startsWith("https://")
         ) {
           return undefined;
         }
@@ -80,7 +76,7 @@ export function githubResolverPlugin(options: GithubResolverOptions): Plugin {
         return undefined;
       });
 
-      build.onLoad({ filter: /.*/, namespace: "github-url" }, async args => {
+      build.onLoad({ filter: /.*/, namespace: "github-url" }, async (args) => {
         if (cache.has(args.path)) {
           return {
             contents: cache.get(args.path)!,

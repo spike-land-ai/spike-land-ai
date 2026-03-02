@@ -120,12 +120,7 @@ export class McpError extends Error {
   public readonly retryable: boolean;
   public override readonly cause?: Error;
 
-  constructor(
-    message: string,
-    code: McpErrorCode,
-    retryable?: boolean,
-    cause?: Error,
-  ) {
+  constructor(message: string, code: McpErrorCode, retryable?: boolean, cause?: Error) {
     super(message);
     this.name = "McpError";
     this.code = code;

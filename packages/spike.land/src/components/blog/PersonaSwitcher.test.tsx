@@ -38,9 +38,7 @@ describe("PersonaSwitcher", () => {
     expect(options).toHaveLength(PERSONAS.length + 1);
 
     for (const persona of PERSONAS) {
-      expect(
-        screen.getByText(new RegExp(persona.name)),
-      ).toBeDefined();
+      expect(screen.getByText(new RegExp(persona.name))).toBeDefined();
     }
   });
 

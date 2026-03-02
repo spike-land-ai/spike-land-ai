@@ -1,7 +1,4 @@
-import type {
-  AgencyPortfolioCategory,
-  AgencyPortfolioItem,
-} from "@/generated/prisma";
+import type { AgencyPortfolioCategory, AgencyPortfolioItem } from "@/generated/prisma";
 import prisma from "@/lib/prisma";
 
 export type CreatePortfolioItemInput = {
@@ -32,11 +29,7 @@ export async function getPortfolioItems(options?: {
       ...(options?.category && { category: options.category }),
       ...(options?.featured !== undefined && { featured: options.featured }),
     },
-    orderBy: [
-      { featured: "desc" },
-      { sortOrder: "asc" },
-      { createdAt: "desc" },
-    ],
+    orderBy: [{ featured: "desc" }, { sortOrder: "asc" }, { createdAt: "desc" }],
     ...(options?.limit !== undefined ? { take: options.limit } : {}),
   });
 }
@@ -44,9 +37,7 @@ export async function getPortfolioItems(options?: {
 /**
  * Get a single portfolio item by slug
  */
-export async function getPortfolioItemBySlug(
-  slug: string,
-): Promise<AgencyPortfolioItem | null> {
+export async function getPortfolioItemBySlug(slug: string): Promise<AgencyPortfolioItem | null> {
   return prisma.agencyPortfolioItem.findUnique({
     where: { slug },
   });
@@ -99,9 +90,7 @@ export async function deletePortfolioItem(slug: string): Promise<void> {
 /**
  * Get featured portfolio items for the homepage
  */
-export async function getFeaturedPortfolioItems(
-  limit = 3,
-): Promise<AgencyPortfolioItem[]> {
+export async function getFeaturedPortfolioItems(limit = 3): Promise<AgencyPortfolioItem[]> {
   return getPortfolioItems({ featured: true, limit });
 }
 

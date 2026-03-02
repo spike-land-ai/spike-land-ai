@@ -28,8 +28,7 @@ export async function sendChallenge(
     data: {
       senderId,
       receiverId,
-      timeControl: (timeControl
-        ?? "BLITZ_5") as import("@/generated/prisma").ChessTimeControl,
+      timeControl: (timeControl ?? "BLITZ_5") as import("@/generated/prisma").ChessTimeControl,
       senderColor: senderColor ?? null,
       expiresAt: new Date(Date.now() + CHALLENGE_EXPIRY_MS),
     },
@@ -39,7 +38,7 @@ export async function sendChallenge(
 export async function acceptChallenge(
   challengeId: string,
   playerId: string,
-): Promise<{ challenge: ChessChallenge; gameId: string; }> {
+): Promise<{ challenge: ChessChallenge; gameId: string }> {
   const prisma = (await import("@/lib/prisma")).default;
   const challenge = await prisma.chessChallenge.findUnique({
     where: { id: challengeId },
@@ -81,8 +80,7 @@ export async function acceptChallenge(
       blackPlayerId,
       status: "WAITING",
       fen: INITIAL_FEN,
-      timeControl: challenge
-        .timeControl as import("@/generated/prisma").ChessTimeControl,
+      timeControl: challenge.timeControl as import("@/generated/prisma").ChessTimeControl,
       whiteTimeMs: timeControlMs,
       blackTimeMs: timeControlMs,
     },
@@ -143,10 +141,7 @@ export async function cancelChallenge(
   });
 }
 
-export async function listChallenges(
-  playerId: string,
-  status?: string,
-): Promise<ChessChallenge[]> {
+export async function listChallenges(playerId: string, status?: string): Promise<ChessChallenge[]> {
   const prisma = (await import("@/lib/prisma")).default;
 
   const where: Record<string, unknown> = {

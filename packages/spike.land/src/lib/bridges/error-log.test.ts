@@ -76,25 +76,19 @@ describe("listErrorIssues", () => {
   it("passes limit option to groupBy", async () => {
     mockErrorLogGroupBy.mockResolvedValue([]);
     await listErrorIssues({ limit: 10 });
-    expect(mockErrorLogGroupBy).toHaveBeenCalledWith(
-      expect.objectContaining({ take: 10 }),
-    );
+    expect(mockErrorLogGroupBy).toHaveBeenCalledWith(expect.objectContaining({ take: 10 }));
   });
 
   it("defaults to limit 25 when no limit provided", async () => {
     mockErrorLogGroupBy.mockResolvedValue([]);
     await listErrorIssues();
-    expect(mockErrorLogGroupBy).toHaveBeenCalledWith(
-      expect.objectContaining({ take: 25 }),
-    );
+    expect(mockErrorLogGroupBy).toHaveBeenCalledWith(expect.objectContaining({ take: 25 }));
   });
 
   it("uses empty where clause when no query provided", async () => {
     mockErrorLogGroupBy.mockResolvedValue([]);
     await listErrorIssues({});
-    expect(mockErrorLogGroupBy).toHaveBeenCalledWith(
-      expect.objectContaining({ where: {} }),
-    );
+    expect(mockErrorLogGroupBy).toHaveBeenCalledWith(expect.objectContaining({ where: {} }));
   });
 
   it("handles null timestamps with empty string fallback", async () => {

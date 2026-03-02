@@ -31,21 +31,19 @@ export function CleanReminderList({
 
   return (
     <div className="space-y-3">
-      {reminders.map(reminder => (
+      {reminders.map((reminder) => (
         <Card key={reminder.id} variant="solid">
           <CardContent className="flex items-center gap-4 p-4">
             <Switch
               checked={reminder.enabled}
-              onCheckedChange={checked => onToggle(reminder.id, checked as boolean)}
+              onCheckedChange={(checked) => onToggle(reminder.id, checked as boolean)}
               aria-label={`Toggle reminder at ${reminder.time}`}
             />
             <div className="flex-1 min-w-0">
               <p className="font-semibold">{reminder.time}</p>
-              <p className="text-sm text-muted-foreground truncate">
-                {reminder.message}
-              </p>
+              <p className="text-sm text-muted-foreground truncate">{reminder.message}</p>
               <p className="text-xs text-muted-foreground mt-0.5">
-                {reminder.days.map(d => DAY_LABELS[d]).join(", ")}
+                {reminder.days.map((d) => DAY_LABELS[d]).join(", ")}
               </p>
             </div>
             <div className="flex items-center gap-1">

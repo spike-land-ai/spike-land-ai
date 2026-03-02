@@ -28,10 +28,7 @@ export type AspectRatio = (typeof SUPPORTED_ASPECT_RATIOS)[number];
  * These match the dimensions Gemini uses for 1K-tier image generation,
  * ensuring uploads and enhanced images share the exact same resolution.
  */
-export const STANDARD_1K_DIMENSIONS: Record<
-  AspectRatio,
-  { width: number; height: number; }
-> = {
+export const STANDARD_1K_DIMENSIONS: Record<AspectRatio, { width: number; height: number }> = {
   "1:1": { width: 1024, height: 1024 },
   "2:3": { width: 848, height: 1264 },
   "3:2": { width: 1264, height: 848 },

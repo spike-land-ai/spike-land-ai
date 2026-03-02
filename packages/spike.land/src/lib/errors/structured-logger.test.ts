@@ -1,9 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import {
-  generateRequestId,
-  logger,
-  StructuredLogger,
-} from "./structured-logger";
+import { generateRequestId, logger, StructuredLogger } from "./structured-logger";
 
 describe("generateRequestId", () => {
   it("returns a 32-character hex string", () => {

@@ -14,7 +14,7 @@ export const FOOTER_EXCLUDED_PATHS = [
 ];
 
 export function shouldHideFooter(pathname: string | null): boolean {
-  return FOOTER_EXCLUDED_PATHS.some(path => pathname?.startsWith(path));
+  return FOOTER_EXCLUDED_PATHS.some((path) => pathname?.startsWith(path));
 }
 
 /** Alias for shouldHideFooter - hides all chrome (footer, nav) on these paths */

@@ -144,9 +144,7 @@ describe("email/client", () => {
 
       await sendEmail({ ...validParams, from: "custom@spike.land" });
 
-      expect(mockSend).toHaveBeenCalledWith(
-        expect.objectContaining({ from: "custom@spike.land" }),
-      );
+      expect(mockSend).toHaveBeenCalledWith(expect.objectContaining({ from: "custom@spike.land" }));
     });
 
     it("should use EMAIL_FROM env var as fallback", async () => {
@@ -155,9 +153,7 @@ describe("email/client", () => {
 
       await sendEmail(validParams);
 
-      expect(mockSend).toHaveBeenCalledWith(
-        expect.objectContaining({ from: "env@spike.land" }),
-      );
+      expect(mockSend).toHaveBeenCalledWith(expect.objectContaining({ from: "env@spike.land" }));
     });
 
     it("should validate multiple recipients", async () => {

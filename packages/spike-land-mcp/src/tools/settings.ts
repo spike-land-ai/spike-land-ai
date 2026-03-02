@@ -18,7 +18,7 @@ import type { DrizzleDB } from "../db/index";
 function randomHex(bytes: number): string {
   const arr = new Uint8Array(bytes);
   crypto.getRandomValues(arr);
-  return Array.from(arr, b => b.toString(16).padStart(2, "0")).join("");
+  return Array.from(arr, (b) => b.toString(16).padStart(2, "0")).join("");
 }
 
 /**
@@ -27,14 +27,10 @@ function randomHex(bytes: number): string {
 async function sha256Hex(input: string): Promise<string> {
   const data = new TextEncoder().encode(input);
   const hashBuffer = await crypto.subtle.digest("SHA-256", data);
-  return Array.from(new Uint8Array(hashBuffer), b => b.toString(16).padStart(2, "0")).join("");
+  return Array.from(new Uint8Array(hashBuffer), (b) => b.toString(16).padStart(2, "0")).join("");
 }
 
-export function registerSettingsTools(
-  registry: ToolRegistry,
-  userId: string,
-  db: DrizzleDB,
-): void {
+export function registerSettingsTools(registry: ToolRegistry, userId: string, db: DrizzleDB): void {
   registry.registerBuilt(
     freeTool(userId, db)
       .tool("settings_list_api_keys", "List your API keys (keys are masked for security).", {})
@@ -58,10 +54,11 @@ export function registerSettingsTools(
         for (const k of keys) {
           const expired = k.expiresAt && k.expiresAt < Date.now();
           const status = expired ? "Expired" : "Active";
-          text += `- **${k.name}** [${status}]\n`
-            + `  Last used: ${k.lastUsedAt ? new Date(k.lastUsedAt).toISOString() : "never"}\n`
-            + `  Created: ${new Date(k.createdAt).toISOString()}\n`
-            + `  ID: ${k.id}\n\n`;
+          text +=
+            `- **${k.name}** [${status}]\n` +
+            `  Last used: ${k.lastUsedAt ? new Date(k.lastUsedAt).toISOString() : "never"}\n` +
+            `  Created: ${new Date(k.createdAt).toISOString()}\n` +
+            `  ID: ${k.id}\n\n`;
         }
         return textResult(text);
       }),
@@ -90,11 +87,11 @@ export function registerSettingsTools(
         });
 
         return textResult(
-          `**API Key Created!**\n\n`
-          + `**ID:** ${id}\n`
-          + `**Name:** ${name.trim()}\n`
-          + `**Key:** ${rawKey}\n\n`
-          + `**IMPORTANT:** Copy this key now. It will not be shown again.`,
+          `**API Key Created!**\n\n` +
+            `**ID:** ${id}\n` +
+            `**Name:** ${name.trim()}\n` +
+            `**Key:** ${rawKey}\n\n` +
+            `**IMPORTANT:** Copy this key now. It will not be shown again.`,
         );
       }),
   );
@@ -116,9 +113,7 @@ export function registerSettingsTools(
           .limit(1);
 
         if (keyRows.length === 0) {
-          return textResult(
-            `**Error: NOT_FOUND**\nAPI key not found.\n**Retryable:** false`,
-          );
+          return textResult(`**Error: NOT_FOUND**\nAPI key not found.\n**Retryable:** false`);
         }
 
         await ctx.db

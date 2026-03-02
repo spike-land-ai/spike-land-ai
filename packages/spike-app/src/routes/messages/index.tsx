@@ -1,9 +1,27 @@
 import { Link } from "@tanstack/react-router";
 
 const conversations = [
-  { userId: "alice", name: "Alice", lastMessage: "Sounds good, let me check.", time: "2m ago", unread: true },
-  { userId: "bob", name: "Bob", lastMessage: "The deployment looks fine.", time: "1h ago", unread: false },
-  { userId: "carol", name: "Carol", lastMessage: "Can you review my PR?", time: "3h ago", unread: false },
+  {
+    userId: "alice",
+    name: "Alice",
+    lastMessage: "Sounds good, let me check.",
+    time: "2m ago",
+    unread: true,
+  },
+  {
+    userId: "bob",
+    name: "Bob",
+    lastMessage: "The deployment looks fine.",
+    time: "1h ago",
+    unread: false,
+  },
+  {
+    userId: "carol",
+    name: "Carol",
+    lastMessage: "Can you review my PR?",
+    time: "3h ago",
+    unread: false,
+  },
 ];
 
 export function MessagesIndexPage() {

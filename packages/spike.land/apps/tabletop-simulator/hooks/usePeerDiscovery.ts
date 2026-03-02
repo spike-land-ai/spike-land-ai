@@ -34,7 +34,7 @@ export function usePeerDiscovery({
   useEffect(() => {
     connectedPeersRef.current = connectedPeers;
     // Clear pending status for connected peers
-    connectedPeers.forEach(id => {
+    connectedPeers.forEach((id) => {
       pendingConnectionsRef.current.delete(id);
       failedPeersRef.current.delete(id);
     });
@@ -75,12 +75,12 @@ export function usePeerDiscovery({
       const discoveredPeers: string[] = data.peers || [];
 
       // Connect to any peers we're not already connected to
-      discoveredPeers.forEach(discoveredPeerId => {
+      discoveredPeers.forEach((discoveredPeerId) => {
         if (
-          discoveredPeerId !== peerId
-          && !connectedPeersRef.current.has(discoveredPeerId)
-          && !pendingConnectionsRef.current.has(discoveredPeerId)
-          && !shouldSkipPeer(discoveredPeerId)
+          discoveredPeerId !== peerId &&
+          !connectedPeersRef.current.has(discoveredPeerId) &&
+          !pendingConnectionsRef.current.has(discoveredPeerId) &&
+          !shouldSkipPeer(discoveredPeerId)
         ) {
           console.log(`[Discovery] Found new peer: ${discoveredPeerId}`);
           pendingConnectionsRef.current.add(discoveredPeerId);

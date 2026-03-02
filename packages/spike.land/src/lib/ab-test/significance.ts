@@ -16,12 +16,7 @@ interface VariantData {
 /**
  * Calculate z-score for two-proportion z-test
  */
-function calculateZScore(
-  p1: number,
-  p2: number,
-  n1: number,
-  n2: number,
-): number {
+function calculateZScore(p1: number, p2: number, n1: number, n2: number): number {
   const pPooled = (p1 * n1 + p2 * n2) / (n1 + n2);
   const se = Math.sqrt(pPooled * (1 - pPooled) * (1 / n1 + 1 / n2));
   if (se === 0) return 0;
@@ -37,13 +32,11 @@ function zScoreToPValue(z: number): number {
   // Approximation of the normal CDF using Abramowitz and Stegun formula 7.1.26
   const t = 1 / (1 + 0.2316419 * absZ);
   const d = 0.3989422804014327; // 1/sqrt(2*PI)
-  const p = d
-    * Math.exp(-0.5 * absZ * absZ)
-    * (t
-      * (0.319381530
-        + t
-          * (-0.356563782
-            + t * (1.781477937 + t * (-1.821255978 + t * 1.330274429)))));
+  const p =
+    d *
+    Math.exp(-0.5 * absZ * absZ) *
+    (t *
+      (0.31938153 + t * (-0.356563782 + t * (1.781477937 + t * (-1.821255978 + t * 1.330274429)))));
   return 2 * p; // two-tailed
 }
 
@@ -60,7 +53,7 @@ export function testSignificance(
       isSignificant: false,
       confidenceLevel,
       winnerVariantId: null,
-      metrics: variants.map(v => ({
+      metrics: variants.map((v) => ({
         variantId: v.variantId,
         conversionRate: v.sampleSize > 0 ? v.conversions / v.sampleSize : 0,
         sampleSize: v.sampleSize,
@@ -76,19 +69,10 @@ export function testSignificance(
   const control = variants[0]!;
   const treatment = variants[1]!;
 
-  const p1 = control.sampleSize > 0
-    ? control.conversions / control.sampleSize
-    : 0;
-  const p2 = treatment.sampleSize > 0
-    ? treatment.conversions / treatment.sampleSize
-    : 0;
+  const p1 = control.sampleSize > 0 ? control.conversions / control.sampleSize : 0;
+  const p2 = treatment.sampleSize > 0 ? treatment.conversions / treatment.sampleSize : 0;
 
-  const zScore = calculateZScore(
-    p1,
-    p2,
-    control.sampleSize,
-    treatment.sampleSize,
-  );
+  const zScore = calculateZScore(p1, p2, control.sampleSize, treatment.sampleSize);
   const pValue = zScoreToPValue(zScore);
 
   const isSignificant = pValue < alpha;
@@ -102,7 +86,7 @@ export function testSignificance(
     isSignificant,
     confidenceLevel,
     winnerVariantId,
-    metrics: variants.map(v => {
+    metrics: variants.map((v) => {
       const rate = v.sampleSize > 0 ? v.conversions / v.sampleSize : 0;
       const z = v.variantId === control.variantId ? zScore : -zScore;
       return {

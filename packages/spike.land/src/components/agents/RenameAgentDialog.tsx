@@ -22,12 +22,7 @@ interface RenameAgentDialogProps {
   onRename: (agentId: string, displayName: string) => Promise<void>;
 }
 
-export function RenameAgentDialog({
-  agent,
-  open,
-  onOpenChange,
-  onRename,
-}: RenameAgentDialogProps) {
+export function RenameAgentDialog({ agent, open, onOpenChange, onRename }: RenameAgentDialogProps) {
   const [displayName, setDisplayName] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -63,9 +58,7 @@ export function RenameAgentDialog({
         <form onSubmit={handleSubmit}>
           <DialogHeader>
             <DialogTitle>Rename Agent</DialogTitle>
-            <DialogDescription>
-              Enter a new display name for this agent.
-            </DialogDescription>
+            <DialogDescription>Enter a new display name for this agent.</DialogDescription>
           </DialogHeader>
 
           <div className="py-4 space-y-4">
@@ -74,7 +67,7 @@ export function RenameAgentDialog({
               <Input
                 id="displayName"
                 value={displayName}
-                onChange={e => setDisplayName(e.target.value)}
+                onChange={(e) => setDisplayName(e.target.value)}
                 placeholder="My Agent"
                 maxLength={100}
                 disabled={isLoading}
@@ -92,13 +85,12 @@ export function RenameAgentDialog({
             >
               Cancel
             </Button>
-            <Button
-              type="submit"
-              disabled={!displayName.trim() || isLoading}
-            >
-              {isLoading
-                ? <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                : <Pencil className="mr-2 h-4 w-4" />}
+            <Button type="submit" disabled={!displayName.trim() || isLoading}>
+              {isLoading ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <Pencil className="mr-2 h-4 w-4" />
+              )}
               Rename
             </Button>
           </DialogFooter>

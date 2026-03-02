@@ -58,7 +58,7 @@ describe("CODESPACE_TOOLS", () => {
   });
 
   it("should include all expected tool names", () => {
-    const names = CODESPACE_TOOLS.map(t => t.name);
+    const names = CODESPACE_TOOLS.map((t) => t.name);
     expect(names).toContain("read_code");
     expect(names).toContain("update_code");
     expect(names).toContain("edit_code");
@@ -76,9 +76,7 @@ describe("CODESPACE_TOOLS", () => {
 
 describe("validateMessages", () => {
   it("should accept valid user messages", () => {
-    const result = validateMessages([
-      { role: "user", content: "Hello" },
-    ]);
+    const result = validateMessages([{ role: "user", content: "Hello" }]);
     expect(result.valid).toBe(true);
     if (result.valid) {
       expect(result.messages).toHaveLength(1);
@@ -127,9 +125,7 @@ describe("validateMessages", () => {
   });
 
   it("should reject invalid role", () => {
-    const result = validateMessages([
-      { role: "system", content: "test" },
-    ]);
+    const result = validateMessages([{ role: "system", content: "test" }]);
     expect(result.valid).toBe(false);
     if (!result.valid) {
       expect(result.error).toContain("invalid role");
@@ -244,11 +240,7 @@ describe("executeTool", () => {
   });
 
   it("should return error when search_and_replace has no replace", async () => {
-    const result = await executeTool(
-      "search_and_replace",
-      { search: "x" },
-      "test",
-    );
+    const result = await executeTool("search_and_replace", { search: "x" }, "test");
     expect(result).toContain("'replace' parameter is required");
   });
 
@@ -377,11 +369,7 @@ describe("executeTool", () => {
     });
     vi.mocked(transpileCode).mockResolvedValue("transpiled");
 
-    const result = await executeTool(
-      "search_and_replace",
-      { search: "x", replace: "y" },
-      "test",
-    );
+    const result = await executeTool("search_and_replace", { search: "x", replace: "y" }, "test");
     expect(result).toBe("success");
   });
 
@@ -438,11 +426,7 @@ describe("executeTool", () => {
     });
     vi.mocked(transpileCode).mockRejectedValue(new Error("Transpile fail"));
 
-    const result = await executeTool(
-      "search_and_replace",
-      { search: "x", replace: "y" },
-      "test",
-    );
+    const result = await executeTool("search_and_replace", { search: "x", replace: "y" }, "test");
     expect(result).toContain("Transpilation error");
   });
 });
@@ -467,9 +451,7 @@ describe("streamCodespaceChat", () => {
 
   it("should emit error when claude client is null", async () => {
     const { getClaudeClient } = await import("@/lib/ai/claude-client");
-    vi.mocked(getClaudeClient).mockResolvedValue(
-      null as unknown as Anthropic,
-    );
+    vi.mocked(getClaudeClient).mockResolvedValue(null as unknown as Anthropic);
 
     const { streamCodespaceChat } = await import("./chat-service");
     const stream = streamCodespaceChat(

@@ -167,7 +167,7 @@ describe("state machine engine - core operations", () => {
 
     it("should throw when removing a non-existent state", () => {
       createMachine({ id: "m1", name: "M", userId: "u" });
-      expect(() => removeState("m1", "nope")).toThrow("State \"nope\" not found");
+      expect(() => removeState("m1", "nope")).toThrow('State "nope" not found');
     });
   });
 
@@ -217,9 +217,7 @@ describe("state machine engine - core operations", () => {
 
     it("should throw when removing a non-existent transition", () => {
       createMachine({ id: "m1", name: "M", userId: "u" });
-      expect(() => removeTransition("m1", "nope")).toThrow(
-        "Transition \"nope\" not found",
-      );
+      expect(() => removeTransition("m1", "nope")).toThrow('Transition "nope" not found');
     });
 
     it("should preserve delayExpression when adding a transition", () => {

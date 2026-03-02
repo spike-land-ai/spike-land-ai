@@ -16,18 +16,12 @@ import { Switch } from "@/components/ui/switch";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Globe, Loader2 } from "lucide-react";
 import { qaNetwork } from "@/lib/qa-studio/actions";
-import {
-  isActionError,
-  type QaNetworkRequest,
-  type QaNetworkResult,
-} from "@/lib/qa-studio/types";
+import { isActionError, type QaNetworkRequest, type QaNetworkResult } from "@/lib/qa-studio/types";
 import { formatBytes } from "@/lib/utils";
 
 type PanelStatus = "idle" | "loading" | "success" | "error";
 
-function getStatusBadgeVariant(
-  status: number,
-): "success" | "warning" | "destructive" | "outline" {
+function getStatusBadgeVariant(status: number): "success" | "warning" | "destructive" | "outline" {
   if (status >= 200 && status < 300) return "success";
   if (status >= 300 && status < 400) return "warning";
   if (status >= 400) return "destructive";
@@ -83,9 +77,7 @@ export function NetworkPanel() {
       setNetwork(result);
       setStatus("success");
     } catch (err: unknown) {
-      const message = err instanceof Error
-        ? err.message
-        : "Failed to fetch network data";
+      const message = err instanceof Error ? err.message : "Failed to fetch network data";
       setError(message);
       setStatus("error");
     }
@@ -113,17 +105,8 @@ export function NetworkPanel() {
                 onCheckedChange={setIncludeStatic}
               />
             </div>
-            <Button
-              size="sm"
-              onClick={handleFetch}
-              disabled={status === "loading"}
-              className="h-7"
-            >
-              {status === "loading"
-                ? <Loader2 className="h-3 w-3 animate-spin" />
-                : (
-                  "Fetch"
-                )}
+            <Button size="sm" onClick={handleFetch} disabled={status === "loading"} className="h-7">
+              {status === "loading" ? <Loader2 className="h-3 w-3 animate-spin" /> : "Fetch"}
             </Button>
           </div>
         </div>
@@ -149,9 +132,7 @@ export function NetworkPanel() {
             <div className="flex items-center gap-4 mb-3 text-xs">
               <div className="flex items-center gap-1.5">
                 <span className="text-muted-foreground">Requests:</span>
-                <span className="font-medium text-foreground">
-                  {network.requests.length}
-                </span>
+                <span className="font-medium text-foreground">{network.requests.length}</span>
               </div>
               <div className="flex items-center gap-1.5">
                 <span className="text-muted-foreground">Total size:</span>
@@ -163,9 +144,7 @@ export function NetworkPanel() {
                 <span className="text-muted-foreground">Errors:</span>
                 <span
                   className={`font-medium ${
-                    network.errorCount > 0
-                      ? "text-destructive"
-                      : "text-foreground"
+                    network.errorCount > 0 ? "text-destructive" : "text-foreground"
                   }`}
                 >
                   {network.errorCount}
@@ -185,10 +164,7 @@ export function NetworkPanel() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {network.requests.map((
-                    req: QaNetworkRequest,
-                    idx: number,
-                  ) => (
+                  {network.requests.map((req: QaNetworkRequest, idx: number) => (
                     <TableRow
                       key={`${req.method}-${req.url}-${idx}`}
                       className="border-border/20 hover:bg-white/5"

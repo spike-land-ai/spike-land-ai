@@ -32,7 +32,7 @@ export interface BinCleanupResult {
   failed: number;
   dryRun: boolean;
   apps: CleanupAppResult[];
-  errors: Array<{ appId: string; error: string; }>;
+  errors: Array<{ appId: string; error: string }>;
 }
 
 const DEFAULT_RETENTION_DAYS = 30;
@@ -52,9 +52,7 @@ export async function cleanupExpiredBinApps(
   } = options;
 
   // Calculate the threshold date
-  const thresholdDate = new Date(
-    Date.now() - retentionDays * 24 * 60 * 60 * 1000,
-  );
+  const thresholdDate = new Date(Date.now() - retentionDays * 24 * 60 * 60 * 1000);
 
   // Find expired apps
   const { data: expiredApps, error: fetchError } = await tryCatch(
@@ -130,9 +128,7 @@ export async function cleanupExpiredBinApps(
     } else {
       result.apps.push(appResult);
       result.deleted++;
-      logger.info(
-        `Cleaned up expired bin app: ${app.name} (${app.id}), user: ${app.userId}`,
-      );
+      logger.info(`Cleaned up expired bin app: ${app.name} (${app.id}), user: ${app.userId}`);
     }
   }
 

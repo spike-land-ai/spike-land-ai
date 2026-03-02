@@ -30,15 +30,12 @@ const TIER_LABELS = {
   TIER_4K: "4K",
 } as const;
 
-function StatusOverlay({ status }: { status: BatchImageStatus["status"]; }) {
+function StatusOverlay({ status }: { status: BatchImageStatus["status"] }) {
   switch (status) {
     case "COMPLETED":
       return (
         <div className="absolute inset-0 flex items-center justify-center bg-green-500/30 backdrop-blur-[1px]">
-          <CheckCircle
-            className="h-6 w-6 text-green-500 drop-shadow-md"
-            aria-hidden="true"
-          />
+          <CheckCircle className="h-6 w-6 text-green-500 drop-shadow-md" aria-hidden="true" />
         </div>
       );
     case "PROCESSING":
@@ -53,20 +50,14 @@ function StatusOverlay({ status }: { status: BatchImageStatus["status"]; }) {
     case "FAILED":
       return (
         <div className="absolute inset-0 flex items-center justify-center bg-red-500/30 backdrop-blur-[1px]">
-          <XCircle
-            className="h-6 w-6 text-red-500 drop-shadow-md"
-            aria-hidden="true"
-          />
+          <XCircle className="h-6 w-6 text-red-500 drop-shadow-md" aria-hidden="true" />
         </div>
       );
     case "PENDING":
     default:
       return (
         <div className="absolute inset-0 flex items-center justify-center bg-gray-500/20 backdrop-blur-[1px]">
-          <Circle
-            className="h-6 w-6 text-gray-400 drop-shadow-md"
-            aria-hidden="true"
-          />
+          <Circle className="h-6 w-6 text-gray-400 drop-shadow-md" aria-hidden="true" />
         </div>
       );
   }
@@ -93,16 +84,14 @@ export function BatchEnhanceProgress({
   onComplete,
   className,
 }: BatchEnhanceProgressProps) {
-  const completedCount = images.filter(img => img.status === "COMPLETED").length;
-  const processingCount = images.filter(img => img.status === "PROCESSING").length;
-  const pendingCount = images.filter(img => img.status === "PENDING").length;
-  const failedCount = images.filter(img => img.status === "FAILED").length;
+  const completedCount = images.filter((img) => img.status === "COMPLETED").length;
+  const processingCount = images.filter((img) => img.status === "PROCESSING").length;
+  const pendingCount = images.filter((img) => img.status === "PENDING").length;
+  const failedCount = images.filter((img) => img.status === "FAILED").length;
 
   const totalCount = images.length;
   const finishedCount = completedCount + failedCount;
-  const progressPercentage = totalCount > 0
-    ? Math.round((finishedCount / totalCount) * 100)
-    : 0;
+  const progressPercentage = totalCount > 0 ? Math.round((finishedCount / totalCount) * 100) : 0;
 
   const isComplete = finishedCount === totalCount && totalCount > 0;
 
@@ -143,7 +132,7 @@ export function BatchEnhanceProgress({
         role="list"
         aria-label="Image processing status"
       >
-        {images.map(image => (
+        {images.map((image) => (
           <div
             key={image.imageId}
             className="relative aspect-square rounded-md overflow-hidden border border-border bg-muted"
@@ -172,22 +161,14 @@ export function BatchEnhanceProgress({
           Processing: {processingCount}
         </Badge>
         <span className="text-muted-foreground">|</span>
-        <Badge variant="secondary">
-          Pending: {pendingCount}
-        </Badge>
+        <Badge variant="secondary">Pending: {pendingCount}</Badge>
         <span className="text-muted-foreground">|</span>
-        <Badge variant="destructive">
-          Failed: {failedCount}
-        </Badge>
+        <Badge variant="destructive">Failed: {failedCount}</Badge>
       </div>
 
       {onCancel && !isComplete && (
         <div className="flex justify-center">
-          <Button
-            variant="outline"
-            onClick={onCancel}
-            className="gap-2"
-          >
+          <Button variant="outline" onClick={onCancel} className="gap-2">
             <XOctagon className="h-4 w-4" />
             Cancel
           </Button>

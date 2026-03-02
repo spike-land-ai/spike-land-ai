@@ -115,9 +115,7 @@ export function LandingHero() {
           className="mt-20 flex flex-wrap items-center justify-center gap-8 text-sm text-muted-foreground bg-secondary/30 py-4 px-8 rounded-full border border-border/50 backdrop-blur-sm max-w-fit mx-auto"
         >
           <div className="flex items-center gap-2">
-            <span className="text-foreground font-bold text-lg">
-              {TOTAL_TOOL_COUNT}+
-            </span>
+            <span className="text-foreground font-bold text-lg">{TOTAL_TOOL_COUNT}+</span>
             <span>Tools</span>
           </div>
           <div className="w-px h-4 bg-border" />

@@ -47,9 +47,7 @@ describe("tryCatch (async)", () => {
   });
 
   it("preserves error message from thrown Error", async () => {
-    const { error } = await tryCatch(
-      Promise.reject(new TypeError("type mismatch")),
-    );
+    const { error } = await tryCatch(Promise.reject(new TypeError("type mismatch")));
     expect((error as TypeError).message).toBe("type mismatch");
   });
 });

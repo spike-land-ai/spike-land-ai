@@ -52,9 +52,7 @@ export function calculateEstimatedEnhancements(
 // Minimum time between focus-triggered refreshes (5 seconds)
 const FOCUS_DEBOUNCE_MS = 5000;
 
-export function useWorkspaceCredits(
-  options?: { autoRefreshOnFocus?: boolean; },
-) {
+export function useWorkspaceCredits(options?: { autoRefreshOnFocus?: boolean }) {
   const [remaining, setRemaining] = useState<number>(0);
   const [limit, setLimit] = useState<number>(0);
   const [used, setUsed] = useState<number>(0);
@@ -68,14 +66,10 @@ export function useWorkspaceCredits(
   const fetchCredits = useCallback(async () => {
     setIsLoading(true);
 
-    const { data: response, error: fetchError } = await tryCatch(
-      fetch("/api/credits/balance"),
-    );
+    const { data: response, error: fetchError } = await tryCatch(fetch("/api/credits/balance"));
 
     if (fetchError) {
-      setError(
-        fetchError instanceof Error ? fetchError : new Error("Unknown error"),
-      );
+      setError(fetchError instanceof Error ? fetchError : new Error("Unknown error"));
       setIsLoading(false);
       return;
     }
@@ -97,9 +91,7 @@ export function useWorkspaceCredits(
     );
 
     if (jsonError) {
-      setError(
-        jsonError instanceof Error ? jsonError : new Error("Unknown error"),
-      );
+      setError(jsonError instanceof Error ? jsonError : new Error("Unknown error"));
       setIsLoading(false);
       return;
     }

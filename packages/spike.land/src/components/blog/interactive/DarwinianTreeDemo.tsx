@@ -6,7 +6,7 @@ import { useInViewProgress } from "./useInViewProgress";
 
 // ─── Types ─────────────────────────────────────────────────────────────────
 
-type Point = { x: number; y: number; };
+type Point = { x: number; y: number };
 
 type BranchDef = {
   id: string;
@@ -46,7 +46,7 @@ function buildTree(maxGenerations: number): BranchDef[] {
 
   if (maxGenerations < 1) return branches;
 
-  const gen1: Array<{ to: Point; survives: boolean; fitness: number; delay: number; }> = [
+  const gen1: Array<{ to: Point; survives: boolean; fitness: number; delay: number }> = [
     { to: { x: 250, y: 200 }, survives: true, fitness: 74, delay: 0.02 },
     { to: { x: 560, y: 210 }, survives: false, fitness: 31, delay: 0.04 },
   ];
@@ -65,7 +65,7 @@ function buildTree(maxGenerations: number): BranchDef[] {
   if (maxGenerations < 2) return branches;
 
   const g1Survivor = gen1[0]!.to;
-  const gen2: Array<{ to: Point; survives: boolean; fitness: number; delay: number; }> = [
+  const gen2: Array<{ to: Point; survives: boolean; fitness: number; delay: number }> = [
     { to: { x: 160, y: 90 }, survives: true, fitness: 91, delay: 0.01 },
     { to: { x: 340, y: 110 }, survives: false, fitness: 22, delay: 0.03 },
   ];
@@ -104,7 +104,7 @@ function buildTree(maxGenerations: number): BranchDef[] {
   if (maxGenerations < 3) return branches;
 
   const g2Survivor = gen2[0]!.to;
-  const gen3: Array<{ to: Point; survives: boolean; fitness: number; delay: number; }> = [
+  const gen3: Array<{ to: Point; survives: boolean; fitness: number; delay: number }> = [
     { to: { x: 90, y: 20 }, survives: true, fitness: 97, delay: 0.01 },
     { to: { x: 200, y: 15 }, survives: false, fitness: 43, delay: 0.02 },
     { to: { x: 130, y: 5 }, survives: false, fitness: 29, delay: 0.035 },
@@ -129,7 +129,7 @@ function buildParticles(branches: BranchDef[]): ParticleDef[] {
   const kbY = 530;
   const particles: ParticleDef[] = [];
   branches
-    .filter(b => !b.survives)
+    .filter((b) => !b.survives)
     .forEach((b, bi) => {
       for (let i = 0; i < 3; i++) {
         const offsetX = (i - 1) * 20 + (bi % 2 === 0 ? 5 : -5);
@@ -399,7 +399,7 @@ function DarwinianTreeSvg({ generations, progress, instanceKey }: DarwinianTreeS
       <rect width="800" height="560" fill="#020817" />
       <rect width="800" height="560" fill={`url(#${dotsId})`} />
 
-      {([0, 1, 2, 3] as const).slice(0, generations + 1).map(gen => {
+      {([0, 1, 2, 3] as const).slice(0, generations + 1).map((gen) => {
         const yMap: Record<number, number> = { 0: 420, 1: 205, 2: 100, 3: 22 };
         const yPos = yMap[gen];
         const labelProgress = Math.max(0, Math.min(1, (progress - gen * 0.18) / 0.1));
@@ -430,7 +430,7 @@ function DarwinianTreeSvg({ generations, progress, instanceKey }: DarwinianTreeS
         );
       })}
 
-      {branches.map(branch => (
+      {branches.map((branch) => (
         <AnimatedBranch
           key={branch.id}
           branch={branch}
@@ -440,12 +440,12 @@ function DarwinianTreeSvg({ generations, progress, instanceKey }: DarwinianTreeS
         />
       ))}
 
-      {branches.map(branch => (
+      {branches.map((branch) => (
         <FitnessLabel key={`label-${branch.id}`} branch={branch} globalProgress={progress} />
       ))}
 
-      {particles.map(particle => {
-        const parentBranch = branches.find(b => b.id === particle.branchId);
+      {particles.map((particle) => {
+        const parentBranch = branches.find((b) => b.id === particle.branchId);
         if (!parentBranch) return null;
         return (
           <LearningParticle
@@ -580,7 +580,7 @@ export function DarwinianTreeDemo() {
   }, [isAutoPlaying, autoProgress]);
 
   function handleResimulate() {
-    setInstanceKey(k => k + 1);
+    setInstanceKey((k) => k + 1);
     setIsAutoPlaying(true);
   }
 
@@ -622,20 +622,8 @@ export function DarwinianTreeDemo() {
 
       <div className="flex flex-col sm:flex-row gap-6 p-6 sm:p-8 rounded-xl bg-slate-950/80 backdrop-blur-xl border border-slate-800 relative overflow-hidden">
         <div className="absolute top-0 right-0 p-4 opacity-10 pointer-events-none">
-          <svg
-            width="40"
-            height="40"
-            viewBox="0 0 100 100"
-            className="stroke-emerald-500"
-          >
-            <circle
-              cx="50"
-              cy="50"
-              r="40"
-              fill="none"
-              strokeWidth="2"
-              strokeDasharray="4 8"
-            />
+          <svg width="40" height="40" viewBox="0 0 100 100" className="stroke-emerald-500">
+            <circle cx="50" cy="50" r="40" fill="none" strokeWidth="2" strokeDasharray="4 8" />
             <circle cx="50" cy="50" r="20" fill="none" strokeWidth="2" />
           </svg>
         </div>
@@ -649,12 +637,12 @@ export function DarwinianTreeDemo() {
           </div>
 
           <div className="flex gap-3">
-            {[1, 2, 3].map(gen => (
+            {[1, 2, 3].map((gen) => (
               <button
                 key={gen}
                 onClick={() => {
                   setGenerations(gen);
-                  setInstanceKey(k => k + 1);
+                  setInstanceKey((k) => k + 1);
                   setIsAutoPlaying(true);
                 }}
                 className={`flex-1 py-2 text-sm font-mono rounded-md border transition-all ${

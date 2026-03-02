@@ -46,10 +46,7 @@ interface SSEEvent {
  * This enables horizontal scaling across multiple Vercel instances while maintaining
  * real-time updates for all connected clients.
  */
-const activeConnections = new Map<
-  string,
-  Set<ReadableStreamDefaultController<Uint8Array>>
->();
+const activeConnections = new Map<string, Set<ReadableStreamDefaultController<Uint8Array>>>();
 
 /**
  * Broadcast an event to all connected clients for an app
@@ -59,10 +56,7 @@ const activeConnections = new Map<
  * 2. Store in Redis Lists (reliable fallback)
  * 3. Broadcast to local connections in this instance
  */
-export function broadcastToApp(
-  appId: string,
-  event: Omit<SSEEvent, "timestamp">,
-) {
+export function broadcastToApp(appId: string, event: Omit<SSEEvent, "timestamp">) {
   const connections = activeConnections.get(appId);
   logger.info(
     `[SSE] Broadcasting ${event.type} to app ${appId}: ${connections?.size || 0} local connections`,
@@ -76,7 +70,7 @@ export function broadcastToApp(
   // 1. Publish to Redis (Pub/Sub + Lists hybrid)
   // This will publish to Redis Pub/Sub channel AND store in a List
   // See: https://upstash.com/docs/redis/features/pubsub
-  publishSSEEvent(appId, fullEvent).catch(error => {
+  publishSSEEvent(appId, fullEvent).catch((error) => {
     logger.error(`[SSE] Failed to publish to Redis:`, error);
     // Don't fail the broadcast if Redis is down - continue with local broadcast
   });
@@ -84,7 +78,9 @@ export function broadcastToApp(
   // 2. Broadcast to local connections (existing logic)
   if (!connections || connections.size === 0) return;
 
-  const eventString = `data: ${JSON.stringify(fullEvent)}\n\n`;
+  const eventString = `data: ${JSON.stringify(fullEvent)}
+
+`;
   const encoder = new TextEncoder();
   const encoded = encoder.encode(eventString);
 
@@ -102,10 +98,7 @@ export function broadcastToApp(
  * GET /api/apps/[id]/messages/stream
  * SSE endpoint for real-time updates
  */
-export async function GET(
-  _request: NextRequest,
-  context: { params: Promise<{ id: string; }>; },
-) {
+export async function GET(_request: NextRequest, context: { params: Promise<{ id: string }> }) {
   const { data: session, error: authError } = await tryCatch(auth());
 
   if (authError || !session?.user?.id) {
@@ -181,12 +174,12 @@ export async function GET(
         data: { appId: id, status: app.status },
         timestamp: Date.now(),
       };
-      controller.enqueue(
-        encoder.encode(`data: ${JSON.stringify(connectedEvent)}\n\n`),
-      );
+      controller.enqueue(encoder.encode(`data: ${JSON.stringify(connectedEvent)}
+
+`));
 
       // Check and send agent working status
-      isAgentWorking(id).then(working => {
+      isAgentWorking(id).then((working) => {
         if (working) {
           const workingEvent: SSEEvent = {
             type: "agent_working",
@@ -194,9 +187,9 @@ export async function GET(
             timestamp: Date.now(),
           };
           try {
-            controller.enqueue(
-              encoder.encode(`data: ${JSON.stringify(workingEvent)}\n\n`),
-            );
+            controller.enqueue(encoder.encode(`data: ${JSON.stringify(workingEvent)}
+
+`));
           } catch {
             // Intentionally silent: Client disconnected between agent status check and enqueue.
           }
@@ -211,9 +204,9 @@ export async function GET(
             data: null,
             timestamp: Date.now(),
           };
-          controller.enqueue(
-            encoder.encode(`data: ${JSON.stringify(heartbeat)}\n\n`),
-          );
+          controller.enqueue(encoder.encode(`data: ${JSON.stringify(heartbeat)}
+
+`));
         } catch {
           // Intentionally silent: Client disconnected - clean up heartbeat interval.
           clearInterval(heartbeatInterval);
@@ -224,27 +217,26 @@ export async function GET(
       // Poll for events from other instances and forward to this connection
       const redisInterval = setInterval(() => {
         getSSEEvents(id, lastProcessedTimestamp)
-          .then(events => {
+          .then((events) => {
             for (const event of events) {
               try {
                 // Skip if we already processed this event
                 if (event.timestamp <= lastProcessedTimestamp) continue;
 
                 // Forward to local connection
-                const eventString = `data: ${JSON.stringify(event)}\n\n`;
+                const eventString = `data: ${JSON.stringify(event)}
+
+`;
                 controller.enqueue(encoder.encode(eventString));
 
                 // Update last processed timestamp
-                lastProcessedTimestamp = Math.max(
-                  lastProcessedTimestamp,
-                  event.timestamp,
-                );
+                lastProcessedTimestamp = Math.max(lastProcessedTimestamp, event.timestamp);
               } catch {
                 // Intentionally silent: Connection closed
               }
             }
           })
-          .catch(error => {
+          .catch((error) => {
             logger.error(`[SSE] Failed to poll Redis events:`, error);
             // Don't stop polling on errors - Redis might be temporarily unavailable
           });
@@ -264,12 +256,12 @@ export async function GET(
       };
 
       // Store cleanup function for cancel
-      (controller as unknown as { cleanup: () => void; }).cleanup = cleanup;
+      (controller as unknown as { cleanup: () => void }).cleanup = cleanup;
     },
 
     cancel() {
       if (controllerRef) {
-        const cleanup = (controllerRef as unknown as { cleanup?: () => void; }).cleanup;
+        const cleanup = (controllerRef as unknown as { cleanup?: () => void }).cleanup;
         if (cleanup) cleanup();
       }
     },
@@ -279,7 +271,7 @@ export async function GET(
     headers: {
       "Content-Type": "text/event-stream",
       "Cache-Control": "no-cache, no-store, must-revalidate",
-      "Connection": "keep-alive",
+      Connection: "keep-alive",
       "X-Accel-Buffering": "no", // Disable nginx buffering
     },
   });
@@ -295,8 +287,8 @@ export function broadcastMessage(
     role: string;
     content: string;
     createdAt: Date;
-    attachments?: Array<{ imageId: string; url: string; }>;
-    codeVersion?: { id: string; createdAt: Date; };
+    attachments?: Array<{ imageId: string; url: string }>;
+    codeVersion?: { id: string; createdAt: Date };
   },
 ) {
   broadcastToApp(appId, {
@@ -308,11 +300,7 @@ export function broadcastMessage(
 /**
  * Helper to broadcast status change to app clients
  */
-export function broadcastStatus(
-  appId: string,
-  status: string,
-  message?: string,
-) {
+export function broadcastStatus(appId: string, status: string, message?: string) {
   broadcastToApp(appId, {
     type: "status",
     data: { status, message },

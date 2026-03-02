@@ -16,19 +16,28 @@ const DOT_SPACING = 0.1;
 // Dot patterns for each dice face (standard d6 arrangement)
 const DOT_PATTERNS: Record<number, Array<[number, number]>> = {
   1: [[0, 0]], // center
-  2: [[-DOT_SPACING, -DOT_SPACING], [DOT_SPACING, DOT_SPACING]], // diagonal
-  3: [[-DOT_SPACING, -DOT_SPACING], [0, 0], [DOT_SPACING, DOT_SPACING]], // diagonal + center
-  4: [[-DOT_SPACING, -DOT_SPACING], [DOT_SPACING, -DOT_SPACING], [
-    -DOT_SPACING,
-    DOT_SPACING,
-  ], [
-    DOT_SPACING,
-    DOT_SPACING,
-  ]], // corners
-  5: [[-DOT_SPACING, -DOT_SPACING], [DOT_SPACING, -DOT_SPACING], [0, 0], [
-    -DOT_SPACING,
-    DOT_SPACING,
-  ], [DOT_SPACING, DOT_SPACING]], // corners + center
+  2: [
+    [-DOT_SPACING, -DOT_SPACING],
+    [DOT_SPACING, DOT_SPACING],
+  ], // diagonal
+  3: [
+    [-DOT_SPACING, -DOT_SPACING],
+    [0, 0],
+    [DOT_SPACING, DOT_SPACING],
+  ], // diagonal + center
+  4: [
+    [-DOT_SPACING, -DOT_SPACING],
+    [DOT_SPACING, -DOT_SPACING],
+    [-DOT_SPACING, DOT_SPACING],
+    [DOT_SPACING, DOT_SPACING],
+  ], // corners
+  5: [
+    [-DOT_SPACING, -DOT_SPACING],
+    [DOT_SPACING, -DOT_SPACING],
+    [0, 0],
+    [-DOT_SPACING, DOT_SPACING],
+    [DOT_SPACING, DOT_SPACING],
+  ], // corners + center
   6: [
     [-DOT_SPACING, -DOT_SPACING],
     [DOT_SPACING, -DOT_SPACING],
@@ -43,7 +52,7 @@ const DOT_PATTERNS: Record<number, Array<[number, number]>> = {
 function createDiceMaterials(): THREE.MeshStandardMaterial[] {
   const faceValues = [3, 4, 1, 6, 2, 5]; // Standard dice face order for boxGeometry: +X, -X, +Y, -Y, +Z, -Z
 
-  return faceValues.map(value => {
+  return faceValues.map((value) => {
     const canvas = document.createElement("canvas");
     canvas.width = 128;
     canvas.height = 128;

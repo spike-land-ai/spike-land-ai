@@ -15,12 +15,8 @@ type ScannerView = "prompt" | "camera" | "analyzing";
 
 import { useState } from "react";
 
-export function RoomScanner(
-  { onScanComplete, onCancel, analyzing = false }: RoomScannerProps,
-) {
-  const [view, setView] = useState<ScannerView>(
-    analyzing ? "analyzing" : "prompt",
-  );
+export function RoomScanner({ onScanComplete, onCancel, analyzing = false }: RoomScannerProps) {
+  const [view, setView] = useState<ScannerView>(analyzing ? "analyzing" : "prompt");
 
   if (analyzing || view === "analyzing") {
     return (
@@ -44,11 +40,9 @@ export function RoomScanner(
   if (view === "camera") {
     return (
       <div className="space-y-4">
-        <h2 className="text-lg font-semibold text-center">
-          Take a photo of your room
-        </h2>
+        <h2 className="text-lg font-semibold text-center">Take a photo of your room</h2>
         <CleanCamera
-          onCapture={base64 => {
+          onCapture={(base64) => {
             setView("analyzing");
             onScanComplete(base64);
           }}
@@ -81,12 +75,7 @@ export function RoomScanner(
             Scan Room
           </Button>
           {onCancel && (
-            <Button
-              variant="outline"
-              size="lg"
-              onClick={onCancel}
-              className="sm:w-auto"
-            >
+            <Button variant="outline" size="lg" onClick={onCancel} className="sm:w-auto">
               Cancel
             </Button>
           )}

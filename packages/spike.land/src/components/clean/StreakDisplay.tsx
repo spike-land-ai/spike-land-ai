@@ -12,16 +12,17 @@ interface StreakDisplayProps {
   compact?: boolean;
 }
 
-function StreakFlame({ value }: { value: number; }) {
-  const size = value === 0
-    ? "text-muted-foreground opacity-30"
-    : value < 3
-    ? "text-orange-400"
-    : value < 7
-    ? "text-orange-300"
-    : value < 30
-    ? "text-amber-300"
-    : "text-yellow-200";
+function StreakFlame({ value }: { value: number }) {
+  const size =
+    value === 0
+      ? "text-muted-foreground opacity-30"
+      : value < 3
+        ? "text-orange-400"
+        : value < 7
+          ? "text-orange-300"
+          : value < 30
+            ? "text-amber-300"
+            : "text-yellow-200";
 
   return (
     <div className="relative">
@@ -35,9 +36,7 @@ function StreakFlame({ value }: { value: number; }) {
 
 export function StreakDisplay({ streak, compact = false }: StreakDisplayProps) {
   const { progress } = pointsToNextLevel(streak.totalPoints);
-  const streakMessage = streak.currentStreak > 0
-    ? getStreakMessage(streak.currentStreak)
-    : null;
+  const streakMessage = streak.currentStreak > 0 ? getStreakMessage(streak.currentStreak) : null;
 
   if (compact) {
     return (
@@ -79,15 +78,11 @@ export function StreakDisplay({ streak, compact = false }: StreakDisplayProps) {
             </div>
             <div className="text-right space-y-2">
               <div>
-                <p className="text-xs text-white/60 uppercase tracking-wider">
-                  Best
-                </p>
+                <p className="text-xs text-white/60 uppercase tracking-wider">Best</p>
                 <p className="text-xl font-bold">{streak.bestStreak}</p>
               </div>
               <div>
-                <p className="text-xs text-white/60 uppercase tracking-wider">
-                  Sessions
-                </p>
+                <p className="text-xs text-white/60 uppercase tracking-wider">Sessions</p>
                 <p className="text-sm font-semibold">{streak.totalSessions}</p>
               </div>
             </div>
@@ -106,9 +101,7 @@ export function StreakDisplay({ streak, compact = false }: StreakDisplayProps) {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Trophy className="h-4 w-4 text-yellow-400" />
-              <span className="text-sm font-semibold">
-                Level {streak.level}
-              </span>
+              <span className="text-sm font-semibold">Level {streak.level}</span>
             </div>
             <span className="text-xs text-muted-foreground tabular-nums">
               {streak.totalPoints.toLocaleString()} XP

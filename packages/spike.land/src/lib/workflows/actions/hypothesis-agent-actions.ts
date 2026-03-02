@@ -8,10 +8,7 @@ const getAgent = () => new HypothesisAgent();
 /**
  * Helper to get workspaceId from context or config
  */
-async function getWorkspaceId(
-  workflowId: string,
-  configWorkspaceId?: string,
-): Promise<string> {
+async function getWorkspaceId(workflowId: string, configWorkspaceId?: string): Promise<string> {
   if (configWorkspaceId) return configWorkspaceId;
 
   const workflow = await prisma.workflow.findUnique({
@@ -25,14 +22,10 @@ async function getWorkspaceId(
 
 registerStepHandler("generate_hypotheses", async (step, context) => {
   try {
-    const workspaceId = await getWorkspaceId(
-      context.workflowId,
-      step.config.workspaceId as string,
-    );
+    const workspaceId = await getWorkspaceId(context.workflowId, step.config.workspaceId as string);
 
     const count = (step.config.count as number) || 3;
-    const focus = (step.config.focus as "engagement" | "conversions" | "reach")
-      || "engagement";
+    const focus = (step.config.focus as "engagement" | "conversions" | "reach") || "engagement";
 
     const hypotheses = await getAgent().generateHypotheses({
       workspaceId,
@@ -44,7 +37,7 @@ registerStepHandler("generate_hypotheses", async (step, context) => {
       output: {
         hypotheses,
         count: hypotheses.length,
-        hypothesisIds: hypotheses.map(h => h.id),
+        hypothesisIds: hypotheses.map((h) => h.id),
       },
     };
   } catch (error) {
@@ -54,8 +47,8 @@ registerStepHandler("generate_hypotheses", async (step, context) => {
 
 registerStepHandler("design_experiment", async (step, context) => {
   try {
-    const hypothesisId = step.config.hypothesisId as string
-      || (context.triggerData?.hypothesisId as string); // Allow trigger to pass it
+    const hypothesisId =
+      (step.config.hypothesisId as string) || (context.triggerData?.hypothesisId as string); // Allow trigger to pass it
 
     if (!hypothesisId) return { error: "Hypothesis ID required" };
 
@@ -73,12 +66,12 @@ registerStepHandler("design_experiment", async (step, context) => {
 
 registerStepHandler("generate_variants", async (step, context) => {
   try {
-    const hypothesisId = step.config.hypothesisId as string
-      || (context.triggerData?.hypothesisId as string);
+    const hypothesisId =
+      (step.config.hypothesisId as string) || (context.triggerData?.hypothesisId as string);
 
     // Allow getting original content from previous step or config
-    const originalContent = (step.config.originalContent as string)
-      || (context.triggerData?.originalContent as string);
+    const originalContent =
+      (step.config.originalContent as string) || (context.triggerData?.originalContent as string);
 
     if (!hypothesisId || !originalContent) {
       return { error: "Hypothesis ID and Original Content required" };
@@ -98,8 +91,8 @@ registerStepHandler("generate_variants", async (step, context) => {
 
 registerStepHandler("analyze_results", async (step, context) => {
   try {
-    const experimentId = step.config.experimentId as string
-      || (context.triggerData?.experimentId as string);
+    const experimentId =
+      (step.config.experimentId as string) || (context.triggerData?.experimentId as string);
 
     if (!experimentId) return { error: "Experiment ID required" };
 
@@ -113,8 +106,8 @@ registerStepHandler("analyze_results", async (step, context) => {
 
 registerStepHandler("select_winner", async (step, context) => {
   try {
-    const experimentId = step.config.experimentId as string
-      || (context.triggerData?.experimentId as string);
+    const experimentId =
+      (step.config.experimentId as string) || (context.triggerData?.experimentId as string);
 
     if (!experimentId) return { error: "Experiment ID required" };
 

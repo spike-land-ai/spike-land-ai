@@ -154,9 +154,7 @@ describe("brand-score validations", () => {
         wordIndex: 5,
         excerpt: "maximize synergy",
       });
-      expect(result.violations[0]!.suggestion).toBe(
-        "Use 'collaboration' instead",
-      );
+      expect(result.violations[0]!.suggestion).toBe("Use 'collaboration' instead");
     });
 
     it("should omit location when no location fields present", () => {

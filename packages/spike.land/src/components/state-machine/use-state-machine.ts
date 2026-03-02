@@ -32,7 +32,7 @@ export type {
 
 interface McpProxyResponse {
   result?: {
-    content: Array<{ type: string; text: string; }>;
+    content: Array<{ type: string; text: string }>;
   };
   error?: string;
 }
@@ -75,7 +75,7 @@ export async function mcpCall(
         error,
       );
       // Exponential backoff: 500ms, 1500ms
-      await new Promise(resolve => setTimeout(resolve, 500 * Math.pow(3, retryCount)));
+      await new Promise((resolve) => setTimeout(resolve, 500 * Math.pow(3, retryCount)));
       return mcpCall(tool, params, retryCount + 1);
     }
     throw error;
@@ -122,12 +122,8 @@ export interface MachineData {
 export function useStateMachine() {
   const [machines, setMachines] = useState<MachineTab[]>([]);
   const [activeMachineId, setActiveMachineId] = useState<string | null>(null);
-  const [machineData, setMachineData] = useState<Record<string, MachineData>>(
-    {},
-  );
-  const [validationIssues, setValidationIssues] = useState<
-    Record<string, ValidationIssue[]>
-  >({});
+  const [machineData, setMachineData] = useState<Record<string, MachineData>>({});
+  const [validationIssues, setValidationIssues] = useState<Record<string, ValidationIssue[]>>({});
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const pollRef = useRef<NodeJS.Timeout | null>(null);
@@ -142,9 +138,7 @@ export function useStateMachine() {
       const lines = text.split("\n");
       for (const line of lines) {
         // - `id` **name** — 2 states, 1 transitions
-        const match = line.match(
-          /- \`([^`]+)\` \*\*(.*?)\*\* — (\d+) states, (\d+) transitions/,
-        );
+        const match = line.match(/- \`([^`]+)\` \*\*(.*?)\*\* — (\d+) states, (\d+) transitions/);
         if (match) {
           tabs.push({
             id: match[1] || "",
@@ -165,11 +159,7 @@ export function useStateMachine() {
 
   // ── Create machine ─────────────────────────────────────────────────
   const createMachine = useCallback(
-    async (
-      name: string,
-      initialState?: string,
-      context?: Record<string, unknown>,
-    ) => {
+    async (name: string, initialState?: string, context?: Record<string, unknown>) => {
       setLoading(true);
       setError(null);
       try {
@@ -182,9 +172,7 @@ export function useStateMachine() {
         const idMatch = text.match(/- \*\*ID:\*\* \`([^`]+)\`/);
         const nameMatch = text.match(/- \*\*Name:\*\* (.*)/);
 
-        const id = idMatch
-          ? idMatch[1] || `unknown-${Date.now()}`
-          : `unknown-${Date.now()}`;
+        const id = idMatch ? idMatch[1] || `unknown-${Date.now()}` : `unknown-${Date.now()}`;
         const machineName = nameMatch ? (nameMatch[1] || name).trim() : name;
 
         const newTab: MachineTab = {
@@ -194,14 +182,12 @@ export function useStateMachine() {
           transitionCount: 0,
           hasUnsavedChanges: false,
         };
-        setMachines(prev => [...prev, newTab]);
+        setMachines((prev) => [...prev, newTab]);
         setActiveMachineId(id);
         return id;
       } catch (err) {
         console.error("[useStateMachine] createMachine error:", err);
-        setError(
-          err instanceof Error ? err.message : "Failed to create machine",
-        );
+        setError(err instanceof Error ? err.message : "Failed to create machine");
         return null;
       } finally {
         setLoading(false);
@@ -222,26 +208,24 @@ export function useStateMachine() {
       }
 
       const exported: MachineData = JSON.parse(jsonMatch[1]);
-      setMachineData(prev => ({ ...prev, [machineId]: exported }));
+      setMachineData((prev) => ({ ...prev, [machineId]: exported }));
 
       // Update tab counts
-      setMachines(prev =>
-        prev.map(m =>
+      setMachines((prev) =>
+        prev.map((m) =>
           m.id === machineId
             ? {
-              ...m,
-              stateCount: Object.keys(exported.definition.states).length,
-              transitionCount: exported.definition.transitions.length,
-            }
-            : m
-        )
+                ...m,
+                stateCount: Object.keys(exported.definition.states).length,
+                transitionCount: exported.definition.transitions.length,
+              }
+            : m,
+        ),
       );
 
       return exported;
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Failed to refresh machine",
-      );
+      setError(err instanceof Error ? err.message : "Failed to refresh machine");
       return null;
     }
   }, []);
@@ -255,12 +239,8 @@ export function useStateMachine() {
       options?: {
         parent?: string;
         initial?: string;
-        entry_actions?: Array<
-          { type: ActionType; params: Record<string, unknown>; }
-        >;
-        exit_actions?: Array<
-          { type: ActionType; params: Record<string, unknown>; }
-        >;
+        entry_actions?: Array<{ type: ActionType; params: Record<string, unknown> }>;
+        exit_actions?: Array<{ type: ActionType; params: Record<string, unknown> }>;
         history_type?: HistoryType;
       },
     ) => {
@@ -317,7 +297,7 @@ export function useStateMachine() {
       event: string,
       options?: {
         guard_expression?: string;
-        actions?: Array<{ type: ActionType; params: Record<string, unknown>; }>;
+        actions?: Array<{ type: ActionType; params: Record<string, unknown> }>;
         internal?: boolean;
         delay_expression?: string;
       },
@@ -336,9 +316,7 @@ export function useStateMachine() {
         await refreshMachine(machineId);
         return true;
       } catch (err) {
-        setError(
-          err instanceof Error ? err.message : "Failed to add transition",
-        );
+        setError(err instanceof Error ? err.message : "Failed to add transition");
         return false;
       } finally {
         setLoading(false);
@@ -360,9 +338,7 @@ export function useStateMachine() {
         await refreshMachine(machineId);
         return true;
       } catch (err) {
-        setError(
-          err instanceof Error ? err.message : "Failed to remove transition",
-        );
+        setError(err instanceof Error ? err.message : "Failed to remove transition");
         return false;
       } finally {
         setLoading(false);
@@ -373,11 +349,7 @@ export function useStateMachine() {
 
   // ── Send event ─────────────────────────────────────────────────────
   const sendEvent = useCallback(
-    async (
-      machineId: string,
-      event: string,
-      payload?: Record<string, unknown>,
-    ) => {
+    async (machineId: string, event: string, payload?: Record<string, unknown>) => {
       setError(null);
       try {
         const params: Record<string, unknown> = {
@@ -402,10 +374,10 @@ export function useStateMachine() {
       const text = await mcpCall("sm_get_state", { machine_id: machineId });
       const jsonMatch = text.match(/```json\n([\s\S]*?)\n```/);
       return jsonMatch && jsonMatch[1]
-        ? {
-          activeStates: [],
-          context: JSON.parse(jsonMatch[1]),
-        } as MachineState
+        ? ({
+            activeStates: [],
+            context: JSON.parse(jsonMatch[1]),
+          } as MachineState)
         : null;
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to get state");
@@ -435,9 +407,7 @@ export function useStateMachine() {
         await refreshMachine(machineId);
         return true;
       } catch (err) {
-        setError(
-          err instanceof Error ? err.message : "Failed to reset machine",
-        );
+        setError(err instanceof Error ? err.message : "Failed to reset machine");
         return false;
       }
     },
@@ -465,12 +435,10 @@ export function useStateMachine() {
           });
         }
       }
-      setValidationIssues(prev => ({ ...prev, [machineId]: issues }));
+      setValidationIssues((prev) => ({ ...prev, [machineId]: issues }));
       return issues;
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Failed to validate machine",
-      );
+      setError(err instanceof Error ? err.message : "Failed to validate machine");
       return [];
     }
   }, []);
@@ -480,9 +448,7 @@ export function useStateMachine() {
     try {
       const text = await mcpCall("sm_export", { machine_id: machineId });
       const jsonMatch = text.match(/```json\n([\s\S]*?)\n```/);
-      return jsonMatch && jsonMatch[1]
-        ? JSON.parse(jsonMatch[1]) as MachineExport
-        : null;
+      return jsonMatch && jsonMatch[1] ? (JSON.parse(jsonMatch[1]) as MachineExport) : null;
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to export machine");
       return null;
@@ -490,28 +456,31 @@ export function useStateMachine() {
   }, []);
 
   // ── Share machine ──────────────────────────────────────────────────
-  const shareMachine = useCallback(async (machineId: string) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const data = machineData[machineId];
-      const text = await mcpCall("sm_share", {
-        machine_id: machineId,
-        machine_data: data ?? undefined,
-      });
-      const tokenMatch = text.match(/- \*\*Token:\*\* \`([^`]+)\`/);
-      const urlMatch = text.match(/- \*\*Link:\*\* \[(.*?)\]/);
-      if (tokenMatch && urlMatch) {
-        return { token: tokenMatch[1] || "", url: urlMatch[1] || "" };
+  const shareMachine = useCallback(
+    async (machineId: string) => {
+      setLoading(true);
+      setError(null);
+      try {
+        const data = machineData[machineId];
+        const text = await mcpCall("sm_share", {
+          machine_id: machineId,
+          machine_data: data ?? undefined,
+        });
+        const tokenMatch = text.match(/- \*\*Token:\*\* \`([^`]+)\`/);
+        const urlMatch = text.match(/- \*\*Link:\*\* \[(.*?)\]/);
+        if (tokenMatch && urlMatch) {
+          return { token: tokenMatch[1] || "", url: urlMatch[1] || "" };
+        }
+        return null;
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Failed to share machine");
+        return null;
+      } finally {
+        setLoading(false);
       }
-      return null;
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to share machine");
-      return null;
-    } finally {
-      setLoading(false);
-    }
-  }, [machineData]);
+    },
+    [machineData],
+  );
 
   // ── Set context ────────────────────────────────────────────────────
   const setContext = useCallback(
@@ -546,20 +515,20 @@ export function useStateMachine() {
   // ── Close machine tab ──────────────────────────────────────────────
   const closeMachine = useCallback(
     (machineId: string) => {
-      setMachines(prev => prev.filter(m => m.id !== machineId));
-      setMachineData(prev => {
+      setMachines((prev) => prev.filter((m) => m.id !== machineId));
+      setMachineData((prev) => {
         const next = { ...prev };
         delete next[machineId];
         return next;
       });
-      setValidationIssues(prev => {
+      setValidationIssues((prev) => {
         const next = { ...prev };
         delete next[machineId];
         return next;
       });
       if (activeMachineId === machineId) {
-        setMachines(prev => {
-          const remaining = prev.filter(m => m.id !== machineId);
+        setMachines((prev) => {
+          const remaining = prev.filter((m) => m.id !== machineId);
           const first = remaining[0];
           setActiveMachineId(first ? first.id : null);
           return remaining;
@@ -570,12 +539,8 @@ export function useStateMachine() {
   );
 
   // Computed
-  const activeMachine = activeMachineId
-    ? machineData[activeMachineId] ?? null
-    : null;
-  const activeValidation = activeMachineId
-    ? validationIssues[activeMachineId] ?? []
-    : [];
+  const activeMachine = activeMachineId ? (machineData[activeMachineId] ?? null) : null;
+  const activeValidation = activeMachineId ? (validationIssues[activeMachineId] ?? []) : [];
 
   return {
     // State

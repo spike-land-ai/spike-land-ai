@@ -23,11 +23,7 @@ vi.mock("@/lib/logger", () => ({
   },
 }));
 
-import {
-  getCircuitState,
-  recordCircuitFailure,
-  recordCircuitSuccess,
-} from "./circuit-breaker";
+import { getCircuitState, recordCircuitFailure, recordCircuitSuccess } from "./circuit-breaker";
 
 describe("circuit-breaker", () => {
   beforeEach(() => {
@@ -122,10 +118,7 @@ describe("circuit-breaker", () => {
       await recordCircuitFailure();
 
       expect(mockIncr).toHaveBeenCalledWith("circuit_breaker:claude:failures");
-      expect(mockExpire).toHaveBeenCalledWith(
-        "circuit_breaker:claude:failures",
-        300,
-      );
+      expect(mockExpire).toHaveBeenCalledWith("circuit_breaker:claude:failures", 300);
     });
 
     it("should NOT open circuit when below threshold", async () => {
@@ -144,11 +137,7 @@ describe("circuit-breaker", () => {
 
       await recordCircuitFailure();
 
-      expect(mockSet).toHaveBeenCalledWith(
-        "circuit_breaker:claude:state",
-        "OPEN",
-        { ex: 300 },
-      );
+      expect(mockSet).toHaveBeenCalledWith("circuit_breaker:claude:state", "OPEN", { ex: 300 });
       expect(mockSet).toHaveBeenCalledWith(
         "circuit_breaker:claude:last_failure",
         expect.any(Number),
@@ -163,11 +152,7 @@ describe("circuit-breaker", () => {
 
       await recordCircuitFailure();
 
-      expect(mockSet).toHaveBeenCalledWith(
-        "circuit_breaker:claude:state",
-        "OPEN",
-        { ex: 300 },
-      );
+      expect(mockSet).toHaveBeenCalledWith("circuit_breaker:claude:state", "OPEN", { ex: 300 });
     });
 
     it("should swallow Redis errors gracefully", async () => {
@@ -184,16 +169,8 @@ describe("circuit-breaker", () => {
 
       await recordCircuitSuccess();
 
-      expect(mockSet).toHaveBeenCalledWith(
-        "circuit_breaker:claude:state",
-        "CLOSED",
-        { ex: 300 },
-      );
-      expect(mockSet).toHaveBeenCalledWith(
-        "circuit_breaker:claude:failures",
-        0,
-        { ex: 300 },
-      );
+      expect(mockSet).toHaveBeenCalledWith("circuit_breaker:claude:state", "CLOSED", { ex: 300 });
+      expect(mockSet).toHaveBeenCalledWith("circuit_breaker:claude:failures", 0, { ex: 300 });
     });
 
     it("should swallow Redis errors gracefully", async () => {

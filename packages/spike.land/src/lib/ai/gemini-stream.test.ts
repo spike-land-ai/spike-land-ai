@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { processGeminiStream } from "./gemini-stream";
 
 vi.mock("@/lib/try-catch", () => ({
-  tryCatch: vi.fn(async p => {
+  tryCatch: vi.fn(async (p) => {
     try {
       const data = await p;
       return { data, error: null };
@@ -22,7 +22,7 @@ describe("gemini-stream", () => {
     vi.useRealTimers();
   });
 
-  const createMockAi = (responseOrError: any, isError = false) => {
+  const createMockAi = (responseOrError: unknown, isError = false) => {
     return {
       models: {
         generateContentStream: vi.fn().mockImplementation(() => {
@@ -30,10 +30,10 @@ describe("gemini-stream", () => {
           return Promise.resolve(responseOrError);
         }),
       },
-    } as any;
+    } as unknown as Awaited<ReturnType<typeof import("./gemini-client").getGeminiClient>>;
   };
 
-  const createAsyncIterable = (chunks: any[]) => {
+  const createAsyncIterable = (chunks: unknown[]) => {
     return {
       async *[Symbol.asyncIterator]() {
         for (const chunk of chunks) {
@@ -46,22 +46,30 @@ describe("gemini-stream", () => {
   it("processes a valid stream successfully", async () => {
     const mockStream = createAsyncIterable([
       {
-        candidates: [{
-          content: {
-            parts: [{
-              inlineData: { data: Buffer.from("chunk1").toString("base64") },
-            }],
+        candidates: [
+          {
+            content: {
+              parts: [
+                {
+                  inlineData: { data: Buffer.from("chunk1").toString("base64") },
+                },
+              ],
+            },
           },
-        }],
+        ],
       },
       {
-        candidates: [{
-          content: {
-            parts: [{
-              inlineData: { data: Buffer.from("chunk2").toString("base64") },
-            }],
+        candidates: [
+          {
+            content: {
+              parts: [
+                {
+                  inlineData: { data: Buffer.from("chunk2").toString("base64") },
+                },
+              ],
+            },
           },
-        }],
+        ],
       },
     ]);
 
@@ -85,37 +93,43 @@ describe("gemini-stream", () => {
   it("throws if stream initiation fails", async () => {
     const ai = createMockAi(new Error("init failed"), true);
 
-    await expect(processGeminiStream({
-      ai,
-      model: "test",
-      config: { responseModalities: [] },
-      contents: [],
-      operationType: "enhancement",
-    })).rejects.toThrow("Failed to start image enhancement: init failed");
+    await expect(
+      processGeminiStream({
+        ai,
+        model: "test",
+        config: { responseModalities: [] },
+        contents: [],
+        operationType: "enhancement",
+      }),
+    ).rejects.toThrow("Failed to start image enhancement: init failed");
   });
 
   it("throws if stream initiation throws non-error", async () => {
     const ai = createMockAi("string error", true);
 
-    await expect(processGeminiStream({
-      ai,
-      model: "test",
-      config: { responseModalities: [] },
-      contents: [],
-      operationType: "modification",
-    })).rejects.toThrow("Failed to start image modification: Unknown error");
+    await expect(
+      processGeminiStream({
+        ai,
+        model: "test",
+        config: { responseModalities: [] },
+        contents: [],
+        operationType: "modification",
+      }),
+    ).rejects.toThrow("Failed to start image modification: Unknown error");
   });
 
   it("throws if no image data received", async () => {
     const mockStream = createAsyncIterable([]);
     const ai = createMockAi(mockStream);
 
-    const expectPromise = expect(processGeminiStream({
-      ai,
-      model: "test",
-      config: { responseModalities: [] },
-      contents: [],
-    })).rejects.toThrow("No image data received from Gemini API");
+    const expectPromise = expect(
+      processGeminiStream({
+        ai,
+        model: "test",
+        config: { responseModalities: [] },
+        contents: [],
+      }),
+    ).rejects.toThrow("No image data received from Gemini API");
 
     await vi.runAllTimersAsync();
     await expectPromise;
@@ -125,13 +139,17 @@ describe("gemini-stream", () => {
     const mockStream = createAsyncIterable([
       { candidates: [] }, // invalid
       {
-        candidates: [{
-          content: {
-            parts: [{
-              inlineData: { data: Buffer.from("valid").toString("base64") },
-            }],
+        candidates: [
+          {
+            content: {
+              parts: [
+                {
+                  inlineData: { data: Buffer.from("valid").toString("base64") },
+                },
+              ],
+            },
           },
-        }],
+        ],
       },
     ]);
 
@@ -152,9 +170,11 @@ describe("gemini-stream", () => {
     const mockStream = {
       async *[Symbol.asyncIterator]() {
         yield {
-          candidates: [{
-            content: { parts: [{ inlineData: { data: "MQA=" } }] },
-          }],
+          candidates: [
+            {
+              content: { parts: [{ inlineData: { data: "MQA=" } }] },
+            },
+          ],
         };
         throw new Error("Stream read failed");
       },
@@ -182,13 +202,15 @@ describe("gemini-stream", () => {
     };
 
     const ai = createMockAi(mockStream);
-    const expectPromise = expect(processGeminiStream({
-      ai,
-      model: "test",
-      config: { responseModalities: [] },
-      contents: [],
-      timeoutMs: 1000,
-    })).rejects.toThrow("Gemini API request timed out");
+    const expectPromise = expect(
+      processGeminiStream({
+        ai,
+        model: "test",
+        config: { responseModalities: [] },
+        contents: [],
+        timeoutMs: 1000,
+      }),
+    ).rejects.toThrow("Gemini API request timed out");
 
     // Fast forward past timeout
     await vi.advanceTimersByTimeAsync(1500);

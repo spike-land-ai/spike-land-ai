@@ -17,7 +17,7 @@ vi.mock("@/lib/codespace/session-service", () => ({
   }),
   getSession: vi.fn().mockResolvedValue({
     codeSpace: "test-cs",
-    code: "import React from \"react\";\nexport default function App() { return null; }",
+    code: 'import React from "react";\nexport default function App() { return null; }',
     transpiled: "",
     hash: "abc123",
     messages: [],
@@ -75,33 +75,25 @@ describe("codespace standalone tools", () => {
         ctx,
       );
       expect(result.isError).toBeFalsy();
-      const text = (result.content[0] as { text: string; }).text;
+      const text = (result.content[0] as { text: string }).text;
       expect(text).toContain("CodeSpace Updated");
     });
   });
 
   describe("codespace_run", () => {
     it("transpiles without updating code", async () => {
-      const result = await registry.call(
-        "codespace_run",
-        { codespace_id: "test-cs" },
-        ctx,
-      );
+      const result = await registry.call("codespace_run", { codespace_id: "test-cs" }, ctx);
       expect(result.isError).toBeFalsy();
-      const text = (result.content[0] as { text: string; }).text;
+      const text = (result.content[0] as { text: string }).text;
       expect(text).toContain("Transpiled");
     });
   });
 
   describe("codespace_get", () => {
     it("returns session data", async () => {
-      const result = await registry.call(
-        "codespace_get",
-        { codespace_id: "test-cs" },
-        ctx,
-      );
+      const result = await registry.call("codespace_get", { codespace_id: "test-cs" }, ctx);
       expect(result.isError).toBeFalsy();
-      const text = (result.content[0] as { text: string; }).text;
+      const text = (result.content[0] as { text: string }).text;
       expect(text).toContain("CodeSpace Details");
     });
   });
@@ -111,22 +103,14 @@ describe("codespace standalone tools", () => {
       const fs = getFilesystem("test-cs");
       fs.set("/src/app.test.ts", "test('works', () => {});");
 
-      const result = await registry.call(
-        "codespace_run_tests",
-        { codespace_id: "test-cs" },
-        ctx,
-      );
+      const result = await registry.call("codespace_run_tests", { codespace_id: "test-cs" }, ctx);
       expect(result.isError).toBeFalsy();
-      const text = (result.content[0] as { text: string; }).text;
+      const text = (result.content[0] as { text: string }).text;
       expect(text).toContain("Test files (1)");
     });
 
     it("returns error when no files exist", async () => {
-      const result = await registry.call(
-        "codespace_run_tests",
-        { codespace_id: "empty-cs" },
-        ctx,
-      );
+      const result = await registry.call("codespace_run_tests", { codespace_id: "empty-cs" }, ctx);
       expect(result.isError).toBe(true);
     });
   });
@@ -139,7 +123,7 @@ describe("codespace standalone tools", () => {
         ctx,
       );
       expect(result.isError).toBeFalsy();
-      const text = (result.content[0] as { text: string; }).text;
+      const text = (result.content[0] as { text: string }).text;
       expect(text).toContain("test-cs-v1");
       expect(text).toContain("test-cs-v2");
     });
@@ -147,11 +131,7 @@ describe("codespace standalone tools", () => {
 
   describe("codespace_regenerate", () => {
     it("returns error when no test files exist", async () => {
-      const result = await registry.call(
-        "codespace_regenerate",
-        { codespace_id: "regen-cs" },
-        ctx,
-      );
+      const result = await registry.call("codespace_regenerate", { codespace_id: "regen-cs" }, ctx);
       expect(result.isError).toBe(true);
     });
 
@@ -162,7 +142,7 @@ describe("codespace standalone tools", () => {
         ctx,
       );
       expect(result.isError).toBeFalsy();
-      const text = (result.content[0] as { text: string; }).text;
+      const text = (result.content[0] as { text: string }).text;
       expect(text).toContain("Version restore requested");
     });
   });
@@ -185,7 +165,7 @@ describe("codespace standalone tools", () => {
         ctx,
       );
       expect(result.isError).toBeFalsy();
-      const text = (result.content[0] as { text: string; }).text;
+      const text = (result.content[0] as { text: string }).text;
       expect(text).toContain("export const x = 1;");
     });
   });
@@ -223,7 +203,7 @@ describe("codespace standalone tools", () => {
         ctx,
       );
       expect(result.isError).toBeFalsy();
-      const text = (result.content[0] as { text: string; }).text;
+      const text = (result.content[0] as { text: string }).text;
       expect(text).toContain("1 file(s)");
       expect(text).toContain("app.test.ts");
     });
@@ -235,13 +215,9 @@ describe("codespace standalone tools", () => {
       fs.set("/src/app.ts", "");
       fs.set("/src/utils.ts", "");
 
-      const result = await registry.call(
-        "fs_ls",
-        { codespace_id: "ls-cs", path: "/" },
-        ctx,
-      );
+      const result = await registry.call("fs_ls", { codespace_id: "ls-cs", path: "/" }, ctx);
       expect(result.isError).toBeFalsy();
-      const text = (result.content[0] as { text: string; }).text;
+      const text = (result.content[0] as { text: string }).text;
       expect(text).toContain("src/");
     });
   });
@@ -276,13 +252,9 @@ describe("codespace standalone tools", () => {
 
   describe("codespace_list_templates", () => {
     it("lists all templates", async () => {
-      const result = await registry.call(
-        "codespace_list_templates",
-        {},
-        ctx,
-      );
+      const result = await registry.call("codespace_list_templates", {}, ctx);
       expect(result.isError).toBeFalsy();
-      const text = (result.content[0] as { text: string; }).text;
+      const text = (result.content[0] as { text: string }).text;
       expect(text).toContain("Available Templates");
       expect(text).toContain("blank");
       expect(text).toContain("react-counter");
@@ -295,7 +267,7 @@ describe("codespace standalone tools", () => {
         ctx,
       );
       expect(result.isError).toBeFalsy();
-      const text = (result.content[0] as { text: string; }).text;
+      const text = (result.content[0] as { text: string }).text;
       expect(text).toContain("dashboard-stats");
     });
   });
@@ -308,7 +280,7 @@ describe("codespace standalone tools", () => {
         ctx,
       );
       expect(result.isError).toBeFalsy();
-      const text = (result.content[0] as { text: string; }).text;
+      const text = (result.content[0] as { text: string }).text;
       expect(text).toContain("Codespace Created from Template");
     });
 
@@ -330,7 +302,7 @@ describe("codespace standalone tools", () => {
         ctx,
       );
       expect(result.isError).toBeFalsy();
-      const text = (result.content[0] as { text: string; }).text;
+      const text = (result.content[0] as { text: string }).text;
       // The mocked session code imports React which is excluded
       expect(text).toContain("Dependencies for codespace");
     });

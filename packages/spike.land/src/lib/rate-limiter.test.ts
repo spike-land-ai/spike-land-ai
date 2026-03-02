@@ -94,7 +94,7 @@ describe("rate-limiter", () => {
       expect(r2.isLimited).toBe(true);
 
       // Wait for window to expire
-      await new Promise(resolve => setTimeout(resolve, 150));
+      await new Promise((resolve) => setTimeout(resolve, 150));
 
       const r3 = await checkRateLimit("user3", config);
       expect(r3.isLimited).toBe(false);
@@ -131,14 +131,11 @@ describe("rate-limiter", () => {
     it("uses redis.eval for atomic counting", async () => {
       mockRedis.eval.mockResolvedValue([1, 60000]);
 
-      const result = await checkRateLimit(
-        "redis-user",
-        rateLimitConfigs.vibeChat,
-      );
+      const result = await checkRateLimit("redis-user", rateLimitConfigs.vibeChat);
 
       expect(result.isLimited).toBe(false);
       expect(mockRedis.eval).toHaveBeenCalledWith(
-        expect.stringContaining("redis.call(\"INCR\", KEYS[1])"),
+        expect.stringContaining('redis.call("INCR", KEYS[1])'),
         ["ratelimit:redis-user"],
         [60],
       );
@@ -147,10 +144,7 @@ describe("rate-limiter", () => {
     it("returns isLimited when count exceeds maxRequests", async () => {
       mockRedis.eval.mockResolvedValue([11, 45000]);
 
-      const result = await checkRateLimit(
-        "redis-user3",
-        rateLimitConfigs.vibeChat,
-      );
+      const result = await checkRateLimit("redis-user3", rateLimitConfigs.vibeChat);
 
       expect(result.isLimited).toBe(true);
       expect(result.remaining).toBe(0);
@@ -159,10 +153,7 @@ describe("rate-limiter", () => {
     it("returns correct remaining count", async () => {
       mockRedis.eval.mockResolvedValue([7, 30000]);
 
-      const result = await checkRateLimit(
-        "redis-user4",
-        rateLimitConfigs.vibeChat,
-      );
+      const result = await checkRateLimit("redis-user4", rateLimitConfigs.vibeChat);
 
       expect(result.isLimited).toBe(false);
       expect(result.remaining).toBe(3); // 10 - 7
@@ -171,10 +162,7 @@ describe("rate-limiter", () => {
     it("falls back to in-memory on Redis error", async () => {
       mockRedis.eval.mockRejectedValue(new Error("Redis connection failed"));
 
-      const result = await checkRateLimit(
-        "fallback-user",
-        rateLimitConfigs.vibeChat,
-      );
+      const result = await checkRateLimit("fallback-user", rateLimitConfigs.vibeChat);
 
       // Should still work via in-memory fallback
       expect(result.isLimited).toBe(false);

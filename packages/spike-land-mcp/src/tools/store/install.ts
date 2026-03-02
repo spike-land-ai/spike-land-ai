@@ -86,12 +86,11 @@ export function registerStoreInstallTools(
       .meta({ category: "store-install", tier: "free" })
       .handler(async () => {
         return safeToolCall("store_app_install_list", async () => {
-          const apps = await apiRequest<Array<{ name: string; slug: string }>>("/api/store/install/my");
+          const apps =
+            await apiRequest<Array<{ name: string; slug: string }>>("/api/store/install/my");
 
           if (apps.length === 0) return textResult("No apps installed yet.");
-          const list = apps
-            .map(a => `- **${a.name}** (/apps/store/${a.slug})`)
-            .join("\n");
+          const list = apps.map((a) => `- **${a.name}** (/apps/store/${a.slug})`).join("\n");
           return textResult(`## Your Installed Apps\n\n${list}`);
         });
       }),
@@ -100,13 +99,19 @@ export function registerStoreInstallTools(
   // store_app_install_count
   registry.registerBuilt(
     t
-      .tool("store_app_install_count", "Get the install count for a store app (public, no auth required).", {
-        slug: z.string().min(1).describe("The app slug"),
-      })
+      .tool(
+        "store_app_install_count",
+        "Get the install count for a store app (public, no auth required).",
+        {
+          slug: z.string().min(1).describe("The app slug"),
+        },
+      )
       .meta({ category: "store-install", tier: "free" })
       .handler(async ({ input }) => {
         return safeToolCall("store_app_install_count", async () => {
-          const result = await apiRequest<{ count: number }>(`/api/store/install/${input.slug}/count`);
+          const result = await apiRequest<{ count: number }>(
+            `/api/store/install/${input.slug}/count`,
+          );
           return textResult(`Install count for "${input.slug}": ${result.count}`);
         });
       }),

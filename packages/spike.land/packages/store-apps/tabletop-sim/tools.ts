@@ -15,15 +15,8 @@ import { jsonResult, safeToolCall, textResult } from "../shared/tool-helpers";
 // ---------------------------------------------------------------------------
 
 const CreateRoomSchema = z.object({
-  host_id: z.string().min(1).describe(
-    "Peer ID or user identifier for the room host.",
-  ),
-  name: z
-    .string()
-    .min(1)
-    .max(60)
-    .optional()
-    .describe("Optional display name for the room."),
+  host_id: z.string().min(1).describe("Peer ID or user identifier for the room host."),
+  name: z.string().min(1).max(60).optional().describe("Optional display name for the room."),
   max_players: z
     .number()
     .int()
@@ -41,9 +34,7 @@ const GetRoomSchema = z.object({
 const RollDiceSchema = z.object({
   room_id: z.string().min(1).describe("The room in which to roll dice."),
   player_id: z.string().min(1).describe("The player rolling the dice."),
-  dice_type: z
-    .enum(["d4", "d6", "d8", "d10", "d12", "d20"])
-    .describe("Type of dice to roll."),
+  dice_type: z.enum(["d4", "d6", "d8", "d10", "d12", "d20"]).describe("Type of dice to roll."),
   count: z
     .number()
     .int()
@@ -82,9 +73,7 @@ const SendMessageSchema = z.object({
   room_id: z.string().min(1).describe("The room to send the message in."),
   player_id: z.string().min(1).describe("The player sending the message."),
   player_name: z.string().min(1).describe("Display name of the sender."),
-  content: z.string().min(1).max(300).describe(
-    "Message content (max 300 chars).",
-  ),
+  content: z.string().min(1).max(300).describe("Message content (max 300 chars)."),
 });
 
 const ListRoomPeersSchema = z.object({
@@ -97,11 +86,7 @@ const ListRoomPeersSchema = z.object({
 
 const SaveGameSchema = z.object({
   room_id: z.string().min(1).describe("The room code whose state to save."),
-  save_name: z
-    .string()
-    .max(80)
-    .optional()
-    .describe("Optional human-readable label for this save."),
+  save_name: z.string().max(80).optional().describe("Optional human-readable label for this save."),
 });
 
 const LoadGameSchema = z.object({
@@ -109,41 +94,21 @@ const LoadGameSchema = z.object({
 });
 
 const ListSavesSchema = z.object({
-  room_id: z
-    .string()
-    .optional()
-    .describe("Filter saves by room code. Omit to list all saves."),
+  room_id: z.string().optional().describe("Filter saves by room code. Omit to list all saves."),
 });
 
 const SendChatSchema = z.object({
-  room_id: z
-    .string()
-    .min(1)
-    .describe("The room in which to send the chat message."),
-  message: z
-    .string()
-    .min(1)
-    .max(500)
-    .describe("Chat message content (max 500 characters)."),
+  room_id: z.string().min(1).describe("The room in which to send the chat message."),
+  message: z.string().min(1).max(500).describe("Chat message content (max 500 characters)."),
 });
 
 const AddAssetSchema = z.object({
-  room_id: z
-    .string()
-    .min(1)
-    .describe("The room that will own this asset."),
+  room_id: z.string().min(1).describe("The room that will own this asset."),
   asset_type: z
     .enum(["map", "token", "tile", "card", "dice"])
     .describe("Category of the game asset."),
-  name: z
-    .string()
-    .min(1)
-    .max(80)
-    .describe("Display name for the asset."),
-  url: z
-    .string()
-    .url()
-    .describe("Publicly accessible URL of the asset image or model."),
+  name: z.string().min(1).max(80).describe("Display name for the asset."),
+  url: z.string().url().describe("Publicly accessible URL of the asset image or model."),
 });
 
 // ---------------------------------------------------------------------------
@@ -209,10 +174,7 @@ function generateId(prefix: string): string {
   return `${prefix}_${suffix}`;
 }
 
-const ASSET_DIMENSIONS: Record<
-  string,
-  { widthPx: number; heightPx: number; }
-> = {
+const ASSET_DIMENSIONS: Record<string, { widthPx: number; heightPx: number }> = {
   map: { widthPx: 2048, heightPx: 2048 },
   token: { widthPx: 128, heightPx: 128 },
   tile: { widthPx: 256, heightPx: 256 },
@@ -243,11 +205,11 @@ export const tabletopSimTools: StandaloneToolDefinition[] = [
         for (const [id, room] of roomStore.entries()) {
           if (room.hostId === args.host_id) {
             return textResult(
-              `**Room Already Exists**\n\n`
-                + `**Room Code:** ${id}\n`
-                + `**Name:** ${room.name}\n`
-                + `**Max Players:** ${room.maxPlayers}\n`
-                + `**Join URL:** /apps/tabletop-simulator/room/${id}`,
+              `**Room Already Exists**\n\n` +
+                `**Room Code:** ${id}\n` +
+                `**Name:** ${room.name}\n` +
+                `**Max Players:** ${room.maxPlayers}\n` +
+                `**Join URL:** /apps/tabletop-simulator/room/${id}`,
             );
           }
         }
@@ -277,12 +239,12 @@ export const tabletopSimTools: StandaloneToolDefinition[] = [
         }
 
         return textResult(
-          `**Room Created**\n\n`
-            + `**Room Code:** ${code}\n`
-            + `**Name:** ${entry.name}\n`
-            + `**Max Players:** ${entry.maxPlayers}\n`
-            + `**Join URL:** /apps/tabletop-simulator/room/${code}\n\n`
-            + `Share the Room Code or URL with players to join.`,
+          `**Room Created**\n\n` +
+            `**Room Code:** ${code}\n` +
+            `**Name:** ${entry.name}\n` +
+            `**Max Players:** ${entry.maxPlayers}\n` +
+            `**Join URL:** /apps/tabletop-simulator/room/${code}\n\n` +
+            `Share the Room Code or URL with players to join.`,
         );
       }),
   },
@@ -304,16 +266,14 @@ export const tabletopSimTools: StandaloneToolDefinition[] = [
         }
 
         // Also fetch live peer count from the peers API
-        const baseUrl = process.env.NEXT_PUBLIC_APP_URL
-          ?? "https://spike.land";
+        const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://spike.land";
         let livePeerCount = room.peerCount;
         try {
-          const resp = await fetch(
-            `${baseUrl}/api/tabletop/rooms/${room.id}/peers`,
-            { next: { revalidate: 0 } },
-          );
+          const resp = await fetch(`${baseUrl}/api/tabletop/rooms/${room.id}/peers`, {
+            next: { revalidate: 0 },
+          });
           if (resp.ok) {
-            const data = (await resp.json()) as { peers: string[]; };
+            const data = (await resp.json()) as { peers: string[] };
             livePeerCount = data.peers.length;
           }
         } catch {
@@ -321,12 +281,12 @@ export const tabletopSimTools: StandaloneToolDefinition[] = [
         }
 
         return jsonResult(
-          `**Room: ${room.name}**\n\n`
-            + `**Code:** ${room.id}\n`
-            + `**Host:** ${room.hostId}\n`
-            + `**Players:** ${livePeerCount}/${room.maxPlayers}\n`
-            + `**Created:** ${new Date(room.createdAt).toISOString()}\n`
-            + `**Join URL:** /apps/tabletop-simulator/room/${room.id}`,
+          `**Room: ${room.name}**\n\n` +
+            `**Code:** ${room.id}\n` +
+            `**Host:** ${room.hostId}\n` +
+            `**Players:** ${livePeerCount}/${room.maxPlayers}\n` +
+            `**Created:** ${new Date(room.createdAt).toISOString()}\n` +
+            `**Join URL:** /apps/tabletop-simulator/room/${room.id}`,
           room,
         );
       }),
@@ -387,11 +347,11 @@ export const tabletopSimTools: StandaloneToolDefinition[] = [
         const cz = Math.max(-10, Math.min(10, zCoord));
 
         return textResult(
-          `**Piece Moved**\n\n`
-            + `**Piece ID:** ${args.piece_id}\n`
-            + `**Player:** ${args.player_id}\n`
-            + `**New Position:** x=${cx.toFixed(2)}, y=${cy.toFixed(2)}, z=${cz.toFixed(2)}\n\n`
-            + `The move has been broadcast to the room via P2P sync.`,
+          `**Piece Moved**\n\n` +
+            `**Piece ID:** ${args.piece_id}\n` +
+            `**Player:** ${args.player_id}\n` +
+            `**New Position:** x=${cx.toFixed(2)}, y=${cy.toFixed(2)}, z=${cz.toFixed(2)}\n\n` +
+            `The move has been broadcast to the room via P2P sync.`,
         );
       }),
   },
@@ -405,11 +365,11 @@ export const tabletopSimTools: StandaloneToolDefinition[] = [
       safeToolCall("tabletop_draw_card", async () => {
         const args = input as z.infer<typeof DrawCardSchema>;
         return textResult(
-          `**Card Drawn**\n\n`
-            + `**Player:** ${args.player_id}\n`
-            + `**Room:** ${args.room_id}\n\n`
-            + `The draw action has been dispatched to the room's CRDT document. `
-            + `The card is now in ${args.player_id}'s hand.`,
+          `**Card Drawn**\n\n` +
+            `**Player:** ${args.player_id}\n` +
+            `**Room:** ${args.room_id}\n\n` +
+            `The draw action has been dispatched to the room's CRDT document. ` +
+            `The card is now in ${args.player_id}'s hand.`,
         );
       }),
   },
@@ -423,11 +383,11 @@ export const tabletopSimTools: StandaloneToolDefinition[] = [
       safeToolCall("tabletop_flip_card", async () => {
         const args = input as z.infer<typeof FlipCardSchema>;
         return textResult(
-          `**Card Flipped**\n\n`
-            + `**Card ID:** ${args.card_id}\n`
-            + `**Player:** ${args.player_id}\n`
-            + `**Room:** ${args.room_id}\n\n`
-            + `The flip action has been dispatched to the room's CRDT document.`,
+          `**Card Flipped**\n\n` +
+            `**Card ID:** ${args.card_id}\n` +
+            `**Player:** ${args.player_id}\n` +
+            `**Room:** ${args.room_id}\n\n` +
+            `The flip action has been dispatched to the room's CRDT document.`,
         );
       }),
   },
@@ -441,11 +401,11 @@ export const tabletopSimTools: StandaloneToolDefinition[] = [
       safeToolCall("tabletop_send_message", async () => {
         const args = input as z.infer<typeof SendMessageSchema>;
         return textResult(
-          `**Message Sent**\n\n`
-            + `**From:** ${args.player_name} (${args.player_id})\n`
-            + `**Room:** ${args.room_id}\n`
-            + `**Message:** "${args.content}"\n\n`
-            + `The message has been broadcast to all peers in the room.`,
+          `**Message Sent**\n\n` +
+            `**From:** ${args.player_name} (${args.player_id})\n` +
+            `**Room:** ${args.room_id}\n` +
+            `**Message:** "${args.content}"\n\n` +
+            `The message has been broadcast to all peers in the room.`,
         );
       }),
   },
@@ -459,26 +419,20 @@ export const tabletopSimTools: StandaloneToolDefinition[] = [
     handler: async (input: never, _ctx: ServerContext): Promise<CallToolResult> =>
       safeToolCall("tabletop_list_peers", async () => {
         const args = input as z.infer<typeof ListRoomPeersSchema>;
-        const baseUrl = process.env.NEXT_PUBLIC_APP_URL
-          ?? "https://spike.land";
-        const resp = await fetch(
-          `${baseUrl}/api/tabletop/rooms/${args.room_id}/peers`,
-          { next: { revalidate: 0 } },
-        );
+        const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://spike.land";
+        const resp = await fetch(`${baseUrl}/api/tabletop/rooms/${args.room_id}/peers`, {
+          next: { revalidate: 0 },
+        });
 
         if (!resp.ok) {
-          return textResult(
-            `**Error:** Could not retrieve peers for room "${args.room_id}".`,
-          );
+          return textResult(`**Error:** Could not retrieve peers for room "${args.room_id}".`);
         }
 
-        const data = (await resp.json()) as { peers: string[]; roomId: string; };
+        const data = (await resp.json()) as { peers: string[]; roomId: string };
         const peers = data.peers;
 
         if (peers.length === 0) {
-          return textResult(
-            `**Room ${args.room_id} is empty** — no active peers found.`,
-          );
+          return textResult(`**Room ${args.room_id} is empty** — no active peers found.`);
         }
 
         const peerList = peers.map((p, i) => `${i + 1}. ${p}`).join("\n");
@@ -521,14 +475,14 @@ export const tabletopSimTools: StandaloneToolDefinition[] = [
         saveStore.set(id, entry);
 
         return textResult(
-          `**Game Saved**\n\n`
-            + `**Save ID:** ${id}\n`
-            + `**Name:** ${entry.name}\n`
-            + `**Room:** ${entry.roomId}\n`
-            + `**Timestamp:** ${new Date(entry.savedAt).toISOString()}\n`
-            + `**Turn:** ${entry.turnNumber}\n`
-            + `**Players:** ${entry.playerCount}\n\n`
-            + `Use \`tabletop_load_game\` with this Save ID to restore the session.`,
+          `**Game Saved**\n\n` +
+            `**Save ID:** ${id}\n` +
+            `**Name:** ${entry.name}\n` +
+            `**Room:** ${entry.roomId}\n` +
+            `**Timestamp:** ${new Date(entry.savedAt).toISOString()}\n` +
+            `**Turn:** ${entry.turnNumber}\n` +
+            `**Players:** ${entry.playerCount}\n\n` +
+            `Use \`tabletop_load_game\` with this Save ID to restore the session.`,
         );
       }),
   },
@@ -548,21 +502,21 @@ export const tabletopSimTools: StandaloneToolDefinition[] = [
 
         if (!save) {
           return textResult(
-            `**Save Not Found**\n\nNo save with ID "${args.save_id}" exists.\n`
-              + `Use \`tabletop_list_saves\` to see available saves.`,
+            `**Save Not Found**\n\nNo save with ID "${args.save_id}" exists.\n` +
+              `Use \`tabletop_list_saves\` to see available saves.`,
           );
         }
 
         return textResult(
-          `**Game Loaded**\n\n`
-            + `**Save ID:** ${save.id}\n`
-            + `**Name:** ${save.name}\n`
-            + `**Room:** ${save.roomId}\n`
-            + `**Saved At:** ${new Date(save.savedAt).toISOString()}\n`
-            + `**Restored Turn:** ${save.turnNumber}\n`
-            + `**Player Count:** ${save.playerCount}\n\n`
-            + `The game state has been restored. All players in room ${save.roomId} `
-            + `will receive the updated board via P2P sync.`,
+          `**Game Loaded**\n\n` +
+            `**Save ID:** ${save.id}\n` +
+            `**Name:** ${save.name}\n` +
+            `**Room:** ${save.roomId}\n` +
+            `**Saved At:** ${new Date(save.savedAt).toISOString()}\n` +
+            `**Restored Turn:** ${save.turnNumber}\n` +
+            `**Player Count:** ${save.playerCount}\n\n` +
+            `The game state has been restored. All players in room ${save.roomId} ` +
+            `will receive the updated board via P2P sync.`,
         );
       }),
   },
@@ -579,15 +533,13 @@ export const tabletopSimTools: StandaloneToolDefinition[] = [
         const args = input as z.infer<typeof ListSavesSchema>;
         const roomFilter = args.room_id?.toUpperCase();
 
-        const saves = [...saveStore.values()].filter(
-          s => !roomFilter || s.roomId === roomFilter,
-        );
+        const saves = [...saveStore.values()].filter((s) => !roomFilter || s.roomId === roomFilter);
 
         if (saves.length === 0) {
           const scope = roomFilter ? ` for room ${roomFilter}` : "";
           return textResult(
-            `**No Saves Found**\n\nThere are no saved games${scope}.\n`
-              + `Use \`tabletop_save_game\` to create one.`,
+            `**No Saves Found**\n\nThere are no saved games${scope}.\n` +
+              `Use \`tabletop_save_game\` to create one.`,
           );
         }
 
@@ -597,10 +549,10 @@ export const tabletopSimTools: StandaloneToolDefinition[] = [
         const rows = saves
           .map(
             (s, i) =>
-              `${i + 1}. **${s.name}**\n`
-              + `   ID: \`${s.id}\`  |  Room: ${s.roomId}  |  `
-              + `Saved: ${new Date(s.savedAt).toISOString().slice(0, 16)}  |  `
-              + `Turn: ${s.turnNumber}  |  Players: ${s.playerCount}`,
+              `${i + 1}. **${s.name}**\n` +
+              `   ID: \`${s.id}\`  |  Room: ${s.roomId}  |  ` +
+              `Saved: ${new Date(s.savedAt).toISOString().slice(0, 16)}  |  ` +
+              `Turn: ${s.turnNumber}  |  Players: ${s.playerCount}`,
           )
           .join("\n\n");
 
@@ -626,12 +578,12 @@ export const tabletopSimTools: StandaloneToolDefinition[] = [
         const timestamp = new Date().toISOString();
 
         return textResult(
-          `**Message Sent**\n\n`
-            + `**Message ID:** ${messageId}\n`
-            + `**Room:** ${args.room_id.toUpperCase()}\n`
-            + `**Timestamp:** ${timestamp}\n`
-            + `**Content:** "${args.message}"\n\n`
-            + `The message has been broadcast to all connected peers in the room.`,
+          `**Message Sent**\n\n` +
+            `**Message ID:** ${messageId}\n` +
+            `**Room:** ${args.room_id.toUpperCase()}\n` +
+            `**Timestamp:** ${timestamp}\n` +
+            `**Content:** "${args.message}"\n\n` +
+            `The message has been broadcast to all connected peers in the room.`,
         );
       }),
   },
@@ -667,15 +619,15 @@ export const tabletopSimTools: StandaloneToolDefinition[] = [
         assetStore.set(id, entry);
 
         return textResult(
-          `**Asset Added**\n\n`
-            + `**Asset ID:** ${id}\n`
-            + `**Name:** ${entry.name}\n`
-            + `**Type:** ${entry.assetType}\n`
-            + `**Room:** ${entry.roomId}\n`
-            + `**Dimensions:** ${entry.widthPx}px x ${entry.heightPx}px\n`
-            + `**URL:** ${entry.url}\n`
-            + `**Added At:** ${new Date(entry.addedAt).toISOString()}\n\n`
-            + `The asset is now available in room ${entry.roomId} and can be placed on the table.`,
+          `**Asset Added**\n\n` +
+            `**Asset ID:** ${id}\n` +
+            `**Name:** ${entry.name}\n` +
+            `**Type:** ${entry.assetType}\n` +
+            `**Room:** ${entry.roomId}\n` +
+            `**Dimensions:** ${entry.widthPx}px x ${entry.heightPx}px\n` +
+            `**URL:** ${entry.url}\n` +
+            `**Added At:** ${new Date(entry.addedAt).toISOString()}\n\n` +
+            `The asset is now available in room ${entry.roomId} and can be placed on the table.`,
         );
       }),
   },

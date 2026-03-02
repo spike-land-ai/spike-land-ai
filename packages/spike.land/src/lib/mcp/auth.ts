@@ -34,9 +34,7 @@ export interface McpAuthResult {
  * }
  * ```
  */
-export async function authenticateMcpRequest(
-  request: NextRequest,
-): Promise<McpAuthResult> {
+export async function authenticateMcpRequest(request: NextRequest): Promise<McpAuthResult> {
   // Extract Authorization header
   const authHeader = request.headers.get("Authorization");
 
@@ -66,12 +64,8 @@ export async function authenticateMcpRequest(
 
   // Check if this is an agent capability token (prefixed with "cap_")
   if (token.startsWith("cap_")) {
-    const { verifyCapabilityToken } = await import(
-      "@/lib/agents/capability-token-service"
-    );
-    const { data: capResult, error: capError } = await tryCatch(
-      verifyCapabilityToken(token),
-    );
+    const { verifyCapabilityToken } = await import("@/lib/agents/capability-token-service");
+    const { data: capResult, error: capError } = await tryCatch(verifyCapabilityToken(token));
 
     if (capError) {
       return {
@@ -97,9 +91,7 @@ export async function authenticateMcpRequest(
 
   // Check if this is an MCP OAuth token (prefixed with "mcp_")
   if (token.startsWith("mcp_")) {
-    const { data: payload, error: oauthError } = await tryCatch(
-      verifyAccessToken(token),
-    );
+    const { data: payload, error: oauthError } = await tryCatch(verifyAccessToken(token));
 
     if (oauthError) {
       return {
@@ -153,9 +145,7 @@ export async function authenticateMcpRequest(
  * Authenticates an SSE request using a token from the query string
  * Used because EventSource doesn't support custom headers
  */
-export async function authenticateSseRequest(
-  request: NextRequest,
-): Promise<McpAuthResult> {
+export async function authenticateSseRequest(request: NextRequest): Promise<McpAuthResult> {
   const { searchParams } = new URL(request.url);
   const token = searchParams.get("token");
 
@@ -168,9 +158,7 @@ export async function authenticateSseRequest(
 
   // Check if this is an MCP OAuth token (prefixed with "mcp_")
   if (token.startsWith("mcp_")) {
-    const { data: payload, error: oauthError } = await tryCatch(
-      verifyAccessToken(token),
-    );
+    const { data: payload, error: oauthError } = await tryCatch(verifyAccessToken(token));
 
     if (oauthError) {
       return {
@@ -252,9 +240,7 @@ export function maskApiKey(apiKey: string): string {
  * @param request - The incoming Next.js request
  * @returns Authentication result with userId if successful
  */
-export async function authenticateMcpOrSession(
-  request: NextRequest,
-): Promise<McpAuthResult> {
+export async function authenticateMcpOrSession(request: NextRequest): Promise<McpAuthResult> {
   // First try API key auth
   const authHeader = request.headers.get("Authorization");
 

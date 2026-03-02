@@ -14,8 +14,8 @@ interface BestTimesChartProps {
 }
 
 export function BestTimesChart({ data }: BestTimesChartProps) {
-  const maxScore = Math.max(...data.map(d => d.engagementScore), 1);
-  const topScore = Math.max(...data.map(d => d.engagementScore));
+  const maxScore = Math.max(...data.map((d) => d.engagementScore), 1);
+  const topScore = Math.max(...data.map((d) => d.engagementScore));
 
   return (
     <Card className="bg-zinc-900 border-zinc-800 w-full">
@@ -24,7 +24,7 @@ export function BestTimesChart({ data }: BestTimesChartProps) {
       </CardHeader>
       <CardContent>
         <div className="flex items-end gap-1.5 h-40 w-full">
-          {data.map(point => {
+          {data.map((point) => {
             const heightPct = (point.engagementScore / maxScore) * 100;
             const isTop = point.engagementScore === topScore;
 
@@ -38,9 +38,7 @@ export function BestTimesChart({ data }: BestTimesChartProps) {
                   <div
                     className={cn(
                       "w-full rounded-t-sm transition-all duration-300",
-                      isTop
-                        ? "bg-primary"
-                        : "bg-zinc-600 group-hover:bg-zinc-500",
+                      isTop ? "bg-primary" : "bg-zinc-600 group-hover:bg-zinc-500",
                     )}
                     style={{ height: `${heightPct}%` }}
                   />

@@ -18,14 +18,10 @@ export interface InstanceStatus {
   privateIp: string | null;
 }
 
-export async function getInstanceStatus(
-  instanceId: string,
-): Promise<InstanceStatus | null> {
+export async function getInstanceStatus(instanceId: string): Promise<InstanceStatus | null> {
   const ec2 = getEC2Client();
   const { data, error } = await tryCatch(
-    ec2.send(
-      new DescribeInstancesCommand({ InstanceIds: [instanceId] }),
-    ),
+    ec2.send(new DescribeInstancesCommand({ InstanceIds: [instanceId] })),
   );
 
   if (error) {
@@ -88,9 +84,7 @@ export async function restartBoxInstance(instanceId: string): Promise<boolean> {
   return true;
 }
 
-export async function terminateBoxInstance(
-  instanceId: string,
-): Promise<boolean> {
+export async function terminateBoxInstance(instanceId: string): Promise<boolean> {
   const ec2 = getEC2Client();
   const { error } = await tryCatch(
     ec2.send(new TerminateInstancesCommand({ InstanceIds: [instanceId] })),
@@ -122,12 +116,12 @@ export async function syncBoxStatus(boxId: string): Promise<void> {
   if (!status) return;
 
   const ec2ToBoxStatus: Record<string, BoxStatus> = {
-    "pending": BoxStatus.STARTING,
-    "running": BoxStatus.RUNNING,
-    "stopping": BoxStatus.STOPPING,
-    "stopped": BoxStatus.STOPPED,
+    pending: BoxStatus.STARTING,
+    running: BoxStatus.RUNNING,
+    stopping: BoxStatus.STOPPING,
+    stopped: BoxStatus.STOPPED,
     "shutting-down": BoxStatus.STOPPING,
-    "terminated": BoxStatus.TERMINATED,
+    terminated: BoxStatus.TERMINATED,
   };
 
   const newStatus = ec2ToBoxStatus[status.state];

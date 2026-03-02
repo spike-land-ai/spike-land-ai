@@ -16,23 +16,40 @@ export function EditorMockup() {
       {/* Code Content */}
       <div className="p-4 overflow-x-auto">
         <pre className="leading-relaxed">
-                    <code>
-                        <span className="text-[#569cd6]">export</span> <span className="text-[#569cd6]">default</span> <span className="text-[#569cd6]">function</span> <span className="text-[#dcdcaa]">Home</span>() {'{'}
-                        {'\n'}
-                        {'  '}<span className="text-[#569cd6]">return</span> (
-                        {'\n'}
-                        {'    '}<span className="text-[#808080]">&lt;</span><span className="text-[#569cd6]">div</span> <span className="text-[#9cdcfe]">className</span>=<span className="text-[#ce9178]">"min-h-screen"</span><span className="text-[#808080]">&gt;</span>
-                        {'\n'}
-                        {'      '}<span className="text-[#808080]">&lt;</span><span className="text-[#4ec9b0]">HeroSection</span> /<span className="text-[#808080]">&gt;</span>
-                        {'\n'}
-                        {'      '}<span className="text-[#808080]">&lt;</span><span className="text-[#4ec9b0]">FeatureGrid</span> /<span className="text-[#808080]">&gt;</span>
-                        {'\n'}
-                        {'    '}<span className="text-[#808080]">&lt;/</span><span className="text-[#569cd6]">div</span><span className="text-[#808080]">&gt;</span>
-                        {'\n'}
-                        {'  '});
-                        {'\n'}
-                        {'}'}
-                    </code>
+          <code>
+            <span className="text-[#569cd6]">export</span>{" "}
+            <span className="text-[#569cd6]">default</span>{" "}
+            <span className="text-[#569cd6]">function</span>{" "}
+            <span className="text-[#dcdcaa]">Home</span>() {"{"}
+            {"\n"}
+            {"  "}
+            <span className="text-[#569cd6]">return</span> ({"\n"}
+            {"    "}
+            <span className="text-[#808080]">&lt;</span>
+            <span className="text-[#569cd6]">div</span>{" "}
+            <span className="text-[#9cdcfe]">className</span>=
+            <span className="text-[#ce9178]">"min-h-screen"</span>
+            <span className="text-[#808080]">&gt;</span>
+            {"\n"}
+            {"      "}
+            <span className="text-[#808080]">&lt;</span>
+            <span className="text-[#4ec9b0]">HeroSection</span> /
+            <span className="text-[#808080]">&gt;</span>
+            {"\n"}
+            {"      "}
+            <span className="text-[#808080]">&lt;</span>
+            <span className="text-[#4ec9b0]">FeatureGrid</span> /
+            <span className="text-[#808080]">&gt;</span>
+            {"\n"}
+            {"    "}
+            <span className="text-[#808080]">&lt;/</span>
+            <span className="text-[#569cd6]">div</span>
+            <span className="text-[#808080]">&gt;</span>
+            {"\n"}
+            {"  "});
+            {"\n"}
+            {"}"}
+          </code>
         </pre>
       </div>
     </ThemeCard>

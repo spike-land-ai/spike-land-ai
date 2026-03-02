@@ -23,9 +23,9 @@ export function isWebGLContextError(error: unknown): boolean {
   if (!(error instanceof Error)) return false;
   const msg = error.message.toLowerCase();
   return (
-    msg.includes("webgl")
-    || msg.includes("context could not be created")
-    || msg.includes("error creating")
-    || msg.includes("webgl2")
+    msg.includes("webgl") ||
+    msg.includes("context could not be created") ||
+    msg.includes("error creating") ||
+    msg.includes("webgl2")
   );
 }

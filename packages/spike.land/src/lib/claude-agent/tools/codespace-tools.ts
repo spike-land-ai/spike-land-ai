@@ -18,13 +18,13 @@ const CODESPACE_ID_REGEX = /^[a-z0-9]([a-z0-9.-]*[a-z0-9])?$/;
  */
 function isValidCodespaceId(id: string): boolean {
   return (
-    typeof id === "string"
-    && id.length > 0
-    && id.length <= 100
-    && !id.includes("..")
-    && !id.includes("/")
-    && !id.includes("\\")
-    && CODESPACE_ID_REGEX.test(id)
+    typeof id === "string" &&
+    id.length > 0 &&
+    id.length <= 100 &&
+    !id.includes("..") &&
+    !id.includes("/") &&
+    !id.includes("\\") &&
+    CODESPACE_ID_REGEX.test(id)
   );
 }
 
@@ -44,10 +44,8 @@ function formatValidationErrors(errors: ValidationError[]): string {
   if (errors.length === 0) return "Unknown validation error";
 
   return errors
-    .map(e => {
-      const location = e.line
-        ? `Line ${e.line}${e.column ? `:${e.column}` : ""}: `
-        : "";
+    .map((e) => {
+      const location = e.line ? `Line ${e.line}${e.column ? `:${e.column}` : ""}: ` : "";
       return `${location}${e.message}`;
     })
     .join("\n");
@@ -62,9 +60,7 @@ async function readCode(codespaceId: string): Promise<string> {
   try {
     const session = await getOrCreateSession(codespaceId);
     const code = session.code || "";
-    logger.info(
-      `[codespace-tools] readCode success, code length: ${code.length}`,
-    );
+    logger.info(`[codespace-tools] readCode success, code length: ${code.length}`);
     return code;
   } catch (error) {
     const msg = `Error reading code: ${error instanceof Error ? error.message : String(error)}`;
@@ -77,10 +73,7 @@ async function readCode(codespaceId: string): Promise<string> {
  * Update the entire code via direct DB access + transpilation
  * Returns "success" on success, or a formatted error message on failure
  */
-async function updateCode(
-  codespaceId: string,
-  code: string,
-): Promise<string> {
+async function updateCode(codespaceId: string, code: string): Promise<string> {
   logger.info(`[codespace-tools] updateCode called for: ${codespaceId}`);
   logger.info(`[codespace-tools] updateCode code length: ${code.length}`);
 
@@ -132,16 +125,14 @@ async function updateCode(
  */
 async function editCode(
   codespaceId: string,
-  edits: Array<{ startLine: number; endLine: number; content: string; }>,
+  edits: Array<{ startLine: number; endLine: number; content: string }>,
 ): Promise<string> {
   logger.info(`[codespace-tools] editCode called for: ${codespaceId}`);
   logger.info(`[codespace-tools] editCode edits:`, { edits });
 
   // First read the current code
   const currentCode = await readCode(codespaceId);
-  if (
-    currentCode.startsWith("Error")
-  ) {
+  if (currentCode.startsWith("Error")) {
     return currentCode;
   }
 
@@ -161,9 +152,7 @@ async function editCode(
   }
 
   const newCode = lines.join("\n");
-  logger.info(
-    `[codespace-tools] editCode resulting code length: ${newCode.length}`,
-  );
+  logger.info(`[codespace-tools] editCode resulting code length: ${newCode.length}`);
   return updateCode(codespaceId, newCode);
 }
 
@@ -190,9 +179,7 @@ async function searchAndReplace(
   logger.info(`[codespace-tools] searchAndReplace isRegex: ${isRegex}`);
 
   const currentCode = await readCode(codespaceId);
-  if (
-    currentCode.startsWith("Error")
-  ) {
+  if (currentCode.startsWith("Error")) {
     return currentCode;
   }
 
@@ -210,9 +197,7 @@ async function searchAndReplace(
     return "No matches found for the search pattern";
   }
 
-  logger.info(
-    `[codespace-tools] searchAndReplace: Found matches, updating code`,
-  );
+  logger.info(`[codespace-tools] searchAndReplace: Found matches, updating code`);
   return updateCode(codespaceId, newCode);
 }
 
@@ -220,10 +205,7 @@ async function searchAndReplace(
  * Validate code without updating the session
  * Returns validation errors if any, or "valid" if the code is valid
  */
-async function validateCode(
-  codespaceId: string,
-  code: string,
-): Promise<string> {
+async function validateCode(codespaceId: string, code: string): Promise<string> {
   logger.info(`[codespace-tools] validateCode called for: ${codespaceId}`);
   logger.info(`[codespace-tools] validateCode code length: ${code.length}`);
 
@@ -240,9 +222,7 @@ async function validateCode(
       const parsed = JSON.parse(errorMsg);
       if (Array.isArray(parsed.errors)) {
         const formattedErrors = formatValidationErrors(parsed.errors);
-        logger.info(
-          `[codespace-tools] validateCode: found errors:\n${formattedErrors}`,
-        );
+        logger.info(`[codespace-tools] validateCode: found errors:\n${formattedErrors}`);
         return `TypeScript/JSX errors:\n${formattedErrors}`;
       }
     } catch {
@@ -257,22 +237,17 @@ async function validateCode(
 /**
  * Find lines matching a pattern
  */
-async function findLines(
-  codespaceId: string,
-  search: string,
-): Promise<string> {
+async function findLines(codespaceId: string, search: string): Promise<string> {
   logger.info(`[codespace-tools] findLines called for: ${codespaceId}`);
   logger.info(`[codespace-tools] findLines search: "${search}"`);
 
   const currentCode = await readCode(codespaceId);
-  if (
-    currentCode.startsWith("Error")
-  ) {
+  if (currentCode.startsWith("Error")) {
     return currentCode;
   }
 
   const lines = currentCode.split("\n");
-  const matches: Array<{ line: number; content: string; }> = [];
+  const matches: Array<{ line: number; content: string }> = [];
 
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
@@ -287,9 +262,7 @@ async function findLines(
     return "No matches found";
   }
 
-  return matches
-    .map(m => `Line ${m.line}: ${m.content}`)
-    .join("\n");
+  return matches.map((m) => `Line ${m.line}: ${m.content}`).join("\n");
 }
 
 /**
@@ -298,18 +271,12 @@ async function findLines(
 export function createCodespaceServer(codespaceId: string) {
   // Validate codespaceId to prevent SSRF attacks
   if (!isValidCodespaceId(codespaceId)) {
-    logger.error(
-      `[codespace-tools] Invalid codespaceId rejected: ${codespaceId}`,
-    );
+    logger.error(`[codespace-tools] Invalid codespaceId rejected: ${codespaceId}`);
     throw new Error(`Invalid codespace ID format: ${codespaceId}`);
   }
 
-  logger.info(
-    `[codespace-tools] Creating MCP server for codespace: ${codespaceId}`,
-  );
-  logger.info(
-    `[codespace-tools] Available tools: ${CODESPACE_TOOL_NAMES.join(", ")}`,
-  );
+  logger.info(`[codespace-tools] Creating MCP server for codespace: ${codespaceId}`);
+  logger.info(`[codespace-tools] Available tools: ${CODESPACE_TOOL_NAMES.join(", ")}`);
 
   return createSdkMcpServer({
     name: "codespace",
@@ -328,7 +295,7 @@ export function createCodespaceServer(codespaceId: string) {
         "update_code",
         "Replace the ENTIRE code content of the file. Use this for major rewrites or when search_and_replace is too complex.",
         { code: z.string().describe("The full new code content for the file") },
-        async args => {
+        async (args) => {
           const result = await updateCode(codespaceId, args.code);
           return { content: [{ type: "text", text: result }] };
         },
@@ -337,21 +304,17 @@ export function createCodespaceServer(codespaceId: string) {
         "edit_code",
         "Edit specific lines of code. Use this for targeted changes when you know the line numbers.",
         {
-          edits: z.array(
-            z.object({
-              startLine: z.number().describe(
-                "1-based line number to start editing from",
-              ),
-              endLine: z.number().describe(
-                "1-based line number to end editing at (inclusive)",
-              ),
-              content: z.string().describe(
-                "New content to replace the lines with",
-              ),
-            }),
-          ).describe("List of edits to apply"),
+          edits: z
+            .array(
+              z.object({
+                startLine: z.number().describe("1-based line number to start editing from"),
+                endLine: z.number().describe("1-based line number to end editing at (inclusive)"),
+                content: z.string().describe("New content to replace the lines with"),
+              }),
+            )
+            .describe("List of edits to apply"),
         },
-        async args => {
+        async (args) => {
           const result = await editCode(codespaceId, args.edits);
           return { content: [{ type: "text", text: result }] };
         },
@@ -360,15 +323,11 @@ export function createCodespaceServer(codespaceId: string) {
         "search_and_replace",
         "Search for a pattern and replace it. Best for small, precise changes like renaming variables or changing colors.",
         {
-          search: z.string().describe(
-            "The string or regex pattern to search for",
-          ),
+          search: z.string().describe("The string or regex pattern to search for"),
           replace: z.string().describe("The string to replace the match with"),
-          isRegex: z.boolean().optional().describe(
-            "Whether the search pattern is a regex",
-          ),
+          isRegex: z.boolean().optional().describe("Whether the search pattern is a regex"),
         },
-        async args => {
+        async (args) => {
           const result = await searchAndReplace(
             codespaceId,
             args.search,
@@ -382,7 +341,7 @@ export function createCodespaceServer(codespaceId: string) {
         "find_lines",
         "Find line numbers matching a pattern. Use this to locate code before using edit_code.",
         { search: z.string().describe("The string pattern to search for") },
-        async args => {
+        async (args) => {
           const result = await findLines(codespaceId, args.search);
           return { content: [{ type: "text", text: result }] };
         },
@@ -391,7 +350,7 @@ export function createCodespaceServer(codespaceId: string) {
         "validate_code",
         "Validate code without updating the codespace. Use this to check for TypeScript/JSX errors before making changes. Returns 'valid' if code is valid, or detailed error messages with line numbers.",
         { code: z.string().describe("The code to validate") },
-        async args => {
+        async (args) => {
           const result = await validateCode(codespaceId, args.code);
           return { content: [{ type: "text", text: result }] };
         },

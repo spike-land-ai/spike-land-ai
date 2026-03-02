@@ -45,9 +45,7 @@ export function useSmartGallery({
   const [viewMode, setViewMode] = useState<GalleryViewMode>("grid");
 
   // Selection state
-  const [selectedImageId, setSelectedImageId] = useState<string | null>(
-    initialSelectedId,
-  );
+  const [selectedImageId, setSelectedImageId] = useState<string | null>(initialSelectedId);
 
   // Peek state
   const [isPeeking, setIsPeeking] = useState(false);
@@ -70,7 +68,7 @@ export function useSmartGallery({
       return { selectedImage: null, currentIndex: -1 };
     }
 
-    const index = images.findIndex(img => img.id === selectedImageId);
+    const index = images.findIndex((img) => img.id === selectedImageId);
     if (index === -1) {
       return { selectedImage: null, currentIndex: -1 };
     }
@@ -96,13 +94,13 @@ export function useSmartGallery({
     clearAutoCycleTimer();
 
     autoCycleTimerRef.current = setInterval(() => {
-      setSelectedImageId(prevId => {
+      setSelectedImageId((prevId) => {
         if (!prevId) {
           // Select first image if nothing selected
           return images[0]?.id ?? null;
         }
 
-        const currentIdx = images.findIndex(img => img.id === prevId);
+        const currentIdx = images.findIndex((img) => img.id === prevId);
         if (currentIdx === -1) {
           return images[0]?.id ?? null;
         }
@@ -115,15 +113,12 @@ export function useSmartGallery({
   }, [autoSelectInterval, images, clearAutoCycleTimer]);
 
   // Select image action
-  const selectImage = useCallback(
-    (id: string, element?: HTMLElement) => {
-      if (element) {
-        transitionOriginRef.current = element.getBoundingClientRect();
-      }
-      setSelectedImageId(id);
-    },
-    [],
-  );
+  const selectImage = useCallback((id: string, element?: HTMLElement) => {
+    if (element) {
+      transitionOriginRef.current = element.getBoundingClientRect();
+    }
+    setSelectedImageId(id);
+  }, []);
 
   // Enter slideshow action
   const enterSlideshow = useCallback(() => {
@@ -161,12 +156,12 @@ export function useSmartGallery({
   const goToNext = useCallback(() => {
     if (images.length === 0) return;
 
-    setSelectedImageId(prevId => {
+    setSelectedImageId((prevId) => {
       if (!prevId) {
         return images[0]?.id ?? null;
       }
 
-      const currentIdx = images.findIndex(img => img.id === prevId);
+      const currentIdx = images.findIndex((img) => img.id === prevId);
       if (currentIdx === -1) {
         return images[0]?.id ?? null;
       }
@@ -180,12 +175,12 @@ export function useSmartGallery({
   const goToPrev = useCallback(() => {
     if (images.length === 0) return;
 
-    setSelectedImageId(prevId => {
+    setSelectedImageId((prevId) => {
       if (!prevId) {
         return images[images.length - 1]?.id ?? null;
       }
 
-      const currentIdx = images.findIndex(img => img.id === prevId);
+      const currentIdx = images.findIndex((img) => img.id === prevId);
       if (currentIdx === -1) {
         return images[images.length - 1]?.id ?? null;
       }
@@ -224,12 +219,7 @@ export function useSmartGallery({
     }
 
     return clearAutoCycleTimer;
-  }, [
-    autoSelectInterval,
-    images.length,
-    startAutoCycleTimer,
-    clearAutoCycleTimer,
-  ]);
+  }, [autoSelectInterval, images.length, startAutoCycleTimer, clearAutoCycleTimer]);
 
   // Handle images prop changes
   useEffect(() => {
@@ -239,10 +229,7 @@ export function useSmartGallery({
     }
 
     // If current selection is invalid, reset to null
-    if (
-      selectedImageId
-      && !images.some(img => img.id === selectedImageId)
-    ) {
+    if (selectedImageId && !images.some((img) => img.id === selectedImageId)) {
       setSelectedImageId(null);
     }
   }, [images, selectedImageId]);

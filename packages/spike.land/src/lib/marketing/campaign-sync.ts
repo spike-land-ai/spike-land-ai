@@ -5,10 +5,7 @@
  * with internal UTM campaign tracking for ROI calculation.
  */
 
-import {
-  safeDecryptToken,
-  safeEncryptToken,
-} from "@/lib/crypto/token-encryption";
+import { safeDecryptToken, safeEncryptToken } from "@/lib/crypto/token-encryption";
 import prisma from "@/lib/prisma";
 import { pMap } from "@/lib/promise-utils";
 import { setCachedMetrics } from "@/lib/tracking/metrics-cache";
@@ -72,9 +69,7 @@ export async function syncExternalCampaigns(): Promise<SyncResult> {
   );
 
   if (accountsError) {
-    result.errors.push(
-      `Sync failed: ${accountsError.message}`,
-    );
+    result.errors.push(`Sync failed: ${accountsError.message}`);
     return result;
   }
 
@@ -83,18 +78,14 @@ export async function syncExternalCampaigns(): Promise<SyncResult> {
   }
 
   // 2. Get all campaign links for matching UTM campaigns to external IDs
-  const { data: campaignLinks, error: linksError } = await tryCatch(
-    prisma.campaignLink.findMany(),
-  );
+  const { data: campaignLinks, error: linksError } = await tryCatch(prisma.campaignLink.findMany());
 
   if (linksError) {
-    result.errors.push(
-      `Sync failed: ${linksError.message}`,
-    );
+    result.errors.push(`Sync failed: ${linksError.message}`);
     return result;
   }
 
-  const linksByExternal = new Map<string, typeof campaignLinks[0]>();
+  const linksByExternal = new Map<string, (typeof campaignLinks)[0]>();
   for (const link of campaignLinks) {
     const key = `${link.platform}:${link.externalCampaignId}`;
     linksByExternal.set(key, link);
@@ -109,8 +100,7 @@ export async function syncExternalCampaigns(): Promise<SyncResult> {
 
   // 3. For each account, fetch campaigns and metrics
   for (const account of accounts) {
-    const currentRefreshToken = account.refreshTokenEncrypted
-      || account.refreshToken;
+    const currentRefreshToken = account.refreshTokenEncrypted || account.refreshToken;
 
     // Check if token is expired
     if (account.expiresAt && new Date(account.expiresAt) < new Date()) {
@@ -145,15 +135,10 @@ export async function syncExternalCampaigns(): Promise<SyncResult> {
       }
     }
 
-    const client = createMarketingClient(
-      account.platform as MarketingPlatform,
-      {
-        accessToken: safeDecryptToken(
-          account.accessTokenEncrypted || account.accessToken || "",
-        ),
-        customerId: account.accountId,
-      },
-    );
+    const client = createMarketingClient(account.platform as MarketingPlatform, {
+      accessToken: safeDecryptToken(account.accessTokenEncrypted || account.accessToken || ""),
+      customerId: account.accountId,
+    });
 
     // Fetch campaigns
     const { data: campaigns, error: campaignsError } = await tryCatch(
@@ -168,7 +153,7 @@ export async function syncExternalCampaigns(): Promise<SyncResult> {
     }
 
     // Filter only linked campaigns to avoid unnecessary processing
-    const linkedCampaigns = campaigns.filter(campaign => {
+    const linkedCampaigns = campaigns.filter((campaign) => {
       const linkKey = `${account.platform}:${campaign.id}`;
       return linksByExternal.has(linkKey);
     });
@@ -177,7 +162,7 @@ export async function syncExternalCampaigns(): Promise<SyncResult> {
     // while significantly speeding up sync for many campaigns
     await pMap(
       linkedCampaigns,
-      async campaign => {
+      async (campaign) => {
         const linkKey = `${account.platform}:${campaign.id}`;
         const link = linksByExternal.get(linkKey);
 
@@ -185,18 +170,11 @@ export async function syncExternalCampaigns(): Promise<SyncResult> {
 
         // Campaign is linked - fetch metrics
         const { data: metrics, error: metricsError } = await tryCatch(
-          client.getCampaignMetrics(
-            account.accountId,
-            campaign.id,
-            startDate,
-            endDate,
-          ),
+          client.getCampaignMetrics(account.accountId, campaign.id, startDate, endDate),
         );
 
         if (metricsError) {
-          result.errors.push(
-            `Campaign ${campaign.id} (${campaign.name}): ${metricsError.message}`,
-          );
+          result.errors.push(`Campaign ${campaign.id} (${campaign.name}): ${metricsError.message}`);
           return;
         }
 
@@ -249,9 +227,7 @@ async function refreshAccountToken(
 
   // Encrypt new tokens before storing in database
   const encryptedAccessToken = safeEncryptToken(newTokens.accessToken);
-  const encryptedRefreshToken = safeEncryptToken(
-    newTokens.refreshToken || refreshToken,
-  );
+  const encryptedRefreshToken = safeEncryptToken(newTokens.refreshToken || refreshToken);
 
   const { error: updateError } = await tryCatch(
     prisma.marketingAccount.update({
@@ -283,14 +259,17 @@ async function cacheExternalSpendData(
   endDate: Date,
 ): Promise<void> {
   // Aggregate by UTM campaign
-  const aggregatedByUtm = new Map<string, {
-    totalSpend: number;
-    totalImpressions: number;
-    totalClicks: number;
-    totalConversions: number;
-    currency: string;
-    platforms: Set<string>;
-  }>();
+  const aggregatedByUtm = new Map<
+    string,
+    {
+      totalSpend: number;
+      totalImpressions: number;
+      totalClicks: number;
+      totalConversions: number;
+      currency: string;
+      platforms: Set<string>;
+    }
+  >();
 
   for (const data of spendData) {
     const existing = aggregatedByUtm.get(data.utmCampaign) || {
@@ -319,12 +298,16 @@ async function cacheExternalSpendData(
   // Cache individual campaign spend data
   for (const [utmCampaign, metrics] of aggregatedByUtm) {
     const cacheKey = `external_spend:${utmCampaign}:${dateRangeKey}`;
-    await setCachedMetrics(cacheKey, {
-      utmCampaign,
-      ...metrics,
-      platforms: Array.from(metrics.platforms),
-      syncedAt: new Date().toISOString(),
-    }, 3600); // Cache for 1 hour
+    await setCachedMetrics(
+      cacheKey,
+      {
+        utmCampaign,
+        ...metrics,
+        platforms: Array.from(metrics.platforms),
+        syncedAt: new Date().toISOString(),
+      },
+      3600,
+    ); // Cache for 1 hour
   }
 
   // Cache aggregated totals
@@ -379,20 +362,16 @@ export async function getExternalSpendForCampaign(
 
   return {
     campaignId: utmCampaign,
-    platform: data.platforms[0] as MarketingPlatform || "FACEBOOK",
+    platform: (data.platforms[0] as MarketingPlatform) || "FACEBOOK",
     dateRange: { start: startDate, end: endDate },
     impressions: data.totalImpressions,
     clicks: data.totalClicks,
     spend: data.totalSpend,
     spendCurrency: data.currency || "USD",
     conversions: data.totalConversions,
-    ctr: data.totalImpressions > 0
-      ? (data.totalClicks / data.totalImpressions) * 100
-      : 0,
+    ctr: data.totalImpressions > 0 ? (data.totalClicks / data.totalImpressions) * 100 : 0,
     cpc: data.totalClicks > 0 ? data.totalSpend / data.totalClicks : 0,
-    cpm: data.totalImpressions > 0
-      ? (data.totalSpend / data.totalImpressions) * 1000
-      : 0,
+    cpm: data.totalImpressions > 0 ? (data.totalSpend / data.totalImpressions) * 1000 : 0,
     reach: 0,
     frequency: 0,
   };

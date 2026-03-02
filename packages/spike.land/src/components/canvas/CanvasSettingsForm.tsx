@@ -36,10 +36,7 @@ const ORDER_OPTIONS = [
 const MIN_INTERVAL = 5;
 const MAX_INTERVAL = 60;
 
-export function CanvasSettingsForm({
-  settings,
-  onChange,
-}: CanvasSettingsFormProps) {
+export function CanvasSettingsForm({ settings, onChange }: CanvasSettingsFormProps) {
   const handleRotationChange = (value: string) => {
     const rotation = parseInt(value, 10) as 0 | 90 | 180 | 270;
     onChange({ ...settings, rotation });
@@ -71,15 +68,12 @@ export function CanvasSettingsForm({
     <div className="space-y-4">
       <div className="space-y-2">
         <Label htmlFor="rotation">Rotation</Label>
-        <Select
-          value={settings.rotation.toString()}
-          onValueChange={handleRotationChange}
-        >
+        <Select value={settings.rotation.toString()} onValueChange={handleRotationChange}>
           <SelectTrigger id="rotation" data-testid="rotation-select">
             <SelectValue placeholder="Select rotation" />
           </SelectTrigger>
           <SelectContent>
-            {ROTATION_OPTIONS.map(option => (
+            {ROTATION_OPTIONS.map((option) => (
               <SelectItem key={option.value} value={option.value}>
                 {option.label}
               </SelectItem>
@@ -95,7 +89,7 @@ export function CanvasSettingsForm({
             <SelectValue placeholder="Select order" />
           </SelectTrigger>
           <SelectContent>
-            {ORDER_OPTIONS.map(option => (
+            {ORDER_OPTIONS.map((option) => (
               <SelectItem key={option.value} value={option.value}>
                 {option.label}
               </SelectItem>

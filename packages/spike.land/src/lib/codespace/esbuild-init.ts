@@ -27,7 +27,9 @@ export function resolveEsbuildBinary(): string | null {
   for (const c of candidates) {
     try {
       if (fs.existsSync(c)) return c;
-    } catch { /* ignore */ }
+    } catch {
+      /* ignore */
+    }
   }
   return null;
 }
@@ -57,10 +59,7 @@ export async function ensureEsbuildReady(): Promise<void> {
       });
     } catch (err) {
       // esbuild throws "Cannot call "initialize" more than once' if already init'd
-      if (
-        err instanceof Error
-        && err.message.includes("initialize")
-      ) {
+      if (err instanceof Error && err.message.includes("initialize")) {
         // Already initialized — safe to continue
       } else {
         initPromise = null;

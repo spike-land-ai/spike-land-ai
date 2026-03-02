@@ -34,10 +34,7 @@ export function McpConfigSnippet({
 
   return (
     <Card
-      className={cn(
-        "overflow-hidden border-border/50 bg-black/40 backdrop-blur-sm",
-        className,
-      )}
+      className={cn("overflow-hidden border-border/50 bg-black/40 backdrop-blur-sm", className)}
     >
       <div className="flex items-center justify-between border-b border-border/50 bg-muted/30 px-4 py-3">
         <div className="flex items-center gap-2">
@@ -58,35 +55,31 @@ export function McpConfigSnippet({
           onClick={handleCopy}
         >
           <AnimatePresence mode="wait" initial={false}>
-            {copied
-              ? (
-                <motion.div
-                  key="check"
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.8 }}
-                >
-                  <Check className="h-4 w-4 text-green-500" />
-                </motion.div>
-              )
-              : (
-                <motion.div
-                  key="copy"
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.8 }}
-                >
-                  <Clipboard className="h-4 w-4 text-muted-foreground" />
-                </motion.div>
-              )}
+            {copied ? (
+              <motion.div
+                key="check"
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.8 }}
+              >
+                <Check className="h-4 w-4 text-green-500" />
+              </motion.div>
+            ) : (
+              <motion.div
+                key="copy"
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.8 }}
+              >
+                <Clipboard className="h-4 w-4 text-muted-foreground" />
+              </motion.div>
+            )}
           </AnimatePresence>
           <span className="sr-only">Copy code</span>
         </Button>
       </div>
       <div className="relative overflow-x-auto p-4 font-mono text-sm leading-relaxed">
-        <pre className="text-muted-foreground">
-          {displayCode}
-        </pre>
+        <pre className="text-muted-foreground">{displayCode}</pre>
       </div>
     </Card>
   );

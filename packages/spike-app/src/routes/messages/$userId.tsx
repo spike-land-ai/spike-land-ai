@@ -29,13 +29,13 @@ export function MessageThreadPage() {
           >
             <div
               className={`max-w-xs rounded-2xl px-4 py-2 ${
-                msg.from === "me"
-                  ? "bg-blue-600 text-white"
-                  : "bg-gray-100 text-gray-900"
+                msg.from === "me" ? "bg-blue-600 text-white" : "bg-gray-100 text-gray-900"
               }`}
             >
               <p className="text-sm">{msg.text}</p>
-              <p className={`mt-1 text-xs ${msg.from === "me" ? "text-blue-200" : "text-gray-400"}`}>
+              <p
+                className={`mt-1 text-xs ${msg.from === "me" ? "text-blue-200" : "text-gray-400"}`}
+              >
                 {msg.time}
               </p>
             </div>

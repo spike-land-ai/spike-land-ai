@@ -42,11 +42,7 @@ export function clearRetro(): void {
 
 // ─── Registration ────────────────────────────────────────────────────────────
 
-export function registerRetroTools(
-  registry: ToolRegistry,
-  userId: string,
-  db: DrizzleDB,
-): void {
+export function registerRetroTools(registry: ToolRegistry, userId: string, db: DrizzleDB): void {
   registry.registerBuilt(
     freeTool(userId, db)
       .tool("retro_analyze", "Perform retrospective analysis on a completed session.", {
@@ -56,14 +52,21 @@ export function registerRetroTools(
       .handler(async ({ input }) => {
         const id = crypto.randomUUID();
         const retro: Retrospective = {
-          id, sessionId: input.session_id,
-          patterns: ["Repetitive boilerplate for API routes", "Successful use of shard-ui components"],
+          id,
+          sessionId: input.session_id,
+          patterns: [
+            "Repetitive boilerplate for API routes",
+            "Successful use of shard-ui components",
+          ],
           metrics: { passRate: 0.85, iterationCount: 3 },
           improvements: ["Abstract API boilerplate into a generator pattern"],
           createdAt: new Date().toISOString(),
         };
         retros.set(id, retro);
-        return jsonResult(`Retrospective completed for session ${input.session_id}. Retro ID: ${id}`, retro);
+        return jsonResult(
+          `Retrospective completed for session ${input.session_id}. Retro ID: ${id}`,
+          retro,
+        );
       }),
   );
 
@@ -91,7 +94,14 @@ export function registerRetroTools(
       .meta({ category: "retro", tier: "free" })
       .handler(async ({ input }) => {
         const id = crypto.randomUUID();
-        const item: KnowledgeItem = { id, category: input.category, title: input.title, content: input.content, tags: input.tags ?? [], createdAt: new Date().toISOString() };
+        const item: KnowledgeItem = {
+          id,
+          category: input.category,
+          title: input.title,
+          content: input.content,
+          tags: input.tags ?? [],
+          createdAt: new Date().toISOString(),
+        };
         knowledgeBase.set(id, item);
         return jsonResult(`Knowledge item added with ID: ${id}`, item);
       }),
@@ -108,11 +118,14 @@ export function registerRetroTools(
       .handler(async ({ input }) => {
         const limit = input.limit ?? 5;
         let results = Array.from(knowledgeBase.values());
-        if (input.category) results = results.filter(i => i.category === input.category);
-        results = results.filter(i =>
-          i.title.toLowerCase().includes(input.query.toLowerCase())
-          || i.content.toLowerCase().includes(input.query.toLowerCase()),
-        ).slice(0, limit);
+        if (input.category) results = results.filter((i) => i.category === input.category);
+        results = results
+          .filter(
+            (i) =>
+              i.title.toLowerCase().includes(input.query.toLowerCase()) ||
+              i.content.toLowerCase().includes(input.query.toLowerCase()),
+          )
+          .slice(0, limit);
         return jsonResult(`Found ${results.length} item(s) in knowledge base`, results);
       }),
   );
@@ -133,9 +146,13 @@ export function registerRetroTools(
 
   registry.registerBuilt(
     freeTool(userId, db)
-      .tool("retro_get_recommendations", "Get improvement recommendations based on accumulated knowledge.", {
-        project_type: z.string().optional().describe("Project type (default nextjs)."),
-      })
+      .tool(
+        "retro_get_recommendations",
+        "Get improvement recommendations based on accumulated knowledge.",
+        {
+          project_type: z.string().optional().describe("Project type (default nextjs)."),
+        },
+      )
       .meta({ category: "retro", tier: "free" })
       .handler(async ({ input }) => {
         return jsonResult("General recommendations for " + (input.project_type ?? "nextjs"), [

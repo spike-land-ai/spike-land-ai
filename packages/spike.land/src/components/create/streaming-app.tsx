@@ -42,10 +42,7 @@ export function StreamingApp({ path, className }: StreamingAppProps) {
 
     const controller = new AbortController();
     abortRef.current = controller;
-    const timeoutId = setTimeout(
-      () => controller.abort(),
-      GENERATION_TIMEOUT_MS,
-    );
+    const timeoutId = setTimeout(() => controller.abort(), GENERATION_TIMEOUT_MS);
 
     try {
       const response = await fetch("/api/create/stream", {
@@ -62,9 +59,7 @@ export function StreamingApp({ path, className }: StreamingAppProps) {
         }
         if (response.status === 429) {
           setStatus("error");
-          setError(
-            "Rate limit reached. Please try again later or sign in for more.",
-          );
+          setError("Rate limit reached. Please try again later or sign in for more.");
           return;
         }
         if (response.status === 202) {
@@ -119,16 +114,9 @@ export function StreamingApp({ path, className }: StreamingAppProps) {
 
   if (status === "error") {
     return (
-      <div
-        className={cn(
-          "flex flex-col items-center justify-center min-h-[50vh] p-8",
-          className,
-        )}
-      >
+      <div className={cn("flex flex-col items-center justify-center min-h-[50vh] p-8", className)}>
         <div className="bg-destructive/10 border border-destructive/50 rounded-lg p-6 max-w-lg w-full text-center">
-          <h3 className="text-xl font-bold text-destructive mb-2">
-            Generation Failed
-          </h3>
+          <h3 className="text-xl font-bold text-destructive mb-2">Generation Failed</h3>
           <p className="text-muted-foreground mb-4">{error}</p>
           <div className="flex flex-col items-center gap-3">
             <button
@@ -142,7 +130,7 @@ export function StreamingApp({ path, className }: StreamingAppProps) {
         {generatedCode && (
           <div className="bg-card border rounded-xl overflow-hidden shadow-sm mt-6 max-w-lg w-full">
             <button
-              onClick={() => setShowCode(v => !v)}
+              onClick={() => setShowCode((v) => !v)}
               className="w-full bg-muted/50 px-4 py-3 border-b text-xs font-medium text-muted-foreground uppercase tracking-wider flex items-center justify-between hover:bg-muted/70 transition-colors"
             >
               <span>Generated Code ({generatedCode.length} chars)</span>
@@ -180,12 +168,7 @@ export function StreamingApp({ path, className }: StreamingAppProps) {
   }
 
   return (
-    <div
-      className={cn(
-        "flex flex-col items-center justify-center min-h-[80vh] w-full",
-        className,
-      )}
-    >
+    <div className={cn("flex flex-col items-center justify-center min-h-[80vh] w-full", className)}>
       <div className="max-w-md w-full space-y-8">
         <div className="text-center space-y-4">
           <div className="relative inline-flex">
@@ -198,9 +181,7 @@ export function StreamingApp({ path, className }: StreamingAppProps) {
             </span>
           </div>
 
-          <h1 className="text-3xl font-bold tracking-tight">
-            Building your app...
-          </h1>
+          <h1 className="text-3xl font-bold tracking-tight">Building your app...</h1>
           <p className="text-muted-foreground">
             Spike Land AI is crafting a React application based on
             <span className="font-mono bg-muted px-2 py-0.5 rounded mx-1 text-foreground">

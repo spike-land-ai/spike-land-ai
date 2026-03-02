@@ -6,10 +6,12 @@ vi.mock("@/lib/ai/gemini-client", () => ({
 vi.mock("@/lib/logger", () => ({ default: { error: vi.fn(), warn: vi.fn() } }));
 vi.mock("@/lib/try-catch", () => ({
   tryCatch: vi.fn((p: Promise<unknown>) =>
-    p.then((data: unknown) => ({ data, error: null })).catch((error: unknown) => ({
-      data: null,
-      error,
-    }))
+    p
+      .then((data: unknown) => ({ data, error: null }))
+      .catch((error: unknown) => ({
+        data: null,
+        error,
+      })),
   ),
 }));
 vi.mock("diff", () => ({
@@ -22,10 +24,7 @@ vi.mock("diff", () => ({
   },
 }));
 
-import {
-  computeDiffHunks,
-  transformRewriteResult,
-} from "./rewrite-content";
+import { computeDiffHunks, transformRewriteResult } from "./rewrite-content";
 
 describe("computeDiffHunks", () => {
   it("returns single unchanged hunk for identical content", () => {
@@ -39,8 +38,8 @@ describe("computeDiffHunks", () => {
   it("returns added and removed hunks for different content", () => {
     const hunks = computeDiffHunks("old content", "new content");
     expect(hunks.length).toBeGreaterThanOrEqual(2);
-    const removed = hunks.find(h => h.type === "removed");
-    const added = hunks.find(h => h.type === "added");
+    const removed = hunks.find((h) => h.type === "removed");
+    const added = hunks.find((h) => h.type === "added");
     expect(removed).toBeDefined();
     expect(added).toBeDefined();
   });
@@ -109,35 +108,17 @@ describe("transformRewriteResult", () => {
   });
 
   it("preserves changes array", () => {
-    const response = transformRewriteResult(
-      "id",
-      "original",
-      mockResult,
-      "TWITTER",
-      false,
-    );
+    const response = transformRewriteResult("id", "original", mockResult, "TWITTER", false);
     expect(response.changes).toEqual(mockResult.changes);
   });
 
   it("preserves character count", () => {
-    const response = transformRewriteResult(
-      "id",
-      "original",
-      mockResult,
-      "TWITTER",
-      false,
-    );
+    const response = transformRewriteResult("id", "original", mockResult, "TWITTER", false);
     expect(response.characterCount).toEqual(mockResult.characterCount);
   });
 
   it("preserves tone analysis", () => {
-    const response = transformRewriteResult(
-      "id",
-      "original",
-      mockResult,
-      "TWITTER",
-      false,
-    );
+    const response = transformRewriteResult("id", "original", mockResult, "TWITTER", false);
     expect(response.toneAnalysis).toEqual(mockResult.toneAnalysis);
   });
 });

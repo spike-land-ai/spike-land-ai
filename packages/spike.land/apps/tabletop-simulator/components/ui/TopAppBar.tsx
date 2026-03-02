@@ -52,12 +52,8 @@ export function TopAppBar({
             title="Click to copy invite link"
           >
             <span className="text-lg">🎲</span>
-            <span className="text-white/90 font-medium text-sm">
-              Room: {roomCode.slice(0, 8)}
-            </span>
-            <span className="text-white/50 text-xs">
-              {copied ? "Copied!" : "📋"}
-            </span>
+            <span className="text-white/90 font-medium text-sm">Room: {roomCode.slice(0, 8)}</span>
+            <span className="text-white/50 text-xs">{copied ? "Copied!" : "📋"}</span>
           </button>
         </div>
 
@@ -66,16 +62,12 @@ export function TopAppBar({
           {/* Connection status */}
           <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-black/60 backdrop-blur-md border border-white/10">
             <span className={`w-2 h-2 rounded-full ${statusColor}`} />
-            <span className="text-white/70 text-xs hidden sm:inline">
-              {statusLabel}
-            </span>
+            <span className="text-white/70 text-xs hidden sm:inline">{statusLabel}</span>
           </div>
 
           {/* Player count */}
           <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-black/60 backdrop-blur-md border border-white/10">
-            <span className="text-white/90 text-sm">
-              👥 {playerCount}
-            </span>
+            <span className="text-white/90 text-sm">👥 {playerCount}</span>
           </div>
         </div>
 

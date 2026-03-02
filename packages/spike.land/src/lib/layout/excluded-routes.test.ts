@@ -1,10 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import {
-  FOOTER_EXCLUDED_PATHS,
-  shouldHideChrome,
-  shouldHideFooter,
-} from "./excluded-routes";
+import { FOOTER_EXCLUDED_PATHS, shouldHideChrome, shouldHideFooter } from "./excluded-routes";
 
 describe("FOOTER_EXCLUDED_PATHS", () => {
   it("is a non-empty array of strings", () => {

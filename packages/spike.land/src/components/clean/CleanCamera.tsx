@@ -3,18 +3,8 @@
 import { Button } from "@/components/ui/button";
 import { useCleanCamera } from "@/hooks/useCleanCamera";
 import type { CameraErrorKind } from "@/hooks/useCleanCamera";
-import {
-  detectPlatform,
-  getCameraPermissionInstructions,
-} from "@/lib/clean/detect-platform";
-import {
-  AlertTriangle,
-  Camera,
-  RefreshCw,
-  ShieldOff,
-  VideoOff,
-  X,
-} from "lucide-react";
+import { detectPlatform, getCameraPermissionInstructions } from "@/lib/clean/detect-platform";
+import { AlertTriangle, Camera, RefreshCw, ShieldOff, VideoOff, X } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
 
@@ -23,7 +13,7 @@ interface CleanCameraProps {
   onCancel: () => void;
 }
 
-function CameraErrorIcon({ kind }: { kind: CameraErrorKind | null; }) {
+function CameraErrorIcon({ kind }: { kind: CameraErrorKind | null }) {
   switch (kind) {
     case "permission-denied":
       return <ShieldOff className="h-12 w-12 text-destructive" />;
@@ -36,14 +26,9 @@ function CameraErrorIcon({ kind }: { kind: CameraErrorKind | null; }) {
   }
 }
 
-function CameraErrorMessage(
-  { kind, message }: { kind: CameraErrorKind | null; message: string; },
-) {
+function CameraErrorMessage({ kind, message }: { kind: CameraErrorKind | null; message: string }) {
   const platform = useMemo(() => detectPlatform(), []);
-  const instructions = useMemo(
-    () => getCameraPermissionInstructions(platform),
-    [platform],
-  );
+  const instructions = useMemo(() => getCameraPermissionInstructions(platform), [platform]);
 
   if (kind === "permission-denied") {
     return (
@@ -80,15 +65,8 @@ function CameraErrorMessage(
 }
 
 export function CleanCamera({ onCapture, onCancel }: CleanCameraProps) {
-  const {
-    videoRef,
-    isReady,
-    error,
-    errorKind,
-    requestCamera,
-    capturePhoto,
-    stopCamera,
-  } = useCleanCamera();
+  const { videoRef, isReady, error, errorKind, requestCamera, capturePhoto, stopCamera } =
+    useCleanCamera();
   const [preview, setPreview] = useState<string | null>(null);
 
   useEffect(() => {
@@ -164,13 +142,7 @@ export function CleanCamera({ onCapture, onCancel }: CleanCameraProps) {
   return (
     <div className="space-y-4">
       <div className="relative overflow-hidden rounded-xl bg-black aspect-video">
-        <video
-          ref={videoRef}
-          autoPlay
-          playsInline
-          muted
-          className="h-full w-full object-cover"
-        />
+        <video ref={videoRef} autoPlay playsInline muted className="h-full w-full object-cover" />
         {!isReady && (
           <div className="absolute inset-0 flex items-center justify-center">
             <p className="text-white/60 text-sm">Starting camera...</p>

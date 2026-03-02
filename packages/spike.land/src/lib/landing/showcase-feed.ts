@@ -15,9 +15,7 @@ export interface ShowcaseApp {
   viewCount?: number;
 }
 
-export async function getLatestShowcaseApps(
-  limit = 10,
-): Promise<ShowcaseApp[]> {
+export async function getLatestShowcaseApps(limit = 10): Promise<ShowcaseApp[]> {
   const [appsResult, createdAppsResult] = await Promise.all([
     tryCatch(
       prisma.app.findMany({
@@ -64,12 +62,10 @@ export async function getLatestShowcaseApps(
     logger.warn(`Failed to fetch apps: ${appsResult.error.message}`);
   }
   if (createdAppsResult.error) {
-    logger.warn(
-      `Failed to fetch created apps: ${createdAppsResult.error.message}`,
-    );
+    logger.warn(`Failed to fetch created apps: ${createdAppsResult.error.message}`);
   }
 
-  const apps: ShowcaseApp[] = (appsResult.data ?? []).map(app => ({
+  const apps: ShowcaseApp[] = (appsResult.data ?? []).map((app) => ({
     id: app.id,
     title: app.name,
     description: app.description ?? "",
@@ -79,18 +75,16 @@ export async function getLatestShowcaseApps(
     source: "app" as const,
   }));
 
-  const createdApps: ShowcaseApp[] = (createdAppsResult.data ?? []).map(
-    app => ({
-      id: app.id,
-      title: app.title,
-      description: app.description,
-      slug: app.slug,
-      codespaceId: app.codespaceId,
-      lastActivity: app.generatedAt,
-      source: "created-app" as const,
-      viewCount: app.viewCount,
-    }),
-  );
+  const createdApps: ShowcaseApp[] = (createdAppsResult.data ?? []).map((app) => ({
+    id: app.id,
+    title: app.title,
+    description: app.description,
+    slug: app.slug,
+    codespaceId: app.codespaceId,
+    lastActivity: app.generatedAt,
+    source: "created-app" as const,
+    viewCount: app.viewCount,
+  }));
 
   const merged = [...apps, ...createdApps].sort(
     (a, b) => b.lastActivity.getTime() - a.lastActivity.getTime(),

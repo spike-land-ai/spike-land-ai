@@ -7,10 +7,7 @@ import { z } from "zod";
 import type { SpacetimePlatformClient } from "../client.js";
 import { errorResult, jsonResult } from "../types.js";
 
-export function registerAnalyticsTools(
-  server: McpServer,
-  client: SpacetimePlatformClient,
-): void {
+export function registerAnalyticsTools(server: McpServer, client: SpacetimePlatformClient): void {
   // ─── stdb_record_event ───
 
   server.tool(
@@ -70,56 +67,46 @@ export function registerAnalyticsTools(
 
   // ─── stdb_analytics_dashboard ───
 
-  server.tool(
-    "stdb_analytics_dashboard",
-    "Get an analytics dashboard summary",
-    {},
-    async () => {
-      try {
-        const events = client.queryEvents({});
-        const byType = new Map<string, number>();
-        const bySource = new Map<string, number>();
-        for (const e of events) {
-          byType.set(e.eventType, (byType.get(e.eventType) ?? 0) + 1);
-          bySource.set(e.source, (bySource.get(e.source) ?? 0) + 1);
-        }
-        return jsonResult({
-          totalEvents: events.length,
-          byType: Object.fromEntries(byType),
-          bySource: Object.fromEntries(bySource),
-        });
-      } catch (err: unknown) {
-        const message = err instanceof Error ? err.message : String(err);
-        if (message.includes("Not connected")) return errorResult("NOT_CONNECTED", message, false);
-        return errorResult("QUERY_FAILED", message, false);
+  server.tool("stdb_analytics_dashboard", "Get an analytics dashboard summary", {}, async () => {
+    try {
+      const events = client.queryEvents({});
+      const byType = new Map<string, number>();
+      const bySource = new Map<string, number>();
+      for (const e of events) {
+        byType.set(e.eventType, (byType.get(e.eventType) ?? 0) + 1);
+        bySource.set(e.source, (bySource.get(e.source) ?? 0) + 1);
       }
-    },
-  );
+      return jsonResult({
+        totalEvents: events.length,
+        byType: Object.fromEntries(byType),
+        bySource: Object.fromEntries(bySource),
+      });
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err);
+      if (message.includes("Not connected")) return errorResult("NOT_CONNECTED", message, false);
+      return errorResult("QUERY_FAILED", message, false);
+    }
+  });
 
   // ─── stdb_health_check ───
 
-  server.tool(
-    "stdb_health_check",
-    "Get health status of all services",
-    {},
-    async () => {
-      try {
-        const checks = client.getHealthStatus();
-        return jsonResult({
-          count: checks.length,
-          checks: checks.map((c) => ({
-            id: c.id.toString(),
-            service: c.service,
-            status: c.status,
-            latencyMs: c.latencyMs,
-            checkedAt: c.checkedAt.toString(),
-          })),
-        });
-      } catch (err: unknown) {
-        const message = err instanceof Error ? err.message : String(err);
-        if (message.includes("Not connected")) return errorResult("NOT_CONNECTED", message, false);
-        return errorResult("QUERY_FAILED", message, false);
-      }
-    },
-  );
+  server.tool("stdb_health_check", "Get health status of all services", {}, async () => {
+    try {
+      const checks = client.getHealthStatus();
+      return jsonResult({
+        count: checks.length,
+        checks: checks.map((c) => ({
+          id: c.id.toString(),
+          service: c.service,
+          status: c.status,
+          latencyMs: c.latencyMs,
+          checkedAt: c.checkedAt.toString(),
+        })),
+      });
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err);
+      if (message.includes("Not connected")) return errorResult("NOT_CONNECTED", message, false);
+      return errorResult("QUERY_FAILED", message, false);
+    }
+  });
 }

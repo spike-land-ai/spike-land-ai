@@ -24,56 +24,44 @@ export function buildDynamicEnhancementPrompt(
   // Track which corrections to skip
   const skipCorrections = new Set(promptConfig?.skipCorrections || []);
 
-  let instruction =
-    `You are a professional image restoration AI. Transform this input image into a stunning, high-resolution, professional photograph taken with a modern camera in ideal lighting conditions. Maintain the original subject and composition perfectly.\n\nSpecific Correction Instructions:\n`;
+  let instruction = `You are a professional image restoration AI. Transform this input image into a stunning, high-resolution, professional photograph taken with a modern camera in ideal lighting conditions. Maintain the original subject and composition perfectly.\n\nSpecific Correction Instructions:\n`;
 
   // Style Conversion (sketches/paintings to photorealistic)
   if (analysis.imageStyle === "sketch") {
-    instruction +=
-      `- Convert this sketch into a photorealistic image while preserving the composition and subject. Add realistic textures, lighting, and colors.\n`;
+    instruction += `- Convert this sketch into a photorealistic image while preserving the composition and subject. Add realistic textures, lighting, and colors.\n`;
   } else if (analysis.imageStyle === "painting") {
-    instruction +=
-      `- Convert this painting into a photorealistic photograph while maintaining the composition. Replace painted textures with realistic details and natural lighting.\n`;
+    instruction += `- Convert this painting into a photorealistic photograph while maintaining the composition. Replace painted textures with realistic details and natural lighting.\n`;
   } else if (analysis.imageStyle === "screenshot") {
-    instruction +=
-      `- Clean up this screenshot and enhance it to photographic quality. Remove any UI elements or compression artifacts.\n`;
+    instruction += `- Clean up this screenshot and enhance it to photographic quality. Remove any UI elements or compression artifacts.\n`;
   }
 
   // Lighting & Exposure
   if (
-    !skipCorrections.has("isDark")
-    && (defects.isDark || analysis.lightingCondition.includes("pitch black"))
+    !skipCorrections.has("isDark") &&
+    (defects.isDark || analysis.lightingCondition.includes("pitch black"))
   ) {
-    instruction +=
-      `- Dramatically relight the scene. Reveal details hidden in shadows as if illuminated by strong, natural light (e.g., bright moonlight or professional studio lighting) while maintaining a realistic atmosphere.\n`;
+    instruction += `- Dramatically relight the scene. Reveal details hidden in shadows as if illuminated by strong, natural light (e.g., bright moonlight or professional studio lighting) while maintaining a realistic atmosphere.\n`;
   } else if (!skipCorrections.has("isOverexposed") && defects.isOverexposed) {
-    instruction +=
-      `- Recover details in blown-out highlight areas. Restore natural texture and color to bright spots.\n`;
+    instruction += `- Recover details in blown-out highlight areas. Restore natural texture and color to bright spots.\n`;
   }
 
   // VHS/Analog Artifacts
   if (!skipCorrections.has("hasVHSArtifacts") && defects.hasVHSArtifacts) {
-    instruction +=
-      `- Completely remove all analog video artifacts, including tracking lines, color bleeding, static noise, and tape distortion.\n`;
+    instruction += `- Completely remove all analog video artifacts, including tracking lines, color bleeding, static noise, and tape distortion.\n`;
   }
 
   // Noise & Resolution
   if (
-    !skipCorrections.has("hasNoise")
-    && !skipCorrections.has("isLowResolution")
-    && (defects.hasNoise || defects.isLowResolution)
+    !skipCorrections.has("hasNoise") &&
+    !skipCorrections.has("isLowResolution") &&
+    (defects.hasNoise || defects.isLowResolution)
   ) {
-    instruction +=
-      `- Apply advanced noise reduction to eliminate grain. Sharpen fine details and textures that are currently pixelated or blurry.\n`;
+    instruction += `- Apply advanced noise reduction to eliminate grain. Sharpen fine details and textures that are currently pixelated or blurry.\n`;
   }
 
   // Color Correction
-  if (
-    !skipCorrections.has("hasColorCast") && defects.hasColorCast
-    && defects.colorCastType
-  ) {
-    instruction +=
-      `- Neutralize the strong ${defects.colorCastType} color cast to restore natural, accurate colors.\n`;
+  if (!skipCorrections.has("hasColorCast") && defects.hasColorCast && defects.colorCastType) {
+    instruction += `- Neutralize the strong ${defects.colorCastType} color cast to restore natural, accurate colors.\n`;
   }
 
   // Focus/Blur
@@ -87,19 +75,16 @@ export function buildDynamicEnhancementPrompt(
   }
 
   // Add reference image instructions if provided
-  if (
-    promptConfig?.referenceImages && promptConfig.referenceImages.length > 0
-  ) {
+  if (promptConfig?.referenceImages && promptConfig.referenceImages.length > 0) {
     instruction += `\nStyle Reference:\n`;
-    instruction +=
-      `- Match the visual style, color grading, and overall aesthetic of the provided reference image${
-        promptConfig.referenceImages.length > 1 ? "s" : ""
-      }.\n`;
+    instruction += `- Match the visual style, color grading, and overall aesthetic of the provided reference image${
+      promptConfig.referenceImages.length > 1 ? "s" : ""
+    }.\n`;
 
     // Add descriptions if available
     const descriptionsWithContent = promptConfig.referenceImages
-      .filter(img => img.description)
-      .map(img => img.description);
+      .filter((img) => img.description)
+      .map((img) => img.description);
 
     if (descriptionsWithContent.length > 0) {
       instruction += `- Reference image notes: ${descriptionsWithContent.join("; ")}\n`;
@@ -107,8 +92,7 @@ export function buildDynamicEnhancementPrompt(
   }
 
   // Final instruction
-  instruction +=
-    `\nFinal Output Requirement: A clean, sharp, highly detailed professional photograph.`;
+  instruction += `\nFinal Output Requirement: A clean, sharp, highly detailed professional photograph.`;
 
   return instruction;
 }
@@ -120,9 +104,7 @@ export function buildDynamicEnhancementPrompt(
  * @param targetAnalysis - Structured analysis result from vision model for the target image
  * @returns Enhancement prompt tailored for blending two images
  */
-export function buildBlendEnhancementPrompt(
-  targetAnalysis: AnalysisDetailedResult,
-): string {
+export function buildBlendEnhancementPrompt(targetAnalysis: AnalysisDetailedResult): string {
   let instruction = `You are a professional image artist specializing in creative image blending.
 You have been given TWO images:
 1. The TARGET image (the main image to enhance)

@@ -6,9 +6,8 @@
  * by exercising the underlying engine functions that CLI delegates to.
  */
 
-import { describe, it, expect, beforeEach, vi, afterEach } from "vitest";
+import { describe, it, expect, beforeEach } from "vitest";
 import { createInterface } from "node:readline";
-import { EventEmitter } from "node:events";
 import {
   createMachine,
   addState,
@@ -29,10 +28,7 @@ describe("CLI command routing (engine integration)", () => {
     clearMachines();
   });
 
-  function dispatchCommand(
-    method: string,
-    params: Record<string, unknown>,
-  ): unknown {
+  function dispatchCommand(method: string, params: Record<string, unknown>): unknown {
     switch (method) {
       case "create":
         return createMachine(params as Parameters<typeof createMachine>[0]);

@@ -14,10 +14,7 @@ export function generateTestCode(spec: string, framework: string): string {
   return code;
 }
 
-export function applyPattern(
-  pattern: TestPattern,
-  variables: Record<string, string>,
-): string {
+export function applyPattern(pattern: TestPattern, variables: Record<string, string>): string {
   let result = pattern.template;
   for (const [key, value] of Object.entries(variables)) {
     result = result.replace(new RegExp(`\\{\\{${key}\\}\\}`, "g"), value);

@@ -138,20 +138,16 @@ spacetimedb.reducer(
   },
 );
 
-spacetimedb.reducer(
-  "mark_delivered",
-  { messageId: t.u64() },
-  (ctx, { messageId }) => {
-    const msg = ctx.db.agent_message.id.find(messageId);
-    if (!msg) {
-      throw new SenderError("Message not found");
-    }
-    if (msg.toAgent !== ctx.sender) {
-      throw new SenderError("Can only mark own messages as delivered");
-    }
-    ctx.db.agent_message.id.update({ ...msg, delivered: true });
-  },
-);
+spacetimedb.reducer("mark_delivered", { messageId: t.u64() }, (ctx, { messageId }) => {
+  const msg = ctx.db.agent_message.id.find(messageId);
+  if (!msg) {
+    throw new SenderError("Message not found");
+  }
+  if (msg.toAgent !== ctx.sender) {
+    throw new SenderError("Can only mark own messages as delivered");
+  }
+  ctx.db.agent_message.id.update({ ...msg, delivered: true });
+});
 
 // ─── Task Reducers ───
 
@@ -197,19 +193,15 @@ spacetimedb.reducer("claim_task", { taskId: t.u64() }, (ctx, { taskId }) => {
   });
 });
 
-spacetimedb.reducer(
-  "complete_task",
-  { taskId: t.u64() },
-  (ctx, { taskId }) => {
-    const task = ctx.db.task.id.find(taskId);
-    if (!task) {
-      throw new SenderError("Task not found");
-    }
-    if (task.assignedTo !== ctx.sender) {
-      throw new SenderError("Can only complete tasks assigned to you");
-    }
-    ctx.db.task.id.update({ ...task, status: "completed" });
-  },
-);
+spacetimedb.reducer("complete_task", { taskId: t.u64() }, (ctx, { taskId }) => {
+  const task = ctx.db.task.id.find(taskId);
+  if (!task) {
+    throw new SenderError("Task not found");
+  }
+  if (task.assignedTo !== ctx.sender) {
+    throw new SenderError("Can only complete tasks assigned to you");
+  }
+  ctx.db.task.id.update({ ...task, status: "completed" });
+});
 
 export default spacetimedb;

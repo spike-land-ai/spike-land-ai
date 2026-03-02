@@ -6,10 +6,7 @@
 const KEY_PREFIX = "mcp:enabled-categories:";
 const TTL_SECONDS = 7 * 24 * 60 * 60; // 7 days
 
-export async function loadEnabledCategories(
-  userId: string,
-  kv: KVNamespace,
-): Promise<string[]> {
+export async function loadEnabledCategories(userId: string, kv: KVNamespace): Promise<string[]> {
   try {
     const raw = await kv.get(`${KEY_PREFIX}${userId}`);
     if (!raw) return [];

@@ -11,8 +11,8 @@ export function SocialProof() {
 
   useEffect(() => {
     fetch("/api/bazdmeg/chat")
-      .then(res => res.json())
-      .then((data: { totalQuestions?: number; }) => {
+      .then((res) => res.json())
+      .then((data: { totalQuestions?: number }) => {
         if (typeof data.totalQuestions === "number") {
           setCount(data.totalQuestions);
         }

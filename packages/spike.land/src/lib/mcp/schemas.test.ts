@@ -1,9 +1,5 @@
 import { describe, expect, it } from "vitest";
-import {
-  McpRegistryGetSchema,
-  McpRegistryInstallSchema,
-  McpRegistrySearchSchema,
-} from "./schemas";
+import { McpRegistryGetSchema, McpRegistryInstallSchema, McpRegistrySearchSchema } from "./schemas";
 
 describe("MCP Registry Schemas", () => {
   describe("McpRegistrySearchSchema", () => {

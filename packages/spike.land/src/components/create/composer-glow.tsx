@@ -11,9 +11,7 @@ interface ComposerGlowProps {
   className?: string;
 }
 
-export function ComposerGlow(
-  { isFocused, children, className }: ComposerGlowProps,
-) {
+export function ComposerGlow({ isFocused, children, className }: ComposerGlowProps) {
   const prefersReducedMotion = useReducedMotion();
 
   return (
@@ -35,24 +33,28 @@ export function ComposerGlow(
         className={cn(
           "absolute inset-[-1px] rounded-2xl transition-opacity duration-400",
           prefersReducedMotion
-            ? (isFocused
+            ? isFocused
               ? "border-glow-cyan"
-              : "border border-white/10 bg-white/5")
-            : (isFocused
+              : "border border-white/10 bg-white/5"
+            : isFocused
               ? "animate-border-rotate-fast"
-              : "animate-border-rotate"),
+              : "animate-border-rotate",
         )}
-        style={prefersReducedMotion ? undefined : {
-          background: isFocused
-            ? `conic-gradient(from var(--angle), #22d3ee, #a855f7, #d946ef, #22d3ee)`
-            : `conic-gradient(from var(--angle), rgba(255,255,255,0.08), rgba(255,255,255,0.02), rgba(255,255,255,0.08))`,
-          opacity: isFocused ? 1 : 0.4,
-          WebkitMask: "linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)",
-          WebkitMaskComposite: "xor",
-          maskComposite: "exclude",
-          padding: "1px",
-          borderRadius: "1rem",
-        }}
+        style={
+          prefersReducedMotion
+            ? undefined
+            : {
+                background: isFocused
+                  ? `conic-gradient(from var(--angle), #22d3ee, #a855f7, #d946ef, #22d3ee)`
+                  : `conic-gradient(from var(--angle), rgba(255,255,255,0.08), rgba(255,255,255,0.02), rgba(255,255,255,0.08))`,
+                opacity: isFocused ? 1 : 0.4,
+                WebkitMask: "linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)",
+                WebkitMaskComposite: "xor",
+                maskComposite: "exclude",
+                padding: "1px",
+                borderRadius: "1rem",
+              }
+        }
       />
 
       {/* Inner content container */}

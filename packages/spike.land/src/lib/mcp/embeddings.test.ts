@@ -89,11 +89,7 @@ describe("embeddings", () => {
     });
 
     it("should normalize to approximately unit vector", () => {
-      const vec = buildVector(
-        "generate_image",
-        "image",
-        "Generate AI images with prompts",
-      );
+      const vec = buildVector("generate_image", "image", "Generate AI images with prompts");
       let magnitude = 0;
       for (const v of vec.values()) {
         magnitude += v * v;
@@ -308,9 +304,7 @@ describe("embeddings", () => {
     });
 
     it("should handle multiple patterns in one query", () => {
-      const params = suggestParameters(
-        "generate code of a function in typescript",
-      );
+      const params = suggestParameters("generate code of a function in typescript");
       expect(params.prompt).toBeDefined();
       expect(params.language).toBe("typescript");
     });

@@ -19,9 +19,7 @@ vi.mock("@/lib/prisma", () => ({ default: mockPrisma }));
 vi.mock("@/lib/logger", () => ({ default: mockLogger }));
 vi.mock("@/lib/try-catch", () => ({
   tryCatch: (p: Promise<unknown>) =>
-    p
-      .then(data => ({ data, error: null }))
-      .catch(error => ({ data: null, error })),
+    p.then((data) => ({ data, error: null })).catch((error) => ({ data: null, error })),
 }));
 
 import { cleanupExpiredBinApps, getBinStats } from "./bin-cleanup";
@@ -88,10 +86,7 @@ describe("bin-cleanup", () => {
     });
 
     it("should delete expired apps and return results", async () => {
-      mockPrisma.app.findMany.mockResolvedValue([
-        expiredApp,
-        anotherExpiredApp,
-      ]);
+      mockPrisma.app.findMany.mockResolvedValue([expiredApp, anotherExpiredApp]);
       mockPrisma.app.delete.mockResolvedValue({});
 
       const result = await cleanupExpiredBinApps();
@@ -112,10 +107,7 @@ describe("bin-cleanup", () => {
     });
 
     it("should handle delete errors for individual apps", async () => {
-      mockPrisma.app.findMany.mockResolvedValue([
-        expiredApp,
-        anotherExpiredApp,
-      ]);
+      mockPrisma.app.findMany.mockResolvedValue([expiredApp, anotherExpiredApp]);
       mockPrisma.app.delete
         .mockRejectedValueOnce(new Error("FK constraint violation"))
         .mockResolvedValueOnce({});
@@ -138,9 +130,7 @@ describe("bin-cleanup", () => {
     });
 
     it("should throw when fetching expired apps fails", async () => {
-      mockPrisma.app.findMany.mockRejectedValue(
-        new Error("Database unavailable"),
-      );
+      mockPrisma.app.findMany.mockRejectedValue(new Error("Database unavailable"));
 
       await expect(cleanupExpiredBinApps()).rejects.toThrow(
         "Failed to fetch expired apps: Database unavailable",
@@ -236,9 +226,7 @@ describe("bin-cleanup", () => {
     });
 
     it("should return zeros when groupBy fails", async () => {
-      mockPrisma.app.groupBy.mockRejectedValue(
-        new Error("Database unavailable"),
-      );
+      mockPrisma.app.groupBy.mockRejectedValue(new Error("Database unavailable"));
 
       const stats = await getBinStats();
 
@@ -267,14 +255,10 @@ describe("bin-cleanup", () => {
     });
 
     it("should handle findMany returning null (error in fetching apps)", async () => {
-      mockPrisma.app.groupBy.mockResolvedValue([
-        { id: "app-1", _count: 1 },
-      ]);
+      mockPrisma.app.groupBy.mockResolvedValue([{ id: "app-1", _count: 1 }]);
       // If findMany fails, tryCatch returns { data: null, error }
       // The code uses `apps || []` so it handles null gracefully
-      mockPrisma.app.findMany.mockRejectedValue(
-        new Error("findMany failed"),
-      );
+      mockPrisma.app.findMany.mockRejectedValue(new Error("findMany failed"));
 
       const stats = await getBinStats();
 

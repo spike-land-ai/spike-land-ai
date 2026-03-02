@@ -109,9 +109,7 @@ export function registerSwarmMonitoringTools(
               .where(eq(claudeCodeAgents.userId, ctx.userId));
 
         if (agents.length === 0) {
-          return textResult(
-            agent_id ? `Agent ${agent_id} not found.` : "No agents found.",
-          );
+          return textResult(agent_id ? `Agent ${agent_id} not found.` : "No agents found.");
         }
 
         const TOKEN_COST_USD = 0.000003;
@@ -210,8 +208,7 @@ export function registerSwarmMonitoringTools(
           );
         }
 
-        let text =
-          `**Replay: ${agent.name}** (steps ${startIdx}–${startIdx + sliced.length - 1} of ${allMessages.length} total)\n\n`;
+        let text = `**Replay: ${agent.name}** (steps ${startIdx}–${startIdx + sliced.length - 1} of ${allMessages.length} total)\n\n`;
 
         sliced.forEach((msg, i) => {
           const stepNum = startIdx + i;
@@ -279,9 +276,7 @@ export function registerSwarmMonitoringTools(
             erroredCount++;
           }
 
-          const lastActivity = a.lastActiveAt
-            ? new Date(a.lastActiveAt).toISOString()
-            : "never";
+          const lastActivity = a.lastActiveAt ? new Date(a.lastActiveAt).toISOString() : "never";
 
           const meta = JSON.parse(a.metadata || "{}") as Record<string, unknown>;
           const currentTask = meta.projectPath

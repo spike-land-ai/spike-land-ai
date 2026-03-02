@@ -1,13 +1,6 @@
-import type {
-  ArchitectureDesign,
-  DependencyGraph,
-  FilePlanTask,
-} from "./types";
+import type { ArchitectureDesign, DependencyGraph, FilePlanTask } from "./types";
 
-export function decomposeFeature(
-  feature: string,
-  _repoFiles: string[],
-): ArchitectureDesign {
+export function decomposeFeature(feature: string, _repoFiles: string[]): ArchitectureDesign {
   // Simple heuristic-based decomposition
   const id = Math.random().toString(36).substring(2, 11);
   const design: ArchitectureDesign = {
@@ -33,19 +26,19 @@ export function decomposeFeature(
 }
 
 export function buildDependencyGraph(
-  files: Array<{ path: string; imports: string[]; }>,
+  files: Array<{ path: string; imports: string[] }>,
 ): DependencyGraph {
-  const nodes = files.map(f => ({
+  const nodes = files.map((f) => ({
     id: f.path,
     label: f.path.split("/").pop() || f.path,
     type: "file",
   }));
-  const edges = files.flatMap(f =>
-    f.imports.map(imp => ({
+  const edges = files.flatMap((f) =>
+    f.imports.map((imp) => ({
       from: f.path,
       to: imp,
       type: "import" as const,
-    }))
+    })),
   );
 
   return { nodes, edges };
@@ -60,5 +53,3 @@ export function createFilePlan(design: ArchitectureDesign): FilePlanTask[] {
     dependencies: [],
   }));
 }
-
-

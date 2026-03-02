@@ -1,0 +1,12 @@
+const fs = require('fs');
+let content = fs.readFileSync('packages/spike.land/package.json', 'utf8');
+const pkg = JSON.parse(content);
+delete pkg.dependencies['next'];
+delete pkg.dependencies['next-mdx-remote'];
+delete pkg.dependencies['next-themes'];
+delete pkg.dependencies['next-view-transitions'];
+delete pkg.devDependencies['@next/eslint-plugin-next'];
+pkg.scripts.dev = "echo 'Next.js has been removed'";
+pkg.scripts.build = "echo 'Next.js has been removed'";
+pkg.scripts.start = "echo 'Next.js has been removed'";
+fs.writeFileSync('packages/spike.land/package.json', JSON.stringify(pkg, null, 2));

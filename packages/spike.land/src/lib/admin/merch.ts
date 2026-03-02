@@ -75,7 +75,7 @@ export async function getMerchMetrics(): Promise<MerchMetrics> {
     totalProducts,
     activeProducts,
     totalRevenue: Number(totalRevenue._sum.totalAmount || 0),
-    recentOrders: recentOrders.map(order => ({
+    recentOrders: recentOrders.map((order) => ({
       id: order.id,
       orderNumber: order.orderNumber,
       status: order.status,

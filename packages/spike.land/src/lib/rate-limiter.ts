@@ -56,15 +56,11 @@ async function isKVAvailable(): Promise<boolean> {
   // Check for required environment variables first (sync check)
   // Support REDIS_URL (native), UPSTASH_REDIS_REST_* (standard), KV_REST_API_* (Vercel)
   const hasNativeEnv = !!process.env.REDIS_URL;
-  const hasUpstashEnv = process.env.UPSTASH_REDIS_REST_URL
-    && process.env.UPSTASH_REDIS_REST_TOKEN;
-  const hasKvEnv = process.env.KV_REST_API_URL
-    && process.env.KV_REST_API_TOKEN;
+  const hasUpstashEnv = process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN;
+  const hasKvEnv = process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN;
 
   if (!hasNativeEnv && !hasUpstashEnv && !hasKvEnv) {
-    logger.warn(
-      "Upstash Redis environment variables not set, using in-memory storage",
-    );
+    logger.warn("Upstash Redis environment variables not set, using in-memory storage");
     kvAvailable = false;
     return false;
   }
@@ -73,10 +69,7 @@ async function isKVAvailable(): Promise<boolean> {
   const { error } = await tryCatch(redis.ping());
 
   if (error) {
-    logger.warn(
-      "Upstash Redis unavailable, falling back to in-memory storage",
-      { error },
-    );
+    logger.warn("Upstash Redis unavailable, falling back to in-memory storage", { error });
     kvAvailable = false;
     kvFailedAt = Date.now();
     return false;
@@ -147,15 +140,9 @@ async function checkRateLimitKV(
     return {count, ttl}
   `;
 
-  const [count, remainingTtl] = (await redis.eval(
-    script,
-    [key],
-    [ttlSeconds],
-  )) as [number, number];
+  const [count, remainingTtl] = (await redis.eval(script, [key], [ttlSeconds])) as [number, number];
 
-  const resetAt = remainingTtl > 0
-    ? Date.now() + remainingTtl
-    : Date.now() + config.windowMs;
+  const resetAt = remainingTtl > 0 ? Date.now() + remainingTtl : Date.now() + config.windowMs;
 
   if (count > config.maxRequests) {
     return {
@@ -256,8 +243,8 @@ export async function checkRateLimit(
 }> {
   // Bypass rate limiting in E2E tests or if explicitly enabled (non-production only)
   if (
-    (process.env.E2E_BYPASS_AUTH || process.env.SKIP_RATE_LIMIT)
-    && process.env.NODE_ENV !== "production"
+    (process.env.E2E_BYPASS_AUTH || process.env.SKIP_RATE_LIMIT) &&
+    process.env.NODE_ENV !== "production"
   ) {
     return {
       isLimited: false,
@@ -269,9 +256,7 @@ export async function checkRateLimit(
   const useKV = await isKVAvailable();
 
   if (useKV) {
-    const { data, error } = await tryCatch(
-      checkRateLimitKV(identifier, config),
-    );
+    const { data, error } = await tryCatch(checkRateLimitKV(identifier, config));
 
     if (error) {
       logger.warn("Redis rate limit check failed, falling back to memory", {
@@ -311,13 +296,11 @@ export async function resetRateLimit(identifier: string): Promise<void> {
  * Useful for testing or administrative purposes.
  * Note: For Redis, this only clears entries with known identifiers.
  */
-export async function clearAllRateLimits(
-  identifiers?: string[],
-): Promise<void> {
+export async function clearAllRateLimits(identifiers?: string[]): Promise<void> {
   const useKV = await isKVAvailable();
 
   if (useKV && identifiers) {
-    const keys = identifiers.map(id => `ratelimit:${id}`);
+    const keys = identifiers.map((id) => `ratelimit:${id}`);
     if (keys.length > 0) {
       const { error } = await tryCatch(redis.del(...keys));
 

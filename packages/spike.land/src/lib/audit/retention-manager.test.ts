@@ -255,9 +255,7 @@ describe("AuditRetentionManager.deletePolicy", () => {
   });
 
   it("returns false when prisma throws", async () => {
-    mockAuditRetentionPolicyDelete.mockRejectedValue(
-      new Error("Cannot delete"),
-    );
+    mockAuditRetentionPolicyDelete.mockRejectedValue(new Error("Cannot delete"));
 
     const result = await AuditRetentionManager.deletePolicy("policy-1");
 
@@ -359,9 +357,7 @@ describe("AuditRetentionManager.getEffectivePolicy", () => {
   });
 
   it("returns null when neither workspace nor system policy exists", async () => {
-    mockAuditRetentionPolicyFindFirst
-      .mockResolvedValueOnce(null)
-      .mockResolvedValueOnce(null);
+    mockAuditRetentionPolicyFindFirst.mockResolvedValueOnce(null).mockResolvedValueOnce(null);
 
     const result = await AuditRetentionManager.getEffectivePolicy("ws-no-policy");
 
@@ -396,9 +392,7 @@ describe("AuditRetentionManager.executeRetentionJob", () => {
   });
 
   it("returns error when policy is inactive", async () => {
-    mockAuditRetentionPolicyFindUnique.mockResolvedValue(
-      makePolicy({ isActive: false }),
-    );
+    mockAuditRetentionPolicyFindUnique.mockResolvedValue(makePolicy({ isActive: false }));
 
     const result = await AuditRetentionManager.executeRetentionJob("policy-1");
 
@@ -487,7 +481,7 @@ describe("AuditRetentionManager.executeRetentionJob", () => {
     await AuditRetentionManager.executeRetentionJob("policy-1");
 
     const findManyCall = mockWorkspaceAuditLogFindMany.mock.calls[0]![0] as {
-      where: { action?: Record<string, unknown>; };
+      where: { action?: Record<string, unknown> };
     };
     expect(findManyCall.where.action).toEqual({ in: ["ROLE_CHANGE"] });
   });
@@ -534,9 +528,7 @@ describe("AuditRetentionManager.executeRetentionJob", () => {
         createdAt: new Date("2024-01-01"),
       },
     ]);
-    mockArchivedAuditLogCreateMany.mockRejectedValue(
-      new Error("Archive DB error"),
-    );
+    mockArchivedAuditLogCreateMany.mockRejectedValue(new Error("Archive DB error"));
 
     const result = await AuditRetentionManager.executeRetentionJob("policy-1");
 
@@ -548,9 +540,7 @@ describe("AuditRetentionManager.executeRetentionJob", () => {
   it("records delete error when archivedAuditLog.deleteMany throws", async () => {
     const policy = makePolicy({ archiveAfterDays: null, deleteAfterDays: 365 });
     mockAuditRetentionPolicyFindUnique.mockResolvedValue(policy);
-    mockArchivedAuditLogDeleteMany.mockRejectedValue(
-      new Error("Delete DB error"),
-    );
+    mockArchivedAuditLogDeleteMany.mockRejectedValue(new Error("Delete DB error"));
 
     const result = await AuditRetentionManager.executeRetentionJob("policy-1");
 
@@ -604,10 +594,7 @@ describe("AuditRetentionManager.executeRetentionJob", () => {
 // ---------------------------------------------------------------------------
 describe("AuditRetentionManager.executeAllRetentionJobs", () => {
   it("runs jobs for all active policies and returns results", async () => {
-    const activePolicies = [
-      makePolicy({ id: "p-active-1" }),
-      makePolicy({ id: "p-active-2" }),
-    ];
+    const activePolicies = [makePolicy({ id: "p-active-1" }), makePolicy({ id: "p-active-2" })];
     mockAuditRetentionPolicyFindMany.mockResolvedValue(activePolicies);
 
     // Both policies will be fetched individually
@@ -662,8 +649,7 @@ describe("AuditRetentionManager.getRetentionStats", () => {
       originalCreatedAt: oldestArchived,
     });
     // getEffectivePolicy → two findFirst calls
-    mockAuditRetentionPolicyFindFirst
-      .mockResolvedValueOnce(makePolicy({ id: "effective-policy" }));
+    mockAuditRetentionPolicyFindFirst.mockResolvedValueOnce(makePolicy({ id: "effective-policy" }));
 
     const stats = await AuditRetentionManager.getRetentionStats("ws-1");
 

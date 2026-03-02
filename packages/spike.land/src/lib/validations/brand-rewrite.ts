@@ -24,12 +24,7 @@ export const PLATFORM_LIMITS: Record<ContentPlatform, number> = {
   GENERAL: 50000,
 } as const;
 
-export const REWRITE_STATUSES = [
-  "PENDING",
-  "PROCESSING",
-  "COMPLETED",
-  "FAILED",
-] as const;
+export const REWRITE_STATUSES = ["PENDING", "PROCESSING", "COMPLETED", "FAILED"] as const;
 
 export const DIFF_HUNK_TYPES = ["added", "removed", "unchanged"] as const;
 
@@ -136,17 +131,11 @@ export type DiffHunkType = (typeof DIFF_HUNK_TYPES)[number];
 export type ContentRewriteRequest = z.infer<typeof contentRewriteRequestSchema>;
 export type DiffHunk = z.infer<typeof diffHunkSchema>;
 export type CharacterCount = z.infer<typeof characterCountSchema>;
-export type ContentRewriteResponse = z.infer<
-  typeof contentRewriteResponseSchema
->;
+export type ContentRewriteResponse = z.infer<typeof contentRewriteResponseSchema>;
 export type GeminiRewriteResponse = z.infer<typeof geminiRewriteResponseSchema>;
 export type RewriteHistoryItem = z.infer<typeof rewriteHistoryItemSchema>;
-export type RewriteHistoryResponse = z.infer<
-  typeof rewriteHistoryResponseSchema
->;
-export type ApplySelectedChangesRequest = z.infer<
-  typeof applySelectedChangesRequestSchema
->;
+export type RewriteHistoryResponse = z.infer<typeof rewriteHistoryResponseSchema>;
+export type ApplySelectedChangesRequest = z.infer<typeof applySelectedChangesRequestSchema>;
 
 // ============================================
 // Helper Functions
@@ -162,10 +151,7 @@ export function getPlatformLimit(platform: ContentPlatform): number {
 /**
  * Check if content exceeds platform limit
  */
-export function exceedsPlatformLimit(
-  content: string,
-  platform: ContentPlatform,
-): boolean {
+export function exceedsPlatformLimit(content: string, platform: ContentPlatform): boolean {
   return content.length > PLATFORM_LIMITS[platform];
 }
 

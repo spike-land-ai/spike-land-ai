@@ -43,12 +43,8 @@ const FALLBACK_QUESTIONS: readonly GeneratedQuestion[] = [
   },
 ] as const;
 
-export function getFallbackQuestion(
-  usedQuestions: string[],
-): GeneratedQuestion {
-  const available = FALLBACK_QUESTIONS.find(
-    q => !usedQuestions.includes(q.question),
-  );
+export function getFallbackQuestion(usedQuestions: string[]): GeneratedQuestion {
+  const available = FALLBACK_QUESTIONS.find((q) => !usedQuestions.includes(q.question));
   if (available) {
     return { question: available.question, tags: [...available.tags] };
   }
@@ -65,10 +61,10 @@ function buildPrompt(
   contextHint?: string,
 ): string {
   const answersDescription = existingAnswers
-    .map(a => `Q: "${a.question}" → ${a.answer ? "Yes" : "No"}`)
+    .map((a) => `Q: "${a.question}" → ${a.answer ? "Yes" : "No"}`)
     .join("\n");
 
-  const usedList = usedQuestions.map(q => `- "${q}"`).join("\n");
+  const usedList = usedQuestions.map((q) => `- "${q}"`).join("\n");
 
   const contextLine = contextHint ? `\nAdditional context: ${contextHint}` : "";
 
@@ -93,19 +89,19 @@ function parseClaudeResponse(text: string): GeneratedQuestion | null {
 
     const parsed: unknown = JSON.parse(jsonMatch[0]);
     if (
-      typeof parsed !== "object"
-      || parsed === null
-      || !("question" in parsed)
-      || !("tags" in parsed)
+      typeof parsed !== "object" ||
+      parsed === null ||
+      !("question" in parsed) ||
+      !("tags" in parsed)
     ) {
       return null;
     }
 
     const response = parsed as ClaudeGeneratedResponse;
     if (
-      typeof response.question !== "string"
-      || !Array.isArray(response.tags)
-      || response.tags.some(t => typeof t !== "string")
+      typeof response.question !== "string" ||
+      !Array.isArray(response.tags) ||
+      response.tags.some((t) => typeof t !== "string")
     ) {
       return null;
     }
@@ -122,9 +118,7 @@ export async function generateDifferentiatingQuestion(
   contextHint?: string,
 ): Promise<GeneratedQuestion> {
   try {
-    const { getClaudeClient, isClaudeConfigured } = await import(
-      "@/lib/ai/claude-client"
-    );
+    const { getClaudeClient, isClaudeConfigured } = await import("@/lib/ai/claude-client");
 
     const configured = await isClaudeConfigured();
     if (!configured) {
@@ -140,7 +134,7 @@ export async function generateDifferentiatingQuestion(
       messages: [{ role: "user", content: prompt }],
     });
 
-    const textBlock = response.content.find(block => block.type === "text");
+    const textBlock = response.content.find((block) => block.type === "text");
     if (!textBlock || textBlock.type !== "text") {
       return getFallbackQuestion(usedQuestions);
     }

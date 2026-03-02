@@ -94,7 +94,7 @@ function AnimatedHourglassSvg() {
         />
 
         {/* Animated falling particles */}
-        {[0, 1, 2, 3, 4].map(i => (
+        {[0, 1, 2, 3, 4].map((i) => (
           <circle key={i} r="2" fill="rgba(245,158,11,0.7)">
             <animateMotion
               dur={`${2.5 + i * 0.4}s`}
@@ -123,7 +123,7 @@ function AnimatedHourglassSvg() {
   );
 }
 
-function GlowOrb({ color, className }: { color: string; className: string; }) {
+function GlowOrb({ color, className }: { color: string; className: string }) {
   return (
     <motion.div
       className={`absolute rounded-full blur-3xl pointer-events-none ${className}`}
@@ -138,9 +138,7 @@ export function HourglassModel() {
   return (
     <div className="flex flex-col gap-12 items-center">
       <div className="text-center max-w-2xl">
-        <h2 className="text-3xl font-bold text-white mb-4">
-          Hourglass Testing Model
-        </h2>
+        <h2 className="text-3xl font-bold text-white mb-4">Hourglass Testing Model</h2>
         <p className="text-zinc-400">
           Reverse the traditional pyramid. Focus on what matters: the requirements and the business
           logic.
@@ -152,14 +150,8 @@ export function HourglassModel() {
         <AnimatedHourglassSvg />
 
         {/* Ambient glow orbs */}
-        <GlowOrb
-          color="rgba(99,102,241,0.15)"
-          className="w-48 h-48 -top-12 -left-12"
-        />
-        <GlowOrb
-          color="rgba(16,185,129,0.12)"
-          className="w-56 h-56 -bottom-16 -right-12"
-        />
+        <GlowOrb color="rgba(99,102,241,0.15)" className="w-48 h-48 -top-12 -left-12" />
+        <GlowOrb color="rgba(16,185,129,0.12)" className="w-56 h-56 -bottom-16 -right-12" />
 
         {/* E2E Specs */}
         <ScrollReveal
@@ -181,13 +173,9 @@ export function HourglassModel() {
               <span className="text-xs font-bold text-indigo-400 px-2 py-1 bg-indigo-500/10 rounded uppercase tracking-wide">
                 20% Share
               </span>
-              <span className="text-xs font-mono text-zinc-500 italic">
-                Humans write these
-              </span>
+              <span className="text-xs font-mono text-zinc-500 italic">Humans write these</span>
             </div>
-            <h4 className="text-xl font-bold text-white mb-2">
-              E2E Specs (Heavy)
-            </h4>
+            <h4 className="text-xl font-bold text-white mb-2">E2E Specs (Heavy)</h4>
             <p className="text-sm text-zinc-400">
               User flows as Given/When/Then. Wiring verification only.
             </p>
@@ -241,9 +229,7 @@ export function HourglassModel() {
               Disposable
             </motion.div>
             <h4 className="text-lg font-bold text-white mb-1">UI Code</h4>
-            <p className="text-xs text-zinc-400">
-              AI generates this. Regenerate, don&apos;t fix.
-            </p>
+            <p className="text-xs text-zinc-400">AI generates this. Regenerate, don&apos;t fix.</p>
           </motion.div>
         </ScrollReveal>
 
@@ -307,9 +293,7 @@ export function HourglassModel() {
                 <span className="text-xs font-bold text-emerald-400 px-2 py-1 bg-emerald-500/10 rounded uppercase tracking-wide">
                   70% Share
                 </span>
-                <span className="text-xs font-mono text-zinc-500 italic">
-                  Bulletproof Core
-                </span>
+                <span className="text-xs font-mono text-zinc-500 italic">Bulletproof Core</span>
               </div>
               <h4 className="text-2xl font-black text-white mb-3 uppercase tracking-wider">
                 Business Logic Tests (HEAVY)

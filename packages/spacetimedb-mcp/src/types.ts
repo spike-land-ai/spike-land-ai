@@ -21,15 +21,27 @@ export interface AgentMessage {
   delivered: boolean;
 }
 
-export interface Task {
+export interface RegisteredTool {
   id: bigint;
+  name: string;
   description: string;
-  assignedTo: string | undefined;
-  status: string;
-  priority: number;
-  context: string;
-  createdBy: string;
+  inputSchema: string;
+  providerIdentity: string;
+  category: string;
   createdAt: bigint;
+}
+
+export interface McpTask {
+  id: bigint;
+  toolName: string;
+  argumentsJson: string;
+  requesterIdentity: string;
+  providerIdentity?: string;
+  status: string; // "pending", "claimed", "completed", "failed"
+  resultJson?: string;
+  error?: string;
+  createdAt: bigint;
+  completedAt?: bigint;
 }
 
 // ─── Connection State ───

@@ -6,14 +6,11 @@ export async function hashApiKey(key: string): Promise<string> {
   const encoded = new TextEncoder().encode(key);
   const hashBuffer = await crypto.subtle.digest("SHA-256", encoded);
   return Array.from(new Uint8Array(hashBuffer))
-    .map(b => b.toString(16).padStart(2, "0"))
+    .map((b) => b.toString(16).padStart(2, "0"))
     .join("");
 }
 
-export async function lookupApiKey(
-  key: string,
-  db: DrizzleDB,
-): Promise<{ userId: string } | null> {
+export async function lookupApiKey(key: string, db: DrizzleDB): Promise<{ userId: string } | null> {
   const keyHash = await hashApiKey(key);
 
   const keyRecord = await db
@@ -29,11 +26,7 @@ export async function lookupApiKey(
   if (record.expiresAt && record.expiresAt < Date.now()) return null;
 
   // Update lastUsedAt fire-and-forget (no await to keep auth fast)
-  void db
-    .update(apiKeys)
-    .set({ lastUsedAt: Date.now() })
-    .where(eq(apiKeys.keyHash, keyHash))
-    .run();
+  void db.update(apiKeys).set({ lastUsedAt: Date.now() }).where(eq(apiKeys.keyHash, keyHash)).run();
 
   return { userId: record.userId };
 }

@@ -82,13 +82,17 @@ interface ParsedTool {
   params: DocsToolParam[];
 }
 
-function scanMcpTools(): { tools: DocsTool[]; categories: DocsCategory[]; } {
+function scanMcpTools(): { tools: DocsTool[]; categories: DocsCategory[] } {
   const toolsDir = path.join(ROOT, "src/lib/mcp/server/tools");
-  const files = fs.readdirSync(toolsDir).filter(
-    f =>
-      f.endsWith(".ts") && !f.endsWith(".test.ts") && f !== "tool-helpers.ts"
-      && f !== "tool-factory.ts",
-  );
+  const files = fs
+    .readdirSync(toolsDir)
+    .filter(
+      (f) =>
+        f.endsWith(".ts") &&
+        !f.endsWith(".test.ts") &&
+        f !== "tool-helpers.ts" &&
+        f !== "tool-factory.ts",
+    );
 
   const allTools: ParsedTool[] = [];
 
@@ -115,7 +119,7 @@ function scanMcpTools(): { tools: DocsTool[]; categories: DocsCategory[]; } {
   }
 
   // Build categories
-  const catMap = new Map<string, { tools: string[]; tier: string; }>();
+  const catMap = new Map<string, { tools: string[]; tier: string }>();
   for (const tool of allTools) {
     let cat = catMap.get(tool.category);
     if (!cat) {
@@ -125,9 +129,7 @@ function scanMcpTools(): { tools: DocsTool[]; categories: DocsCategory[]; } {
     cat.tools.push(tool.name);
   }
 
-  const categories: DocsCategory[] = Array.from(catMap.entries()).map((
-    [name, data],
-  ) => ({
+  const categories: DocsCategory[] = Array.from(catMap.entries()).map(([name, data]) => ({
     name,
     description: CATEGORY_DESCRIPTIONS[name] || `${name} tools`,
     tier: data.tier,
@@ -135,7 +137,7 @@ function scanMcpTools(): { tools: DocsTool[]; categories: DocsCategory[]; } {
     tools: data.tools,
   }));
 
-  const tools: DocsTool[] = allTools.map(t => ({
+  const tools: DocsTool[] = allTools.map((t) => ({
     name: t.name,
     description: t.description,
     category: t.category,
@@ -146,15 +148,12 @@ function scanMcpTools(): { tools: DocsTool[]; categories: DocsCategory[]; } {
   return { tools, categories };
 }
 
-function extractParamsFromFile(
-  content: string,
-  toolName: string,
-): DocsToolParam[] {
+function extractParamsFromFile(content: string, toolName: string): DocsToolParam[] {
   // Find the registry.register call for this tool
   const toolBlockRegex = new RegExp(
-    `registry\\.register\\(\\{[\\s\\S]*?name:\\s*["']${
-      escapeRegex(toolName)
-    }["'][\\s\\S]*?inputSchema:\\s*([\\s\\S]*?)(?:,\\s*handler|\\}\\))`,
+    `registry\\.register\\(\\{[\\s\\S]*?name:\\s*["']${escapeRegex(
+      toolName,
+    )}["'][\\s\\S]*?inputSchema:\\s*([\\s\\S]*?)(?:,\\s*handler|\\}\\))`,
     "m",
   );
   const toolMatch = content.match(toolBlockRegex);
@@ -226,11 +225,7 @@ function scanApiRoutes(): DocsApiEndpoint[] {
 
         const methods: string[] = [];
         for (const method of ["GET", "POST", "PUT", "PATCH", "DELETE"]) {
-          if (
-            content.match(
-              new RegExp(`export\\s+(?:async\\s+)?function\\s+${method}\\b`),
-            )
-          ) {
+          if (content.match(new RegExp(`export\\s+(?:async\\s+)?function\\s+${method}\\b`))) {
             methods.push(method);
           }
         }
@@ -244,9 +239,10 @@ function scanApiRoutes(): DocsApiEndpoint[] {
         const domain = segments[0] || "general";
 
         // Check if auth is required
-        const auth = content.includes("getServerSession")
-          || content.includes("requireAuth")
-          || content.includes("auth()");
+        const auth =
+          content.includes("getServerSession") ||
+          content.includes("requireAuth") ||
+          content.includes("auth()");
 
         if (methods.length > 0) {
           endpoints.push({ path: apiPath, methods, description, domain, auth });
@@ -282,9 +278,7 @@ function scanPages(): DocsPage[] {
 
         // Extract metadata
         const titleMatch = content.match(/title:\s*["']([^"']+)["']/);
-        const descMatch = content.match(
-          /description:\s*\n?\s*["']([^"']+)["']/,
-        );
+        const descMatch = content.match(/description:\s*\n?\s*["']([^"']+)["']/);
 
         // Determine section
         const segments = relPath.split(path.sep);
@@ -326,15 +320,12 @@ function scanMarkdownDocs(): DocsGuide[] {
         const title = titleMatch?.[1] || entry.name.replace(/\.md$/, "");
 
         // Extract excerpt from first paragraph after heading
-        const paragraphs = content.split(/\n\n/).filter(p => !p.startsWith("#") && p.trim());
-        const excerpt = (paragraphs[0] || "").replace(/\n/g, " ").slice(0, 200)
-          .trim();
+        const paragraphs = content.split(/\n\n/).filter((p) => !p.startsWith("#") && p.trim());
+        const excerpt = (paragraphs[0] || "").replace(/\n/g, " ").slice(0, 200).trim();
 
         // Category from directory
         const dirSegments = path.dirname(relPath).split(path.sep);
-        const category = dirSegments[0] === "."
-          ? "general"
-          : dirSegments[0] || "general";
+        const category = dirSegments[0] === "." ? "general" : dirSegments[0] || "general";
 
         guides.push({ slug, title, excerpt, category, filePath: relPath });
       }
@@ -373,12 +364,10 @@ function buildSearchIndex(
       title: `${endpoint.methods.join(", ")} ${endpoint.path}`,
       description: endpoint.description,
       category: endpoint.domain,
-      href: `/docs/api${
-        endpoint.path.replace(/^\/api/, "").replace(/\[/g, "%5B").replace(
-          /\]/g,
-          "%5D",
-        )
-      }`,
+      href: `/docs/api${endpoint.path
+        .replace(/^\/api/, "")
+        .replace(/\[/g, "%5B")
+        .replace(/\]/g, "%5D")}`,
     });
   }
 
@@ -415,9 +404,7 @@ function main(): void {
   fs.mkdirSync(OUT_DIR, { recursive: true });
 
   const { tools, categories } = scanMcpTools();
-  logger.info(
-    `  Found ${tools.length} MCP tools in ${categories.length} categories`,
-  );
+  logger.info(`  Found ${tools.length} MCP tools in ${categories.length} categories`);
 
   const api = scanApiRoutes();
   logger.info(`  Found ${api.length} API endpoints`);

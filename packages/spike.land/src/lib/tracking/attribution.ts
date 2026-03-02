@@ -15,11 +15,7 @@ import {
   extractUTMFromSession,
   getExternalCampaignId,
 } from "./attribution-helpers";
-import type {
-  AttributionParams,
-  AttributionType,
-  ConversionType,
-} from "./attribution-types";
+import type { AttributionParams, AttributionType, ConversionType } from "./attribution-types";
 import { getPlatformFromUTM } from "./utm-capture";
 
 // Re-export types and helpers for backward compatibility
@@ -39,9 +35,7 @@ export {
  *
  * @param params - Attribution parameters
  */
-export async function createAttribution(
-  params: AttributionParams,
-): Promise<void> {
+export async function createAttribution(params: AttributionParams): Promise<void> {
   const {
     userId,
     sessionId,
@@ -55,8 +49,7 @@ export async function createAttribution(
   } = params;
 
   // Determine platform from UTM params if not provided
-  const derivedPlatform = platform
-    || (utmParams ? getPlatformFromUTM(utmParams) : "DIRECT");
+  const derivedPlatform = platform || (utmParams ? getPlatformFromUTM(utmParams) : "DIRECT");
 
   await prisma.campaignAttribution.create({
     data: {
@@ -101,9 +94,7 @@ export async function getFirstTouchAttribution(
  * @param userId - The user ID to look up
  * @returns The last-touch attribution or null
  */
-export async function getLastTouchAttribution(
-  userId: string,
-): Promise<CampaignAttribution | null> {
+export async function getLastTouchAttribution(userId: string): Promise<CampaignAttribution | null> {
   return prisma.campaignAttribution.findFirst({
     where: {
       userId,
@@ -121,9 +112,7 @@ export async function getLastTouchAttribution(
  * @param userId - The user ID to look up
  * @returns Array of attribution records
  */
-export async function getAllAttributions(
-  userId: string,
-): Promise<CampaignAttribution[]> {
+export async function getAllAttributions(userId: string): Promise<CampaignAttribution[]> {
   return prisma.campaignAttribution.findMany({
     where: { userId },
     orderBy: { convertedAt: "desc" },
@@ -142,10 +131,8 @@ async function buildSessionAttribution(
   conversionValue?: number,
 ): Promise<AttributionParams> {
   const platform = await determineSessionPlatform(session);
-  const externalCampaignId = (await getExternalCampaignId(session))
-    || session.gclid
-    || session.fbclid
-    || undefined;
+  const externalCampaignId =
+    (await getExternalCampaignId(session)) || session.gclid || session.fbclid || undefined;
   return {
     userId,
     sessionId: session.id,
@@ -219,9 +206,7 @@ export async function attributeConversion(
   );
 
   // Linear: equal value split across all sessions
-  const linearValue = value && sessions.length > 0
-    ? value / sessions.length
-    : undefined;
+  const linearValue = value && sessions.length > 0 ? value / sessions.length : undefined;
   for (const session of sessions) {
     await createAttribution(
       await buildSessionAttribution(
@@ -387,29 +372,18 @@ export async function getCampaignAttributionSummary(
   };
 
   for (const conversionAttrs of conversions.values()) {
-    const firstTouch = conversionAttrs.find(
-      a => a.attributionType === "FIRST_TOUCH",
-    );
-    const lastTouch = conversionAttrs.find(
-      a => a.attributionType === "LAST_TOUCH",
-    );
-    const linearAttrs = conversionAttrs.filter(
-      a => a.attributionType === "LINEAR",
-    );
+    const firstTouch = conversionAttrs.find((a) => a.attributionType === "FIRST_TOUCH");
+    const lastTouch = conversionAttrs.find((a) => a.attributionType === "LAST_TOUCH");
+    const linearAttrs = conversionAttrs.filter((a) => a.attributionType === "LINEAR");
 
     if (firstTouch) {
       summary.firstTouchValue += firstTouch.conversionValue || 0;
-      summary.conversionsByType[
-        firstTouch.conversionType as ConversionType
-      ]++;
+      summary.conversionsByType[firstTouch.conversionType as ConversionType]++;
     }
     if (lastTouch) {
       summary.lastTouchValue += lastTouch.conversionValue || 0;
     }
-    summary.linearValue += linearAttrs.reduce(
-      (sum, a) => sum + (a.conversionValue || 0),
-      0,
-    );
+    summary.linearValue += linearAttrs.reduce((sum, a) => sum + (a.conversionValue || 0), 0);
   }
 
   return summary;
@@ -492,18 +466,19 @@ export async function getGlobalAttributionSummary(
     "TIME_DECAY",
     "POSITION_BASED",
   ];
-  const comparison = models.map(model => {
-    const stat = modelStats.find(s => s.attributionType === model);
+  const comparison = models.map((model) => {
+    const stat = modelStats.find((s) => s.attributionType === model);
     return {
       model,
       value: stat?._sum?.conversionValue || 0,
-      conversionCount: model === "FIRST_TOUCH" || model === "LAST_TOUCH"
-        ? (stat?._count?._all || 0)
-        : totalConversions,
+      conversionCount:
+        model === "FIRST_TOUCH" || model === "LAST_TOUCH"
+          ? stat?._count?._all || 0
+          : totalConversions,
     };
   });
 
-  const platformBreakdown = platformStats.map(s => ({
+  const platformBreakdown = platformStats.map((s) => ({
     platform: s.platform || "UNKNOWN",
     conversionCount: s._count?._all || 0,
     value: s._sum?.conversionValue || 0,

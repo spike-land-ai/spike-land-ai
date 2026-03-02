@@ -78,15 +78,13 @@ export class WorkspaceCreditManager {
 
     if (!user) {
       logger.debug(
-        `Cannot auto-create workspace: user record missing for userId=${userId}. `
-          + "User needs to sign in again to trigger user record creation.",
+        `Cannot auto-create workspace: user record missing for userId=${userId}. ` +
+          "User needs to sign in again to trigger user record creation.",
       );
       return null;
     }
 
-    const { data: workspaceId, error } = await tryCatch(
-      ensurePersonalWorkspace(userId, user.name),
-    );
+    const { data: workspaceId, error } = await tryCatch(ensurePersonalWorkspace(userId, user.name));
 
     if (error || !workspaceId) {
       logger.warn("Failed to auto-create personal workspace", { error });
@@ -133,17 +131,11 @@ export class WorkspaceCreditManager {
   /**
    * Check if user has enough credits for an operation
    */
-  static async hasEnoughCredits(
-    userId: string,
-    amount: number,
-  ): Promise<boolean> {
+  static async hasEnoughCredits(userId: string, amount: number): Promise<boolean> {
     const workspaceId = await this.resolveWorkspaceForUser(userId);
     if (!workspaceId) return false;
 
-    const check = await WorkspaceSubscriptionService.canUseAiCredits(
-      workspaceId,
-      amount,
-    );
+    const check = await WorkspaceSubscriptionService.canUseAiCredits(workspaceId, amount);
     return check.allowed;
   }
 
@@ -179,7 +171,7 @@ export class WorkspaceCreditManager {
     model?: string;
     provider?: string;
     feature?: string;
-  }): Promise<{ success: boolean; remaining: number; error?: string; }> {
+  }): Promise<{ success: boolean; remaining: number; error?: string }> {
     const workspaceId = await this.resolveWorkspaceForUser(userId);
     if (!workspaceId) {
       return {

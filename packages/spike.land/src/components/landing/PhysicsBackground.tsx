@@ -5,12 +5,7 @@ import { CuboidCollider, Physics, RigidBody } from "@react-three/rapier";
 import type { RapierRigidBody } from "@react-three/rapier";
 import { type MotionValue, useScroll } from "framer-motion";
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
-import {
-  type Material,
-  MeshStandardMaterial,
-  SphereGeometry,
-  Vector3,
-} from "three";
+import { type Material, MeshStandardMaterial, SphereGeometry, Vector3 } from "three";
 import { ErrorBoundary } from "@/components/errors/error-boundary";
 import { hasWebGLSupport } from "@/lib/webgl-support";
 import { detectSlowDevice } from "@/lib/device";
@@ -36,14 +31,18 @@ interface FloatingOrbProps {
 // WASM bridge crossings (2400 -> 1200/sec) with negligible visual difference.
 const IMPULSE_FRAME_SKIP = 2;
 
-const FloatingOrb = memo(function FloatingOrb(
-  { position, scale, material, geometry, scrollYProgress }: FloatingOrbProps,
-) {
+const FloatingOrb = memo(function FloatingOrb({
+  position,
+  scale,
+  material,
+  geometry,
+  scrollYProgress,
+}: FloatingOrbProps) {
   const rigidBodyRef = useRef<RapierRigidBody>(null);
   const impulse = useMemo(() => new Vector3(), []);
   const frameCount = useRef(0);
 
-  useFrame(state => {
+  useFrame((state) => {
     if (!rigidBodyRef.current) return;
 
     // Skip frames to reduce WASM bridge crossings
@@ -59,8 +58,7 @@ const FloatingOrb = memo(function FloatingOrb(
       // Random X movement
       Math.sin(t * 2 + position[0]) * 0.05,
       // Y movement: Buoyancy + Random Y + Scroll effect
-      (0.08 * scale) + (Math.cos(t * 1.5 + position[1]) * 0.05)
-        + (scrollEffect * 0.1),
+      0.08 * scale + Math.cos(t * 1.5 + position[1]) * 0.05 + scrollEffect * 0.1,
       // Random Z movement
       Math.cos(t * 2 + position[2]) * 0.05,
     );
@@ -97,7 +95,7 @@ function Scene() {
   // Create materials once and reuse them
   const materials = useMemo(() => {
     const mats: Record<string, MeshStandardMaterial> = {};
-    COLORS.forEach(color => {
+    COLORS.forEach((color) => {
       mats[color] = new MeshStandardMaterial({
         color,
         emissive: color,
@@ -114,7 +112,7 @@ function Scene() {
   useEffect(() => {
     return () => {
       geometry.dispose();
-      Object.values(materials).forEach(m => m.dispose());
+      Object.values(materials).forEach((m) => m.dispose());
     };
   }, [geometry, materials]);
 
@@ -136,7 +134,7 @@ function Scene() {
       <ambientLight intensity={0.5} />
       <pointLight position={[10, 10, 10]} intensity={1} />
       <Physics gravity={[0, -1, 0]}>
-        {orbs.map(orb => (
+        {orbs.map((orb) => (
           <FloatingOrb
             key={orb.id}
             {...orb}
@@ -171,19 +169,15 @@ function shouldUseAntialias(): boolean {
   return window.devicePixelRatio >= 2;
 }
 
-export function PhysicsBackground(
-  { disabled = false }: { disabled?: boolean; },
-) {
+export function PhysicsBackground({ disabled = false }: { disabled?: boolean }) {
   const [mounted, setMounted] = useState(false);
   const [webglSupported, setWebglSupported] = useState(true);
   const [runtimeError, setRuntimeError] = useState(false);
   // Derive isSlowDevice and antialias eagerly on mount to avoid extra renders
-  const [deviceCaps, setDeviceCaps] = useState<
-    {
-      isSlowDevice: boolean;
-      antialias: boolean;
-    } | null
-  >(null);
+  const [deviceCaps, setDeviceCaps] = useState<{
+    isSlowDevice: boolean;
+    antialias: boolean;
+  } | null>(null);
 
   // Track canvas visibility to pause rendering when off-screen
   const canvasWrapperRef = useRef<HTMLDivElement>(null);

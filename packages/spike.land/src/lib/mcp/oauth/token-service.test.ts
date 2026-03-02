@@ -47,9 +47,7 @@ describe("token-service", () => {
   describe("verifyPkce", () => {
     it("should verify valid PKCE S256 challenge", () => {
       const codeVerifier = "dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk";
-      const codeChallenge = createHash("sha256")
-        .update(codeVerifier)
-        .digest("base64url");
+      const codeChallenge = createHash("sha256").update(codeVerifier).digest("base64url");
 
       expect(verifyPkce(codeVerifier, codeChallenge)).toBe(true);
     });
@@ -311,9 +309,7 @@ describe("token-service", () => {
   describe("exchangeAuthorizationCode", () => {
     it("should exchange valid code for tokens", async () => {
       const codeVerifier = "test-verifier-string-long-enough";
-      const codeChallenge = createHash("sha256")
-        .update(codeVerifier)
-        .digest("base64url");
+      const codeChallenge = createHash("sha256").update(codeVerifier).digest("base64url");
 
       // Atomic mark-as-used succeeds
       mockPrisma.oAuthAuthorizationCode.updateMany.mockResolvedValue({
@@ -344,12 +340,10 @@ describe("token-service", () => {
       expect(result!.accessToken).toMatch(/^mcp_/);
       expect(result!.refreshToken).toMatch(/^mcp_/);
       // Verify atomic update was called with usedAt: null condition
-      expect(mockPrisma.oAuthAuthorizationCode.updateMany).toHaveBeenCalledWith(
-        {
-          where: { code: "test-code", usedAt: null },
-          data: { usedAt: expect.any(Date) },
-        },
-      );
+      expect(mockPrisma.oAuthAuthorizationCode.updateMany).toHaveBeenCalledWith({
+        where: { code: "test-code", usedAt: null },
+        data: { usedAt: expect.any(Date) },
+      });
     });
 
     it("should reject already-used codes (atomic update returns count 0)", async () => {
@@ -367,8 +361,7 @@ describe("token-service", () => {
 
       expect(result).toBeNull();
       // findUnique should NOT be called since updateMany returned 0
-      expect(mockPrisma.oAuthAuthorizationCode.findUnique).not
-        .toHaveBeenCalled();
+      expect(mockPrisma.oAuthAuthorizationCode.findUnique).not.toHaveBeenCalled();
     });
 
     it("should reject expired codes", async () => {
@@ -464,9 +457,7 @@ describe("token-service", () => {
 
     it("should reject when PKCE verification fails (mismatched codeVerifier)", async () => {
       const codeVerifier = "correct-verifier-string";
-      const codeChallenge = createHash("sha256")
-        .update(codeVerifier)
-        .digest("base64url");
+      const codeChallenge = createHash("sha256").update(codeVerifier).digest("base64url");
 
       // Atomic mark-as-used succeeds
       mockPrisma.oAuthAuthorizationCode.updateMany.mockResolvedValue({
@@ -578,10 +569,7 @@ describe("token-service", () => {
         revokedAt: null,
       });
 
-      const result = await refreshAccessToken(
-        "mcp_refresh_expired",
-        "client-1",
-      );
+      const result = await refreshAccessToken("mcp_refresh_expired", "client-1");
       expect(result).toBeNull();
     });
 
@@ -597,20 +585,14 @@ describe("token-service", () => {
         revokedAt: new Date(), // revoked
       });
 
-      const result = await refreshAccessToken(
-        "mcp_refresh_revoked",
-        "client-1",
-      );
+      const result = await refreshAccessToken("mcp_refresh_revoked", "client-1");
       expect(result).toBeNull();
     });
 
     it("should reject non-existent refresh token", async () => {
       mockPrisma.oAuthAccessToken.findUnique.mockResolvedValue(null);
 
-      const result = await refreshAccessToken(
-        "mcp_refresh_nonexistent",
-        "client-1",
-      );
+      const result = await refreshAccessToken("mcp_refresh_nonexistent", "client-1");
       expect(result).toBeNull();
     });
 
@@ -626,10 +608,7 @@ describe("token-service", () => {
         revokedAt: null,
       });
 
-      const result = await refreshAccessToken(
-        "mcp_access_as_refresh",
-        "client-1",
-      );
+      const result = await refreshAccessToken("mcp_access_as_refresh", "client-1");
       expect(result).toBeNull();
     });
 
@@ -664,10 +643,9 @@ describe("token-service", () => {
 
   describe("generateTokenPair - P2003 foreign key retry", () => {
     it("should retry on P2003 foreign key constraint error", async () => {
-      const p2003Error = Object.assign(
-        new Error("Foreign key constraint failed"),
-        { code: "P2003" },
-      );
+      const p2003Error = Object.assign(new Error("Foreign key constraint failed"), {
+        code: "P2003",
+      });
       // First create call (refresh token) throws P2003
       mockPrisma.oAuthAccessToken.create.mockRejectedValueOnce(p2003Error);
       // After retry: refresh token + access token succeed
@@ -708,8 +686,9 @@ describe("token-service", () => {
       });
       mockPrisma.oAuthAccessToken.create.mockRejectedValueOnce(otherError);
 
-      await expect(generateTokenPair("user-1", "client-1", "mcp"))
-        .rejects.toThrow("Unknown database error");
+      await expect(generateTokenPair("user-1", "client-1", "mcp")).rejects.toThrow(
+        "Unknown database error",
+      );
     });
   });
 
@@ -717,12 +696,7 @@ describe("token-service", () => {
     it("should pass resource to both token records", async () => {
       mockPrisma.oAuthAccessToken.create.mockResolvedValue({ id: "token-id" });
 
-      await generateTokenPair(
-        "user-1",
-        "client-1",
-        "mcp",
-        "https://api.example.com",
-      );
+      await generateTokenPair("user-1", "client-1", "mcp", "https://api.example.com");
 
       const refreshCall = mockPrisma.oAuthAccessToken.create.mock.calls[0]?.[0];
       const accessCall = mockPrisma.oAuthAccessToken.create.mock.calls[1]?.[0];
@@ -750,12 +724,7 @@ describe("token-service", () => {
       mockPrisma.oAuthAuthorizationCode.updateMany.mockResolvedValue({ count: 1 });
       mockPrisma.oAuthAuthorizationCode.findUnique.mockResolvedValue(null);
 
-      const result = await exchangeAuthorizationCode(
-        "code",
-        "client",
-        "verifier",
-        "uri",
-      );
+      const result = await exchangeAuthorizationCode("code", "client", "verifier", "uri");
       expect(result).toBeNull();
     });
   });

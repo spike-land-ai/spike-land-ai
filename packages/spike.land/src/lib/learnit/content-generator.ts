@@ -5,24 +5,29 @@ import { z } from "zod";
 
 const LearnItGeneratedSchema = z.object({
   title: z.string().describe("The main title of the topic/tutorial"),
-  description: z.string().describe(
-    "A concise summary (1-2 sentences) of what this topic covers",
-  ),
-  sections: z.array(z.object({
-    heading: z.string(),
-    content: z.string().describe(
-      "The MDX content for this section. Use code blocks, standard markdown, and [[wiki links]] to other topics.",
+  description: z.string().describe("A concise summary (1-2 sentences) of what this topic covers"),
+  sections: z
+    .array(
+      z.object({
+        heading: z.string(),
+        content: z
+          .string()
+          .describe(
+            "The MDX content for this section. Use code blocks, standard markdown, and [[wiki links]] to other topics.",
+          ),
+      }),
+    )
+    .describe("The main content sections of the tutorial"),
+  relatedTopics: z
+    .array(z.string())
+    .describe(
+      "List of 3-5 related topics that would make good next steps, as simple strings (e.g. 'Advanced React', 'State Management')",
     ),
-  })).describe("The main content sections of the tutorial"),
-  relatedTopics: z.array(z.string()).describe(
-    "List of 3-5 related topics that would make good next steps, as simple strings (e.g. 'Advanced React', 'State Management')",
-  ),
 });
 
 export type GeneratedLearnItContent = z.infer<typeof LearnItGeneratedSchema>;
 
-const LEARNIT_STRUCTURED_PROMPT =
-  `You are an expert technical educator creating a high-quality, interactive learning wiki called LearnIt.
+const LEARNIT_STRUCTURED_PROMPT = `You are an expert technical educator creating a high-quality, interactive learning wiki called LearnIt.
 
 The content should be:
 1. **Beginner-friendly but deep**: targeted at developers learning this specific concept.
@@ -51,7 +56,7 @@ Expected JSON Structure:
  */
 export async function generateLearnItTopic(
   path: string[],
-): Promise<GeneratedLearnItContent & { aiModel: string; } | null> {
+): Promise<(GeneratedLearnItContent & { aiModel: string }) | null> {
   const topic = path.join(" > ");
 
   // Try Claude Opus 4.6 first
@@ -81,9 +86,7 @@ export async function generateLearnItTopic(
   return null;
 }
 
-async function generateWithClaude(
-  topic: string,
-): Promise<GeneratedLearnItContent | null> {
+async function generateWithClaude(topic: string): Promise<GeneratedLearnItContent | null> {
   const anthropic = await getClaudeClient();
 
   const prompt = `${LEARNIT_STRUCTURED_PROMPT}
@@ -102,20 +105,20 @@ Return ONLY valid JSON, no markdown code fences.`;
   });
 
   const text = response.content
-    .filter(block => block.type === "text")
-    .map(block => block.text)
+    .filter((block) => block.type === "text")
+    .map((block) => block.text)
     .join("");
 
   // Strip markdown code fences if present
-  const cleaned = text.replace(/^```json\s*/m, "").replace(/```\s*$/m, "")
+  const cleaned = text
+    .replace(/^```json\s*/m, "")
+    .replace(/```\s*$/m, "")
     .trim();
   const parsed = JSON.parse(cleaned);
   return LearnItGeneratedSchema.parse(parsed);
 }
 
-async function generateWithGemini(
-  topic: string,
-): Promise<GeneratedLearnItContent | null> {
+async function generateWithGemini(topic: string): Promise<GeneratedLearnItContent | null> {
   const prompt = `${LEARNIT_STRUCTURED_PROMPT}
 
 Your task is to generate a comprehensive tutorial for the topic: "${topic}".`;
