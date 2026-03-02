@@ -12,3 +12,4 @@ binaryen/
 .next/
 coverage/
 .claude/
+packages/my-spacetime-app/
