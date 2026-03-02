@@ -25,7 +25,8 @@
     "url": "git+https://github.com/spike-land-ai/spacetimedb-mcp.git"
   },
   "publishConfig": {
-    "access": "public"
+    "access": "public",
+    "registry": "https://npm.pkg.github.com"
   },
   "scripts": {
     "build": "tsc",
