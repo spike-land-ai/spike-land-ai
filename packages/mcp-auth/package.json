@@ -1,33 +1,37 @@
 {
-    "name": "@spike-land-ai/mcp-auth",
-    "version": "1.0.0",
-    "description": "Auth MCP server for spike.land",
-    "type": "module",
-    "main": "src/index.ts",
-    "scripts": {
-        "dev": "wrangler dev",
-        "deploy": "wrangler deploy",
-        "db:generate": "drizzle-kit generate",
-        "db:push": "drizzle-kit push",
-        "db:studio": "drizzle-kit studio",
-        "typecheck": "tsc --noEmit",
-        "test": "vitest run",
-        "test:coverage": "vitest run --coverage",
-        "lint": "eslint src/"
-    },
-    "dependencies": {
-        "@modelcontextprotocol/sdk": "^1.2.0",
-        "better-auth": "^1.1.20",
-        "drizzle-orm": "^0.40.0"
-    },
-    "devDependencies": {
-        "@cloudflare/workers-types": "^4.20250224.0",
-        "@spike-land-ai/eslint-config": "*",
-        "@spike-land-ai/tsconfig": "*",
-        "@vitest/coverage-v8": "^2.1.9",
-        "drizzle-kit": "^0.30.5",
-        "typescript": "^5.0.0",
-        "vitest": "^2.0.0",
-        "wrangler": "^3.111.0"
-    }
+  "name": "@spike-land-ai/mcp-auth",
+  "version": "1.0.0",
+  "description": "Auth MCP server for spike.land",
+  "type": "module",
+  "main": "src/index.ts",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "db:generate": "drizzle-kit generate",
+    "db:push": "drizzle-kit push",
+    "db:studio": "drizzle-kit studio",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "lint": "eslint src/"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.2.0",
+    "better-auth": "^1.1.20",
+    "drizzle-orm": "^0.40.0"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20250224.0",
+    "@spike-land-ai/eslint-config": "*",
+    "@spike-land-ai/tsconfig": "*",
+    "@vitest/coverage-v8": "^2.1.9",
+    "drizzle-kit": "^0.30.5",
+    "typescript": "^5.0.0",
+    "vitest": "^2.0.0",
+    "wrangler": "^3.111.0"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com",
+    "access": "public"
+  }
 }
