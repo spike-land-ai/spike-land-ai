@@ -4564,6 +4564,27 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@spike-land-ai/bazdmeg-mcp@workspace:packages/bazdmeg-mcp":
+  version: 0.0.0-use.local
+  resolution: "@spike-land-ai/bazdmeg-mcp@workspace:packages/bazdmeg-mcp"
+  dependencies:
+    "@changesets/cli": "npm:2.29.8"
+    "@modelcontextprotocol/sdk": "npm:1.27.1"
+    "@spike-land-ai/eslint-config": "npm:*"
+    "@spike-land-ai/mcp-server-base": "npm:*"
+    "@spike-land-ai/tsconfig": "npm:*"
+    "@types/node": "npm:25.3.3"
+    "@vitest/coverage-v8": "npm:4.0.18"
+    eslint: "npm:10.0.2"
+    typescript: "npm:5.9.3"
+    typescript-eslint: "npm:8.56.1"
+    vitest: "npm:4.0.18"
+    zod: "npm:4.3.6"
+  bin:
+    bazdmeg-mcp: dist/index.js
+  languageName: unknown
+  linkType: soft
+
 "@spike-land-ai/chess-engine@workspace:packages/chess-engine":
   version: 0.0.0-use.local
   resolution: "@spike-land-ai/chess-engine@workspace:packages/chess-engine"
@@ -4797,7 +4818,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@spike-land-ai/mcp-server-base@workspace:packages/mcp-server-base":
+"@spike-land-ai/mcp-server-base@npm:*, @spike-land-ai/mcp-server-base@workspace:packages/mcp-server-base":
   version: 0.0.0-use.local
   resolution: "@spike-land-ai/mcp-server-base@workspace:packages/mcp-server-base"
   dependencies:

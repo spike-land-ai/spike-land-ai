@@ -5,9 +5,32 @@
  * Exposes methods for Leaf Servers (Providers) and Agents (Consumers).
  */
 
-import type { Agent, ConnectionState, McpTask, RegisteredTool } from "./types.js";
+import type { Agent, AgentMessage, ConnectionState, McpTask, RegisteredTool, Task } from "./types.js";
 
-// ─── Client Interface ───
+// ─── Agent-Coordination Client Interface ───
+// Used by agent-tools.ts and task-tools.ts (and their tests).
+
+export interface SpacetimeClient {
+  getState(): ConnectionState;
+  connect(uri: string, moduleName: string, token?: string): Promise<ConnectionState>;
+  disconnect(): void;
+
+  registerAgent(displayName: string, capabilities: string[]): Promise<void>;
+  unregisterAgent(): Promise<void>;
+  listAgents(): Agent[];
+
+  sendMessage(toAgent: string, content: string): Promise<void>;
+  getMessages(onlyUndelivered?: boolean): AgentMessage[];
+  markDelivered(messageId: bigint): Promise<void>;
+
+  createTask(description: string, priority: number, context: string): Promise<void>;
+  listTasks(statusFilter?: string): Task[];
+  claimTask(taskId: bigint): Promise<void>;
+  completeTask(taskId: bigint): Promise<void>;
+}
+
+// ─── Swarm Client Interface ───
+// Used by swarm-tools.ts (newer MCP swarm API).
 
 export interface SpacetimeMcpClient {
   /** Current connection state */

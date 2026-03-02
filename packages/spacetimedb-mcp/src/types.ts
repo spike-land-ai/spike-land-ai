@@ -54,6 +54,17 @@ export interface ConnectionState {
   token: string | null;
 }
 
+export interface Task {
+  id: bigint;
+  description: string;
+  assignedTo: string | undefined;
+  status: string;
+  priority: number;
+  context: string;
+  createdBy: string;
+  createdAt: bigint;
+}
+
 // ─── Error Codes ───
 
 export type StdbErrorCode =

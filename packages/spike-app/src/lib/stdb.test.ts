@@ -19,7 +19,7 @@ describe("stdbClient", () => {
     vi.useFakeTimers();
     wsInstances = [];
 
-    MockWebSocket = vi.fn().mockImplementation((url: string) => {
+    MockWebSocket = vi.fn().mockImplementation(function (url: string) {
       const listeners = new Map<string, Set<EventListener>>();
       const instance = {
         url,

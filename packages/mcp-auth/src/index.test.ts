@@ -21,51 +21,55 @@ const mockHandleRequest = vi.fn(
 );
 
 vi.mock("@modelcontextprotocol/sdk/server/mcp.js", () => ({
-  McpServer: vi.fn().mockImplementation(() => ({
-    tool: vi.fn(
-      (
-        name: string,
-        description: string,
-        schema: unknown,
-        handler: (args: Record<string, unknown>) => Promise<unknown>,
-      ) => {
-        registeredTools.push({
-          name,
-          description,
-          schema: schema as Record<string, unknown>,
-          handler,
-        });
-      },
-    ),
-    connect: mockMcpConnect,
-  })),
+  McpServer: vi.fn().mockImplementation(function () {
+    return {
+      tool: vi.fn(
+        (
+          name: string,
+          description: string,
+          schema: unknown,
+          handler: (args: Record<string, unknown>) => Promise<unknown>,
+        ) => {
+          registeredTools.push({
+            name,
+            description,
+            schema: schema as Record<string, unknown>,
+            handler,
+          });
+        },
+      ),
+      connect: mockMcpConnect,
+    };
+  }),
 }));
 
 vi.mock("@modelcontextprotocol/sdk/server/webStandardStreamableHttp.js", () => ({
-  WebStandardStreamableHTTPServerTransport: vi.fn().mockImplementation(() => ({
-    handleRequest: mockHandleRequest,
-  })),
+  WebStandardStreamableHTTPServerTransport: vi.fn().mockImplementation(function () {
+    return {
+      handleRequest: mockHandleRequest,
+    };
+  }),
 }));
 
 // Mock drizzle — expose a setter so tests can override findFirst behavior
-let mockFindFirst = vi.fn(async () => null);
+let mockFindFirst = vi.fn(async (..._args: any[]) => null as any);
 vi.mock("drizzle-orm/d1", () => ({
   drizzle: vi.fn(() => ({
     query: {
       user: {
-        findFirst: (...args: unknown[]) => mockFindFirst(...args),
+        findFirst: (...args: any[]) => mockFindFirst(...args),
       },
     },
   })),
 }));
 
 // Mock auth module
-let mockGetSession = vi.fn(async () => null);
+let mockGetSession = vi.fn(async (..._args: any[]) => null as any);
 vi.mock("./auth", () => ({
   createAuth: vi.fn(() => ({
     handler: vi.fn(async (_req: Request) => new Response("auth response", { status: 200 })),
     api: {
-      getSession: (...args: unknown[]) => mockGetSession(...args),
+      getSession: (...args: any[]) => mockGetSession(...args),
     },
   })),
 }));
@@ -85,8 +89,8 @@ const makeRequest = (method: string, path: string, headers?: Record<string, stri
 describe("worker fetch handler", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mockFindFirst = vi.fn(async () => null);
-    mockGetSession = vi.fn(async () => null);
+    mockFindFirst = vi.fn(async (..._args: any[]) => null as any);
+    mockGetSession = vi.fn(async (..._args: any[]) => null as any);
     registeredTools.length = 0;
   });
 
@@ -230,7 +234,7 @@ describe("MCP tool: verify-session", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     registeredTools.length = 0;
-    mockGetSession = vi.fn(async () => null);
+    mockGetSession = vi.fn(async (..._args: any[]) => null as any);
   });
 
   async function getVerifySessionTool() {
@@ -246,7 +250,7 @@ describe("MCP tool: verify-session", () => {
     const result = (await tool!.handler({ sessionToken: "invalid-token" })) as {
       content: Array<{ text: string }>;
     };
-    const data = JSON.parse(result.content[0].text);
+    const data = JSON.parse(result.content[0]!.text);
     expect(data.valid).toBe(false);
   });
 
@@ -256,7 +260,7 @@ describe("MCP tool: verify-session", () => {
     const result = (await tool!.handler({ sessionToken: "token" })) as {
       content: Array<{ text: string }>;
     };
-    const data = JSON.parse(result.content[0].text);
+    const data = JSON.parse(result.content[0]!.text);
     expect(data.valid).toBe(false);
   });
 
@@ -269,7 +273,7 @@ describe("MCP tool: verify-session", () => {
     const result = (await tool!.handler({ sessionToken: "valid-token" })) as {
       content: Array<{ text: string }>;
     };
-    const data = JSON.parse(result.content[0].text);
+    const data = JSON.parse(result.content[0]!.text);
     expect(data.valid).toBe(true);
     expect(data.user.id).toBe("user-1");
     expect(data.user.email).toBe("test@example.com");
@@ -292,7 +296,7 @@ describe("MCP tool: verify-session", () => {
     const result = (await tool!.handler({ sessionToken: "tok" })) as {
       content: Array<{ type: string }>;
     };
-    expect(result.content[0].type).toBe("text");
+    expect(result.content[0]!.type).toBe("text");
   });
 });
 
@@ -300,7 +304,7 @@ describe("MCP tool: get-user-by-email", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     registeredTools.length = 0;
-    mockFindFirst = vi.fn(async () => null);
+    mockFindFirst = vi.fn(async (..._args: any[]) => null as any);
   });
 
   async function getEmailTool() {
@@ -316,7 +320,7 @@ describe("MCP tool: get-user-by-email", () => {
     const result = (await tool!.handler({ email: "notfound@example.com" })) as {
       content: Array<{ text: string }>;
     };
-    const data = JSON.parse(result.content[0].text);
+    const data = JSON.parse(result.content[0]!.text);
     expect(data.found).toBe(false);
   });
 
@@ -332,7 +336,7 @@ describe("MCP tool: get-user-by-email", () => {
     const result = (await tool!.handler({ email: "alice@example.com" })) as {
       content: Array<{ text: string }>;
     };
-    const data = JSON.parse(result.content[0].text);
+    const data = JSON.parse(result.content[0]!.text);
     expect(data.found).toBe(true);
     expect(data.user.id).toBe("user-42");
     expect(data.user.email).toBe("alice@example.com");
@@ -352,7 +356,7 @@ describe("MCP tool: get-user-by-email", () => {
     const result = (await tool!.handler({ email: "bob@example.com" })) as {
       content: Array<{ text: string }>;
     };
-    const data = JSON.parse(result.content[0].text);
+    const data = JSON.parse(result.content[0]!.text);
     expect(data.user).not.toHaveProperty("image");
   });
 
@@ -367,7 +371,7 @@ describe("MCP tool: get-user-by-email", () => {
     const result = (await tool!.handler({ email: "charlie@example.com" })) as {
       content: Array<{ text: string }>;
     };
-    const data = JSON.parse(result.content[0].text);
+    const data = JSON.parse(result.content[0]!.text);
     expect(data.found).toBe(true);
     expect(data.user.role).toBeNull();
   });
@@ -378,6 +382,6 @@ describe("MCP tool: get-user-by-email", () => {
     const result = (await tool!.handler({ email: "x@example.com" })) as {
       content: Array<{ type: string }>;
     };
-    expect(result.content[0].type).toBe("text");
+    expect(result.content[0]!.type).toBe("text");
   });
 });
