@@ -35,7 +35,19 @@ export function createAuth(env: Env) {
 
   return betterAuth({
     secret: env.BETTER_AUTH_SECRET,
-    baseURL: env.APP_URL || "http://localhost:3000",
+    baseURL: env.APP_URL || "https://auth-mcp.spike.land",
+    trustedOrigins: [
+      "https://image-studio-mcp.spike.land",
+      "https://auth-mcp.spike.land",
+      "http://localhost:5173",
+      "http://localhost:3000",
+    ],
+    advanced: {
+      crossSubDomainCookies: {
+        enabled: true,
+        domain: ".spike.land",
+      },
+    },
     database: drizzleAdapter(db, {
       provider: "sqlite",
     }),
@@ -69,9 +81,9 @@ export function createAuth(env: Env) {
     },
     plugins: [
       magicLink({
-        sendMagicLink: async ({ email, url }) => {
+        sendMagicLink: async () => {
           // This will be called from the Worker to send magic links
-          console.log(`Sending magic link to ${email}: ${url}`);
+          console.log("Magic link sent");
           // Send via external service...
         },
       }),
@@ -83,7 +95,7 @@ export function createAuth(env: Env) {
               path: string,
               options: { method: string; body: ReturnType<typeof z.object>; use: never[] },
               handler: (ctx: QRAuthContext) => Promise<Response>,
-            ) => ReturnType<typeof createAuthEndpoint>
+            ) => unknown
           )(
             "/sign-in/qr",
             {

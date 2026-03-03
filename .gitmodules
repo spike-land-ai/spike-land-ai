@@ -37,9 +37,6 @@
 [submodule "video"]
 	path = packages/video
 	url = https://github.com/spike-land-ai/video.git
-[submodule "packages/mcp-image-studio"]
-	path = packages/mcp-image-studio
-	url = https://github.com/spike-land-ai/mcp-image-studio.git
 [submodule ".github"]
 	path = .github
 	url = https://github.com/spike-land-ai/.github.git

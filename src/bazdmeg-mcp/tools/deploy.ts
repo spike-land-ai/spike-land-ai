@@ -10,6 +10,7 @@ import { GenerateWranglerTomlSchema, DeployWorkerSchema } from "../types.js";
 import { getManifestPackage } from "../manifest.js";
 import { runCommand } from "../shell.js";
 import { writeFile } from "node:fs/promises";
+import { existsSync } from "node:fs";
 import { join } from "node:path";
 import type { ManifestWorkerConfig } from "../manifest.js";
 
@@ -149,7 +150,10 @@ export function registerDeployTools(server: McpServer): void {
         const toml = generateToml(packageName, pkg.worker, pkg.entry);
 
         if (!dryRun) {
-          const outPath = join(repoRoot, "packages", packageName, "wrangler.toml");
+          const outDir = existsSync(join(repoRoot, "src", packageName))
+            ? join(repoRoot, "src", packageName)
+            : join(repoRoot, "packages", packageName);
+          const outPath = join(outDir, "wrangler.toml");
           await writeFile(outPath, toml + "\n", "utf-8");
           return textResult(
             `## Generated wrangler.toml — ${packageName}\n\nWritten to \`${outPath}\`\n\n\`\`\`toml\n${toml}\n\`\`\``,
@@ -199,25 +203,62 @@ export function registerDeployTools(server: McpServer): void {
           );
         }
 
-        const pkgDir = `${repoRoot}/packages/${packageName}`;
+        const pkgDir = existsSync(join(repoRoot, "src", packageName))
+          ? join(repoRoot, "src", packageName)
+          : join(repoRoot, "packages", packageName);
         let report = `## Deploy Pipeline — ${packageName}\n\n`;
         report += `**Worker Name**: ${pkg.worker.name}\n`;
+        report += `**Package Dir**: ${pkgDir}\n`;
         report += `**Environment**: ${env ?? "default"}\n`;
         report += `**Dry Run**: ${dryRun}\n\n`;
 
-        // Step 1: Build
-        report += `### 1. Build\n`;
-        const buildStart = Date.now();
-        const buildResult = await runCommand("npm", ["run", "build"], pkgDir);
-        const buildDur = ((Date.now() - buildStart) / 1000).toFixed(1);
+        // Step 1: Build (skip for src/ packages that don't have package.json with build script)
+        const hasBuildScript = existsSync(join(pkgDir, "package.json"));
+        if (hasBuildScript) {
+          report += `### 1. Build\n`;
+          const buildStart = Date.now();
+          const buildResult = await runCommand("npm", ["run", "build"], pkgDir);
+          const buildDur = ((Date.now() - buildStart) / 1000).toFixed(1);
 
-        if (!buildResult.ok) {
-          report += `**FAILED** (${buildDur}s)\n`;
-          report += `\`\`\`\n${(buildResult.stderr || buildResult.stdout).trim().slice(0, 1000)}\n\`\`\`\n`;
-          report += `\n**BLOCKED** at build step.`;
-          return textResult(report);
+          if (!buildResult.ok) {
+            report += `**FAILED** (${buildDur}s)\n`;
+            report += `\`\`\`\n${(buildResult.stderr || buildResult.stdout).trim().slice(0, 1000)}\n\`\`\`\n`;
+            report += `\n**BLOCKED** at build step.`;
+            return textResult(report);
+          }
+          report += `PASS (${buildDur}s)\n\n`;
+        } else {
+          report += `### 1. Build (skipped — no package.json)\n\n`;
         }
-        report += `PASS (${buildDur}s)\n\n`;
+
+        // Step 1.5: Frontend build (if assets directory references frontend/)
+        if (pkg.worker.assets?.directory?.includes("frontend/")) {
+          const frontendDir = join(pkgDir, "frontend");
+          if (existsSync(frontendDir)) {
+            report += `### 1.5. Frontend Build\n`;
+            // Install frontend deps if needed
+            if (!existsSync(join(frontendDir, "node_modules"))) {
+              const installResult = await runCommand("npm", ["install"], frontendDir);
+              if (!installResult.ok) {
+                report += `**npm install FAILED**\n`;
+                report += `\`\`\`\n${(installResult.stderr || installResult.stdout).trim().slice(0, 1000)}\n\`\`\`\n`;
+                report += `\n**BLOCKED** at frontend install step.`;
+                return textResult(report);
+              }
+            }
+            const viteBuildStart = Date.now();
+            const viteBuild = await runCommand("npx", ["vite", "build"], frontendDir);
+            const viteDur = ((Date.now() - viteBuildStart) / 1000).toFixed(1);
+
+            if (!viteBuild.ok) {
+              report += `**FAILED** (${viteDur}s)\n`;
+              report += `\`\`\`\n${(viteBuild.stderr || viteBuild.stdout).trim().slice(0, 1000)}\n\`\`\`\n`;
+              report += `\n**BLOCKED** at frontend build step.`;
+              return textResult(report);
+            }
+            report += `PASS (${viteDur}s)\n\n`;
+          }
+        }
 
         // Step 2: Generate wrangler.toml
         report += `### 2. Generate wrangler.toml\n`;

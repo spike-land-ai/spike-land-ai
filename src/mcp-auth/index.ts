@@ -6,19 +6,33 @@ import * as schema from "./db/schema";
 import { createAuth, type Env } from "./auth";
 
 // CORS configuration for Better Auth and MCP
+const ALLOWED_ORIGINS = [
+  "https://image-studio-mcp.spike.land",
+  "https://auth-mcp.spike.land",
+  "http://localhost:5173",
+  "http://localhost:3000",
+];
+
+function getCorsOrigin(request: Request): string {
+  const origin = request.headers.get("Origin") ?? "";
+  return ALLOWED_ORIGINS.includes(origin) ? origin : (ALLOWED_ORIGINS[0] ?? "");
+}
+
 const CORS_HEADERS: Record<string, string> = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "GET, POST, DELETE, OPTIONS",
   "Access-Control-Allow-Headers":
-    "Content-Type, Authorization, Mcp-Session-Id, Mcp-Protocol-Version",
-  "Access-Control-Expose-Headers": "Mcp-Session-Id",
+    "Content-Type, Authorization, Mcp-Session-Id, Mcp-Protocol-Version, Cookie",
+  "Access-Control-Allow-Credentials": "true",
+  "Access-Control-Expose-Headers": "Mcp-Session-Id, Set-Cookie",
 };
 
-function withCors(response: Response): Response {
+function withCors(response: Response, request: Request): Response {
   const headers = new Headers(response.headers);
   for (const [k, v] of Object.entries(CORS_HEADERS)) {
     headers.set(k, v);
   }
+  headers.set("Access-Control-Allow-Origin", getCorsOrigin(request));
   return new Response(response.body, {
     status: response.status,
     statusText: response.statusText,
@@ -29,7 +43,11 @@ function withCors(response: Response): Response {
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     if (request.method === "OPTIONS") {
-      return new Response(null, { status: 204, headers: CORS_HEADERS });
+      const corsOrigin = getCorsOrigin(request);
+      return new Response(null, {
+        status: 204,
+        headers: { ...CORS_HEADERS, "Access-Control-Allow-Origin": corsOrigin },
+      });
     }
 
     const url = new URL(request.url);
@@ -37,7 +55,8 @@ export default {
     // 1. Better Auth catch-all API routes (OAuth, Magic Links, Session queries)
     if (url.pathname.startsWith("/api/auth/")) {
       const auth = createAuth(env);
-      return auth.handler(request);
+      const authResponse = await auth.handler(request);
+      return withCors(authResponse, request);
     }
 
     // 2. MCP Server Configuration
@@ -134,6 +153,6 @@ export default {
     await mcpServer.connect(transport);
 
     const response = await transport.handleRequest(request);
-    return withCors(response);
+    return withCors(response, request);
   },
 };

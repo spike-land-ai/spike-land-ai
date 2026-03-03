@@ -374,6 +374,31 @@ packages:
           custom_domain: true
 
   # ─── Apps ───────────────────────────────────────────────────────────────────
+  image-studio-worker:
+    kind: worker
+    version: 1.0.0
+    description: Image Studio — Cloudflare Worker with React frontend
+    entry: index.ts
+    private: true
+    deps: [mcp-image-studio, shared]
+    worker:
+      name: image-studio-mcp
+      compatibility_date: "2025-02-28"
+      compatibility_flags: [nodejs_compat]
+      d1_databases:
+        - binding: IMAGE_DB
+          database_name: pixel-studio
+          database_id: 74991261-c270-45d2-ab40-e8955e43f93f
+      r2_buckets:
+        - binding: IMAGE_R2
+          bucket_name: pixel-studio
+      assets:
+        directory: ./frontend/dist
+        not_found_handling: none
+      routes:
+        - pattern: image-studio-mcp.spike.land
+          custom_domain: true
+
   spike-app:
     kind: browser
     version: 1.0.0

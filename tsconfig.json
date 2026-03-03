@@ -43,6 +43,7 @@
       "@spike-land-ai/spike-review/*": ["./src/spike-review/*"],
       "@spike-land-ai/hackernews-mcp": ["./src/hackernews-mcp/index.ts"],
       "@spike-land-ai/mcp-image-studio": ["./src/mcp-image-studio/index.ts"],
+      "@spike-land-ai/mcp-image-studio/*": ["./src/mcp-image-studio/*"],
       "@spike-land-ai/openclaw-mcp": ["./src/openclaw-mcp/index.ts"],
       "@spike-land-ai/bazdmeg-mcp": ["./src/bazdmeg-mcp/index.ts"],
       "@spike-land-ai/chess-engine": ["./src/chess-engine/index.ts"],
@@ -53,7 +54,8 @@
       "@spike-land-ai/video": ["./src/video/index.ts"],
       "@spike-land-ai/eslint-config": ["./src/eslint-config/index.mjs"],
       "@spike-land-ai/eslint-config/*": ["./src/eslint-config/*"],
-      "@spike-land-ai/tsconfig/*": ["./src/tsconfig/*"]
+      "@spike-land-ai/tsconfig/*": ["./src/tsconfig/*"],
+      "@spike-land-ai/image-studio-worker": ["./src/image-studio-worker/index.ts"]
     }
   },
   "include": ["src/**/*.ts", "src/**/*.tsx"],
@@ -67,6 +69,7 @@
     "**/*.spec.ts",
     "src/spike-app/**",
     "src/code/**",
-    "src/chess-engine/**"
+    "src/chess-engine/**",
+    "src/image-studio-worker/frontend/**"
   ],
 }

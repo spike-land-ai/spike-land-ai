@@ -1,0 +1,21 @@
+name = "image-studio-mcp"
+main = "index.ts"
+compatibility_date = "2025-02-28"
+compatibility_flags = ["nodejs_compat"]
+
+[[d1_databases]]
+binding = "IMAGE_DB"
+database_name = "pixel-studio"
+database_id = "74991261-c270-45d2-ab40-e8955e43f93f"
+
+[[r2_buckets]]
+binding = "IMAGE_R2"
+bucket_name = "pixel-studio"
+
+[[routes]]
+pattern = "image-studio-mcp.spike.land"
+custom_domain = true
+
+[assets]
+directory = "./frontend/dist"
+not_found_handling = "none"
