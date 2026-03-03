@@ -11,8 +11,6 @@ import type {
  * Transpile React/JSX code to JavaScript via js.spike.land service
  */
 async function transpileCode(code: string, origin: string): Promise<string> {
-  console.log(`[MCP] Transpiling code (${code.length} chars) with origin: ${origin}`);
-
   const response = await fetch("https://js.spike.land", {
     method: "POST",
     headers: {
@@ -28,9 +26,7 @@ async function transpileCode(code: string, origin: string): Promise<string> {
     throw new Error(`Transpilation failed: ${errorText}`);
   }
 
-  const transpiled = await response.text();
-  console.log(`[MCP] Transpilation successful (${transpiled.length} chars)`);
-  return transpiled;
+  return await response.text();
 }
 
 export const updateCodeTool: Tool = {
@@ -132,11 +128,6 @@ export async function executeUpdateCode(
   updateSession: (session: ICodeSession) => Promise<void>,
   origin?: string,
 ): Promise<UpdateCodeResult> {
-  console.log(`[MCP] update_code called for codeSpace: ${codeSpace}`);
-  console.log(
-    `[MCP] Current code length: ${session.code?.length || 0}, New code length: ${code.length}`,
-  );
-
   // Transpile the code server-side
   let transpiled = "";
   let transpilationFailed = false;
@@ -148,8 +139,6 @@ export async function executeUpdateCode(
       transpilationFailed = true;
       // Continue with empty transpiled - client can trigger re-transpilation
     }
-  } else {
-    console.warn(`[MCP] No origin provided, skipping server-side transpilation`);
   }
 
   const updatedSession = {
@@ -161,11 +150,6 @@ export async function executeUpdateCode(
     codeSpace,
   };
 
-  console.log(
-    `[MCP] Broadcasting session update with transpiled=${
-      transpiled.length > 0 ? transpiled.length + " chars" : "empty"
-    }`,
-  );
   await updateSession(updatedSession);
 
   return {

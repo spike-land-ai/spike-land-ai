@@ -72,8 +72,6 @@ export class McpHandler {
     const currentSession = this.durableObject.getSession();
 
     if (currentSession.codeSpace !== codeSpace) {
-      console.log(`Switching session from '${currentSession.codeSpace}' to '${codeSpace}'`);
-
       const url = new URL(`http://localhost:8787/?room=${codeSpace}`);
 
       await this.durableObject.initializeSession(url);
@@ -332,8 +330,6 @@ export class McpHandler {
     }
 
     const session = await this.getSessionForCodeSpace(requestedCodeSpace);
-
-    console.log(`MCP Tool '${toolName}' executing for codeSpace: ${requestedCodeSpace}`);
 
     if (!session.codeSpace) {
       throw new Error("Session codeSpace is missing. The session may not be properly initialized.");

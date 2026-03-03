@@ -86,7 +86,6 @@ export class Code implements DurableObject {
     this.versionCount = versionNumber;
     await this.largeStorage.putDirect("version_count", versionNumber);
 
-    console.log(`[Version] Saved version ${versionNumber} for codeSpace: ${session.codeSpace}`);
 
     return version;
   }
@@ -407,7 +406,6 @@ export class Code implements DurableObject {
         this.env.R2.put(r2HtmlKey, html || ""),
         this.env.R2.put(r2CssKey, css || ""),
       ]);
-      console.log(`Session for ${codeSpace} saved successfully.`);
     });
   }
 
@@ -456,7 +454,7 @@ export class Code implements DurableObject {
 
         // If we found data with the old key, migrate it to the new key
         if (sessionCore) {
-          console.log(`Migrating session data from old key for codeSpace: ${codeSpace}`);
+          console.warn(`Migrating session data from old key for codeSpace: ${codeSpace}`);
           await this.largeStorage.put("session_core", sessionCore);
           await this.largeStorage.delete("session"); // Clean up old key
         }
@@ -584,9 +582,6 @@ export class Code implements DurableObject {
       const storedVersionCount = await this.largeStorage.getDirect<number>("version_count");
       if (storedVersionCount) {
         this.versionCount = storedVersionCount;
-        console.log(
-          `[Version] Loaded version count: ${this.versionCount} for codeSpace: ${codeSpace}`,
-        );
       }
 
       // Load virtual filesystem
@@ -622,7 +617,6 @@ export class Code implements DurableObject {
       if (path[0] === "mcp") {
         // If not initialized, initialize with default codeSpace
         if (!this.initialized) {
-          console.log("Initializing session for MCP request with default codeSpace");
           try {
             await this.initializeSession(url, request);
           } catch (_error) {
@@ -659,15 +653,9 @@ export class Code implements DurableObject {
     const oldHash = computeSessionHash(oldSession);
     const hashCode = computeSessionHash(newSession);
 
-    console.log(`[updateAndBroadcastSession] Called for codeSpace: ${newSession.codeSpace}`);
-    console.log(`[updateAndBroadcastSession] Old hash: ${oldHash}, New hash: ${hashCode}`);
-
     if (oldHash === hashCode) {
-      console.log(`[updateAndBroadcastSession] No changes detected, skipping broadcast`);
       return; // No change needed
     }
-
-    console.log(`[updateAndBroadcastSession] Changes detected, saving session...`);
     // Attempt to save the new session parts first and wait for them to complete
 
     // If save is successful (i.e., did not throw), update in-memory state and broadcast
@@ -690,26 +678,12 @@ export class Code implements DurableObject {
 
     if (codeChanged || transpiledChanged) {
       try {
-        const version = await this._saveVersion(newSession);
-        console.log(`[updateAndBroadcastSession] Created version ${version.number}`);
+        await this._saveVersion(newSession);
       } catch (e) {
         console.error(`[updateAndBroadcastSession] Failed to save version:`, e);
         // Don't fail the update if versioning fails
       }
     }
-
-    console.log(`[updateAndBroadcastSession] Broadcasting patch to WebSocket clients`);
-    console.log(
-      `[updateAndBroadcastSession] Patch includes code change: ${(patch.delta as Record<string, unknown>)?.code !== undefined}`,
-    );
-    console.log(
-      `[updateAndBroadcastSession] Patch includes transpiled change: ${
-        (patch.delta as Record<string, unknown>)?.transpiled !== undefined
-      }`,
-    );
-    console.log(
-      `[updateAndBroadcastSession] Active WebSocket sessions: ${this.wsHandler.getWsSessions().length}`,
-    );
 
     this.wsHandler.broadcast(patch, wsSession);
   }
@@ -722,12 +696,10 @@ export class Code implements DurableObject {
       capabilities,
       registeredAt: Date.now(),
     });
-    console.log(`[Swarm] Agent registered: ${agentId} (${displayName})`);
   }
 
   public unregisterSwarmAgent(agentId: string): void {
     this.swarmAgents.delete(agentId);
-    console.log(`[Swarm] Agent unregistered: ${agentId}`);
   }
 
   public getSwarmAgents(): Map<

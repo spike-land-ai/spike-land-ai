@@ -122,14 +122,6 @@ export class PostHandler {
     const requestId = crypto.randomUUID();
 
     try {
-      // Log incoming request details for debugging
-      console.log(`[AI Routes][${requestId}] Incoming request:`, {
-        method: request.method,
-        url: request.url,
-        contentType: request.headers.get("content-type"),
-        contentLength: request.headers.get("content-length"),
-      });
-
       // Validate request size
       const contentLength = request.headers.get("content-length");
       if (contentLength && parseInt(contentLength) > 10 * 1024 * 1024) {
@@ -145,13 +137,6 @@ export class PostHandler {
       // See: https://github.com/vercel/ai/issues/7333
       // Workaround: Use direct JSON schema format instead of the tool() helper
       if (body.tools) {
-        console.log(
-          `[AI Routes][${requestId}] Request contains tools:`,
-          Array.isArray(body.tools)
-            ? `Array with ${body.tools.length} tools`
-            : `Object with keys: ${Object.keys(body.tools).join(", ")}`,
-        );
-
         // Check for various invalid tool formats and clean them
         if (Array.isArray(body.tools)) {
           const invalidTools = this.validateToolsArray(body.tools);
@@ -165,11 +150,6 @@ export class PostHandler {
           }
         }
       }
-
-      // We ignore tools from the request body and only use MCP-generated tools
-      console.log(
-        `[AI Routes][${requestId}] Ignoring tools from request body, will use MCP-generated tools instead.`,
-      );
 
       // Validate messages
       const validationError = this.validateMessages(body.messages);
@@ -433,58 +413,14 @@ export class PostHandler {
       apiKey: this.env.GEMINI_API_KEY,
     });
 
-    // Log message count and types instead of full content for privacy
-    const messageSummary = messages.map((m) => ({
-      role: m.role,
-      contentLength: Array.isArray(m.content) ? m.content.length : String(m.content).length,
-    }));
-    console.log(
-      `[AI Routes][${requestId}] Creating stream with ${messages.length} messages, summary:`,
-      messageSummary,
-    );
-
     // Create a copy of messages to avoid mutation
     const messagesCopy = JSON.parse(JSON.stringify(body.messages));
 
     try {
-      // Log tools structure for debugging
-      console.log(`[AI Routes][${requestId}] Processing ${tools.length} tools for streaming`);
-
       const processedTools = this.processTools(tools, codeSpace, requestId);
 
       // Check if we should disable tools due to AI SDK compatibility issues
       const disableTools = this.env.DISABLE_AI_TOOLS === "true";
-
-      if (disableTools) {
-        console.warn(
-          `[AI Routes][${requestId}] AI tools are disabled via DISABLE_AI_TOOLS environment variable`,
-        );
-      }
-
-      // Log the tools being sent to debug the format issue
-      if (!disableTools && processedTools) {
-        console.log(
-          `[AI Routes][${requestId}] Sending tools to streamText:`,
-          JSON.stringify(Object.keys(processedTools)),
-        );
-
-        // Enable debug mode for Anthropic proxy if needed
-        if (this.env.DEBUG_ANTHROPIC_PROXY === "true") {
-          console.log(
-            `[AI Routes][${requestId}] Full tools object:`,
-            JSON.stringify(
-              processedTools,
-              (key, value) => {
-                if (key === "execute" || key === "parameters") {
-                  return "[Function/Schema]";
-                }
-                return value;
-              },
-              2,
-            ),
-          );
-        }
-      }
 
       const result = await streamText({
         model: google("gemini-3-flash-preview"),
@@ -563,13 +499,6 @@ export class PostHandler {
         );
         return acc;
       }
-
-      // Log the tool structure for debugging
-      console.log(`[AI Routes][${requestId}] Processing tool '${mcpTool.name}':`, {
-        hasInputSchema: !!mcpTool.inputSchema,
-        inputSchemaType: mcpTool.inputSchema?.type,
-        inputSchemaKeys: mcpTool.inputSchema ? Object.keys(mcpTool.inputSchema) : [],
-      });
 
       // Validate that the inputSchema has type: 'object'
       if (mcpTool.inputSchema.type !== "object") {

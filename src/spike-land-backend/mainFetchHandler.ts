@@ -74,8 +74,6 @@ export async function handleMainFetch(
   }
 
   return handleErrors(request, async () => {
-    console.log(`handling request: ${request.url}`);
-
     const url = new URL(request.url);
 
     const redirect = routes[url.pathname as keyof typeof routes];
