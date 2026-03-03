@@ -396,7 +396,7 @@ export function ToolExplorer() {
   // Loading state
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-24">
+      <div className="flex items-center justify-center py-24 animate-delayed-show">
         <div className="flex flex-col items-center gap-3">
           <svg
             className="animate-spin w-8 h-8 text-accent-400"

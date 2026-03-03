@@ -137,7 +137,7 @@ export function Library() {
       {/* Intersection Observer Target */}
       <div ref={observerTarget} className="h-10 flex items-center justify-center">
         {isFetchingNextPage && (
-          <div className="w-6 h-6 border-2 border-accent-500 border-t-transparent rounded-full animate-spin" />
+          <div className="w-6 h-6 border-2 border-amber-neon border-t-transparent rounded-full animate-spin animate-delayed-show" />
         )}
       </div>
 
