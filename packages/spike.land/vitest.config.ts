@@ -2,6 +2,41 @@ import react from "@vitejs/plugin-react";
 import path from "path";
 import { defineConfig } from "vitest/config";
 
+const root = import.meta.dirname;
+
+const aliases = [
+  // Map @store-apps/* sub-path imports to packages/store-apps/*
+  {
+    find: /^@store-apps\/(.+)$/,
+    replacement: path.resolve(root, "./packages/store-apps/$1"),
+  },
+  { find: "@/components", replacement: path.resolve(root, "./src/components") },
+  { find: "@/ui", replacement: path.resolve(root, "./src/components/ui") },
+  { find: "@/lib", replacement: path.resolve(root, "./src/lib") },
+  { find: "@/utils", replacement: path.resolve(root, "./src/lib/utils") },
+  { find: "@/hooks", replacement: path.resolve(root, "./src/hooks") },
+  { find: "@/auth", replacement: path.resolve(root, "./src/auth.ts") },
+  { find: "@", replacement: path.resolve(root, "./src") },
+  { find: "@apps", replacement: path.resolve(root, "./apps") },
+  { find: "@vercel/kv", replacement: path.resolve(root, "./vitest.mock-vercel-kv.ts") },
+  // Mock next-view-transitions to avoid ESM import issues
+  {
+    find: "next-view-transitions",
+    replacement: path.resolve(root, "./vitest.mock-next-view-transitions.tsx"),
+  },
+  // next/* module resolution — hoisted to monorepo root node_modules
+  { find: "next/link", replacement: path.resolve(root, "../../node_modules/next/link.js") },
+  { find: "next/image", replacement: path.resolve(root, "../../node_modules/next/image.js") },
+  { find: "next/server", replacement: path.resolve(root, "../../node_modules/next/server.js") },
+  // Map @prisma/client to the generated Prisma client location
+  { find: "@prisma/client", replacement: path.resolve(root, "./src/generated/prisma") },
+  // Fix: spike-cli exports field references index.mjs but only index.js exists in dist
+  {
+    find: "@spike-land-ai/spike-cli",
+    replacement: path.resolve(root, "../../dist/spike-cli/index.js"),
+  },
+];
+
 export default defineConfig({
   plugins: [react()],
   ssr: {
@@ -39,39 +74,7 @@ export default defineConfig({
           ...(process.env.VITEST_COVERAGE ? ["./scripts/vitest-coverage-mapper-reporter.ts"] : []),
         ]
       : ["../../vitest-minimal-reporter.ts"],
-    alias: [
-      // Map @store-apps/* sub-path imports to packages/store-apps/*
-      {
-        find: /^@store-apps\/(.+)$/,
-        replacement: path.resolve(__dirname, "./packages/store-apps/$1"),
-      },
-      { find: "@/components", replacement: path.resolve(__dirname, "./src/components") },
-      { find: "@/ui", replacement: path.resolve(__dirname, "./src/components/ui") },
-      { find: "@/lib", replacement: path.resolve(__dirname, "./src/lib") },
-      { find: "@/utils", replacement: path.resolve(__dirname, "./src/lib/utils") },
-      { find: "@/hooks", replacement: path.resolve(__dirname, "./src/hooks") },
-      { find: "@/auth", replacement: path.resolve(__dirname, "./src/auth.ts") },
-      { find: "@", replacement: path.resolve(__dirname, "./src") },
-      { find: "@apps", replacement: path.resolve(__dirname, "./apps") },
-      { find: "@vercel/kv", replacement: path.resolve(__dirname, "./vitest.mock-vercel-kv.ts") },
-      // Mock next-view-transitions to avoid ESM import issues
-      {
-        find: "next-view-transitions",
-        replacement: path.resolve(__dirname, "./vitest.mock-next-view-transitions.tsx"),
-      },
-      // Fix ESM module resolution for next-auth imports
-      // Using require.resolve for Yarn PnP compatibility
-      { find: "next/link", replacement: require.resolve("next/link") },
-      { find: "next/image", replacement: require.resolve("next/image") },
-      { find: "next/server", replacement: require.resolve("next/server") },
-      // Map @prisma/client to the generated Prisma client location
-      { find: "@prisma/client", replacement: path.resolve(__dirname, "./src/generated/prisma") },
-      // Fix: spike-cli exports field references index.mjs but only index.js exists in dist
-      {
-        find: "@spike-land-ai/spike-cli",
-        replacement: path.resolve(__dirname, "../../packages/spike-cli/dist/index.js"),
-      },
-    ],
+    alias: aliases,
     coverage: {
       provider: "v8",
       reporter: ["text-summary"],
@@ -93,38 +96,6 @@ export default defineConfig({
     },
   },
   resolve: {
-    alias: [
-      // Map @store-apps/* sub-path imports to packages/store-apps/*
-      {
-        find: /^@store-apps\/(.+)$/,
-        replacement: path.resolve(__dirname, "./packages/store-apps/$1"),
-      },
-      { find: "@/components", replacement: path.resolve(__dirname, "./src/components") },
-      { find: "@/ui", replacement: path.resolve(__dirname, "./src/components/ui") },
-      { find: "@/lib", replacement: path.resolve(__dirname, "./src/lib") },
-      { find: "@/utils", replacement: path.resolve(__dirname, "./src/lib/utils") },
-      { find: "@/hooks", replacement: path.resolve(__dirname, "./src/hooks") },
-      { find: "@/auth", replacement: path.resolve(__dirname, "./src/auth.ts") },
-      { find: "@", replacement: path.resolve(__dirname, "./src") },
-      { find: "@apps", replacement: path.resolve(__dirname, "./apps") },
-      { find: "@vercel/kv", replacement: path.resolve(__dirname, "./vitest.mock-vercel-kv.ts") },
-      // Mock next-view-transitions to avoid ESM import issues
-      {
-        find: "next-view-transitions",
-        replacement: path.resolve(__dirname, "./vitest.mock-next-view-transitions.tsx"),
-      },
-      // Fix ESM module resolution for next-auth imports
-      // Using require.resolve for Yarn PnP compatibility
-      { find: "next/link", replacement: require.resolve("next/link") },
-      { find: "next/image", replacement: require.resolve("next/image") },
-      { find: "next/server", replacement: require.resolve("next/server") },
-      // Map @prisma/client to the generated Prisma client location
-      { find: "@prisma/client", replacement: path.resolve(__dirname, "./src/generated/prisma") },
-      // Fix: spike-cli exports field references index.mjs but only index.js exists in dist
-      {
-        find: "@spike-land-ai/spike-cli",
-        replacement: path.resolve(__dirname, "../../packages/spike-cli/dist/index.js"),
-      },
-    ],
+    alias: aliases,
   },
 });
