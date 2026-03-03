@@ -13,7 +13,7 @@ type EventMap = {
 type EventHandler<K extends keyof EventMap> = (data: EventMap[K]) => void;
 
 class EventBus {
-  private handlers = new Map<string, Set<Function>>();
+  private handlers = new Map<string, Set<(...args: unknown[]) => void>>();
 
   on<K extends keyof EventMap>(event: K, handler: EventHandler<K>): () => void {
     if (!this.handlers.has(event)) {

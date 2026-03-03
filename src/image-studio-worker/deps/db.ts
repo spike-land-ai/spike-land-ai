@@ -1166,7 +1166,8 @@ export async function galleryRecentImages(
 
   const hasMore = rows.length > limit;
   const images = hasMore ? rows.slice(0, limit) : rows;
-  const nextCursor = hasMore ? images[images.length - 1].createdAt.toISOString() : null;
+  const lastImage = images[images.length - 1];
+  const nextCursor = hasMore && lastImage ? lastImage.createdAt.toISOString() : null;
 
   return { images, nextCursor };
 }

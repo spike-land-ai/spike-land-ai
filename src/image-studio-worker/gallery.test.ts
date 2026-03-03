@@ -374,13 +374,13 @@ describe("Gallery DB Helpers", () => {
       const { addImageToDefaultAlbum } = await import("./deps/db.ts");
 
       const albumRow = { id: "alb-default", handle: "gallery-user12-abcdef" };
-      let callCount = 0;
+      let _callCount = 0;
 
       const mockDb = {
         prepare: vi.fn().mockImplementation((sql: string) => ({
           bind: vi.fn().mockReturnValue({
             first: vi.fn().mockImplementation(() => {
-              callCount++;
+              _callCount++;
               // First call: getOrCreateDefaultAlbum SELECT → return album
               // Second call: MAX sortOrder → return null
               if (sql.includes("isDefault")) return Promise.resolve(albumRow);
