@@ -4,7 +4,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { Workflow, Plus, Trash2, Copy, Settings } from "lucide-react";
+import { Plus, Trash2, Copy } from "lucide-react";
 import { Button, Input, Select, TextArea, Badge, Modal } from "@/components/ui";
 import { callTool, parseToolResult } from "@/api/client";
 import { ENHANCEMENT_TIERS, PIPELINE_VISIBILITY } from "@/constants/enums";
@@ -121,7 +121,7 @@ export function Pipelines() {
   const tierOptions = ENHANCEMENT_TIERS.map((t) => ({ value: t, label: t }));
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 p-6 md:p-8">
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold text-gray-100">Pipelines</h2>
@@ -144,11 +144,10 @@ export function Pipelines() {
               <button
                 key={p.id}
                 onClick={() => viewDetail(p)}
-                className={`w-full text-left p-3 rounded-lg border transition-colors ${
-                  selected?.id === p.id
-                    ? "bg-accent-600/10 border-accent-500/30"
-                    : "bg-gray-900 border-gray-800 hover:border-gray-700"
-                }`}
+                className={`w-full text-left p-3 rounded-lg border transition-colors ${selected?.id === p.id
+                  ? "bg-accent-600/10 border-accent-500/30"
+                  : "bg-gray-900 border-gray-800 hover:border-gray-700"
+                  }`}
               >
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium text-gray-200 truncate">{p.name}</span>

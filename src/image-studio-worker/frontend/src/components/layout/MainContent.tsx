@@ -19,9 +19,9 @@ const WORKSPACE_COMPONENTS: Record<Workspace, React.ComponentType> = {
 
 export function MainContent({ workspace }: MainContentProps) {
   const Component = WORKSPACE_COMPONENTS[workspace];
-  
+
   return (
-    <main className="flex-1 overflow-hidden relative">
+    <main className="flex-1 overflow-y-auto relative">
       <Component />
     </main>
   );

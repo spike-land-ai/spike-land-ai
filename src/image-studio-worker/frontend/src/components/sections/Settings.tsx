@@ -6,7 +6,7 @@ export function Settings() {
   const [apiKey, setApiKey] = useState("");
   const [isValidating, setIsValidating] = useState(false);
   const [validationStatus, setIsValidatingStatus] = useState<"idle" | "valid" | "invalid">("idle");
-  
+
   // Model Preferences
   const [textModel, setTextModel] = useState("gemini-3-flash-preview");
   const [imageModel, setImageModel] = useState("gemini-3.1-flash-image-preview");
@@ -31,7 +31,7 @@ export function Settings() {
     if (!apiKey) return;
     setIsValidating(true);
     setIsValidatingStatus("idle");
-    
+
     try {
       // Basic call to list models to verify key
       const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`);
@@ -42,7 +42,7 @@ export function Settings() {
         setIsValidatingStatus("invalid");
         toast.error("Invalid API Key");
       }
-    } catch (err) {
+    } catch {
       setIsValidatingStatus("invalid");
       toast.error("Validation failed");
     } finally {
@@ -57,7 +57,7 @@ export function Settings() {
   };
 
   return (
-    <div className="max-w-3xl mx-auto py-12 px-6 space-y-12 animate-in fade-in slide-in-from-bottom-8 duration-700">
+    <div className="max-w-3xl mx-auto py-12 px-6 md:pt-20 space-y-12 animate-in fade-in slide-in-from-bottom-8 duration-700">
       <div className="space-y-4">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-neon/10 border border-amber-neon/20 text-[10px] font-black uppercase tracking-[0.2em] text-amber-neon">
           System Core
@@ -142,7 +142,7 @@ export function Settings() {
               <label className="text-[10px] font-black uppercase tracking-widest text-gray-500 flex items-center gap-2">
                 <Brain className="w-3 h-3" /> Linguistic Engine
               </label>
-              <select 
+              <select
                 value={textModel}
                 onChange={(e) => setTextModel(e.target.value)}
                 className="w-full bg-obsidian-950/50 border border-white/10 rounded-xl py-3 px-4 text-xs font-bold text-gray-300 focus:outline-none"
@@ -156,7 +156,7 @@ export function Settings() {
               <label className="text-[10px] font-black uppercase tracking-widest text-gray-500 flex items-center gap-2">
                 <ImageIcon className="w-3 h-3" /> Visual Manifestation
               </label>
-              <select 
+              <select
                 value={imageModel}
                 onChange={(e) => setImageModel(e.target.value)}
                 className="w-full bg-obsidian-950/50 border border-white/10 rounded-xl py-3 px-4 text-xs font-bold text-gray-300 focus:outline-none"
@@ -172,11 +172,10 @@ export function Settings() {
                   <button
                     key={mode}
                     onClick={() => setThinkingBudget(mode)}
-                    className={`py-2 rounded-lg text-[10px] font-black uppercase transition-all ${
-                      thinkingBudget === mode 
-                        ? "bg-emerald-neon text-obsidian-950 shadow-[0_0_15px_rgba(0,255,170,0.3)]" 
-                        : "bg-white/5 text-gray-500 hover:text-gray-300"
-                    }`}
+                    className={`py-2 rounded-lg text-[10px] font-black uppercase transition-all ${thinkingBudget === mode
+                      ? "bg-emerald-neon text-obsidian-950 shadow-[0_0_15px_rgba(0,255,170,0.3)]"
+                      : "bg-white/5 text-gray-500 hover:text-gray-300"
+                      }`}
                   >
                     {mode}
                   </button>

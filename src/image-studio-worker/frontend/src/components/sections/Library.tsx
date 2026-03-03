@@ -57,7 +57,7 @@ export function Library() {
   }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
 
   return (
-    <div className="space-y-6 pb-12">
+    <div className="space-y-6 pb-12 p-6 md:p-8">
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold text-gray-100">Library</h2>

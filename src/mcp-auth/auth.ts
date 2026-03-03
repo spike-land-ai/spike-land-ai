@@ -47,6 +47,9 @@ export function createAuth(env: Env) {
         enabled: true,
         domain: ".spike.land",
       },
+      defaultCookieAttributes: {
+        sameSite: "none" as const,
+      },
     },
     database: drizzleAdapter(db, {
       provider: "sqlite",
