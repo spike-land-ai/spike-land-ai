@@ -6,6 +6,7 @@ import { imageProcedure } from "../tool-builder/image-middleware.js";
 export const jobStatusTool = imageProcedure
   .tool("job_status", "Check the status of generation or enhancement jobs", {
     job_id: z.string().describe("ID of the job to check").optional(),
+    jobId: z.string().describe("Alias for job_id").optional(),
     image_ids: z.array(z.string().describe("Image ID")).describe("Image IDs to check").optional(),
     job_type: z
       .enum(JOB_TYPE_VALUES)
@@ -15,9 +16,11 @@ export const jobStatusTool = imageProcedure
   .handler(async ({ input: input, ctx: ctx }) => {
     const { userId, deps } = ctx;
 
+    const actualJobId = input.job_id || input.jobId;
+
     // Single job lookup
-    if (input.job_id) {
-      const jobId = asJobId(input.job_id);
+    if (actualJobId) {
+      const jobId = asJobId(actualJobId);
 
       // Try generation job first (unless type hint says enhancement)
       if (input.job_type !== "enhancement") {
@@ -44,7 +47,7 @@ export const jobStatusTool = imageProcedure
         }
         // If type was explicitly generation and not found, return error
         if (input.job_type === "generation") {
-          return errorResult("NOT_FOUND", `Job ${input.job_id} not found`);
+          return errorResult("NOT_FOUND", `Job ${actualJobId} not found`);
         }
       }
 
@@ -53,7 +56,7 @@ export const jobStatusTool = imageProcedure
       if (enhRes.ok && enhRes.data) {
         const e = enhRes.data;
         if (e.userId !== userId) {
-          return errorResult("NOT_FOUND", `Job ${input.job_id} not found`);
+          return errorResult("NOT_FOUND", `Job ${actualJobId} not found`);
         }
         const response: Record<string, unknown> = {
           id: e.id,
@@ -74,7 +77,7 @@ export const jobStatusTool = imageProcedure
         return jsonResult(response);
       }
 
-      return errorResult("NOT_FOUND", `Job ${input.job_id} not found`);
+      return errorResult("NOT_FOUND", `Job ${actualJobId} not found`);
     }
 
     // Multiple job lookup by image ID (batch)
