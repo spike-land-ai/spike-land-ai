@@ -40,12 +40,32 @@ if [ -f "$CACHE_DIR/app.treehash" ]; then
   CACHED_HASH="$(cat "$CACHE_DIR/app.treehash")"
 fi
 
-if [ "$TREE_HASH" = "$CACHED_HASH" ] && [ -d "dist" ]; then
-  echo "Source unchanged (tree hash: ${TREE_HASH:0:12}) — skipping build."
-else
+# Also hash block-website content (blog posts flow through it)
+CONTENT_HASH="$(git ls-tree -r HEAD -- ../block-website/src/core/generated-posts.ts 2>/dev/null | git hash-object --stdin 2>/dev/null || echo "none")"
+CACHED_CONTENT=""
+if [ -f "$CACHE_DIR/content.treehash" ]; then
+  CACHED_CONTENT="$(cat "$CACHE_DIR/content.treehash")"
+fi
+
+NEED_BUILD=false
+if [ "$TREE_HASH" != "$CACHED_HASH" ] || [ ! -d "dist" ]; then
+  NEED_BUILD=true
+fi
+if [ "$CONTENT_HASH" != "$CACHED_CONTENT" ]; then
+  echo "Blog content changed — rebuilding block-website..."
+  (cd ../block-website && npm run build)
+  # Clear Vite dep cache so it picks up new block-website dist
+  rm -rf node_modules/.vite
+  NEED_BUILD=true
+fi
+
+if [ "$NEED_BUILD" = true ]; then
   echo "Building spike-app..."
   npm run build
   echo "$TREE_HASH" > "$CACHE_DIR/app.treehash"
+  echo "$CONTENT_HASH" > "$CACHE_DIR/content.treehash"
+else
+  echo "Source unchanged (tree hash: ${TREE_HASH:0:12}) — skipping build."
 fi
 
 # ── 4. Inject build metadata into index.html ──
