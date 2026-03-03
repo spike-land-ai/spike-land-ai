@@ -177,6 +177,33 @@ export async function handleChatStream(
                   }),
                 );
 
+                // Emit gallery_update for image-mutating tools
+                const imageTools = new Set([
+                  "img_generate", "img_edit", "img_enhance", "img_upload",
+                  "img_delete", "img_auto_crop", "img_smart_enhance",
+                  "img_background_remove", "img_upscale", "img_style_transfer",
+                  "img_color_grade", "img_restore",
+                ]);
+                if (imageTools.has(fnName) && !resultText.includes("Error")) {
+                  let imageId: string | undefined;
+                  try {
+                    const parsed = JSON.parse(resultText);
+                    imageId = parsed.imageId || parsed.id;
+                  } catch { /* ignore parse failures */ }
+
+                  const action = fnName === "img_delete" ? "image_deleted"
+                    : fnName.includes("enhance") || fnName.includes("upscale") || fnName.includes("restore") ? "image_enhanced"
+                    : "image_created";
+
+                  controller.enqueue(
+                    sseEvent({
+                      type: "gallery_update",
+                      action,
+                      ...(imageId ? { imageId } : {}),
+                    }),
+                  );
+                }
+
                 const sig = (part.functionCall as Record<string, unknown>).thoughtSignature;
                 toolResponsesInThisTurn.push({
                   functionResponse: {
