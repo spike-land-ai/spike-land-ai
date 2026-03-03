@@ -15,8 +15,7 @@
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.27.1",
     "@spike-land-ai/mcp-server-base": "*",
-    "@spike-land-ai/shared": "*",
-    "@spike-land-ai/spacetimedb-platform": "*"
+    "@spike-land-ai/shared": "*"
   },
   "devDependencies": {
     "@spike-land-ai/eslint-config": "*",

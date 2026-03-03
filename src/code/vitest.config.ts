@@ -18,10 +18,6 @@ export default mergeConfig(
     resolve: {
       alias: {
         "@": path.resolve(__dirname, "./@"),
-        "@spike-land-ai/spacetimedb-platform/stdb-http-client": path.resolve(
-          __dirname,
-          "../spacetimedb-platform/stdb-http-client.ts",
-        ),
       },
     },
   }),

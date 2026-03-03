@@ -352,6 +352,37 @@ function TerminalToolCall({
   );
 }
 
+// ── Static color maps (avoids dynamic Tailwind class purging) ─────────────────
+const COLOR_STYLES: Record<string, {
+  glow1: string;
+  glow2: string;
+  dotActive: string;
+  progressBar: string;
+  accentText: string;
+}> = {
+  cyan: {
+    glow1: "rgba(6,182,212,0.10)",
+    glow2: "rgba(6,182,212,0.05)",
+    dotActive: "#22d3ee",
+    progressBar: "rgba(6,182,212,0.30)",
+    accentText: "#22d3ee",
+  },
+  blue: {
+    glow1: "rgba(59,130,246,0.10)",
+    glow2: "rgba(59,130,246,0.05)",
+    dotActive: "#60a5fa",
+    progressBar: "rgba(59,130,246,0.30)",
+    accentText: "#60a5fa",
+  },
+  violet: {
+    glow1: "rgba(139,92,246,0.10)",
+    glow2: "rgba(139,92,246,0.05)",
+    dotActive: "#a78bfa",
+    progressBar: "rgba(139,92,246,0.30)",
+    accentText: "#a78bfa",
+  },
+};
+
 /* ── Main Component ──────────────────────────────── */
 export function ScrollStoryCard({ title, illustration, mappings }: ScrollStoryCardProps) {
   const { ref, progress } = useInViewProgress();
@@ -360,16 +391,19 @@ export function ScrollStoryCard({ title, illustration, mappings }: ScrollStoryCa
   const resolvedMappings = Array.isArray(mappings) ? mappings : data.defaultMappings;
 
   const isTerminalMode = progress > 0.55;
+  const cs = COLOR_STYLES[data.color] ?? COLOR_STYLES.cyan;
 
   return (
     <div ref={ref} className="min-h-[70vh] flex items-center py-16 px-4">
       <div className="w-full max-w-2xl mx-auto bg-slate-900/60 border border-slate-800 rounded-[2.5rem] p-8 md:p-12 backdrop-blur-xl relative overflow-hidden ring-1 ring-white/5">
-        {/* Decorative Glow */}
+        {/* Decorative Glow — inline styles avoid Tailwind JIT purge of dynamic classes */}
         <div
-          className={`absolute -top-24 -right-24 w-64 h-64 bg-${data.color}-500/10 blur-[100px] rounded-full`}
+          className="absolute -top-24 -right-24 w-64 h-64 blur-[100px] rounded-full"
+          style={{ backgroundColor: cs.glow1 }}
         />
         <div
-          className={`absolute -bottom-24 -left-24 w-64 h-64 bg-${data.color}-500/5 blur-[80px] rounded-full`}
+          className="absolute -bottom-24 -left-24 w-64 h-64 blur-[80px] rounded-full"
+          style={{ backgroundColor: cs.glow2 }}
         />
 
         {/* Header */}
@@ -382,7 +416,11 @@ export function ScrollStoryCard({ title, illustration, mappings }: ScrollStoryCa
           </div>
           <motion.div
             animate={{ rotate: isTerminalMode ? 180 : 0 }}
-            className={`w-10 h-10 rounded-full bg-${data.color}-500/10 flex items-center justify-center border border-${data.color}-500/20`}
+            className="w-10 h-10 rounded-full flex items-center justify-center border"
+            style={{
+              backgroundColor: cs.glow1,
+              borderColor: cs.glow1.replace("0.10", "0.20"),
+            }}
           >
             <span className="text-xl">{isTerminalMode ? "⚙️" : data.scene}</span>
           </motion.div>
@@ -397,6 +435,7 @@ export function ScrollStoryCard({ title, illustration, mappings }: ScrollStoryCa
                 initial={{ opacity: 0, scale: 0.9, y: 10 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.95, y: -10 }}
+                transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
                 className="flex flex-col items-center gap-6"
               >
                 <div className="relative">
@@ -406,7 +445,7 @@ export function ScrollStoryCard({ title, illustration, mappings }: ScrollStoryCa
                   <motion.span
                     initial={{ y: 0 }}
                     animate={{ y: [0, -5, 0] }}
-                    transition={{ repeat: Infinity, duration: 3 }}
+                    transition={{ repeat: Infinity, duration: 3, ease: "easeInOut" }}
                     className="absolute -top-2 -right-4 text-3xl"
                   >
                     {data.subScene.substring(0, 2)}
@@ -422,6 +461,7 @@ export function ScrollStoryCard({ title, illustration, mappings }: ScrollStoryCa
                 initial={{ opacity: 0, scale: 1.05, y: 10 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.95, y: -10 }}
+                transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
                 className="w-full"
               >
                 <TerminalToolCall
@@ -440,8 +480,12 @@ export function ScrollStoryCard({ title, illustration, mappings }: ScrollStoryCa
             <span className="text-[10px] font-mono text-slate-500 uppercase tracking-[0.3em]">
               Translation Map
             </span>
+            {/* Gradient divider via inline style to avoid purged dynamic classes */}
             <div
-              className={`h-px flex-grow bg-gradient-to-r from-slate-800 via-${data.color}-500/20 to-transparent`}
+              className="h-px flex-grow"
+              style={{
+                background: `linear-gradient(to right, rgb(30,41,59), ${cs.glow1}, transparent)`,
+              }}
             />
           </div>
 
@@ -456,15 +500,18 @@ export function ScrollStoryCard({ title, illustration, mappings }: ScrollStoryCa
                     x: active ? 0 : -8,
                     backgroundColor: active ? "rgba(30, 41, 59, 0.4)" : "rgba(30, 41, 59, 0)",
                   }}
-                  className={`grid grid-cols-2 items-center gap-4 px-4 py-3 rounded-xl border border-transparent transition-colors duration-500 ${
+                  transition={{ duration: 0.4, ease: "easeOut" }}
+                  className={`grid grid-cols-2 items-center gap-4 px-4 py-3 rounded-xl border border-transparent ${
                     active ? "border-slate-700/50" : ""
                   }`}
                 >
                   <div className="flex items-center gap-3">
                     <div
-                      className={`w-1.5 h-1.5 rounded-full ${
-                        active ? `bg-${data.color}-400` : "bg-slate-700"
-                      } transition-colors shadow-[0_0_8px_rgba(34,211,238,0.4)]`}
+                      className="w-1.5 h-1.5 rounded-full transition-colors"
+                      style={{
+                        backgroundColor: active ? cs.dotActive : "rgb(51,65,85)",
+                        boxShadow: active ? `0 0 8px ${cs.dotActive}66` : "none",
+                      }}
                     />
                     <span className="text-sm text-slate-200 font-medium tracking-tight truncate">
                       {row.left}
@@ -472,20 +519,12 @@ export function ScrollStoryCard({ title, illustration, mappings }: ScrollStoryCa
                   </div>
                   <div className="flex items-center justify-end md:justify-start">
                     <motion.span
-                      initial={{ scale: 1, color: "#e2e8f0" }}
                       animate={
                         active
-                          ? {
-                              scale: [1, 1.05, 1],
-                              color:
-                                data.color === "cyan"
-                                  ? "#22d3ee"
-                                  : data.color === "blue"
-                                    ? "#60a5fa"
-                                    : "#a78bfa",
-                            }
-                          : {}
+                          ? { scale: [1, 1.05, 1], color: cs.accentText }
+                          : { scale: 1, color: "#e2e8f0" }
                       }
+                      transition={{ duration: 0.3 }}
                       className="text-sm font-mono font-bold tracking-tight opacity-90 truncate"
                     >
                       {row.right}
@@ -501,7 +540,9 @@ export function ScrollStoryCard({ title, illustration, mappings }: ScrollStoryCa
         <div className="absolute bottom-4 left-0 right-0 flex justify-center opacity-30">
           <motion.div
             animate={{ scaleX: progress }}
-            className={`h-0.5 w-full bg-${data.color}-500/30 origin-left`}
+            transition={{ duration: 0.1, ease: "linear" }}
+            className="h-0.5 w-full origin-left"
+            style={{ backgroundColor: cs.progressBar }}
           />
         </div>
       </div>

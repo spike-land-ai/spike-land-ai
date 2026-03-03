@@ -18,7 +18,7 @@ export function ToolsCategoryPage() {
       </div>
       <div className="rounded-xl border bg-white p-8 text-center text-gray-500">
         <p>Tools in the "{displayName}" category will appear here.</p>
-        <p className="mt-2 text-sm">Connected to SpacetimeDB for live updates.</p>
+        <p className="mt-2 text-sm">Live updates coming soon.</p>
       </div>
     </div>
   );

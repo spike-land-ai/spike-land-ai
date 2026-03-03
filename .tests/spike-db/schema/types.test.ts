@@ -1,8 +1,0 @@
-import { describe, expect, it } from "vitest";
-import { MIGRATION_KINDS } from "../../../src/spike-db/schema/types.js";
-
-describe("types", () => {
-  it("defines MIGRATION_KINDS", () => {
-    expect(MIGRATION_KINDS).toContain("add_table");
-  });
-});

@@ -1,0 +1,397 @@
+/**
+ * Orchestrator Tools
+ *
+ * MCP tools for creating execution plans, dispatching subtasks,
+ * tracking status, submitting results, and merging final output.
+ */
+
+import { z } from "zod";
+import type { CallToolResult } from "@modelcontextprotocol/sdk/types.js";
+import type { ToolRegistry } from "../tool-registry";
+import { safeToolCall, textResult } from "./tool-helpers";
+import { randomUUID } from "node:crypto";
+
+interface Subtask {
+  id: string;
+  description: string;
+  status: "pending" | "dispatched" | "running" | "completed" | "failed";
+  dependencies: string[];
+  result?: string;
+  error?: string;
+  dispatchedAt?: Date;
+  completedAt?: Date;
+}
+
+interface Plan {
+  id: string;
+  userId: string;
+  description: string;
+  context?: string;
+  status: "pending" | "in_progress" | "completed" | "failed";
+  subtasks: Subtask[];
+  createdAt: Date;
+  completedAt?: Date;
+}
+
+const plans = new Map<string, Plan>();
+
+/** Exported for testing — clears all in-memory plans. */
+export function clearPlans(): void {
+  plans.clear();
+}
+
+export function registerOrchestratorTools(
+  registry: ToolRegistry,
+  userId: string,
+): void {
+  // orchestrator_create_plan
+  registry.register({
+    name: "orchestrator_create_plan",
+    description:
+      "Create an execution plan from a task description with ordered subtasks and dependency tracking.",
+    category: "orchestrator",
+    tier: "free",
+    inputSchema: {
+      description: z.string().min(1).describe("High-level task description"),
+      subtasks: z
+        .array(
+          z.object({
+            description: z.string().min(1).describe("Subtask description"),
+            dependencies: z
+              .array(z.string())
+              .optional()
+              .describe("IDs of subtasks this depends on (e.g. subtask-1)"),
+          }),
+        )
+        .min(1)
+        .describe("List of subtasks to execute"),
+      context: z
+        .string()
+        .optional()
+        .describe("Optional repo/project context"),
+    },
+    handler: async ({
+      description,
+      subtasks,
+      context,
+    }: {
+      description: string;
+      subtasks: Array<{ description: string; dependencies?: string[]; }>;
+      context?: string;
+    }): Promise<CallToolResult> => {
+      return safeToolCall("orchestrator_create_plan", async () => {
+        const planId = randomUUID();
+        const subtaskList: Subtask[] = subtasks.map((st, idx) => ({
+          id: `subtask-${idx + 1}`,
+          description: st.description,
+          status: "pending" as const,
+          dependencies: st.dependencies ?? [],
+        }));
+
+        // Validate that all dependency references exist
+        const validIds = new Set(subtaskList.map(s => s.id));
+        for (const st of subtaskList) {
+          for (const dep of st.dependencies) {
+            if (!validIds.has(dep)) {
+              throw new Error(
+                `Subtask "${st.id}" references unknown dependency "${dep}"`,
+              );
+            }
+          }
+        }
+
+        const plan: Plan = {
+          id: planId,
+          userId,
+          description,
+          context,
+          status: "pending",
+          subtasks: subtaskList,
+          createdAt: new Date(),
+        };
+
+        plans.set(planId, plan);
+
+        let text = `**Plan Created**\n\n`;
+        text += `- **Plan ID:** \`${planId}\`\n`;
+        text += `- **Status:** ${plan.status}\n`;
+        text += `- **Subtasks:** ${subtaskList.length}\n\n`;
+        for (const st of subtaskList) {
+          const deps = st.dependencies.length > 0
+            ? ` (depends on: ${st.dependencies.join(", ")})`
+            : "";
+          text += `- \`${st.id}\`: ${st.description} [${st.status}]${deps}\n`;
+        }
+
+        return textResult(text);
+      });
+    },
+  });
+
+  // orchestrator_dispatch
+  registry.register({
+    name: "orchestrator_dispatch",
+    description:
+      "Mark a plan's ready subtasks as dispatched. Only subtasks whose dependencies are all completed will be dispatched.",
+    category: "orchestrator",
+    tier: "free",
+    inputSchema: {
+      plan_id: z.string().min(1).describe("The plan ID"),
+    },
+    handler: async ({
+      plan_id,
+    }: {
+      plan_id: string;
+    }): Promise<CallToolResult> => {
+      return safeToolCall("orchestrator_dispatch", async () => {
+        const plan = plans.get(plan_id);
+        if (!plan) {
+          throw new Error(`Plan "${plan_id}" not found`);
+        }
+        if (plan.userId !== userId) {
+          throw new Error("Unauthorized: you do not own this plan");
+        }
+
+        const completedIds = new Set(
+          plan.subtasks
+            .filter(s => s.status === "completed")
+            .map(s => s.id),
+        );
+
+        const dispatched: string[] = [];
+        for (const st of plan.subtasks) {
+          if (st.status !== "pending") continue;
+          const allDepsCompleted = st.dependencies.every(dep => completedIds.has(dep));
+          if (allDepsCompleted) {
+            st.status = "dispatched";
+            st.dispatchedAt = new Date();
+            dispatched.push(st.id);
+          }
+        }
+
+        // Update plan status to in_progress if we dispatched anything
+        if (dispatched.length > 0 && plan.status === "pending") {
+          plan.status = "in_progress";
+        }
+
+        let text: string;
+        if (dispatched.length === 0) {
+          text =
+            `**No subtasks ready for dispatch.**\nAll pending subtasks have unmet dependencies.`;
+        } else {
+          text = `**Dispatched ${dispatched.length} subtask(s):**\n\n`;
+          for (const id of dispatched) {
+            const st = plan.subtasks.find(s => s.id === id)!;
+            text += `- \`${id}\`: ${st.description}\n`;
+          }
+        }
+
+        return textResult(text);
+      });
+    },
+  });
+
+  // orchestrator_status
+  registry.register({
+    name: "orchestrator_status",
+    description: "Get current status of all subtasks in a plan.",
+    category: "orchestrator",
+    tier: "free",
+    inputSchema: {
+      plan_id: z.string().min(1).describe("The plan ID"),
+    },
+    handler: async ({
+      plan_id,
+    }: {
+      plan_id: string;
+    }): Promise<CallToolResult> => {
+      return safeToolCall("orchestrator_status", async () => {
+        const plan = plans.get(plan_id);
+        if (!plan) {
+          throw new Error(`Plan "${plan_id}" not found`);
+        }
+        if (plan.userId !== userId) {
+          throw new Error("Unauthorized: you do not own this plan");
+        }
+
+        let text = `**Plan Status: ${plan.status}**\n\n`;
+        text += `- **Description:** ${plan.description}\n`;
+        text += `- **Created:** ${plan.createdAt.toISOString()}\n`;
+        if (plan.completedAt) {
+          text += `- **Completed:** ${plan.completedAt.toISOString()}\n`;
+        }
+        text += `\n**Subtasks:**\n\n`;
+
+        for (const st of plan.subtasks) {
+          let line = `- \`${st.id}\` [${st.status}]: ${st.description}`;
+          if (st.result) {
+            line += ` — Result: ${st.result.slice(0, 100)}${st.result.length > 100 ? "..." : ""}`;
+          }
+          if (st.error) {
+            line += ` — Error: ${st.error}`;
+          }
+          text += `${line}\n`;
+        }
+
+        return textResult(text);
+      });
+    },
+  });
+
+  // orchestrator_submit_result
+  registry.register({
+    name: "orchestrator_submit_result",
+    description:
+      "Submit the result of a completed subtask. Updates subtask status and may auto-complete or auto-fail the plan.",
+    category: "orchestrator",
+    tier: "free",
+    inputSchema: {
+      plan_id: z.string().min(1).describe("The plan ID"),
+      subtask_id: z.string().min(1).describe("The subtask ID"),
+      status: z
+        .enum(["completed", "failed"])
+        .describe("Result status"),
+      result: z.string().describe("The result text"),
+      error: z.string().optional().describe("Error message if failed"),
+    },
+    handler: async ({
+      plan_id,
+      subtask_id,
+      status,
+      result,
+      error,
+    }: {
+      plan_id: string;
+      subtask_id: string;
+      status: "completed" | "failed";
+      result: string;
+      error?: string;
+    }): Promise<CallToolResult> => {
+      return safeToolCall("orchestrator_submit_result", async () => {
+        const plan = plans.get(plan_id);
+        if (!plan) {
+          throw new Error(`Plan "${plan_id}" not found`);
+        }
+        if (plan.userId !== userId) {
+          throw new Error("Unauthorized: you do not own this plan");
+        }
+
+        const subtask = plan.subtasks.find(s => s.id === subtask_id);
+        if (!subtask) {
+          throw new Error(
+            `Subtask "${subtask_id}" not found in plan "${plan_id}"`,
+          );
+        }
+
+        subtask.status = status;
+        subtask.result = result;
+        subtask.completedAt = new Date();
+        if (error) {
+          subtask.error = error;
+        }
+
+        // Update plan status
+        const allCompleted = plan.subtasks.every(
+          s => s.status === "completed",
+        );
+        const anyFailed = plan.subtasks.some(s => s.status === "failed");
+
+        if (allCompleted) {
+          plan.status = "completed";
+          plan.completedAt = new Date();
+        } else if (anyFailed) {
+          plan.status = "failed";
+        } else if (plan.status === "pending") {
+          plan.status = "in_progress";
+        }
+
+        let text = `**Subtask Updated**\n\n`;
+        text += `- **Subtask:** \`${subtask_id}\` → ${status}\n`;
+        text += `- **Plan Status:** ${plan.status}\n`;
+        if (result) {
+          text += `- **Result:** ${result.slice(0, 200)}${result.length > 200 ? "..." : ""}\n`;
+        }
+        if (error) {
+          text += `- **Error:** ${error}\n`;
+        }
+
+        return textResult(text);
+      });
+    },
+  });
+
+  // orchestrator_merge
+  registry.register({
+    name: "orchestrator_merge",
+    description: "Merge all completed subtask results into a final output in dependency order.",
+    category: "orchestrator",
+    tier: "free",
+    inputSchema: {
+      plan_id: z.string().min(1).describe("The plan ID"),
+    },
+    handler: async ({
+      plan_id,
+    }: {
+      plan_id: string;
+    }): Promise<CallToolResult> => {
+      return safeToolCall("orchestrator_merge", async () => {
+        const plan = plans.get(plan_id);
+        if (!plan) {
+          throw new Error(`Plan "${plan_id}" not found`);
+        }
+        if (plan.userId !== userId) {
+          throw new Error("Unauthorized: you do not own this plan");
+        }
+
+        if (plan.status !== "completed") {
+          throw new Error(
+            `Plan is not completed (status: ${plan.status}). Cannot merge until all subtasks are done.`,
+          );
+        }
+
+        // Topological sort by dependencies
+        const sorted = topologicalSort(plan.subtasks);
+
+        const merged = sorted
+          .map(st => `## ${st.id}: ${st.description}\n\n${st.result ?? ""}`)
+          .join("\n\n---\n\n");
+
+        let text = `**Merged Output for Plan \`${plan_id}\`**\n\n`;
+        text += merged;
+
+        return textResult(text);
+      });
+    },
+  });
+}
+
+/**
+ * Topological sort of subtasks by their dependencies.
+ * Returns subtasks in an order where each subtask appears after its dependencies.
+ */
+function topologicalSort(subtasks: Subtask[]): Subtask[] {
+  const byId = new Map<string, Subtask>();
+  for (const st of subtasks) {
+    byId.set(st.id, st);
+  }
+
+  const visited = new Set<string>();
+  const result: Subtask[] = [];
+
+  function visit(id: string): void {
+    if (visited.has(id)) return;
+    visited.add(id);
+    const st = byId.get(id);
+    if (!st) return;
+    for (const dep of st.dependencies) {
+      visit(dep);
+    }
+    result.push(st);
+  }
+
+  for (const st of subtasks) {
+    visit(st.id);
+  }
+
+  return result;
+}

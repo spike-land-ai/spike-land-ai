@@ -18,14 +18,7 @@ in `.github/.github/workflows/ci-publish.yml`.
 
 All packages live under `src/`:
 
-### SpacetimeDB (real-time backbone)
-
-| Directory                  | Package                               | Runtime                | Purpose                                                                                    |
-| -------------------------- | ------------------------------------- | ---------------------- | ------------------------------------------------------------------------------------------ |
-| `src/spacetimedb-platform` | `@spike-land-ai/spacetimedb-platform` | SpacetimeDB 2.0 (WASM) | Platform module — users, tools, apps, agents, content, messaging (14 tables, 30+ reducers) |
-| `src/spacetimedb-mcp`      | `@spike-land-ai/spacetimedb-mcp`      | Node.js                | MCP server for agent coordination — real-time messaging, tasks                             |
-
-### New Platform Stack
+### Platform Stack
 
 | Directory             | Package                          | Runtime                          | Purpose                                 |
 | --------------------- | -------------------------------- | -------------------------------- | --------------------------------------- |
@@ -78,7 +71,7 @@ All packages live under `src/`:
 
 | Directory             | Package      | Runtime    | Purpose                                                                                         |
 | --------------------- | ------------ | ---------- | ----------------------------------------------------------------------------------------------- |
-| `packages/spike.land` | `spike-land` | Next.js 16 | Legacy platform — MCP registry, app store, auth, payments (being replaced by SpacetimeDB stack) |
+| `packages/spike.land` | `spike-land` | Next.js 16 | Legacy platform — MCP registry, app store, auth, payments (being replaced by spike-app + spike-edge stack) |
 
 ## Common Commands
 
@@ -88,10 +81,6 @@ Each package has its own scripts. The most common patterns:
 # Org-wide health check (PRs, CI, issues, worktrees, dep drift)
 make health
 # or: bash .github/scripts/org-health.sh
-
-# SpacetimeDB (spacetimedb-platform)
-spacetime build                          # Compile WASM module
-spacetime publish rightful-dirt-5033     # Deploy to maincloud
 
 # spike-app (Vite + TanStack Router frontend)
 cd src/spike-app
@@ -134,18 +123,9 @@ yarn depot:ci         # Preferred CI — fast remote builds via Depot
 
 ## Architecture
 
-### SpacetimeDB Real-Time Backbone (spacetimedb-platform, spacetimedb-mcp)
-
-The platform is migrating to SpacetimeDB 2.0 as the core data layer. The
-`spacetimedb-platform` module defines 14 tables and 30+ reducers covering users,
-tools, apps, agents, content, and messaging. The `spacetimedb-mcp` module
-provides agent coordination with real-time messaging and task management.
-Server: `maincloud`, database: `rightful-dirt-5033`.
-
 ### Frontend (spike-app)
 
-Vite + React + TanStack Router SPA replacing the Next.js UI. Talks to spike-edge
-and SpacetimeDB directly.
+Vite + React + TanStack Router SPA replacing the Next.js UI. Talks to spike-edge.
 
 ### Edge Services (spike-edge, spike-land-mcp, mcp-auth, spike-land-backend, transpile)
 
@@ -166,8 +146,7 @@ streaming). See `src/react-ts-worker/CLAUDE.md` for architecture details.
 Multiple MCP servers following a common pattern: `@modelcontextprotocol/sdk` +
 Zod validation + Vitest tests. `mcp-server-base` provides shared utilities.
 `spike-land-mcp` acts as the MCP registry aggregating 80+ tools. Additional MCP
-servers: esbuild-wasm-mcp, hackernews-mcp, mcp-image-studio, openclaw-mcp,
-spacetimedb-mcp.
+servers: esbuild-wasm-mcp, hackernews-mcp, mcp-image-studio, openclaw-mcp.
 
 ### Domain Packages
 
@@ -178,8 +157,8 @@ spacetimedb-mcp.
 ### Legacy Platform (spike.land)
 
 Next.js 16 App Router application with ~520 routes, ~383 API endpoints,
-PostgreSQL + Prisma, Stripe payments. Being replaced by the SpacetimeDB +
-spike-app + spike-edge stack. Has its own detailed
+PostgreSQL + Prisma, Stripe payments. Being replaced by the spike-app +
+spike-edge stack. Has its own detailed
 `packages/spike.land/CLAUDE.md` with ticket-driven workflow requirements.
 
 ## CI/CD
@@ -214,7 +193,7 @@ receive a PR bumping the version.
 | `@spike-land-ai/shared`           | mcp-image-studio, spike-land-mcp, spike.land                                                                                                                                                                                    |
 | `@spike-land-ai/react-ts-worker`  | spike.land                                                                                                                                                                                                                      |
 | `@spike-land-ai/spike-cli`        | spike.land                                                                                                                                                                                                                      |
-| `@spike-land-ai/eslint-config`    | chess-engine, code, esbuild-wasm-mcp, hackernews-mcp, mcp-image-studio, mcp-server-base, openclaw-mcp, react-ts-worker, shared, spacetimedb-platform, spike-app, spike-cli, spike-edge, spike-review, state-machine, spike.land |
+| `@spike-land-ai/eslint-config`    | chess-engine, code, esbuild-wasm-mcp, hackernews-mcp, mcp-image-studio, mcp-server-base, openclaw-mcp, react-ts-worker, shared, spike-app, spike-cli, spike-edge, spike-review, state-machine, spike.land |
 | `@spike-land-ai/tsconfig`         | chess-engine, code, esbuild-wasm-mcp, hackernews-mcp, mcp-image-studio, mcp-server-base, openclaw-mcp, react-ts-worker, shared, spike-cli, spike-review, state-machine, spike.land                                              |
 
 ### Key files
@@ -237,8 +216,8 @@ bash .github/scripts/verify-deps.sh
 - `vinext.spike.land` — uses git-SHA deps, not registry versions
 - Leaf MCP servers (hackernews-mcp, mcp-image-studio, openclaw-mcp,
   spike-review, vibe-dev) — no internal deps
-- New leaf packages (spacetimedb-mcp, mcp-auth, spike-app, spike-edge,
-  qa-studio, state-machine, chess-engine) — no internal deps
+- New leaf packages (mcp-auth, spike-app, spike-edge, qa-studio, state-machine,
+  chess-engine) — no internal deps
 
 ## Content
 

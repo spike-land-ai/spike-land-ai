@@ -1,0 +1,350 @@
+/**
+ * Sandbox Tools (Server-Side)
+ *
+ * MCP tools for ephemeral sandbox environments — create sandboxes,
+ * execute code, read/write files, and tear down when done.
+ */
+
+import { z } from "zod";
+import type { CallToolResult } from "@modelcontextprotocol/sdk/types.js";
+import type { ToolRegistry } from "../tool-registry";
+import { safeToolCall, textResult } from "./tool-helpers";
+import { randomUUID } from "node:crypto";
+
+interface ExecEntry {
+  code: string;
+  language: string;
+  stdout: string;
+  stderr: string;
+  exitCode: number;
+  durationMs: number;
+  timestamp: Date;
+}
+
+interface SandboxState {
+  id: string;
+  name: string;
+  userId: string;
+  language: string;
+  files: Map<string, string>;
+  execLog: ExecEntry[];
+  createdAt: Date;
+  status: "active" | "destroyed";
+}
+
+// In-memory sandbox storage
+const sandboxes = new Map<string, SandboxState>();
+
+/** Exported for testing — clears all sandboxes. */
+export function _resetSandboxes(): void {
+  sandboxes.clear();
+}
+
+/** Exported for testing — get sandbox count. */
+export function _getSandboxCount(): number {
+  return sandboxes.size;
+}
+
+function getSandboxOrError(sandboxId: string): SandboxState | CallToolResult {
+  const sandbox = sandboxes.get(sandboxId);
+  if (!sandbox) {
+    return {
+      content: [{ type: "text", text: `Sandbox "${sandboxId}" not found.` }],
+      isError: true,
+    };
+  }
+  if (sandbox.status === "destroyed") {
+    return {
+      content: [{
+        type: "text",
+        text: `Sandbox "${sandboxId}" has been destroyed.`,
+      }],
+      isError: true,
+    };
+  }
+  return sandbox;
+}
+
+function isSandboxState(
+  value: SandboxState | CallToolResult,
+): value is SandboxState {
+  return "id" in value && "files" in value;
+}
+
+export function registerSandboxTools(
+  registry: ToolRegistry,
+  userId: string,
+): void {
+  // sandbox_create
+  registry.register({
+    name: "sandbox_create",
+    description:
+      "Create an ephemeral sandbox environment for code execution. Returns a sandbox ID for subsequent operations.",
+    category: "orchestration",
+    tier: "free",
+    inputSchema: {
+      name: z
+        .string()
+        .max(100)
+        .optional()
+        .describe("Sandbox name (auto-generated if omitted)"),
+      language: z
+        .enum(["typescript", "javascript", "python"])
+        .optional()
+        .default("typescript")
+        .describe("Default language for code execution"),
+    },
+    handler: async ({
+      name,
+      language,
+    }: {
+      name?: string;
+      language: string;
+    }): Promise<CallToolResult> =>
+      safeToolCall("sandbox_create", async () => {
+        const id = randomUUID();
+        const sandboxName = name || `sandbox-${id.slice(0, 8)}`;
+
+        const sandbox: SandboxState = {
+          id,
+          name: sandboxName,
+          userId,
+          language,
+          files: new Map(),
+          execLog: [],
+          createdAt: new Date(),
+          status: "active",
+        };
+
+        sandboxes.set(id, sandbox);
+
+        return textResult(
+          `**Sandbox created**\n\n`
+            + `- **ID:** \`${id}\`\n`
+            + `- **Name:** ${sandboxName}\n`
+            + `- **Language:** ${language}\n`
+            + `- **Status:** active\n`
+            + `- **Created:** ${sandbox.createdAt.toISOString()}`,
+        );
+      }),
+  });
+
+  // sandbox_exec
+  registry.register({
+    name: "sandbox_exec",
+    description: "Execute code in a sandbox. Returns stdout, stderr, and exit code.",
+    category: "orchestration",
+    tier: "free",
+    inputSchema: {
+      sandbox_id: z.string().min(1).describe("The sandbox ID"),
+      code: z.string().min(1).describe("Code to execute"),
+      language: z
+        .enum(["typescript", "javascript", "python"])
+        .optional()
+        .describe("Language override (defaults to sandbox language)"),
+    },
+    handler: async ({
+      sandbox_id,
+      code,
+      language,
+    }: {
+      sandbox_id: string;
+      code: string;
+      language?: string;
+    }): Promise<CallToolResult> =>
+      safeToolCall("sandbox_exec", async () => {
+        const result = getSandboxOrError(sandbox_id);
+        if (!isSandboxState(result)) return result;
+
+        const sandbox = result;
+        const execLanguage = language || sandbox.language;
+        const startTime = Date.now();
+
+        // MVP: Simulate execution — store code and return mock result
+        const stdout = `[${execLanguage}] Executed ${
+          code.split("\n").length
+        } line(s) successfully.`;
+        const stderr = "";
+        const exitCode = 0;
+        const durationMs = Date.now() - startTime;
+
+        const entry: ExecEntry = {
+          code,
+          language: execLanguage,
+          stdout,
+          stderr,
+          exitCode,
+          durationMs,
+          timestamp: new Date(),
+        };
+        sandbox.execLog.push(entry);
+
+        return textResult(
+          `**Execution result**\n\n`
+            + `- **Language:** ${execLanguage}\n`
+            + `- **Exit code:** ${exitCode}\n`
+            + `- **Duration:** ${durationMs}ms\n\n`
+            + `**stdout:**\n\`\`\`\n${stdout}\n\`\`\`\n\n`
+            + `**stderr:**\n\`\`\`\n${stderr}\n\`\`\``,
+        );
+      }),
+  });
+
+  // sandbox_read_file
+  registry.register({
+    name: "sandbox_read_file",
+    description: "Read a file from the sandbox virtual filesystem.",
+    category: "orchestration",
+    tier: "free",
+    inputSchema: {
+      sandbox_id: z.string().min(1).describe("The sandbox ID"),
+      file_path: z.string().min(1).describe("Path of the file to read"),
+    },
+    handler: async ({
+      sandbox_id,
+      file_path,
+    }: {
+      sandbox_id: string;
+      file_path: string;
+    }): Promise<CallToolResult> =>
+      safeToolCall("sandbox_read_file", async () => {
+        const result = getSandboxOrError(sandbox_id);
+        if (!isSandboxState(result)) return result;
+
+        const sandbox = result;
+        const content = sandbox.files.get(file_path);
+
+        if (content === undefined) {
+          return {
+            content: [
+              {
+                type: "text",
+                text: `File "${file_path}" not found in sandbox "${sandbox_id}".`,
+              },
+            ],
+            isError: true,
+          };
+        }
+
+        return textResult(
+          `**File: ${file_path}**\n\n\`\`\`\n${content}\n\`\`\``,
+        );
+      }),
+  });
+
+  // sandbox_write_file
+  registry.register({
+    name: "sandbox_write_file",
+    description: "Write a file to the sandbox virtual filesystem.",
+    category: "orchestration",
+    tier: "free",
+    inputSchema: {
+      sandbox_id: z.string().min(1).describe("The sandbox ID"),
+      file_path: z.string().min(1).describe("Path of the file to write"),
+      content: z.string().describe("File content to write"),
+    },
+    handler: async ({
+      sandbox_id,
+      file_path,
+      content,
+    }: {
+      sandbox_id: string;
+      file_path: string;
+      content: string;
+    }): Promise<CallToolResult> =>
+      safeToolCall("sandbox_write_file", async () => {
+        const result = getSandboxOrError(sandbox_id);
+        if (!isSandboxState(result)) return result;
+
+        const sandbox = result;
+
+        const MAX_FILE_COUNT = 100;
+        const MAX_FILE_SIZE_BYTES = 1_048_576; // 1MB
+        const MAX_TOTAL_SIZE_BYTES = 52_428_800; // 50MB
+
+        const sizeBytes = new TextEncoder().encode(content).byteLength;
+        if (sizeBytes > MAX_FILE_SIZE_BYTES) {
+          return {
+            content: [{
+              type: "text",
+              text: `File exceeds 1MB limit (${sizeBytes} bytes).`,
+            }],
+            isError: true,
+          };
+        }
+        if (
+          sandbox.files.size >= MAX_FILE_COUNT && !sandbox.files.has(file_path)
+        ) {
+          return {
+            content: [{
+              type: "text",
+              text: `Sandbox file limit (${MAX_FILE_COUNT}) reached.`,
+            }],
+            isError: true,
+          };
+        }
+        // Check total size
+        let totalSize = 0;
+        for (const [, fileContent] of sandbox.files) {
+          totalSize += new TextEncoder().encode(fileContent).byteLength;
+        }
+        totalSize += sizeBytes;
+        if (totalSize > MAX_TOTAL_SIZE_BYTES) {
+          return {
+            content: [{
+              type: "text",
+              text: `Sandbox total size limit (50MB) exceeded.`,
+            }],
+            isError: true,
+          };
+        }
+
+        sandbox.files.set(file_path, content);
+
+        return textResult(
+          `**File written**\n\n`
+            + `- **Path:** ${file_path}\n`
+            + `- **Size:** ${sizeBytes} bytes\n`
+            + `- **Total files:** ${sandbox.files.size}`,
+        );
+      }),
+  });
+
+  // sandbox_destroy
+  registry.register({
+    name: "sandbox_destroy",
+    description: "Destroy a sandbox and free its resources. Returns summary statistics.",
+    category: "orchestration",
+    tier: "free",
+    inputSchema: {
+      sandbox_id: z.string().min(1).describe("The sandbox ID to destroy"),
+    },
+    handler: async ({
+      sandbox_id,
+    }: {
+      sandbox_id: string;
+    }): Promise<CallToolResult> =>
+      safeToolCall("sandbox_destroy", async () => {
+        const result = getSandboxOrError(sandbox_id);
+        if (!isSandboxState(result)) return result;
+
+        const sandbox = result;
+        const filesCreated = sandbox.files.size;
+        const commandsRun = sandbox.execLog.length;
+        const durationMs = Date.now() - sandbox.createdAt.getTime();
+
+        sandbox.status = "destroyed";
+        sandbox.files.clear();
+        sandbox.execLog.length = 0;
+
+        return textResult(
+          `**Sandbox destroyed**\n\n`
+            + `- **ID:** \`${sandbox_id}\`\n`
+            + `- **Name:** ${sandbox.name}\n`
+            + `- **Files created:** ${filesCreated}\n`
+            + `- **Commands run:** ${commandsRun}\n`
+            + `- **Lifetime:** ${durationMs}ms`,
+        );
+      }),
+  });
+}

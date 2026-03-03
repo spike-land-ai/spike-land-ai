@@ -18,7 +18,6 @@ export function createApp(): Hono<{ Bindings: Env; Variables: AuthVariables }> {
         "https://spike.land",
         "https://staging.spike.land",
         "http://localhost:3000",
-        "https://6f02b08d.my-spacetime-app.pages.dev",
       ],
       allowHeaders: ["Authorization", "Content-Type"],
       allowMethods: ["GET", "POST", "DELETE", "OPTIONS"],

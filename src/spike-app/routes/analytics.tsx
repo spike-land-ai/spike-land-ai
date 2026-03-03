@@ -1,5 +1,4 @@
 import { useMemo, useState } from "react";
-import { useTable } from "@/hooks/useTable";
 
 type TimeRange = "24h" | "7d" | "30d";
 
@@ -86,9 +85,10 @@ export function AnalyticsPage() {
   const [timeRange, setTimeRange] = useState<TimeRange>("24h");
   const cutoff = Date.now() - timeRangeToMs(timeRange);
 
-  const allEvents = useTable<PlatformEvent>("PlatformEvent");
-  const agents = useTable<Agent>("Agent");
-  const apps = useTable<App>("App");
+  // TODO: wire up to edge API
+  const allEvents: PlatformEvent[] = [];
+  const agents: Agent[] = [];
+  const apps: App[] = [];
 
   const filteredEvents = useMemo(
     () => allEvents.filter((e) => e.created_at >= cutoff),

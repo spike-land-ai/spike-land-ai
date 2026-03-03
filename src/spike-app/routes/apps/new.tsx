@@ -1,7 +1,6 @@
 import { type ChangeEvent, type FormEvent, useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { type AppStatus, StatusBadge } from "@/components/StatusBadge";
-import { useStdb } from "@/hooks/useStdb";
 
 const steps = ["Details", "Prompt", "Review"] as const;
 
@@ -56,7 +55,6 @@ export function AppsNewPage() {
     prompt: "",
   });
 
-  const { client, connected } = useStdb();
   const navigate = useNavigate();
 
   function update(field: keyof FormData, value: string) {
@@ -99,16 +97,6 @@ export function AppsNewPage() {
       setBuildStatus("drafting");
       await new Promise((r) => setTimeout(r, 800));
       setBuildStatus("building");
-
-      if (connected) {
-        client.recordEvent("create_app", {
-          name: data.name,
-          slug: data.slug,
-          description: data.description,
-          category: data.category,
-          prompt: data.prompt,
-        });
-      }
 
       await new Promise((r) => setTimeout(r, 1000));
       setBuildStatus("live");

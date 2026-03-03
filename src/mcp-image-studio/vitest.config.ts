@@ -18,7 +18,6 @@ export default mergeConfig(
           "index.ts",
           "generated/**",
           "cli-server.ts",
-          "db-spacetime.ts",
         ],
       },
     },

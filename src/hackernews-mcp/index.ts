@@ -7,8 +7,7 @@
  */
 
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { createLiveSpacetimeMcpClient } from "@spike-land-ai/spacetimedb-mcp/client";
-import { SpacetimeServerTransport } from "@spike-land-ai/spacetimedb-mcp/transport";
+import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { SessionManager } from "./session/session-manager.js";
 import { HNReadClient } from "./clients/hn-read-client.js";
 import { HNWriteClient } from "./clients/hn-write-client.js";
@@ -41,11 +40,8 @@ registerSubmitTools(server, writeClient);
 registerVoteTools(server, writeClient);
 registerCommentTools(server, writeClient);
 
-// Start server on SpacetimeDB Swarm
-const client = createLiveSpacetimeMcpClient();
-await client.connect("ws://localhost:3000", "spike-platform");
-
-const transport = new SpacetimeServerTransport(client, "hackernews");
+// Start server on stdio
+const transport = new StdioServerTransport();
 await server.connect(transport);
 
-console.error("HackerNews MCP Swarm Node Connected to SpacetimeDB.");
+console.error("HackerNews MCP Server running on stdio.");

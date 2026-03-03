@@ -4,7 +4,6 @@ import { type AppStatus, StatusBadge } from "@/components/StatusBadge";
 import { ChatThread, type Message } from "@/components/ChatThread";
 import { type AppVersion, VersionHistory } from "@/components/VersionHistory";
 import { LivePreview } from "@/components/LivePreview";
-import { useStdb } from "@/hooks/useStdb";
 
 const tabs = ["Chat", "Versions", "Preview"] as const;
 type Tab = (typeof tabs)[number];
@@ -32,8 +31,6 @@ export function AppDetailPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [appStatus] = useState<AppStatus>("live");
 
-  const { client, connected } = useStdb();
-
   const handleSendMessage = useCallback(
     (content: string) => {
       const userMsg: Message = {
@@ -44,10 +41,6 @@ export function AppDetailPage() {
       };
       setMessages((prev) => [...prev, userMsg]);
       setIsLoading(true);
-
-      if (connected) {
-        client.recordEvent("send_message", { appId, content });
-      }
 
       // Simulate assistant response
       setTimeout(() => {
@@ -64,13 +57,11 @@ export function AppDetailPage() {
         setIsLoading(false);
       }, 1500);
     },
-    [appId, client, connected],
+    [appId],
   );
 
-  function handleAction(action: "archive" | "delete" | "restore") {
-    if (connected) {
-      client.recordEvent("app_action", { appId, action });
-    }
+  function handleAction(_action: "archive" | "delete" | "restore") {
+    // TODO: wire up to edge API
   }
 
   return (

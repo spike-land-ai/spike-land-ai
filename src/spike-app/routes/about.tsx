@@ -8,7 +8,7 @@ export function AboutPage() {
         <p className="leading-relaxed text-gray-700">
           spike.land is an AI development platform for building, deploying, and managing AI-powered
           applications with real-time collaboration. It combines a powerful MCP tool registry, live
-          code editing, and SpacetimeDB-backed real-time state into a single cohesive platform.
+          code editing, and real-time collaboration into a single cohesive platform.
         </p>
       </section>
 
@@ -16,7 +16,7 @@ export function AboutPage() {
         <h2 className="text-xl font-semibold">Key Features</h2>
         <ul className="list-inside list-disc space-y-2 text-gray-700">
           <li>80+ MCP tools available through the tool registry</li>
-          <li>Real-time collaboration powered by SpacetimeDB</li>
+          <li>Real-time collaboration</li>
           <li>Live code editor with Monaco and instant preview</li>
           <li>App store for discovering and sharing AI applications</li>
           <li>Edge-deployed on Cloudflare Workers for global low-latency access</li>

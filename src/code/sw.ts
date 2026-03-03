@@ -117,7 +117,6 @@ self.addEventListener("fetch", (event) => {
     request.method !== "GET" ||
     url.protocol.startsWith("chrome-extension") ||
     url.pathname.startsWith("/api/") ||
-    url.pathname.includes("/spacetimedb") ||
     url.protocol === "ws:" ||
     url.protocol === "wss:"
   ) {

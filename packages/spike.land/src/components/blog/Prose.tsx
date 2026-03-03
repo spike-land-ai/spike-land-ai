@@ -13,10 +13,7 @@ export function Prose({ children, className, ...props }: ProseProps) {
   return (
     <div
       className={cn(
-        // Base typography
         "prose-blog",
-        // Max width for readability
-        "max-w-none",
         className,
       )}
       {...props}

@@ -37,20 +37,6 @@ analytics.post("/analytics/ingest", async (c) => {
     return c.json({ error: "No valid events in batch" }, 400);
   }
 
-  // Forward to SpacetimeDB via HTTP API
-  if (c.env.SPACETIMEDB_URI) {
-    try {
-      await fetch(`${c.env.SPACETIMEDB_URI}/api/v1/analytics/ingest`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(events),
-      });
-    } catch {
-      // Log but don't fail the request — analytics is best-effort
-      console.error("Failed to forward analytics to SpacetimeDB");
-    }
-  }
-
   return c.json({ accepted: events.length });
 });
 

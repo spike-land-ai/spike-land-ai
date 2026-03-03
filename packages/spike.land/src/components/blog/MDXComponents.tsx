@@ -5,13 +5,36 @@ import { Link } from "@/components/ui/link";
 import type { MDXComponents } from "mdx/types";
 import dynamic from "next/dynamic";
 import Image from "next/image";
-import type { ComponentPropsWithoutRef } from "react";
+import React, { type ComponentPropsWithoutRef } from "react";
 
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 import { ImagePlaceholder } from "./ImagePlaceholder";
+import { InteractiveBlogErrorBoundary } from "./interactive/InteractiveBlogErrorBoundary";
 import { ReadAloudParagraph } from "./ReadAloudButton";
+
+// ---------------------------------------------------------------------------
+// Helper: wraps a dynamic component in an InteractiveBlogErrorBoundary so that
+// a crash in one animation never breaks the entire blog post.
+// ---------------------------------------------------------------------------
+function withInteractiveBoundary<T extends object>(
+  Component: React.ComponentType<T>,
+  componentName: string,
+): React.FC<T> {
+  const Wrapped: React.FC<T> = (props) => (
+    <InteractiveBlogErrorBoundary componentName={componentName}>
+      <Component {...props} />
+    </InteractiveBlogErrorBoundary>
+  );
+  Wrapped.displayName = `WithBoundary(${componentName})`;
+  return Wrapped;
+}
+
+// Skeleton shared across all interactive full-width components
+const InteractiveSkeleton = () => (
+  <div className="w-full aspect-video bg-muted animate-pulse rounded-xl my-16" />
+);
 
 // Dynamic imports with SSR disabled to prevent React hooks errors during static generation
 const ImageComparisonSlider = dynamic(
@@ -164,11 +187,13 @@ function CTAButton({ href, children }: { href: string; children: React.ReactNode
  */
 function CustomLink({ href, children, ...props }: ComponentPropsWithoutRef<"a">) {
   const isExternal = href?.startsWith("http");
+  const linkClass =
+    "text-cyan-500 underline underline-offset-2 decoration-cyan-500/40 hover:text-cyan-400 hover:decoration-cyan-400 transition-colors duration-150";
   if (isExternal) {
     return (
       <a
         href={href}
-        className="text-primary hover:underline transition-colors"
+        className={linkClass}
         target="_blank"
         rel="noopener noreferrer"
         {...props}
@@ -181,11 +206,7 @@ function CustomLink({ href, children, ...props }: ComponentPropsWithoutRef<"a">)
     Object.entries(props).filter(([, v]) => v !== undefined),
   );
   return (
-    <Link
-      href={href || "#"}
-      className="text-primary hover:underline transition-colors"
-      {...filteredProps}
-    >
+    <Link href={href || "#"} className={linkClass} {...filteredProps}>
       {children}
     </Link>
   );
@@ -198,13 +219,16 @@ function CustomCode({ children, className, ...props }: ComponentPropsWithoutRef<
   const isInline = !className;
   if (isInline) {
     return (
-      <code className="font-mono text-sm bg-muted px-1.5 py-0.5 rounded" {...props}>
+      <code
+        className="font-mono text-[0.85em] bg-muted/80 text-cyan-400 px-1.5 py-0.5 rounded border border-border/60"
+        {...props}
+      >
         {children}
       </code>
     );
   }
   return (
-    <code className="font-mono text-sm" {...props}>
+    <code className={cn("font-mono text-sm leading-relaxed", className)} {...props}>
       {children}
     </code>
   );
@@ -218,14 +242,18 @@ function CustomImage({ src, alt }: { src?: string; alt?: string }) {
     return null;
   }
   return (
-    <span className="block my-6">
+    <span className="block my-8 not-prose">
       <Image
         src={src}
         alt={alt || ""}
         width={1200}
         height={675}
-        className="rounded-lg w-full h-auto"
+        className="rounded-xl w-full h-auto shadow-md border border-border/40 object-cover"
+        style={{ aspectRatio: "auto" }}
       />
+      {alt && (
+        <span className="block mt-2 text-center text-xs text-muted-foreground italic">{alt}</span>
+      )}
     </span>
   );
 }
@@ -330,24 +358,36 @@ function PDFViewer({
  * These override default HTML elements with styled versions
  */
 export const mdxComponents: MDXComponents = {
-  // Headings with Montserrat font
+  // Headings with Montserrat font (font-heading class)
   h1: ({ children, ...props }: ComponentPropsWithoutRef<"h1">) => (
-    <h1 className="font-heading text-4xl font-bold mt-12 mb-6 text-foreground" {...props}>
+    <h1
+      className="font-heading text-4xl font-bold mt-14 mb-6 text-foreground tracking-tight leading-tight"
+      {...props}
+    >
       {children}
     </h1>
   ),
   h2: ({ children, ...props }: ComponentPropsWithoutRef<"h2">) => (
-    <h2 className="font-heading text-3xl font-bold mt-10 mb-4 text-foreground" {...props}>
+    <h2
+      className="font-heading text-3xl font-bold mt-12 mb-5 text-foreground tracking-tight leading-snug border-b border-border/50 pb-2"
+      {...props}
+    >
       {children}
     </h2>
   ),
   h3: ({ children, ...props }: ComponentPropsWithoutRef<"h3">) => (
-    <h3 className="font-heading text-2xl font-semibold mt-8 mb-3 text-foreground" {...props}>
+    <h3
+      className="font-heading text-2xl font-semibold mt-10 mb-4 text-foreground tracking-tight leading-snug"
+      {...props}
+    >
       {children}
     </h3>
   ),
   h4: ({ children, ...props }: ComponentPropsWithoutRef<"h4">) => (
-    <h4 className="font-heading text-xl font-semibold mt-6 mb-2 text-foreground" {...props}>
+    <h4
+      className="font-heading text-xl font-semibold mt-8 mb-3 text-foreground/90 tracking-tight"
+      {...props}
+    >
       {children}
     </h4>
   ),
@@ -357,105 +397,111 @@ export const mdxComponents: MDXComponents = {
   // contains block-level elements (e.g., interactive components inside paragraphs)
   p: ({ children, ...props }: ComponentPropsWithoutRef<"p">) => (
     <ReadAloudParagraph>
-      <div className="text-foreground leading-relaxed mb-6" {...props}>
+      <div className="text-foreground/90 leading-7 mb-6 text-base" {...props}>
         {children}
       </div>
     </ReadAloudParagraph>
   ),
 
-  // Links with Pixel Cyan color
+  // Links with cyan accent color
   a: CustomLink,
 
-  // Lists
+  // Lists with proper indentation and custom markers
   ul: ({ children, ...props }: ComponentPropsWithoutRef<"ul">) => (
-    <ul className="list-disc list-inside space-y-2 mb-6 text-foreground" {...props}>
+    <ul className="my-6 ml-6 list-disc space-y-1.5 text-foreground/90" {...props}>
       {children}
     </ul>
   ),
   ol: ({ children, ...props }: ComponentPropsWithoutRef<"ol">) => (
-    <ol className="list-decimal list-inside space-y-2 mb-6 text-foreground" {...props}>
+    <ol className="my-6 ml-6 list-decimal space-y-1.5 text-foreground/90" {...props}>
       {children}
     </ol>
   ),
   li: ({ children, ...props }: ComponentPropsWithoutRef<"li">) => (
-    <li className="leading-relaxed" {...props}>
+    <li className="leading-7 marker:text-cyan-500" {...props}>
       {children}
     </li>
   ),
 
-  // Blockquotes
+  // Blockquotes with subtle left border and background
   blockquote: ({ children, ...props }: ComponentPropsWithoutRef<"blockquote">) => (
     <blockquote
-      className="border-l-4 border-primary pl-4 py-2 my-6 text-muted-foreground italic flex items-center min-h-[3rem]"
+      className="border-l-4 border-cyan-500/60 bg-muted/30 pl-5 pr-4 py-3 my-8 rounded-r-lg text-muted-foreground italic"
       {...props}
     >
-      <div>{children}</div>
+      {children}
     </blockquote>
   ),
 
-  // Code blocks
+  // Code blocks with richer styling
   pre: ({ children, ...props }: ComponentPropsWithoutRef<"pre">) => (
-    <pre className="bg-card rounded-lg p-4 overflow-x-auto my-6 border border-border" {...props}>
+    <pre
+      className="bg-zinc-950 text-zinc-100 rounded-xl p-5 overflow-x-auto my-8 border border-border/60 shadow-md text-sm leading-relaxed"
+      {...props}
+    >
       {children}
     </pre>
   ),
   code: CustomCode,
 
   // Horizontal rule
-  hr: () => <hr className="my-8 border-border" />,
+  hr: () => <hr className="my-10 border-border/60" />,
 
   // Strong/bold
   strong: ({ children, ...props }: ComponentPropsWithoutRef<"strong">) => (
-    <strong className="font-bold text-foreground" {...props}>
+    <strong className="font-semibold text-foreground" {...props}>
       {children}
     </strong>
   ),
 
   // Emphasis/italic
   em: ({ children, ...props }: ComponentPropsWithoutRef<"em">) => (
-    <em className="italic" {...props}>
+    <em className="italic text-foreground/80" {...props}>
       {children}
     </em>
   ),
 
-  // Tables
+  // Tables with alternating row backgrounds
   table: ({ children, ...props }: ComponentPropsWithoutRef<"table">) => (
-    <div className="my-6 w-full overflow-x-auto">
+    <div className="my-8 w-full overflow-x-auto rounded-xl border border-border shadow-sm">
       <table className="w-full border-collapse text-sm" {...props}>
         {children}
       </table>
     </div>
   ),
   thead: ({ children, ...props }: ComponentPropsWithoutRef<"thead">) => (
-    <thead className="bg-muted/50" {...props}>
+    <thead className="bg-muted/70 border-b border-border" {...props}>
       {children}
     </thead>
   ),
   tbody: ({ children, ...props }: ComponentPropsWithoutRef<"tbody">) => (
-    <tbody className="divide-y divide-border" {...props}>
+    <tbody className="[&>tr:nth-child(even)]:bg-muted/20" {...props}>
       {children}
     </tbody>
   ),
   tr: ({ children, ...props }: ComponentPropsWithoutRef<"tr">) => (
-    <tr className="border-b border-border transition-colors hover:bg-muted/30" {...props}>
+    <tr
+      className="border-b border-border/50 last:border-0 transition-colors hover:bg-muted/40"
+      {...props}
+    >
       {children}
     </tr>
   ),
   th: ({ children, ...props }: ComponentPropsWithoutRef<"th">) => (
     <th
-      className="px-4 py-3 text-left font-semibold text-foreground border-b border-border"
+      className="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground"
       {...props}
     >
       {children}
     </th>
   ),
   td: ({ children, ...props }: ComponentPropsWithoutRef<"td">) => (
-    <td className="px-4 py-3 text-foreground" {...props}>
+    <td className="px-5 py-3 text-foreground/90 align-top" {...props}>
       {children}
     </td>
   ),
 
-  // Images with Next.js Image component
+  // Images with Next.js Image component and rounded corners
   img: CustomImage,
 
   // Custom components for MDX

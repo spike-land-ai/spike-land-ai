@@ -138,15 +138,6 @@ packages:
       registries: [github, npm]
     mirror: spike-land-ai/react-ts-worker
 
-  spacetimedb-platform:
-    kind: library
-    version: 1.0.0
-    description: SpacetimeDB platform module (14 tables, 30+ reducers)
-    entry: index.ts
-    publish:
-      registries: [github]
-    mirror: spike-land-ai/spacetimedb-platform
-
   # ─── MCP Servers ────────────────────────────────────────────────────────────
   bazdmeg-mcp:
     kind: mcp-server
@@ -186,7 +177,7 @@ packages:
     description: AI image generation, enhancement, albums & pipelines
     entry: index.ts
     bin: cli-server.js
-    deps: [mcp-server-base, shared, spacetimedb-platform]
+    deps: [mcp-server-base, shared]
     publish:
       registries: [github]
     mirror: spike-land-ai/mcp-image-studio
@@ -200,16 +191,6 @@ packages:
     publish:
       registries: [github]
     mirror: spike-land-ai/openclaw-mcp
-
-  spacetimedb-mcp:
-    kind: mcp-server
-    version: 1.0.0
-    description: MCP server for SpacetimeDB agent coordination
-    entry: index.ts
-    bin: index.js
-    deps: [mcp-server-base]
-    publish:
-      registries: [github]
 
   spike-review:
     kind: mcp-server
@@ -237,7 +218,7 @@ packages:
     entry: index.ts
     bin: index.js
     binName: spike
-    deps: [spacetimedb-platform]
+    deps: []
     publish:
       registries: [github]
     mirror: spike-land-ai/spike-cli
@@ -388,26 +369,13 @@ packages:
         - pattern: auth-mcp.spike.land
           custom_domain: true
 
-  spike-db:
-    kind: worker
-    version: 1.0.0
-    description: Cloudflare Workers Durable Objects SQLite database
-    entry: worker/index.ts
-    worker:
-      name: spike-db
-      compatibility_date: "2025-01-01"
-      compatibility_flags: [nodejs_compat]
-      durable_objects:
-        - name: SPIKE_DATABASE
-          class_name: SpikeDatabase
-          sqlite: true
 
   code:
     kind: browser
     version: 1.0.0
     description: Monaco Editor-based code editor with live preview
     entry: modules.ts
-    deps: [esbuild-wasm, spacetimedb-platform, esbuild-wasm-mcp]
+    deps: [esbuild-wasm, esbuild-wasm-mcp]
     publish:
       registries: [github]
     mirror: spike-land-ai/code

@@ -1,0 +1,114 @@
+/**
+ * Blog MCP Tools
+ *
+ * Read-only access to published blog posts (file-based MDX content).
+ */
+
+import { z } from "zod";
+import type { CallToolResult } from "@modelcontextprotocol/sdk/types.js";
+import type { ToolRegistry } from "../tool-registry";
+import { safeToolCall, textResult } from "./tool-helpers";
+
+const ListPostsSchema = z.object({
+  category: z.string().optional().describe("Filter by category."),
+  tag: z.string().optional().describe("Filter by tag."),
+  featured: z.boolean().optional().describe("Filter featured posts only."),
+  limit: z.number().int().min(1).max(100).optional().describe(
+    "Max results (default 20).",
+  ),
+  offset: z.number().int().min(0).optional().describe(
+    "Offset for pagination (default 0).",
+  ),
+});
+
+const GetPostSchema = z.object({
+  slug: z.string().min(1).describe("Blog post slug."),
+});
+
+export function registerBlogTools(
+  registry: ToolRegistry,
+  _userId: string,
+): void {
+  registry.register({
+    name: "blog_list_posts",
+    description: "List published blog posts with optional filters.",
+    category: "blog",
+    tier: "free",
+    inputSchema: ListPostsSchema.shape,
+    handler: async ({
+      category,
+      tag,
+      featured,
+      limit = 20,
+      offset = 0,
+    }: z.infer<typeof ListPostsSchema>): Promise<CallToolResult> =>
+      safeToolCall("blog_list_posts", async () => {
+        const {
+          getAllPosts,
+          getPostsByCategory,
+          getPostsByTag,
+          getFeaturedPosts,
+        } = await import("@/lib/blog/get-posts");
+
+        let posts;
+        if (category) {
+          posts = getPostsByCategory(category);
+        } else if (tag) {
+          posts = getPostsByTag(tag);
+        } else if (featured) {
+          posts = getFeaturedPosts();
+        } else {
+          posts = getAllPosts();
+        }
+
+        const paginated = posts.slice(offset, offset + limit);
+        if (paginated.length === 0) return textResult("No blog posts found.");
+
+        let text = `**Blog Posts (${paginated.length} of ${posts.length}):**\n\n`;
+        for (const post of paginated) {
+          text += `- **${post.frontmatter.title}** (${post.slug})\n`
+            + `  ${post.frontmatter.description}\n`
+            + `  Category: ${post.frontmatter.category} | Tags: ${
+              post.frontmatter.tags.join(", ")
+            } | ${post.readingTime}\n`
+            + `  Date: ${post.frontmatter.date}${
+              post.frontmatter.featured ? " | Featured" : ""
+            }\n\n`;
+        }
+        return textResult(text);
+      }),
+  });
+
+  registry.register({
+    name: "blog_get_post",
+    description: "Get a blog post by slug with full content.",
+    category: "blog",
+    tier: "free",
+    inputSchema: GetPostSchema.shape,
+    handler: async (
+      { slug }: z.infer<typeof GetPostSchema>,
+    ): Promise<CallToolResult> =>
+      safeToolCall("blog_get_post", async () => {
+        const { getPostBySlug } = await import("@/lib/blog/get-posts");
+        const post = getPostBySlug(slug);
+        if (!post) {
+          return textResult(
+            "**Error: NOT_FOUND**\nBlog post not found.\n**Retryable:** false",
+          );
+        }
+
+        return textResult(
+          `**${post.frontmatter.title}**\n\n`
+            + `**Slug:** ${post.slug}\n`
+            + `**Author:** ${post.frontmatter.author}\n`
+            + `**Date:** ${post.frontmatter.date}\n`
+            + `**Category:** ${post.frontmatter.category}\n`
+            + `**Tags:** ${post.frontmatter.tags.join(", ")}\n`
+            + `**Reading Time:** ${post.readingTime}\n`
+            + `**Featured:** ${post.frontmatter.featured ? "Yes" : "No"}\n`
+            + `**Excerpt:** ${post.frontmatter.description}\n\n`
+            + `---\n\n${post.content}`,
+        );
+      }),
+  });
+}

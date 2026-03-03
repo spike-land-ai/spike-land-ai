@@ -26,7 +26,7 @@ export function PrivacyPage() {
       <section className="space-y-3">
         <h2 className="text-xl font-semibold">Data Storage</h2>
         <p className="leading-relaxed text-gray-700">
-          Your data is stored on SpacetimeDB and Cloudflare infrastructure. We do not sell your
+          Your data is stored on Cloudflare infrastructure. We do not sell your
           personal information to third parties. Application data you create (apps, tools, messages)
           is stored as long as your account is active.
         </p>

@@ -21,8 +21,7 @@
     "noImplicitOverride": true,
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./*"],
-      "@spike-land-ai/spacetimedb-platform": ["../spacetimedb-platform/index.ts"]
+      "@/*": ["./*"]
     }
   },
   "include": ["**/*.ts", "**/*.tsx"],

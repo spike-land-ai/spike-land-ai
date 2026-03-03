@@ -22,23 +22,37 @@ export function BlogPostsGrid({ orderedPosts, relevantSlugs }: BlogPostsGridProp
     );
   }
 
+  const [featuredPost, ...restPosts] = orderedPosts;
+
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-10">
-      {orderedPosts.map((post, index) => (
-        <div
-          key={post.slug}
-          className={["relative group", index === 0 ? "lg:col-span-3" : ""]
-            .filter(Boolean)
-            .join(" ")}
-        >
-          {relevantSet.has(post.slug) && (
-            <span className="absolute -top-3 -right-3 z-10 bg-gradient-to-br from-primary to-accent text-primary-foreground text-xs font-bold px-3 py-1.5 rounded-full shadow-glow-primary border border-white/20 transform hover:scale-105 transition-transform duration-300">
+    <div className="space-y-8 md:space-y-10">
+      {/* Featured post — full-width hero card */}
+      {featuredPost && (
+        <div className="relative group">
+          {relevantSet.has(featuredPost.slug) && (
+            <span className="absolute -top-3 -right-3 z-10 bg-gradient-to-br from-primary to-accent text-primary-foreground text-xs font-bold px-3 py-1.5 rounded-full shadow-glow-primary border border-white/20">
               Personalized
             </span>
           )}
-          <BlogCard post={post} />
+          <BlogCard post={featuredPost} />
         </div>
-      ))}
+      )}
+
+      {/* Remaining posts — 2-col on md, 3-col on lg */}
+      {restPosts.length > 0 && (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+          {restPosts.map((post) => (
+            <div key={post.slug} className="relative group">
+              {relevantSet.has(post.slug) && (
+                <span className="absolute -top-3 -right-3 z-10 bg-gradient-to-br from-primary to-accent text-primary-foreground text-xs font-bold px-3 py-1.5 rounded-full shadow-glow-primary border border-white/20">
+                  Personalized
+                </span>
+              )}
+              <BlogCard post={post} />
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

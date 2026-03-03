@@ -2,11 +2,9 @@ import type { ICodeSession } from "@/lib/interfaces";
 import { computeSessionHash, sanitizeSession } from "@/lib/make-sess";
 import { tryCatch } from "@/lib/try-catch";
 import type { ISessionSynchronizer } from "./types";
-import { connectToSpacetimeDB, getStdbClient } from "@/lib/stdb";
 
 /**
- * SessionSynchronizer enables communication for code sessions
- * using SpacetimeDB.
+ * SessionSynchronizer enables communication for code sessions.
  */
 export class SessionSynchronizer implements ISessionSynchronizer {
   private session: ICodeSession | null = null;
@@ -19,11 +17,6 @@ export class SessionSynchronizer implements ISessionSynchronizer {
     if (session) {
       this.session = session;
     }
-
-    // Ensure connection is started
-    connectToSpacetimeDB();
-
-    // TODO: Real-time subscriptions not supported via HTTP client
   }
 
   // handleDbUpdate removed — will be re-added when real-time WebSocket subscriptions are implemented
@@ -104,19 +97,6 @@ export class SessionSynchronizer implements ISessionSynchronizer {
         }
         this.session = sanitizeSession(session);
         this.notifySubscribers(session);
-      }
-
-      // Sync to SpacetimeDB
-      const client = getStdbClient();
-      if (client) {
-        client.callReducer("update_code_session", [
-          this.session.codeSpace,
-          this.session.code || "",
-          this.session.html || "",
-          this.session.css || "",
-          this.session.transpiled || "",
-          JSON.stringify(this.session.messages || []),
-        ]);
       }
     } catch (error) {
       console.error("Error in SessionSynchronizer.broadcastSession", error);

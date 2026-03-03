@@ -7,9 +7,8 @@
 | Cloudflare Workers      | 6     | spike-land-backend, transpile, spike-land-mcp, mcp-auth, mcp-image-studio, spike-edge        |
 | Cloudflare Pages/Assets | 1     | spike-app (via spike-edge)                                                                   |
 | AWS ECS                 | 1     | spike.land (legacy Next.js)                                                                  |
-| SpacetimeDB             | 1     | spacetimedb-platform (rightful-dirt-5033)                                                    |
-| npm (GitHub Packages)   | 27    | All @spike-land-ai/* packages                                                                |
-| MCP stdio servers       | 6     | spacetimedb-mcp, esbuild-wasm-mcp, hackernews-mcp, mcp-image-studio, openclaw-mcp, spike-cli |
+| npm (GitHub Packages)   | 25    | All @spike-land-ai/* packages                                                                |
+| MCP stdio servers       | 5     | esbuild-wasm-mcp, hackernews-mcp, mcp-image-studio, openclaw-mcp, spike-cli                  |
 
 ## Service Details
 
@@ -61,32 +60,12 @@
    - Manual deploy:
      `gh workflow run deploy.yml --repo spike-land-ai/spike.land -f target_environment=production`
 
-### SpacetimeDB
-
-8. **spacetimedb-platform** — Real-time data backbone
-   - Server: maincloud
-   - Database: rightful-dirt-5033
-   - Tables: 14 (users, tools, apps, agents, content, messaging, images, albums,
-     pipelines, etc.)
-   - Reducers: 30+
-   - SDK: spacetimedb@^2.0.2
-   - Config: `src/spacetimedb-platform/spacetime.json` (maincloud),
-     `spacetime.local.json` (local dev)
-   - Build: `spacetime build`
-   - Publish: `spacetime publish rightful-dirt-5033`
-   - Bindings:
-     `spacetime generate --lang=typescript --out-dir=src/module_bindings`
-
 ### MCP stdio Servers (local process, not deployed)
 
 These packages are consumed as npm dependencies or run as stdio processes, not
 deployed as standalone services:
 
-9. **spacetimedb-mcp** — Agent coordination, real-time messaging, tasks
-   - Config: `src/spacetimedb-mcp/package.json`
-   - Purpose: Provides MCP interface to SpacetimeDB platform
-
-10. **esbuild-wasm-mcp** — MCP server wrapping esbuild-wasm
+9. **esbuild-wasm-mcp** — MCP server wrapping esbuild-wasm
     - Config: `src/esbuild-wasm-mcp/package.json`
     - Purpose: Exposes esbuild compilation to Claude
 
@@ -216,13 +195,6 @@ All secrets are set via `wrangler secret put <NAME>` per worker.
 - **Auth**: Cloudflare API token (CF_API_TOKEN secret)
 - **Config**: Per-package `wrangler.toml`
 
-### SpacetimeDB (spacetimedb-platform)
-
-- **Deploy method**: `spacetime publish rightful-dirt-5033`
-- **Auth**: SpacetimeDB token (SPACETIME_TOKEN secret)
-- **Build**: `spacetime build` (compiles WASM module)
-- **Triggered by**: Manual or CI step in appropriate workflow
-
 ## Dependency Cascade System
 
 When any `@spike-land-ai/*` package publishes, consuming repos automatically
@@ -255,9 +227,7 @@ bash .github/scripts/verify-deps.sh
 | Component                    | Current State        | Target State                                           | Status         |
 | ---------------------------- | -------------------- | ------------------------------------------------------ | -------------- |
 | Auth in mcp-image-studio     | Embedded Better Auth | Delegated to auth-mcp.spike.land                       | In progress    |
-| Domain data (images, albums) | D1 in CF Worker      | Keep D1 (CF Worker path), SpacetimeDB (MCP stdio path) | Done           |
-| Tool call logging            | D1 only              | D1 (worker) + SpacetimeDB PlatformEvent (stdio)        | In progress    |
-| Full D1→SpacetimeDB          | N/A                  | Requires HTTP adapter or proxy                         | Deferred to P1 |
+| Domain data (images, albums) | D1 in CF Worker      | Keep D1 (CF Worker path)                                | Done           |
 | Frontend                     | spike.land (Next.js) | spike-app (Vite + TanStack Router)                     | In progress    |
 | Edge API                     | spike-land-backend   | spike-edge                                             | In progress    |
 
@@ -277,18 +247,13 @@ mcp-image-studio, spike-edge
 - Cluster: spike-land (production)
 - ALB: spike-land-alb
 
-**SpacetimeDB**: spacetimedb-platform
-
-- Deploy: `spacetime publish rightful-dirt-5033`
-- Server: maincloud
-
-**npm Registry**: All 27 packages
+**npm Registry**: All 25 packages
 
 - Deploy: Automatic via Changesets on main branch
 - Registry: npm.pkg.github.com/@spike-land-ai
 
-**MCP stdio**: spacetimedb-mcp, esbuild-wasm-mcp, hackernews-mcp,
-mcp-image-studio, openclaw-mcp, spike-cli
+**MCP stdio**: esbuild-wasm-mcp, hackernews-mcp, mcp-image-studio, openclaw-mcp,
+spike-cli
 
 - Deploy method: npm installation + local execution
 
@@ -312,15 +277,7 @@ make health
 # Deploy all Cloudflare Workers (CI does this automatically)
 # Per-package: cd src/<name> && npm run w:deploy:prod
 
-# Deploy SpacetimeDB platform
-cd src/spacetimedb-platform
-spacetime build
-spacetime publish rightful-dirt-5033
-
 # Deploy spike.land (legacy)
 gh workflow run deploy.yml --repo spike-land-ai/spike.land -f target_environment=production
 
-# Regenerate SpacetimeDB TypeScript bindings
-cd src/spacetimedb-platform
-spacetime generate --lang=typescript --out-dir=src/module_bindings
 ```

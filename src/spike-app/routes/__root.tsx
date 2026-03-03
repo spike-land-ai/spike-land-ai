@@ -1,7 +1,6 @@
 import { Link, Outlet, useRouterState } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useAnalytics } from "@/hooks/useAnalytics";
-import { useStdb } from "@/hooks/useStdb";
 import { LoginButton } from "@/components/LoginButton";
 
 const DEFAULT_TITLE = "spike.land - AI Development Platform";
@@ -63,7 +62,6 @@ const navItems = [
 
 export function RootLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const { connected } = useStdb();
   useAnalytics();
 
   const pathname = useRouterState({ select: (s) => s.location.pathname });
@@ -122,10 +120,6 @@ export function RootLayout() {
       >
         <div className="flex h-16 items-center gap-2 border-b px-6">
           <span className="text-xl font-bold">Spike</span>
-          <span
-            className={`h-2 w-2 rounded-full ${connected ? "bg-green-500" : "bg-gray-300"}`}
-            title={connected ? "Connected" : "Disconnected"}
-          />
         </div>
         <nav className="flex flex-col gap-1 p-4">
           {navItems.map((item) => (

@@ -92,7 +92,6 @@
     "@react-three/fiber": "9.5.0",
     "@react-three/rapier": "2.2.0",
     "@spike-land-ai/esbuild-wasm": "*",
-    "@spike-land-ai/spacetimedb-platform": "workspace:*",
     "@tailwindcss/browser": "4.2.1",
     "@tailwindcss/postcss": "4.2.1",
     "@tailwindcss/vite": "4.2.1",

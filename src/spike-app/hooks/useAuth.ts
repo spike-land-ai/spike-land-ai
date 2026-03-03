@@ -1,6 +1,5 @@
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback } from "react";
 import { authClient } from "@/lib/auth";
-import { stdbClient } from "@/lib/stdb";
 
 export interface AppUser {
   sub: string;
@@ -12,23 +11,8 @@ export interface AppUser {
 
 export function useAuth() {
   const { data: session, isPending, error } = authClient.useSession();
-  const prevTokenRef = useRef<string | undefined>(undefined);
 
   const isAuthenticated = !!session?.user;
-  const token = session?.session?.token;
-
-  useEffect(() => {
-    if (isAuthenticated && token) {
-      if (token !== prevTokenRef.current) {
-        stdbClient.disconnect();
-        stdbClient.connect(token);
-        prevTokenRef.current = token;
-      }
-    } else if (!isAuthenticated && prevTokenRef.current) {
-      stdbClient.disconnect();
-      prevTokenRef.current = undefined;
-    }
-  }, [isAuthenticated, token]);
 
   const login = useCallback((provider?: string) => {
     if (!provider) {
@@ -42,8 +26,6 @@ export function useAuth() {
   }, []);
 
   const logout = useCallback(async () => {
-    stdbClient.disconnect();
-    prevTokenRef.current = undefined;
     await authClient.signOut();
   }, []);
 

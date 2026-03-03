@@ -1,0 +1,61 @@
+/**
+ * Known first-level route segments that map to real pages in src/app/.
+ *
+ * Used by the proxy (to avoid rewriting these to /g/<path>) and by the
+ * not-found page (to distinguish "real 404" from "needs generation").
+ *
+ * Keep this list in sync with the directories under src/app/.
+ * Excludes files (layout.tsx, page.tsx, etc.) and internal prefixes (_next).
+ */
+export const KNOWN_ROUTE_SEGMENTS = new Set([
+  "about",
+  "agents",
+  "ai",
+  "albums",
+  "api",
+  "apps",
+  "docs-data",
+  "auth",
+  "bazdmeg",
+  "blendr",
+  "blog",
+  "boxes",
+  "canvas",
+  "career",
+  "clean",
+  "comic-sans",
+  "community",
+  "connect",
+  "cookies",
+  "create",
+  "cv",
+  "docs",
+  "for",
+  "g",
+  "gallery",
+  "generate",
+  "learnit",
+  "live",
+  "mcp",
+  "my-apps",
+  "most-epic-nye-counter-ever",
+  "onboarding",
+  "p",
+  "press",
+  "pricing",
+  "privacy",
+  "profile",
+  "remotion",
+  "services",
+  "settings",
+  "share",
+  "store",
+  "storybook",
+  "sule",
+  "terms",
+  "test-enhancement",
+  "token-test",
+  "tokens",
+  "physics-demo",
+  "waitlist",
+]);

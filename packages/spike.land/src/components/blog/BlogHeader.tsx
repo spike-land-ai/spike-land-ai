@@ -13,34 +13,34 @@ interface BlogHeaderProps {
  */
 export function BlogHeader({ frontmatter, readingTime }: BlogHeaderProps) {
   return (
-    <header>
-      {/* Category */}
-      <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary border border-primary/20 backdrop-blur-sm self-start mb-6">
-        <Tag className="h-4 w-4 shrink-0" />
-        <span className="text-sm font-semibold tracking-wide uppercase">
+    <header className="mb-4">
+      {/* Category badge */}
+      <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary border border-primary/20 backdrop-blur-sm mb-8">
+        <Tag className="h-3.5 w-3.5 shrink-0" />
+        <span className="text-xs font-bold tracking-widest uppercase">
           {frontmatter.category}
         </span>
       </div>
 
-      {/* Title */}
-      <h1 className="font-heading text-5xl md:text-6xl font-extrabold leading-tight tracking-tighter mb-4 text-foreground drop-shadow-sm">
+      {/* Title — Montserrat, tight tracking for large display size */}
+      <h1 className="font-heading text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-[1.1] tracking-tight mb-6 text-foreground">
         {frontmatter.title}
       </h1>
 
-      {/* Description */}
-      <p className="text-xl md:text-2xl text-muted-foreground leading-relaxed font-medium mb-8 max-w-3xl">
+      {/* Description — larger lead text, muted for visual contrast */}
+      <p className="text-lg sm:text-xl text-muted-foreground/90 leading-relaxed font-normal mb-8 max-w-2xl">
         {frontmatter.description}
       </p>
 
-      {/* Meta info */}
-      <div className="flex flex-wrap items-center gap-4 text-sm font-semibold text-muted-foreground/90 border-y border-border/50 py-5 my-8">
-        <div className="flex items-center gap-2 px-3 py-1.5 bg-muted/40 rounded-full">
-          <User className="h-4 w-4 shrink-0 text-primary/80" />
-          <span>{frontmatter.author}</span>
+      {/* Meta info row */}
+      <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground border-t border-b border-border/40 py-4 my-8">
+        <div className="flex items-center gap-1.5">
+          <User className="h-3.5 w-3.5 shrink-0 text-primary/70" />
+          <span className="font-medium">{frontmatter.author}</span>
         </div>
-        <div className="hidden sm:block text-border/50">•</div>
-        <div className="flex items-center gap-2 px-3 py-1.5 bg-muted/40 rounded-full">
-          <Calendar className="h-4 w-4 shrink-0 text-primary/80" />
+        <span className="text-border/60" aria-hidden="true">·</span>
+        <div className="flex items-center gap-1.5">
+          <Calendar className="h-3.5 w-3.5 shrink-0 text-primary/70" />
           <time dateTime={frontmatter.date}>
             {new Date(frontmatter.date).toLocaleDateString("en-US", {
               year: "numeric",
@@ -50,22 +50,22 @@ export function BlogHeader({ frontmatter, readingTime }: BlogHeaderProps) {
             })}
           </time>
         </div>
-        <div className="hidden sm:block text-border/50">•</div>
-        <div className="flex items-center gap-2 px-3 py-1.5 bg-muted/40 rounded-full">
-          <Clock className="h-4 w-4 shrink-0 text-primary/80" />
+        <span className="text-border/60" aria-hidden="true">·</span>
+        <div className="flex items-center gap-1.5">
+          <Clock className="h-3.5 w-3.5 shrink-0 text-primary/70" />
           <span>{readingTime}</span>
         </div>
       </div>
 
       {/* Tags */}
       {frontmatter.tags.length > 0 && (
-        <div className="flex flex-wrap gap-2 mt-4">
+        <div className="flex flex-wrap gap-1.5 mb-10">
           {frontmatter.tags.map((tag) => (
             <span
               key={tag}
-              className="text-xs font-bold tracking-wider uppercase bg-primary/10 text-primary px-3 py-1.5 rounded-full border border-primary/20 backdrop-blur-sm"
+              className="text-[10px] font-bold tracking-widest uppercase bg-primary/8 text-primary/80 px-2.5 py-1 rounded-full border border-primary/15"
             >
-              #{tag}
+              {tag}
             </span>
           ))}
         </div>
@@ -73,8 +73,8 @@ export function BlogHeader({ frontmatter, readingTime }: BlogHeaderProps) {
 
       {/* Featured Image */}
       {frontmatter.image && (
-        <div className="relative aspect-[21/9] w-full overflow-hidden rounded-2xl mt-12 border border-border/50 shadow-2xl shadow-primary/10 ring-1 ring-white/10">
-          <div className="absolute inset-0 bg-gradient-to-t from-background/20 to-transparent z-10 pointer-events-none" />
+        <div className="relative aspect-[21/9] w-full overflow-hidden rounded-2xl mt-6 mb-2 border border-border/40 shadow-xl shadow-black/20">
+          <div className="absolute inset-0 bg-gradient-to-t from-background/10 to-transparent z-10 pointer-events-none" />
           <Image
             src={frontmatter.image}
             alt={frontmatter.title}

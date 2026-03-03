@@ -1,5 +1,4 @@
 import { useCallback, useMemo, useState } from "react";
-import { useTable } from "@/hooks/useTable";
 
 type TimeRange = "24h" | "7d" | "30d";
 
@@ -348,7 +347,8 @@ export function BazdmegDashboardPage() {
   const [replayTimestamp, setReplayTimestamp] = useState<number | null>(null);
   const cutoff = Date.now() - timeRangeToMs(timeRange);
 
-  const allEvents = useTable<PlatformEvent>("PlatformEvent");
+  // TODO: wire up to edge API
+  const allEvents: PlatformEvent[] = [];
 
   const handleReplayChange = useCallback((ts: number) => setReplayTimestamp(ts), []);
   const handleGoLive = useCallback(() => setReplayTimestamp(null), []);

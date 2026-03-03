@@ -1,16 +1,9 @@
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
-import { createLiveSpacetimeMcpClient } from "@spike-land-ai/spacetimedb-mcp/client";
-import { SpacetimeServerTransport } from "@spike-land-ai/spacetimedb-mcp/transport";
+import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { CallToolRequestSchema, ListToolsRequestSchema } from "@modelcontextprotocol/sdk/types.js";
 import { registerImageStudioTools } from "./register.js";
 import type { ImageStudioDeps, ImageStudioToolRegistry, ToolDefinition } from "./types.js";
 import { asAlbumHandle, asImageId, asJobId, asPipelineId } from "./types.js";
-import {
-  createSpacetimeCredits,
-  createSpacetimeDb,
-  createSpacetimeResolvers,
-} from "./db-spacetime.js";
-import { createStdbHttpClient } from "@spike-land-ai/spacetimedb-platform";
 
 // --- 1. Mock the Dependencies so the tools can run without a real DB ---
 
@@ -218,28 +211,10 @@ function createMockDeps(): ImageStudioDeps {
   };
 }
 
-// --- 2. Setup the SpacetimeDB Connection & Deps ---
-
-const SPACETIMEDB_URI = process.env.SPACETIMEDB_URI || "ws://localhost:3000";
-const SPACETIMEDB_MODULE = process.env.SPACETIMEDB_MODULE || "spike-platform";
-
-// Convert ws:// to http:// for HTTP API
-const httpHost = SPACETIMEDB_URI.replace(/^ws(s?):\/\//, "http$1://");
-const conn = createStdbHttpClient({
-  host: httpHost,
-  database: SPACETIMEDB_MODULE,
-});
+// --- 2. Setup Deps ---
 
 const DEFAULT_USER_ID = process.env.IMAGE_STUDIO_USER_ID || "test-user";
-const mockDeps = createMockDeps();
-
-const dbProvider = createSpacetimeDb(conn);
-const deps: ImageStudioDeps = {
-  ...mockDeps,
-  db: dbProvider,
-  credits: createSpacetimeCredits(conn),
-  resolvers: createSpacetimeResolvers(dbProvider, DEFAULT_USER_ID),
-};
+const deps = createMockDeps();
 
 // --- 3. Setup the MCP Server & Registry ---
 
@@ -280,16 +255,13 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
   };
 });
 
-// --- 5. Start Server on SpacetimeDB Swarm ---
+// --- 5. Start Server on Stdio ---
 
-const client = createLiveSpacetimeMcpClient();
-await client.connect(SPACETIMEDB_URI, SPACETIMEDB_MODULE);
-
-const transport = new SpacetimeServerTransport(client, "image");
+const transport = new StdioServerTransport();
 server
   .connect(transport)
   .then(() => {
-    console.log("Image Studio MCP Swarm Node Connected to SpacetimeDB.");
+    console.log("Image Studio MCP Server running on stdio.");
   })
   .catch((err: unknown) => {
     console.error("Fatal error:", err);

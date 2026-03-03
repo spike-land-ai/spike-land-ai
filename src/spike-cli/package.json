@@ -31,7 +31,6 @@
     "@anthropic-ai/sdk": "0.78.0",
     "@google/genai": "^1.43.0",
     "@modelcontextprotocol/sdk": "1.27.1",
-    "@spike-land-ai/spacetimedb-platform": "workspace:*",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
     "commander": "14.0.3",

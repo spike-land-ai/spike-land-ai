@@ -7,7 +7,6 @@ export interface Env {
   STRIPE_SECRET_KEY: string;
   AI_API_KEY: string;
   GITHUB_TOKEN: string;
-  SPACETIMEDB_URI: string;
   ALLOWED_ORIGINS: string;
   QUIZ_BADGE_SECRET: string;
 }

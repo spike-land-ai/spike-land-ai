@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useRef } from "react";
 import { useRouter } from "@tanstack/react-router";
-import { stdbClient } from "@/lib/stdb";
 
 interface QueuedEvent {
   event: string;
@@ -16,10 +15,8 @@ let flushTimer: ReturnType<typeof setTimeout> | null = null;
 function flushEvents() {
   if (eventQueue.length === 0) return;
 
-  const batch = eventQueue.splice(0, eventQueue.length);
-  for (const { event, data } of batch) {
-    stdbClient.recordEvent(event, data);
-  }
+  // TODO: wire up to edge API for event tracking
+  eventQueue.splice(0, eventQueue.length);
 }
 
 function enqueueEvent(event: string, data: Record<string, unknown>) {
