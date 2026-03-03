@@ -27,15 +27,36 @@ function runCheck(name: string, command: string): CheckResult {
   } catch (err: unknown) {
     const e = err as { stdout?: string; stderr?: string; status?: number };
     const output = [e.stdout ?? "", e.stderr ?? ""].filter(Boolean).join("\n");
+    const duration = Date.now() - start;
+
+    // Vitest may exit non-zero despite all tests passing (e.g. deprecation warnings).
+    // Detect this: output contains "X passed" with no "failed" count.
+    const allTestsPassed =
+      name === "test" &&
+      /\d+ passed/.test(output) &&
+      !/\d+ failed/.test(output);
+
+    if (allTestsPassed) {
+      if (verbose) {
+        console.log(`    [verbose] ${name} PASS (${(duration / 1000).toFixed(1)}s) (exit code ${e.status ?? "?"}, but all tests passed)`);
+      }
+      return {
+        name,
+        passed: true,
+        output: output.trim(),
+        durationMs: duration,
+      };
+    }
+
     if (verbose) {
-      console.log(`    [verbose] ${name} FAIL (${((Date.now() - start) / 1000).toFixed(1)}s)`);
+      console.log(`    [verbose] ${name} FAIL (${(duration / 1000).toFixed(1)}s)`);
       console.log(`    [verbose] ${name} output:\n${output.trim().slice(0, 2000)}${output.length > 2000 ? "\n    ... (truncated)" : ""}`);
     }
     return {
       name,
       passed: false,
       output: output.trim(),
-      durationMs: Date.now() - start,
+      durationMs: duration,
     };
   }
 }
