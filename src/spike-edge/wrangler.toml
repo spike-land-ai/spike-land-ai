@@ -25,6 +25,10 @@ new_classes = ["RateLimiter"]
 # QUIZ_BADGE_SECRET moved to wrangler secrets (run: wrangler secret put QUIZ_BADGE_SECRET)
 [vars]
 
+[[services]]
+binding = "AUTH_MCP"
+service = "mcp-auth"
+
 [[routes]]
 pattern = "edge.spike.land"
 custom_domain = true

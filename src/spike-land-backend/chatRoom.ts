@@ -12,7 +12,6 @@ import { LargeValueStorage } from "./largeValueStorage";
 import { McpServer } from "./mcp";
 import { RouteHandler } from "./routeHandler";
 import { WebSocketHandler } from "./websocketHandler";
-import type { WebsocketSession } from "./websocketHandler";
 
 export { md5 };
 
@@ -319,7 +318,7 @@ export class Code implements DurableObject {
       this.env.R2,
       this.state.id.toString(),
     );
-    this.wsHandler = new WebSocketHandler(this);
+    this.wsHandler = new WebSocketHandler(this, this.state);
     this.routeHandler = new RouteHandler(this);
     this.mcpServer = new McpServer(this);
   }
@@ -647,9 +646,8 @@ export class Code implements DurableObject {
   }
 
   async updateAndBroadcastSession(
-    // Add async keyword
     newSession: ICodeSession,
-    wsSession?: WebsocketSession,
+    excludeWs?: WebSocket,
   ) {
     const oldSession = this.getSession();
     const oldHash = computeSessionHash(oldSession);
@@ -687,7 +685,7 @@ export class Code implements DurableObject {
       }
     }
 
-    this.wsHandler.broadcast(patch, wsSession);
+    this.wsHandler.broadcast(patch, excludeWs);
   }
 
   // --- Swarm agent registration ---
@@ -709,6 +707,31 @@ export class Code implements DurableObject {
     { displayName: string; capabilities: string[]; registeredAt: number }
   > {
     return this.swarmAgents;
+  }
+
+  // --- Hibernation API WebSocket handlers ---
+
+  async webSocketMessage(ws: WebSocket, message: string | ArrayBuffer) {
+    if (!this.initialized) {
+      // The DO should already be initialized from the initial fetch that set up the WS.
+      // If we wake from hibernation, state is restored but initialized may be false.
+      // We can't initialize without a URL, so rely on stored state.
+      try {
+        const origin = this.origin || "https://spike.land";
+        await this.initializeSession(new URL(`${origin}/?room=default`));
+      } catch (e) {
+        console.error("Failed to initialize session on wake:", e);
+      }
+    }
+    this.wsHandler.handleMessage(ws, message);
+  }
+
+  async webSocketClose(ws: WebSocket, _code: number, _reason: string, _wasClean: boolean) {
+    this.wsHandler.handleClose(ws);
+  }
+
+  async webSocketError(ws: WebSocket, error: unknown) {
+    this.wsHandler.handleError(ws, error);
   }
 
   getState() {

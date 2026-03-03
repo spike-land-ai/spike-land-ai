@@ -1,29 +1,8 @@
-import { createRootRoute, createRoute, createRouter } from "@tanstack/react-router";
+import { createRootRoute, createRoute, createRouter, lazyRouteComponent } from "@tanstack/react-router";
 import { RootLayout } from "./routes/__root";
 import { IndexPage } from "./routes/index";
-import { DashboardPage } from "./routes/dashboard/index";
-import { BlogIndexPage } from "./routes/blog/index";
-import { BlogPostPage } from "./routes/blog/$slug";
-import { ToolsIndexPage } from "./routes/tools/index";
-import { ToolsCategoryPage } from "./routes/tools/$category";
-import { AppsIndexPage } from "./routes/apps/index";
-import { AppsNewPage } from "./routes/apps/new";
-import { AppDetailPage } from "./routes/apps/$appId";
-import { StorePage } from "./routes/store";
-import { MessagesIndexPage } from "./routes/messages/index";
-import { MessageThreadPage } from "./routes/messages/$userId";
-import { AnalyticsPage } from "./routes/analytics";
-import { BazdmegDashboardPage } from "./routes/dashboard/bazdmeg";
-import { SettingsPage } from "./routes/settings";
 import { LoginPage } from "./routes/login";
 import { CallbackPage } from "./routes/callback";
-import { LearnIndexPage } from "./routes/learn/index";
-import { LearnSessionPage } from "./routes/learn/$sessionId";
-import { BadgePage } from "./routes/learn/badge/$token";
-import { AboutPage } from "./routes/about";
-import { PrivacyPage } from "./routes/privacy";
-import { TermsPage } from "./routes/terms";
-import { VersionPage } from "./routes/version";
 
 const rootRoute = createRootRoute({
   component: RootLayout,
@@ -38,85 +17,85 @@ const indexRoute = createRoute({
 const dashboardRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/dashboard",
-  component: DashboardPage,
+  component: lazyRouteComponent(() => import("./routes/dashboard/index"), "DashboardPage"),
 });
 
 const blogIndexRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/blog",
-  component: BlogIndexPage,
+  component: lazyRouteComponent(() => import("./routes/blog/index"), "BlogIndexPage"),
 });
 
 const blogPostRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/blog/$slug",
-  component: BlogPostPage,
+  component: lazyRouteComponent(() => import("./routes/blog/$slug"), "BlogPostPage"),
 });
 
 const toolsIndexRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/tools",
-  component: ToolsIndexPage,
+  component: lazyRouteComponent(() => import("./routes/tools/index"), "ToolsIndexPage"),
 });
 
 const toolsCategoryRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/tools/$category",
-  component: ToolsCategoryPage,
+  component: lazyRouteComponent(() => import("./routes/tools/$category"), "ToolsCategoryPage"),
 });
 
 const appsIndexRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/apps",
-  component: AppsIndexPage,
+  component: lazyRouteComponent(() => import("./routes/apps/index"), "AppsIndexPage"),
 });
 
 const appsNewRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/apps/new",
-  component: AppsNewPage,
+  component: lazyRouteComponent(() => import("./routes/apps/new"), "AppsNewPage"),
 });
 
 const appDetailRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/apps/$appId",
-  component: AppDetailPage,
+  component: lazyRouteComponent(() => import("./routes/apps/$appId"), "AppDetailPage"),
 });
 
 const storeRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/store",
-  component: StorePage,
+  component: lazyRouteComponent(() => import("./routes/store"), "StorePage"),
 });
 
 const messagesIndexRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/messages",
-  component: MessagesIndexPage,
+  component: lazyRouteComponent(() => import("./routes/messages/index"), "MessagesIndexPage"),
 });
 
 const messageThreadRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/messages/$userId",
-  component: MessageThreadPage,
+  component: lazyRouteComponent(() => import("./routes/messages/$userId"), "MessageThreadPage"),
 });
 
 const analyticsRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/analytics",
-  component: AnalyticsPage,
+  component: lazyRouteComponent(() => import("./routes/analytics"), "AnalyticsPage"),
 });
 
 const bazdmegDashboardRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/dashboard/bazdmeg",
-  component: BazdmegDashboardPage,
+  component: lazyRouteComponent(() => import("./routes/dashboard/bazdmeg"), "BazdmegDashboardPage"),
 });
 
 const settingsRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/settings",
-  component: SettingsPage,
+  component: lazyRouteComponent(() => import("./routes/settings"), "SettingsPage"),
 });
 
 const loginRoute = createRoute({
@@ -134,43 +113,43 @@ const callbackRoute = createRoute({
 const learnIndexRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/learn",
-  component: LearnIndexPage,
+  component: lazyRouteComponent(() => import("./routes/learn/index"), "LearnIndexPage"),
 });
 
 const learnSessionRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/learn/$sessionId",
-  component: LearnSessionPage,
+  component: lazyRouteComponent(() => import("./routes/learn/$sessionId"), "LearnSessionPage"),
 });
 
 const learnBadgeRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/learn/badge/$token",
-  component: BadgePage,
+  component: lazyRouteComponent(() => import("./routes/learn/badge/$token"), "BadgePage"),
 });
 
 const aboutRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/about",
-  component: AboutPage,
+  component: lazyRouteComponent(() => import("./routes/about"), "AboutPage"),
 });
 
 const privacyRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/privacy",
-  component: PrivacyPage,
+  component: lazyRouteComponent(() => import("./routes/privacy"), "PrivacyPage"),
 });
 
 const termsRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/terms",
-  component: TermsPage,
+  component: lazyRouteComponent(() => import("./routes/terms"), "TermsPage"),
 });
 
 const versionRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/version",
-  component: VersionPage,
+  component: lazyRouteComponent(() => import("./routes/version"), "VersionPage"),
 });
 
 export const routeTree = rootRoute.addChildren([

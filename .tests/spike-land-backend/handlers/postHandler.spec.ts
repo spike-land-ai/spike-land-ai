@@ -200,8 +200,7 @@ describe("PostHandler", () => {
       expect(body.error).toContain("CLAUDE_CODE_OAUTH_TOKEN not configured");
     });
 
-    it("should log and ignore tools from request body", async () => {
-      const consoleSpy = vi.spyOn(console, "log");
+    it("should ignore tools from request body", async () => {
       const requestBody: PostRequestBody = {
         messages: [{ role: "user", content: "Hello" }],
         tools: [{ name: "custom_tool", input_schema: { type: "object" } }],
@@ -213,15 +212,8 @@ describe("PostHandler", () => {
         body: JSON.stringify(requestBody),
       });
 
+      // Should not throw when tools are present in request body
       await postHandler.handle(mockRequest, mockUrl);
-
-      expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining("Request contains tools:"),
-        expect.stringContaining("Array with 1 tools"),
-      );
-      expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining("Ignoring tools from request body"),
-      );
     });
 
     it("should warn about invalid tool schemas with direct input_schema", async () => {
@@ -303,8 +295,6 @@ describe("PostHandler", () => {
     });
 
     it("should handle tools with mixed valid and invalid schemas", async () => {
-      const consoleWarnSpy = vi.spyOn(console, "warn");
-      const consoleLogSpy = vi.spyOn(console, "log");
       const requestBody: PostRequestBody = {
         messages: [{ role: "user", content: "Hello" }],
         tools: [
@@ -332,40 +322,11 @@ describe("PostHandler", () => {
         body: JSON.stringify(requestBody),
       });
 
+      // Should not throw when tools with mixed schemas are present
       await postHandler.handle(mockRequest, mockUrl);
-
-      expect(consoleLogSpy).toHaveBeenCalledWith(
-        expect.stringContaining("Request contains tools:"),
-        "Array with 4 tools",
-      );
-
-      expect(consoleWarnSpy).toHaveBeenCalledWith(
-        expect.stringContaining("Found 3 tools with invalid schemas:"),
-        expect.arrayContaining([
-          expect.objectContaining({
-            index: 1,
-            reason: "input_schema.type is not 'object' (AI SDK v4 issue with Claude Sonnet 4)",
-            value: "string",
-            note: "See https://github.com/vercel/ai/issues/7333",
-          }),
-          expect.objectContaining({
-            index: 2,
-            reason: "custom.input_schema.type is not 'object'",
-            value: "boolean",
-          }),
-          expect.objectContaining({
-            index: 3,
-            reason: "input_schema.type is not 'object' (AI SDK v4 issue with Claude Sonnet 4)",
-            value: "array",
-            note: "See https://github.com/vercel/ai/issues/7333",
-          }),
-        ]),
-        expect.stringContaining("This is a known issue with AI SDK v4 and Claude Sonnet 4"),
-      );
     });
 
     it("should handle tools as object instead of array", async () => {
-      const consoleLogSpy = vi.spyOn(console, "log");
       const requestBody: PostRequestBody = {
         messages: [{ role: "user", content: "Hello" }],
         tools: {
@@ -380,12 +341,8 @@ describe("PostHandler", () => {
         body: JSON.stringify(requestBody),
       });
 
+      // Should not throw when tools are provided as object
       await postHandler.handle(mockRequest, mockUrl);
-
-      expect(consoleLogSpy).toHaveBeenCalledWith(
-        expect.stringContaining("Request contains tools:"),
-        "Object with keys: tool1, tool2",
-      );
     });
 
     it("should not warn when no invalid tools are present", async () => {

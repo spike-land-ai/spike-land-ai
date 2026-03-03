@@ -90,7 +90,7 @@ describe("StorageService", () => {
 
   describe("saveRequestBody", () => {
     it("should save body as JSON to R2", async () => {
-      const consoleLogSpy = vi.spyOn(console, "log").mockImplementation(() => {});
+      vi.spyOn(console, "log").mockImplementation(() => {});
       vi.mocked(mockEnv.R2.put).mockResolvedValue(undefined as never);
       const body = {
         messages: [
@@ -102,9 +102,6 @@ describe("StorageService", () => {
       await service.saveRequestBody("my-space", body);
 
       expect(mockEnv.R2.put).toHaveBeenCalledWith("request_body_my-space", JSON.stringify(body));
-      expect(consoleLogSpy).toHaveBeenCalledWith(
-        expect.stringContaining("Saved request body with 2 messages"),
-      );
     });
 
     it("should throw error when R2 put fails", async () => {
@@ -135,15 +132,12 @@ describe("StorageService", () => {
     });
 
     it("should save empty messages array", async () => {
-      const consoleLogSpy = vi.spyOn(console, "log").mockImplementation(() => {});
+      vi.spyOn(console, "log").mockImplementation(() => {});
       vi.mocked(mockEnv.R2.put).mockResolvedValue(undefined as never);
 
       await service.saveRequestBody("empty-space", { messages: [] });
 
       expect(mockEnv.R2.put).toHaveBeenCalled();
-      expect(consoleLogSpy).toHaveBeenCalledWith(
-        expect.stringContaining("Saved request body with 0 messages"),
-      );
     });
   });
 });

@@ -1,3 +1,4 @@
+import { computeSessionHash } from "@spike-land-ai/code";
 import type { Code } from "../chatRoom";
 
 export class WebsocketRoutes {
@@ -9,11 +10,30 @@ export class WebsocketRoutes {
     }
 
     const pair = new WebSocketPair();
-    await this.code.wsHandler.handleWebsocketSession(pair[1]);
+    const client = pair[0];
+    const server = pair[1];
+
+    // Use Hibernation API: acceptWebSocket on the DO state
+    this.code.getState().acceptWebSocket(server);
+
+    // Store initial session metadata as attachment
+    server.serializeAttachment({
+      name: null,
+      subscribedTopics: [],
+      blockedMessages: [],
+      swarmAgent: null,
+    });
+
+    // Send initial handshake
+    server.send(JSON.stringify({
+      type: "handshake",
+      hash: computeSessionHash(this.code.getSession()),
+    }));
+
     return new Response(null, {
       status: 101,
       statusText: "Switching Protocols",
-      webSocket: pair[0],
+      webSocket: client,
     });
   }
 

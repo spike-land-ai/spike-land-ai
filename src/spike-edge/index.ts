@@ -52,7 +52,7 @@ app.route("/", analytics);
 app.route("/", quizBadge);
 app.route("/", version);
 
-// Better Auth proxy
+// Better Auth proxy via service binding (sub-1ms internal call)
 app.all("/api/auth/*", async (c) => {
   const url = new URL(c.req.url);
   url.hostname = "auth-mcp.spike.land";
@@ -63,7 +63,7 @@ app.all("/api/auth/*", async (c) => {
   newRequest.headers.set("X-Forwarded-Host", "spike.land");
   newRequest.headers.set("X-Forwarded-Proto", "https");
 
-  return fetch(newRequest);
+  return c.env.AUTH_MCP.fetch(newRequest);
 });
 
 app.route("/", spa);

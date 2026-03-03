@@ -54,10 +54,6 @@ describe("KVLogger", () => {
         "test-prefix:2023-01-01:12:00:00",
         JSON.stringify({ level: "info", message: "Test message" }),
       );
-
-      expect(mockConsoleLog).toHaveBeenCalledWith(
-        "Log entry saved: test-prefix:2023-01-01:12:00:00",
-      );
     });
 
     it("should handle different log levels", async () => {

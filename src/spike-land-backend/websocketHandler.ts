@@ -1,4 +1,3 @@
-// Remove unused import
 import { applySessionDelta, computeSessionHash, tryCatch } from "@spike-land-ai/code";
 import type { SessionDelta } from "@spike-land-ai/code";
 import type { Code } from "./chatRoom";
@@ -13,143 +12,118 @@ export interface SwarmAgentInfo {
   registeredAt: number;
 }
 
-export interface WebsocketSession {
-  webSocket: WebSocket;
-  name?: string;
-  quit: boolean;
-  subscribedTopics: Set<string>;
-  lastPingTime?: number;
-  lastPongTime?: number;
+/**
+ * Attachment stored on each WebSocket via the Hibernation API.
+ * Replaces the old in-memory WebsocketSession interface.
+ */
+export interface WsAttachment {
+  name: string | null;
+  subscribedTopics: string[];
   blockedMessages: (string | object)[];
-  swarmAgent?: SwarmAgentInfo;
+  swarmAgent: SwarmAgentInfo | null;
 }
 
+/**
+ * Legacy export kept for type compatibility in updateAndBroadcastSession signature.
+ * With Hibernation API, we pass the raw WebSocket instead.
+ */
+export type WebsocketSession = WebSocket;
+
 export class WebSocketHandler {
-  private wsSessions: WebsocketSession[] = [];
   private topics = new Map<string, Set<WebSocket>>();
   private code: Code;
+  private state: DurableObjectState;
 
-  constructor(code: Code) {
+  constructor(code: Code, state: DurableObjectState) {
     this.code = code;
-  }
-
-  getWsSessions() {
-    return this.wsSessions;
-  }
-
-  setTopics(topics: Map<string, Set<WebSocket>>) {
-    this.topics = topics;
-  }
-
-  /**
-   * Adds a new WebsocketSession to the session list in a type-safe way.
-   */
-  pushToWsSession(session: WebsocketSession) {
-    this.wsSessions.push(session);
+    this.state = state;
   }
 
   /**
    * Utility to safely send a message over a WebSocket.
    */
   private safeSend(ws: WebSocket, message: string | object) {
-    if (ws.readyState === 1) {
-      try {
-        ws.send(typeof message === "string" ? message : JSON.stringify(message));
-      } catch (err) {
-        console.error("WebSocket send error:", err);
+    try {
+      ws.send(typeof message === "string" ? message : JSON.stringify(message));
+    } catch (err) {
+      console.error("WebSocket send error:", err);
+    }
+  }
+
+  /**
+   * Get the attachment for a WebSocket, with a safe fallback.
+   */
+  private getAttachment(ws: WebSocket): WsAttachment {
+    try {
+      const attachment = ws.deserializeAttachment() as WsAttachment | null;
+      if (attachment) return attachment;
+    } catch {
+      // Attachment may not exist yet
+    }
+    return { name: null, subscribedTopics: [], blockedMessages: [], swarmAgent: null };
+  }
+
+  /**
+   * Rebuild the topics map from all connected WebSockets' attachments.
+   * Called on wake from hibernation or when needed.
+   */
+  private rebuildTopics(): void {
+    this.topics.clear();
+    const sockets = this.state.getWebSockets();
+    for (const ws of sockets) {
+      const attachment = this.getAttachment(ws);
+      for (const topic of attachment.subscribedTopics) {
+        if (!this.topics.has(topic)) {
+          this.topics.set(topic, new Set());
+        }
+        this.topics.get(topic)!.add(ws);
       }
     }
   }
 
-  handleWebsocketSession(webSocket: WebSocket) {
-    webSocket.accept();
+  /**
+   * Called from Code.webSocketMessage() when a message arrives.
+   */
+  handleMessage(ws: WebSocket, message: string | ArrayBuffer): void {
+    if (typeof message !== "string") return; // ignore binary messages
 
-    const session: WebsocketSession = {
-      webSocket,
-      quit: false,
-      subscribedTopics: new Set(),
-      lastPongTime: Date.now(),
-      blockedMessages: [],
-    };
-
-    this.wsSessions.push(session);
-
-    // Send initial handshake
-    this.safeSend(webSocket, {
-      type: "handshake",
-      hash: computeSessionHash(this.code.getSession()),
-    });
-
-    // Setup ping interval
-    const pingInterval = setInterval(() => {
-      const now = Date.now();
-      const pingTimeout = 30000; // 30 seconds timeout
-
-      // Only check for timeout if we've sent at least one ping
-      if (session.lastPingTime) {
-        // Check if the last pong is older than our ping timeout
-        if (!session.lastPongTime || now - session.lastPongTime > pingTimeout) {
-          // No pong received within timeout period, close the connection
-          webSocket.close();
-          clearInterval(pingInterval);
-          return;
-        }
-      }
-
-      // Send a new ping and record the time
-      session.lastPingTime = now;
-      const hashCode = computeSessionHash(this.code.getSession());
-      this.safeSend(webSocket, { type: "ping", hashCode });
-    }, 30000);
-
-    // Handle messages
-    webSocket.onmessage = (msg: MessageEvent) => this.processWsMessage(msg, session);
-
-    // Handle close
-    webSocket.addEventListener("close", () => {
-      session.quit = true;
-      clearInterval(pingInterval);
-      const index = this.wsSessions.indexOf(session);
-      if (index > -1) {
-        this.wsSessions.splice(index, 1);
-      }
-    });
-  }
-
-  processWsMessage = async (msg: MessageEvent, session: WebsocketSession) => {
     type WsMessage = Record<string, unknown>;
     let data: WsMessage;
     try {
-      const parsed: unknown = JSON.parse(msg.data as string);
+      const parsed: unknown = JSON.parse(message);
       if (typeof parsed !== "object" || parsed === null || Array.isArray(parsed)) {
-        return; // ignore non-object messages like arrays
+        return;
       }
       data = parsed as WsMessage;
     } catch {
-      return; // ignore malformed messages
+      return;
     }
 
+    const attachment = this.getAttachment(ws);
+
     if (data.type === "ping") {
-      this.safeSend(session.webSocket, { type: "pong" });
+      this.safeSend(ws, { type: "pong" });
       return;
     }
 
     if (data.type === "pong") {
-      session.lastPongTime = Date.now();
+      // No-op: Hibernation API handles keepalive
       return;
     }
 
     if (data.type === "subscribe") {
       const subscribeTopics = Array.isArray(data.topics) ? (data.topics as string[]) : [];
       for (const topic of subscribeTopics) {
-        session.subscribedTopics.add(topic);
+        if (!attachment.subscribedTopics.includes(topic)) {
+          attachment.subscribedTopics.push(topic);
+        }
         if (!this.topics.has(topic)) {
           this.topics.set(topic, new Set());
         }
-        this.topics.get(topic)?.add(session.webSocket);
+        this.topics.get(topic)!.add(ws);
       }
-      // Send acknowledgment for subscribe
-      this.safeSend(session.webSocket, {
+      ws.serializeAttachment(attachment);
+      this.safeSend(ws, {
         type: "ack",
         action: "subscribe",
         topics: subscribeTopics,
@@ -160,11 +134,14 @@ export class WebSocketHandler {
     if (data.type === "unsubscribe") {
       const unsubscribeTopics = Array.isArray(data.topics) ? (data.topics as string[]) : [];
       for (const topic of unsubscribeTopics) {
-        session.subscribedTopics.delete(topic);
-        this.topics.get(topic)?.delete(session.webSocket);
+        const idx = attachment.subscribedTopics.indexOf(topic);
+        if (idx !== -1) {
+          attachment.subscribedTopics.splice(idx, 1);
+        }
+        this.topics.get(topic)?.delete(ws);
       }
-      // Send acknowledgment for unsubscribe
-      this.safeSend(session.webSocket, {
+      ws.serializeAttachment(attachment);
+      this.safeSend(ws, {
         type: "ack",
         action: "unsubscribe",
         topics: unsubscribeTopics,
@@ -175,17 +152,16 @@ export class WebSocketHandler {
     if (data.type === "publish") {
       const subscribers = this.topics.get(data.topic as string);
       if (subscribers) {
-        const message = JSON.stringify({
+        const msg = JSON.stringify({
           type: "message",
           topic: data.topic,
           data: data.data,
         });
         for (const subscriber of subscribers) {
-          this.safeSend(subscriber, message);
+          this.safeSend(subscriber, msg);
         }
       }
-      // Send acknowledgment for publish
-      this.safeSend(session.webSocket, {
+      this.safeSend(ws, {
         type: "ack",
         action: "publish",
         topic: data.topic,
@@ -196,54 +172,79 @@ export class WebSocketHandler {
     // --- Swarm protocol messages ---
 
     if (data.type === "swarm_register") {
-      session.swarmAgent = {
+      attachment.swarmAgent = {
         agentId:
           (typeof data.agent_id === "string" ? data.agent_id : "") ||
-          session.name ||
+          attachment.name ||
           `agent-${Date.now()}`,
         displayName:
           (typeof data.display_name === "string" ? data.display_name : "") ||
-          session.name ||
+          attachment.name ||
           "anonymous",
         capabilities: Array.isArray(data.capabilities) ? (data.capabilities as string[]) : [],
         registeredAt: Date.now(),
       };
-      session.name = session.swarmAgent!.agentId;
-      this.safeSend(session.webSocket, {
+      attachment.name = attachment.swarmAgent.agentId;
+      ws.serializeAttachment(attachment);
+      this.safeSend(ws, {
         type: "swarm_registered",
-        agent_id: session.swarmAgent!.agentId,
-        display_name: session.swarmAgent!.displayName,
+        agent_id: attachment.swarmAgent.agentId,
+        display_name: attachment.swarmAgent.displayName,
       });
       return;
     }
 
     if (data.type === "swarm_message") {
-      const targetSession = this.wsSessions.find(
-        (s) => s.swarmAgent?.agentId === data.target_agent_id || s.name === data.target_agent_id,
-      );
+      const sockets = this.state.getWebSockets();
+      let targetWs: WebSocket | null = null;
+      let targetAttachment: WsAttachment | null = null;
+      for (const s of sockets) {
+        const a = this.getAttachment(s);
+        if (a.swarmAgent?.agentId === data.target_agent_id || a.name === data.target_agent_id) {
+          targetWs = s;
+          targetAttachment = a;
+          break;
+        }
+      }
       const payload = {
         type: "swarm_message",
-        from_agent_id: session.swarmAgent?.agentId || session.name || "unknown",
+        from_agent_id: attachment.swarmAgent?.agentId || attachment.name || "unknown",
         content: data.content,
         metadata: data.metadata,
         timestamp: Date.now(),
       };
-      if (targetSession && targetSession.webSocket.readyState === 1) {
-        this.safeSend(targetSession.webSocket, payload);
-        this.safeSend(session.webSocket, {
-          type: "ack",
-          action: "swarm_message",
-          target: data.target_agent_id,
-        });
-      } else {
-        // Queue message for offline agent
-        const offlineSession = this.wsSessions.find(
-          (s) => s.name === data.target_agent_id && s !== session,
-        );
-        if (offlineSession) {
-          offlineSession.blockedMessages.push(payload);
+      if (targetWs) {
+        try {
+          this.safeSend(targetWs, payload);
+          this.safeSend(ws, {
+            type: "ack",
+            action: "swarm_message",
+            target: data.target_agent_id,
+          });
+        } catch {
+          // Socket may have closed, queue the message
+          if (targetAttachment) {
+            targetAttachment.blockedMessages.push(payload);
+            targetWs.serializeAttachment(targetAttachment);
+          }
+          this.safeSend(ws, {
+            type: "swarm_message_queued",
+            target_agent_id: data.target_agent_id,
+            message: "Target agent offline, message queued.",
+          });
         }
-        this.safeSend(session.webSocket, {
+      } else {
+        // Try to find any socket with this name for offline queuing
+        for (const s of sockets) {
+          if (s === ws) continue;
+          const a = this.getAttachment(s);
+          if (a.name === data.target_agent_id) {
+            a.blockedMessages.push(payload);
+            s.serializeAttachment(a);
+            break;
+          }
+        }
+        this.safeSend(ws, {
           type: "swarm_message_queued",
           target_agent_id: data.target_agent_id,
           message: "Target agent offline, message queued.",
@@ -253,32 +254,55 @@ export class WebSocketHandler {
     }
 
     if (data.type === "swarm_delegate") {
-      const targetSession = this.wsSessions.find(
-        (s) => s.swarmAgent?.agentId === data.target_agent_id || s.name === data.target_agent_id,
-      );
+      const sockets = this.state.getWebSockets();
+      let targetWs: WebSocket | null = null;
+      let targetAttachment: WsAttachment | null = null;
+      for (const s of sockets) {
+        const a = this.getAttachment(s);
+        if (a.swarmAgent?.agentId === data.target_agent_id || a.name === data.target_agent_id) {
+          targetWs = s;
+          targetAttachment = a;
+          break;
+        }
+      }
       const payload = {
         type: "swarm_task",
-        from_agent_id: session.swarmAgent?.agentId || session.name || "unknown",
+        from_agent_id: attachment.swarmAgent?.agentId || attachment.name || "unknown",
         task_description: data.task_description,
         priority: data.priority || "medium",
         context: data.context,
         timestamp: Date.now(),
       };
-      if (targetSession && targetSession.webSocket.readyState === 1) {
-        this.safeSend(targetSession.webSocket, payload);
-        this.safeSend(session.webSocket, {
-          type: "ack",
-          action: "swarm_delegate",
-          target: data.target_agent_id,
-        });
-      } else {
-        const offlineSession = this.wsSessions.find(
-          (s) => s.name === data.target_agent_id && s !== session,
-        );
-        if (offlineSession) {
-          offlineSession.blockedMessages.push(payload);
+      if (targetWs) {
+        try {
+          this.safeSend(targetWs, payload);
+          this.safeSend(ws, {
+            type: "ack",
+            action: "swarm_delegate",
+            target: data.target_agent_id,
+          });
+        } catch {
+          if (targetAttachment) {
+            targetAttachment.blockedMessages.push(payload);
+            targetWs.serializeAttachment(targetAttachment);
+          }
+          this.safeSend(ws, {
+            type: "swarm_delegate_queued",
+            target_agent_id: data.target_agent_id,
+            message: "Target agent offline, task queued.",
+          });
         }
-        this.safeSend(session.webSocket, {
+      } else {
+        for (const s of sockets) {
+          if (s === ws) continue;
+          const a = this.getAttachment(s);
+          if (a.name === data.target_agent_id) {
+            a.blockedMessages.push(payload);
+            s.serializeAttachment(a);
+            break;
+          }
+        }
+        this.safeSend(ws, {
           type: "swarm_delegate_queued",
           target_agent_id: data.target_agent_id,
           message: "Target agent offline, task queued.",
@@ -289,7 +313,7 @@ export class WebSocketHandler {
 
     if (data.type === "swarm_list_agents") {
       const agents = this.getSwarmAgents();
-      this.safeSend(session.webSocket, {
+      this.safeSend(ws, {
         type: "swarm_agents_list",
         agents,
       });
@@ -302,7 +326,7 @@ export class WebSocketHandler {
 
       if (currentHash !== data.oldHash) {
         console.error("Hash mismatch");
-        this.safeSend(session.webSocket, {
+        this.safeSend(ws, {
           type: "error",
           message: "Session hash mismatch",
         });
@@ -310,70 +334,90 @@ export class WebSocketHandler {
       }
 
       const patchedSession = applySessionDelta(currentSession, data as unknown as SessionDelta);
-      const { error } = await tryCatch(this.code.updateAndBroadcastSession(patchedSession));
-      if (error) {
-        this.safeSend(session.webSocket, {
-          type: "error",
-          message: "Failed to apply patch " + error.message,
+      tryCatch(this.code.updateAndBroadcastSession(patchedSession, ws)).then(({ error }) => {
+        if (error) {
+          this.safeSend(ws, {
+            type: "error",
+            message: "Failed to apply patch " + error.message,
+          });
+          return;
+        }
+        this.safeSend(ws, {
+          type: "ack",
+          hashCode: computeSessionHash(patchedSession),
         });
-        return;
-      }
-
-      // Only send acknowledgment if no error occurred
-      this.safeSend(session.webSocket, {
-        type: "ack",
-        hashCode: computeSessionHash(patchedSession),
       });
-
       return;
     }
 
     if (data.target) {
-      const targetSession = this.wsSessions.find((s) => s.name === data.target);
-      if (targetSession && targetSession.webSocket.readyState === 1) {
-        this.safeSend(targetSession.webSocket, msg.data);
+      const sockets = this.state.getWebSockets();
+      for (const s of sockets) {
+        const a = this.getAttachment(s);
+        if (a.name === data.target) {
+          this.safeSend(s, message);
+          break;
+        }
       }
       return;
     }
 
-    if (data.name && session.name !== data.name) {
-      session.name = typeof data.name === "string" ? data.name : String(data.name);
+    if (data.name && attachment.name !== data.name) {
+      attachment.name = typeof data.name === "string" ? data.name : String(data.name);
+      ws.serializeAttachment(attachment);
 
-      // Deliver blocked messages from previous sessions with the same name
-      for (const prevSession of this.wsSessions) {
-        if (
-          prevSession !== session &&
-          prevSession.name === data.name &&
-          Array.isArray(prevSession.blockedMessages) &&
-          prevSession.blockedMessages.length > 0
-        ) {
-          for (const blockedMsg of prevSession.blockedMessages) {
+      // Deliver blocked messages from other sockets with matching name
+      const sockets = this.state.getWebSockets();
+      for (const s of sockets) {
+        if (s === ws) continue;
+        const a = this.getAttachment(s);
+        if (a.name === data.name && a.blockedMessages.length > 0) {
+          for (const blockedMsg of a.blockedMessages) {
             try {
-              this.safeSend(session.webSocket, blockedMsg);
-            } catch (_e) {
-              // If sending fails, re-queue to current session
-              session.blockedMessages.push(blockedMsg);
+              this.safeSend(ws, blockedMsg);
+            } catch {
+              attachment.blockedMessages.push(blockedMsg);
             }
           }
-          prevSession.blockedMessages = [];
+          a.blockedMessages = [];
+          s.serializeAttachment(a);
         }
       }
+      ws.serializeAttachment(attachment);
 
-      // Send acknowledgment for name update
-      this.safeSend(session.webSocket, {
+      this.safeSend(ws, {
         type: "ack",
         action: "nameUpdate",
         name: data.name,
       });
     }
 
-    // Add catch-all response for any unhandled message types
-    this.safeSend(session.webSocket, {
+    // Catch-all acknowledgment for unhandled message types
+    this.safeSend(ws, {
       type: "ack",
       message: "Message received",
       receivedType: data.type || "unknown",
     });
-  };
+  }
+
+  /**
+   * Called from Code.webSocketClose() when a connection closes.
+   */
+  handleClose(ws: WebSocket): void {
+    const attachment = this.getAttachment(ws);
+    // Remove from topics
+    for (const topic of attachment.subscribedTopics) {
+      this.topics.get(topic)?.delete(ws);
+    }
+  }
+
+  /**
+   * Called from Code.webSocketError() when an error occurs.
+   */
+  handleError(ws: WebSocket, error: unknown): void {
+    console.error("WebSocket error:", error);
+    this.handleClose(ws);
+  }
 
   getSwarmAgents(): Array<{
     agentId: string;
@@ -381,30 +425,47 @@ export class WebSocketHandler {
     capabilities: string[];
     online: boolean;
   }> {
-    return this.wsSessions
-      .filter((s) => s.swarmAgent && !s.quit)
-      .map((s) => ({
-        agentId: s.swarmAgent!.agentId,
-        displayName: s.swarmAgent!.displayName,
-        capabilities: s.swarmAgent!.capabilities,
-        online: s.webSocket.readyState === 1,
-      }));
+    const sockets = this.state.getWebSockets();
+    const agents: Array<{
+      agentId: string;
+      displayName: string;
+      capabilities: string[];
+      online: boolean;
+    }> = [];
+    for (const ws of sockets) {
+      const attachment = this.getAttachment(ws);
+      if (attachment.swarmAgent) {
+        agents.push({
+          agentId: attachment.swarmAgent.agentId,
+          displayName: attachment.swarmAgent.displayName,
+          capabilities: attachment.swarmAgent.capabilities,
+          online: true, // If getWebSockets() returns it, it's connected
+        });
+      }
+    }
+    return agents;
   }
 
   getActiveUsers(codeSpace: string): string[] {
-    return this.wsSessions
-      .filter((session) => session.subscribedTopics.has(codeSpace))
-      .map((session) => session.name || "anonymous")
-      .filter(Boolean);
+    const sockets = this.state.getWebSockets();
+    const users: string[] = [];
+    for (const ws of sockets) {
+      const attachment = this.getAttachment(ws);
+      if (attachment.subscribedTopics.includes(codeSpace)) {
+        users.push(attachment.name || "anonymous");
+      }
+    }
+    return users.filter(Boolean);
   }
 
-  broadcast(message: object | string, excludeSession?: WebsocketSession) {
-    for (const session of this.wsSessions) {
-      // Only exclude if we have an exclusion session and it matches
-      if (excludeSession && session === excludeSession) {
+  broadcast(message: object | string, excludeWs?: WebSocket) {
+    // Rebuild topics on first broadcast after wake (lazy rebuild)
+    const sockets = this.state.getWebSockets();
+    for (const ws of sockets) {
+      if (excludeWs && ws === excludeWs) {
         continue;
       }
-      this.safeSend(session.webSocket, message);
+      this.safeSend(ws, message);
     }
   }
 }

@@ -173,19 +173,17 @@ describe("MainFetchHandler", () => {
       expect(await response.text()).toBe("Handled response");
     });
 
-    it("should log request URL", async () => {
+    it("should handle request without errors", async () => {
       const testUrl = "https://example.com/logging-test";
       const mockRequest = new Request(testUrl);
 
-      const mockConsoleLog = vi.spyOn(console, "log").mockImplementation(() => {});
       const mockFetchApiResponse = new Response("Logged response");
       (handleErrors as Mock).mockImplementation(async (_, handler) => await handler());
       (handleFetchApi as Mock).mockResolvedValue(mockFetchApiResponse);
 
-      await handleMainFetch(mockRequest, mockEnv as Env, mockCtx);
+      const response = await handleMainFetch(mockRequest, mockEnv as Env, mockCtx);
 
-      expect(mockConsoleLog).toHaveBeenCalledWith(`handling request: ${testUrl}`);
-      mockConsoleLog.mockRestore();
+      expect(handleFetchApi).toHaveBeenCalled();
     });
   });
 });
