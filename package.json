@@ -18,7 +18,8 @@
     "format": "biome format --write .",
     "format:check": "biome format .",
     "changeset": "changeset",
-    "release": "changeset publish"
+    "release": "changeset publish",
+    "bazdmeg": "npx tsx scripts/bazdmeg.ts"
   },
   "dependencies": {
     "rehype-raw": "^7.0.0",

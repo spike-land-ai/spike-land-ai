@@ -1,167 +1,465 @@
 ---
-title: "The Database for Agents: How SpacetimeDB Replaced My Coordination Layer in a Weekend"
+title: "defineBlock(): How I Built a Full-Stack Database Abstraction on Cloudflare Workers"
 slug: "the-database-for-agents"
-description: "Last week I solved tool composition. This week I found the database that makes agent coordination a primitive, not a feature. Here's how SpacetimeDB collapsed my coordination stack."
-date: "2026-03-02"
+description: "I tried SpacetimeDB, wrote a blog post about it, then deleted it two days later. But the syntax stuck. Here's how I rebuilt those patterns on Cloudflare Workers and migrated my entire platform in a weekend."
+date: "2026-03-08"
 author: "Zoltan Erdos"
 category: "Developer Experience"
-tags: ["spacetimedb", "mcp", "ai", "agents", "architecture", "real-time", "database"]
+tags: ["cloudflare-workers", "d1", "block-sdk", "mcp", "ai", "agents", "architecture", "typescript"]
 featured: true
 ---
 
-![The Database for Agents: SpacetimeDB replaces the entire backend stack — agents subscribe, tools register, tasks flow](/blog/the-database-for-agents/hero.jpeg)
+![defineBlock(): a single function that packages schema, procedures, and MCP tools into a composable unit running on any runtime](/blog/the-database-for-agents/hero.jpeg)
 
 <Callout type="info">
 **TL;DR**
 
-- Traditional backends (PostgreSQL + Prisma + Redis + NextAuth) are designed for human request-response, not for 50 agents subscribing to state changes in real time
-- SpacetimeDB 2.0 collapses the entire stack: tables = schema, reducers = API, `ctx.sender` = auth, subscriptions = real-time
-- Agent coordination (messaging, task queues, tool discovery) becomes 4 tables instead of 4 services
-- Auto-generated TypeScript bindings eliminate schema drift — the module IS the single source of truth
-- One `spacetime publish` deploys what used to require PostgreSQL + Redis + Express + NextAuth + a message bus
+- I tried SpacetimeDB, got excited, wrote a blog post about it — then deleted everything two days later
+- The patterns were right: tables = schema, reducers = API, `ctx.sender` = auth, subscriptions = real-time
+- I rebuilt those same patterns on Cloudflare Workers as `block-sdk` — a `defineBlock()` DSL that packages storage schema + business logic + MCP tools into composable units
+- `defineBlock()` runs on CF Workers (D1), in the browser (IndexedDB), or in Node.js (memory) — same code, three runtimes
+- The full migration from Next.js happened over a weekend: 27 packages, 80+ MCP tools, zero AWS
 </Callout>
 
 ## The Sequel
 
 [Last week I solved tool composition.](/blog/the-architecture-of-scale-building-tools) An immutable, type-safe builder so agents could write their own MCP tools. Middleware stacks. Phantom-branded context types. Zero casts. The whole thing.
 
-But tools need data. Data needs a backbone. And the backbone was still PostgreSQL + Prisma + Redis + NextAuth — a stack designed for request-response, not for 50 agents subscribing to state changes in real time.
+But tools need data. Data needs a backbone. This post is about the backbone — how I found it, lost it, and rebuilt it.
 
-The tool-builder gave agents the ability to compose. What it did not give them was the ability to coordinate. An agent could write a tool, but it could not discover another agent's tools. It could not subscribe to task updates. It could not send a message to another agent and get a response without polling a REST endpoint every two seconds.
+## The Honest Retrospective
 
-I had solved composition. I had not solved coordination. Then I found SpacetimeDB.
+On March 2, I published a blog post at this very URL titled *"The Database for Agents: How SpacetimeDB Replaced My Coordination Layer in a Weekend."* I was genuinely excited. SpacetimeDB had patterns that felt right:
+
+- **Tables** as schema — you define them in a module, they hold your data
+- **Reducers** as API — typed functions that read/write tables inside transactions
+- **`ctx.sender`** as auth — cryptographic identity, no JWT ceremony
+- **Subscriptions** as real-time — SQL query subscriptions with delta pushes
+
+I wrote 170 lines of breathless prose about it. Published it. Shared it.
+
+Then on March 3, I sat down and asked myself: *what does SpacetimeDB give me that I don't already have?*
+
+The answer was: patterns. Just patterns. The infrastructure underneath — D1, KV, R2, Durable Objects — was already sitting in my Cloudflare account. I had been paying for it. I had been deploying to it. I just hadn't organized my code the way SpacetimeDB organized its modules.
+
+So I deleted SpacetimeDB. All of it. `spacetimedb-platform`, `spacetimedb-mcp`, `spike-db` — gone. And I kept the patterns.
+
+| SpacetimeDB Concept | What I Built on CF Workers |
+|---|---|
+| Table definition in module | `defineTable()` with schema DSL |
+| Reducer | Procedure (typed handler with Zod validation) |
+| `ctx.sender` (Identity) | `BlockContext.userId` (injected by auth middleware) |
+| Subscription queries | Durable Objects + WebSocket (when needed) |
+| Auto-generated TypeScript bindings | Drizzle ORM + auto-generated types |
+| `spacetime publish` (one deploy) | `wrangler deploy` (one deploy per service) |
+| Module = single binary | Block = composable unit (`defineBlock()`) |
+
+The syntax I wanted already existed. I just needed to write it.
 
 ## The Old Stack and Its Friction
 
-The spike.land platform was built on a stack that would be familiar to anyone who has shipped a Next.js application:
-
-```
-Client → Next.js API Routes → NextAuth Middleware → Prisma ORM → PostgreSQL
-                                                  → Redis (cache + pub/sub)
-                                                  → Stripe (payments)
-```
-
-~520 routes. ~383 API endpoints. 120+ MCP tool files. It worked. It scaled. It had all the problems that every mature Next.js application has.
+The spike.land platform was a Next.js monolith. ~520 routes. ~383 API endpoints. 120+ MCP tool files. It worked. It had all the problems.
 
 **Schema drift.** Prisma migrations are a ceremony. The schema lives in `schema.prisma`. The types live in `@prisma/client`. The validation lives in Zod schemas scattered across route handlers. Every schema change touches three places. Miss one and you get a runtime error that the compiler blessed.
 
-**Polling hell.** When an agent wants to know if a new task is available, it calls `GET /api/tasks?status=pending`. When 50 agents want to know, that is 25 requests per second doing nothing useful. Redis pub/sub helps, but now you have two data models: the authoritative one in PostgreSQL and the notification one in Redis. They drift. They always drift.
+**Polling hell.** When 50 agents want to know if a task is available, that is 25 requests per second doing nothing useful. Redis pub/sub helps, but now you have two data models that drift.
 
-**Auth ceremony.** NextAuth gives you session tokens, JWT refresh, middleware chains. Every MCP tool needs to verify the caller. That is 120+ tools, each importing the same auth middleware, each checking sessions, each handling the edge case where the token expired between the check and the database call. The auth logic is correct. It is also everywhere.
+**Auth ceremony.** NextAuth gives you session tokens, JWT refresh, middleware chains. Every MCP tool needs to verify the caller. That is 120+ tools importing the same auth middleware.
 
-**No coordination primitive.** Agents can call tools. Agents cannot talk to each other. There is no agent registry. No task queue built into the data model. No message bus that is also the database. Redis pub/sub is a bolt-on. SQS is a bolt-on. Every coordination mechanism is a separate service that needs its own deployment, monitoring, and failure handling.
+**No coordination primitive.** Agents can call tools. Agents cannot talk to each other. Every coordination mechanism — Redis pub/sub, SQS — is a bolt-on service with its own deployment and failure handling.
 
-I had been migrating away from this stack for weeks. spike-app for the frontend. spike-edge for the edge API. mcp-auth for authentication. spike-land-mcp for the MCP registry. Twelve new packages. The migration was underway. But each new package still needed to talk to the others, and the coordination layer was still missing.
+I tried vinext too. It was still Next.js underneath, just with a different build pipeline. The architectural friction was the same: a monolith pretending to be modular.
 
 <StackCollapseDemo />
 
-The before and after:
+| Next.js Monolith | CF Workers Stack |
+|---|---|
+| Prisma schema + migration | Drizzle schema + `generate` |
+| Express/Next.js API route | Hono route handler (typed) |
+| NextAuth session + JWT | Better Auth session + `ctx.userId` |
+| Redis pub/sub | Durable Objects (when needed) |
+| PostgreSQL + Prisma client | D1 + Drizzle ORM |
+| AWS (ECS + Aurora + Redis + CloudFront) | Cloudflare (Workers + D1 + R2 + DO) |
+| One monolith, 520 routes | 27 packages, each does one thing |
 
-| Old Stack | SpacetimeDB Equivalent |
-|-----------|----------------------|
-| Prisma schema + migration | Table definition in module |
-| Express/Hono route handler | Reducer |
-| NextAuth session + JWT | `ctx.sender` (Identity) |
-| Redis pub/sub | Subscription queries |
-| REST API types (manual) | Auto-generated TypeScript bindings |
-| Database + App Server + Auth | One deployed module |
+## defineBlock(): The Syntax I Wanted
 
-One publish. One binary. One source of truth. The rest of this post is the how.
+The core innovation is `defineBlock()` — a single function that packages everything a "block" needs:
 
-## What SpacetimeDB Actually Is
+```typescript
+// src/block-sdk/define-block.ts — the actual API
 
-SpacetimeDB is a database that runs your code inside it.
+/** Context available to all block procedures */
+export interface BlockContext {
+  /** The storage adapter (D1, IDB, or memory) */
+  storage: StorageAdapter;
+  /** Current user ID (injected by auth middleware) */
+  userId: string;
+  /** Generate a unique ID */
+  nanoid: (length?: number) => string;
+}
 
-Not "a database with stored procedures." Not "a database with an ORM." A database where you write a module in Rust (or C#), define tables and functions, publish the module, and the database becomes your entire backend. No separate app server. No separate API layer. No separate auth service.
+export interface BlockDefinition<TStorage, TProcedures, TComponents> {
+  /** Block name (kebab-case identifier) */
+  name: string;
+  /** Semantic version */
+  version: string;
+  /** Storage schema — tables the block needs */
+  storage: TStorage;
+  /** Business logic — procedures with middleware chains */
+  procedures: (ctx: BlockProcedureContext) => TProcedures;
+  /** React components — UI layer */
+  components?: TComponents;
+  /** MCP tool configuration — "auto" derives from procedures */
+  tools?: "auto" | string[];
+}
+```
 
-Here is the mental model:
+The schema DSL gives you typed column builders:
 
-- **Tables** are your schema. You define them in the module. They hold your data. SpacetimeDB has 17 of them in the platform module: `User`, `Agent`, `RegisteredTool`, `McpTask`, `AgentMessage`, `App`, `Page`, `DirectMessage`, and nine more covering the full domain.
+```typescript
+// src/block-sdk/schema/types.ts
 
-- **Reducers** are your API. A reducer is a function that takes a context and arguments, reads and writes tables, and runs inside a transaction. SpacetimeDB has 31 reducers in the platform module: `register_user`, `create_app`, `send_agent_message`, `claim_mcp_task`, `invoke_tool_request`, and twenty-six more. Each one is a typed endpoint. No route definition. No controller. No middleware chain.
+/** Column type factories — the `t` namespace */
+export const t = {
+  string: () => createColumnBuilder("string"),
+  number: () => createColumnBuilder("number"),
+  boolean: () => createColumnBuilder("boolean"),
+  u64: () => createColumnBuilder("u64"),
+  enum: (values: string[]) => createColumnBuilder("string", values),
+};
 
-- **`ctx.sender`** is your auth. Every reducer receives a `ReducerContext` that includes the caller's `Identity` — a cryptographic identifier derived from the client's connection. You do not check a session token. You do not verify a JWT. You read `ctx.sender` and you know who called you. The identity is the auth primitive.
+/** Define a table with a name and column schema */
+export function defineTable(
+  name: string,
+  columns: Record<string, ColumnBuilder>,
+): TableDef { /* ... */ }
+```
 
-- **Subscriptions** are your real-time layer. A client subscribes to a SQL query. When the data matching that query changes, SpacetimeDB pushes the delta. Not the whole result set — the delta. Agents subscribe to `SELECT * FROM mcp_task WHERE status = 'pending'` and get notified the instant a new task appears. No polling. No WebSocket plumbing. No Redis pub/sub.
+And `defineBlock()` itself resolves everything:
 
-- **Auto-generated bindings** are your types. Run `spacetime generate --lang=typescript` and you get a complete TypeScript client with typed table accessors and typed reducer callers. No Prisma client. No hand-written types. No drift. The bindings are generated from the module, and the module is the source of truth.
+```
+defineBlock({...})
+    │
+    ├── schema → schemaToSQL() → CREATE TABLE statements
+    │
+    ├── procedures → createProcedures(storage, userId) → typed handlers
+    │                    │
+    │                    └── middleware injects BlockContext
+    │                        (storage adapter + userId + nanoid)
+    │
+    ├── tools: "auto" → introspects procedures → discovers tool names
+    │
+    ├── initialize(storage) → runs SQL migrations
+    │
+    └── getTools(storage, userId) → BuiltTool[] for MCP registration
+```
 
-## Schema = API = Auth
+When you set `tools: "auto"`, `defineBlock()` creates a dummy storage adapter, runs the procedure factory, and introspects which procedures have tool metadata. Those become MCP tools automatically. Write a procedure, get an MCP tool. No registration boilerplate.
 
-This is the section where the thesis becomes concrete.
+## StorageAdapter: One Interface, Three Runtimes
 
-When you define a `User` table with `identity` as the primary key, you have defined the auth model. Any reducer that reads `ctx.sender` and looks up the `User` table knows who is calling. There are no sessions to manage. No tokens to refresh. No middleware to chain. The database row IS the user. The connection identity IS the credential.
+The key to runtime portability is `StorageAdapter` — a universal interface that abstracts over three backends:
 
-When you define a `register_user` reducer that inserts into the `User` table, you have defined the API endpoint. The reducer validates its arguments (they are typed). It checks `ctx.sender` to see if the user already exists. It inserts the row. It is transactional by default — if anything fails, the write rolls back. No REST route. No controller. No ORM query builder. No try/catch around a Prisma call that might throw a constraint violation.
+```typescript
+// src/block-sdk/storage/types.ts
 
-When you run `spacetime generate --lang=typescript`, you get bindings that look like this conceptually: a `User` class with typed fields, a `registerUser()` function that takes typed arguments, and event callbacks that fire when rows change. The client code is generated from the module. If the module changes, the bindings change. If the bindings change, the TypeScript compiler catches every call site that needs updating. Zero drift. Zero manual synchronization.
+/** Key-value storage interface */
+export interface KVAdapter {
+  get<T = unknown>(key: string): Promise<T | null>;
+  put<T = unknown>(key: string, value: T): Promise<void>;
+  delete(key: string): Promise<boolean>;
+  list(prefix?: string): Promise<Array<{ key: string; value: unknown }>>;
+}
 
-The old stack had three sources of truth: the Prisma schema (what the database looks like), the TypeScript types (what the code thinks the database looks like), and the Zod schemas (what the API validates). Keeping them in sync was a job. A boring, error-prone, never-quite-done job.
+/** SQL storage interface */
+export interface SQLAdapter {
+  execute<T extends Row = Row>(
+    query: string, params?: unknown[]
+  ): Promise<QueryResult<T>>;
+  batch(
+    queries: Array<{ query: string; params?: unknown[] }>
+  ): Promise<QueryResult[]>;
+}
 
-SpacetimeDB has one source of truth: the module. Everything else is derived. That is not an incremental improvement. That is an entire category of bugs that ceases to exist.
+/** Blob storage interface */
+export interface BlobAdapter {
+  put(key: string, data: ArrayBuffer | Uint8Array | ReadableStream): Promise<void>;
+  get(key: string): Promise<ArrayBuffer | null>;
+  delete(key: string): Promise<boolean>;
+  list(prefix?: string): Promise<string[]>;
+}
 
-## Agent Coordination as a Primitive
+/** The universal storage adapter that blocks interact with */
+export interface StorageAdapter {
+  kv: KVAdapter;
+  sql: SQLAdapter;
+  blobs?: BlobAdapter;
+}
+```
+
+Three implementations, same interface:
+
+```
+┌─────────────────────┬──────────────────────┬──────────────────────┐
+│   CF Workers (D1)   │   Browser (IDB)      │   Node.js (Memory)   │
+├─────────────────────┼──────────────────────┼──────────────────────┤
+│ kv  → KV namespace  │ kv  → object store   │ kv  → Map<string,T>  │
+│ sql → D1 database   │ sql → sql.js / WASM  │ sql → better-sqlite3 │
+│ blob→ R2 bucket     │ blob→ OPFS           │ blob→ fs (optional)  │
+└─────────────────────┴──────────────────────┴──────────────────────┘
+```
+
+The D1 adapter wraps Cloudflare's D1 binding. The IDB adapter wraps IndexedDB with sql.js for SQL support. The memory adapter uses in-memory Maps — perfect for tests. Your block code never knows which one it's talking to.
+
+## A Real Block: task-queue
+
+Here is the full `block-tasks` package — a task queue with CRUD operations and a claim workflow. This is the actual code from `src/block-tasks/index.ts`:
+
+```typescript
+import { defineBlock, defineTable, t } from "@spike-land-ai/block-sdk";
+import { z } from "zod";
+
+export const TASK_STATUSES = ["pending", "claimed", "done"] as const;
+
+export const taskQueue = defineBlock({
+  name: "task-queue",
+  version: "1.0.0",
+
+  // ── Schema ──────────────────────────────────────────────
+  storage: {
+    tasks: defineTable("tasks", {
+      id: t.string().primaryKey(),
+      title: t.string(),
+      description: t.string(),
+      status: t.string(),       // "pending" | "claimed" | "done"
+      assignee: t.string(),
+      created: t.u64(),
+      updated: t.u64(),
+    }),
+  },
+
+  // ── Procedures ──────────────────────────────────────────
+  procedures: (ctx) => ({
+    createTask: ctx.procedure
+      .tool("create_task", "Create a new task in the queue", {
+        title: z.string().min(1).max(200),
+        description: z.string().max(2000).default(""),
+      })
+      .handler(async ({ input, ctx: blockCtx }) => {
+        const now = Date.now();
+        const task = {
+          id: blockCtx.nanoid(12),
+          title: input.title,
+          description: input.description,
+          status: "pending",
+          assignee: "",
+          created: now,
+          updated: now,
+        };
+        await blockCtx.storage.sql.execute(
+          `INSERT INTO tasks (id, title, description, status,
+           assignee, created, updated) VALUES (?, ?, ?, ?, ?, ?, ?)`,
+          [task.id, task.title, task.description,
+           task.status, task.assignee, task.created, task.updated],
+        );
+        return {
+          content: [{ type: "text", text: JSON.stringify(task, null, 2) }],
+        };
+      }),
+
+    claimTask: ctx.procedure
+      .tool("claim_task", "Claim a pending task for the current user", {
+        taskId: z.string(),
+      })
+      .handler(async ({ input, ctx: blockCtx }) => {
+        const result = await blockCtx.storage.sql.execute(
+          `UPDATE tasks SET status = ?, assignee = ?, updated = ?
+           WHERE id = ? AND status = ?`,
+          ["claimed", blockCtx.userId, Date.now(), input.taskId, "pending"],
+        );
+        if (result.rowsAffected === 0) {
+          return {
+            content: [{ type: "text",
+              text: "Task is not available for claiming" }],
+            isError: true,
+          };
+        }
+        return {
+          content: [{ type: "text",
+            text: JSON.stringify({ claimed: true, taskId: input.taskId }) }],
+        };
+      }),
+
+    // ... listTasks, getTask, completeTask, deleteTask
+  }),
+
+  tools: "auto",  // ← all 6 procedures become MCP tools
+});
+```
+
+The claim workflow is atomic: `UPDATE ... WHERE status = 'pending'` means only one agent can claim a task. No distributed locks. No Redis. Just SQL.
 
 <AgentCoordinationDemo />
 
-This is where SpacetimeDB stops being a "better database" and becomes "the database for agents."
+## The New Architecture
 
-**The Agent table.** Agents register themselves with capabilities, model type, and status. When an agent connects to SpacetimeDB, the `client_connected` lifecycle hook fires and sets the agent online. When the connection drops, `client_disconnected` sets it offline. No heartbeat polling. No health check endpoint. The database knows who is connected because the database IS the connection layer.
+Here is the full stack, running entirely on Cloudflare:
 
-**The AgentMessage table.** Point-to-point messaging between agents. Agent A calls the `send_agent_message` reducer with a recipient identity and a payload. The message is written to the table. Agent B, subscribed to messages where `recipient = self`, gets the delta pushed instantly. No external message bus. No Redis pub/sub. No SQS. The database IS the message bus.
+```
+                            ┌─────────────────────┐
+                            │     spike-app        │
+                            │  Vite + React +      │
+                            │  TanStack Router     │
+                            │  (SPA in R2)         │
+                            └─────────┬───────────┘
+                                      │ HTTPS
+                            ┌─────────▼───────────┐
+                            │     spike-edge       │
+                            │  Hono on CF Workers  │
+                            │  ┌─────────────────┐ │
+                            │  │ CORS + Security  │ │
+                            │  │ Rate Limiter (DO)│ │
+                            │  │ R2 assets        │ │
+                            │  │ Auth proxy       │ │
+                            │  │ API proxy        │ │
+                            │  └─────────────────┘ │
+                            └──┬──────┬──────┬────┘
+                               │      │      │
+                 ┌─────────────▼┐  ┌──▼────┐ ┌▼──────────────┐
+                 │  mcp-auth     │  │spike- │ │spike-land-    │
+                 │  Better Auth  │  │land-  │ │backend        │
+                 │  + D1         │  │mcp    │ │Durable Objects│
+                 │  sessions,    │  │80+    │ │real-time sync │
+                 │  OAuth,       │  │MCP    │ │WebSocket      │
+                 │  device flow  │  │tools  │ │collaboration  │
+                 └──────────────┘  │D1 +   │ └───────────────┘
+                                   │Drizzle│
+                                   └───────┘
+```
 
-**The McpTask table.** A task queue with claim/complete workflow. An orchestrator calls `invoke_tool_request` with a tool name and arguments. The reducer creates an `McpTask` with status `pending`. Any agent subscribed to pending tasks sees it appear. The first agent to call `claim_mcp_task` wins — the reducer checks the status atomically and transitions it to `in_progress`. When done, `complete_mcp_task` writes the result. The whole workflow is four reducers and one table. No Redis-backed job queue. No Celery. No SQS. No dead letter queue configuration.
+The spike-edge service is the edge gateway — here is its actual route structure:
 
-**The RegisteredTool table.** Agents register their tools in the database. Other agents query the table to discover what tools exist, who provides them, and what arguments they take. Tool discovery is a subscription. When a new agent comes online and registers its tools, every other agent subscribed to the `RegisteredTool` table sees them appear in real time.
+```typescript
+// src/spike-edge/index.ts
+const app = new Hono<{ Bindings: Env }>();
 
-Compare this to the old architecture. Agent messaging needed Redis pub/sub — a separate service with its own deployment, monitoring, and failure modes. Task queuing needed SQS or a Redis-backed job queue — another service. Tool discovery needed a custom registry backed by PostgreSQL — another set of API endpoints. That is three services with three failure domains to replace what SpacetimeDB does with three tables in one module.
+// Global middleware: CORS, security headers, error handling
+app.route("/", health);       // GET /health — R2 connectivity
+app.route("/", r2);           // GET/POST/DELETE /r2/:key
+app.route("/", proxy);        // POST /proxy/stripe|ai|github
+app.route("/", live);         // Live update endpoints
+app.route("/", analytics);    // Analytics ingestion
+app.route("/", quizBadge);    // Quiz badge generation
+app.route("/", version);      // Version info
+app.all("/api/auth/*", ...);  // Auth proxy → mcp-auth
+app.route("/", spa);          // SPA catch-all → R2
+```
 
-The SpacetimeServerTransport pattern makes this even more powerful. Any MCP server can connect to SpacetimeDB and become part of the agent swarm. Its tools auto-register in the `RegisteredTool` table. Incoming tasks auto-route through the `McpTask` table. The server does not need to know about the swarm. It just connects, and the database handles the rest.
+<DependencyCascadeDemo />
 
 ## The Migration Math
 
-What we deleted:
-- PostgreSQL as the primary datastore for agent coordination
+**Deleted:**
+- PostgreSQL (Aurora) as primary datastore
 - Prisma as the ORM and migration tool
-- Redis as the cache, pub/sub, and job queue
-- NextAuth session management for agent-to-agent auth
-- Dozens of REST API routes that existed solely to bridge agents to data
+- Redis (ElastiCache) as cache, pub/sub, and job queue
+- NextAuth session management
+- All of AWS — ECS clusters, ALBs, CloudFront distributions, NAT gateways, VPCs
+- SpacetimeDB (lasted exactly one day)
 
-What we deployed:
-- `spacetimedb-platform` — 17 tables, 31 reducers, one `spacetime publish`
-- `spacetimedb-mcp` — 3 more tables, 8 more reducers, agent coordination focused
+**Deployed:**
+- 27 packages, each does one thing
+- D1 database with 17 tables in spike-land-mcp alone (Drizzle-managed)
+- 80+ MCP tools
+- 5 Cloudflare Workers (spike-edge, spike-land-mcp, mcp-auth, spike-land-backend, transpile)
+- 0 servers to manage
 
-What the new stack looks like:
-- **spacetimedb-platform** — the data backbone (one module, one deploy)
-- **spike-edge** — edge API for external clients (Cloudflare Workers + Hono)
-- **spike-app** — frontend SPA (Vite + TanStack Router)
-- **mcp-auth** — authentication for external users (Better Auth on CF Workers)
-- **spike-land-mcp** — MCP registry with 80+ tools (CF Workers + D1)
+| What | Before | After |
+|---|---|---|
+| Database | PostgreSQL (Aurora) | D1 (SQLite at the edge) |
+| ORM | Prisma | Drizzle |
+| Cache | Redis (ElastiCache) | KV / D1 |
+| Auth | NextAuth + JWT | Better Auth + session |
+| Real-time | Redis pub/sub | Durable Objects |
+| Hosting | AWS (ECS + ALB + CloudFront) | Cloudflare Workers |
+| Deploy | Docker build → ECR → ECS | `wrangler deploy` |
+| Monthly cost | $200+ (Aurora + Redis + ECS + NAT) | ~$5 (Workers paid plan) |
 
-The old spike.land: one monolithic Next.js application with ~520 routes and ~383 API endpoints, doing everything from serving pages to managing agent tasks to processing payments.
+## Schema = API = Auth (On Workers)
 
-The new stack: 27 packages. But the complexity went down, not up. Each package does one thing. The platform module replaced what used to be scattered across Prisma migrations, Express routes, Redis scripts, and NextAuth callbacks. Infrastructure packages replaced ceremony packages.
+The thesis that excited me about SpacetimeDB is alive — just on different infrastructure.
 
-## What This Unlocks
+**D1 table = schema.** Drizzle generates migrations from TypeScript table definitions. Here is a snippet from spike-land-mcp's actual schema:
 
-- Agents coordinate in real time. Subscriptions push state changes. No polling. No webhooks. No "check back in two seconds."
-- Any MCP server becomes part of the swarm with one transport change. Connect to SpacetimeDB, auto-register tools, start receiving tasks.
-- The database IS the coordination layer. No glue code between the datastore and the message bus and the task queue. They are the same system.
-- Schema changes propagate to all clients automatically. Regenerate bindings. Recompile. The compiler tells you what broke.
+```typescript
+// src/spike-land-mcp/db/schema.ts (17 tables, excerpt)
+export const users = sqliteTable("users", {
+  id: text("id").primaryKey(),
+  email: text("email").notNull().unique(),
+  name: text("name"),
+  role: text("role").notNull().default("user"),
+  createdAt: integer("created_at", { mode: "number" }).notNull(),
+  updatedAt: integer("updated_at", { mode: "number" }).notNull(),
+});
+
+export const registeredTools = sqliteTable("registered_tools", {
+  id: text("id").primaryKey(),
+  userId: text("user_id").notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  name: text("name").notNull(),
+  description: text("description").notNull(),
+  schema: text("schema").notNull().default("{}"),
+  status: text("status").notNull().default("draft"),
+  installCount: integer("install_count").notNull().default(0),
+  createdAt: integer("created_at", { mode: "number" }).notNull(),
+  updatedAt: integer("updated_at", { mode: "number" }).notNull(),
+});
+```
+
+**Hono route = API.** Typed handlers with Zod validation. No controller classes. No middleware chains longer than three lines.
+
+**Better Auth session = auth.** No JWT refresh. No token expiry edge cases. The session is the credential. `ctx.userId` is the equivalent of SpacetimeDB's `ctx.sender`.
+
+**`drizzle-kit generate` = `spacetime generate`.** Both derive types from the schema. Both catch drift at compile time.
+
+<ConvergenceDemo />
+
+| SpacetimeDB Pattern | CF Workers Equivalent |
+|---|---|
+| Table in module | Drizzle `sqliteTable()` definition |
+| Reducer | Hono route handler / block procedure |
+| `ctx.sender` | `ctx.userId` (Better Auth session) |
+| Subscription query | Durable Object + WebSocket push |
+| `spacetime generate` | `drizzle-kit generate` |
+| `spacetime publish` | `wrangler deploy` |
+| One module = everything | One block = schema + procedures + tools |
 
 ## Trade-Offs
 
-SpacetimeDB is not free of costs. Rust compilation means module builds are meaningfully slower than `prisma generate` — expect minutes, not seconds, for a full rebuild. Debugging is different: there is no `console.log` inside reducers; `spacetime logs` is your interface, and it takes getting used to. The data model is vendor-specific — tables and reducers are SpacetimeDB constructs with no standard SQL escape hatch, so if you need to leave, you are rewriting, not migrating. And SpacetimeDB 2.0 is young. The ecosystem is small compared to PostgreSQL's decades of tooling, extensions, and community knowledge. I am betting on the trajectory, not the current state. That bet could be wrong.
+I am not going to pretend this is strictly better. Here is the honest assessment:
+
+**No built-in real-time subscriptions.** SpacetimeDB's subscription queries — where you subscribe to a SQL query and get deltas pushed — were genuinely great. On CF Workers, real-time requires Durable Objects + WebSocket plumbing. It works, but it's not a primitive. You have to build it.
+
+**D1 is SQLite, not PostgreSQL.** No full-text search (without FTS5 extensions). Limited concurrent write throughput. 10MB database size limit on free tier. For the spike.land workload (mostly reads, moderate writes), this is fine. For a write-heavy analytical workload, it would not be.
+
+**Vendor lock-in shifted.** From SpacetimeDB (small startup, young ecosystem) to Cloudflare (massive company, mature ecosystem). I sleep better at night, but I'm still locked in. The `StorageAdapter` abstraction means I *could* swap backends, but let's be honest — if Cloudflare disappeared tomorrow, I'd be rewriting more than adapters.
+
+**block-sdk is custom and young.** No community. No ecosystem. No Stack Overflow answers. If I get hit by a bus, the next developer reads my code or starts over. But: I own every line. I can read every line. I can change it on a Tuesday. That matters more to me than ecosystem size at this scale.
+
+**SpacetimeDB's developer experience was genuinely good.** The Rust module system, the auto-generated bindings, the single-binary deployment — these are well-designed. If SpacetimeDB had been a Cloudflare product, I might still be using it. The reason I left was not quality. It was that I was adding a dependency I didn't need on top of infrastructure I already had.
 
 ## Closing
 
-I built the tool composition layer so agents could write their own tools. Then I found the database that makes agent coordination a primitive, not a feature. The two together mean agents do not just write tools — they coordinate, discover each other's capabilities, and route tasks in real time.
+The best architecture is the one you stole the patterns from and rebuilt on infrastructure you already understood.
 
-Five years of spiking on ESM, TypeScript, and build pipelines. Strict types. Pure functions. Dependency injection. Zod everywhere. None of it was wasted. Every decision that seemed like an over-investment in correctness turned out to be an under-investment in flexibility. When the right database appeared, the codebase was ready for it.
+SpacetimeDB showed me what a good data abstraction looks like: schema and API and auth converging into one thing. I just didn't need SpacetimeDB to build it. The patterns were universal. The implementation was portable. The weekend was well spent.
 
-The pattern is clear now. The best infrastructure is the kind that disappears. The best ORM is no ORM. The best auth middleware is no middleware. The best message bus is the database itself.
+Twenty-seven packages. Eighty-plus MCP tools. Five Cloudflare Workers. Zero servers. One `defineBlock()` call that packages schema, business logic, and MCP tools into a composable unit that runs anywhere.
 
-The best database for agents is one where the agents are the schema.
+Published on March 8 — International Women's Day, and also Zoltan's nameday. Boldog nevnapot!
+
+*Check out the platform at [spike.land](https://spike.land), or try the [QA Studio](https://spike.land/apps/qa-studio).*
 
 ---
 
