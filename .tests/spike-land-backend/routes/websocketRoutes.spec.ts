@@ -2,22 +2,42 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { Code } from "../../../src/spike-land-backend/chatRoom";
 import { WebsocketRoutes } from "../../../src/spike-land-backend/routes/websocketRoutes";
 
+vi.mock("@spike-land-ai/code", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@spike-land-ai/code")>();
+  return {
+    ...actual,
+    computeSessionHash: vi.fn().mockReturnValue("mock-hash"),
+  };
+});
+
 describe("WebsocketRoutes", () => {
   let websocketRoutes: WebsocketRoutes;
   let mockCode: Code;
   let mockWsHandler: {
-    handleWebsocketSession: ReturnType<typeof vi.fn>;
     getActiveUsers: ReturnType<typeof vi.fn>;
   };
+  let mockAcceptWebSocket: ReturnType<typeof vi.fn>;
 
   beforeEach(() => {
     mockWsHandler = {
-      handleWebsocketSession: vi.fn().mockResolvedValue(undefined),
       getActiveUsers: vi.fn().mockReturnValue(["user1", "user2"]),
     };
 
+    mockAcceptWebSocket = vi.fn();
+
     mockCode = {
       wsHandler: mockWsHandler,
+      getState: vi.fn().mockReturnValue({
+        acceptWebSocket: mockAcceptWebSocket,
+      }),
+      getSession: vi.fn().mockReturnValue({
+        code: "mock code",
+        html: "mock html",
+        css: "mock css",
+        transpiled: "mock transpiled",
+        codeSpace: "test-space",
+        messages: [],
+      }),
     } as unknown as Code;
 
     websocketRoutes = new WebsocketRoutes(mockCode);
@@ -40,12 +60,11 @@ describe("WebsocketRoutes", () => {
       });
 
       // WebSocketPair is only available in Cloudflare Workers
-      // In Node.js test environment, this will throw
       try {
         const response = await websocketRoutes.handleWebsocketRoute(request);
         // If it works (CF Workers), verify the response
         expect(response.status).toBe(101);
-        expect(mockWsHandler.handleWebsocketSession).toHaveBeenCalled();
+        expect(mockAcceptWebSocket).toHaveBeenCalled();
       } catch {
         // WebSocketPair not available in Node.js - expected in test environment
       }

@@ -64,27 +64,9 @@ export class WebSocketHandler {
   }
 
   /**
-   * Rebuild the topics map from all connected WebSockets' attachments.
-   * Called on wake from hibernation or when needed.
-   */
-  private rebuildTopics(): void {
-    this.topics.clear();
-    const sockets = this.state.getWebSockets();
-    for (const ws of sockets) {
-      const attachment = this.getAttachment(ws);
-      for (const topic of attachment.subscribedTopics) {
-        if (!this.topics.has(topic)) {
-          this.topics.set(topic, new Set());
-        }
-        this.topics.get(topic)!.add(ws);
-      }
-    }
-  }
-
-  /**
    * Called from Code.webSocketMessage() when a message arrives.
    */
-  handleMessage(ws: WebSocket, message: string | ArrayBuffer): void {
+  async handleMessage(ws: WebSocket, message: string | ArrayBuffer): Promise<void> {
     if (typeof message !== "string") return; // ignore binary messages
 
     type WsMessage = Record<string, unknown>;
@@ -334,18 +316,17 @@ export class WebSocketHandler {
       }
 
       const patchedSession = applySessionDelta(currentSession, data as unknown as SessionDelta);
-      tryCatch(this.code.updateAndBroadcastSession(patchedSession, ws)).then(({ error }) => {
-        if (error) {
-          this.safeSend(ws, {
-            type: "error",
-            message: "Failed to apply patch " + error.message,
-          });
-          return;
-        }
+      const { error } = await tryCatch(this.code.updateAndBroadcastSession(patchedSession, ws));
+      if (error) {
         this.safeSend(ws, {
-          type: "ack",
-          hashCode: computeSessionHash(patchedSession),
+          type: "error",
+          message: "Failed to apply patch " + error.message,
         });
+        return;
+      }
+      this.safeSend(ws, {
+        type: "ack",
+        hashCode: computeSessionHash(patchedSession),
       });
       return;
     }
