@@ -6,6 +6,7 @@
   "main": "index.ts",
   "scripts": {
     "dev": "wrangler dev",
+    "build": "echo 'CF Worker — no build step required'",
     "deploy": "wrangler deploy",
     "db:generate": "drizzle-kit generate",
     "db:push": "drizzle-kit push",

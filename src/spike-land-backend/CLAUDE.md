@@ -9,7 +9,7 @@ Main backend for spike.land — real-time collaboration, API services, AI integr
 ```bash
 npm run dev          # Local wrangler dev server
 npm run dev:remote   # Remote wrangler dev
-npm run deploy:prod  # Deploy to production (wrangler deploy --minify)
+npm run deploy       # Deploy to production (wrangler deploy --minify)
 npm run deploy:dev   # Deploy to testing env
 npm test             # Run tests (Vitest)
 npm run test:coverage # Tests with coverage

@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "wrangler dev",
     "dev:remote": "wrangler dev --remote",
+    "build": "echo 'CF Worker — no build step required'",
     "deploy": "wrangler deploy --minify",
     "typecheck": "tsc --noEmit",
     "lint": "eslint --quiet src/",
