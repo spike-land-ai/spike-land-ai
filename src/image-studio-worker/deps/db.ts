@@ -130,18 +130,24 @@ interface D1AlbumRow {
   defaultTier: string;
   shareToken: string | null;
   sortOrder: number;
+  isDefault: number;
   pipelineId: string | null;
   createdAt: string;
   updatedAt: string;
 }
 
-function mapAlbumRow(r: D1AlbumRow): AlbumRow {
+export interface GalleryAlbumRow extends AlbumRow {
+  isDefault: boolean;
+}
+
+function mapAlbumRow(r: D1AlbumRow): GalleryAlbumRow {
   return {
     ...r,
     handle: r.handle as AlbumHandle,
     coverImageId: r.coverImageId as ImageId | null,
     privacy: r.privacy as AlbumRow["privacy"],
     defaultTier: r.defaultTier as AlbumRow["defaultTier"],
+    isDefault: r.isDefault === 1,
     pipelineId: r.pipelineId as PipelineId | null,
     createdAt: parseDate(r.createdAt),
     updatedAt: parseDate(r.updatedAt),
@@ -515,8 +521,8 @@ export function createD1Db(env: Env): ImageStudioDeps["db"] {
       await db
         .prepare(
           `INSERT INTO albums (id, handle, userId, name, description, coverImageId,
-           privacy, defaultTier, shareToken, sortOrder, pipelineId, createdAt, updatedAt)
-           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+           privacy, defaultTier, shareToken, sortOrder, isDefault, pipelineId, createdAt, updatedAt)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?, ?)`,
         )
         .bind(
           id,
@@ -1097,4 +1103,95 @@ export function createD1Db(env: Env): ImageStudioDeps["db"] {
       await db.prepare("DELETE FROM subjects WHERE id = ?").bind(id).run();
     },
   };
+}
+
+// ─── Standalone Gallery Functions ───
+
+export async function getOrCreateDefaultAlbum(
+  db: D1Database,
+  userId: string,
+): Promise<{ id: string; handle: string }> {
+  const existing = await db
+    .prepare("SELECT id, handle FROM albums WHERE userId = ? AND isDefault = 1")
+    .bind(userId)
+    .first<{ id: string; handle: string }>();
+
+  if (existing) return existing;
+
+  const id = nanoid();
+  const handle = `gallery-${userId.slice(0, 8)}-${id.slice(0, 6)}`;
+  const now = new Date().toISOString();
+
+  await db
+    .prepare(
+      `INSERT INTO albums (id, handle, userId, name, description, privacy, defaultTier, sortOrder, isDefault, createdAt, updatedAt)
+       VALUES (?, ?, ?, ?, ?, ?, ?, 0, 1, ?, ?)`,
+    )
+    .bind(id, handle, userId, "My Gallery", "Your default image gallery", "PRIVATE", "FREE", now, now)
+    .run();
+
+  return { id, handle };
+}
+
+export async function galleryRecentImages(
+  db: D1Database,
+  userId: string,
+  opts: { cursor?: string; limit?: number; search?: string; tag?: string },
+): Promise<{ images: ImageRow[]; nextCursor: string | null }> {
+  const limit = opts.limit ?? 50;
+  let sql = "SELECT * FROM images WHERE userId = ?";
+  const params: unknown[] = [userId];
+
+  if (opts.search) {
+    sql += " AND (name LIKE ? OR description LIKE ?)";
+    const term = `%${opts.search}%`;
+    params.push(term, term);
+  }
+
+  if (opts.tag) {
+    sql += " AND tags LIKE ?";
+    params.push(`%"${opts.tag}"%`);
+  }
+
+  if (opts.cursor) {
+    sql += " AND createdAt < ?";
+    params.push(opts.cursor);
+  }
+
+  sql += " ORDER BY createdAt DESC LIMIT ?";
+  params.push(limit + 1);
+
+  const result = await db.prepare(sql).bind(...params).all<D1ImageRow>();
+  const rows = result.results.map(mapImageRow);
+
+  const hasMore = rows.length > limit;
+  const images = hasMore ? rows.slice(0, limit) : rows;
+  const nextCursor = hasMore ? images[images.length - 1].createdAt.toISOString() : null;
+
+  return { images, nextCursor };
+}
+
+export async function addImageToDefaultAlbum(
+  db: D1Database,
+  userId: string,
+  imageId: string,
+): Promise<void> {
+  const album = await getOrCreateDefaultAlbum(db, userId);
+  const maxSort = await db
+    .prepare("SELECT MAX(sortOrder) as maxSort FROM album_images WHERE albumId = ?")
+    .bind(album.id)
+    .first<{ maxSort: number | null }>();
+
+  const nextSort = (maxSort?.maxSort ?? -1) + 1;
+  const id = nanoid();
+  const now = new Date().toISOString();
+
+  try {
+    await db
+      .prepare("INSERT INTO album_images (id, albumId, imageId, sortOrder, addedAt) VALUES (?, ?, ?, ?, ?)")
+      .bind(id, album.id, imageId, nextSort, now)
+      .run();
+  } catch {
+    // UNIQUE constraint — already in album, ignore
+  }
 }

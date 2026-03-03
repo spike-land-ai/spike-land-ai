@@ -16,6 +16,7 @@ CREATE TABLE IF NOT EXISTS images (
   viewCount INTEGER NOT NULL DEFAULT 0,
   tags TEXT NOT NULL DEFAULT '[]',
   shareToken TEXT,
+  thumbnailUrl TEXT,
   createdAt TEXT NOT NULL,
   updatedAt TEXT NOT NULL
 );
@@ -56,12 +57,14 @@ CREATE TABLE IF NOT EXISTS albums (
   defaultTier TEXT NOT NULL DEFAULT 'FREE',
   shareToken TEXT,
   sortOrder INTEGER NOT NULL DEFAULT 0,
+  isDefault INTEGER NOT NULL DEFAULT 0,
   pipelineId TEXT,
   createdAt TEXT NOT NULL,
   updatedAt TEXT NOT NULL
 );
 CREATE INDEX IF NOT EXISTS idx_albums_userId ON albums(userId);
 CREATE INDEX IF NOT EXISTS idx_albums_handle ON albums(handle);
+CREATE INDEX IF NOT EXISTS idx_albums_default ON albums(userId, isDefault);
 
 CREATE TABLE IF NOT EXISTS album_images (
   id TEXT PRIMARY KEY,
