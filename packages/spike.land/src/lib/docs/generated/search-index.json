@@ -1,0 +1,3594 @@
+[
+  {
+    "id": "api-/api/404-log",
+    "type": "api",
+    "title": "POST /api/404-log",
+    "description": "/api/404-log endpoint",
+    "category": "404-log",
+    "href": "/docs/api/404-log"
+  },
+  {
+    "id": "api-/api/ab-test/assign",
+    "type": "api",
+    "title": "GET, POST /api/ab-test/assign",
+    "description": "/api/ab-test/assign endpoint",
+    "category": "ab-test",
+    "href": "/docs/api/ab-test/assign"
+  },
+  {
+    "id": "api-/api/admin/mcp-health",
+    "type": "api",
+    "title": "GET /api/admin/mcp-health",
+    "description": "MCP Health & Metrics API Route",
+    "category": "admin",
+    "href": "/docs/api/admin/mcp-health"
+  },
+  {
+    "id": "api-/api/agent-chat",
+    "type": "api",
+    "title": "POST /api/agent-chat",
+    "description": "/api/agent-chat endpoint",
+    "category": "agent-chat",
+    "href": "/docs/api/agent-chat"
+  },
+  {
+    "id": "api-/api/agent-loop",
+    "type": "api",
+    "title": "POST /api/agent-loop",
+    "description": "/api/agent-loop endpoint",
+    "category": "agent-loop",
+    "href": "/docs/api/agent-loop"
+  },
+  {
+    "id": "api-/api/agent/apps/[appId]/context",
+    "type": "api",
+    "title": "GET /api/agent/apps/[appId]/context",
+    "description": "GET /api/agent/apps/[appId]/context",
+    "category": "agent",
+    "href": "/docs/api/agent/apps/%5BappId%5D/context"
+  },
+  {
+    "id": "api-/api/agent/apps/[appId]/respond",
+    "type": "api",
+    "title": "POST /api/agent/apps/[appId]/respond",
+    "description": "POST /api/agent/apps/[appId]/respond",
+    "category": "agent",
+    "href": "/docs/api/agent/apps/%5BappId%5D/respond"
+  },
+  {
+    "id": "api-/api/agent/capabilities",
+    "type": "api",
+    "title": "GET /api/agent/capabilities",
+    "description": "GET /api/agent/capabilities",
+    "category": "agent",
+    "href": "/docs/api/agent/capabilities"
+  },
+  {
+    "id": "api-/api/agent/messages/[messageId]",
+    "type": "api",
+    "title": "GET, PATCH /api/agent/messages/[messageId]",
+    "description": "GET /api/agent/messages/[messageId]",
+    "category": "agent",
+    "href": "/docs/api/agent/messages/%5BmessageId%5D"
+  },
+  {
+    "id": "api-/api/agent/queue",
+    "type": "api",
+    "title": "GET /api/agent/queue",
+    "description": "GET /api/agent/queue",
+    "category": "agent",
+    "href": "/docs/api/agent/queue"
+  },
+  {
+    "id": "api-/api/agent/sandbox/callback",
+    "type": "api",
+    "title": "POST /api/agent/sandbox/callback",
+    "description": "Sandbox Callback Endpoint",
+    "category": "agent",
+    "href": "/docs/api/agent/sandbox/callback"
+  },
+  {
+    "id": "api-/api/agents",
+    "type": "api",
+    "title": "GET /api/agents",
+    "description": "Agent List API",
+    "category": "agents",
+    "href": "/docs/api/agents"
+  },
+  {
+    "id": "api-/api/agents/[agentId]",
+    "type": "api",
+    "title": "GET, PATCH, DELETE /api/agents/[agentId]",
+    "description": "Single Agent API",
+    "category": "agents",
+    "href": "/docs/api/agents/%5BagentId%5D"
+  },
+  {
+    "id": "api-/api/agents/[agentId]/messages",
+    "type": "api",
+    "title": "GET, POST /api/agents/[agentId]/messages",
+    "description": "Agent Messages API",
+    "category": "agents",
+    "href": "/docs/api/agents/%5BagentId%5D/messages"
+  },
+  {
+    "id": "api-/api/agents/[agentId]/tasks",
+    "type": "api",
+    "title": "POST /api/agents/[agentId]/tasks",
+    "description": "Agent Tasks API",
+    "category": "agents",
+    "href": "/docs/api/agents/%5BagentId%5D/tasks"
+  },
+  {
+    "id": "api-/api/agents/connect",
+    "type": "api",
+    "title": "POST /api/agents/connect",
+    "description": "Agent Connection API",
+    "category": "agents",
+    "href": "/docs/api/agents/connect"
+  },
+  {
+    "id": "api-/api/agents/heartbeat",
+    "type": "api",
+    "title": "POST /api/agents/heartbeat",
+    "description": "Agent Heartbeat API",
+    "category": "agents",
+    "href": "/docs/api/agents/heartbeat"
+  },
+  {
+    "id": "api-/api/agents/stream",
+    "type": "api",
+    "title": "GET /api/agents/stream",
+    "description": "Agent SSE Stream API",
+    "category": "agents",
+    "href": "/docs/api/agents/stream"
+  },
+  {
+    "id": "api-/api/ai/connect/[connectId]",
+    "type": "api",
+    "title": "GET, POST, PUT /api/ai/connect/[connectId]",
+    "description": "Agent Connection API",
+    "category": "ai",
+    "href": "/docs/api/ai/connect/%5BconnectId%5D"
+  },
+  {
+    "id": "api-/api/apps",
+    "type": "api",
+    "title": "GET, POST /api/apps",
+    "description": "/api/apps endpoint",
+    "category": "apps",
+    "href": "/docs/api/apps"
+  },
+  {
+    "id": "api-/api/apps/[id]",
+    "type": "api",
+    "title": "GET, PATCH, DELETE /api/apps/[id]",
+    "description": "GET /api/apps/[id]",
+    "category": "apps",
+    "href": "/docs/api/apps/%5Bid%5D"
+  },
+  {
+    "id": "api-/api/apps/[id]/agent",
+    "type": "api",
+    "title": "POST, PATCH /api/apps/[id]/agent",
+    "description": "PATCH /api/apps/[id]/agent",
+    "category": "apps",
+    "href": "/docs/api/apps/%5Bid%5D/agent"
+  },
+  {
+    "id": "api-/api/apps/[id]/agent/chat",
+    "type": "api",
+    "title": "POST /api/apps/[id]/agent/chat",
+    "description": "/api/apps/[id]/agent/chat endpoint",
+    "category": "apps",
+    "href": "/docs/api/apps/%5Bid%5D/agent/chat"
+  },
+  {
+    "id": "api-/api/apps/[id]/bin",
+    "type": "api",
+    "title": "POST /api/apps/[id]/bin",
+    "description": "POST /api/apps/[id]/bin",
+    "category": "apps",
+    "href": "/docs/api/apps/%5Bid%5D/bin"
+  },
+  {
+    "id": "api-/api/apps/[id]/bin/restore",
+    "type": "api",
+    "title": "POST /api/apps/[id]/bin/restore",
+    "description": "POST /api/apps/[id]/bin/restore",
+    "category": "apps",
+    "href": "/docs/api/apps/%5Bid%5D/bin/restore"
+  },
+  {
+    "id": "api-/api/apps/[id]/images",
+    "type": "api",
+    "title": "GET, POST /api/apps/[id]/images",
+    "description": "GET /api/apps/[id]/images",
+    "category": "apps",
+    "href": "/docs/api/apps/%5Bid%5D/images"
+  },
+  {
+    "id": "api-/api/apps/[id]/messages",
+    "type": "api",
+    "title": "GET, POST, DELETE /api/apps/[id]/messages",
+    "description": "GET /api/apps/[id]/messages",
+    "category": "apps",
+    "href": "/docs/api/apps/%5Bid%5D/messages"
+  },
+  {
+    "id": "api-/api/apps/[id]/messages/stream",
+    "type": "api",
+    "title": "GET /api/apps/[id]/messages/stream",
+    "description": "SSE Connection Store",
+    "category": "apps",
+    "href": "/docs/api/apps/%5Bid%5D/messages/stream"
+  },
+  {
+    "id": "api-/api/apps/[id]/permanent",
+    "type": "api",
+    "title": "DELETE /api/apps/[id]/permanent",
+    "description": "DELETE /api/apps/[id]/permanent",
+    "category": "apps",
+    "href": "/docs/api/apps/%5Bid%5D/permanent"
+  },
+  {
+    "id": "api-/api/apps/[id]/status",
+    "type": "api",
+    "title": "GET, PATCH /api/apps/[id]/status",
+    "description": "GET /api/apps/[id]/status",
+    "category": "apps",
+    "href": "/docs/api/apps/%5Bid%5D/status"
+  },
+  {
+    "id": "api-/api/apps/[id]/sync-status",
+    "type": "api",
+    "title": "POST /api/apps/[id]/sync-status",
+    "description": "/api/apps/[id]/sync-status endpoint",
+    "category": "apps",
+    "href": "/docs/api/apps/%5Bid%5D/sync-status"
+  },
+  {
+    "id": "api-/api/apps/[id]/versions",
+    "type": "api",
+    "title": "GET /api/apps/[id]/versions",
+    "description": "/api/apps/[id]/versions endpoint",
+    "category": "apps",
+    "href": "/docs/api/apps/%5Bid%5D/versions"
+  },
+  {
+    "id": "api-/api/apps/[id]/versions/[versionId]/restore",
+    "type": "api",
+    "title": "POST /api/apps/[id]/versions/[versionId]/restore",
+    "description": "/api/apps/[id]/versions/[versionId]/restore endpoint",
+    "category": "apps",
+    "href": "/docs/api/apps/%5Bid%5D/versions/%5BversionId%5D/restore"
+  },
+  {
+    "id": "api-/api/apps/bin",
+    "type": "api",
+    "title": "GET /api/apps/bin",
+    "description": "GET /api/apps/bin",
+    "category": "apps",
+    "href": "/docs/api/apps/bin"
+  },
+  {
+    "id": "api-/api/apps/by-codespace/[codeSpace]",
+    "type": "api",
+    "title": "GET /api/apps/by-codespace/[codeSpace]",
+    "description": "GET /api/apps/by-codespace/[codeSpace]",
+    "category": "apps",
+    "href": "/docs/api/apps/by-codespace/%5BcodeSpace%5D"
+  },
+  {
+    "id": "api-/api/audio/[trackId]",
+    "type": "api",
+    "title": "GET, DELETE /api/audio/[trackId]",
+    "description": "Audio Track API Route - GET and DELETE operations",
+    "category": "audio",
+    "href": "/docs/api/audio/%5BtrackId%5D"
+  },
+  {
+    "id": "api-/api/audio/upload",
+    "type": "api",
+    "title": "POST /api/audio/upload",
+    "description": "Audio Upload API Route",
+    "category": "audio",
+    "href": "/docs/api/audio/upload"
+  },
+  {
+    "id": "api-/api/auth/check-email",
+    "type": "api",
+    "title": "POST /api/auth/check-email",
+    "description": "Email Check API Route",
+    "category": "auth",
+    "href": "/docs/api/auth/check-email"
+  },
+  {
+    "id": "api-/api/auth/health",
+    "type": "api",
+    "title": "GET /api/auth/health",
+    "description": "Auth provider health check endpoint.",
+    "category": "auth",
+    "href": "/docs/api/auth/health"
+  },
+  {
+    "id": "api-/api/auth/mobile/signin",
+    "type": "api",
+    "title": "POST /api/auth/mobile/signin",
+    "description": "Mobile Sign In API Route",
+    "category": "auth",
+    "href": "/docs/api/auth/mobile/signin"
+  },
+  {
+    "id": "api-/api/auth/qr/approve",
+    "type": "api",
+    "title": "POST /api/auth/qr/approve",
+    "description": "/api/auth/qr/approve endpoint",
+    "category": "auth",
+    "href": "/docs/api/auth/qr/approve"
+  },
+  {
+    "id": "api-/api/auth/qr/complete",
+    "type": "api",
+    "title": "POST /api/auth/qr/complete",
+    "description": "/api/auth/qr/complete endpoint",
+    "category": "auth",
+    "href": "/docs/api/auth/qr/complete"
+  },
+  {
+    "id": "api-/api/auth/qr/initiate",
+    "type": "api",
+    "title": "POST /api/auth/qr/initiate",
+    "description": "/api/auth/qr/initiate endpoint",
+    "category": "auth",
+    "href": "/docs/api/auth/qr/initiate"
+  },
+  {
+    "id": "api-/api/auth/qr/poll",
+    "type": "api",
+    "title": "GET /api/auth/qr/poll",
+    "description": "/api/auth/qr/poll endpoint",
+    "category": "auth",
+    "href": "/docs/api/auth/qr/poll"
+  },
+  {
+    "id": "api-/api/auth/signup",
+    "type": "api",
+    "title": "POST /api/auth/signup",
+    "description": "User Signup API Route",
+    "category": "auth",
+    "href": "/docs/api/auth/signup"
+  },
+  {
+    "id": "api-/api/avl/session",
+    "type": "api",
+    "title": "GET, POST /api/avl/session",
+    "description": "AVL Session API",
+    "category": "avl",
+    "href": "/docs/api/avl/session"
+  },
+  {
+    "id": "api-/api/bazdmeg/chat",
+    "type": "api",
+    "title": "GET, POST /api/bazdmeg/chat",
+    "description": "/api/bazdmeg/chat endpoint",
+    "category": "bazdmeg",
+    "href": "/docs/api/bazdmeg/chat"
+  },
+  {
+    "id": "api-/api/bazdmeg/dashboard/chat",
+    "type": "api",
+    "title": "POST /api/bazdmeg/dashboard/chat",
+    "description": "Dashboard Chat Streaming API",
+    "category": "bazdmeg",
+    "href": "/docs/api/bazdmeg/dashboard/chat"
+  },
+  {
+    "id": "api-/api/bazdmeg/dashboard/issues",
+    "type": "api",
+    "title": "GET /api/bazdmeg/dashboard/issues",
+    "description": "Dashboard Issues API",
+    "category": "bazdmeg",
+    "href": "/docs/api/bazdmeg/dashboard/issues"
+  },
+  {
+    "id": "api-/api/bazdmeg/dashboard/jules/status",
+    "type": "api",
+    "title": "GET /api/bazdmeg/dashboard/jules/status",
+    "description": "Jules Status Polling API",
+    "category": "bazdmeg",
+    "href": "/docs/api/bazdmeg/dashboard/jules/status"
+  },
+  {
+    "id": "api-/api/bazdmeg/dashboard/plan",
+    "type": "api",
+    "title": "GET, PUT /api/bazdmeg/dashboard/plan",
+    "description": "Dashboard Plan CRUD API",
+    "category": "bazdmeg",
+    "href": "/docs/api/bazdmeg/dashboard/plan"
+  },
+  {
+    "id": "api-/api/bazdmeg/dashboard/plan/[planId]/approve",
+    "type": "api",
+    "title": "POST /api/bazdmeg/dashboard/plan/[planId]/approve",
+    "description": "Approve Plan API",
+    "category": "bazdmeg",
+    "href": "/docs/api/bazdmeg/dashboard/plan/%5BplanId%5D/approve"
+  },
+  {
+    "id": "api-/api/bazdmeg/dashboard/plan/[planId]/send-to-jules",
+    "type": "api",
+    "title": "POST /api/bazdmeg/dashboard/plan/[planId]/send-to-jules",
+    "description": "Send to Jules API",
+    "category": "bazdmeg",
+    "href": "/docs/api/bazdmeg/dashboard/plan/%5BplanId%5D/send-to-jules"
+  },
+  {
+    "id": "api-/api/bazdmeg/engagement",
+    "type": "api",
+    "title": "POST /api/bazdmeg/engagement",
+    "description": "/api/bazdmeg/engagement endpoint",
+    "category": "bazdmeg",
+    "href": "/docs/api/bazdmeg/engagement"
+  },
+  {
+    "id": "api-/api/bazdmeg/faq",
+    "type": "api",
+    "title": "GET, POST, PATCH, DELETE /api/bazdmeg/faq",
+    "description": "/api/bazdmeg/faq endpoint",
+    "category": "bazdmeg",
+    "href": "/docs/api/bazdmeg/faq"
+  },
+  {
+    "id": "api-/api/bazdmeg/faq/[id]/helpful",
+    "type": "api",
+    "title": "POST /api/bazdmeg/faq/[id]/helpful",
+    "description": "/api/bazdmeg/faq/[id]/helpful endpoint",
+    "category": "bazdmeg",
+    "href": "/docs/api/bazdmeg/faq/%5Bid%5D/helpful"
+  },
+  {
+    "id": "api-/api/bazdmeg/orchestrator",
+    "type": "api",
+    "title": "POST /api/bazdmeg/orchestrator",
+    "description": "/api/bazdmeg/orchestrator endpoint",
+    "category": "bazdmeg",
+    "href": "/docs/api/bazdmeg/orchestrator"
+  },
+  {
+    "id": "api-/api/blog/poll",
+    "type": "api",
+    "title": "GET, POST /api/blog/poll",
+    "description": "POST /api/blog/poll — submit or update a vote",
+    "category": "blog",
+    "href": "/docs/api/blog/poll"
+  },
+  {
+    "id": "api-/api/blog/posts",
+    "type": "api",
+    "title": "GET /api/blog/posts",
+    "description": "GET /api/blog/posts",
+    "category": "blog",
+    "href": "/docs/api/blog/posts"
+  },
+  {
+    "id": "api-/api/blog/posts/[slug]",
+    "type": "api",
+    "title": "GET /api/blog/posts/[slug]",
+    "description": "GET /api/blog/posts/[slug]",
+    "category": "blog",
+    "href": "/docs/api/blog/posts/%5Bslug%5D"
+  },
+  {
+    "id": "api-/api/boxes",
+    "type": "api",
+    "title": "GET, POST /api/boxes",
+    "description": "/api/boxes endpoint",
+    "category": "boxes",
+    "href": "/docs/api/boxes"
+  },
+  {
+    "id": "api-/api/boxes/[id]",
+    "type": "api",
+    "title": "GET, DELETE /api/boxes/[id]",
+    "description": "Resolves and validates the `id` route param.",
+    "category": "boxes",
+    "href": "/docs/api/boxes/%5Bid%5D"
+  },
+  {
+    "id": "api-/api/boxes/[id]/action",
+    "type": "api",
+    "title": "POST /api/boxes/[id]/action",
+    "description": "Resolves and validates the `id` route param.",
+    "category": "boxes",
+    "href": "/docs/api/boxes/%5Bid%5D/action"
+  },
+  {
+    "id": "api-/api/boxes/[id]/clone",
+    "type": "api",
+    "title": "POST /api/boxes/[id]/clone",
+    "description": "/api/boxes/[id]/clone endpoint",
+    "category": "boxes",
+    "href": "/docs/api/boxes/%5Bid%5D/clone"
+  },
+  {
+    "id": "api-/api/boxes/[id]/messages",
+    "type": "api",
+    "title": "POST /api/boxes/[id]/messages",
+    "description": "/api/boxes/[id]/messages endpoint",
+    "category": "boxes",
+    "href": "/docs/api/boxes/%5Bid%5D/messages"
+  },
+  {
+    "id": "api-/api/boxes/[id]/vnc-session",
+    "type": "api",
+    "title": "GET /api/boxes/[id]/vnc-session",
+    "description": "Short-lived token duration for VNC session access.",
+    "category": "boxes",
+    "href": "/docs/api/boxes/%5Bid%5D/vnc-session"
+  },
+  {
+    "id": "api-/api/career/assess",
+    "type": "api",
+    "title": "POST /api/career/assess",
+    "description": "/api/career/assess endpoint",
+    "category": "career",
+    "href": "/docs/api/career/assess"
+  },
+  {
+    "id": "api-/api/career/compare",
+    "type": "api",
+    "title": "POST /api/career/compare",
+    "description": "/api/career/compare endpoint",
+    "category": "career",
+    "href": "/docs/api/career/compare"
+  },
+  {
+    "id": "api-/api/career/geolocation",
+    "type": "api",
+    "title": "GET /api/career/geolocation",
+    "description": "/api/career/geolocation endpoint",
+    "category": "career",
+    "href": "/docs/api/career/geolocation"
+  },
+  {
+    "id": "api-/api/career/jobs",
+    "type": "api",
+    "title": "GET /api/career/jobs",
+    "description": "/api/career/jobs endpoint",
+    "category": "career",
+    "href": "/docs/api/career/jobs"
+  },
+  {
+    "id": "api-/api/career/occupations",
+    "type": "api",
+    "title": "GET /api/career/occupations",
+    "description": "/api/career/occupations endpoint",
+    "category": "career",
+    "href": "/docs/api/career/occupations"
+  },
+  {
+    "id": "api-/api/career/occupations/[id]",
+    "type": "api",
+    "title": "GET /api/career/occupations/[id]",
+    "description": "/api/career/occupations/[id] endpoint",
+    "category": "career",
+    "href": "/docs/api/career/occupations/%5Bid%5D"
+  },
+  {
+    "id": "api-/api/chat",
+    "type": "api",
+    "title": "POST /api/chat",
+    "description": "/api/chat endpoint",
+    "category": "chat",
+    "href": "/docs/api/chat"
+  },
+  {
+    "id": "api-/api/clean/achievements",
+    "type": "api",
+    "title": "GET /api/clean/achievements",
+    "description": "GET /api/clean/achievements",
+    "category": "clean",
+    "href": "/docs/api/clean/achievements"
+  },
+  {
+    "id": "api-/api/clean/achievements/check",
+    "type": "api",
+    "title": "POST /api/clean/achievements/check",
+    "description": "POST /api/clean/achievements/check",
+    "category": "clean",
+    "href": "/docs/api/clean/achievements/check"
+  },
+  {
+    "id": "api-/api/clean/reminders",
+    "type": "api",
+    "title": "GET, POST /api/clean/reminders",
+    "description": "GET /api/clean/reminders",
+    "category": "clean",
+    "href": "/docs/api/clean/reminders"
+  },
+  {
+    "id": "api-/api/clean/reminders/[reminderId]",
+    "type": "api",
+    "title": "PATCH, DELETE /api/clean/reminders/[reminderId]",
+    "description": "PATCH /api/clean/reminders/[reminderId]",
+    "category": "clean",
+    "href": "/docs/api/clean/reminders/%5BreminderId%5D"
+  },
+  {
+    "id": "api-/api/clean/sessions",
+    "type": "api",
+    "title": "GET, POST /api/clean/sessions",
+    "description": "GET /api/clean/sessions",
+    "category": "clean",
+    "href": "/docs/api/clean/sessions"
+  },
+  {
+    "id": "api-/api/clean/sessions/[sessionId]",
+    "type": "api",
+    "title": "GET, PATCH /api/clean/sessions/[sessionId]",
+    "description": "GET /api/clean/sessions/[sessionId]",
+    "category": "clean",
+    "href": "/docs/api/clean/sessions/%5BsessionId%5D"
+  },
+  {
+    "id": "api-/api/clean/sessions/[sessionId]/tasks",
+    "type": "api",
+    "title": "GET, POST /api/clean/sessions/[sessionId]/tasks",
+    "description": "GET /api/clean/sessions/[sessionId]/tasks",
+    "category": "clean",
+    "href": "/docs/api/clean/sessions/%5BsessionId%5D/tasks"
+  },
+  {
+    "id": "api-/api/clean/sessions/[sessionId]/tasks/[taskId]",
+    "type": "api",
+    "title": "PATCH /api/clean/sessions/[sessionId]/tasks/[taskId]",
+    "description": "PATCH /api/clean/sessions/[sessionId]/tasks/[taskId]",
+    "category": "clean",
+    "href": "/docs/api/clean/sessions/%5BsessionId%5D/tasks/%5BtaskId%5D"
+  },
+  {
+    "id": "api-/api/clean/streaks",
+    "type": "api",
+    "title": "GET /api/clean/streaks",
+    "description": "GET /api/clean/streaks",
+    "category": "clean",
+    "href": "/docs/api/clean/streaks"
+  },
+  {
+    "id": "api-/api/clean/streaks/record",
+    "type": "api",
+    "title": "POST /api/clean/streaks/record",
+    "description": "POST /api/clean/streaks/record",
+    "category": "clean",
+    "href": "/docs/api/clean/streaks/record"
+  },
+  {
+    "id": "api-/api/codespace/[codeSpace]/bundle",
+    "type": "api",
+    "title": "GET /api/codespace/[codeSpace]/bundle",
+    "description": "GET /api/codespace/[codeSpace]/bundle",
+    "category": "codespace",
+    "href": "/docs/api/codespace/%5BcodeSpace%5D/bundle"
+  },
+  {
+    "id": "api-/api/codespace/[codeSpace]/chat",
+    "type": "api",
+    "title": "POST /api/codespace/[codeSpace]/chat",
+    "description": "/api/codespace/[codeSpace]/chat endpoint",
+    "category": "codespace",
+    "href": "/docs/api/codespace/%5BcodeSpace%5D/chat"
+  },
+  {
+    "id": "api-/api/codespace/[codeSpace]/code",
+    "type": "api",
+    "title": "GET, PUT /api/codespace/[codeSpace]/code",
+    "description": "/api/codespace/[codeSpace]/code endpoint",
+    "category": "codespace",
+    "href": "/docs/api/codespace/%5BcodeSpace%5D/code"
+  },
+  {
+    "id": "api-/api/codespace/[codeSpace]/embed",
+    "type": "api",
+    "title": "GET /api/codespace/[codeSpace]/embed",
+    "description": "GET /api/codespace/[codeSpace]/embed",
+    "category": "codespace",
+    "href": "/docs/api/codespace/%5BcodeSpace%5D/embed"
+  },
+  {
+    "id": "api-/api/codespace/[codeSpace]/mcp",
+    "type": "api",
+    "title": "GET, POST /api/codespace/[codeSpace]/mcp",
+    "description": "MCP (Model Context Protocol) JSON-RPC 2.0 Endpoint",
+    "category": "codespace",
+    "href": "/docs/api/codespace/%5BcodeSpace%5D/mcp"
+  },
+  {
+    "id": "api-/api/codespace/[codeSpace]/run",
+    "type": "api",
+    "title": "POST /api/codespace/[codeSpace]/run",
+    "description": "/api/codespace/[codeSpace]/run endpoint",
+    "category": "codespace",
+    "href": "/docs/api/codespace/%5BcodeSpace%5D/run"
+  },
+  {
+    "id": "api-/api/codespace/[codeSpace]/session",
+    "type": "api",
+    "title": "GET /api/codespace/[codeSpace]/session",
+    "description": "/api/codespace/[codeSpace]/session endpoint",
+    "category": "codespace",
+    "href": "/docs/api/codespace/%5BcodeSpace%5D/session"
+  },
+  {
+    "id": "api-/api/codespace/[codeSpace]/stream",
+    "type": "api",
+    "title": "GET /api/codespace/[codeSpace]/stream",
+    "description": "GET /api/codespace/[codeSpace]/stream",
+    "category": "codespace",
+    "href": "/docs/api/codespace/%5BcodeSpace%5D/stream"
+  },
+  {
+    "id": "api-/api/codespace/[codeSpace]/update",
+    "type": "api",
+    "title": "POST /api/codespace/[codeSpace]/update",
+    "description": "POST /api/codespace/[codeSpace]/update",
+    "category": "codespace",
+    "href": "/docs/api/codespace/%5BcodeSpace%5D/update"
+  },
+  {
+    "id": "api-/api/codespace/[codeSpace]/validate",
+    "type": "api",
+    "title": "POST /api/codespace/[codeSpace]/validate",
+    "description": "/api/codespace/[codeSpace]/validate endpoint",
+    "category": "codespace",
+    "href": "/docs/api/codespace/%5BcodeSpace%5D/validate"
+  },
+  {
+    "id": "api-/api/codespace/[codeSpace]/version/[number]",
+    "type": "api",
+    "title": "GET /api/codespace/[codeSpace]/version/[number]",
+    "description": "GET /api/codespace/[codeSpace]/version/[number]",
+    "category": "codespace",
+    "href": "/docs/api/codespace/%5BcodeSpace%5D/version/%5Bnumber%5D"
+  },
+  {
+    "id": "api-/api/codespace/[codeSpace]/version/[number]/code",
+    "type": "api",
+    "title": "GET /api/codespace/[codeSpace]/version/[number]/code",
+    "description": "GET /api/codespace/[codeSpace]/version/[number]/code",
+    "category": "codespace",
+    "href": "/docs/api/codespace/%5BcodeSpace%5D/version/%5Bnumber%5D/code"
+  },
+  {
+    "id": "api-/api/codespace/[codeSpace]/version/[number]/css",
+    "type": "api",
+    "title": "GET /api/codespace/[codeSpace]/version/[number]/css",
+    "description": "GET /api/codespace/[codeSpace]/version/[number]/css",
+    "category": "codespace",
+    "href": "/docs/api/codespace/%5BcodeSpace%5D/version/%5Bnumber%5D/css"
+  },
+  {
+    "id": "api-/api/codespace/[codeSpace]/version/[number]/embed",
+    "type": "api",
+    "title": "GET /api/codespace/[codeSpace]/version/[number]/embed",
+    "description": "GET /api/codespace/[codeSpace]/version/[number]/embed",
+    "category": "codespace",
+    "href": "/docs/api/codespace/%5BcodeSpace%5D/version/%5Bnumber%5D/embed"
+  },
+  {
+    "id": "api-/api/codespace/[codeSpace]/version/[number]/js",
+    "type": "api",
+    "title": "GET /api/codespace/[codeSpace]/version/[number]/js",
+    "description": "GET /api/codespace/[codeSpace]/version/[number]/js",
+    "category": "codespace",
+    "href": "/docs/api/codespace/%5BcodeSpace%5D/version/%5Bnumber%5D/js"
+  },
+  {
+    "id": "api-/api/codespace/[codeSpace]/versions",
+    "type": "api",
+    "title": "GET /api/codespace/[codeSpace]/versions",
+    "description": "GET /api/codespace/[codeSpace]/versions",
+    "category": "codespace",
+    "href": "/docs/api/codespace/%5BcodeSpace%5D/versions"
+  },
+  {
+    "id": "api-/api/codespace/[codeSpace]/worker",
+    "type": "api",
+    "title": "GET /api/codespace/[codeSpace]/worker",
+    "description": "GET /api/codespace/[codeSpace]/worker",
+    "category": "codespace",
+    "href": "/docs/api/codespace/%5BcodeSpace%5D/worker"
+  },
+  {
+    "id": "api-/api/comments",
+    "type": "api",
+    "title": "GET, POST /api/comments",
+    "description": "GET /api/comments?contentType=blog&slug=my-slug",
+    "category": "comments",
+    "href": "/docs/api/comments"
+  },
+  {
+    "id": "api-/api/comments/[id]",
+    "type": "api",
+    "title": "DELETE /api/comments/[id]",
+    "description": "DELETE /api/comments/[id]",
+    "category": "comments",
+    "href": "/docs/api/comments/%5Bid%5D"
+  },
+  {
+    "id": "api-/api/competitors",
+    "type": "api",
+    "title": "GET, POST /api/competitors",
+    "description": "/api/competitors endpoint",
+    "category": "competitors",
+    "href": "/docs/api/competitors"
+  },
+  {
+    "id": "api-/api/competitors/[id]",
+    "type": "api",
+    "title": "DELETE /api/competitors/[id]",
+    "description": "/api/competitors/[id] endpoint",
+    "category": "competitors",
+    "href": "/docs/api/competitors/%5Bid%5D"
+  },
+  {
+    "id": "api-/api/connect/challenges",
+    "type": "api",
+    "title": "GET, POST /api/connect/challenges",
+    "description": "GET /api/connect/challenges - List open challenges",
+    "category": "connect",
+    "href": "/docs/api/connect/challenges"
+  },
+  {
+    "id": "api-/api/connect/challenges/[id]",
+    "type": "api",
+    "title": "GET /api/connect/challenges/[id]",
+    "description": "GET /api/connect/challenges/[id] - Challenge detail with top submissions",
+    "category": "connect",
+    "href": "/docs/api/connect/challenges/%5Bid%5D"
+  },
+  {
+    "id": "api-/api/connect/challenges/[id]/review",
+    "type": "api",
+    "title": "POST /api/connect/challenges/[id]/review",
+    "description": "POST /api/connect/challenges/[id]/review - Submit a review",
+    "category": "connect",
+    "href": "/docs/api/connect/challenges/%5Bid%5D/review"
+  },
+  {
+    "id": "api-/api/connect/challenges/[id]/stream",
+    "type": "api",
+    "title": "GET /api/connect/challenges/[id]/stream",
+    "description": "GET /api/connect/challenges/[id]/stream?submissionId=xxx",
+    "category": "connect",
+    "href": "/docs/api/connect/challenges/%5Bid%5D/stream"
+  },
+  {
+    "id": "api-/api/connect/challenges/[id]/submit",
+    "type": "api",
+    "title": "POST /api/connect/challenges/[id]/submit",
+    "description": "POST /api/connect/challenges/[id]/submit - Submit a prompt",
+    "category": "connect",
+    "href": "/docs/api/connect/challenges/%5Bid%5D/submit"
+  },
+  {
+    "id": "api-/api/connect/leaderboard",
+    "type": "api",
+    "title": "GET /api/connect/leaderboard",
+    "description": "GET /api/connect/leaderboard - Top ELO rankings",
+    "category": "connect",
+    "href": "/docs/api/connect/leaderboard"
+  },
+  {
+    "id": "api-/api/content/stats",
+    "type": "api",
+    "title": "GET /api/content/stats",
+    "description": "GET /api/content/stats?path=/blog/some-slug",
+    "category": "content",
+    "href": "/docs/api/content/stats"
+  },
+  {
+    "id": "api-/api/create/[slug]/screenshot",
+    "type": "api",
+    "title": "GET /api/create/[slug]/screenshot",
+    "description": "/api/create/[slug]/screenshot endpoint",
+    "category": "create",
+    "href": "/docs/api/create/%5Bslug%5D/screenshot"
+  },
+  {
+    "id": "api-/api/create/classify",
+    "type": "api",
+    "title": "POST /api/create/classify",
+    "description": "/api/create/classify endpoint",
+    "category": "create",
+    "href": "/docs/api/create/classify"
+  },
+  {
+    "id": "api-/api/create/generate",
+    "type": "api",
+    "title": "GET /api/create/generate",
+    "description": "/api/create/generate endpoint",
+    "category": "create",
+    "href": "/docs/api/create/generate"
+  },
+  {
+    "id": "api-/api/create/health",
+    "type": "api",
+    "title": "GET /api/create/health",
+    "description": "/api/create/health endpoint",
+    "category": "create",
+    "href": "/docs/api/create/health"
+  },
+  {
+    "id": "api-/api/create/revalidate",
+    "type": "api",
+    "title": "POST /api/create/revalidate",
+    "description": "POST /api/create/revalidate",
+    "category": "create",
+    "href": "/docs/api/create/revalidate"
+  },
+  {
+    "id": "api-/api/create/review",
+    "type": "api",
+    "title": "GET, POST /api/create/review",
+    "description": "GET /api/create/review?slug=...",
+    "category": "create",
+    "href": "/docs/api/create/review"
+  },
+  {
+    "id": "api-/api/create/screenshot",
+    "type": "api",
+    "title": "GET /api/create/screenshot",
+    "description": "/api/create/screenshot endpoint",
+    "category": "create",
+    "href": "/docs/api/create/screenshot"
+  },
+  {
+    "id": "api-/api/create/search",
+    "type": "api",
+    "title": "GET /api/create/search",
+    "description": "/api/create/search endpoint",
+    "category": "create",
+    "href": "/docs/api/create/search"
+  },
+  {
+    "id": "api-/api/create/stream",
+    "type": "api",
+    "title": "POST /api/create/stream",
+    "description": "Check if the local Create agent is reachable.",
+    "category": "create",
+    "href": "/docs/api/create/stream"
+  },
+  {
+    "id": "api-/api/create/upload-image",
+    "type": "api",
+    "title": "POST /api/create/upload-image",
+    "description": "/api/create/upload-image endpoint",
+    "category": "create",
+    "href": "/docs/api/create/upload-image"
+  },
+  {
+    "id": "api-/api/credits/balance",
+    "type": "api",
+    "title": "GET /api/credits/balance",
+    "description": "GET /api/credits/balance",
+    "category": "credits",
+    "href": "/docs/api/credits/balance"
+  },
+  {
+    "id": "api-/api/cron/boost-detector",
+    "type": "api",
+    "title": "GET /api/cron/boost-detector",
+    "description": "GET /api/cron/boost-detector",
+    "category": "cron",
+    "href": "/docs/api/cron/boost-detector"
+  },
+  {
+    "id": "api-/api/cron/boost-performance-sync",
+    "type": "api",
+    "title": "GET /api/cron/boost-performance-sync",
+    "description": "GET /api/cron/boost-performance-sync",
+    "category": "cron",
+    "href": "/docs/api/cron/boost-performance-sync"
+  },
+  {
+    "id": "api-/api/cron/cleanup-bin",
+    "type": "api",
+    "title": "GET /api/cron/cleanup-bin",
+    "description": "Cron Bin Cleanup Route",
+    "category": "cron",
+    "href": "/docs/api/cron/cleanup-bin"
+  },
+  {
+    "id": "api-/api/cron/cleanup-errors",
+    "type": "api",
+    "title": "GET /api/cron/cleanup-errors",
+    "description": "Error Log Cleanup Cron Job",
+    "category": "cron",
+    "href": "/docs/api/cron/cleanup-errors"
+  },
+  {
+    "id": "api-/api/cron/cleanup-jobs",
+    "type": "api",
+    "title": "GET /api/cron/cleanup-jobs",
+    "description": "/api/cron/cleanup-jobs endpoint",
+    "category": "cron",
+    "href": "/docs/api/cron/cleanup-jobs"
+  },
+  {
+    "id": "api-/api/cron/cleanup-sandboxes",
+    "type": "api",
+    "title": "GET /api/cron/cleanup-sandboxes",
+    "description": "Sandbox Cleanup Cron Job",
+    "category": "cron",
+    "href": "/docs/api/cron/cleanup-sandboxes"
+  },
+  {
+    "id": "api-/api/cron/cleanup-tracking",
+    "type": "api",
+    "title": "GET /api/cron/cleanup-tracking",
+    "description": "Data Retention Cleanup Cron Job",
+    "category": "cron",
+    "href": "/docs/api/cron/cleanup-tracking"
+  },
+  {
+    "id": "api-/api/cron/create-agent-alert",
+    "type": "api",
+    "title": "GET /api/cron/create-agent-alert",
+    "description": "Create Agent Alert Cron Job",
+    "category": "cron",
+    "href": "/docs/api/cron/create-agent-alert"
+  },
+  {
+    "id": "api-/api/cron/marketing-sync",
+    "type": "api",
+    "title": "GET /api/cron/marketing-sync",
+    "description": "Marketing Sync Cron Job",
+    "category": "cron",
+    "href": "/docs/api/cron/marketing-sync"
+  },
+  {
+    "id": "api-/api/cron/reset-workspace-credits",
+    "type": "api",
+    "title": "GET /api/cron/reset-workspace-credits",
+    "description": "Cron Workspace Credit Reset Route",
+    "category": "cron",
+    "href": "/docs/api/cron/reset-workspace-credits"
+  },
+  {
+    "id": "api-/api/cron/sync-box-status",
+    "type": "api",
+    "title": "GET /api/cron/sync-box-status",
+    "description": "Box Status Sync Cron Job",
+    "category": "cron",
+    "href": "/docs/api/cron/sync-box-status"
+  },
+  {
+    "id": "api-/api/errors/report",
+    "type": "api",
+    "title": "POST /api/errors/report",
+    "description": "POST /api/errors/report",
+    "category": "errors",
+    "href": "/docs/api/errors/report"
+  },
+  {
+    "id": "api-/api/g/generate",
+    "type": "api",
+    "title": "POST /api/g/generate",
+    "description": "/api/g/generate endpoint",
+    "category": "g",
+    "href": "/docs/api/g/generate"
+  },
+  {
+    "id": "api-/api/g/status/[...slug]",
+    "type": "api",
+    "title": "GET /api/g/status/[...slug]",
+    "description": "/api/g/status/[...slug] endpoint",
+    "category": "g",
+    "href": "/docs/api/g/status/%5B...slug%5D"
+  },
+  {
+    "id": "api-/api/g/stream/[generationId]",
+    "type": "api",
+    "title": "GET /api/g/stream/[generationId]",
+    "description": "/api/g/stream/[generationId] endpoint",
+    "category": "g",
+    "href": "/docs/api/g/stream/%5BgenerationId%5D"
+  },
+  {
+    "id": "api-/api/health",
+    "type": "api",
+    "title": "GET /api/health",
+    "description": "Health check endpoint for deployment verification",
+    "category": "health",
+    "href": "/docs/api/health"
+  },
+  {
+    "id": "api-/api/image-studio/mcp",
+    "type": "api",
+    "title": "POST /api/image-studio/mcp",
+    "description": "/api/image-studio/mcp endpoint",
+    "category": "image-studio",
+    "href": "/docs/api/image-studio/mcp"
+  },
+  {
+    "id": "api-/api/learnit/generate",
+    "type": "api",
+    "title": "POST /api/learnit/generate",
+    "description": "/api/learnit/generate endpoint",
+    "category": "learnit",
+    "href": "/docs/api/learnit/generate"
+  },
+  {
+    "id": "api-/api/learnit/regenerate",
+    "type": "api",
+    "title": "POST /api/learnit/regenerate",
+    "description": "/api/learnit/regenerate endpoint",
+    "category": "learnit",
+    "href": "/docs/api/learnit/regenerate"
+  },
+  {
+    "id": "api-/api/learnit/relations",
+    "type": "api",
+    "title": "GET, POST /api/learnit/relations",
+    "description": "GET /api/learnit/relations?slug=topic-slug&type=all",
+    "category": "learnit",
+    "href": "/docs/api/learnit/relations"
+  },
+  {
+    "id": "api-/api/learnit/search",
+    "type": "api",
+    "title": "GET /api/learnit/search",
+    "description": "/api/learnit/search endpoint",
+    "category": "learnit",
+    "href": "/docs/api/learnit/search"
+  },
+  {
+    "id": "api-/api/learnit/stream",
+    "type": "api",
+    "title": "POST /api/learnit/stream",
+    "description": "Streaming endpoint for LearnIt content generation.",
+    "category": "learnit",
+    "href": "/docs/api/learnit/stream"
+  },
+  {
+    "id": "api-/api/learnit/topics/[...slug]",
+    "type": "api",
+    "title": "GET /api/learnit/topics/[...slug]",
+    "description": "/api/learnit/topics/[...slug] endpoint",
+    "category": "learnit",
+    "href": "/docs/api/learnit/topics/%5B...slug%5D"
+  },
+  {
+    "id": "api-/api/live/[codeSpace]",
+    "type": "api",
+    "title": "GET /api/live/[codeSpace]",
+    "description": "GET /api/live/[codeSpace]",
+    "category": "live",
+    "href": "/docs/api/live/%5BcodeSpace%5D"
+  },
+  {
+    "id": "api-/api/live/[codeSpace]/sync",
+    "type": "api",
+    "title": "POST /api/live/[codeSpace]/sync",
+    "description": "POST /api/live/[codeSpace]/sync",
+    "category": "live",
+    "href": "/docs/api/live/%5BcodeSpace%5D/sync"
+  },
+  {
+    "id": "api-/api/logs/image-error",
+    "type": "api",
+    "title": "POST /api/logs/image-error",
+    "description": "/api/logs/image-error endpoint",
+    "category": "logs",
+    "href": "/docs/api/logs/image-error"
+  },
+  {
+    "id": "api-/api/mcp",
+    "type": "api",
+    "title": "GET, POST, DELETE /api/mcp",
+    "description": "Streamable HTTP MCP Endpoint",
+    "category": "mcp",
+    "href": "/docs/api/mcp"
+  },
+  {
+    "id": "api-/api/mcp/apps/[slug]",
+    "type": "api",
+    "title": "GET, POST, DELETE /api/mcp/apps/[slug]",
+    "description": "Per-App MCP Endpoint",
+    "category": "mcp",
+    "href": "/docs/api/mcp/apps/%5Bslug%5D"
+  },
+  {
+    "id": "api-/api/mcp/balance",
+    "type": "api",
+    "title": "GET /api/mcp/balance",
+    "description": "GET /api/mcp/balance",
+    "category": "mcp",
+    "href": "/docs/api/mcp/balance"
+  },
+  {
+    "id": "api-/api/mcp/oauth/authorize",
+    "type": "api",
+    "title": "GET /api/mcp/oauth/authorize",
+    "description": "OAuth Authorization Endpoint",
+    "category": "mcp",
+    "href": "/docs/api/mcp/oauth/authorize"
+  },
+  {
+    "id": "api-/api/mcp/oauth/device",
+    "type": "api",
+    "title": "POST /api/mcp/oauth/device",
+    "description": "Device Authorization Endpoint (RFC 8628)",
+    "category": "mcp",
+    "href": "/docs/api/mcp/oauth/device"
+  },
+  {
+    "id": "api-/api/mcp/oauth/device/poll",
+    "type": "api",
+    "title": "POST /api/mcp/oauth/device/poll",
+    "description": "Device Code Polling Endpoint (RFC 8628)",
+    "category": "mcp",
+    "href": "/docs/api/mcp/oauth/device/poll"
+  },
+  {
+    "id": "api-/api/mcp/oauth/device/verify",
+    "type": "api",
+    "title": "GET, POST /api/mcp/oauth/device/verify",
+    "description": "Device Code Browser Verification API",
+    "category": "mcp",
+    "href": "/docs/api/mcp/oauth/device/verify"
+  },
+  {
+    "id": "api-/api/mcp/oauth/register",
+    "type": "api",
+    "title": "POST /api/mcp/oauth/register",
+    "description": "OAuth Dynamic Client Registration Endpoint (RFC 7591)",
+    "category": "mcp",
+    "href": "/docs/api/mcp/oauth/register"
+  },
+  {
+    "id": "api-/api/mcp/oauth/token",
+    "type": "api",
+    "title": "POST /api/mcp/oauth/token",
+    "description": "OAuth Token Endpoint",
+    "category": "mcp",
+    "href": "/docs/api/mcp/oauth/token"
+  },
+  {
+    "id": "api-/api/mcp/proxy",
+    "type": "api",
+    "title": "POST /api/mcp/proxy",
+    "description": "/api/mcp/proxy endpoint",
+    "category": "mcp",
+    "href": "/docs/api/mcp/proxy"
+  },
+  {
+    "id": "api-/api/mcp/token",
+    "type": "api",
+    "title": "POST /api/mcp/token",
+    "description": "/api/mcp/token endpoint",
+    "category": "mcp",
+    "href": "/docs/api/mcp/token"
+  },
+  {
+    "id": "api-/api/newsletter/subscribe",
+    "type": "api",
+    "title": "POST /api/newsletter/subscribe",
+    "description": "/api/newsletter/subscribe endpoint",
+    "category": "newsletter",
+    "href": "/docs/api/newsletter/subscribe"
+  },
+  {
+    "id": "api-/api/onboarding",
+    "type": "api",
+    "title": "GET, POST /api/onboarding",
+    "description": "GET /api/onboarding — return the current user's onboarding persona (or null)",
+    "category": "onboarding",
+    "href": "/docs/api/onboarding"
+  },
+  {
+    "id": "api-/api/permissions/pending",
+    "type": "api",
+    "title": "GET /api/permissions/pending",
+    "description": "GET /api/permissions/pending",
+    "category": "permissions",
+    "href": "/docs/api/permissions/pending"
+  },
+  {
+    "id": "api-/api/permissions/respond",
+    "type": "api",
+    "title": "POST /api/permissions/respond",
+    "description": "POST /api/permissions/respond",
+    "category": "permissions",
+    "href": "/docs/api/permissions/respond"
+  },
+  {
+    "id": "api-/api/ready",
+    "type": "api",
+    "title": "GET /api/ready",
+    "description": "Readiness endpoint — verifies DB and Redis connectivity.",
+    "category": "ready",
+    "href": "/docs/api/ready"
+  },
+  {
+    "id": "api-/api/settings/api-keys",
+    "type": "api",
+    "title": "GET, POST /api/settings/api-keys",
+    "description": "/api/settings/api-keys endpoint",
+    "category": "settings",
+    "href": "/docs/api/settings/api-keys"
+  },
+  {
+    "id": "api-/api/settings/api-keys/[id]",
+    "type": "api",
+    "title": "GET, DELETE /api/settings/api-keys/[id]",
+    "description": "/api/settings/api-keys/[id] endpoint",
+    "category": "settings",
+    "href": "/docs/api/settings/api-keys/%5Bid%5D"
+  },
+  {
+    "id": "api-/api/site-chat",
+    "type": "api",
+    "title": "POST /api/site-chat",
+    "description": "/api/site-chat endpoint",
+    "category": "site-chat",
+    "href": "/docs/api/site-chat"
+  },
+  {
+    "id": "api-/api/store-app/engagement",
+    "type": "api",
+    "title": "POST /api/store-app/engagement",
+    "description": "/api/store-app/engagement endpoint",
+    "category": "store-app",
+    "href": "/docs/api/store-app/engagement"
+  },
+  {
+    "id": "api-/api/store-app/error",
+    "type": "api",
+    "title": "POST /api/store-app/error",
+    "description": "/api/store-app/error endpoint",
+    "category": "store-app",
+    "href": "/docs/api/store-app/error"
+  },
+  {
+    "id": "api-/api/store-app/impression",
+    "type": "api",
+    "title": "POST /api/store-app/impression",
+    "description": "/api/store-app/impression endpoint",
+    "category": "store-app",
+    "href": "/docs/api/store-app/impression"
+  },
+  {
+    "id": "api-/api/store/apps/[slug]/install",
+    "type": "api",
+    "title": "GET, POST /api/store/apps/[slug]/install",
+    "description": "/api/store/apps/[slug]/install endpoint",
+    "category": "store",
+    "href": "/docs/api/store/apps/%5Bslug%5D/install"
+  },
+  {
+    "id": "api-/api/store/apps/[slug]/reviews",
+    "type": "api",
+    "title": "GET, POST /api/store/apps/[slug]/reviews",
+    "description": "/api/store/apps/[slug]/reviews endpoint",
+    "category": "store",
+    "href": "/docs/api/store/apps/%5Bslug%5D/reviews"
+  },
+  {
+    "id": "api-/api/store/personalized",
+    "type": "api",
+    "title": "GET /api/store/personalized",
+    "description": "Personalized Store API",
+    "category": "store",
+    "href": "/docs/api/store/personalized"
+  },
+  {
+    "id": "api-/api/store/recommendations",
+    "type": "api",
+    "title": "GET /api/store/recommendations",
+    "description": "/api/store/recommendations endpoint",
+    "category": "store",
+    "href": "/docs/api/store/recommendations"
+  },
+  {
+    "id": "api-/api/store/skills",
+    "type": "api",
+    "title": "GET /api/store/skills",
+    "description": "Skill Store API - Public catalog",
+    "category": "store",
+    "href": "/docs/api/store/skills"
+  },
+  {
+    "id": "api-/api/store/skills/[skillId]",
+    "type": "api",
+    "title": "GET /api/store/skills/[skillId]",
+    "description": "Skill Store API - Skill detail",
+    "category": "store",
+    "href": "/docs/api/store/skills/%5BskillId%5D"
+  },
+  {
+    "id": "api-/api/store/skills/[skillId]/install",
+    "type": "api",
+    "title": "POST /api/store/skills/[skillId]/install",
+    "description": "Skill Store API - Install tracking",
+    "category": "store",
+    "href": "/docs/api/store/skills/%5BskillId%5D/install"
+  },
+  {
+    "id": "api-/api/store/wishlist",
+    "type": "api",
+    "title": "GET, POST /api/store/wishlist",
+    "description": "/api/store/wishlist endpoint",
+    "category": "store",
+    "href": "/docs/api/store/wishlist"
+  },
+  {
+    "id": "api-/api/stripe/blog-support",
+    "type": "api",
+    "title": "POST /api/stripe/blog-support",
+    "description": "/api/stripe/blog-support endpoint",
+    "category": "stripe",
+    "href": "/docs/api/stripe/blog-support"
+  },
+  {
+    "id": "api-/api/stripe/checkout",
+    "type": "api",
+    "title": "POST /api/stripe/checkout",
+    "description": "/api/stripe/checkout endpoint",
+    "category": "stripe",
+    "href": "/docs/api/stripe/checkout"
+  },
+  {
+    "id": "api-/api/stripe/webhook",
+    "type": "api",
+    "title": "POST /api/stripe/webhook",
+    "description": "/api/stripe/webhook endpoint",
+    "category": "stripe",
+    "href": "/docs/api/stripe/webhook"
+  },
+  {
+    "id": "api-/api/tabletop/rooms/[roomId]/peers",
+    "type": "api",
+    "title": "GET, POST, DELETE /api/tabletop/rooms/[roomId]/peers",
+    "description": "/api/tabletop/rooms/[roomId]/peers endpoint",
+    "category": "tabletop",
+    "href": "/docs/api/tabletop/rooms/%5BroomId%5D/peers"
+  },
+  {
+    "id": "api-/api/test-gemini",
+    "type": "api",
+    "title": "POST /api/test-gemini",
+    "description": "/api/test-gemini endpoint",
+    "category": "test-gemini",
+    "href": "/docs/api/test-gemini"
+  },
+  {
+    "id": "api-/api/token-test",
+    "type": "api",
+    "title": "POST /api/token-test",
+    "description": "/api/token-test endpoint",
+    "category": "token-test",
+    "href": "/docs/api/token-test"
+  },
+  {
+    "id": "api-/api/tracking/event",
+    "type": "api",
+    "title": "POST /api/tracking/event",
+    "description": "Analytics Event Tracking API Route",
+    "category": "tracking",
+    "href": "/docs/api/tracking/event"
+  },
+  {
+    "id": "api-/api/tracking/pageview",
+    "type": "api",
+    "title": "POST /api/tracking/pageview",
+    "description": "Page View Tracking API Route",
+    "category": "tracking",
+    "href": "/docs/api/tracking/pageview"
+  },
+  {
+    "id": "api-/api/tracking/session",
+    "type": "api",
+    "title": "POST, PATCH /api/tracking/session",
+    "description": "Session Tracking API Route",
+    "category": "tracking",
+    "href": "/docs/api/tracking/session"
+  },
+  {
+    "id": "api-/api/tts",
+    "type": "api",
+    "title": "POST /api/tts",
+    "description": "/api/tts endpoint",
+    "category": "tts",
+    "href": "/docs/api/tts"
+  },
+  {
+    "id": "api-/api/turn-credentials",
+    "type": "api",
+    "title": "GET /api/turn-credentials",
+    "description": "API endpoint to fetch TURN server credentials from Twilio",
+    "category": "turn-credentials",
+    "href": "/docs/api/turn-credentials"
+  },
+  {
+    "id": "api-/api/v1/agent/heartbeat",
+    "type": "api",
+    "title": "POST /api/v1/agent/heartbeat",
+    "description": "/api/v1/agent/heartbeat endpoint",
+    "category": "v1",
+    "href": "/docs/api/v1/agent/heartbeat"
+  },
+  {
+    "id": "api-/api/v1/agent/tasks",
+    "type": "api",
+    "title": "GET, POST /api/v1/agent/tasks",
+    "description": "/api/v1/agent/tasks endpoint",
+    "category": "v1",
+    "href": "/docs/api/v1/agent/tasks"
+  },
+  {
+    "id": "api-/api/workflows/webhook/[token]",
+    "type": "api",
+    "title": "POST /api/workflows/webhook/[token]",
+    "description": "Workflow Webhook Endpoint",
+    "category": "workflows",
+    "href": "/docs/api/workflows/webhook/%5Btoken%5D"
+  },
+  {
+    "id": "api-/api/workspace/personal",
+    "type": "api",
+    "title": "GET /api/workspace/personal",
+    "description": "/api/workspace/personal endpoint",
+    "category": "workspace",
+    "href": "/docs/api/workspace/personal"
+  },
+  {
+    "id": "api-/api/workspaces",
+    "type": "api",
+    "title": "GET, POST /api/workspaces",
+    "description": "Generate a URL-safe slug from a name",
+    "category": "workspaces",
+    "href": "/docs/api/workspaces"
+  },
+  {
+    "id": "api-/api/workspaces/[workspaceId]",
+    "type": "api",
+    "title": "GET, PATCH /api/workspaces/[workspaceId]",
+    "description": "Workspace API",
+    "category": "workspaces",
+    "href": "/docs/api/workspaces/%5BworkspaceId%5D"
+  },
+  {
+    "id": "api-/api/workspaces/[workspaceId]/brand-brain/rewrite",
+    "type": "api",
+    "title": "POST /api/workspaces/[workspaceId]/brand-brain/rewrite",
+    "description": "/api/workspaces/[workspaceId]/brand-brain/rewrite endpoint",
+    "category": "workspaces",
+    "href": "/docs/api/workspaces/%5BworkspaceId%5D/brand-brain/rewrite"
+  },
+  {
+    "id": "api-/api/workspaces/[workspaceId]/brand-brain/rewrites",
+    "type": "api",
+    "title": "GET /api/workspaces/[workspaceId]/brand-brain/rewrites",
+    "description": "/api/workspaces/[workspaceId]/brand-brain/rewrites endpoint",
+    "category": "workspaces",
+    "href": "/docs/api/workspaces/%5BworkspaceId%5D/brand-brain/rewrites"
+  },
+  {
+    "id": "api-/api/workspaces/[workspaceId]/brand-brain/score",
+    "type": "api",
+    "title": "POST /api/workspaces/[workspaceId]/brand-brain/score",
+    "description": "/api/workspaces/[workspaceId]/brand-brain/score endpoint",
+    "category": "workspaces",
+    "href": "/docs/api/workspaces/%5BworkspaceId%5D/brand-brain/score"
+  },
+  {
+    "id": "api-/api/workspaces/[workspaceId]/brand-profile",
+    "type": "api",
+    "title": "GET, POST, PATCH, DELETE /api/workspaces/[workspaceId]/brand-profile",
+    "description": "/api/workspaces/[workspaceId]/brand-profile endpoint",
+    "category": "workspaces",
+    "href": "/docs/api/workspaces/%5BworkspaceId%5D/brand-profile"
+  },
+  {
+    "id": "api-/api/workspaces/[workspaceId]/favorite",
+    "type": "api",
+    "title": "GET, POST /api/workspaces/[workspaceId]/favorite",
+    "description": "Workspace Favorite Toggle API",
+    "category": "workspaces",
+    "href": "/docs/api/workspaces/%5BworkspaceId%5D/favorite"
+  },
+  {
+    "id": "api-/api/workspaces/[workspaceId]/workflows",
+    "type": "api",
+    "title": "GET, POST /api/workspaces/[workspaceId]/workflows",
+    "description": "Workflow List/Create API",
+    "category": "workspaces",
+    "href": "/docs/api/workspaces/%5BworkspaceId%5D/workflows"
+  },
+  {
+    "id": "api-/api/workspaces/[workspaceId]/workflows/[workflowId]",
+    "type": "api",
+    "title": "GET, PATCH, DELETE /api/workspaces/[workspaceId]/workflows/[workflowId]",
+    "description": "Single Workflow API",
+    "category": "workspaces",
+    "href": "/docs/api/workspaces/%5BworkspaceId%5D/workflows/%5BworkflowId%5D"
+  },
+  {
+    "id": "api-/api/workspaces/[workspaceId]/workflows/[workflowId]/run",
+    "type": "api",
+    "title": "POST /api/workspaces/[workspaceId]/workflows/[workflowId]/run",
+    "description": "Workflow Manual Run API",
+    "category": "workspaces",
+    "href": "/docs/api/workspaces/%5BworkspaceId%5D/workflows/%5BworkflowId%5D/run"
+  },
+  {
+    "id": "api-/api/workspaces/[workspaceId]/workflows/[workflowId]/triggers",
+    "type": "api",
+    "title": "GET, POST, PATCH, DELETE /api/workspaces/[workspaceId]/workflows/[workflowId]/triggers",
+    "description": "Workflow Triggers API",
+    "category": "workspaces",
+    "href": "/docs/api/workspaces/%5BworkspaceId%5D/workflows/%5BworkflowId%5D/triggers"
+  },
+  {
+    "id": "api-/api/workspaces/[workspaceId]/workflows/[workflowId]/versions",
+    "type": "api",
+    "title": "POST /api/workspaces/[workspaceId]/workflows/[workflowId]/versions",
+    "description": "Workflow Versions API",
+    "category": "workspaces",
+    "href": "/docs/api/workspaces/%5BworkspaceId%5D/workflows/%5BworkflowId%5D/versions"
+  },
+  {
+    "id": "api-/api/workspaces/aggregate",
+    "type": "api",
+    "title": "GET, POST /api/workspaces/aggregate",
+    "description": "Aggregate Dashboard API",
+    "category": "workspaces",
+    "href": "/docs/api/workspaces/aggregate"
+  },
+  {
+    "id": "api-/api/workspaces/by-slug/[slug]",
+    "type": "api",
+    "title": "GET /api/workspaces/by-slug/[slug]",
+    "description": "/api/workspaces/by-slug/[slug] endpoint",
+    "category": "workspaces",
+    "href": "/docs/api/workspaces/by-slug/%5Bslug%5D"
+  },
+  {
+    "id": "page-/",
+    "type": "page",
+    "title": "/",
+    "description": "",
+    "category": "home",
+    "href": "/"
+  },
+  {
+    "id": "page-/about",
+    "type": "page",
+    "title": "About spike.land — Open-Source MCP Multiplexer Platform",
+    "description": "An open-source, AI-powered development platform removing the friction between idea and shipped software.",
+    "category": "about",
+    "href": "/about"
+  },
+  {
+    "id": "page-/admin/mcp-dashboard",
+    "type": "page",
+    "title": "MCP Observability Dashboard - spike.land Admin",
+    "description": "Per-tool metrics, system health, and user analytics for MCP tools.",
+    "category": "admin",
+    "href": "/admin/mcp-dashboard"
+  },
+  {
+    "id": "page-/agents",
+    "type": "page",
+    "title": "Connected Agents | spike.land",
+    "description": "Manage your Claude Code agents",
+    "category": "agents",
+    "href": "/agents"
+  },
+  {
+    "id": "page-/apps/ai-orchestrator",
+    "type": "page",
+    "title": "AI Orchestrator | spike.land",
+    "description": "Multi-model AI pipeline builder and prompt engineering studio.",
+    "category": "apps",
+    "href": "/apps/ai-orchestrator"
+  },
+  {
+    "id": "page-/apps/audio-mixer",
+    "type": "page",
+    "title": "Audio Studio — Multi-track Mixing & AI Voice | Spike Land",
+    "description": "A professional audio production suite with multi-track mixing, drag-drop upload, waveform visualization, and AI-powered text-to-speech.",
+    "category": "apps",
+    "href": "/apps/audio-mixer"
+  },
+  {
+    "id": "page-/apps/be-uniq",
+    "type": "page",
+    "title": "beUniq | spike.land",
+    "description": "Answer yes/no questions until your combination is one nobody else has chosen. A game powered by AVL profile trees.",
+    "category": "apps",
+    "href": "/apps/be-uniq"
+  },
+  {
+    "id": "page-/apps/brand-command",
+    "type": "page",
+    "title": "Brand Command | spike.land",
+    "description": "Unified brand identity & creative asset management.",
+    "category": "apps",
+    "href": "/apps/brand-command"
+  },
+  {
+    "id": "page-/apps/career-navigator",
+    "type": "page",
+    "title": "Career Navigator | spike.land",
+    "description": "AI-powered career path planning, skill gap analysis & job matching.",
+    "category": "apps",
+    "href": "/apps/career-navigator"
+  },
+  {
+    "id": "page-/apps/chess-arena",
+    "type": "page",
+    "title": "Chess Arena | spike.land",
+    "description": "Multiplayer chess with ELO ratings, timed controls, and full game replay.",
+    "category": "apps",
+    "href": "/apps/chess-arena"
+  },
+  {
+    "id": "page-/apps/content-hub",
+    "type": "page",
+    "title": "Content Hub | spike.land",
+    "description": "Blog publishing & newsletter management platform.",
+    "category": "apps",
+    "href": "/apps/content-hub"
+  },
+  {
+    "id": "page-/apps/display/client",
+    "type": "page",
+    "title": "/apps/display/client",
+    "description": "",
+    "category": "apps",
+    "href": "/apps/display/client"
+  },
+  {
+    "id": "page-/apps/display/run",
+    "type": "page",
+    "title": "/apps/display/run",
+    "description": "",
+    "category": "apps",
+    "href": "/apps/display/run"
+  },
+  {
+    "id": "page-/apps/mcp-explorer",
+    "type": "page",
+    "title": "MCP Explorer — Spike Land",
+    "description": "",
+    "category": "apps",
+    "href": "/apps/mcp-explorer"
+  },
+  {
+    "id": "page-/apps/music-creator",
+    "type": "page",
+    "title": "Music Creator — AI Multi-Track Composer | Spike Land",
+    "description": "Compose multi-track music with a piano roll, instrument selector, mixer controls, and AI generation powered by Spike Land.",
+    "category": "apps",
+    "href": "/apps/music-creator"
+  },
+  {
+    "id": "page-/apps/page-builder",
+    "type": "page",
+    "title": "Page Builder | spike.land",
+    "description": "AI-powered dynamic page creation and visual editor.",
+    "category": "apps",
+    "href": "/apps/page-builder"
+  },
+  {
+    "id": "page-/apps/qa-studio",
+    "type": "page",
+    "title": "QA Studio | Spike Land",
+    "description": "Web QA automation and testing dashboard",
+    "category": "apps",
+    "href": "/apps/qa-studio"
+  },
+  {
+    "id": "page-/apps/social-autopilot",
+    "type": "page",
+    "title": "Social Autopilot | spike.land",
+    "description": "Automated social media scheduling & engagement analytics.",
+    "category": "apps",
+    "href": "/apps/social-autopilot"
+  },
+  {
+    "id": "page-/apps/spike-land-admin",
+    "type": "page",
+    "title": "Admin Dashboard — Spike Land",
+    "description": "Platform administration and monitoring dashboard.",
+    "category": "apps",
+    "href": "/apps/spike-land-admin"
+  },
+  {
+    "id": "page-/apps/state-machine",
+    "type": "page",
+    "title": "State Machine Studio | spike.land",
+    "description": "Create, visualize, and simulate hierarchical state machines with AI assistance, templates, and live simulation.",
+    "category": "apps",
+    "href": "/apps/state-machine"
+  },
+  {
+    "id": "page-/apps/store",
+    "type": "page",
+    "title": "App Store — Build Full-Stack Apps with a Single Prompt | Spike Land",
+    "description": "Create and deploy full-stack apps from a single prompt. Powered by Model Context Protocol. Free and open source. Alpha.",
+    "category": "apps",
+    "href": "/apps/store"
+  },
+  {
+    "id": "page-/apps/tabletop-simulator",
+    "type": "page",
+    "title": "Tabletop Simulator | spike.land",
+    "description": "Gather your friends for board games and RPGs in a shared 3D space. Real-time multiplayer with physics-based pieces.",
+    "category": "apps",
+    "href": "/apps/tabletop-simulator"
+  },
+  {
+    "id": "page-/auth/error",
+    "type": "page",
+    "title": "Server Configuration Error",
+    "description": "There is a problem with the server configuration. Please contact support if this persists.",
+    "category": "auth",
+    "href": "/auth/error"
+  },
+  {
+    "id": "page-/auth/qr-verify",
+    "type": "page",
+    "title": "/auth/qr-verify",
+    "description": "",
+    "category": "auth",
+    "href": "/auth/qr-verify"
+  },
+  {
+    "id": "page-/auth/signin",
+    "type": "page",
+    "title": "/auth/signin",
+    "description": "",
+    "category": "auth",
+    "href": "/auth/signin"
+  },
+  {
+    "id": "page-/bazdmeg",
+    "type": "page",
+    "title": "Requirements Are The Product",
+    "description": "",
+    "category": "bazdmeg",
+    "href": "/bazdmeg"
+  },
+  {
+    "id": "page-/bazdmeg/dashboard",
+    "type": "page",
+    "title": "/bazdmeg/dashboard",
+    "description": "",
+    "category": "bazdmeg",
+    "href": "/bazdmeg/dashboard"
+  },
+  {
+    "id": "page-/bazdmeg/orchestrator",
+    "type": "page",
+    "title": "/bazdmeg/orchestrator",
+    "description": "",
+    "category": "bazdmeg",
+    "href": "/bazdmeg/orchestrator"
+  },
+  {
+    "id": "page-/blog",
+    "type": "page",
+    "title": "Blog | Spike Land",
+    "description": "Latest news, tutorials, and updates from spike.land. Learn about AI-powered development, MCP tools, deploying apps with AI, and more.",
+    "category": "blog",
+    "href": "/blog"
+  },
+  {
+    "id": "page-/boxes",
+    "type": "page",
+    "title": "/boxes",
+    "description": "",
+    "category": "boxes",
+    "href": "/boxes"
+  },
+  {
+    "id": "page-/boxes/new",
+    "type": "page",
+    "title": "/boxes/new",
+    "description": "",
+    "category": "boxes",
+    "href": "/boxes/new"
+  },
+  {
+    "id": "page-/career",
+    "type": "page",
+    "title": "Skills Assessment",
+    "description": "Add your skills, rate your proficiency, and discover which careers match your profile best.",
+    "category": "career",
+    "href": "/career"
+  },
+  {
+    "id": "page-/career/assessment",
+    "type": "page",
+    "title": "/career/assessment",
+    "description": "",
+    "category": "career",
+    "href": "/career/assessment"
+  },
+  {
+    "id": "page-/career/compare",
+    "type": "page",
+    "title": "/career/compare",
+    "description": "",
+    "category": "career",
+    "href": "/career/compare"
+  },
+  {
+    "id": "page-/career/explore",
+    "type": "page",
+    "title": "/career/explore",
+    "description": "",
+    "category": "career",
+    "href": "/career/explore"
+  },
+  {
+    "id": "page-/clean",
+    "type": "page",
+    "title": "/clean",
+    "description": "",
+    "category": "clean",
+    "href": "/clean"
+  },
+  {
+    "id": "page-/clean/achievements",
+    "type": "page",
+    "title": "/clean/achievements",
+    "description": "",
+    "category": "clean",
+    "href": "/clean/achievements"
+  },
+  {
+    "id": "page-/clean/session",
+    "type": "page",
+    "title": "/clean/session",
+    "description": "",
+    "category": "clean",
+    "href": "/clean/session"
+  },
+  {
+    "id": "page-/clean/settings",
+    "type": "page",
+    "title": "/clean/settings",
+    "description": "",
+    "category": "clean",
+    "href": "/clean/settings"
+  },
+  {
+    "id": "page-/comic-sans",
+    "type": "page",
+    "title": "/comic-sans",
+    "description": "",
+    "category": "comic-sans",
+    "href": "/comic-sans"
+  },
+  {
+    "id": "page-/community",
+    "type": "page",
+    "title": "Welcome",
+    "description": "",
+    "category": "community",
+    "href": "/community"
+  },
+  {
+    "id": "page-/connect",
+    "type": "page",
+    "title": "AI Prompt Arena | Spike Land",
+    "description": "Compete in the AI Prompt Arena. Write single-shot prompts, generate React apps, and climb the ELO leaderboard.",
+    "category": "connect",
+    "href": "/connect"
+  },
+  {
+    "id": "page-/connect/leaderboard",
+    "type": "page",
+    "title": "Leaderboard | AI Prompt Arena",
+    "description": "See who writes the best AI prompts. ELO rankings for the Prompt Arena.",
+    "category": "connect",
+    "href": "/connect/leaderboard"
+  },
+  {
+    "id": "page-/cookies",
+    "type": "page",
+    "title": "What Are Cookies",
+    "description": "",
+    "category": "cookies",
+    "href": "/cookies"
+  },
+  {
+    "id": "page-/create",
+    "type": "page",
+    "title": "Create | Spike Land AI",
+    "description": "Describe any app and watch AI build it live. One-shot React app generator powered by Spike Land.",
+    "category": "create",
+    "href": "/create"
+  },
+  {
+    "id": "page-/cv",
+    "type": "page",
+    "title": "My PRs Were Pure AI Slop: A Developer",
+    "description": "",
+    "category": "cv",
+    "href": "/cv"
+  },
+  {
+    "id": "page-/docs",
+    "type": "page",
+    "title": "Documentation - spike.land",
+    "description": "Everything you need to build with spike.land. Browse MCP tools, API endpoints, guides, and more.",
+    "category": "docs",
+    "href": "/docs"
+  },
+  {
+    "id": "page-/docs/components",
+    "type": "page",
+    "title": "UI Components - spike.land",
+    "description": "Explore the spike.land design system. Browse all UI components, patterns, and visual styles.",
+    "category": "docs",
+    "href": "/docs/components"
+  },
+  {
+    "id": "page-/docs/guides",
+    "type": "page",
+    "title": "Guides & Documentation - spike.land",
+    "description": "Browse all guides, architecture docs, best practices, and more for the spike.land platform.",
+    "category": "docs",
+    "href": "/docs/guides"
+  },
+  {
+    "id": "page-/docs/sitemap",
+    "type": "page",
+    "title": "/docs/sitemap",
+    "description": "",
+    "category": "docs",
+    "href": "/docs/sitemap"
+  },
+  {
+    "id": "page-/docs/tools",
+    "type": "page",
+    "title": "MCP Tools - Documentation - spike.land",
+    "description": "Browse all MCP tools by category. Each tool is documented with parameters, types, and descriptions.",
+    "category": "docs",
+    "href": "/docs/tools"
+  },
+  {
+    "id": "page-/generate",
+    "type": "page",
+    "title": "Prompt Explorer | Spike Land AI",
+    "description": "Explore how AI system prompts are built from your topic. See which skills activate and what instructions the AI receives.",
+    "category": "generate",
+    "href": "/generate"
+  },
+  {
+    "id": "page-/learnit",
+    "type": "page",
+    "title": "/learnit",
+    "description": "",
+    "category": "learnit",
+    "href": "/learnit"
+  },
+  {
+    "id": "page-/live/example",
+    "type": "page",
+    "title": "/live/example",
+    "description": "",
+    "category": "live",
+    "href": "/live/example"
+  },
+  {
+    "id": "page-/mcp/auth/device",
+    "type": "page",
+    "title": "/mcp/auth/device",
+    "description": "",
+    "category": "mcp",
+    "href": "/mcp/auth/device"
+  },
+  {
+    "id": "page-/mcp/categories",
+    "type": "page",
+    "title": "Tool Categories - MCP Server - Spike Land",
+    "description": "",
+    "category": "mcp",
+    "href": "/mcp/categories"
+  },
+  {
+    "id": "page-/my-apps",
+    "type": "page",
+    "title": "My Apps - Spike Land",
+    "description": "Manage your AI-powered apps",
+    "category": "my-apps",
+    "href": "/my-apps"
+  },
+  {
+    "id": "page-/onboarding",
+    "type": "page",
+    "title": "/onboarding",
+    "description": "",
+    "category": "onboarding",
+    "href": "/onboarding"
+  },
+  {
+    "id": "page-/physics-demo",
+    "type": "page",
+    "title": "/physics-demo",
+    "description": "",
+    "category": "physics-demo",
+    "href": "/physics-demo"
+  },
+  {
+    "id": "page-/press",
+    "type": "page",
+    "title": "VHS to 4K Restoration",
+    "description": "",
+    "category": "press",
+    "href": "/press"
+  },
+  {
+    "id": "page-/pricing",
+    "type": "page",
+    "title": "/pricing",
+    "description": "",
+    "category": "pricing",
+    "href": "/pricing"
+  },
+  {
+    "id": "page-/privacy",
+    "type": "page",
+    "title": "Introduction",
+    "description": "",
+    "category": "privacy",
+    "href": "/privacy"
+  },
+  {
+    "id": "page-/profile",
+    "type": "page",
+    "title": "/profile",
+    "description": "",
+    "category": "profile",
+    "href": "/profile"
+  },
+  {
+    "id": "page-/services",
+    "type": "page",
+    "title": "/services",
+    "description": "",
+    "category": "services",
+    "href": "/services"
+  },
+  {
+    "id": "page-/settings",
+    "type": "page",
+    "title": "/settings",
+    "description": "",
+    "category": "settings",
+    "href": "/settings"
+  },
+  {
+    "id": "page-/settings/mcp-history",
+    "type": "page",
+    "title": "MCP Usage History - Spike Land",
+    "description": "View your MCP API usage history for image generation and modification",
+    "category": "settings",
+    "href": "/settings/mcp-history"
+  },
+  {
+    "id": "page-/settings/subscription",
+    "type": "page",
+    "title": "/settings/subscription",
+    "description": "Please try again or contact support if the issue persists.",
+    "category": "settings",
+    "href": "/settings/subscription"
+  },
+  {
+    "id": "page-/store/skills",
+    "type": "page",
+    "title": "/store/skills",
+    "description": "",
+    "category": "store",
+    "href": "/store/skills"
+  },
+  {
+    "id": "page-/storybook",
+    "type": "page",
+    "title": "/storybook",
+    "description": "",
+    "category": "storybook",
+    "href": "/storybook"
+  },
+  {
+    "id": "page-/storybook/accessibility",
+    "type": "page",
+    "title": "/storybook/accessibility",
+    "description": "Next element",
+    "category": "storybook",
+    "href": "/storybook/accessibility"
+  },
+  {
+    "id": "page-/storybook/agents",
+    "type": "page",
+    "title": "/storybook/agents",
+    "description": "Edited src/components/agents/AgentCard.tsx",
+    "category": "storybook",
+    "href": "/storybook/agents"
+  },
+  {
+    "id": "page-/storybook/ai-orchestrator",
+    "type": "page",
+    "title": "/storybook/ai-orchestrator",
+    "description": "",
+    "category": "storybook",
+    "href": "/storybook/ai-orchestrator"
+  },
+  {
+    "id": "page-/storybook/animations",
+    "type": "page",
+    "title": "/storybook/animations",
+    "description": "Micro-interactions: hover, focus, active states",
+    "category": "storybook",
+    "href": "/storybook/animations"
+  },
+  {
+    "id": "page-/storybook/arena",
+    "type": "page",
+    "title": "Chess Grandmaster AI",
+    "description": "Build a React chess interface with drag-and-drop pieces, legal move highlighting, and a basic minimax AI opponent.",
+    "category": "storybook",
+    "href": "/storybook/arena"
+  },
+  {
+    "id": "page-/storybook/audio-studio",
+    "type": "page",
+    "title": "/storybook/audio-studio",
+    "description": "",
+    "category": "storybook",
+    "href": "/storybook/audio-studio"
+  },
+  {
+    "id": "page-/storybook/auth",
+    "type": "page",
+    "title": "/storybook/auth",
+    "description": "User initiates authentication via SignInButton or AuthButtons component.",
+    "category": "storybook",
+    "href": "/storybook/auth"
+  },
+  {
+    "id": "page-/storybook/bazdmeg",
+    "type": "page",
+    "title": "Business-First Requirements",
+    "description": "",
+    "category": "storybook",
+    "href": "/storybook/bazdmeg"
+  },
+  {
+    "id": "page-/storybook/be-uniq",
+    "type": "page",
+    "title": "/storybook/be-uniq",
+    "description": "",
+    "category": "storybook",
+    "href": "/storybook/be-uniq"
+  },
+  {
+    "id": "page-/storybook/blog",
+    "type": "page",
+    "title": "Building an AI-Powered Code Editor with MCP",
+    "description": "A deep dive into how spike.land uses the Model Context Protocol to connect AI agents with real-time code editing, transpilation, and deployment.",
+    "category": "storybook",
+    "href": "/storybook/blog"
+  },
+  {
+    "id": "page-/storybook/buttons",
+    "type": "page",
+    "title": "/storybook/buttons",
+    "description": "Controls the visual style of the button.",
+    "category": "storybook",
+    "href": "/storybook/buttons"
+  },
+  {
+    "id": "page-/storybook/canvas",
+    "type": "page",
+    "title": "/storybook/canvas",
+    "description": "",
+    "category": "storybook",
+    "href": "/storybook/canvas"
+  },
+  {
+    "id": "page-/storybook/career",
+    "type": "page",
+    "title": "Full-Stack Developer",
+    "description": "Designs, develops, and maintains web applications across front-end and back-end layers using modern frameworks and cloud infrastructure.",
+    "category": "storybook",
+    "href": "/storybook/career"
+  },
+  {
+    "id": "page-/storybook/chat",
+    "type": "page",
+    "title": "Chess Arena - Multiplayer Chess",
+    "description": "Real-time multiplayer chess with ELO ranking, challenges, and spectator mode.",
+    "category": "storybook",
+    "href": "/storybook/chat"
+  },
+  {
+    "id": "page-/storybook/clean",
+    "type": "page",
+    "title": "/storybook/clean",
+    "description": "Wipe down kitchen counters and stovetop",
+    "category": "storybook",
+    "href": "/storybook/clean"
+  },
+  {
+    "id": "page-/storybook/code-review-agent",
+    "type": "page",
+    "title": "/storybook/code-review-agent",
+    "description": "All async calls must be wrapped in try/catch or have .catch() handlers.",
+    "category": "storybook",
+    "href": "/storybook/code-review-agent"
+  },
+  {
+    "id": "page-/storybook/colors",
+    "type": "page",
+    "title": "/storybook/colors",
+    "description": "",
+    "category": "storybook",
+    "href": "/storybook/colors"
+  },
+  {
+    "id": "page-/storybook/comparison",
+    "type": "page",
+    "title": "/storybook/comparison",
+    "description": "",
+    "category": "storybook",
+    "href": "/storybook/comparison"
+  },
+  {
+    "id": "page-/storybook/components",
+    "type": "page",
+    "title": "/storybook/components",
+    "description": "",
+    "category": "storybook",
+    "href": "/storybook/components"
+  },
+  {
+    "id": "page-/storybook/content-hub",
+    "type": "page",
+    "title": "Getting Started with Next.js 16 App Router",
+    "description": "",
+    "category": "storybook",
+    "href": "/storybook/content-hub"
+  },
+  {
+    "id": "page-/storybook/create",
+    "type": "page",
+    "title": "Chess Arena",
+    "description": "Multiplayer chess with ELO ratings, AI opponents, and real-time spectating.",
+    "category": "storybook",
+    "href": "/storybook/create"
+  },
+  {
+    "id": "page-/storybook/data-display",
+    "type": "page",
+    "title": "/storybook/data-display",
+    "description": "",
+    "category": "storybook",
+    "href": "/storybook/data-display"
+  },
+  {
+    "id": "page-/storybook/enhance",
+    "type": "page",
+    "title": "/storybook/enhance",
+    "description": "",
+    "category": "storybook",
+    "href": "/storybook/enhance"
+  },
+  {
+    "id": "page-/storybook/errors",
+    "type": "page",
+    "title": "/storybook/errors",
+    "description": "",
+    "category": "storybook",
+    "href": "/storybook/errors"
+  },
+  {
+    "id": "page-/storybook/feedback",
+    "type": "page",
+    "title": "New message",
+    "description": "Team standup has been scheduled for Monday at 10:00 AM.",
+    "category": "storybook",
+    "href": "/storybook/feedback"
+  },
+  {
+    "id": "page-/storybook/forms",
+    "type": "page",
+    "title": "/storybook/forms",
+    "description": "Create your account",
+    "category": "storybook",
+    "href": "/storybook/forms"
+  },
+  {
+    "id": "page-/storybook/infographic",
+    "type": "page",
+    "title": "TypeScript",
+    "description": "",
+    "category": "storybook",
+    "href": "/storybook/infographic"
+  },
+  {
+    "id": "page-/storybook/landing",
+    "type": "page",
+    "title": "AI Task Manager",
+    "description": "A smart task manager that prioritizes and organizes your work using AI.",
+    "category": "storybook",
+    "href": "/storybook/landing"
+  },
+  {
+    "id": "page-/storybook/layout",
+    "type": "page",
+    "title": "/storybook/layout",
+    "description": "",
+    "category": "storybook",
+    "href": "/storybook/layout"
+  },
+  {
+    "id": "page-/storybook/loading",
+    "type": "page",
+    "title": "/storybook/loading",
+    "description": "",
+    "category": "storybook",
+    "href": "/storybook/loading"
+  },
+  {
+    "id": "page-/storybook/mcp",
+    "type": "page",
+    "title": "/storybook/mcp",
+    "description": "Create AI-generated images from text prompts using multiple providers (DALL-E, Stable Diffusion).",
+    "category": "storybook",
+    "href": "/storybook/mcp"
+  },
+  {
+    "id": "page-/storybook/modals",
+    "type": "page",
+    "title": "/storybook/modals",
+    "description": "",
+    "category": "storybook",
+    "href": "/storybook/modals"
+  },
+  {
+    "id": "page-/storybook/page-builder",
+    "type": "page",
+    "title": "/storybook/page-builder",
+    "description": "Full-width banner with headline and CTA",
+    "category": "storybook",
+    "href": "/storybook/page-builder"
+  },
+  {
+    "id": "page-/storybook/qa-studio",
+    "type": "page",
+    "title": "/storybook/qa-studio",
+    "description": "Elements must have sufficient color contrast",
+    "category": "storybook",
+    "href": "/storybook/qa-studio"
+  },
+  {
+    "id": "page-/storybook/spike-land-admin",
+    "type": "page",
+    "title": "/storybook/spike-land-admin",
+    "description": "",
+    "category": "storybook",
+    "href": "/storybook/spike-land-admin"
+  },
+  {
+    "id": "page-/storybook/state-machine",
+    "type": "page",
+    "title": "/storybook/state-machine",
+    "description": "Simple 3-state cycle with timers",
+    "category": "storybook",
+    "href": "/storybook/state-machine"
+  },
+  {
+    "id": "page-/storybook/store-apps",
+    "type": "page",
+    "title": "Describe",
+    "description": "Tell AI what you want to build. One prompt is all it takes.",
+    "category": "storybook",
+    "href": "/storybook/store-apps"
+  },
+  {
+    "id": "page-/storybook/surfaces",
+    "type": "page",
+    "title": "/storybook/surfaces",
+    "description": "Used for backgrounds, recessed panels, or secondary containers.",
+    "category": "storybook",
+    "href": "/storybook/surfaces"
+  },
+  {
+    "id": "page-/storybook/tabletop-sim",
+    "type": "page",
+    "title": "/storybook/tabletop-sim",
+    "description": "",
+    "category": "storybook",
+    "href": "/storybook/tabletop-sim"
+  },
+  {
+    "id": "page-/storybook/typography",
+    "type": "page",
+    "title": "/storybook/typography",
+    "description": "",
+    "category": "storybook",
+    "href": "/storybook/typography"
+  },
+  {
+    "id": "page-/sule",
+    "type": "page",
+    "title": "/sule",
+    "description": "",
+    "category": "sule",
+    "href": "/sule"
+  },
+  {
+    "id": "page-/terms",
+    "type": "page",
+    "title": "Acceptance of Terms",
+    "description": "",
+    "category": "terms",
+    "href": "/terms"
+  },
+  {
+    "id": "page-/test-enhancement",
+    "type": "page",
+    "title": "/test-enhancement",
+    "description": "",
+    "category": "test-enhancement",
+    "href": "/test-enhancement"
+  },
+  {
+    "id": "page-/token-test",
+    "type": "page",
+    "title": "/token-test",
+    "description": "",
+    "category": "token-test",
+    "href": "/token-test"
+  },
+  {
+    "id": "page-/tokens",
+    "type": "page",
+    "title": "/tokens",
+    "description": "Your credits have been added to your account.",
+    "category": "tokens",
+    "href": "/tokens"
+  },
+  {
+    "id": "page-/waitlist",
+    "type": "page",
+    "title": "Join the Waitlist | spike.land — Lazy-Load MCP Tools",
+    "description": "spike-cli multiplexes MCP servers and lazy-loads tool definitions — AI agents only see what they need.",
+    "category": "waitlist",
+    "href": "/waitlist"
+  },
+  {
+    "id": "guide-ACCELERATOR_ROADMAP",
+    "type": "guide",
+    "title": "Accelerator Application Roadmap for SPIKE LAND LTD",
+    "description": "> **Last Updated**: February 2026 **Status**: Pre-Launch Stage - Product Ready, > Marketing Gap **Issue**: > [#1027](https://github.com/spike-land-ai/spike.land/issues/1027)",
+    "category": "general",
+    "href": "/docs/guides/ACCELERATOR_ROADMAP"
+  },
+  {
+    "id": "guide-AGENT_FIRST",
+    "type": "guide",
+    "title": "Agent-First Platform",
+    "description": "> **CEO Decision: Agent-First Platform** > > 1. Every UI action MUST have an MCP tool equivalent. No feature ships without >    MCP coverage. > 2. Tool descriptions are marketing copy for agents — the",
+    "category": "general",
+    "href": "/docs/guides/AGENT_FIRST"
+  },
+  {
+    "id": "guide-API_ALBUMS_BATCH_ENHANCE",
+    "type": "guide",
+    "title": "Album Batch Enhancement API",
+    "description": "This document describes the API endpoint for batch enhancing all photos in an album. The endpoint processes multiple images in a single batch operation, automatically handling token consumption, rate",
+    "category": "general",
+    "href": "/docs/guides/API_ALBUMS_BATCH_ENHANCE"
+  },
+  {
+    "id": "guide-API_CHANGELOG",
+    "type": "guide",
+    "title": "API Changelog",
+    "description": "> **Last Updated**: 2025-12-30 **Current API Version**: Unversioned (v1 > implicit) **Status**: Active Development",
+    "category": "general",
+    "href": "/docs/guides/API_CHANGELOG"
+  },
+  {
+    "id": "guide-API_PUBLIC_ALBUMS_GALLERY",
+    "type": "guide",
+    "title": "Public Albums Gallery API",
+    "description": "- [Overview](#overview)   - [Use Cases](#use-cases)   - [Key Characteristics](#key-characteristics) - [Endpoint](#endpoint) - [Authentication](#authentication) - [Features](#features) - [Response Form",
+    "category": "general",
+    "href": "/docs/guides/API_PUBLIC_ALBUMS_GALLERY"
+  },
+  {
+    "id": "guide-API_VERSIONING",
+    "type": "guide",
+    "title": "Spike Land API Versioning Strategy",
+    "description": "> **Last Updated**: December 30, 2025 **Status**: Hybrid Versioning - v1 for > Agent API, unversioned for public endpoints **Document Version**: 2.0",
+    "category": "general",
+    "href": "/docs/guides/API_VERSIONING"
+  },
+  {
+    "id": "guide-api/00_START_HERE",
+    "type": "guide",
+    "title": "Spike Land API Documentation - Start Here",
+    "description": "Welcome to the Spike Land API documentation. This file will guide you to the right resources for your needs.",
+    "category": "api",
+    "href": "/docs/guides/api/00_START_HERE"
+  },
+  {
+    "id": "guide-api/ALBUM_ENDPOINTS",
+    "type": "guide",
+    "title": "Album API Endpoints",
+    "description": "Complete reference for album management endpoints in the Spike Land API.",
+    "category": "api",
+    "href": "/docs/guides/api/ALBUM_ENDPOINTS"
+  },
+  {
+    "id": "guide-api/CURL_EXAMPLES",
+    "type": "guide",
+    "title": "Spike Land API - cURL Examples",
+    "description": "Quick reference for testing API endpoints using cURL.",
+    "category": "api",
+    "href": "/docs/guides/api/CURL_EXAMPLES"
+  },
+  {
+    "id": "guide-api/IMAGE_ENDPOINTS",
+    "type": "guide",
+    "title": "Image Enhancement API Endpoints",
+    "description": "Complete REST API documentation for image management and AI-powered enhancement operations in Spike Land.",
+    "category": "api",
+    "href": "/docs/guides/api/IMAGE_ENDPOINTS"
+  },
+  {
+    "id": "guide-api/INDEX",
+    "type": "guide",
+    "title": "Spike Land API Documentation Index",
+    "description": "Complete reference guide for all API documentation files and endpoints.",
+    "category": "api",
+    "href": "/docs/guides/api/INDEX"
+  },
+  {
+    "id": "guide-api/INTEGRATION_GUIDE",
+    "type": "guide",
+    "title": "Spike Land API Integration Guide",
+    "description": "Quick start guide for developers integrating with the Spike Land API.",
+    "category": "api",
+    "href": "/docs/guides/api/INTEGRATION_GUIDE"
+  },
+  {
+    "id": "guide-api/README",
+    "type": "guide",
+    "title": "Spike Land API Documentation",
+    "description": "This directory contains comprehensive API documentation for the Spike Land platform.",
+    "category": "api",
+    "href": "/docs/guides/api/README"
+  },
+  {
+    "id": "guide-api/REFUND_POLICY",
+    "type": "guide",
+    "title": "Token Refund Policy",
+    "description": "Spike Land's image enhancement system uses tokens for AI-powered image processing. This document explains the refund policy for failed enhancements.",
+    "category": "api",
+    "href": "/docs/guides/api/REFUND_POLICY"
+  },
+  {
+    "id": "guide-architecture/API_REFERENCE",
+    "type": "guide",
+    "title": "API Reference",
+    "description": "> **Last Updated**: February 2026 | **Status**: Production | **Base URL**: > `https://spike.land` (Production) or `http://localhost:3000` (Development)",
+    "category": "architecture",
+    "href": "/docs/guides/architecture/API_REFERENCE"
+  },
+  {
+    "id": "guide-architecture/AWS_MIGRATION",
+    "type": "guide",
+    "title": "AWS Migration Status",
+    "description": "> Migration from **Vercel + Cloudflare Workers + Neon + Upstash + Cloudflare > R2** → **AWS ECS Fargate + Aurora PostgreSQL + ElastiCache Redis + S3 + > CloudFront + Global Accelerator**",
+    "category": "architecture",
+    "href": "/docs/guides/architecture/AWS_MIGRATION"
+  },
+  {
+    "id": "guide-architecture/DATABASE_SCHEMA",
+    "type": "guide",
+    "title": "Database Schema Documentation",
+    "description": "> Generated by [`prisma-markdown`](https://github.com/samchon/prisma-markdown)",
+    "category": "architecture",
+    "href": "/docs/guides/architecture/DATABASE_SCHEMA"
+  },
+  {
+    "id": "guide-architecture/DATABASE_SETUP",
+    "type": "guide",
+    "title": "Database Setup Guide",
+    "description": "This guide covers the complete database setup for Spike Land platform using Prisma ORM with PostgreSQL.",
+    "category": "architecture",
+    "href": "/docs/guides/architecture/DATABASE_SETUP"
+  },
+  {
+    "id": "guide-architecture/DEPENDENCY_RESOLUTIONS",
+    "type": "guide",
+    "title": "Dependency Resolution Explanations",
+    "description": "> **Last Updated**: 2026-02-26",
+    "category": "architecture",
+    "href": "/docs/guides/architecture/DEPENDENCY_RESOLUTIONS"
+  },
+  {
+    "id": "guide-architecture/DEPLOYMENT_PIPELINE_COSTS",
+    "type": "guide",
+    "title": "Deployment Pipeline Timing & Cost Analysis",
+    "description": "> **Last updated:** 2026-02-19 **Data source:** GitHub Actions runs Feb 16-19, > 2026 (1000+ runs analyzed)",
+    "category": "architecture",
+    "href": "/docs/guides/architecture/DEPLOYMENT_PIPELINE_COSTS"
+  },
+  {
+    "id": "guide-architecture/JSON_SCHEMAS",
+    "type": "guide",
+    "title": "JSON Column Schemas",
+    "description": "> **Phase 3 - Schema Improvement Plan** > > This document provides TypeScript interfaces and Zod schemas for all JSON > columns in the Prisma schema. The schema has 83 JSON columns across various > mo",
+    "category": "architecture",
+    "href": "/docs/guides/architecture/JSON_SCHEMAS"
+  },
+  {
+    "id": "guide-architecture/MCP_TOOL_GUIDELINES",
+    "type": "guide",
+    "title": "MCP Tool Error Handling Guidelines",
+    "description": "**Pattern**: `tryCatch` wrapper for consistent error handling and type safety in MCP Tools.",
+    "category": "architecture",
+    "href": "/docs/guides/architecture/MCP_TOOL_GUIDELINES"
+  },
+  {
+    "id": "guide-architecture/MY_APPS_ARCHITECTURE",
+    "type": "guide",
+    "title": "Apps Architecture",
+    "description": "This document provides comprehensive developer documentation for the `/my-apps` feature in spike.land.",
+    "category": "architecture",
+    "href": "/docs/guides/architecture/MY_APPS_ARCHITECTURE"
+  },
+  {
+    "id": "guide-architecture/SENTRY",
+    "type": "guide",
+    "title": "Error Tracking (formerly Sentry)",
+    "description": "> **Status**: Sentry was removed in Feb 2026. All error tracking now uses the > built-in ErrorLog pipeline.",
+    "category": "architecture",
+    "href": "/docs/guides/architecture/SENTRY"
+  },
+  {
+    "id": "guide-architecture/SPIKE_CLI_COMPETITIVE_LANDSCAPE",
+    "type": "guide",
+    "title": "Research: How Unique is spike-cli's MCP-to-CLI Approach?",
+    "description": "> **Product context:** spike-cli is not just a technical component -- it is a > core product differentiator for the Spike Land platform. The **web dashboard** > is the GUI for humans to manage deploym",
+    "category": "architecture",
+    "href": "/docs/guides/architecture/SPIKE_CLI_COMPETITIVE_LANDSCAPE"
+  },
+  {
+    "id": "guide-architecture/TOKEN_SYSTEM",
+    "type": "guide",
+    "title": "Token System Documentation",
+    "description": "> **Last Updated**: February 2026 | **Status**: Production",
+    "category": "architecture",
+    "href": "/docs/guides/architecture/TOKEN_SYSTEM"
+  },
+  {
+    "id": "guide-BACKUPS",
+    "type": "guide",
+    "title": "Database Backup and Restore",
+    "description": "> **Last Updated**: 2026-02-26",
+    "category": "general",
+    "href": "/docs/guides/BACKUPS"
+  },
+  {
+    "id": "guide-BAZDMEG",
+    "type": "guide",
+    "title": "The BAZDMEG Method",
+    "description": "**Born from pain. Tested in production. Named in Hungarian.**",
+    "category": "general",
+    "href": "/docs/guides/BAZDMEG"
+  },
+  {
+    "id": "guide-best-practices/api-design",
+    "type": "guide",
+    "title": "REST API Design Best Practices",
+    "description": "A comprehensive guide to building scalable, maintainable, and secure REST APIs with modern industry standards.",
+    "category": "best-practices",
+    "href": "/docs/guides/best-practices/api-design"
+  },
+  {
+    "id": "guide-best-practices/cicd-pipelines",
+    "type": "guide",
+    "title": "CI/CD Pipeline Best Practices",
+    "description": "This comprehensive guide covers industry best practices for designing, implementing, and maintaining CI/CD pipelines in modern application development. Based on current 2025 standards and proven metho",
+    "category": "best-practices",
+    "href": "/docs/guides/best-practices/cicd-pipelines"
+  },
+  {
+    "id": "guide-best-practices/cloudflare-services",
+    "type": "guide",
+    "title": "Cloudflare Cloud Services: Best Practices & Integration Guide",
+    "description": "A comprehensive guide to Cloudflare's cloud services ecosystem, including R2 object storage, Workers edge computing, D1 SQL database, and security features. This document covers best practices, integr",
+    "category": "best-practices",
+    "href": "/docs/guides/best-practices/cloudflare-services"
+  },
+  {
+    "id": "guide-best-practices/error-handling",
+    "type": "guide",
+    "title": "Error Handling Best Practices in TypeScript/React Applications",
+    "description": "A comprehensive guide to implementing robust error handling patterns in TypeScript and React applications, from custom error classes to production monitoring.",
+    "category": "best-practices",
+    "href": "/docs/guides/best-practices/error-handling"
+  },
+  {
+    "id": "guide-best-practices/http-status-codes",
+    "type": "guide",
+    "title": "HTTP Status Code Standards",
+    "description": "A comprehensive guide for consistent HTTP status code usage across all API endpoints in the spike.land platform.",
+    "category": "best-practices",
+    "href": "/docs/guides/best-practices/http-status-codes"
+  },
+  {
+    "id": "guide-best-practices/image-generation-ai",
+    "type": "guide",
+    "title": "Image Generation AI Best Practices",
+    "description": "Comprehensive guide to integrating and optimizing image generation APIs for production applications. This document covers API integration patterns, prompt engineering, performance optimization, cost m",
+    "category": "best-practices",
+    "href": "/docs/guides/best-practices/image-generation-ai"
+  },
+  {
+    "id": "guide-best-practices/logging-monitoring",
+    "type": "guide",
+    "title": "Logging and Monitoring Best Practices for Node.js/Next.js",
+    "description": "A comprehensive guide to implementing production-ready logging, monitoring, and observability in Node.js and Next.js applications. This document covers structured logging, monitoring tools, metrics co",
+    "category": "best-practices",
+    "href": "/docs/guides/best-practices/logging-monitoring"
+  },
+  {
+    "id": "guide-best-practices/MCP_DEVELOPMENT_INDEX",
+    "type": "guide",
+    "title": "MCP Development Documentation Index",
+    "description": "This index provides a comprehensive overview of the Model Context Protocol (MCP) server development documentation and related resources.",
+    "category": "best-practices",
+    "href": "/docs/guides/best-practices/MCP_DEVELOPMENT_INDEX"
+  },
+  {
+    "id": "guide-best-practices/MCP_QUICK_REFERENCE",
+    "type": "guide",
+    "title": "MCP Server Development - Quick Reference",
+    "description": "Fast lookup for common tasks and patterns.",
+    "category": "best-practices",
+    "href": "/docs/guides/best-practices/MCP_QUICK_REFERENCE"
+  },
+  {
+    "id": "guide-best-practices/mcp-server-development",
+    "type": "guide",
+    "title": "MCP Server Development: Comprehensive Best Practices Guide",
+    "description": "1. [MCP Architecture & Overview](#mcp-architecture--overview) 2. [Protocol Fundamentals](#protocol-fundamentals) 3. [Server Development with TypeScript SDK](#server-development-with-typescript-sdk) 4.",
+    "category": "best-practices",
+    "href": "/docs/guides/best-practices/mcp-server-development"
+  },
+  {
+    "id": "guide-best-practices/nextjs-16",
+    "type": "guide",
+    "title": "Next.js 15 App Router Best Practices Guide",
+    "description": "Comprehensive documentation covering modern Next.js 15 patterns, optimization techniques, and production-ready implementations.",
+    "category": "best-practices",
+    "href": "/docs/guides/best-practices/nextjs-16"
+  },
+  {
+    "id": "guide-best-practices/prisma-orm",
+    "type": "guide",
+    "title": "Prisma ORM Best Practices for Production Applications",
+    "description": "A comprehensive guide covering schema design, query optimization, migrations, connection management, type safety, and testing strategies for production Prisma applications.",
+    "category": "best-practices",
+    "href": "/docs/guides/best-practices/prisma-orm"
+  },
+  {
+    "id": "guide-best-practices/react-patterns",
+    "type": "guide",
+    "title": "Modern React Patterns and Best Practices",
+    "description": "> **Last Updated**: December 2025 **Audience**: React developers building > production applications **Framework Context**: Next.js 15, React 19+, > TypeScript",
+    "category": "best-practices",
+    "href": "/docs/guides/best-practices/react-patterns"
+  },
+  {
+    "id": "guide-best-practices/README",
+    "type": "guide",
+    "title": "API Best Practices Documentation",
+    "description": "This directory contains comprehensive guides for building production-ready APIs and services.",
+    "category": "best-practices",
+    "href": "/docs/guides/best-practices/README"
+  },
+  {
+    "id": "guide-best-practices/SECURITY_INDEX",
+    "type": "guide",
+    "title": "Web Application Security Documentation Index",
+    "description": "Complete web application security resources and implementation guides.",
+    "category": "best-practices",
+    "href": "/docs/guides/best-practices/SECURITY_INDEX"
+  },
+  {
+    "id": "guide-best-practices/SECURITY_QUICK_REFERENCE",
+    "type": "guide",
+    "title": "Web Security Quick Reference",
+    "description": "A fast lookup guide for the most critical security implementations. For detailed information, see [web-security.md](./web-security.md).",
+    "category": "best-practices",
+    "href": "/docs/guides/best-practices/SECURITY_QUICK_REFERENCE"
+  },
+  {
+    "id": "guide-best-practices/seo-nextjs",
+    "type": "guide",
+    "title": "SEO Best Practices for Next.js Applications",
+    "description": "A comprehensive guide to optimizing Next.js applications for search engines, covering technical SEO, performance, content optimization, and indexing strategies.",
+    "category": "best-practices",
+    "href": "/docs/guides/best-practices/seo-nextjs"
+  },
+  {
+    "id": "guide-best-practices/SEO-REFERENCE",
+    "type": "guide",
+    "title": "SEO Best Practices Quick Reference",
+    "description": "Quick links to key sections in the comprehensive SEO guide for Next.js applications.",
+    "category": "best-practices",
+    "href": "/docs/guides/best-practices/SEO-REFERENCE"
+  },
+  {
+    "id": "guide-best-practices/state-management",
+    "type": "guide",
+    "title": "React State Management Best Practices 2025",
+    "description": "A comprehensive guide to managing state in modern React applications, covering server state, client state, URL state, form state, and persistence strategies.",
+    "category": "best-practices",
+    "href": "/docs/guides/best-practices/state-management"
+  },
+  {
+    "id": "guide-best-practices/stripe-integration",
+    "type": "guide",
+    "title": "Stripe Integration Best Practices",
+    "description": "Comprehensive guide to integrating Stripe payments securely and reliably. This document covers checkout integration, subscription management, webhook handling, security, testing, and error handling.",
+    "category": "best-practices",
+    "href": "/docs/guides/best-practices/stripe-integration"
+  },
+  {
+    "id": "guide-best-practices/tailwind-css",
+    "type": "guide",
+    "title": "Tailwind CSS Best Practices Guide",
+    "description": "A comprehensive guide to writing maintainable, performant, and well-organized Tailwind CSS code. This document covers configuration, component patterns, responsive design, dark mode, performance optim",
+    "category": "best-practices",
+    "href": "/docs/guides/best-practices/tailwind-css"
+  },
+  {
+    "id": "guide-best-practices/testing-strategies",
+    "type": "guide",
+    "title": "Testing Strategies Best Practices",
+    "description": "Comprehensive guide to testing strategies for modern web applications, with practical examples tailored to Next.js, Vitest, React Testing Library, Playwright, and Cucumber.",
+    "category": "best-practices",
+    "href": "/docs/guides/best-practices/testing-strategies"
+  },
+  {
+    "id": "guide-best-practices/typescript",
+    "type": "guide",
+    "title": "TypeScript Best Practices for Production Applications",
+    "description": "A comprehensive guide to writing maintainable, type-safe, and performant TypeScript code in production environments.",
+    "category": "best-practices",
+    "href": "/docs/guides/best-practices/typescript"
+  },
+  {
+    "id": "guide-best-practices/web-performance",
+    "type": "guide",
+    "title": "Web Performance Optimization Best Practices 2025",
+    "description": "A comprehensive guide to optimizing web performance across Core Web Vitals, image delivery, JavaScript bundling, caching strategies, network optimization, and measurement tools.",
+    "category": "best-practices",
+    "href": "/docs/guides/best-practices/web-performance"
+  },
+  {
+    "id": "guide-best-practices/web-security",
+    "type": "guide",
+    "title": "Web Application Security Best Practices",
+    "description": "A comprehensive guide to securing web applications, covering the OWASP Top 10, authentication security, input validation, security headers, secrets management, and dependency security.",
+    "category": "best-practices",
+    "href": "/docs/guides/best-practices/web-security"
+  },
+  {
+    "id": "guide-BETA_DEPENDENCIES",
+    "type": "guide",
+    "title": "Beta Dependencies",
+    "description": "> **Last Updated**: 2026-02-26",
+    "category": "general",
+    "href": "/docs/guides/BETA_DEPENDENCIES"
+  },
+  {
+    "id": "guide-blog/01-my-prs-were-pure-ai-slop",
+    "type": "guide",
+    "title": "My PRs Were Pure AI Slop: A Developer's Confession",
+    "description": "_By Zoltan Erdos | Brighton, UK | January 2026_",
+    "category": "blog",
+    "href": "/docs/guides/blog/01-my-prs-were-pure-ai-slop"
+  },
+  {
+    "id": "guide-blog/02-more-productive-ruining-career",
+    "type": "guide",
+    "title": "I'm More Productive Than Ever and It's Ruining My Career",
+    "description": "_By Zoltan Erdos | Brighton, UK | January 2026_",
+    "category": "blog",
+    "href": "/docs/guides/blog/02-more-productive-ruining-career"
+  },
+  {
+    "id": "guide-blog/03-last-two-days-sprint-horror",
+    "type": "guide",
+    "title": "The Last Two Days of Every Sprint: A Horror Story",
+    "description": "_By Zoltan Erdos | Brighton, UK | January 2026_",
+    "category": "blog",
+    "href": "/docs/guides/blog/03-last-two-days-sprint-horror"
+  },
+  {
+    "id": "guide-blog/04-2025-year-agents-outperformed",
+    "type": "guide",
+    "title": "2025: The Year Coding Agents Outperformed Developers",
+    "description": "_By Zoltan Erdos | Brighton, UK | January 2026_",
+    "category": "blog",
+    "href": "/docs/guides/blog/04-2025-year-agents-outperformed"
+  },
+  {
+    "id": "guide-blog/05-trust-gap-teams-reject-ai-code",
+    "type": "guide",
+    "title": "The Trust Gap: Why Teams Reject AI-Generated Code",
+    "description": "_By Zoltan Erdos | Brighton, UK | January 2026_",
+    "category": "blog",
+    "href": "/docs/guides/blog/05-trust-gap-teams-reject-ai-code"
+  },
+  {
+    "id": "guide-blog/06-quality-speed-price-triangle-broken",
+    "type": "guide",
+    "title": "Quality, Speed, Price: The Triangle AI Just Broke",
+    "description": "_By Zoltan Erdos | Brighton, UK | January 2026_",
+    "category": "blog",
+    "href": "/docs/guides/blog/06-quality-speed-price-triangle-broken"
+  },
+  {
+    "id": "guide-blog/07-context-engineering-replaced-coding",
+    "type": "guide",
+    "title": "Context Engineering: The Skill That Replaced Coding",
+    "description": "_By Zoltan Erdos | Brighton, UK | January 2026_",
+    "category": "blog",
+    "href": "/docs/guides/blog/07-context-engineering-replaced-coding"
+  },
+  {
+    "id": "guide-blog/08-how-to-not-produce-ai-slop",
+    "type": "guide",
+    "title": "How to Not Produce AI Slop: A Framework",
+    "description": "_By Zoltan Erdos | Brighton, UK | January 2026_",
+    "category": "blog",
+    "href": "/docs/guides/blog/08-how-to-not-produce-ai-slop"
+  },
+  {
+    "id": "guide-blog/09-new-developer-onboarding-ai-edition",
+    "type": "guide",
+    "title": "The New Developer Onboarding: AI Edition",
+    "description": "_By Zoltan Erdos | Brighton, UK | January 2026_",
+    "category": "blog",
+    "href": "/docs/guides/blog/09-new-developer-onboarding-ai-edition"
+  },
+  {
+    "id": "guide-blog/10-what-do-developers-become",
+    "type": "guide",
+    "title": "What Do Developers Become?",
+    "description": "_By Zoltan Erdos | Brighton, UK | January 2026_",
+    "category": "blog",
+    "href": "/docs/guides/blog/10-what-do-developers-become"
+  },
+  {
+    "id": "guide-blog/11-requirement-is-the-product",
+    "type": "guide",
+    "title": "The Requirement Is the Product",
+    "description": "_By Zoltan Erdos | Brighton, UK | January 2026_",
+    "category": "blog",
+    "href": "/docs/guides/blog/11-requirement-is-the-product"
+  },
+  {
+    "id": "guide-blog/12-earning-less-than-five-years-ago",
+    "type": "guide",
+    "title": "Earning Less Than Five Years Ago: The Developer's Economic Reality",
+    "description": "_By Zoltan Erdos | Brighton, UK | January 2026_",
+    "category": "blog",
+    "href": "/docs/guides/blog/12-earning-less-than-five-years-ago"
+  },
+  {
+    "id": "guide-blog/13-brighton-dogs-adhd-startup",
+    "type": "guide",
+    "title": "Brighton, Dogs, and ADHD: Building a Startup While Everything Burns",
+    "description": "_By Zoltan Erdos | Brighton, UK | January 2026_",
+    "category": "blog",
+    "href": "/docs/guides/blog/13-brighton-dogs-adhd-startup"
+  },
+  {
+    "id": "guide-blog/14-why-i-still-code-when-ai-better",
+    "type": "guide",
+    "title": "Why I Still Code When AI Does It Better",
+    "description": "_By Zoltan Erdos | Brighton, UK | January 2026_",
+    "category": "blog",
+    "href": "/docs/guides/blog/14-why-i-still-code-when-ai-better"
+  },
+  {
+    "id": "guide-blog/15-letter-to-junior-developer-2026",
+    "type": "guide",
+    "title": "A Letter to the Junior Developer of 2026",
+    "description": "_By Zoltan Erdos | Brighton, UK | January 2026_",
+    "category": "blog",
+    "href": "/docs/guides/blog/15-letter-to-junior-developer-2026"
+  },
+  {
+    "id": "guide-blog/16-how-i-vibe-coded-production-saas",
+    "type": "guide",
+    "title": "How I Vibe-Coded a Production SaaS in Two Months",
+    "description": "_By Zoltan Erdos | Brighton, UK | February 2026_",
+    "category": "blog",
+    "href": "/docs/guides/blog/16-how-i-vibe-coded-production-saas"
+  },
+  {
+    "id": "guide-blog/17-it-feels-like-cheating",
+    "type": "guide",
+    "title": "It Feels Like Cheating (Because It Is)",
+    "description": "_By Zoltan Erdos | Brighton, UK | February 2026_",
+    "category": "blog",
+    "href": "/docs/guides/blog/17-it-feels-like-cheating"
+  },
+  {
+    "id": "guide-blog/18-your-page-regenerates-itself",
+    "type": "guide",
+    "title": "Your Page Regenerates Itself",
+    "description": "_By Zoltan Erdos | Brighton, UK | February 2026_",
+    "category": "blog",
+    "href": "/docs/guides/blog/18-your-page-regenerates-itself"
+  },
+  {
+    "id": "guide-blog/2026-01-interview-notes-zoltan",
+    "type": "guide",
+    "title": "Interview Notes: Zoltan Erdos on the Developer Identity Crisis of 2026",
+    "description": "**Date:** January 2026 **Subject:** Zoltan Erdos **Location:** Brighton, UK **Role:** Developer & Founder of Spike.land",
+    "category": "blog",
+    "href": "/docs/guides/blog/2026-01-interview-notes-zoltan"
+  },
+  {
+    "id": "guide-business/APPLICATION_TRACKER",
+    "type": "guide",
+    "title": "Accelerator & Credits Application Tracker",
+    "description": "> **Last Updated**: February 10, 2026 **Purpose**: Track status of all > accelerator and credit program applications",
+    "category": "business",
+    "href": "/docs/guides/business/APPLICATION_TRACKER"
+  },
+  {
+    "id": "guide-business/AWS_MEETING_PREP_2026-02-20",
+    "type": "guide",
+    "title": "AWS 1:1 Meeting Prep - Lennon Hobson",
+    "description": "> **Date**: Thursday 20 February 2026, 12:00 noon (30 min) **With**: Lennon > Hobson, AWS Account Manager **Format**: Video call (check calendar for link) > **Goal**: Introduce what we're building, ex",
+    "category": "business",
+    "href": "/docs/guides/business/AWS_MEETING_PREP_2026-02-20"
+  },
+  {
+    "id": "guide-business/BUSINESS_STRUCTURE",
+    "type": "guide",
+    "title": "Spike Land - Business Structure Documentation",
+    "description": "> **Last Updated**: February 2026 **Decision**: Form UK Limited Company > **Company Name**: SPIKE LAND LTD (Company #16906682)",
+    "category": "business",
+    "href": "/docs/guides/business/BUSINESS_STRUCTURE"
+  },
+  {
+    "id": "guide-business/LAUNCH_CHECKLIST",
+    "type": "guide",
+    "title": "Launch Checklist - Spike Land Platform",
+    "description": "**Target Launch Date:** TBD **Platform Version:** Main Branch **Last Updated:** February 26, 2026",
+    "category": "business",
+    "href": "/docs/guides/business/LAUNCH_CHECKLIST"
+  },
+  {
+    "id": "guide-business/LAUNCH_PLAN",
+    "type": "guide",
+    "title": "Launch Plan - Spike Land Platform",
+    "description": "**Target Launch Date:** TBD (Recommended: Q1 2026) **Platform:** https://spike.land **Version:** 1.0.0",
+    "category": "business",
+    "href": "/docs/guides/business/LAUNCH_PLAN"
+  },
+  {
+    "id": "guide-business/MARKETING_PERSONAS",
+    "type": "guide",
+    "title": "Marketing Personas - Spike Land Platform",
+    "description": "> **Last Updated**: February 2026 **Product**: Spike Land (managed deployment > platform with MCP registry) **Primary Channels**: GitHub, Twitter/X, LinkedIn, > Hacker News, Discord",
+    "category": "business",
+    "href": "/docs/guides/business/MARKETING_PERSONAS"
+  },
+  {
+    "id": "guide-business/PEOPLE_LIKE_YOU",
+    "type": "guide",
+    "title": "People Like You: A Curated Reading List & 2-Week Focus Plan",
+    "description": "Zoltan Erdos is a solo UK founder (SPIKE LAND LTD, Dec 2025) building a managed deployment platform with MCP registry (Spike Land) featuring 455+ MCP tools, 18 apps, real-time code editor on Cloudflar",
+    "category": "business",
+    "href": "/docs/guides/business/PEOPLE_LIKE_YOU"
+  },
+  {
+    "id": "guide-business/PITCH_DECK_OUTLINE",
+    "type": "guide",
+    "title": "Pitch Deck Outline for Accelerator Applications",
+    "description": "> **Last Updated**: February 2026 **Purpose**: Structure for Seedcamp, > Techstars, and equity-based accelerator applications **Stage**: Pre-launch > (product ready, pre-revenue)",
+    "category": "business",
+    "href": "/docs/guides/business/PITCH_DECK_OUTLINE"
+  },
+  {
+    "id": "guide-business/SUBSCRIPTIONS",
+    "type": "guide",
+    "title": "Subscriptions & Costs",
+    "description": "> **Company**: SPIKE LAND LTD (UK #16906682) **Last Updated**: February 2026 > **Currency**: GBP (£) unless stated otherwise",
+    "category": "business",
+    "href": "/docs/guides/business/SUBSCRIPTIONS"
+  },
+  {
+    "id": "guide-business/VALUATION_ANALYSIS",
+    "type": "guide",
+    "title": "Market Valuation Analysis: SPIKE LAND LTD",
+    "description": "> **Company**: SPIKE LAND LTD (UK Company #16906682) **Date**: 19 February 2026 > **Classification**: Confidential — For Internal & Investor Use Only **Stage**: > Pre-Revenue, Production-Ready (Dual-P",
+    "category": "business",
+    "href": "/docs/guides/business/VALUATION_ANALYSIS"
+  },
+  {
+    "id": "guide-business/VERITASIUM_STYLE_GUIDE",
+    "type": "guide",
+    "title": "Veritasium Style Guide",
+    "description": "This document outlines the design principles, color palettes, and component usage for Veritasium-style educational videos and interactive demos in spike.land.",
+    "category": "business",
+    "href": "/docs/guides/business/VERITASIUM_STYLE_GUIDE"
+  },
+  {
+    "id": "guide-business/ZOLTAN_ERDOS",
+    "type": "guide",
+    "title": "Zoltan Erdos - Founder & CEO",
+    "description": "> **Role**: Founder, CEO & Solo Developer | **Company**: SPIKE LAND LTD > **Location**: Brighton, UK | **Since**: 2013",
+    "category": "business",
+    "href": "/docs/guides/business/ZOLTAN_ERDOS"
+  },
+  {
+    "id": "guide-CEO_DECISIONS",
+    "type": "guide",
+    "title": "CEO Decisions - Spike Land Platform",
+    "description": "> **Purpose**: This document records strategic decisions made by the CEO (Zoltan > Erdos) for the Spike Land platform. These decisions guide development > priorities, technology choices, and business",
+    "category": "general",
+    "href": "/docs/guides/CEO_DECISIONS"
+  },
+  {
+    "id": "guide-DATABASE_USAGE_TRACKING",
+    "type": "guide",
+    "title": "Database Table Usage Tracking",
+    "description": "This document tracks where each database table is used in the codebase.",
+    "category": "general",
+    "href": "/docs/guides/DATABASE_USAGE_TRACKING"
+  },
+  {
+    "id": "guide-database/ALBUM_IMAGE_INDEX_ANALYSIS",
+    "type": "guide",
+    "title": "AlbumImage Index Analysis & Optimization",
+    "description": "**Status:** ✅ Primary index already exists and is correctly optimized **Action Taken:** Added supplementary chronological index for future use **Migration Required:** Yes (schema drift detected, requi",
+    "category": "database",
+    "href": "/docs/guides/database/ALBUM_IMAGE_INDEX_ANALYSIS"
+  },
+  {
+    "id": "guide-database/ALBUM_IMAGE_INDEXES",
+    "type": "guide",
+    "title": "AlbumImage Index Optimization",
+    "description": "Added compound index on `(albumId, addedAt)` to optimize chronological album queries.",
+    "category": "database",
+    "href": "/docs/guides/database/ALBUM_IMAGE_INDEXES"
+  },
+  {
+    "id": "guide-database/album-enhance-pagination-optimization",
+    "type": "guide",
+    "title": "Album Enhancement Query Pagination Optimization",
+    "description": "Optimized the album batch enhancement endpoint to handle large albums (>100 images) efficiently by implementing count-based checks before fetching data.",
+    "category": "database",
+    "href": "/docs/guides/database/album-enhance-pagination-optimization"
+  },
+  {
+    "id": "guide-E2E_TEST_IMPLEMENTATION",
+    "type": "guide",
+    "title": "E2E Test Implementation for Image Enhancement App Features",
+    "description": "> **Status (2026-02-26):** The E2E test files referenced in this document > (`e2e/features/*.feature`, `e2e/step-definitions/*.steps.ts`) were removed > during the dead code cleanup (~420 files remove",
+    "category": "general",
+    "href": "/docs/guides/E2E_TEST_IMPLEMENTATION"
+  },
+  {
+    "id": "guide-features/FEATURES",
+    "type": "guide",
+    "title": "spike.land — Features",
+    "description": "spike.land is a workspace platform where AI agents build, deploy, and manage full-stack applications. Each workspace is personalized based on a 4-question onboarding flow (16 personas). The platform e",
+    "category": "features",
+    "href": "/docs/guides/features/FEATURES"
+  },
+  {
+    "id": "guide-features/SUBSCRIPTION_TIERS",
+    "type": "guide",
+    "title": "Platform Subscription Tiers",
+    "description": "This document describes the platform-level subscription system for Spike Land.",
+    "category": "features",
+    "href": "/docs/guides/features/SUBSCRIPTION_TIERS"
+  },
+  {
+    "id": "guide-features/USER_GUIDE",
+    "type": "guide",
+    "title": "Spike Land - User Guide",
+    "description": "> **Last Updated**: January 2026 **Platform**: [spike.land](https://spike.land) > **Company**: SPIKE LAND LTD (UK Company #16906682)",
+    "category": "features",
+    "href": "/docs/guides/features/USER_GUIDE"
+  },
+  {
+    "id": "guide-features/VOUCHER_SYSTEM_UPDATED",
+    "type": "guide",
+    "title": "Voucher System Documentation",
+    "description": "> **Last Updated**: December 2025 **Status**: MVP Release",
+    "category": "features",
+    "href": "/docs/guides/features/VOUCHER_SYSTEM_UPDATED"
+  },
+  {
+    "id": "guide-guides/AUTOMATED_SETUP",
+    "type": "guide",
+    "title": "Automated E2E Bypass Setup Guide",
+    "description": "This guide explains how to configure the E2E authentication bypass feature using both automated tools (Playwright MCP) and manual steps.",
+    "category": "guides",
+    "href": "/docs/guides/guides/AUTOMATED_SETUP"
+  },
+  {
+    "id": "guide-guides/CI_CD_DEBUGGING",
+    "type": "guide",
+    "title": "CI/CD Debugging Guide",
+    "description": "This guide helps you troubleshoot CI/CD pipeline failures, understand expected build times, and locate Vercel preview deployments.",
+    "category": "guides",
+    "href": "/docs/guides/guides/CI_CD_DEBUGGING"
+  },
+  {
+    "id": "guide-guides/CREDENTIAL_ROTATION",
+    "type": "guide",
+    "title": "Credential Rotation Procedures",
+    "description": "This document provides step-by-step instructions for rotating credentials when a security incident occurs or as part of regular security hygiene.",
+    "category": "guides",
+    "href": "/docs/guides/guides/CREDENTIAL_ROTATION"
+  },
+  {
+    "id": "guide-guides/DATABASE_MIGRATION_ROLLBACK",
+    "type": "guide",
+    "title": "Database Migration Rollback Guide",
+    "description": "This document outlines procedures for rolling back database migrations, particularly for the voucher system tables.",
+    "category": "guides",
+    "href": "/docs/guides/guides/DATABASE_MIGRATION_ROLLBACK"
+  },
+  {
+    "id": "guide-guides/DATABASE_QUICK_START",
+    "type": "guide",
+    "title": "Database Quick Start",
+    "description": "This is a condensed guide to get the database up and running quickly. For comprehensive documentation, see [DATABASE_SETUP.md](./DATABASE_SETUP.md).",
+    "category": "guides",
+    "href": "/docs/guides/guides/DATABASE_QUICK_START"
+  },
+  {
+    "id": "guide-guides/DEPENDENCY_MANAGEMENT",
+    "type": "guide",
+    "title": "Dependency Management Guide",
+    "description": "This guide covers best practices for managing dependencies in the Spike Land codebase, including adding/removing packages, dead code detection, security auditing, and handling Dependabot updates.",
+    "category": "guides",
+    "href": "/docs/guides/guides/DEPENDENCY_MANAGEMENT"
+  },
+  {
+    "id": "guide-guides/ERROR_LOG_AUDIT_GUIDE",
+    "type": "guide",
+    "title": "Error Log Audit Guide",
+    "description": "This guide provides instructions for auditing error logs, identifying common error patterns, and monitoring application health using the `ErrorLog` table and the `tryCatch` utility.",
+    "category": "guides",
+    "href": "/docs/guides/guides/ERROR_LOG_AUDIT_GUIDE"
+  },
+  {
+    "id": "guide-guides/MANUAL_MY_APPS_TEST",
+    "type": "guide",
+    "title": "Manual /my-apps Testing Guide",
+    "description": "This document provides a step-by-step guide to manually test the `/my-apps` functionality both locally and on production.",
+    "category": "guides",
+    "href": "/docs/guides/guides/MANUAL_MY_APPS_TEST"
+  },
+  {
+    "id": "guide-guides/MANUAL_TESTING_GUIDE",
+    "type": "guide",
+    "title": "Manual Testing Guide - Image Enhancement App",
+    "description": "**Version:** Phase 3-5 Release **Environment:** https://spike.land **Last Updated:** 2026-02-26",
+    "category": "guides",
+    "href": "/docs/guides/guides/MANUAL_TESTING_GUIDE"
+  },
+  {
+    "id": "guide-guides/MY_APPS_TESTING_GUIDE",
+    "type": "guide",
+    "title": "My-Apps Testing Guide",
+    "description": "This document provides step-by-step instructions for testing the /my-apps functionality locally and on production.",
+    "category": "guides",
+    "href": "/docs/guides/guides/MY_APPS_TESTING_GUIDE"
+  },
+  {
+    "id": "guide-guides/SECRETS_SETUP",
+    "type": "guide",
+    "title": "Secrets and Environment Variables Setup",
+    "description": "This is the **single source of truth** for all secrets and environment variables used in the Spike Land platform. All other documentation should reference this file rather than duplicating secrets inf",
+    "category": "guides",
+    "href": "/docs/guides/guides/SECRETS_SETUP"
+  },
+  {
+    "id": "guide-guides/TESTING_STRATEGY",
+    "type": "guide",
+    "title": "Testing Strategy",
+    "description": "Comprehensive guide to the testing infrastructure, conventions, and best practices for the Spike Land platform.",
+    "category": "guides",
+    "href": "/docs/guides/guides/TESTING_STRATEGY"
+  },
+  {
+    "id": "guide-integrations/CAMPAIGN_TRACKING_INTEGRATION",
+    "type": "guide",
+    "title": "Campaign Analytics Tracking Integration",
+    "description": "This document explains how to integrate the SessionTracker component and useTracking hook for campaign analytics.",
+    "category": "integrations",
+    "href": "/docs/guides/integrations/CAMPAIGN_TRACKING_INTEGRATION"
+  },
+  {
+    "id": "guide-JOB_CLEANUP_SYSTEM",
+    "type": "guide",
+    "title": "Job Cleanup System",
+    "description": "This document describes the automatic job timeout and cleanup mechanism for stuck enhancement jobs.",
+    "category": "general",
+    "href": "/docs/guides/JOB_CLEANUP_SYSTEM"
+  },
+  {
+    "id": "guide-JULES_PROCESS_OBSERVATIONS_AND_FUTURE_IMPROVEMENTS",
+    "type": "guide",
+    "title": "Jules Process Observations and Future Improvements",
+    "description": "This document captures observations from running the Ralph Jules automation system and identifies areas for improvement.",
+    "category": "general",
+    "href": "/docs/guides/JULES_PROCESS_OBSERVATIONS_AND_FUTURE_IMPROVEMENTS"
+  },
+  {
+    "id": "guide-MCP_TOOL_SYSTEM_ANALYSIS",
+    "type": "guide",
+    "title": "MCP Tool System Analysis: spike-land-ai vs Industry",
+    "description": "The spike-land-ai MCP ecosystem is a **three-tier architecture** (standalone servers → multiplexer → platform registry) that is architecturally more sophisticated than any single competitor in the MCP",
+    "category": "general",
+    "href": "/docs/guides/MCP_TOOL_SYSTEM_ANALYSIS"
+  },
+  {
+    "id": "guide-MIGRATION_GUIDE",
+    "type": "guide",
+    "title": "Database Migration Guide",
+    "description": "This guide covers how to create, manage, and apply database migrations safely.",
+    "category": "general",
+    "href": "/docs/guides/MIGRATION_GUIDE"
+  },
+  {
+    "id": "guide-migrations/MIGRATION_TEMPLATE",
+    "type": "guide",
+    "title": "API Migration Guide Template",
+    "description": "> Use this template when creating migration guides for API version changes.",
+    "category": "migrations",
+    "href": "/docs/guides/migrations/MIGRATION_TEMPLATE"
+  },
+  {
+    "id": "guide-migrations/README",
+    "type": "guide",
+    "title": "API Migration Guides",
+    "description": "This directory contains step-by-step migration guides for API version changes.",
+    "category": "migrations",
+    "href": "/docs/guides/migrations/README"
+  },
+  {
+    "id": "guide-MY_APPS_TESTING_STATUS_CURRENT",
+    "type": "guide",
+    "title": "My-Apps Testing Status Report",
+    "description": "---",
+    "category": "general",
+    "href": "/docs/guides/MY_APPS_TESTING_STATUS_CURRENT"
+  },
+  {
+    "id": "guide-NON_MCP_TEST_INVENTORY",
+    "type": "guide",
+    "title": "Non-MCP Test Inventory",
+    "description": "This document catalogs non-MCP test files that were scheduled for removal as part of the MCP Platform Consolidation. A major cleanup (~420 files removed) was completed on 2026-02-26.",
+    "category": "general",
+    "href": "/docs/guides/NON_MCP_TEST_INVENTORY"
+  },
+  {
+    "id": "guide-physics-of-attention-assets",
+    "type": "guide",
+    "title": "Asset Requirements: Physics of Attention",
+    "description": "Please generate the following images and save them to `packages/video/public/images/attention/`.",
+    "category": "general",
+    "href": "/docs/guides/physics-of-attention-assets"
+  },
+  {
+    "id": "guide-README",
+    "type": "guide",
+    "title": "Spike Land Documentation",
+    "description": "Welcome to the Spike Land documentation. This is the central index for all platform documentation.",
+    "category": "general",
+    "href": "/docs/guides/README"
+  },
+  {
+    "id": "guide-ROADMAP",
+    "type": "guide",
+    "title": "Spike Land - Development Roadmap",
+    "description": "> **Last Updated**: 2026-02-26 **Current Phase**: Platform Launch & Growth > **Business Structure**: UK Limited Company (SPIKE LAND LTD - Company > #16906682)",
+    "category": "general",
+    "href": "/docs/guides/ROADMAP"
+  },
+  {
+    "id": "guide-RUNBOOK",
+    "type": "guide",
+    "title": "Operational Runbook",
+    "description": "> **Living document** — Agents add entries here when they discover operational > knowledge, troubleshooting steps, or maintenance procedures during development > sessions.",
+    "category": "general",
+    "href": "/docs/guides/RUNBOOK"
+  },
+  {
+    "id": "guide-security/SECURITY_AUDIT_REPORT",
+    "type": "guide",
+    "title": "Security Audit Report - Spike Land Platform",
+    "description": "**Audit Date:** December 10, 2025 **Auditor:** Security Team (Automated Security Audit) **Platform Version:** Main Branch (commit: 14b22b6) **Scope:** Full application security audit based on OWASP To",
+    "category": "security",
+    "href": "/docs/guides/security/SECURITY_AUDIT_REPORT"
+  },
+  {
+    "id": "guide-security/SECURITY_HARDENING",
+    "type": "guide",
+    "title": "Security Hardening",
+    "description": "This document outlines security improvements implemented in the application.",
+    "category": "security",
+    "href": "/docs/guides/security/SECURITY_HARDENING"
+  },
+  {
+    "id": "guide-TECH_DEBT",
+    "type": "guide",
+    "title": "Tech Debt Registry",
+    "description": "> Last updated: 2026-02-26 Last audit: 2026-02-26 (Sprint 4 Cleanup)",
+    "category": "general",
+    "href": "/docs/guides/TECH_DEBT"
+  },
+  {
+    "id": "guide-tech-debt/BUGS",
+    "type": "guide",
+    "title": "Confirmed Bugs — spike.land",
+    "description": "**Generated**: 2026-02-19 **Updated**: 2026-03-01 **Method**: 16-agent parallel codebase scan + manual prod testing **Status**: These are confirmed bugs (not theoretical), verified by reading actual c",
+    "category": "tech-debt",
+    "href": "/docs/guides/tech-debt/BUGS"
+  },
+  {
+    "id": "guide-tech-debt/TECH_DEBT_REPORT",
+    "type": "guide",
+    "title": "Tech Debt & Bug Report — spike.land",
+    "description": "**Generated**: 2026-02-19 **Updated**: 2026-02-26 **Method**: 16 parallel agents scanning TypeScript files across `src/lib/`, `src/app/`, and 2 Cloudflare Worker packages **Total issues found**: ~180",
+    "category": "tech-debt",
+    "href": "/docs/guides/tech-debt/TECH_DEBT_REPORT"
+  },
+  {
+    "id": "guide-testing/testing-everything-manually",
+    "type": "guide",
+    "title": "Spike Land - Complete Manual Testing Guide",
+    "description": "**Last Updated:** 2026-02-26 **Production URL:** https://spike.land **Pre-tested by:** Claude Code with Playwright MCP",
+    "category": "testing",
+    "href": "/docs/guides/testing/testing-everything-manually"
+  },
+  {
+    "id": "guide-useParallelEnhancement-hook",
+    "type": "guide",
+    "title": "useParallelEnhancement Hook",
+    "description": "The `useParallelEnhancement` hook manages multiple image enhancement jobs simultaneously. It handles SSE (Server-Sent Events) connections for real-time job status updates and provides aggregated statu",
+    "category": "general",
+    "href": "/docs/guides/useParallelEnhancement-hook"
+  }
+]

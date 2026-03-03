@@ -44,6 +44,7 @@ export function createAuth(env: Env) {
       "http://localhost:3000",
     ],
     advanced: {
+      trustProxy: true,
       crossSubDomainCookies: {
         enabled: true,
         domain: ".spike.land",

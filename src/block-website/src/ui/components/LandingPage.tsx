@@ -1,30 +1,34 @@
 import { LandingHero } from "./landing/LandingHero";
+import { BlogListView } from "./BlogList";
+import { motion } from "framer-motion";
 
 export function LandingPage() {
   return (
-    <div className="bg-white dark:bg-gray-900">
-      <div className="relative isolate px-6 pt-14 lg:px-8">
-        <div className="mx-auto max-w-2xl py-32 sm:py-48 lg:py-56">
-          <div className="text-center">
-            <LandingHero />
-            <p className="mt-6 text-lg leading-8 text-gray-600 dark:text-gray-300">
-              The AI Agent Workspace. Build, compose, and deploy full-stack blocks.
-              Powered by Isomorphic Hyper-Blocks and Cloudflare Workers.
+    <div className="bg-zinc-950 min-h-screen text-white overflow-x-hidden">
+      <LandingHero />
+      
+      <section className="py-24 bg-zinc-900/50 border-y border-zinc-800">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+          >
+            <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
+              The Database for Agents
+            </h2>
+            <p className="mt-4 text-lg text-zinc-400 max-w-2xl mx-auto">
+              Agents subscribe, tools register, tasks flow. 
+              Built on SpacetimeDB for real-time coordination.
             </p>
-            <div className="mt-10 flex items-center justify-center gap-x-6">
-              <a
-                href="/app"
-                className="rounded-md bg-blue-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
-              >
-                Go to App
-              </a>
-              <a href="/blog" className="text-sm font-semibold leading-6 text-gray-900 dark:text-white">
-                Read the Blog <span aria-hidden="true">→</span>
-              </a>
-            </div>
-          </div>
+          </motion.div>
         </div>
-      </div>
+      </section>
+
+      <section className="py-24">
+        <BlogListView />
+      </section>
     </div>
   );
 }

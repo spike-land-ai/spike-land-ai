@@ -1,0 +1,1930 @@
+[
+  {
+    "path": "/api/404-log",
+    "methods": [
+      "POST"
+    ],
+    "description": "/api/404-log endpoint",
+    "domain": "404-log",
+    "auth": false
+  },
+  {
+    "path": "/api/ab-test/assign",
+    "methods": [
+      "GET",
+      "POST"
+    ],
+    "description": "/api/ab-test/assign endpoint",
+    "domain": "ab-test",
+    "auth": false
+  },
+  {
+    "path": "/api/admin/mcp-health",
+    "methods": [
+      "GET"
+    ],
+    "description": "MCP Health & Metrics API Route",
+    "domain": "admin",
+    "auth": true
+  },
+  {
+    "path": "/api/agent-chat",
+    "methods": [
+      "POST"
+    ],
+    "description": "/api/agent-chat endpoint",
+    "domain": "agent-chat",
+    "auth": true
+  },
+  {
+    "path": "/api/agent-loop",
+    "methods": [
+      "POST"
+    ],
+    "description": "/api/agent-loop endpoint",
+    "domain": "agent-loop",
+    "auth": true
+  },
+  {
+    "path": "/api/agent/apps/[appId]/context",
+    "methods": [
+      "GET"
+    ],
+    "description": "GET /api/agent/apps/[appId]/context",
+    "domain": "agent",
+    "auth": false
+  },
+  {
+    "path": "/api/agent/apps/[appId]/respond",
+    "methods": [
+      "POST"
+    ],
+    "description": "POST /api/agent/apps/[appId]/respond",
+    "domain": "agent",
+    "auth": false
+  },
+  {
+    "path": "/api/agent/capabilities",
+    "methods": [
+      "GET"
+    ],
+    "description": "GET /api/agent/capabilities",
+    "domain": "agent",
+    "auth": false
+  },
+  {
+    "path": "/api/agent/messages/[messageId]",
+    "methods": [
+      "GET",
+      "PATCH"
+    ],
+    "description": "GET /api/agent/messages/[messageId]",
+    "domain": "agent",
+    "auth": false
+  },
+  {
+    "path": "/api/agent/queue",
+    "methods": [
+      "GET"
+    ],
+    "description": "GET /api/agent/queue",
+    "domain": "agent",
+    "auth": false
+  },
+  {
+    "path": "/api/agent/sandbox/callback",
+    "methods": [
+      "POST"
+    ],
+    "description": "Sandbox Callback Endpoint",
+    "domain": "agent",
+    "auth": false
+  },
+  {
+    "path": "/api/agents",
+    "methods": [
+      "GET"
+    ],
+    "description": "Agent List API",
+    "domain": "agents",
+    "auth": true
+  },
+  {
+    "path": "/api/agents/[agentId]",
+    "methods": [
+      "GET",
+      "PATCH",
+      "DELETE"
+    ],
+    "description": "Single Agent API",
+    "domain": "agents",
+    "auth": true
+  },
+  {
+    "path": "/api/agents/[agentId]/messages",
+    "methods": [
+      "GET",
+      "POST"
+    ],
+    "description": "Agent Messages API",
+    "domain": "agents",
+    "auth": true
+  },
+  {
+    "path": "/api/agents/[agentId]/tasks",
+    "methods": [
+      "POST"
+    ],
+    "description": "Agent Tasks API",
+    "domain": "agents",
+    "auth": true
+  },
+  {
+    "path": "/api/agents/connect",
+    "methods": [
+      "POST"
+    ],
+    "description": "Agent Connection API",
+    "domain": "agents",
+    "auth": true
+  },
+  {
+    "path": "/api/agents/heartbeat",
+    "methods": [
+      "POST"
+    ],
+    "description": "Agent Heartbeat API",
+    "domain": "agents",
+    "auth": true
+  },
+  {
+    "path": "/api/agents/stream",
+    "methods": [
+      "GET"
+    ],
+    "description": "Agent SSE Stream API",
+    "domain": "agents",
+    "auth": true
+  },
+  {
+    "path": "/api/ai/connect/[connectId]",
+    "methods": [
+      "GET",
+      "POST",
+      "PUT"
+    ],
+    "description": "Agent Connection API",
+    "domain": "ai",
+    "auth": true
+  },
+  {
+    "path": "/api/apps",
+    "methods": [
+      "GET",
+      "POST"
+    ],
+    "description": "/api/apps endpoint",
+    "domain": "apps",
+    "auth": true
+  },
+  {
+    "path": "/api/apps/[id]",
+    "methods": [
+      "GET",
+      "PATCH",
+      "DELETE"
+    ],
+    "description": "GET /api/apps/[id]",
+    "domain": "apps",
+    "auth": true
+  },
+  {
+    "path": "/api/apps/[id]/agent",
+    "methods": [
+      "POST",
+      "PATCH"
+    ],
+    "description": "PATCH /api/apps/[id]/agent",
+    "domain": "apps",
+    "auth": false
+  },
+  {
+    "path": "/api/apps/[id]/agent/chat",
+    "methods": [
+      "POST"
+    ],
+    "description": "/api/apps/[id]/agent/chat endpoint",
+    "domain": "apps",
+    "auth": true
+  },
+  {
+    "path": "/api/apps/[id]/bin",
+    "methods": [
+      "POST"
+    ],
+    "description": "POST /api/apps/[id]/bin",
+    "domain": "apps",
+    "auth": true
+  },
+  {
+    "path": "/api/apps/[id]/bin/restore",
+    "methods": [
+      "POST"
+    ],
+    "description": "POST /api/apps/[id]/bin/restore",
+    "domain": "apps",
+    "auth": true
+  },
+  {
+    "path": "/api/apps/[id]/images",
+    "methods": [
+      "GET",
+      "POST"
+    ],
+    "description": "GET /api/apps/[id]/images",
+    "domain": "apps",
+    "auth": true
+  },
+  {
+    "path": "/api/apps/[id]/messages",
+    "methods": [
+      "GET",
+      "POST",
+      "DELETE"
+    ],
+    "description": "GET /api/apps/[id]/messages",
+    "domain": "apps",
+    "auth": true
+  },
+  {
+    "path": "/api/apps/[id]/messages/stream",
+    "methods": [
+      "GET"
+    ],
+    "description": "SSE Connection Store",
+    "domain": "apps",
+    "auth": true
+  },
+  {
+    "path": "/api/apps/[id]/permanent",
+    "methods": [
+      "DELETE"
+    ],
+    "description": "DELETE /api/apps/[id]/permanent",
+    "domain": "apps",
+    "auth": true
+  },
+  {
+    "path": "/api/apps/[id]/status",
+    "methods": [
+      "GET",
+      "PATCH"
+    ],
+    "description": "GET /api/apps/[id]/status",
+    "domain": "apps",
+    "auth": true
+  },
+  {
+    "path": "/api/apps/[id]/sync-status",
+    "methods": [
+      "POST"
+    ],
+    "description": "/api/apps/[id]/sync-status endpoint",
+    "domain": "apps",
+    "auth": true
+  },
+  {
+    "path": "/api/apps/[id]/versions",
+    "methods": [
+      "GET"
+    ],
+    "description": "/api/apps/[id]/versions endpoint",
+    "domain": "apps",
+    "auth": true
+  },
+  {
+    "path": "/api/apps/[id]/versions/[versionId]/restore",
+    "methods": [
+      "POST"
+    ],
+    "description": "/api/apps/[id]/versions/[versionId]/restore endpoint",
+    "domain": "apps",
+    "auth": true
+  },
+  {
+    "path": "/api/apps/bin",
+    "methods": [
+      "GET"
+    ],
+    "description": "GET /api/apps/bin",
+    "domain": "apps",
+    "auth": true
+  },
+  {
+    "path": "/api/apps/by-codespace/[codeSpace]",
+    "methods": [
+      "GET"
+    ],
+    "description": "GET /api/apps/by-codespace/[codeSpace]",
+    "domain": "apps",
+    "auth": true
+  },
+  {
+    "path": "/api/audio/[trackId]",
+    "methods": [
+      "GET",
+      "DELETE"
+    ],
+    "description": "Audio Track API Route - GET and DELETE operations",
+    "domain": "audio",
+    "auth": true
+  },
+  {
+    "path": "/api/audio/upload",
+    "methods": [
+      "POST"
+    ],
+    "description": "Audio Upload API Route",
+    "domain": "audio",
+    "auth": true
+  },
+  {
+    "path": "/api/auth/check-email",
+    "methods": [
+      "POST"
+    ],
+    "description": "Email Check API Route",
+    "domain": "auth",
+    "auth": false
+  },
+  {
+    "path": "/api/auth/health",
+    "methods": [
+      "GET"
+    ],
+    "description": "Auth provider health check endpoint.",
+    "domain": "auth",
+    "auth": false
+  },
+  {
+    "path": "/api/auth/mobile/signin",
+    "methods": [
+      "POST"
+    ],
+    "description": "Mobile Sign In API Route",
+    "domain": "auth",
+    "auth": false
+  },
+  {
+    "path": "/api/auth/qr/approve",
+    "methods": [
+      "POST"
+    ],
+    "description": "/api/auth/qr/approve endpoint",
+    "domain": "auth",
+    "auth": true
+  },
+  {
+    "path": "/api/auth/qr/complete",
+    "methods": [
+      "POST"
+    ],
+    "description": "/api/auth/qr/complete endpoint",
+    "domain": "auth",
+    "auth": false
+  },
+  {
+    "path": "/api/auth/qr/initiate",
+    "methods": [
+      "POST"
+    ],
+    "description": "/api/auth/qr/initiate endpoint",
+    "domain": "auth",
+    "auth": false
+  },
+  {
+    "path": "/api/auth/qr/poll",
+    "methods": [
+      "GET"
+    ],
+    "description": "/api/auth/qr/poll endpoint",
+    "domain": "auth",
+    "auth": false
+  },
+  {
+    "path": "/api/auth/signup",
+    "methods": [
+      "POST"
+    ],
+    "description": "User Signup API Route",
+    "domain": "auth",
+    "auth": false
+  },
+  {
+    "path": "/api/avl/session",
+    "methods": [
+      "GET",
+      "POST"
+    ],
+    "description": "AVL Session API",
+    "domain": "avl",
+    "auth": true
+  },
+  {
+    "path": "/api/bazdmeg/chat",
+    "methods": [
+      "GET",
+      "POST"
+    ],
+    "description": "/api/bazdmeg/chat endpoint",
+    "domain": "bazdmeg",
+    "auth": false
+  },
+  {
+    "path": "/api/bazdmeg/dashboard/chat",
+    "methods": [
+      "POST"
+    ],
+    "description": "Dashboard Chat Streaming API",
+    "domain": "bazdmeg",
+    "auth": true
+  },
+  {
+    "path": "/api/bazdmeg/dashboard/issues",
+    "methods": [
+      "GET"
+    ],
+    "description": "Dashboard Issues API",
+    "domain": "bazdmeg",
+    "auth": true
+  },
+  {
+    "path": "/api/bazdmeg/dashboard/jules/status",
+    "methods": [
+      "GET"
+    ],
+    "description": "Jules Status Polling API",
+    "domain": "bazdmeg",
+    "auth": true
+  },
+  {
+    "path": "/api/bazdmeg/dashboard/plan",
+    "methods": [
+      "GET",
+      "PUT"
+    ],
+    "description": "Dashboard Plan CRUD API",
+    "domain": "bazdmeg",
+    "auth": true
+  },
+  {
+    "path": "/api/bazdmeg/dashboard/plan/[planId]/approve",
+    "methods": [
+      "POST"
+    ],
+    "description": "Approve Plan API",
+    "domain": "bazdmeg",
+    "auth": true
+  },
+  {
+    "path": "/api/bazdmeg/dashboard/plan/[planId]/send-to-jules",
+    "methods": [
+      "POST"
+    ],
+    "description": "Send to Jules API",
+    "domain": "bazdmeg",
+    "auth": true
+  },
+  {
+    "path": "/api/bazdmeg/engagement",
+    "methods": [
+      "POST"
+    ],
+    "description": "/api/bazdmeg/engagement endpoint",
+    "domain": "bazdmeg",
+    "auth": false
+  },
+  {
+    "path": "/api/bazdmeg/faq",
+    "methods": [
+      "GET",
+      "POST",
+      "PATCH",
+      "DELETE"
+    ],
+    "description": "/api/bazdmeg/faq endpoint",
+    "domain": "bazdmeg",
+    "auth": true
+  },
+  {
+    "path": "/api/bazdmeg/faq/[id]/helpful",
+    "methods": [
+      "POST"
+    ],
+    "description": "/api/bazdmeg/faq/[id]/helpful endpoint",
+    "domain": "bazdmeg",
+    "auth": false
+  },
+  {
+    "path": "/api/bazdmeg/orchestrator",
+    "methods": [
+      "POST"
+    ],
+    "description": "/api/bazdmeg/orchestrator endpoint",
+    "domain": "bazdmeg",
+    "auth": false
+  },
+  {
+    "path": "/api/blog/poll",
+    "methods": [
+      "GET",
+      "POST"
+    ],
+    "description": "POST /api/blog/poll — submit or update a vote",
+    "domain": "blog",
+    "auth": false
+  },
+  {
+    "path": "/api/blog/posts",
+    "methods": [
+      "GET"
+    ],
+    "description": "GET /api/blog/posts",
+    "domain": "blog",
+    "auth": false
+  },
+  {
+    "path": "/api/blog/posts/[slug]",
+    "methods": [
+      "GET"
+    ],
+    "description": "GET /api/blog/posts/[slug]",
+    "domain": "blog",
+    "auth": false
+  },
+  {
+    "path": "/api/boxes",
+    "methods": [
+      "GET",
+      "POST"
+    ],
+    "description": "/api/boxes endpoint",
+    "domain": "boxes",
+    "auth": true
+  },
+  {
+    "path": "/api/boxes/[id]",
+    "methods": [
+      "GET",
+      "DELETE"
+    ],
+    "description": "Resolves and validates the `id` route param.",
+    "domain": "boxes",
+    "auth": true
+  },
+  {
+    "path": "/api/boxes/[id]/action",
+    "methods": [
+      "POST"
+    ],
+    "description": "Resolves and validates the `id` route param.",
+    "domain": "boxes",
+    "auth": true
+  },
+  {
+    "path": "/api/boxes/[id]/clone",
+    "methods": [
+      "POST"
+    ],
+    "description": "/api/boxes/[id]/clone endpoint",
+    "domain": "boxes",
+    "auth": true
+  },
+  {
+    "path": "/api/boxes/[id]/messages",
+    "methods": [
+      "POST"
+    ],
+    "description": "/api/boxes/[id]/messages endpoint",
+    "domain": "boxes",
+    "auth": true
+  },
+  {
+    "path": "/api/boxes/[id]/vnc-session",
+    "methods": [
+      "GET"
+    ],
+    "description": "Short-lived token duration for VNC session access.",
+    "domain": "boxes",
+    "auth": true
+  },
+  {
+    "path": "/api/career/assess",
+    "methods": [
+      "POST"
+    ],
+    "description": "/api/career/assess endpoint",
+    "domain": "career",
+    "auth": false
+  },
+  {
+    "path": "/api/career/compare",
+    "methods": [
+      "POST"
+    ],
+    "description": "/api/career/compare endpoint",
+    "domain": "career",
+    "auth": false
+  },
+  {
+    "path": "/api/career/geolocation",
+    "methods": [
+      "GET"
+    ],
+    "description": "/api/career/geolocation endpoint",
+    "domain": "career",
+    "auth": false
+  },
+  {
+    "path": "/api/career/jobs",
+    "methods": [
+      "GET"
+    ],
+    "description": "/api/career/jobs endpoint",
+    "domain": "career",
+    "auth": false
+  },
+  {
+    "path": "/api/career/occupations",
+    "methods": [
+      "GET"
+    ],
+    "description": "/api/career/occupations endpoint",
+    "domain": "career",
+    "auth": false
+  },
+  {
+    "path": "/api/career/occupations/[id]",
+    "methods": [
+      "GET"
+    ],
+    "description": "/api/career/occupations/[id] endpoint",
+    "domain": "career",
+    "auth": false
+  },
+  {
+    "path": "/api/chat",
+    "methods": [
+      "POST"
+    ],
+    "description": "/api/chat endpoint",
+    "domain": "chat",
+    "auth": true
+  },
+  {
+    "path": "/api/clean/achievements",
+    "methods": [
+      "GET"
+    ],
+    "description": "GET /api/clean/achievements",
+    "domain": "clean",
+    "auth": true
+  },
+  {
+    "path": "/api/clean/achievements/check",
+    "methods": [
+      "POST"
+    ],
+    "description": "POST /api/clean/achievements/check",
+    "domain": "clean",
+    "auth": true
+  },
+  {
+    "path": "/api/clean/reminders",
+    "methods": [
+      "GET",
+      "POST"
+    ],
+    "description": "GET /api/clean/reminders",
+    "domain": "clean",
+    "auth": true
+  },
+  {
+    "path": "/api/clean/reminders/[reminderId]",
+    "methods": [
+      "PATCH",
+      "DELETE"
+    ],
+    "description": "PATCH /api/clean/reminders/[reminderId]",
+    "domain": "clean",
+    "auth": true
+  },
+  {
+    "path": "/api/clean/sessions",
+    "methods": [
+      "GET",
+      "POST"
+    ],
+    "description": "GET /api/clean/sessions",
+    "domain": "clean",
+    "auth": true
+  },
+  {
+    "path": "/api/clean/sessions/[sessionId]",
+    "methods": [
+      "GET",
+      "PATCH"
+    ],
+    "description": "GET /api/clean/sessions/[sessionId]",
+    "domain": "clean",
+    "auth": true
+  },
+  {
+    "path": "/api/clean/sessions/[sessionId]/tasks",
+    "methods": [
+      "GET",
+      "POST"
+    ],
+    "description": "GET /api/clean/sessions/[sessionId]/tasks",
+    "domain": "clean",
+    "auth": true
+  },
+  {
+    "path": "/api/clean/sessions/[sessionId]/tasks/[taskId]",
+    "methods": [
+      "PATCH"
+    ],
+    "description": "PATCH /api/clean/sessions/[sessionId]/tasks/[taskId]",
+    "domain": "clean",
+    "auth": true
+  },
+  {
+    "path": "/api/clean/streaks",
+    "methods": [
+      "GET"
+    ],
+    "description": "GET /api/clean/streaks",
+    "domain": "clean",
+    "auth": true
+  },
+  {
+    "path": "/api/clean/streaks/record",
+    "methods": [
+      "POST"
+    ],
+    "description": "POST /api/clean/streaks/record",
+    "domain": "clean",
+    "auth": true
+  },
+  {
+    "path": "/api/codespace/[codeSpace]/bundle",
+    "methods": [
+      "GET"
+    ],
+    "description": "GET /api/codespace/[codeSpace]/bundle",
+    "domain": "codespace",
+    "auth": false
+  },
+  {
+    "path": "/api/codespace/[codeSpace]/chat",
+    "methods": [
+      "POST"
+    ],
+    "description": "/api/codespace/[codeSpace]/chat endpoint",
+    "domain": "codespace",
+    "auth": false
+  },
+  {
+    "path": "/api/codespace/[codeSpace]/code",
+    "methods": [
+      "GET",
+      "PUT"
+    ],
+    "description": "/api/codespace/[codeSpace]/code endpoint",
+    "domain": "codespace",
+    "auth": false
+  },
+  {
+    "path": "/api/codespace/[codeSpace]/embed",
+    "methods": [
+      "GET"
+    ],
+    "description": "GET /api/codespace/[codeSpace]/embed",
+    "domain": "codespace",
+    "auth": false
+  },
+  {
+    "path": "/api/codespace/[codeSpace]/mcp",
+    "methods": [
+      "GET",
+      "POST"
+    ],
+    "description": "MCP (Model Context Protocol) JSON-RPC 2.0 Endpoint",
+    "domain": "codespace",
+    "auth": false
+  },
+  {
+    "path": "/api/codespace/[codeSpace]/run",
+    "methods": [
+      "POST"
+    ],
+    "description": "/api/codespace/[codeSpace]/run endpoint",
+    "domain": "codespace",
+    "auth": false
+  },
+  {
+    "path": "/api/codespace/[codeSpace]/session",
+    "methods": [
+      "GET"
+    ],
+    "description": "/api/codespace/[codeSpace]/session endpoint",
+    "domain": "codespace",
+    "auth": false
+  },
+  {
+    "path": "/api/codespace/[codeSpace]/stream",
+    "methods": [
+      "GET"
+    ],
+    "description": "GET /api/codespace/[codeSpace]/stream",
+    "domain": "codespace",
+    "auth": false
+  },
+  {
+    "path": "/api/codespace/[codeSpace]/update",
+    "methods": [
+      "POST"
+    ],
+    "description": "POST /api/codespace/[codeSpace]/update",
+    "domain": "codespace",
+    "auth": false
+  },
+  {
+    "path": "/api/codespace/[codeSpace]/validate",
+    "methods": [
+      "POST"
+    ],
+    "description": "/api/codespace/[codeSpace]/validate endpoint",
+    "domain": "codespace",
+    "auth": false
+  },
+  {
+    "path": "/api/codespace/[codeSpace]/version/[number]",
+    "methods": [
+      "GET"
+    ],
+    "description": "GET /api/codespace/[codeSpace]/version/[number]",
+    "domain": "codespace",
+    "auth": false
+  },
+  {
+    "path": "/api/codespace/[codeSpace]/version/[number]/code",
+    "methods": [
+      "GET"
+    ],
+    "description": "GET /api/codespace/[codeSpace]/version/[number]/code",
+    "domain": "codespace",
+    "auth": false
+  },
+  {
+    "path": "/api/codespace/[codeSpace]/version/[number]/css",
+    "methods": [
+      "GET"
+    ],
+    "description": "GET /api/codespace/[codeSpace]/version/[number]/css",
+    "domain": "codespace",
+    "auth": false
+  },
+  {
+    "path": "/api/codespace/[codeSpace]/version/[number]/embed",
+    "methods": [
+      "GET"
+    ],
+    "description": "GET /api/codespace/[codeSpace]/version/[number]/embed",
+    "domain": "codespace",
+    "auth": false
+  },
+  {
+    "path": "/api/codespace/[codeSpace]/version/[number]/js",
+    "methods": [
+      "GET"
+    ],
+    "description": "GET /api/codespace/[codeSpace]/version/[number]/js",
+    "domain": "codespace",
+    "auth": false
+  },
+  {
+    "path": "/api/codespace/[codeSpace]/versions",
+    "methods": [
+      "GET"
+    ],
+    "description": "GET /api/codespace/[codeSpace]/versions",
+    "domain": "codespace",
+    "auth": false
+  },
+  {
+    "path": "/api/codespace/[codeSpace]/worker",
+    "methods": [
+      "GET"
+    ],
+    "description": "GET /api/codespace/[codeSpace]/worker",
+    "domain": "codespace",
+    "auth": false
+  },
+  {
+    "path": "/api/comments",
+    "methods": [
+      "GET",
+      "POST"
+    ],
+    "description": "GET /api/comments?contentType=blog&slug=my-slug",
+    "domain": "comments",
+    "auth": true
+  },
+  {
+    "path": "/api/comments/[id]",
+    "methods": [
+      "DELETE"
+    ],
+    "description": "DELETE /api/comments/[id]",
+    "domain": "comments",
+    "auth": true
+  },
+  {
+    "path": "/api/competitors",
+    "methods": [
+      "GET",
+      "POST"
+    ],
+    "description": "/api/competitors endpoint",
+    "domain": "competitors",
+    "auth": false
+  },
+  {
+    "path": "/api/competitors/[id]",
+    "methods": [
+      "DELETE"
+    ],
+    "description": "/api/competitors/[id] endpoint",
+    "domain": "competitors",
+    "auth": false
+  },
+  {
+    "path": "/api/connect/challenges",
+    "methods": [
+      "GET",
+      "POST"
+    ],
+    "description": "GET /api/connect/challenges - List open challenges",
+    "domain": "connect",
+    "auth": true
+  },
+  {
+    "path": "/api/connect/challenges/[id]",
+    "methods": [
+      "GET"
+    ],
+    "description": "GET /api/connect/challenges/[id] - Challenge detail with top submissions",
+    "domain": "connect",
+    "auth": false
+  },
+  {
+    "path": "/api/connect/challenges/[id]/review",
+    "methods": [
+      "POST"
+    ],
+    "description": "POST /api/connect/challenges/[id]/review - Submit a review",
+    "domain": "connect",
+    "auth": true
+  },
+  {
+    "path": "/api/connect/challenges/[id]/stream",
+    "methods": [
+      "GET"
+    ],
+    "description": "GET /api/connect/challenges/[id]/stream?submissionId=xxx",
+    "domain": "connect",
+    "auth": false
+  },
+  {
+    "path": "/api/connect/challenges/[id]/submit",
+    "methods": [
+      "POST"
+    ],
+    "description": "POST /api/connect/challenges/[id]/submit - Submit a prompt",
+    "domain": "connect",
+    "auth": true
+  },
+  {
+    "path": "/api/connect/leaderboard",
+    "methods": [
+      "GET"
+    ],
+    "description": "GET /api/connect/leaderboard - Top ELO rankings",
+    "domain": "connect",
+    "auth": false
+  },
+  {
+    "path": "/api/content/stats",
+    "methods": [
+      "GET"
+    ],
+    "description": "GET /api/content/stats?path=/blog/some-slug",
+    "domain": "content",
+    "auth": false
+  },
+  {
+    "path": "/api/create/[slug]/screenshot",
+    "methods": [
+      "GET"
+    ],
+    "description": "/api/create/[slug]/screenshot endpoint",
+    "domain": "create",
+    "auth": false
+  },
+  {
+    "path": "/api/create/classify",
+    "methods": [
+      "POST"
+    ],
+    "description": "/api/create/classify endpoint",
+    "domain": "create",
+    "auth": false
+  },
+  {
+    "path": "/api/create/generate",
+    "methods": [
+      "GET"
+    ],
+    "description": "/api/create/generate endpoint",
+    "domain": "create",
+    "auth": false
+  },
+  {
+    "path": "/api/create/health",
+    "methods": [
+      "GET"
+    ],
+    "description": "/api/create/health endpoint",
+    "domain": "create",
+    "auth": false
+  },
+  {
+    "path": "/api/create/revalidate",
+    "methods": [
+      "POST"
+    ],
+    "description": "POST /api/create/revalidate",
+    "domain": "create",
+    "auth": true
+  },
+  {
+    "path": "/api/create/review",
+    "methods": [
+      "GET",
+      "POST"
+    ],
+    "description": "GET /api/create/review?slug=...",
+    "domain": "create",
+    "auth": true
+  },
+  {
+    "path": "/api/create/screenshot",
+    "methods": [
+      "GET"
+    ],
+    "description": "/api/create/screenshot endpoint",
+    "domain": "create",
+    "auth": false
+  },
+  {
+    "path": "/api/create/search",
+    "methods": [
+      "GET"
+    ],
+    "description": "/api/create/search endpoint",
+    "domain": "create",
+    "auth": false
+  },
+  {
+    "path": "/api/create/stream",
+    "methods": [
+      "POST"
+    ],
+    "description": "Check if the local Create agent is reachable.",
+    "domain": "create",
+    "auth": true
+  },
+  {
+    "path": "/api/create/upload-image",
+    "methods": [
+      "POST"
+    ],
+    "description": "/api/create/upload-image endpoint",
+    "domain": "create",
+    "auth": false
+  },
+  {
+    "path": "/api/credits/balance",
+    "methods": [
+      "GET"
+    ],
+    "description": "GET /api/credits/balance",
+    "domain": "credits",
+    "auth": true
+  },
+  {
+    "path": "/api/cron/boost-detector",
+    "methods": [
+      "GET"
+    ],
+    "description": "GET /api/cron/boost-detector",
+    "domain": "cron",
+    "auth": false
+  },
+  {
+    "path": "/api/cron/boost-performance-sync",
+    "methods": [
+      "GET"
+    ],
+    "description": "GET /api/cron/boost-performance-sync",
+    "domain": "cron",
+    "auth": false
+  },
+  {
+    "path": "/api/cron/cleanup-bin",
+    "methods": [
+      "GET"
+    ],
+    "description": "Cron Bin Cleanup Route",
+    "domain": "cron",
+    "auth": false
+  },
+  {
+    "path": "/api/cron/cleanup-errors",
+    "methods": [
+      "GET"
+    ],
+    "description": "Error Log Cleanup Cron Job",
+    "domain": "cron",
+    "auth": false
+  },
+  {
+    "path": "/api/cron/cleanup-jobs",
+    "methods": [
+      "GET"
+    ],
+    "description": "/api/cron/cleanup-jobs endpoint",
+    "domain": "cron",
+    "auth": false
+  },
+  {
+    "path": "/api/cron/cleanup-sandboxes",
+    "methods": [
+      "GET"
+    ],
+    "description": "Sandbox Cleanup Cron Job",
+    "domain": "cron",
+    "auth": false
+  },
+  {
+    "path": "/api/cron/cleanup-tracking",
+    "methods": [
+      "GET"
+    ],
+    "description": "Data Retention Cleanup Cron Job",
+    "domain": "cron",
+    "auth": false
+  },
+  {
+    "path": "/api/cron/create-agent-alert",
+    "methods": [
+      "GET"
+    ],
+    "description": "Create Agent Alert Cron Job",
+    "domain": "cron",
+    "auth": false
+  },
+  {
+    "path": "/api/cron/marketing-sync",
+    "methods": [
+      "GET"
+    ],
+    "description": "Marketing Sync Cron Job",
+    "domain": "cron",
+    "auth": false
+  },
+  {
+    "path": "/api/cron/reset-workspace-credits",
+    "methods": [
+      "GET"
+    ],
+    "description": "Cron Workspace Credit Reset Route",
+    "domain": "cron",
+    "auth": false
+  },
+  {
+    "path": "/api/cron/sync-box-status",
+    "methods": [
+      "GET"
+    ],
+    "description": "Box Status Sync Cron Job",
+    "domain": "cron",
+    "auth": false
+  },
+  {
+    "path": "/api/errors/report",
+    "methods": [
+      "POST"
+    ],
+    "description": "POST /api/errors/report",
+    "domain": "errors",
+    "auth": false
+  },
+  {
+    "path": "/api/g/generate",
+    "methods": [
+      "POST"
+    ],
+    "description": "/api/g/generate endpoint",
+    "domain": "g",
+    "auth": true
+  },
+  {
+    "path": "/api/g/status/[...slug]",
+    "methods": [
+      "GET"
+    ],
+    "description": "/api/g/status/[...slug] endpoint",
+    "domain": "g",
+    "auth": false
+  },
+  {
+    "path": "/api/g/stream/[generationId]",
+    "methods": [
+      "GET"
+    ],
+    "description": "/api/g/stream/[generationId] endpoint",
+    "domain": "g",
+    "auth": false
+  },
+  {
+    "path": "/api/health",
+    "methods": [
+      "GET"
+    ],
+    "description": "Health check endpoint for deployment verification",
+    "domain": "health",
+    "auth": false
+  },
+  {
+    "path": "/api/image-studio/mcp",
+    "methods": [
+      "POST"
+    ],
+    "description": "/api/image-studio/mcp endpoint",
+    "domain": "image-studio",
+    "auth": false
+  },
+  {
+    "path": "/api/learnit/generate",
+    "methods": [
+      "POST"
+    ],
+    "description": "/api/learnit/generate endpoint",
+    "domain": "learnit",
+    "auth": true
+  },
+  {
+    "path": "/api/learnit/regenerate",
+    "methods": [
+      "POST"
+    ],
+    "description": "/api/learnit/regenerate endpoint",
+    "domain": "learnit",
+    "auth": true
+  },
+  {
+    "path": "/api/learnit/relations",
+    "methods": [
+      "GET",
+      "POST"
+    ],
+    "description": "GET /api/learnit/relations?slug=topic-slug&type=all",
+    "domain": "learnit",
+    "auth": true
+  },
+  {
+    "path": "/api/learnit/search",
+    "methods": [
+      "GET"
+    ],
+    "description": "/api/learnit/search endpoint",
+    "domain": "learnit",
+    "auth": false
+  },
+  {
+    "path": "/api/learnit/stream",
+    "methods": [
+      "POST"
+    ],
+    "description": "Streaming endpoint for LearnIt content generation.",
+    "domain": "learnit",
+    "auth": true
+  },
+  {
+    "path": "/api/learnit/topics/[...slug]",
+    "methods": [
+      "GET"
+    ],
+    "description": "/api/learnit/topics/[...slug] endpoint",
+    "domain": "learnit",
+    "auth": false
+  },
+  {
+    "path": "/api/live/[codeSpace]",
+    "methods": [
+      "GET"
+    ],
+    "description": "GET /api/live/[codeSpace]",
+    "domain": "live",
+    "auth": false
+  },
+  {
+    "path": "/api/live/[codeSpace]/sync",
+    "methods": [
+      "POST"
+    ],
+    "description": "POST /api/live/[codeSpace]/sync",
+    "domain": "live",
+    "auth": false
+  },
+  {
+    "path": "/api/logs/image-error",
+    "methods": [
+      "POST"
+    ],
+    "description": "/api/logs/image-error endpoint",
+    "domain": "logs",
+    "auth": false
+  },
+  {
+    "path": "/api/mcp",
+    "methods": [
+      "GET",
+      "POST",
+      "DELETE"
+    ],
+    "description": "Streamable HTTP MCP Endpoint",
+    "domain": "mcp",
+    "auth": false
+  },
+  {
+    "path": "/api/mcp/apps/[slug]",
+    "methods": [
+      "GET",
+      "POST",
+      "DELETE"
+    ],
+    "description": "Per-App MCP Endpoint",
+    "domain": "mcp",
+    "auth": false
+  },
+  {
+    "path": "/api/mcp/balance",
+    "methods": [
+      "GET"
+    ],
+    "description": "GET /api/mcp/balance",
+    "domain": "mcp",
+    "auth": false
+  },
+  {
+    "path": "/api/mcp/oauth/authorize",
+    "methods": [
+      "GET"
+    ],
+    "description": "OAuth Authorization Endpoint",
+    "domain": "mcp",
+    "auth": true
+  },
+  {
+    "path": "/api/mcp/oauth/device",
+    "methods": [
+      "POST"
+    ],
+    "description": "Device Authorization Endpoint (RFC 8628)",
+    "domain": "mcp",
+    "auth": false
+  },
+  {
+    "path": "/api/mcp/oauth/device/poll",
+    "methods": [
+      "POST"
+    ],
+    "description": "Device Code Polling Endpoint (RFC 8628)",
+    "domain": "mcp",
+    "auth": false
+  },
+  {
+    "path": "/api/mcp/oauth/device/verify",
+    "methods": [
+      "GET",
+      "POST"
+    ],
+    "description": "Device Code Browser Verification API",
+    "domain": "mcp",
+    "auth": true
+  },
+  {
+    "path": "/api/mcp/oauth/register",
+    "methods": [
+      "POST"
+    ],
+    "description": "OAuth Dynamic Client Registration Endpoint (RFC 7591)",
+    "domain": "mcp",
+    "auth": false
+  },
+  {
+    "path": "/api/mcp/oauth/token",
+    "methods": [
+      "POST"
+    ],
+    "description": "OAuth Token Endpoint",
+    "domain": "mcp",
+    "auth": false
+  },
+  {
+    "path": "/api/mcp/proxy",
+    "methods": [
+      "POST"
+    ],
+    "description": "/api/mcp/proxy endpoint",
+    "domain": "mcp",
+    "auth": true
+  },
+  {
+    "path": "/api/mcp/token",
+    "methods": [
+      "POST"
+    ],
+    "description": "/api/mcp/token endpoint",
+    "domain": "mcp",
+    "auth": true
+  },
+  {
+    "path": "/api/newsletter/subscribe",
+    "methods": [
+      "POST"
+    ],
+    "description": "/api/newsletter/subscribe endpoint",
+    "domain": "newsletter",
+    "auth": false
+  },
+  {
+    "path": "/api/onboarding",
+    "methods": [
+      "GET",
+      "POST"
+    ],
+    "description": "GET /api/onboarding — return the current user's onboarding persona (or null)",
+    "domain": "onboarding",
+    "auth": true
+  },
+  {
+    "path": "/api/permissions/pending",
+    "methods": [
+      "GET"
+    ],
+    "description": "GET /api/permissions/pending",
+    "domain": "permissions",
+    "auth": false
+  },
+  {
+    "path": "/api/permissions/respond",
+    "methods": [
+      "POST"
+    ],
+    "description": "POST /api/permissions/respond",
+    "domain": "permissions",
+    "auth": false
+  },
+  {
+    "path": "/api/ready",
+    "methods": [
+      "GET"
+    ],
+    "description": "Readiness endpoint — verifies DB and Redis connectivity.",
+    "domain": "ready",
+    "auth": false
+  },
+  {
+    "path": "/api/settings/api-keys",
+    "methods": [
+      "GET",
+      "POST"
+    ],
+    "description": "/api/settings/api-keys endpoint",
+    "domain": "settings",
+    "auth": true
+  },
+  {
+    "path": "/api/settings/api-keys/[id]",
+    "methods": [
+      "GET",
+      "DELETE"
+    ],
+    "description": "/api/settings/api-keys/[id] endpoint",
+    "domain": "settings",
+    "auth": true
+  },
+  {
+    "path": "/api/site-chat",
+    "methods": [
+      "POST"
+    ],
+    "description": "/api/site-chat endpoint",
+    "domain": "site-chat",
+    "auth": true
+  },
+  {
+    "path": "/api/store-app/engagement",
+    "methods": [
+      "POST"
+    ],
+    "description": "/api/store-app/engagement endpoint",
+    "domain": "store-app",
+    "auth": false
+  },
+  {
+    "path": "/api/store-app/error",
+    "methods": [
+      "POST"
+    ],
+    "description": "/api/store-app/error endpoint",
+    "domain": "store-app",
+    "auth": false
+  },
+  {
+    "path": "/api/store-app/impression",
+    "methods": [
+      "POST"
+    ],
+    "description": "/api/store-app/impression endpoint",
+    "domain": "store-app",
+    "auth": false
+  },
+  {
+    "path": "/api/store/apps/[slug]/install",
+    "methods": [
+      "GET",
+      "POST"
+    ],
+    "description": "/api/store/apps/[slug]/install endpoint",
+    "domain": "store",
+    "auth": true
+  },
+  {
+    "path": "/api/store/apps/[slug]/reviews",
+    "methods": [
+      "GET",
+      "POST"
+    ],
+    "description": "/api/store/apps/[slug]/reviews endpoint",
+    "domain": "store",
+    "auth": true
+  },
+  {
+    "path": "/api/store/personalized",
+    "methods": [
+      "GET"
+    ],
+    "description": "Personalized Store API",
+    "domain": "store",
+    "auth": true
+  },
+  {
+    "path": "/api/store/recommendations",
+    "methods": [
+      "GET"
+    ],
+    "description": "/api/store/recommendations endpoint",
+    "domain": "store",
+    "auth": false
+  },
+  {
+    "path": "/api/store/skills",
+    "methods": [
+      "GET"
+    ],
+    "description": "Skill Store API - Public catalog",
+    "domain": "store",
+    "auth": false
+  },
+  {
+    "path": "/api/store/skills/[skillId]",
+    "methods": [
+      "GET"
+    ],
+    "description": "Skill Store API - Skill detail",
+    "domain": "store",
+    "auth": false
+  },
+  {
+    "path": "/api/store/skills/[skillId]/install",
+    "methods": [
+      "POST"
+    ],
+    "description": "Skill Store API - Install tracking",
+    "domain": "store",
+    "auth": true
+  },
+  {
+    "path": "/api/store/wishlist",
+    "methods": [
+      "GET",
+      "POST"
+    ],
+    "description": "/api/store/wishlist endpoint",
+    "domain": "store",
+    "auth": true
+  },
+  {
+    "path": "/api/stripe/blog-support",
+    "methods": [
+      "POST"
+    ],
+    "description": "/api/stripe/blog-support endpoint",
+    "domain": "stripe",
+    "auth": true
+  },
+  {
+    "path": "/api/stripe/checkout",
+    "methods": [
+      "POST"
+    ],
+    "description": "/api/stripe/checkout endpoint",
+    "domain": "stripe",
+    "auth": true
+  },
+  {
+    "path": "/api/stripe/webhook",
+    "methods": [
+      "POST"
+    ],
+    "description": "/api/stripe/webhook endpoint",
+    "domain": "stripe",
+    "auth": false
+  },
+  {
+    "path": "/api/tabletop/rooms/[roomId]/peers",
+    "methods": [
+      "GET",
+      "POST",
+      "DELETE"
+    ],
+    "description": "/api/tabletop/rooms/[roomId]/peers endpoint",
+    "domain": "tabletop",
+    "auth": false
+  },
+  {
+    "path": "/api/test-gemini",
+    "methods": [
+      "POST"
+    ],
+    "description": "/api/test-gemini endpoint",
+    "domain": "test-gemini",
+    "auth": true
+  },
+  {
+    "path": "/api/token-test",
+    "methods": [
+      "POST"
+    ],
+    "description": "/api/token-test endpoint",
+    "domain": "token-test",
+    "auth": true
+  },
+  {
+    "path": "/api/tracking/event",
+    "methods": [
+      "POST"
+    ],
+    "description": "Analytics Event Tracking API Route",
+    "domain": "tracking",
+    "auth": false
+  },
+  {
+    "path": "/api/tracking/pageview",
+    "methods": [
+      "POST"
+    ],
+    "description": "Page View Tracking API Route",
+    "domain": "tracking",
+    "auth": false
+  },
+  {
+    "path": "/api/tracking/session",
+    "methods": [
+      "POST",
+      "PATCH"
+    ],
+    "description": "Session Tracking API Route",
+    "domain": "tracking",
+    "auth": false
+  },
+  {
+    "path": "/api/tts",
+    "methods": [
+      "POST"
+    ],
+    "description": "/api/tts endpoint",
+    "domain": "tts",
+    "auth": false
+  },
+  {
+    "path": "/api/turn-credentials",
+    "methods": [
+      "GET"
+    ],
+    "description": "API endpoint to fetch TURN server credentials from Twilio",
+    "domain": "turn-credentials",
+    "auth": true
+  },
+  {
+    "path": "/api/v1/agent/heartbeat",
+    "methods": [
+      "POST"
+    ],
+    "description": "/api/v1/agent/heartbeat endpoint",
+    "domain": "v1",
+    "auth": false
+  },
+  {
+    "path": "/api/v1/agent/tasks",
+    "methods": [
+      "GET",
+      "POST"
+    ],
+    "description": "/api/v1/agent/tasks endpoint",
+    "domain": "v1",
+    "auth": false
+  },
+  {
+    "path": "/api/workflows/webhook/[token]",
+    "methods": [
+      "POST"
+    ],
+    "description": "Workflow Webhook Endpoint",
+    "domain": "workflows",
+    "auth": false
+  },
+  {
+    "path": "/api/workspace/personal",
+    "methods": [
+      "GET"
+    ],
+    "description": "/api/workspace/personal endpoint",
+    "domain": "workspace",
+    "auth": false
+  },
+  {
+    "path": "/api/workspaces",
+    "methods": [
+      "GET",
+      "POST"
+    ],
+    "description": "Generate a URL-safe slug from a name",
+    "domain": "workspaces",
+    "auth": true
+  },
+  {
+    "path": "/api/workspaces/[workspaceId]",
+    "methods": [
+      "GET",
+      "PATCH"
+    ],
+    "description": "Workspace API",
+    "domain": "workspaces",
+    "auth": true
+  },
+  {
+    "path": "/api/workspaces/[workspaceId]/brand-brain/rewrite",
+    "methods": [
+      "POST"
+    ],
+    "description": "/api/workspaces/[workspaceId]/brand-brain/rewrite endpoint",
+    "domain": "workspaces",
+    "auth": true
+  },
+  {
+    "path": "/api/workspaces/[workspaceId]/brand-brain/rewrites",
+    "methods": [
+      "GET"
+    ],
+    "description": "/api/workspaces/[workspaceId]/brand-brain/rewrites endpoint",
+    "domain": "workspaces",
+    "auth": true
+  },
+  {
+    "path": "/api/workspaces/[workspaceId]/brand-brain/score",
+    "methods": [
+      "POST"
+    ],
+    "description": "/api/workspaces/[workspaceId]/brand-brain/score endpoint",
+    "domain": "workspaces",
+    "auth": true
+  },
+  {
+    "path": "/api/workspaces/[workspaceId]/brand-profile",
+    "methods": [
+      "GET",
+      "POST",
+      "PATCH",
+      "DELETE"
+    ],
+    "description": "/api/workspaces/[workspaceId]/brand-profile endpoint",
+    "domain": "workspaces",
+    "auth": true
+  },
+  {
+    "path": "/api/workspaces/[workspaceId]/favorite",
+    "methods": [
+      "GET",
+      "POST"
+    ],
+    "description": "Workspace Favorite Toggle API",
+    "domain": "workspaces",
+    "auth": true
+  },
+  {
+    "path": "/api/workspaces/[workspaceId]/workflows",
+    "methods": [
+      "GET",
+      "POST"
+    ],
+    "description": "Workflow List/Create API",
+    "domain": "workspaces",
+    "auth": true
+  },
+  {
+    "path": "/api/workspaces/[workspaceId]/workflows/[workflowId]",
+    "methods": [
+      "GET",
+      "PATCH",
+      "DELETE"
+    ],
+    "description": "Single Workflow API",
+    "domain": "workspaces",
+    "auth": true
+  },
+  {
+    "path": "/api/workspaces/[workspaceId]/workflows/[workflowId]/run",
+    "methods": [
+      "POST"
+    ],
+    "description": "Workflow Manual Run API",
+    "domain": "workspaces",
+    "auth": true
+  },
+  {
+    "path": "/api/workspaces/[workspaceId]/workflows/[workflowId]/triggers",
+    "methods": [
+      "GET",
+      "POST",
+      "PATCH",
+      "DELETE"
+    ],
+    "description": "Workflow Triggers API",
+    "domain": "workspaces",
+    "auth": true
+  },
+  {
+    "path": "/api/workspaces/[workspaceId]/workflows/[workflowId]/versions",
+    "methods": [
+      "POST"
+    ],
+    "description": "Workflow Versions API",
+    "domain": "workspaces",
+    "auth": true
+  },
+  {
+    "path": "/api/workspaces/aggregate",
+    "methods": [
+      "GET",
+      "POST"
+    ],
+    "description": "Aggregate Dashboard API",
+    "domain": "workspaces",
+    "auth": true
+  },
+  {
+    "path": "/api/workspaces/by-slug/[slug]",
+    "methods": [
+      "GET"
+    ],
+    "description": "/api/workspaces/by-slug/[slug] endpoint",
+    "domain": "workspaces",
+    "auth": true
+  }
+]

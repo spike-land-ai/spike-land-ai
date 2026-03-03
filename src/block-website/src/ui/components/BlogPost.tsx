@@ -1,5 +1,40 @@
 import Markdown from "react-markdown";
+import rehypeRaw from "rehype-raw";
 import { getPostBySlug } from "../../core/reducers";
+import * as Interactive from "../interactive";
+
+const COMPONENT_MAP: Record<string, any> = {
+  convergencedemo: Interactive.ConvergenceDemo,
+  dependencycascadedemo: Interactive.DependencyCascadeDemo,
+  stackcollapsedemo: Interactive.StackCollapseDemo,
+  agentcoordinationdemo: Interactive.AgentCoordinationDemo,
+  splitscreendemo: Interactive.SplitScreenDemo,
+  attentionspotlightdemo: Interactive.AttentionSpotlightDemo,
+  fivelayerstackdemo: Interactive.FiveLayerStackDemo,
+  darwiniantreedemo: Interactive.DarwinianTreeDemo,
+  recursivezoomdemo: Interactive.RecursiveZoomDemo,
+  modelcascadedemo: Interactive.ModelCascadeDemo,
+  bayesianconfidencedemo: Interactive.BayesianConfidenceDemo,
+  mcpterminaldemo: Interactive.MCPTerminalDemo,
+  scrollstorycard: Interactive.ScrollStoryCard,
+  mcpflowdiagram: Interactive.MCPFlowDiagram,
+  perspectivecarousel: Interactive.PerspectiveCarousel,
+  spikeclidemo: Interactive.SpikeCliDemo,
+  pyramidreshapedemo: Interactive.PyramidReshapeDemo,
+  testcodenamevenn: Interactive.TestCodeNameVenn,
+  hourglassmodeldemo: Interactive.HourglassModelDemo,
+  paradigmguilttimeline: Interactive.ParadigmGuiltTimeline,
+  effortinversiondemo: Interactive.EffortInversionDemo,
+  contextlayerbuilderdemo: Interactive.ContextLayerBuilderDemo,
+  callout: ({ children, type }: any) => (
+    <div className={`p-4 my-6 rounded-xl border ${
+      type === 'info' ? 'bg-blue-50 border-blue-200 dark:bg-blue-900/30 dark:border-blue-800 text-blue-900 dark:text-blue-100' : 
+      'bg-gray-50 border-gray-200 dark:bg-gray-800/50 dark:border-gray-700'
+    }`}>
+      {children}
+    </div>
+  ),
+};
 
 export function BlogPostView({ slug }: { slug: string }) {
   const post = getPostBySlug(slug);
@@ -39,7 +74,9 @@ export function BlogPostView({ slug }: { slug: string }) {
       </header>
       
       <div className="prose prose-lg dark:prose-invert max-w-none prose-img:rounded-xl prose-img:shadow-lg">
-        <Markdown>{post.content}</Markdown>
+        <Markdown rehypePlugins={[rehypeRaw]} components={COMPONENT_MAP}>
+          {post.content}
+        </Markdown>
       </div>
     </article>
   );

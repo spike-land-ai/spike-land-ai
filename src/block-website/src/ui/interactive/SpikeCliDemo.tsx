@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef } from "react";
-import { TOTAL_TOOL_COUNT } from "@/components/mcp/mcp-tool-registry";
+import { TOTAL_TOOL_COUNT } from "../components/landing/LandingHero";
 import { useInViewProgress } from "./useInViewProgress";
 import { AnimatePresence, motion } from "framer-motion";
 

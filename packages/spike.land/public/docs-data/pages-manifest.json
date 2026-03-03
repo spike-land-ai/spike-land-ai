@@ -1,0 +1,692 @@
+[
+  {
+    "path": "/",
+    "title": "/",
+    "description": "",
+    "section": "home"
+  },
+  {
+    "path": "/about",
+    "title": "About spike.land — Open-Source MCP Multiplexer Platform",
+    "description": "An open-source, AI-powered development platform removing the friction between idea and shipped software.",
+    "section": "about"
+  },
+  {
+    "path": "/admin/mcp-dashboard",
+    "title": "MCP Observability Dashboard - spike.land Admin",
+    "description": "Per-tool metrics, system health, and user analytics for MCP tools.",
+    "section": "admin"
+  },
+  {
+    "path": "/agents",
+    "title": "Connected Agents | spike.land",
+    "description": "Manage your Claude Code agents",
+    "section": "agents"
+  },
+  {
+    "path": "/apps/ai-orchestrator",
+    "title": "AI Orchestrator | spike.land",
+    "description": "Multi-model AI pipeline builder and prompt engineering studio.",
+    "section": "apps"
+  },
+  {
+    "path": "/apps/audio-mixer",
+    "title": "Audio Studio — Multi-track Mixing & AI Voice | Spike Land",
+    "description": "A professional audio production suite with multi-track mixing, drag-drop upload, waveform visualization, and AI-powered text-to-speech.",
+    "section": "apps"
+  },
+  {
+    "path": "/apps/be-uniq",
+    "title": "beUniq | spike.land",
+    "description": "Answer yes/no questions until your combination is one nobody else has chosen. A game powered by AVL profile trees.",
+    "section": "apps"
+  },
+  {
+    "path": "/apps/brand-command",
+    "title": "Brand Command | spike.land",
+    "description": "Unified brand identity & creative asset management.",
+    "section": "apps"
+  },
+  {
+    "path": "/apps/career-navigator",
+    "title": "Career Navigator | spike.land",
+    "description": "AI-powered career path planning, skill gap analysis & job matching.",
+    "section": "apps"
+  },
+  {
+    "path": "/apps/chess-arena",
+    "title": "Chess Arena | spike.land",
+    "description": "Multiplayer chess with ELO ratings, timed controls, and full game replay.",
+    "section": "apps"
+  },
+  {
+    "path": "/apps/content-hub",
+    "title": "Content Hub | spike.land",
+    "description": "Blog publishing & newsletter management platform.",
+    "section": "apps"
+  },
+  {
+    "path": "/apps/display/client",
+    "title": "/apps/display/client",
+    "description": "",
+    "section": "apps"
+  },
+  {
+    "path": "/apps/display/run",
+    "title": "/apps/display/run",
+    "description": "",
+    "section": "apps"
+  },
+  {
+    "path": "/apps/mcp-explorer",
+    "title": "MCP Explorer — Spike Land",
+    "description": "",
+    "section": "apps"
+  },
+  {
+    "path": "/apps/music-creator",
+    "title": "Music Creator — AI Multi-Track Composer | Spike Land",
+    "description": "Compose multi-track music with a piano roll, instrument selector, mixer controls, and AI generation powered by Spike Land.",
+    "section": "apps"
+  },
+  {
+    "path": "/apps/page-builder",
+    "title": "Page Builder | spike.land",
+    "description": "AI-powered dynamic page creation and visual editor.",
+    "section": "apps"
+  },
+  {
+    "path": "/apps/qa-studio",
+    "title": "QA Studio | Spike Land",
+    "description": "Web QA automation and testing dashboard",
+    "section": "apps"
+  },
+  {
+    "path": "/apps/social-autopilot",
+    "title": "Social Autopilot | spike.land",
+    "description": "Automated social media scheduling & engagement analytics.",
+    "section": "apps"
+  },
+  {
+    "path": "/apps/spike-land-admin",
+    "title": "Admin Dashboard — Spike Land",
+    "description": "Platform administration and monitoring dashboard.",
+    "section": "apps"
+  },
+  {
+    "path": "/apps/state-machine",
+    "title": "State Machine Studio | spike.land",
+    "description": "Create, visualize, and simulate hierarchical state machines with AI assistance, templates, and live simulation.",
+    "section": "apps"
+  },
+  {
+    "path": "/apps/store",
+    "title": "App Store — Build Full-Stack Apps with a Single Prompt | Spike Land",
+    "description": "Create and deploy full-stack apps from a single prompt. Powered by Model Context Protocol. Free and open source. Alpha.",
+    "section": "apps"
+  },
+  {
+    "path": "/apps/tabletop-simulator",
+    "title": "Tabletop Simulator | spike.land",
+    "description": "Gather your friends for board games and RPGs in a shared 3D space. Real-time multiplayer with physics-based pieces.",
+    "section": "apps"
+  },
+  {
+    "path": "/auth/error",
+    "title": "Server Configuration Error",
+    "description": "There is a problem with the server configuration. Please contact support if this persists.",
+    "section": "auth"
+  },
+  {
+    "path": "/auth/qr-verify",
+    "title": "/auth/qr-verify",
+    "description": "",
+    "section": "auth"
+  },
+  {
+    "path": "/auth/signin",
+    "title": "/auth/signin",
+    "description": "",
+    "section": "auth"
+  },
+  {
+    "path": "/bazdmeg",
+    "title": "Requirements Are The Product",
+    "description": "",
+    "section": "bazdmeg"
+  },
+  {
+    "path": "/bazdmeg/dashboard",
+    "title": "/bazdmeg/dashboard",
+    "description": "",
+    "section": "bazdmeg"
+  },
+  {
+    "path": "/bazdmeg/orchestrator",
+    "title": "/bazdmeg/orchestrator",
+    "description": "",
+    "section": "bazdmeg"
+  },
+  {
+    "path": "/blog",
+    "title": "Blog | Spike Land",
+    "description": "Latest news, tutorials, and updates from spike.land. Learn about AI-powered development, MCP tools, deploying apps with AI, and more.",
+    "section": "blog"
+  },
+  {
+    "path": "/boxes",
+    "title": "/boxes",
+    "description": "",
+    "section": "boxes"
+  },
+  {
+    "path": "/boxes/new",
+    "title": "/boxes/new",
+    "description": "",
+    "section": "boxes"
+  },
+  {
+    "path": "/career",
+    "title": "Skills Assessment",
+    "description": "Add your skills, rate your proficiency, and discover which careers match your profile best.",
+    "section": "career"
+  },
+  {
+    "path": "/career/assessment",
+    "title": "/career/assessment",
+    "description": "",
+    "section": "career"
+  },
+  {
+    "path": "/career/compare",
+    "title": "/career/compare",
+    "description": "",
+    "section": "career"
+  },
+  {
+    "path": "/career/explore",
+    "title": "/career/explore",
+    "description": "",
+    "section": "career"
+  },
+  {
+    "path": "/clean",
+    "title": "/clean",
+    "description": "",
+    "section": "clean"
+  },
+  {
+    "path": "/clean/achievements",
+    "title": "/clean/achievements",
+    "description": "",
+    "section": "clean"
+  },
+  {
+    "path": "/clean/session",
+    "title": "/clean/session",
+    "description": "",
+    "section": "clean"
+  },
+  {
+    "path": "/clean/settings",
+    "title": "/clean/settings",
+    "description": "",
+    "section": "clean"
+  },
+  {
+    "path": "/comic-sans",
+    "title": "/comic-sans",
+    "description": "",
+    "section": "comic-sans"
+  },
+  {
+    "path": "/community",
+    "title": "Welcome",
+    "description": "",
+    "section": "community"
+  },
+  {
+    "path": "/connect",
+    "title": "AI Prompt Arena | Spike Land",
+    "description": "Compete in the AI Prompt Arena. Write single-shot prompts, generate React apps, and climb the ELO leaderboard.",
+    "section": "connect"
+  },
+  {
+    "path": "/connect/leaderboard",
+    "title": "Leaderboard | AI Prompt Arena",
+    "description": "See who writes the best AI prompts. ELO rankings for the Prompt Arena.",
+    "section": "connect"
+  },
+  {
+    "path": "/cookies",
+    "title": "What Are Cookies",
+    "description": "",
+    "section": "cookies"
+  },
+  {
+    "path": "/create",
+    "title": "Create | Spike Land AI",
+    "description": "Describe any app and watch AI build it live. One-shot React app generator powered by Spike Land.",
+    "section": "create"
+  },
+  {
+    "path": "/cv",
+    "title": "My PRs Were Pure AI Slop: A Developer",
+    "description": "",
+    "section": "cv"
+  },
+  {
+    "path": "/docs",
+    "title": "Documentation - spike.land",
+    "description": "Everything you need to build with spike.land. Browse MCP tools, API endpoints, guides, and more.",
+    "section": "docs"
+  },
+  {
+    "path": "/docs/components",
+    "title": "UI Components - spike.land",
+    "description": "Explore the spike.land design system. Browse all UI components, patterns, and visual styles.",
+    "section": "docs"
+  },
+  {
+    "path": "/docs/guides",
+    "title": "Guides & Documentation - spike.land",
+    "description": "Browse all guides, architecture docs, best practices, and more for the spike.land platform.",
+    "section": "docs"
+  },
+  {
+    "path": "/docs/sitemap",
+    "title": "/docs/sitemap",
+    "description": "",
+    "section": "docs"
+  },
+  {
+    "path": "/docs/tools",
+    "title": "MCP Tools - Documentation - spike.land",
+    "description": "Browse all MCP tools by category. Each tool is documented with parameters, types, and descriptions.",
+    "section": "docs"
+  },
+  {
+    "path": "/generate",
+    "title": "Prompt Explorer | Spike Land AI",
+    "description": "Explore how AI system prompts are built from your topic. See which skills activate and what instructions the AI receives.",
+    "section": "generate"
+  },
+  {
+    "path": "/learnit",
+    "title": "/learnit",
+    "description": "",
+    "section": "learnit"
+  },
+  {
+    "path": "/live/example",
+    "title": "/live/example",
+    "description": "",
+    "section": "live"
+  },
+  {
+    "path": "/mcp/auth/device",
+    "title": "/mcp/auth/device",
+    "description": "",
+    "section": "mcp"
+  },
+  {
+    "path": "/mcp/categories",
+    "title": "Tool Categories - MCP Server - Spike Land",
+    "description": "",
+    "section": "mcp"
+  },
+  {
+    "path": "/my-apps",
+    "title": "My Apps - Spike Land",
+    "description": "Manage your AI-powered apps",
+    "section": "my-apps"
+  },
+  {
+    "path": "/onboarding",
+    "title": "/onboarding",
+    "description": "",
+    "section": "onboarding"
+  },
+  {
+    "path": "/physics-demo",
+    "title": "/physics-demo",
+    "description": "",
+    "section": "physics-demo"
+  },
+  {
+    "path": "/press",
+    "title": "VHS to 4K Restoration",
+    "description": "",
+    "section": "press"
+  },
+  {
+    "path": "/pricing",
+    "title": "/pricing",
+    "description": "",
+    "section": "pricing"
+  },
+  {
+    "path": "/privacy",
+    "title": "Introduction",
+    "description": "",
+    "section": "privacy"
+  },
+  {
+    "path": "/profile",
+    "title": "/profile",
+    "description": "",
+    "section": "profile"
+  },
+  {
+    "path": "/services",
+    "title": "/services",
+    "description": "",
+    "section": "services"
+  },
+  {
+    "path": "/settings",
+    "title": "/settings",
+    "description": "",
+    "section": "settings"
+  },
+  {
+    "path": "/settings/mcp-history",
+    "title": "MCP Usage History - Spike Land",
+    "description": "View your MCP API usage history for image generation and modification",
+    "section": "settings"
+  },
+  {
+    "path": "/settings/subscription",
+    "title": "/settings/subscription",
+    "description": "Please try again or contact support if the issue persists.",
+    "section": "settings"
+  },
+  {
+    "path": "/store/skills",
+    "title": "/store/skills",
+    "description": "",
+    "section": "store"
+  },
+  {
+    "path": "/storybook",
+    "title": "/storybook",
+    "description": "",
+    "section": "storybook"
+  },
+  {
+    "path": "/storybook/accessibility",
+    "title": "/storybook/accessibility",
+    "description": "Next element",
+    "section": "storybook"
+  },
+  {
+    "path": "/storybook/agents",
+    "title": "/storybook/agents",
+    "description": "Edited src/components/agents/AgentCard.tsx",
+    "section": "storybook"
+  },
+  {
+    "path": "/storybook/ai-orchestrator",
+    "title": "/storybook/ai-orchestrator",
+    "description": "",
+    "section": "storybook"
+  },
+  {
+    "path": "/storybook/animations",
+    "title": "/storybook/animations",
+    "description": "Micro-interactions: hover, focus, active states",
+    "section": "storybook"
+  },
+  {
+    "path": "/storybook/arena",
+    "title": "Chess Grandmaster AI",
+    "description": "Build a React chess interface with drag-and-drop pieces, legal move highlighting, and a basic minimax AI opponent.",
+    "section": "storybook"
+  },
+  {
+    "path": "/storybook/audio-studio",
+    "title": "/storybook/audio-studio",
+    "description": "",
+    "section": "storybook"
+  },
+  {
+    "path": "/storybook/auth",
+    "title": "/storybook/auth",
+    "description": "User initiates authentication via SignInButton or AuthButtons component.",
+    "section": "storybook"
+  },
+  {
+    "path": "/storybook/bazdmeg",
+    "title": "Business-First Requirements",
+    "description": "",
+    "section": "storybook"
+  },
+  {
+    "path": "/storybook/be-uniq",
+    "title": "/storybook/be-uniq",
+    "description": "",
+    "section": "storybook"
+  },
+  {
+    "path": "/storybook/blog",
+    "title": "Building an AI-Powered Code Editor with MCP",
+    "description": "A deep dive into how spike.land uses the Model Context Protocol to connect AI agents with real-time code editing, transpilation, and deployment.",
+    "section": "storybook"
+  },
+  {
+    "path": "/storybook/buttons",
+    "title": "/storybook/buttons",
+    "description": "Controls the visual style of the button.",
+    "section": "storybook"
+  },
+  {
+    "path": "/storybook/canvas",
+    "title": "/storybook/canvas",
+    "description": "",
+    "section": "storybook"
+  },
+  {
+    "path": "/storybook/career",
+    "title": "Full-Stack Developer",
+    "description": "Designs, develops, and maintains web applications across front-end and back-end layers using modern frameworks and cloud infrastructure.",
+    "section": "storybook"
+  },
+  {
+    "path": "/storybook/chat",
+    "title": "Chess Arena - Multiplayer Chess",
+    "description": "Real-time multiplayer chess with ELO ranking, challenges, and spectator mode.",
+    "section": "storybook"
+  },
+  {
+    "path": "/storybook/clean",
+    "title": "/storybook/clean",
+    "description": "Wipe down kitchen counters and stovetop",
+    "section": "storybook"
+  },
+  {
+    "path": "/storybook/code-review-agent",
+    "title": "/storybook/code-review-agent",
+    "description": "All async calls must be wrapped in try/catch or have .catch() handlers.",
+    "section": "storybook"
+  },
+  {
+    "path": "/storybook/colors",
+    "title": "/storybook/colors",
+    "description": "",
+    "section": "storybook"
+  },
+  {
+    "path": "/storybook/comparison",
+    "title": "/storybook/comparison",
+    "description": "",
+    "section": "storybook"
+  },
+  {
+    "path": "/storybook/components",
+    "title": "/storybook/components",
+    "description": "",
+    "section": "storybook"
+  },
+  {
+    "path": "/storybook/content-hub",
+    "title": "Getting Started with Next.js 16 App Router",
+    "description": "",
+    "section": "storybook"
+  },
+  {
+    "path": "/storybook/create",
+    "title": "Chess Arena",
+    "description": "Multiplayer chess with ELO ratings, AI opponents, and real-time spectating.",
+    "section": "storybook"
+  },
+  {
+    "path": "/storybook/data-display",
+    "title": "/storybook/data-display",
+    "description": "",
+    "section": "storybook"
+  },
+  {
+    "path": "/storybook/enhance",
+    "title": "/storybook/enhance",
+    "description": "",
+    "section": "storybook"
+  },
+  {
+    "path": "/storybook/errors",
+    "title": "/storybook/errors",
+    "description": "",
+    "section": "storybook"
+  },
+  {
+    "path": "/storybook/feedback",
+    "title": "New message",
+    "description": "Team standup has been scheduled for Monday at 10:00 AM.",
+    "section": "storybook"
+  },
+  {
+    "path": "/storybook/forms",
+    "title": "/storybook/forms",
+    "description": "Create your account",
+    "section": "storybook"
+  },
+  {
+    "path": "/storybook/infographic",
+    "title": "TypeScript",
+    "description": "",
+    "section": "storybook"
+  },
+  {
+    "path": "/storybook/landing",
+    "title": "AI Task Manager",
+    "description": "A smart task manager that prioritizes and organizes your work using AI.",
+    "section": "storybook"
+  },
+  {
+    "path": "/storybook/layout",
+    "title": "/storybook/layout",
+    "description": "",
+    "section": "storybook"
+  },
+  {
+    "path": "/storybook/loading",
+    "title": "/storybook/loading",
+    "description": "",
+    "section": "storybook"
+  },
+  {
+    "path": "/storybook/mcp",
+    "title": "/storybook/mcp",
+    "description": "Create AI-generated images from text prompts using multiple providers (DALL-E, Stable Diffusion).",
+    "section": "storybook"
+  },
+  {
+    "path": "/storybook/modals",
+    "title": "/storybook/modals",
+    "description": "",
+    "section": "storybook"
+  },
+  {
+    "path": "/storybook/page-builder",
+    "title": "/storybook/page-builder",
+    "description": "Full-width banner with headline and CTA",
+    "section": "storybook"
+  },
+  {
+    "path": "/storybook/qa-studio",
+    "title": "/storybook/qa-studio",
+    "description": "Elements must have sufficient color contrast",
+    "section": "storybook"
+  },
+  {
+    "path": "/storybook/spike-land-admin",
+    "title": "/storybook/spike-land-admin",
+    "description": "",
+    "section": "storybook"
+  },
+  {
+    "path": "/storybook/state-machine",
+    "title": "/storybook/state-machine",
+    "description": "Simple 3-state cycle with timers",
+    "section": "storybook"
+  },
+  {
+    "path": "/storybook/store-apps",
+    "title": "Describe",
+    "description": "Tell AI what you want to build. One prompt is all it takes.",
+    "section": "storybook"
+  },
+  {
+    "path": "/storybook/surfaces",
+    "title": "/storybook/surfaces",
+    "description": "Used for backgrounds, recessed panels, or secondary containers.",
+    "section": "storybook"
+  },
+  {
+    "path": "/storybook/tabletop-sim",
+    "title": "/storybook/tabletop-sim",
+    "description": "",
+    "section": "storybook"
+  },
+  {
+    "path": "/storybook/typography",
+    "title": "/storybook/typography",
+    "description": "",
+    "section": "storybook"
+  },
+  {
+    "path": "/sule",
+    "title": "/sule",
+    "description": "",
+    "section": "sule"
+  },
+  {
+    "path": "/terms",
+    "title": "Acceptance of Terms",
+    "description": "",
+    "section": "terms"
+  },
+  {
+    "path": "/test-enhancement",
+    "title": "/test-enhancement",
+    "description": "",
+    "section": "test-enhancement"
+  },
+  {
+    "path": "/token-test",
+    "title": "/token-test",
+    "description": "",
+    "section": "token-test"
+  },
+  {
+    "path": "/tokens",
+    "title": "/tokens",
+    "description": "Your credits have been added to your account.",
+    "section": "tokens"
+  },
+  {
+    "path": "/waitlist",
+    "title": "Join the Waitlist | spike.land — Lazy-Load MCP Tools",
+    "description": "spike-cli multiplexes MCP servers and lazy-loads tool definitions — AI agents only see what they need.",
+    "section": "waitlist"
+  }
+]

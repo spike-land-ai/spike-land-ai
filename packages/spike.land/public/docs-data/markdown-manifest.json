@@ -1,0 +1,891 @@
+[
+  {
+    "slug": "ACCELERATOR_ROADMAP",
+    "title": "Accelerator Application Roadmap for SPIKE LAND LTD",
+    "excerpt": "> **Last Updated**: February 2026 **Status**: Pre-Launch Stage - Product Ready, > Marketing Gap **Issue**: > [#1027](https://github.com/spike-land-ai/spike.land/issues/1027)",
+    "category": "general",
+    "filePath": "ACCELERATOR_ROADMAP.md"
+  },
+  {
+    "slug": "AGENT_FIRST",
+    "title": "Agent-First Platform",
+    "excerpt": "> **CEO Decision: Agent-First Platform** > > 1. Every UI action MUST have an MCP tool equivalent. No feature ships without >    MCP coverage. > 2. Tool descriptions are marketing copy for agents — the",
+    "category": "general",
+    "filePath": "AGENT_FIRST.md"
+  },
+  {
+    "slug": "API_ALBUMS_BATCH_ENHANCE",
+    "title": "Album Batch Enhancement API",
+    "excerpt": "This document describes the API endpoint for batch enhancing all photos in an album. The endpoint processes multiple images in a single batch operation, automatically handling token consumption, rate",
+    "category": "general",
+    "filePath": "API_ALBUMS_BATCH_ENHANCE.md"
+  },
+  {
+    "slug": "API_CHANGELOG",
+    "title": "API Changelog",
+    "excerpt": "> **Last Updated**: 2025-12-30 **Current API Version**: Unversioned (v1 > implicit) **Status**: Active Development",
+    "category": "general",
+    "filePath": "API_CHANGELOG.md"
+  },
+  {
+    "slug": "API_PUBLIC_ALBUMS_GALLERY",
+    "title": "Public Albums Gallery API",
+    "excerpt": "- [Overview](#overview)   - [Use Cases](#use-cases)   - [Key Characteristics](#key-characteristics) - [Endpoint](#endpoint) - [Authentication](#authentication) - [Features](#features) - [Response Form",
+    "category": "general",
+    "filePath": "API_PUBLIC_ALBUMS_GALLERY.md"
+  },
+  {
+    "slug": "API_VERSIONING",
+    "title": "Spike Land API Versioning Strategy",
+    "excerpt": "> **Last Updated**: December 30, 2025 **Status**: Hybrid Versioning - v1 for > Agent API, unversioned for public endpoints **Document Version**: 2.0",
+    "category": "general",
+    "filePath": "API_VERSIONING.md"
+  },
+  {
+    "slug": "api/00_START_HERE",
+    "title": "Spike Land API Documentation - Start Here",
+    "excerpt": "Welcome to the Spike Land API documentation. This file will guide you to the right resources for your needs.",
+    "category": "api",
+    "filePath": "api/00_START_HERE.md"
+  },
+  {
+    "slug": "api/ALBUM_ENDPOINTS",
+    "title": "Album API Endpoints",
+    "excerpt": "Complete reference for album management endpoints in the Spike Land API.",
+    "category": "api",
+    "filePath": "api/ALBUM_ENDPOINTS.md"
+  },
+  {
+    "slug": "api/CURL_EXAMPLES",
+    "title": "Spike Land API - cURL Examples",
+    "excerpt": "Quick reference for testing API endpoints using cURL.",
+    "category": "api",
+    "filePath": "api/CURL_EXAMPLES.md"
+  },
+  {
+    "slug": "api/IMAGE_ENDPOINTS",
+    "title": "Image Enhancement API Endpoints",
+    "excerpt": "Complete REST API documentation for image management and AI-powered enhancement operations in Spike Land.",
+    "category": "api",
+    "filePath": "api/IMAGE_ENDPOINTS.md"
+  },
+  {
+    "slug": "api/INDEX",
+    "title": "Spike Land API Documentation Index",
+    "excerpt": "Complete reference guide for all API documentation files and endpoints.",
+    "category": "api",
+    "filePath": "api/INDEX.md"
+  },
+  {
+    "slug": "api/INTEGRATION_GUIDE",
+    "title": "Spike Land API Integration Guide",
+    "excerpt": "Quick start guide for developers integrating with the Spike Land API.",
+    "category": "api",
+    "filePath": "api/INTEGRATION_GUIDE.md"
+  },
+  {
+    "slug": "api/README",
+    "title": "Spike Land API Documentation",
+    "excerpt": "This directory contains comprehensive API documentation for the Spike Land platform.",
+    "category": "api",
+    "filePath": "api/README.md"
+  },
+  {
+    "slug": "api/REFUND_POLICY",
+    "title": "Token Refund Policy",
+    "excerpt": "Spike Land's image enhancement system uses tokens for AI-powered image processing. This document explains the refund policy for failed enhancements.",
+    "category": "api",
+    "filePath": "api/REFUND_POLICY.md"
+  },
+  {
+    "slug": "architecture/API_REFERENCE",
+    "title": "API Reference",
+    "excerpt": "> **Last Updated**: February 2026 | **Status**: Production | **Base URL**: > `https://spike.land` (Production) or `http://localhost:3000` (Development)",
+    "category": "architecture",
+    "filePath": "architecture/API_REFERENCE.md"
+  },
+  {
+    "slug": "architecture/AWS_MIGRATION",
+    "title": "AWS Migration Status",
+    "excerpt": "> Migration from **Vercel + Cloudflare Workers + Neon + Upstash + Cloudflare > R2** → **AWS ECS Fargate + Aurora PostgreSQL + ElastiCache Redis + S3 + > CloudFront + Global Accelerator**",
+    "category": "architecture",
+    "filePath": "architecture/AWS_MIGRATION.md"
+  },
+  {
+    "slug": "architecture/DATABASE_SCHEMA",
+    "title": "Database Schema Documentation",
+    "excerpt": "> Generated by [`prisma-markdown`](https://github.com/samchon/prisma-markdown)",
+    "category": "architecture",
+    "filePath": "architecture/DATABASE_SCHEMA.md"
+  },
+  {
+    "slug": "architecture/DATABASE_SETUP",
+    "title": "Database Setup Guide",
+    "excerpt": "This guide covers the complete database setup for Spike Land platform using Prisma ORM with PostgreSQL.",
+    "category": "architecture",
+    "filePath": "architecture/DATABASE_SETUP.md"
+  },
+  {
+    "slug": "architecture/DEPENDENCY_RESOLUTIONS",
+    "title": "Dependency Resolution Explanations",
+    "excerpt": "> **Last Updated**: 2026-02-26",
+    "category": "architecture",
+    "filePath": "architecture/DEPENDENCY_RESOLUTIONS.md"
+  },
+  {
+    "slug": "architecture/DEPLOYMENT_PIPELINE_COSTS",
+    "title": "Deployment Pipeline Timing & Cost Analysis",
+    "excerpt": "> **Last updated:** 2026-02-19 **Data source:** GitHub Actions runs Feb 16-19, > 2026 (1000+ runs analyzed)",
+    "category": "architecture",
+    "filePath": "architecture/DEPLOYMENT_PIPELINE_COSTS.md"
+  },
+  {
+    "slug": "architecture/JSON_SCHEMAS",
+    "title": "JSON Column Schemas",
+    "excerpt": "> **Phase 3 - Schema Improvement Plan** > > This document provides TypeScript interfaces and Zod schemas for all JSON > columns in the Prisma schema. The schema has 83 JSON columns across various > mo",
+    "category": "architecture",
+    "filePath": "architecture/JSON_SCHEMAS.md"
+  },
+  {
+    "slug": "architecture/MCP_TOOL_GUIDELINES",
+    "title": "MCP Tool Error Handling Guidelines",
+    "excerpt": "**Pattern**: `tryCatch` wrapper for consistent error handling and type safety in MCP Tools.",
+    "category": "architecture",
+    "filePath": "architecture/MCP_TOOL_GUIDELINES.md"
+  },
+  {
+    "slug": "architecture/MY_APPS_ARCHITECTURE",
+    "title": "Apps Architecture",
+    "excerpt": "This document provides comprehensive developer documentation for the `/my-apps` feature in spike.land.",
+    "category": "architecture",
+    "filePath": "architecture/MY_APPS_ARCHITECTURE.md"
+  },
+  {
+    "slug": "architecture/SENTRY",
+    "title": "Error Tracking (formerly Sentry)",
+    "excerpt": "> **Status**: Sentry was removed in Feb 2026. All error tracking now uses the > built-in ErrorLog pipeline.",
+    "category": "architecture",
+    "filePath": "architecture/SENTRY.md"
+  },
+  {
+    "slug": "architecture/SPIKE_CLI_COMPETITIVE_LANDSCAPE",
+    "title": "Research: How Unique is spike-cli's MCP-to-CLI Approach?",
+    "excerpt": "> **Product context:** spike-cli is not just a technical component -- it is a > core product differentiator for the Spike Land platform. The **web dashboard** > is the GUI for humans to manage deploym",
+    "category": "architecture",
+    "filePath": "architecture/SPIKE_CLI_COMPETITIVE_LANDSCAPE.md"
+  },
+  {
+    "slug": "architecture/TOKEN_SYSTEM",
+    "title": "Token System Documentation",
+    "excerpt": "> **Last Updated**: February 2026 | **Status**: Production",
+    "category": "architecture",
+    "filePath": "architecture/TOKEN_SYSTEM.md"
+  },
+  {
+    "slug": "BACKUPS",
+    "title": "Database Backup and Restore",
+    "excerpt": "> **Last Updated**: 2026-02-26",
+    "category": "general",
+    "filePath": "BACKUPS.md"
+  },
+  {
+    "slug": "BAZDMEG",
+    "title": "The BAZDMEG Method",
+    "excerpt": "**Born from pain. Tested in production. Named in Hungarian.**",
+    "category": "general",
+    "filePath": "BAZDMEG.md"
+  },
+  {
+    "slug": "best-practices/api-design",
+    "title": "REST API Design Best Practices",
+    "excerpt": "A comprehensive guide to building scalable, maintainable, and secure REST APIs with modern industry standards.",
+    "category": "best-practices",
+    "filePath": "best-practices/api-design.md"
+  },
+  {
+    "slug": "best-practices/cicd-pipelines",
+    "title": "CI/CD Pipeline Best Practices",
+    "excerpt": "This comprehensive guide covers industry best practices for designing, implementing, and maintaining CI/CD pipelines in modern application development. Based on current 2025 standards and proven metho",
+    "category": "best-practices",
+    "filePath": "best-practices/cicd-pipelines.md"
+  },
+  {
+    "slug": "best-practices/cloudflare-services",
+    "title": "Cloudflare Cloud Services: Best Practices & Integration Guide",
+    "excerpt": "A comprehensive guide to Cloudflare's cloud services ecosystem, including R2 object storage, Workers edge computing, D1 SQL database, and security features. This document covers best practices, integr",
+    "category": "best-practices",
+    "filePath": "best-practices/cloudflare-services.md"
+  },
+  {
+    "slug": "best-practices/error-handling",
+    "title": "Error Handling Best Practices in TypeScript/React Applications",
+    "excerpt": "A comprehensive guide to implementing robust error handling patterns in TypeScript and React applications, from custom error classes to production monitoring.",
+    "category": "best-practices",
+    "filePath": "best-practices/error-handling.md"
+  },
+  {
+    "slug": "best-practices/http-status-codes",
+    "title": "HTTP Status Code Standards",
+    "excerpt": "A comprehensive guide for consistent HTTP status code usage across all API endpoints in the spike.land platform.",
+    "category": "best-practices",
+    "filePath": "best-practices/http-status-codes.md"
+  },
+  {
+    "slug": "best-practices/image-generation-ai",
+    "title": "Image Generation AI Best Practices",
+    "excerpt": "Comprehensive guide to integrating and optimizing image generation APIs for production applications. This document covers API integration patterns, prompt engineering, performance optimization, cost m",
+    "category": "best-practices",
+    "filePath": "best-practices/image-generation-ai.md"
+  },
+  {
+    "slug": "best-practices/logging-monitoring",
+    "title": "Logging and Monitoring Best Practices for Node.js/Next.js",
+    "excerpt": "A comprehensive guide to implementing production-ready logging, monitoring, and observability in Node.js and Next.js applications. This document covers structured logging, monitoring tools, metrics co",
+    "category": "best-practices",
+    "filePath": "best-practices/logging-monitoring.md"
+  },
+  {
+    "slug": "best-practices/MCP_DEVELOPMENT_INDEX",
+    "title": "MCP Development Documentation Index",
+    "excerpt": "This index provides a comprehensive overview of the Model Context Protocol (MCP) server development documentation and related resources.",
+    "category": "best-practices",
+    "filePath": "best-practices/MCP_DEVELOPMENT_INDEX.md"
+  },
+  {
+    "slug": "best-practices/MCP_QUICK_REFERENCE",
+    "title": "MCP Server Development - Quick Reference",
+    "excerpt": "Fast lookup for common tasks and patterns.",
+    "category": "best-practices",
+    "filePath": "best-practices/MCP_QUICK_REFERENCE.md"
+  },
+  {
+    "slug": "best-practices/mcp-server-development",
+    "title": "MCP Server Development: Comprehensive Best Practices Guide",
+    "excerpt": "1. [MCP Architecture & Overview](#mcp-architecture--overview) 2. [Protocol Fundamentals](#protocol-fundamentals) 3. [Server Development with TypeScript SDK](#server-development-with-typescript-sdk) 4.",
+    "category": "best-practices",
+    "filePath": "best-practices/mcp-server-development.md"
+  },
+  {
+    "slug": "best-practices/nextjs-16",
+    "title": "Next.js 15 App Router Best Practices Guide",
+    "excerpt": "Comprehensive documentation covering modern Next.js 15 patterns, optimization techniques, and production-ready implementations.",
+    "category": "best-practices",
+    "filePath": "best-practices/nextjs-16.md"
+  },
+  {
+    "slug": "best-practices/prisma-orm",
+    "title": "Prisma ORM Best Practices for Production Applications",
+    "excerpt": "A comprehensive guide covering schema design, query optimization, migrations, connection management, type safety, and testing strategies for production Prisma applications.",
+    "category": "best-practices",
+    "filePath": "best-practices/prisma-orm.md"
+  },
+  {
+    "slug": "best-practices/react-patterns",
+    "title": "Modern React Patterns and Best Practices",
+    "excerpt": "> **Last Updated**: December 2025 **Audience**: React developers building > production applications **Framework Context**: Next.js 15, React 19+, > TypeScript",
+    "category": "best-practices",
+    "filePath": "best-practices/react-patterns.md"
+  },
+  {
+    "slug": "best-practices/README",
+    "title": "API Best Practices Documentation",
+    "excerpt": "This directory contains comprehensive guides for building production-ready APIs and services.",
+    "category": "best-practices",
+    "filePath": "best-practices/README.md"
+  },
+  {
+    "slug": "best-practices/SECURITY_INDEX",
+    "title": "Web Application Security Documentation Index",
+    "excerpt": "Complete web application security resources and implementation guides.",
+    "category": "best-practices",
+    "filePath": "best-practices/SECURITY_INDEX.md"
+  },
+  {
+    "slug": "best-practices/SECURITY_QUICK_REFERENCE",
+    "title": "Web Security Quick Reference",
+    "excerpt": "A fast lookup guide for the most critical security implementations. For detailed information, see [web-security.md](./web-security.md).",
+    "category": "best-practices",
+    "filePath": "best-practices/SECURITY_QUICK_REFERENCE.md"
+  },
+  {
+    "slug": "best-practices/seo-nextjs",
+    "title": "SEO Best Practices for Next.js Applications",
+    "excerpt": "A comprehensive guide to optimizing Next.js applications for search engines, covering technical SEO, performance, content optimization, and indexing strategies.",
+    "category": "best-practices",
+    "filePath": "best-practices/seo-nextjs.md"
+  },
+  {
+    "slug": "best-practices/SEO-REFERENCE",
+    "title": "SEO Best Practices Quick Reference",
+    "excerpt": "Quick links to key sections in the comprehensive SEO guide for Next.js applications.",
+    "category": "best-practices",
+    "filePath": "best-practices/SEO-REFERENCE.md"
+  },
+  {
+    "slug": "best-practices/state-management",
+    "title": "React State Management Best Practices 2025",
+    "excerpt": "A comprehensive guide to managing state in modern React applications, covering server state, client state, URL state, form state, and persistence strategies.",
+    "category": "best-practices",
+    "filePath": "best-practices/state-management.md"
+  },
+  {
+    "slug": "best-practices/stripe-integration",
+    "title": "Stripe Integration Best Practices",
+    "excerpt": "Comprehensive guide to integrating Stripe payments securely and reliably. This document covers checkout integration, subscription management, webhook handling, security, testing, and error handling.",
+    "category": "best-practices",
+    "filePath": "best-practices/stripe-integration.md"
+  },
+  {
+    "slug": "best-practices/tailwind-css",
+    "title": "Tailwind CSS Best Practices Guide",
+    "excerpt": "A comprehensive guide to writing maintainable, performant, and well-organized Tailwind CSS code. This document covers configuration, component patterns, responsive design, dark mode, performance optim",
+    "category": "best-practices",
+    "filePath": "best-practices/tailwind-css.md"
+  },
+  {
+    "slug": "best-practices/testing-strategies",
+    "title": "Testing Strategies Best Practices",
+    "excerpt": "Comprehensive guide to testing strategies for modern web applications, with practical examples tailored to Next.js, Vitest, React Testing Library, Playwright, and Cucumber.",
+    "category": "best-practices",
+    "filePath": "best-practices/testing-strategies.md"
+  },
+  {
+    "slug": "best-practices/typescript",
+    "title": "TypeScript Best Practices for Production Applications",
+    "excerpt": "A comprehensive guide to writing maintainable, type-safe, and performant TypeScript code in production environments.",
+    "category": "best-practices",
+    "filePath": "best-practices/typescript.md"
+  },
+  {
+    "slug": "best-practices/web-performance",
+    "title": "Web Performance Optimization Best Practices 2025",
+    "excerpt": "A comprehensive guide to optimizing web performance across Core Web Vitals, image delivery, JavaScript bundling, caching strategies, network optimization, and measurement tools.",
+    "category": "best-practices",
+    "filePath": "best-practices/web-performance.md"
+  },
+  {
+    "slug": "best-practices/web-security",
+    "title": "Web Application Security Best Practices",
+    "excerpt": "A comprehensive guide to securing web applications, covering the OWASP Top 10, authentication security, input validation, security headers, secrets management, and dependency security.",
+    "category": "best-practices",
+    "filePath": "best-practices/web-security.md"
+  },
+  {
+    "slug": "BETA_DEPENDENCIES",
+    "title": "Beta Dependencies",
+    "excerpt": "> **Last Updated**: 2026-02-26",
+    "category": "general",
+    "filePath": "BETA_DEPENDENCIES.md"
+  },
+  {
+    "slug": "blog/01-my-prs-were-pure-ai-slop",
+    "title": "My PRs Were Pure AI Slop: A Developer's Confession",
+    "excerpt": "_By Zoltan Erdos | Brighton, UK | January 2026_",
+    "category": "blog",
+    "filePath": "blog/01-my-prs-were-pure-ai-slop.md"
+  },
+  {
+    "slug": "blog/02-more-productive-ruining-career",
+    "title": "I'm More Productive Than Ever and It's Ruining My Career",
+    "excerpt": "_By Zoltan Erdos | Brighton, UK | January 2026_",
+    "category": "blog",
+    "filePath": "blog/02-more-productive-ruining-career.md"
+  },
+  {
+    "slug": "blog/03-last-two-days-sprint-horror",
+    "title": "The Last Two Days of Every Sprint: A Horror Story",
+    "excerpt": "_By Zoltan Erdos | Brighton, UK | January 2026_",
+    "category": "blog",
+    "filePath": "blog/03-last-two-days-sprint-horror.md"
+  },
+  {
+    "slug": "blog/04-2025-year-agents-outperformed",
+    "title": "2025: The Year Coding Agents Outperformed Developers",
+    "excerpt": "_By Zoltan Erdos | Brighton, UK | January 2026_",
+    "category": "blog",
+    "filePath": "blog/04-2025-year-agents-outperformed.md"
+  },
+  {
+    "slug": "blog/05-trust-gap-teams-reject-ai-code",
+    "title": "The Trust Gap: Why Teams Reject AI-Generated Code",
+    "excerpt": "_By Zoltan Erdos | Brighton, UK | January 2026_",
+    "category": "blog",
+    "filePath": "blog/05-trust-gap-teams-reject-ai-code.md"
+  },
+  {
+    "slug": "blog/06-quality-speed-price-triangle-broken",
+    "title": "Quality, Speed, Price: The Triangle AI Just Broke",
+    "excerpt": "_By Zoltan Erdos | Brighton, UK | January 2026_",
+    "category": "blog",
+    "filePath": "blog/06-quality-speed-price-triangle-broken.md"
+  },
+  {
+    "slug": "blog/07-context-engineering-replaced-coding",
+    "title": "Context Engineering: The Skill That Replaced Coding",
+    "excerpt": "_By Zoltan Erdos | Brighton, UK | January 2026_",
+    "category": "blog",
+    "filePath": "blog/07-context-engineering-replaced-coding.md"
+  },
+  {
+    "slug": "blog/08-how-to-not-produce-ai-slop",
+    "title": "How to Not Produce AI Slop: A Framework",
+    "excerpt": "_By Zoltan Erdos | Brighton, UK | January 2026_",
+    "category": "blog",
+    "filePath": "blog/08-how-to-not-produce-ai-slop.md"
+  },
+  {
+    "slug": "blog/09-new-developer-onboarding-ai-edition",
+    "title": "The New Developer Onboarding: AI Edition",
+    "excerpt": "_By Zoltan Erdos | Brighton, UK | January 2026_",
+    "category": "blog",
+    "filePath": "blog/09-new-developer-onboarding-ai-edition.md"
+  },
+  {
+    "slug": "blog/10-what-do-developers-become",
+    "title": "What Do Developers Become?",
+    "excerpt": "_By Zoltan Erdos | Brighton, UK | January 2026_",
+    "category": "blog",
+    "filePath": "blog/10-what-do-developers-become.md"
+  },
+  {
+    "slug": "blog/11-requirement-is-the-product",
+    "title": "The Requirement Is the Product",
+    "excerpt": "_By Zoltan Erdos | Brighton, UK | January 2026_",
+    "category": "blog",
+    "filePath": "blog/11-requirement-is-the-product.md"
+  },
+  {
+    "slug": "blog/12-earning-less-than-five-years-ago",
+    "title": "Earning Less Than Five Years Ago: The Developer's Economic Reality",
+    "excerpt": "_By Zoltan Erdos | Brighton, UK | January 2026_",
+    "category": "blog",
+    "filePath": "blog/12-earning-less-than-five-years-ago.md"
+  },
+  {
+    "slug": "blog/13-brighton-dogs-adhd-startup",
+    "title": "Brighton, Dogs, and ADHD: Building a Startup While Everything Burns",
+    "excerpt": "_By Zoltan Erdos | Brighton, UK | January 2026_",
+    "category": "blog",
+    "filePath": "blog/13-brighton-dogs-adhd-startup.md"
+  },
+  {
+    "slug": "blog/14-why-i-still-code-when-ai-better",
+    "title": "Why I Still Code When AI Does It Better",
+    "excerpt": "_By Zoltan Erdos | Brighton, UK | January 2026_",
+    "category": "blog",
+    "filePath": "blog/14-why-i-still-code-when-ai-better.md"
+  },
+  {
+    "slug": "blog/15-letter-to-junior-developer-2026",
+    "title": "A Letter to the Junior Developer of 2026",
+    "excerpt": "_By Zoltan Erdos | Brighton, UK | January 2026_",
+    "category": "blog",
+    "filePath": "blog/15-letter-to-junior-developer-2026.md"
+  },
+  {
+    "slug": "blog/16-how-i-vibe-coded-production-saas",
+    "title": "How I Vibe-Coded a Production SaaS in Two Months",
+    "excerpt": "_By Zoltan Erdos | Brighton, UK | February 2026_",
+    "category": "blog",
+    "filePath": "blog/16-how-i-vibe-coded-production-saas.md"
+  },
+  {
+    "slug": "blog/17-it-feels-like-cheating",
+    "title": "It Feels Like Cheating (Because It Is)",
+    "excerpt": "_By Zoltan Erdos | Brighton, UK | February 2026_",
+    "category": "blog",
+    "filePath": "blog/17-it-feels-like-cheating.md"
+  },
+  {
+    "slug": "blog/18-your-page-regenerates-itself",
+    "title": "Your Page Regenerates Itself",
+    "excerpt": "_By Zoltan Erdos | Brighton, UK | February 2026_",
+    "category": "blog",
+    "filePath": "blog/18-your-page-regenerates-itself.md"
+  },
+  {
+    "slug": "blog/2026-01-interview-notes-zoltan",
+    "title": "Interview Notes: Zoltan Erdos on the Developer Identity Crisis of 2026",
+    "excerpt": "**Date:** January 2026 **Subject:** Zoltan Erdos **Location:** Brighton, UK **Role:** Developer & Founder of Spike.land",
+    "category": "blog",
+    "filePath": "blog/2026-01-interview-notes-zoltan.md"
+  },
+  {
+    "slug": "business/APPLICATION_TRACKER",
+    "title": "Accelerator & Credits Application Tracker",
+    "excerpt": "> **Last Updated**: February 10, 2026 **Purpose**: Track status of all > accelerator and credit program applications",
+    "category": "business",
+    "filePath": "business/APPLICATION_TRACKER.md"
+  },
+  {
+    "slug": "business/AWS_MEETING_PREP_2026-02-20",
+    "title": "AWS 1:1 Meeting Prep - Lennon Hobson",
+    "excerpt": "> **Date**: Thursday 20 February 2026, 12:00 noon (30 min) **With**: Lennon > Hobson, AWS Account Manager **Format**: Video call (check calendar for link) > **Goal**: Introduce what we're building, ex",
+    "category": "business",
+    "filePath": "business/AWS_MEETING_PREP_2026-02-20.md"
+  },
+  {
+    "slug": "business/BUSINESS_STRUCTURE",
+    "title": "Spike Land - Business Structure Documentation",
+    "excerpt": "> **Last Updated**: February 2026 **Decision**: Form UK Limited Company > **Company Name**: SPIKE LAND LTD (Company #16906682)",
+    "category": "business",
+    "filePath": "business/BUSINESS_STRUCTURE.md"
+  },
+  {
+    "slug": "business/LAUNCH_CHECKLIST",
+    "title": "Launch Checklist - Spike Land Platform",
+    "excerpt": "**Target Launch Date:** TBD **Platform Version:** Main Branch **Last Updated:** February 26, 2026",
+    "category": "business",
+    "filePath": "business/LAUNCH_CHECKLIST.md"
+  },
+  {
+    "slug": "business/LAUNCH_PLAN",
+    "title": "Launch Plan - Spike Land Platform",
+    "excerpt": "**Target Launch Date:** TBD (Recommended: Q1 2026) **Platform:** https://spike.land **Version:** 1.0.0",
+    "category": "business",
+    "filePath": "business/LAUNCH_PLAN.md"
+  },
+  {
+    "slug": "business/MARKETING_PERSONAS",
+    "title": "Marketing Personas - Spike Land Platform",
+    "excerpt": "> **Last Updated**: February 2026 **Product**: Spike Land (managed deployment > platform with MCP registry) **Primary Channels**: GitHub, Twitter/X, LinkedIn, > Hacker News, Discord",
+    "category": "business",
+    "filePath": "business/MARKETING_PERSONAS.md"
+  },
+  {
+    "slug": "business/PEOPLE_LIKE_YOU",
+    "title": "People Like You: A Curated Reading List & 2-Week Focus Plan",
+    "excerpt": "Zoltan Erdos is a solo UK founder (SPIKE LAND LTD, Dec 2025) building a managed deployment platform with MCP registry (Spike Land) featuring 455+ MCP tools, 18 apps, real-time code editor on Cloudflar",
+    "category": "business",
+    "filePath": "business/PEOPLE_LIKE_YOU.md"
+  },
+  {
+    "slug": "business/PITCH_DECK_OUTLINE",
+    "title": "Pitch Deck Outline for Accelerator Applications",
+    "excerpt": "> **Last Updated**: February 2026 **Purpose**: Structure for Seedcamp, > Techstars, and equity-based accelerator applications **Stage**: Pre-launch > (product ready, pre-revenue)",
+    "category": "business",
+    "filePath": "business/PITCH_DECK_OUTLINE.md"
+  },
+  {
+    "slug": "business/SUBSCRIPTIONS",
+    "title": "Subscriptions & Costs",
+    "excerpt": "> **Company**: SPIKE LAND LTD (UK #16906682) **Last Updated**: February 2026 > **Currency**: GBP (£) unless stated otherwise",
+    "category": "business",
+    "filePath": "business/SUBSCRIPTIONS.md"
+  },
+  {
+    "slug": "business/VALUATION_ANALYSIS",
+    "title": "Market Valuation Analysis: SPIKE LAND LTD",
+    "excerpt": "> **Company**: SPIKE LAND LTD (UK Company #16906682) **Date**: 19 February 2026 > **Classification**: Confidential — For Internal & Investor Use Only **Stage**: > Pre-Revenue, Production-Ready (Dual-P",
+    "category": "business",
+    "filePath": "business/VALUATION_ANALYSIS.md"
+  },
+  {
+    "slug": "business/VERITASIUM_STYLE_GUIDE",
+    "title": "Veritasium Style Guide",
+    "excerpt": "This document outlines the design principles, color palettes, and component usage for Veritasium-style educational videos and interactive demos in spike.land.",
+    "category": "business",
+    "filePath": "business/VERITASIUM_STYLE_GUIDE.md"
+  },
+  {
+    "slug": "business/ZOLTAN_ERDOS",
+    "title": "Zoltan Erdos - Founder & CEO",
+    "excerpt": "> **Role**: Founder, CEO & Solo Developer | **Company**: SPIKE LAND LTD > **Location**: Brighton, UK | **Since**: 2013",
+    "category": "business",
+    "filePath": "business/ZOLTAN_ERDOS.md"
+  },
+  {
+    "slug": "CEO_DECISIONS",
+    "title": "CEO Decisions - Spike Land Platform",
+    "excerpt": "> **Purpose**: This document records strategic decisions made by the CEO (Zoltan > Erdos) for the Spike Land platform. These decisions guide development > priorities, technology choices, and business",
+    "category": "general",
+    "filePath": "CEO_DECISIONS.md"
+  },
+  {
+    "slug": "DATABASE_USAGE_TRACKING",
+    "title": "Database Table Usage Tracking",
+    "excerpt": "This document tracks where each database table is used in the codebase.",
+    "category": "general",
+    "filePath": "DATABASE_USAGE_TRACKING.md"
+  },
+  {
+    "slug": "database/ALBUM_IMAGE_INDEX_ANALYSIS",
+    "title": "AlbumImage Index Analysis & Optimization",
+    "excerpt": "**Status:** ✅ Primary index already exists and is correctly optimized **Action Taken:** Added supplementary chronological index for future use **Migration Required:** Yes (schema drift detected, requi",
+    "category": "database",
+    "filePath": "database/ALBUM_IMAGE_INDEX_ANALYSIS.md"
+  },
+  {
+    "slug": "database/ALBUM_IMAGE_INDEXES",
+    "title": "AlbumImage Index Optimization",
+    "excerpt": "Added compound index on `(albumId, addedAt)` to optimize chronological album queries.",
+    "category": "database",
+    "filePath": "database/ALBUM_IMAGE_INDEXES.md"
+  },
+  {
+    "slug": "database/album-enhance-pagination-optimization",
+    "title": "Album Enhancement Query Pagination Optimization",
+    "excerpt": "Optimized the album batch enhancement endpoint to handle large albums (>100 images) efficiently by implementing count-based checks before fetching data.",
+    "category": "database",
+    "filePath": "database/album-enhance-pagination-optimization.md"
+  },
+  {
+    "slug": "E2E_TEST_IMPLEMENTATION",
+    "title": "E2E Test Implementation for Image Enhancement App Features",
+    "excerpt": "> **Status (2026-02-26):** The E2E test files referenced in this document > (`e2e/features/*.feature`, `e2e/step-definitions/*.steps.ts`) were removed > during the dead code cleanup (~420 files remove",
+    "category": "general",
+    "filePath": "E2E_TEST_IMPLEMENTATION.md"
+  },
+  {
+    "slug": "features/FEATURES",
+    "title": "spike.land — Features",
+    "excerpt": "spike.land is a workspace platform where AI agents build, deploy, and manage full-stack applications. Each workspace is personalized based on a 4-question onboarding flow (16 personas). The platform e",
+    "category": "features",
+    "filePath": "features/FEATURES.md"
+  },
+  {
+    "slug": "features/SUBSCRIPTION_TIERS",
+    "title": "Platform Subscription Tiers",
+    "excerpt": "This document describes the platform-level subscription system for Spike Land.",
+    "category": "features",
+    "filePath": "features/SUBSCRIPTION_TIERS.md"
+  },
+  {
+    "slug": "features/USER_GUIDE",
+    "title": "Spike Land - User Guide",
+    "excerpt": "> **Last Updated**: January 2026 **Platform**: [spike.land](https://spike.land) > **Company**: SPIKE LAND LTD (UK Company #16906682)",
+    "category": "features",
+    "filePath": "features/USER_GUIDE.md"
+  },
+  {
+    "slug": "features/VOUCHER_SYSTEM_UPDATED",
+    "title": "Voucher System Documentation",
+    "excerpt": "> **Last Updated**: December 2025 **Status**: MVP Release",
+    "category": "features",
+    "filePath": "features/VOUCHER_SYSTEM_UPDATED.md"
+  },
+  {
+    "slug": "guides/AUTOMATED_SETUP",
+    "title": "Automated E2E Bypass Setup Guide",
+    "excerpt": "This guide explains how to configure the E2E authentication bypass feature using both automated tools (Playwright MCP) and manual steps.",
+    "category": "guides",
+    "filePath": "guides/AUTOMATED_SETUP.md"
+  },
+  {
+    "slug": "guides/CI_CD_DEBUGGING",
+    "title": "CI/CD Debugging Guide",
+    "excerpt": "This guide helps you troubleshoot CI/CD pipeline failures, understand expected build times, and locate Vercel preview deployments.",
+    "category": "guides",
+    "filePath": "guides/CI_CD_DEBUGGING.md"
+  },
+  {
+    "slug": "guides/CREDENTIAL_ROTATION",
+    "title": "Credential Rotation Procedures",
+    "excerpt": "This document provides step-by-step instructions for rotating credentials when a security incident occurs or as part of regular security hygiene.",
+    "category": "guides",
+    "filePath": "guides/CREDENTIAL_ROTATION.md"
+  },
+  {
+    "slug": "guides/DATABASE_MIGRATION_ROLLBACK",
+    "title": "Database Migration Rollback Guide",
+    "excerpt": "This document outlines procedures for rolling back database migrations, particularly for the voucher system tables.",
+    "category": "guides",
+    "filePath": "guides/DATABASE_MIGRATION_ROLLBACK.md"
+  },
+  {
+    "slug": "guides/DATABASE_QUICK_START",
+    "title": "Database Quick Start",
+    "excerpt": "This is a condensed guide to get the database up and running quickly. For comprehensive documentation, see [DATABASE_SETUP.md](./DATABASE_SETUP.md).",
+    "category": "guides",
+    "filePath": "guides/DATABASE_QUICK_START.md"
+  },
+  {
+    "slug": "guides/DEPENDENCY_MANAGEMENT",
+    "title": "Dependency Management Guide",
+    "excerpt": "This guide covers best practices for managing dependencies in the Spike Land codebase, including adding/removing packages, dead code detection, security auditing, and handling Dependabot updates.",
+    "category": "guides",
+    "filePath": "guides/DEPENDENCY_MANAGEMENT.md"
+  },
+  {
+    "slug": "guides/ERROR_LOG_AUDIT_GUIDE",
+    "title": "Error Log Audit Guide",
+    "excerpt": "This guide provides instructions for auditing error logs, identifying common error patterns, and monitoring application health using the `ErrorLog` table and the `tryCatch` utility.",
+    "category": "guides",
+    "filePath": "guides/ERROR_LOG_AUDIT_GUIDE.md"
+  },
+  {
+    "slug": "guides/MANUAL_MY_APPS_TEST",
+    "title": "Manual /my-apps Testing Guide",
+    "excerpt": "This document provides a step-by-step guide to manually test the `/my-apps` functionality both locally and on production.",
+    "category": "guides",
+    "filePath": "guides/MANUAL_MY_APPS_TEST.md"
+  },
+  {
+    "slug": "guides/MANUAL_TESTING_GUIDE",
+    "title": "Manual Testing Guide - Image Enhancement App",
+    "excerpt": "**Version:** Phase 3-5 Release **Environment:** https://spike.land **Last Updated:** 2026-02-26",
+    "category": "guides",
+    "filePath": "guides/MANUAL_TESTING_GUIDE.md"
+  },
+  {
+    "slug": "guides/MY_APPS_TESTING_GUIDE",
+    "title": "My-Apps Testing Guide",
+    "excerpt": "This document provides step-by-step instructions for testing the /my-apps functionality locally and on production.",
+    "category": "guides",
+    "filePath": "guides/MY_APPS_TESTING_GUIDE.md"
+  },
+  {
+    "slug": "guides/SECRETS_SETUP",
+    "title": "Secrets and Environment Variables Setup",
+    "excerpt": "This is the **single source of truth** for all secrets and environment variables used in the Spike Land platform. All other documentation should reference this file rather than duplicating secrets inf",
+    "category": "guides",
+    "filePath": "guides/SECRETS_SETUP.md"
+  },
+  {
+    "slug": "guides/TESTING_STRATEGY",
+    "title": "Testing Strategy",
+    "excerpt": "Comprehensive guide to the testing infrastructure, conventions, and best practices for the Spike Land platform.",
+    "category": "guides",
+    "filePath": "guides/TESTING_STRATEGY.md"
+  },
+  {
+    "slug": "integrations/CAMPAIGN_TRACKING_INTEGRATION",
+    "title": "Campaign Analytics Tracking Integration",
+    "excerpt": "This document explains how to integrate the SessionTracker component and useTracking hook for campaign analytics.",
+    "category": "integrations",
+    "filePath": "integrations/CAMPAIGN_TRACKING_INTEGRATION.md"
+  },
+  {
+    "slug": "JOB_CLEANUP_SYSTEM",
+    "title": "Job Cleanup System",
+    "excerpt": "This document describes the automatic job timeout and cleanup mechanism for stuck enhancement jobs.",
+    "category": "general",
+    "filePath": "JOB_CLEANUP_SYSTEM.md"
+  },
+  {
+    "slug": "JULES_PROCESS_OBSERVATIONS_AND_FUTURE_IMPROVEMENTS",
+    "title": "Jules Process Observations and Future Improvements",
+    "excerpt": "This document captures observations from running the Ralph Jules automation system and identifies areas for improvement.",
+    "category": "general",
+    "filePath": "JULES_PROCESS_OBSERVATIONS_AND_FUTURE_IMPROVEMENTS.md"
+  },
+  {
+    "slug": "MCP_TOOL_SYSTEM_ANALYSIS",
+    "title": "MCP Tool System Analysis: spike-land-ai vs Industry",
+    "excerpt": "The spike-land-ai MCP ecosystem is a **three-tier architecture** (standalone servers → multiplexer → platform registry) that is architecturally more sophisticated than any single competitor in the MCP",
+    "category": "general",
+    "filePath": "MCP_TOOL_SYSTEM_ANALYSIS.md"
+  },
+  {
+    "slug": "MIGRATION_GUIDE",
+    "title": "Database Migration Guide",
+    "excerpt": "This guide covers how to create, manage, and apply database migrations safely.",
+    "category": "general",
+    "filePath": "MIGRATION_GUIDE.md"
+  },
+  {
+    "slug": "migrations/MIGRATION_TEMPLATE",
+    "title": "API Migration Guide Template",
+    "excerpt": "> Use this template when creating migration guides for API version changes.",
+    "category": "migrations",
+    "filePath": "migrations/MIGRATION_TEMPLATE.md"
+  },
+  {
+    "slug": "migrations/README",
+    "title": "API Migration Guides",
+    "excerpt": "This directory contains step-by-step migration guides for API version changes.",
+    "category": "migrations",
+    "filePath": "migrations/README.md"
+  },
+  {
+    "slug": "MY_APPS_TESTING_STATUS_CURRENT",
+    "title": "My-Apps Testing Status Report",
+    "excerpt": "---",
+    "category": "general",
+    "filePath": "MY_APPS_TESTING_STATUS_CURRENT.md"
+  },
+  {
+    "slug": "NON_MCP_TEST_INVENTORY",
+    "title": "Non-MCP Test Inventory",
+    "excerpt": "This document catalogs non-MCP test files that were scheduled for removal as part of the MCP Platform Consolidation. A major cleanup (~420 files removed) was completed on 2026-02-26.",
+    "category": "general",
+    "filePath": "NON_MCP_TEST_INVENTORY.md"
+  },
+  {
+    "slug": "physics-of-attention-assets",
+    "title": "Asset Requirements: Physics of Attention",
+    "excerpt": "Please generate the following images and save them to `packages/video/public/images/attention/`.",
+    "category": "general",
+    "filePath": "physics-of-attention-assets.md"
+  },
+  {
+    "slug": "README",
+    "title": "Spike Land Documentation",
+    "excerpt": "Welcome to the Spike Land documentation. This is the central index for all platform documentation.",
+    "category": "general",
+    "filePath": "README.md"
+  },
+  {
+    "slug": "ROADMAP",
+    "title": "Spike Land - Development Roadmap",
+    "excerpt": "> **Last Updated**: 2026-02-26 **Current Phase**: Platform Launch & Growth > **Business Structure**: UK Limited Company (SPIKE LAND LTD - Company > #16906682)",
+    "category": "general",
+    "filePath": "ROADMAP.md"
+  },
+  {
+    "slug": "RUNBOOK",
+    "title": "Operational Runbook",
+    "excerpt": "> **Living document** — Agents add entries here when they discover operational > knowledge, troubleshooting steps, or maintenance procedures during development > sessions.",
+    "category": "general",
+    "filePath": "RUNBOOK.md"
+  },
+  {
+    "slug": "security/SECURITY_AUDIT_REPORT",
+    "title": "Security Audit Report - Spike Land Platform",
+    "excerpt": "**Audit Date:** December 10, 2025 **Auditor:** Security Team (Automated Security Audit) **Platform Version:** Main Branch (commit: 14b22b6) **Scope:** Full application security audit based on OWASP To",
+    "category": "security",
+    "filePath": "security/SECURITY_AUDIT_REPORT.md"
+  },
+  {
+    "slug": "security/SECURITY_HARDENING",
+    "title": "Security Hardening",
+    "excerpt": "This document outlines security improvements implemented in the application.",
+    "category": "security",
+    "filePath": "security/SECURITY_HARDENING.md"
+  },
+  {
+    "slug": "TECH_DEBT",
+    "title": "Tech Debt Registry",
+    "excerpt": "> Last updated: 2026-02-26 Last audit: 2026-02-26 (Sprint 4 Cleanup)",
+    "category": "general",
+    "filePath": "TECH_DEBT.md"
+  },
+  {
+    "slug": "tech-debt/BUGS",
+    "title": "Confirmed Bugs — spike.land",
+    "excerpt": "**Generated**: 2026-02-19 **Updated**: 2026-03-01 **Method**: 16-agent parallel codebase scan + manual prod testing **Status**: These are confirmed bugs (not theoretical), verified by reading actual c",
+    "category": "tech-debt",
+    "filePath": "tech-debt/BUGS.md"
+  },
+  {
+    "slug": "tech-debt/TECH_DEBT_REPORT",
+    "title": "Tech Debt & Bug Report — spike.land",
+    "excerpt": "**Generated**: 2026-02-19 **Updated**: 2026-02-26 **Method**: 16 parallel agents scanning TypeScript files across `src/lib/`, `src/app/`, and 2 Cloudflare Worker packages **Total issues found**: ~180",
+    "category": "tech-debt",
+    "filePath": "tech-debt/TECH_DEBT_REPORT.md"
+  },
+  {
+    "slug": "testing/testing-everything-manually",
+    "title": "Spike Land - Complete Manual Testing Guide",
+    "excerpt": "**Last Updated:** 2026-02-26 **Production URL:** https://spike.land **Pre-tested by:** Claude Code with Playwright MCP",
+    "category": "testing",
+    "filePath": "testing/testing-everything-manually.md"
+  },
+  {
+    "slug": "useParallelEnhancement-hook",
+    "title": "useParallelEnhancement Hook",
+    "excerpt": "The `useParallelEnhancement` hook manages multiple image enhancement jobs simultaneously. It handles SSE (Server-Sent Events) connections for real-time job status updates and provides aggregated statu",
+    "category": "general",
+    "filePath": "useParallelEnhancement-hook.md"
+  }
+]

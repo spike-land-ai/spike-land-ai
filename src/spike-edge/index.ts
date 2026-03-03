@@ -58,7 +58,12 @@ app.all("/api/auth/*", async (c) => {
   url.hostname = "auth-mcp.spike.land";
   url.port = "";
   url.protocol = "https:";
-  return fetch(url.toString(), c.req.raw);
+
+  const newRequest = new Request(url.toString(), c.req.raw);
+  newRequest.headers.set("X-Forwarded-Host", "spike.land");
+  newRequest.headers.set("X-Forwarded-Proto", "https");
+
+  return fetch(newRequest);
 });
 
 app.route("/", spa);

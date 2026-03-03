@@ -7857,7 +7857,7 @@ __metadata:
     "@types/react": "npm:^19.0.8"
     class-variance-authority: "npm:^0.7.1"
     clsx: "npm:^2.1.1"
-    framer-motion: "npm:^12.4.7"
+    framer-motion: "npm:^12.34.5"
     gray-matter: "npm:^4.0.3"
     lucide-react: "npm:^0.474.0"
     react: "npm:^19.2.4"
@@ -8213,6 +8213,7 @@ __metadata:
     eslint: "npm:^10.0.2"
     eslint-plugin-react: "npm:^7.37.5"
     eslint-plugin-react-hooks: "npm:^7.0.1"
+    framer-motion: "npm:^12.34.5"
     react: "npm:^19.2.4"
     react-dom: "npm:^19.2.4"
     tailwindcss: "npm:^4.2.1"
@@ -15044,7 +15045,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"framer-motion@npm:12.34.5, framer-motion@npm:^12.4.7":
+"framer-motion@npm:12.34.5, framer-motion@npm:^12.34.5":
   version: 12.34.5
   resolution: "framer-motion@npm:12.34.5"
   dependencies:
