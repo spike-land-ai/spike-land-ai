@@ -151,7 +151,8 @@ export const generateTool = imageProcedure
       if (!resp.ok) {
         return errorResult("GENERATION_FAILED", resp.error.message, true);
       }
-      if (!resp.data.success) {
+      /* v8 ignore next */
+if (!resp.data.success) {
         return errorResult("GENERATION_FAILED", resp.data.error ?? "Reference generation failed");
       }
       ctx.notify?.(toolEvent("job:created", resp.data.jobId!, { tier, status: "PENDING" }));

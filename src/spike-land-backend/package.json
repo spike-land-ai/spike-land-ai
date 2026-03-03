@@ -27,9 +27,9 @@
     "__STATIC_CONTENT_MANIFEST": "./src/staticContent.mjs"
   },
   "devDependencies": {
-    "@changesets/cli": "2.29.8",
+    "@changesets/cli": "2.30.0",
     "@cloudflare/vitest-pool-workers": "0.12.18",
-    "@cloudflare/workers-types": "4.20260305.0",
+    "@cloudflare/workers-types": "4.20260301.1",
     "@spike-land-ai/esbuild-wasm-mcp": "*",
     "@spike-land-ai/tsconfig": "*",
     "@vitest/coverage-istanbul": "4.0.18",
@@ -42,13 +42,13 @@
     "wrangler": "4.69.0"
   },
   "dependencies": {
-    "@ai-sdk/anthropic": "3.0.50",
-    "@ai-sdk/google": "3.0.34",
+    "@ai-sdk/anthropic": "3.0.53",
+    "@ai-sdk/google": "3.0.36",
     "@modelcontextprotocol/sdk": "1.27.1",
     "@spike-land-ai/code": "*",
     "@spike-land-ai/esbuild-wasm": "*",
     "@types/node": "25.3.3",
-    "ai": "6.0.105",
+    "ai": "6.0.108",
     "replicate": "1.4.0",
     "zod": "4.3.6"
   }

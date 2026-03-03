@@ -21,18 +21,18 @@
     "release": "changeset publish"
   },
   "dependencies": {
-    "yaml": "^2.7.1"
+    "yaml": "^2.8.2"
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.4.4",
-    "@changesets/cli": "2.29.8",
+    "@biomejs/biome": "^2.4.5",
+    "@changesets/cli": "2.30.0",
     "@types/node": "25.3.3",
     "@vitest/coverage-v8": "4.0.18",
-    "esbuild": "^0.25.0",
+    "esbuild": "^0.27.3",
     "eslint": "10.0.2",
     "eslint-plugin-react": "7.37.5",
     "eslint-plugin-react-hooks": "7.0.1",
-    "tsx": "^4.19.0",
+    "tsx": "^4.21.0",
     "typescript": "5.9.3",
     "typescript-eslint": "8.56.1",
     "vitest": "4.0.18"

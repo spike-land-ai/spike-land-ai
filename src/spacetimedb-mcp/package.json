@@ -59,7 +59,7 @@
     "zod": "4.3.6"
   },
   "devDependencies": {
-    "@changesets/cli": "2.29.8",
+    "@changesets/cli": "2.30.0",
     "@spike-land-ai/eslint-config": "*",
     "@spike-land-ai/tsconfig": "*",
     "@types/node": "25.3.3",

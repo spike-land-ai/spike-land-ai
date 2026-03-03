@@ -20,7 +20,7 @@
     "access": "public"
   },
   "devDependencies": {
-    "@changesets/cli": "2.29.8",
+    "@changesets/cli": "2.30.0",
     "@spike-land-ai/eslint-config": "*"
   },
   "overrides": {

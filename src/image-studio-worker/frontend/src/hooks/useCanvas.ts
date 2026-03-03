@@ -15,8 +15,14 @@ export function useCanvas() {
   }, [pan, zoom]);
 
   const updateAssetPosition = useCallback((id: string, x: number, y: number) => {
-    setAssets((prev) => 
+    setAssets((prev) =>
       prev.map(a => a.id === id ? { ...a, x, y } : a)
+    );
+  }, []);
+
+  const updateAsset = useCallback((id: string, updates: Partial<StudioAsset>) => {
+    setAssets((prev) =>
+      prev.map(a => a.id === id ? { ...a, ...updates } : a)
     );
   }, []);
 
@@ -71,6 +77,7 @@ export function useCanvas() {
     pan,
     selectedAssetId,
     addAsset,
+    updateAsset,
     updateAssetPosition,
     setSelectedAssetId,
     handleWheel,

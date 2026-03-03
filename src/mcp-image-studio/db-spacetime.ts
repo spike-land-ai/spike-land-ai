@@ -1,13 +1,15 @@
 import {
     typedTables as tables,
     typedReducers as reducers,
-    type Image as SpacetimeImage,
-    type EnhancementJob as SpacetimeEnhancementJob,
-    type Album as SpacetimeAlbum,
-    type AlbumImage as SpacetimeAlbumImage,
-    type Pipeline as SpacetimePipeline,
-    type GenerationJob as SpacetimeGenerationJob,
-    type Subject as SpacetimeSubject,
+} from "@spike-land-ai/spacetimedb-platform";
+import type {
+    Image as SpacetimeImage,
+    EnhancementJob as SpacetimeEnhancementJob,
+    Album as SpacetimeAlbum,
+    AlbumImage as SpacetimeAlbumImage,
+    Pipeline as SpacetimePipeline,
+    GenerationJob as SpacetimeGenerationJob,
+    Subject as SpacetimeSubject,
 } from "@spike-land-ai/spacetimedb-platform";
 import {
     type ImageStudioDeps,

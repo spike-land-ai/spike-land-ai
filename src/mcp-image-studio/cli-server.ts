@@ -1,4 +1,3 @@
-#!/usr/bin/env node
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { createLiveSpacetimeMcpClient } from "@spike-land-ai/spacetimedb-mcp/client";
 import { SpacetimeServerTransport } from "@spike-land-ai/spacetimedb-mcp/transport";

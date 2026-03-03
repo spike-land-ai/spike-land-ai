@@ -8,6 +8,7 @@ import { Sparkles, Github, Activity, Zap, Shield, Zap as ZapIcon, Layout, Cpu, I
 import { DragDropProvider } from "./contexts/DragDropContext";
 import { eventBus } from "./services/event-bus";
 
+import { InteractivePrompts } from "./components/sections/InteractivePrompts";
 import { LiveActivity } from "./components/sections/LiveActivity";
 import { AnimatedGenerations } from "./components/sections/AnimatedGenerations";
 
@@ -51,6 +52,12 @@ export function App() {
     window.addEventListener("hashchange", handleHashChange);
     return () => window.removeEventListener("hashchange", handleHashChange);
   }, []);
+
+  const handleEditInteractive = (url: string, prompt: string) => {
+    sessionStorage.setItem("studio_initial_image", JSON.stringify({ url, name: prompt }));
+    setIsDemo(true);
+    window.location.hash = "#/studio";
+  };
 
   // Global paste-to-upload handler (authenticated/demo app)
   useEffect(() => {
@@ -182,6 +189,9 @@ export function App() {
             </div>
           ))}
         </section>
+
+        {/* Pre-Generated Image Demo */}
+        <InteractivePrompts onEdit={handleEditInteractive} />
 
         {/* Live Network Section */}
         <section id="network" className="relative px-6 md:px-12 py-12 md:py-24 z-10 max-w-7xl mx-auto border-t border-white/5">

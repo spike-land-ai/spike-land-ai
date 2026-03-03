@@ -13,10 +13,10 @@
     "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
-    "hono": "^4.12.3"
+    "hono": "^4.12.4"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "4.20260305.0",
+    "@cloudflare/workers-types": "4.20260301.1",
     "@spike-land-ai/eslint-config": "*",
     "@vitest/coverage-v8": "^4.0.18",
     "eslint": "^10.0.2",

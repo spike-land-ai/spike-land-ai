@@ -10,7 +10,8 @@
     "dev:all": "npm run build:frontend & wrangler dev",
     "build": "npm run build:frontend && echo 'Worker uses [assets] directive — frontend/dist is ready'",
     "build:frontend": "cd frontend && npm run build",
-    "deploy": "npm run build && wrangler deploy",
+    "db:migrate": "wrangler d1 migrations apply IMAGE_DB --remote",
+    "deploy": "npm run build && npm run db:migrate && wrangler deploy",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "lint": "eslint --quiet ."
@@ -20,7 +21,7 @@
     "@spike-land-ai/shared": "*"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "4.20260305.0",
+    "@cloudflare/workers-types": "4.20260301.1",
     "@spike-land-ai/eslint-config": "*",
     "@spike-land-ai/tsconfig": "*",
     "typescript": "^5.9.3",

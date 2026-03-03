@@ -124,4 +124,54 @@ describe("bulkDelete", () => {
     // db.imageDelete should only be called for images where storage succeeded
     expect(mocks.db.imageDelete).toHaveBeenCalledTimes(2);
   });
+
+  it("should use bulk optimization when available", async () => {
+    const notify = vi.fn();
+    const ctx = { userId, deps, notify };
+    const images = [
+      mockImageRow({ id: asImageId("img-1"), userId, originalR2Key: "key-1" }),
+      mockImageRow({ id: asImageId("img-2"), userId, originalR2Key: "key-2" }),
+    ];
+    mocks.resolverMocks.resolveImages.mockResolvedValue(images);
+    
+    deps.db.imageDeleteMany = vi.fn().mockResolvedValue(2);
+    deps.storage.deleteMany = vi.fn().mockResolvedValue(2);
+
+    const result = await bulkDelete({ image_ids: ["img-1", "img-2"], confirm: true }, ctx);
+
+    expect(result.isError).toBeUndefined();
+    expect(deps.storage.deleteMany).toHaveBeenCalledWith(["key-1", "key-2"]);
+    expect(deps.db.imageDeleteMany).toHaveBeenCalledWith(["img-1", "img-2"]);
+    const data = JSON.parse(result.content[0].text);
+    expect(data.deleted).toBe(2);
+    expect(data.failed).toBe(0);
+  });
+
+  it("should throw DomainError when storage.deleteMany fails", async () => {
+    const ctx = { userId, deps };
+    const images = [mockImageRow({ id: asImageId("img-1"), userId, originalR2Key: "key-1" })];
+    mocks.resolverMocks.resolveImages.mockResolvedValue(images);
+    
+    deps.db.imageDeleteMany = vi.fn();
+    deps.storage.deleteMany = vi.fn().mockRejectedValue(new Error("Bulk storage err"));
+
+    const result = await bulkDelete({ image_ids: ["img-1"], confirm: true }, ctx);
+
+    expect(result.isError).toBe(true);
+    expect(result.content[0].text).toContain("STORAGE_ERROR");
+  });
+
+  it("should throw DomainError when db.imageDeleteMany fails", async () => {
+    const ctx = { userId, deps };
+    const images = [mockImageRow({ id: asImageId("img-1"), userId, originalR2Key: "key-1" })];
+    mocks.resolverMocks.resolveImages.mockResolvedValue(images);
+    
+    deps.db.imageDeleteMany = vi.fn().mockRejectedValue(new Error("Bulk DB err"));
+    deps.storage.deleteMany = vi.fn().mockResolvedValue(1);
+
+    const result = await bulkDelete({ image_ids: ["img-1"], confirm: true }, ctx);
+
+    expect(result.isError).toBe(true);
+    expect(result.content[0].text).toContain("DB_ERROR");
+  });
 });

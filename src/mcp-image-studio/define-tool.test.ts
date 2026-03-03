@@ -163,4 +163,148 @@ describe("define-tool framework", () => {
       expect(res.content[0].text).toContain("Not enough credits");
     });
   });
+
+  describe("requireOwnership", () => {
+    it("should return UNAUTHORIZED if image is not owned by user", async () => {
+      const tool = defineTool("ownership_test_img", "desc", { image_id: z.string() })
+        .resolves({ image_id: "image" })
+        .requireOwnership(["image_id"])
+        .handler(async () => jsonResult({}));
+      
+      const mockDeps = {
+        resolvers: {
+          resolveImage: vi.fn().mockResolvedValue({ id: "img-1", userId: "other-user" }),
+        }
+      };
+
+      const res = await tool.handler({ image_id: "img-1" }, { userId: "u1", deps: mockDeps as any });
+      expect(res.isError).toBe(true);
+      expect(res.content[0].text).toContain("UNAUTHORIZED");
+    });
+
+    it("should return UNAUTHORIZED if one of images is not owned by user", async () => {
+      const tool = defineTool("ownership_test_imgs", "desc", { image_ids: z.array(z.string()) })
+        .resolves({ image_ids: "images" })
+        .requireOwnership(["image_ids"])
+        .handler(async () => jsonResult({}));
+      
+      const mockDeps = {
+        resolvers: {
+          resolveImages: vi.fn().mockResolvedValue([
+            { id: "img-1", userId: "u1" },
+            { id: "img-2", userId: "other-user" }
+          ]),
+        }
+      };
+
+      const res = await tool.handler({ image_ids: ["img-1", "img-2"] }, { userId: "u1", deps: mockDeps as any });
+      expect(res.isError).toBe(true);
+      expect(res.content[0].text).toContain("UNAUTHORIZED");
+    });
+
+    it("should return UNAUTHORIZED if album is not owned by user", async () => {
+      const tool = defineTool("ownership_test_album", "desc", { album_handle: z.string() })
+        .resolves({ album_handle: "album" })
+        .requireOwnership(["album_handle"])
+        .handler(async () => jsonResult({}));
+      
+      const mockDeps = {
+        resolvers: {
+          resolveAlbum: vi.fn().mockResolvedValue({ handle: "alb", userId: "other-user" }),
+        }
+      };
+
+      const res = await tool.handler({ album_handle: "alb" }, { userId: "u1", deps: mockDeps as any });
+      expect(res.isError).toBe(true);
+      expect(res.content[0].text).toContain("UNAUTHORIZED");
+    });
+  });
+
+  describe("validates and contextValidates", () => {
+    it("should run custom validates before resolution", async () => {
+      const tool = defineTool("val_test", "desc", { val: z.string() })
+        .validate((input) => {
+          if (input.val === "bad") return { isError: true, content: [{ type: "text", text: "BAD_VAL" }] };
+        })
+        .handler(async () => jsonResult({}));
+      
+      const res = await tool.handler({ val: "bad" }, { userId: "u1", deps: {} as any });
+      expect(res.isError).toBe(true);
+      expect(res.content[0].text).toContain("BAD_VAL");
+    });
+
+    it("should run contextValidates after resolution", async () => {
+      const tool = defineTool("cval_test", "desc", { val: z.string() })
+        .resolves({ val: "image" })
+        .validateContext((input, ctx) => {
+          if (ctx.entities.val.name === "bad-name") return { isError: true, content: [{ type: "text", text: "BAD_NAME" }] };
+        })
+        .handler(async () => jsonResult({}));
+      
+      const mockDeps = {
+        resolvers: {
+          resolveImage: vi.fn().mockResolvedValue({ id: "img-1", name: "bad-name", userId: "u1" }),
+        }
+      };
+
+      const res = await tool.handler({ val: "img-1" }, { userId: "u1", deps: mockDeps as any });
+      expect(res.isError).toBe(true);
+      expect(res.content[0].text).toContain("BAD_NAME");
+    });
+  });
+
+  describe("agentInstructions", () => {
+    it("should append agent instructions to output", async () => {
+      const tool = defineTool("agent_test", "desc", { val: z.string() })
+        .agentInstructions("Tell the user hi")
+        .handler(async () => jsonResult({ ok: true }));
+      
+      const res = await tool.handler({ val: "v" }, { userId: "u1", deps: {} as any });
+      expect(res.isError).toBeFalsy();
+      expect(res.content.some(c => c.type === "text" && c.text.includes("Tell the user hi"))).toBe(true);
+    });
+  });
+
+  describe("DomainError catching", () => {
+    it("should catch DomainError and convert to errorResult", async () => {
+      const { DomainError } = await import("./tools/try-catch.js");
+      const tool = defineTool("domain_err_test", "desc", {})
+        .handler(async () => {
+          throw new DomainError("UNKNOWN_ERROR", "A specific domain error", true);
+        });
+      
+      const res = await tool.handler({}, { userId: "u1", deps: {} as any });
+      expect(res.isError).toBe(true);
+      expect(res.content[0].text).toContain("UNKNOWN_ERROR");
+      expect(res.content[0].text).toContain("A specific domain error");
+      expect(res.content[0].text).toContain("Retryable:** true");
+    });
+
+    it("should rethrow non-DomainErrors", async () => {
+      const tool = defineTool("throw_test", "desc", {})
+        .handler(async () => {
+          throw new Error("Normal error");
+        });
+      
+      await expect(tool.handler({}, { userId: "u1", deps: {} as any })).rejects.toThrow("Normal error");
+    });
+  });
+
+  describe("job creation failure", () => {
+    it("should return JOB_CREATE_FAILED if job creation fails", async () => {
+      const tool = defineTool("job_fail_test", "desc", { image_id: z.string() })
+        .job({ imageIdField: "image_id" })
+        .handler(async () => jsonResult({}));
+      
+      const mockDeps = {
+        db: {
+          jobCreate: vi.fn().mockResolvedValue(null) // fails
+        }
+      };
+
+      const res = await tool.handler({ image_id: "img-1" }, { userId: "u1", deps: mockDeps as any });
+      expect(res.isError).toBe(true);
+      expect(res.content[0].text).toContain("JOB_CREATE_FAILED");
+    });
+  });
 });

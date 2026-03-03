@@ -156,18 +156,13 @@ export function ChatWidget() {
             </div>
           )}
           <div className="space-y-5">
-            {messages.map((msg) => (
-              <ChatMessage key={msg.id} message={msg} />
+            {messages.map((msg, i) => (
+              <ChatMessage
+                key={msg.id}
+                message={msg}
+                isStreaming={isStreaming && msg.role === "assistant" && i === messages.length - 1}
+              />
             ))}
-            {isStreaming && (
-              <div className="flex items-center gap-2 text-amber-neon/50">
-                <div className="flex gap-1">
-                  <div className="w-1.5 h-1.5 rounded-full bg-amber-neon animate-bounce" style={{ animationDelay: "0ms" }} />
-                  <div className="w-1.5 h-1.5 rounded-full bg-amber-neon animate-bounce" style={{ animationDelay: "150ms" }} />
-                  <div className="w-1.5 h-1.5 rounded-full bg-amber-neon animate-bounce" style={{ animationDelay: "300ms" }} />
-                </div>
-              </div>
-            )}
           </div>
         </div>
 

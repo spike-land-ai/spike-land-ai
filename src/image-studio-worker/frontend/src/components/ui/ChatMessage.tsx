@@ -135,9 +135,11 @@ function SimpleMarkdown({ text, isUser }: { text: string; isUser: boolean }) {
   );
 }
 
-export function ChatMessage({ message }: ChatMessageProps) {
+export function ChatMessage({ message, isStreaming }: ChatMessageProps & { isStreaming?: boolean }) {
   const isUser = message.role === "user";
-  const isEmpty = !message.content && (!message.toolCalls || message.toolCalls.length === 0);
+  const hasContent = !!message.content;
+  const hasToolCalls = !!(message.toolCalls && message.toolCalls.length > 0);
+  const isEmpty = !hasContent && !hasToolCalls;
 
   return (
     <div className={`flex ${isUser ? "justify-end" : "justify-start"} group`}>
@@ -148,19 +150,20 @@ export function ChatMessage({ message }: ChatMessageProps) {
             : "glass-panel border-white/5 text-gray-200 rounded-tl-sm"
         }`}
       >
-        {isEmpty ? (
+        {isEmpty && isStreaming ? (
           <LoadingDots />
         ) : (
           <div className="flex gap-3">
             <div className="flex-1 space-y-2.5 overflow-hidden">
-              {message.content && (
+              {hasContent && (
                 <div className={`text-xs ${isUser ? "font-bold" : "font-medium leading-relaxed"}`}>
                   <SimpleMarkdown text={message.content} isUser={isUser} />
+                  {isStreaming && <span className="inline-block w-0.5 h-3 bg-amber-neon ml-0.5 animate-pulse align-text-bottom" />}
                 </div>
               )}
-              {message.toolCalls && message.toolCalls.length > 0 && (
+              {hasToolCalls && (
                 <div className="space-y-2">
-                  {message.toolCalls.map((tc, i) => (
+                  {message.toolCalls!.map((tc, i) => (
                     <ToolCallCard key={`${tc.name}-${i}`} tc={tc} />
                   ))}
                 </div>

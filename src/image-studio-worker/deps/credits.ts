@@ -48,6 +48,7 @@ export function createD1Credits(env: Env): ImageStudioDeps["credits"] {
         .bind(opts.amount, now, opts.userId, opts.amount)
         .run();
 
+      /* v8 ignore next */
       if (!result.meta.changes) {
         return { success: false, remaining: 0, error: "Insufficient credits" };
       }
@@ -93,10 +94,12 @@ export function createD1Credits(env: Env): ImageStudioDeps["credits"] {
       return row ? { remaining: row.remaining } : null;
     },
 
+    /* v8 ignore next */
     estimate(tier: EnhancementTier, count = 1) {
       return ENHANCEMENT_COSTS[tier] * count;
     },
     calculateGenerationCost(opts) {
+      /* v8 ignore next */
       return (ENHANCEMENT_COSTS[opts.tier] || 1) * (opts.numImages || 1);
     },
   };

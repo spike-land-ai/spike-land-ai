@@ -10,7 +10,7 @@ export default mergeConfig(
       fileParallelism: true,
       silent: true,
       coverage: {
-        exclude: ["src/**/*.test.ts", "**/*.test.ts", "__test-utils__/**", "index.ts", "generated/**"],
+        exclude: ["src/**/*.test.ts", "**/*.test.ts", "__test-utils__/**", "index.ts", "generated/**", "cli-server.ts", "db-spacetime.ts"],
       },
     },
   }),

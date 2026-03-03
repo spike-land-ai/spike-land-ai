@@ -338,6 +338,18 @@ describe("createR2Storage", () => {
   });
 });
 
+  it("uploads bytes with fallback bin extension", async () => {
+    const { createR2Storage } = await import("./deps/storage.ts");
+    const mockPut = vi.fn().mockResolvedValue(undefined);
+    const mockEnv = { IMAGE_R2: { put: mockPut } } as any;
+    const storage = createR2Storage(mockEnv, "https://cdn.example.com");
+    const result = await storage.upload("user-xyz", new Uint8Array([0xff]), {
+      filename: "noextension",
+      contentType: "image/jpeg",
+    });
+    expect(result.r2Key.endsWith(".bin")).toBe(true);
+  });
+
 // ─── Auth helper Tests ────────────────────────────────────────────────────────
 
 describe("validateSession", () => {

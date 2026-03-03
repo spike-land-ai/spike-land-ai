@@ -17,11 +17,11 @@
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.27.1",
-    "better-auth": "^1.5.1",
+    "better-auth": "^1.5.2",
     "drizzle-orm": "^0.45.1"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "4.20260305.0",
+    "@cloudflare/workers-types": "4.20260301.1",
     "@spike-land-ai/eslint-config": "*",
     "@spike-land-ai/tsconfig": "*",
     "@vitest/coverage-v8": "^4.0.18",

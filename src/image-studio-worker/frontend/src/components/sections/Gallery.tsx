@@ -221,6 +221,13 @@ export function Gallery() {
               }}
               actions={[
                 {
+                  label: "Edit in Studio",
+                  onClick: () => {
+                    sessionStorage.setItem("studio_initial_image", JSON.stringify({ url: img.originalUrl, name: img.name }));
+                    window.location.hash = "#/studio";
+                  }
+                },
+                {
                   label: "Delete",
                   onClick: () => setDeleteTarget({ id: img.id, name: img.name }),
                   danger: true,

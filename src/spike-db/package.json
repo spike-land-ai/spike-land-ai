@@ -15,14 +15,14 @@
     "lint": "eslint src/"
   },
   "dependencies": {
-    "hono": "^4.7.10",
-    "zod": "^3.24.2"
+    "hono": "^4.12.4",
+    "zod": "^3.25.76"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^4.20250214.0",
+    "@cloudflare/workers-types": "4.20260301.1",
     "@vitest/coverage-v8": "4.0.18",
-    "typescript": "^5.8.3",
+    "typescript": "^5.9.3",
     "vitest": "4.0.18",
-    "wrangler": "^4.14.1"
+    "wrangler": "^4.69.0"
   }
 }

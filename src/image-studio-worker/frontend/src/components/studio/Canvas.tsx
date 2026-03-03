@@ -1,10 +1,11 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect, useCallback } from "react";
 import { useCanvas } from "../../hooks/useCanvas";
 import { Sparkles, MousePointer2, Loader2, Plus, Minus, X, Trash2 } from "lucide-react";
 import { ToolOrb } from "./ToolOrb";
 import { UploadZone } from "./UploadZone";
 import { DetailsPanel } from "./DetailsPanel";
 import { StudioEngine } from "../../services/studio-engine";
+import { callTool, parseToolResult } from "../../api/client";
 import { toast } from "sonner";
 
 export function Canvas() {
@@ -16,6 +17,7 @@ export function Canvas() {
     handleWheel,
     setSelectedAssetId,
     updateAssetPosition,
+    updateAsset,
     addAsset,
     setZoom,
     handleTouchStart,
@@ -26,7 +28,69 @@ export function Canvas() {
 
   const [prompt, setPrompt] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
+  const [pendingJobs, setPendingJobs] = useState<Map<string, string>>(new Map()); // assetId -> jobId
   const containerRef = useRef<HTMLDivElement>(null);
+
+  // Poll pending generation jobs and update asset URLs when complete
+  const pollJob = useCallback(async (assetId: string, jobId: string) => {
+    try {
+      const result = await callTool("img_job_status", { job_id: jobId });
+      const data = parseToolResult<Record<string, unknown>>(result);
+      const status = data.status as string;
+
+      if (status === "COMPLETED") {
+        const url = (data.outputUrl ?? data.outputImageUrl) as string | undefined;
+        if (url) {
+          updateAsset(assetId, { url });
+        }
+        setPendingJobs(prev => { const next = new Map(prev); next.delete(assetId); return next; });
+        return true;
+      }
+      if (status === "FAILED" || status === "CANCELLED") {
+        const msg = (data.error ?? data.errorMessage ?? "Generation failed") as string;
+        toast.error(msg);
+        setPendingJobs(prev => { const next = new Map(prev); next.delete(assetId); return next; });
+        return true;
+      }
+      return false;
+    } catch {
+      return false;
+    }
+  }, [updateAsset]);
+
+  useEffect(() => {
+    if (pendingJobs.size === 0) return;
+    let cancelled = false;
+    const run = async () => {
+      for (const [assetId, jobId] of pendingJobs) {
+        if (cancelled) return;
+        await pollJob(assetId, jobId);
+      }
+      if (!cancelled && pendingJobs.size > 0) {
+        setTimeout(run, 3000);
+      }
+    };
+    run();
+    return () => { cancelled = true; };
+  }, [pendingJobs, pollJob]);
+
+  useEffect(() => {
+    const initial = sessionStorage.getItem("studio_initial_image");
+    if (initial) {
+      sessionStorage.removeItem("studio_initial_image");
+      try {
+        const { url, name } = JSON.parse(initial);
+        const assetId = `asset-${Date.now()}`;
+        addAsset({
+          id: assetId,
+          type: "image",
+          url,
+          name
+        });
+        setTimeout(() => setSelectedAssetId(assetId), 100);
+      } catch (e) {}
+    }
+  }, [addAsset, setSelectedAssetId]);
 
   const selectedAsset = assets.find(a => a.id === selectedAssetId) || null;
 
@@ -46,13 +110,16 @@ export function Canvas() {
     const toastId = toast.loading("Sparking your vision...");
     
     try {
-      const result = await StudioEngine.generateAsset(prompt);
+      const result = await StudioEngine.generateAsset(prompt) as { jobId?: string; job_id?: string };
+      const jobId = result.jobId ?? result.job_id ?? `gen-${Date.now()}`;
+      const assetId = `asset-${jobId}`;
       addAsset({
-        id: (result as { jobId: string }).jobId || `gen-${Date.now()}`,
+        id: assetId,
         type: "image",
-        url: "https://placehold.co/600x400/020203/white?text=Generating...",
+        url: "generating",
         name: prompt
       });
+      setPendingJobs(prev => new Map(prev).set(assetId, jobId));
       setPrompt("");
       toast.success("Vision captured on canvas", { id: toastId });
     } catch (err: unknown) {
@@ -137,20 +204,21 @@ export function Canvas() {
                 ? "ring-2 ring-amber-neon shadow-[0_0_50px_rgba(255,170,0,0.3)] scale-105" 
                 : "opacity-80 grayscale-[0.5] hover:opacity-100 hover:grayscale-0"
             }`}>
-              <div className={`relative aspect-square bg-obsidian-900 flex items-center justify-center ${asset.url.includes("Generating") ? "animate-pulse" : ""}`}>
-                {asset.url.includes("Generating") && (
-                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full animate-[shimmer_2s_infinite]" />
-                )}
-                <img 
-                  src={asset.url} 
-                  alt={asset.name} 
-                  className={`w-full h-full object-cover transition-opacity duration-1000 ${asset.url.includes("Generating") ? "opacity-0" : "opacity-100"}`} 
-                />
-                {asset.url.includes("Generating") && (
-                  <div className="flex flex-col items-center gap-4">
-                    <Loader2 className="w-8 h-8 text-amber-neon animate-spin" />
-                    <span className="text-[8px] font-black uppercase tracking-[0.3em] text-amber-neon/50">Neural Flux</span>
-                  </div>
+              <div className={`relative aspect-square bg-obsidian-900 ${asset.url === "generating" ? "animate-pulse" : ""}`}>
+                {asset.url === "generating" ? (
+                  <>
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full animate-[shimmer_2s_infinite]" />
+                    <div className="absolute inset-0 flex flex-col items-center justify-center">
+                      <Loader2 className="w-8 h-8 text-amber-neon animate-spin" />
+                      <span className="mt-4 text-[8px] font-black uppercase tracking-[0.3em] text-amber-neon/50">Neural Flux</span>
+                    </div>
+                  </>
+                ) : (
+                  <img
+                    src={asset.url}
+                    alt={asset.name}
+                    className="w-full h-full object-cover transition-opacity duration-1000"
+                  />
                 )}
               </div>
               <div className="p-4 bg-obsidian-900/90 backdrop-blur-md border-t border-white/5">

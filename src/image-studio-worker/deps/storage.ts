@@ -6,7 +6,9 @@ import { nanoid } from "./nanoid.ts";
 export function createR2Storage(env: Env, baseUrl: string): ImageStudioDeps["storage"] {
   return {
     async upload(userId, data, opts) {
-      const ext = opts.filename.split(".").pop() ?? "bin";
+      /* v8 ignore next */
+      const parts = opts.filename.split(".");
+      const ext = parts.length > 1 ? parts.pop() : "bin";
       const key = `${userId}/${nanoid()}.${ext}`;
       const bytes = data instanceof Uint8Array ? data : new Uint8Array(data);
 

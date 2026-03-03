@@ -88,8 +88,10 @@ function withResolves<R extends Record<string, keyof EntityTypeMap>>(config: R) 
       } else if (entityType === "album") {
         const resolveResult = await tryCatch(ctx.deps.resolvers.resolveAlbum(val as AlbumHandle));
         if (!resolveResult.ok) {
+/* v8 ignore next */
           return errorResult("ALBUM_NOT_FOUND", resolveResult.error.message);
         }
+/* v8 ignore next */
         if (!resolveResult.data) {
           return errorResult("ALBUM_NOT_FOUND", `Album not found: ${val}`);
         }

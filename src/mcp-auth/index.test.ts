@@ -177,7 +177,7 @@ describe("worker fetch handler", () => {
     it("returns 404 with CORS headers", async () => {
       const req = makeRequest("GET", "/unknown");
       const res = await worker.fetch(req, makeEnv());
-      expect(res.headers.get("Access-Control-Allow-Origin")).toBe("*");
+      expect(res.headers.get("Access-Control-Allow-Origin")).toBe("https://image-studio-mcp.spike.land");
     });
 
     it("returns 'Not found' body for unknown path", async () => {

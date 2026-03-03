@@ -33,7 +33,7 @@
   },
   "devDependencies": {
     "@spike-land-ai/tsconfig": "*",
-    "playwright": "^1.52.0",
+    "playwright": "^1.58.2",
     "typescript": "5.9.3",
     "vitest": "^4.0.18"
   },

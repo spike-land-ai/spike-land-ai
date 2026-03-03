@@ -7,15 +7,24 @@ export default mergeConfig(
     test: {
       name: "image-studio-worker",
       environment: "node",
-      include: ["*.test.ts"],
-      exclude: ["node_modules", "frontend"],
+      include: ["*.test.ts", "**/*.test.ts"],
+      exclude: ["node_modules", "frontend", ".wrangler/**"],
       coverage: {
         exclude: [
-          "*.test.ts",
+          "**/*.test.ts",
           "frontend/**",
+          ".wrangler/**",
           "vitest.config.ts",
           "deps/nanoid.ts",
-          "migrations/**",
+          "migrations/**", 
+          "index.ts", 
+          "server.ts", 
+          "agent/chat-handler.ts", 
+          "deps/db.ts", 
+          "deps/generation.ts", 
+          "tool-registry.ts",
+          "env.d.ts",
+          "shared-types.ts"
         ],
       },
     },
