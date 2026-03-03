@@ -10,10 +10,10 @@ export default mergeConfig(
       pool: "forks",
       fileParallelism: true,
       silent: true,
-      include: ["src/**/*.test.ts", "src/**/*.test.tsx"],
+      include: ["**/*.test.ts", "**/*.test.tsx"],
       coverage: {
-        include: ["src/**/*.ts", "src/**/*.tsx"],
-        exclude: ["src/**/*.test.ts", "src/**/*.test.tsx", "src/__test-utils__/**", "src/index.ts"],
+        include: ["**/*.ts", "**/*.tsx"],
+        exclude: ["**/*.test.ts", "**/*.test.tsx", "__test-utils__/**", "index.ts"],
       },
     },
   }),

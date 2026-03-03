@@ -46,7 +46,7 @@
     "types:build": "tsc --build",
     "types:watch": "tsc --watch",
     "types:cp": "cp -r dts/src/reactMod.d.ts dts/src/reactDom.d.ts dts/src/jsx.d.ts dts/src/emotion.d.ts dts/src/reactDomClient.d.ts dist/ && cp -r dts/src/@ dist/.",
-    "test": "sh scripts/run-tests.sh",
+    "test": "vitest run",
     "test:coverage": "vitest run --coverage",
     "test:full": "npm run types:check && npm run lint && npm run test",
     "clean": "rm -rf .tsBuildInfo dist dts dist-vite && mkdir -p dist dts dist-vite",

@@ -6,7 +6,7 @@ export default mergeConfig(
   defineConfig({
     test: {
       name: "js.spike.land",
-      include: ["src/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}"],
+      include: ["**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}"],
     },
   }),
 );
