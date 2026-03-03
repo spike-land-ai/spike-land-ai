@@ -124,6 +124,7 @@ export async function proxy(request: NextRequest) {
   // to trigger a hard reload (prevents "Failed to find Server Action" errors).
   const DEPLOYMENT_ID =
     process.env.NEXT_DEPLOYMENT_ID ||
+    process.env.CF_DEPLOYMENT_ID ||
     process.env.VERCEL_DEPLOYMENT_ID ||
     process.env.VERCEL_GIT_COMMIT_SHA ||
     "";
@@ -237,8 +238,8 @@ export async function proxy(request: NextRequest) {
   requestHeaders.set(CSP_NONCE_HEADER, nonce);
   if (!isEmbedRoute) {
     requestHeaders.set("Content-Security-Policy", cspHeader);
-    // Next.js 13+ requires this specific header format to detect CSP from middleware
-    // and apply the nonce to its dynamically generated inline scripts
+    // Next.js/vinext uses this header to detect CSP from middleware
+    // and apply the nonce to dynamically generated inline scripts
     requestHeaders.set("x-middleware-request-content-security-policy", cspHeader);
   }
 
@@ -346,16 +347,14 @@ export async function proxy(request: NextRequest) {
     );
   }
 
-  // Check authentication status
-  const sessionRes = await fetch(`${request.nextUrl.origin}/api/auth/get-session`, {
-    headers: {
-      cookie: request.headers.get("cookie") || "",
-    },
-  }).catch(() => null);
-  const session = sessionRes?.ok ? await sessionRes.json().catch(() => null) : null;
+  // Check authentication via session cookie presence.
+  // On Cloudflare Workers, self-fetch (loopback) is not possible, so we use
+  // a lightweight cookie check instead of calling /api/auth/get-session.
+  // The actual session validity is verified server-side when the page loads.
+  const hasSession = SESSION_COOKIES.some((name) => request.cookies.has(name));
 
   // If user is not authenticated, redirect to sign in page with callback URL
-  if (!session?.user) {
+  if (!hasSession) {
     const url = new URL("/", request.url);
     url.searchParams.set("auth", "required");
     url.searchParams.set("callbackUrl", pathname);
