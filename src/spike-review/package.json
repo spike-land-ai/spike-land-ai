@@ -27,7 +27,7 @@
     "typecheck": "tsc --noEmit",
     "lint": "eslint --quiet .",
     "start": "node dist/cli.js",
-    "deploy": "wrangler deploy"
+    "deploy": "npx wrangler deploy"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "1.27.1",

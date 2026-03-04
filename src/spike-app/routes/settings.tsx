@@ -10,8 +10,9 @@ export function SettingsPage() {
         <h2 className="mb-4 text-lg font-semibold">Profile</h2>
         <div className="space-y-4">
           <div>
-            <label className="mb-1 block text-sm font-medium">Display Name</label>
+            <label htmlFor="displayName" className="mb-1 block text-sm font-medium">Display Name</label>
             <input
+              id="displayName"
               type="text"
               defaultValue={isAuthenticated ? (user?.name ?? "") : ""}
               className="w-full rounded-lg border px-4 py-2"
@@ -19,8 +20,9 @@ export function SettingsPage() {
             />
           </div>
           <div>
-            <label className="mb-1 block text-sm font-medium">Email</label>
+            <label htmlFor="email" className="mb-1 block text-sm font-medium">Email</label>
             <input
+              id="email"
               type="email"
               defaultValue={isAuthenticated ? (user?.email ?? "") : ""}
               className="w-full rounded-lg border px-4 py-2"
@@ -28,8 +30,9 @@ export function SettingsPage() {
             />
           </div>
           <div>
-            <label className="mb-1 block text-sm font-medium">Avatar URL</label>
+            <label htmlFor="avatarUrl" className="mb-1 block text-sm font-medium">Avatar URL</label>
             <input
+              id="avatarUrl"
               type="url"
               defaultValue={isAuthenticated ? ((user?.picture as string) ?? "") : ""}
               className="w-full rounded-lg border px-4 py-2"
