@@ -1,35 +1,48 @@
-import { Link, useParams } from "@tanstack/react-router";
-import { useCallback, useState } from "react";
+import { Link, useParams, useSearch, useNavigate, createRoute } from "@tanstack/react-router";
+import { useCallback, useState, useEffect } from "react";
 import { type AppStatus, StatusBadge } from "@/components/StatusBadge";
 import { ChatThread, type Message } from "@/components/ChatThread";
 import { type AppVersion, VersionHistory } from "@/components/VersionHistory";
 import { LivePreview } from "@/components/LivePreview";
+import { AppProductPage } from "@/components/AppProductPage";
+import { z } from "zod";
 
-const tabs = ["Chat", "Versions", "Preview"] as const;
+const tabs = ["App", "Chat", "Versions", "Preview"] as const;
 type Tab = (typeof tabs)[number];
 
-// Placeholder data until real-time subscriptions are wired
-const placeholderVersions: AppVersion[] = [
-  {
-    version: 1,
-    changeDescription: "Initial version - scaffolded from prompt",
-    author: "agent",
-    timestamp: new Date(Date.now() - 86400000).toISOString(),
-  },
-  {
-    version: 2,
-    changeDescription: "Added responsive layout and dark mode support",
-    author: "agent",
-    timestamp: new Date(Date.now() - 3600000).toISOString(),
-  },
-];
+const appSearchSchema = z.object({
+  tab: z.enum(tabs).optional().catch("App"),
+});
 
 export function AppDetailPage() {
   const { appId } = useParams({ strict: false });
-  const [activeTab, setActiveTab] = useState<Tab>("Chat");
+  const search = useSearch({ from: "/apps/$appId" });
+  const navigate = useNavigate();
+
+  const activeTab = search.tab || "App";
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [appStatus] = useState<AppStatus>("live");
+
+  const setActiveTab = useCallback((tab: Tab) => {
+    navigate({
+      to: "/apps/$appId",
+      params: { appId: appId ?? "" },
+      search: (prev) => ({ ...prev, tab }),
+    });
+  }, [navigate, appId]);
+
+
+  useEffect(() => {
+    const handleTabChange = (e: Event) => {
+      const customEvent = e as CustomEvent<Tab>;
+      if (tabs.includes(customEvent.detail)) {
+        setActiveTab(customEvent.detail);
+      }
+    };
+    window.addEventListener("change-tab", handleTabChange);
+    return () => window.removeEventListener("change-tab", handleTabChange);
+  }, [setActiveTab]);
 
   const handleSendMessage = useCallback(
     (content: string) => {
@@ -120,7 +133,8 @@ export function AppDetailPage() {
       </div>
 
       {/* Tab content */}
-      <div className="min-h-0 flex-1 rounded-xl border bg-white">
+      <div className="min-h-0 flex-1 rounded-xl border bg-white overflow-y-auto">
+        {activeTab === "App" && <AppProductPage appId={appId ?? ""} />}
         {activeTab === "Chat" && (
           <ChatThread messages={messages} onSendMessage={handleSendMessage} isLoading={isLoading} />
         )}

@@ -64,15 +64,28 @@ export function RootLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   useAnalytics();
 
-  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const location = useRouterState({ select: (s) => s.location });
+  const { pathname, searchStr } = location;
 
   useEffect(() => {
     // Match exact path first, then strip dynamic segments for a best-effort match
-    const meta = ROUTE_META[pathname] ??
+    let meta = ROUTE_META[pathname] ??
       ROUTE_META[pathname.replace(/\/[^/]+$/, "")] ?? {
         title: DEFAULT_TITLE,
         description: DEFAULT_DESCRIPTION,
       };
+
+    // Special handling for dynamic app pages
+    if (pathname.startsWith("/apps/") && pathname !== "/apps/new") {
+      const appId = pathname.split("/")[2];
+      const search = new URLSearchParams(searchStr);
+      const tab = search.get("tab") || "App";
+      const appName = appId ? appId.replace(/-/g, " ").replace(/\b\w/g, (l) => l.toUpperCase()) : "App";
+      meta = {
+        title: `${appName} (${tab}) — spike.land`,
+        description: `Explore ${appName} on spike.land — the AI multi-agent operating system.`,
+      };
+    }
 
     document.title = meta.title;
 
@@ -93,14 +106,14 @@ export function RootLayout() {
 
     const canonical = document.querySelector<HTMLLinkElement>('link[rel="canonical"]');
     if (canonical) {
-      canonical.href = `https://spike.land${pathname === "/" ? "" : pathname}`;
+      canonical.href = `https://spike.land${pathname === "/" ? "" : pathname}${searchStr}`;
     }
 
     const ogUrl = document.querySelector<HTMLMetaElement>('meta[property="og:url"]');
     if (ogUrl) {
-      ogUrl.content = `https://spike.land${pathname === "/" ? "" : pathname}`;
+      ogUrl.content = `https://spike.land${pathname === "/" ? "" : pathname}${searchStr}`;
     }
-  }, [pathname]);
+  }, [pathname, searchStr]);
 
   return (
     <div className="flex h-screen bg-gray-50 text-gray-900">

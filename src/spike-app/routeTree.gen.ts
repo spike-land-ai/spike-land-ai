@@ -40,8 +40,8 @@ const toolsIndexRoute = createRoute({
 
 const toolsCategoryRoute = createRoute({
   getParentRoute: () => rootRoute,
-  path: "/tools/$category",
-  component: lazyRouteComponent(() => import("./routes/tools/$category"), "ToolsCategoryPage"),
+  path: "/tools/$toolName",
+  component: lazyRouteComponent(() => import("./routes/tools/$toolName"), "ToolsCategoryPage"),
 });
 
 const appsIndexRoute = createRoute({
