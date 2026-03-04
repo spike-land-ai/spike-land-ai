@@ -70,28 +70,9 @@ security incident occurs or as part of regular security hygiene.
 4. Update STRIPE_WEBHOOK_SECRET in all environments
 5. Verify webhook delivery in Stripe dashboard
 
-### 2. Database Credentials (CRITICAL)
+### 2. Database Credentials (Legacy)
 
-**Impact**: All database operations will fail; users cannot log in
-
-```bash
-# 1. Go to Neon Console
-# https://console.neon.tech
-
-# 2. Select your project > Settings > Connection
-
-# 3. Reset the password for the database role
-
-# 4. Update connection strings in all environments:
-# - DATABASE_URL (pooled connection)
-# - DATABASE_URL_UNPOOLED (direct connection for migrations)
-
-# 5. Verify database connectivity
-npx prisma db pull
-
-# 6. Run a test query
-npx prisma studio
-```
+> **Note:** The platform now uses Cloudflare D1 (no connection strings needed). This section applies only to the legacy `packages/spike.land` PostgreSQL database.
 
 ### 3. AUTH_SECRET (HIGH)
 
@@ -163,6 +144,16 @@ openssl rand -base64 32
 3. Create new credentials
 4. Update TWILIO_ACCOUNT_SID and TWILIO_AUTH_TOKEN
 5. Revoke old credentials
+
+### 9. Cloudflare API Token (HIGH)
+
+**Impact**: Worker deployments and D1 operations will fail
+
+1. Go to https://dash.cloudflare.com/profile/api-tokens
+2. Create a new API token with "Edit Cloudflare Workers" template
+3. Update `CLOUDFLARE_API_TOKEN` in GitHub Secrets
+4. Test with `wrangler whoami`
+5. Revoke old token
 
 ## Post-Rotation Checklist
 

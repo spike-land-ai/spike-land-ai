@@ -178,14 +178,9 @@ All secrets are set via `wrangler secret put <NAME>` per worker.
 - **Publishing**: Changesets on main branch push to GitHub Packages npm registry
 - **Registry**: npm.pkg.github.com/@spike-land-ai
 
-### spike.land (legacy, separate repo)
+### spike.land (legacy)
 
-- **Workflow**: `spike-land-ai/spike.land/.github/workflows/deploy.yml`
-- **Triggers**: Manual workflow_dispatch or push to main
-- **Steps**: ESLint, TypeScript, Vitest (4 shards), Next.js build, AWS ECS
-  deploy
-- **Environments**: staging, production
-- **Deploy role**: arn:aws:iam::382539351820:role/github-actions-deploy
+> **Note:** AWS ECS deploy pipeline was decommissioned on 2026-03-02. spike.land is legacy-only.
 
 ### Cloudflare Workers (spike-land-backend, transpile, spike-land-mcp, etc.)
 
@@ -268,8 +263,4 @@ make health
 ```bash
 # Deploy all Cloudflare Workers (CI does this automatically)
 # Per-package: cd src/<name> && npm run w:deploy:prod
-
-# Deploy spike.land (legacy)
-gh workflow run deploy.yml --repo spike-land-ai/spike.land -f target_environment=production
-
 ```
