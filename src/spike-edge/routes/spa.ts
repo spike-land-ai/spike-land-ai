@@ -30,6 +30,7 @@ spa.get("/*", async (c) => {
     const isImmutable = IMMUTABLE_EXTENSIONS.has(ext) && isHashedAsset(key);
     const ttl = isImmutable ? 31536000 : 3600;
 
+    const cacheKey = `${c.req.url}?_cv=${c.env.CACHE_VERSION ?? "v1"}`;
     const cached = await withEdgeCache(c.req.raw, safeCtx(c), async () => {
       const object = await c.env.SPA_ASSETS.get(key);
       if (!object) return null;
@@ -38,7 +39,7 @@ spa.get("/*", async (c) => {
       object.writeHttpMetadata(headers);
       headers.set("etag", object.httpEtag);
       return new Response(object.body, { headers });
-    }, { ttl, swr: isImmutable ? undefined : 3600, immutable: isImmutable });
+    }, { ttl, swr: isImmutable ? undefined : 3600, immutable: isImmutable, cacheKey });
 
     if (cached) return cached;
 

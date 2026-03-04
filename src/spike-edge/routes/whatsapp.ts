@@ -330,7 +330,7 @@ whatsapp.post("/whatsapp/webhook", async (c) => {
   // 8. Log message and send reply
   const now = Date.now();
   const logWork = c.env.DB.prepare(
-    "INSERT INTO whatsapp_message_log (id, user_id, phone_hash, direction, command, message_preview, created_at) VALUES (lower(hex(randomblob(16))), ?, ?, 'inbound', ?, ?, ?)",
+    "INSERT INTO whatsapp_message_log (id, user_id, phone_hash, direction, command, message_preview, status, created_at) VALUES (lower(hex(randomblob(16))), ?, ?, 'inbound', ?, ?, 'ok', ?)",
   )
     .bind(userId, phoneHash, cmd.name, payload.message.slice(0, 100), now)
     .run();

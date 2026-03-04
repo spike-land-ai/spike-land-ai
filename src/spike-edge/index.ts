@@ -23,6 +23,7 @@ import { apiKeys } from "./routes/api-keys.js";
 import { cockpit } from "./routes/cockpit.js";
 import { credits } from "./routes/credits.js";
 import { creditMeterMiddleware } from "./middleware/credit-meter.js";
+import { support } from "./routes/support.js";
 import { spa } from "./routes/spa.js";
 
 const app = new Hono<{ Bindings: Env }>();
@@ -79,7 +80,7 @@ app.use("*", async (c, next) => {
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
       "img-src 'self' https://*.r2.dev https://*.r2.cloudflarestorage.com https://avatars.githubusercontent.com https://*.googleusercontent.com data: blob:",
       "font-src 'self' https://fonts.gstatic.com data:",
-      "connect-src 'self' https://edge.spike.land https://auth-mcp.spike.land https://mcp.spike.land wss://spike.land blob: data:",
+      "connect-src 'self' https://edge.spike.land https://auth-mcp.spike.land https://mcp.spike.land https://checkout.stripe.com wss://spike.land blob: data:",
       "worker-src 'self' blob:",
       "frame-src 'self' https://edge.spike.land",
       "object-src 'none'",
@@ -149,6 +150,7 @@ app.route("/", billing);
 app.route("/", apiKeys);
 app.route("/", cockpit);
 app.route("/", credits);
+app.route("/", support);
 
 // MCP tools listing proxy (public, no auth required)
 app.get("/mcp/tools", async (c) => {

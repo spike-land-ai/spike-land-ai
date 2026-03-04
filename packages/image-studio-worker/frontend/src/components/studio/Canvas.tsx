@@ -149,6 +149,29 @@ export function Canvas() {
     }
   };
 
+  const resolveImageId = async (asset: (typeof assets)[0]): Promise<string | null> => {
+    // If metadata already has an image_id, use it
+    if (asset.metadata?.image_id) return asset.metadata.image_id as string;
+
+    // Try to extract jobId from asset ID (format: asset-<jobId>)
+    const jobId = asset.id.replace(/^asset-/, "");
+    if (!jobId || jobId === asset.id) return null;
+
+    try {
+      const result = await callTool("img_job_status", { job_id: jobId });
+      const data = parseToolResult<Record<string, unknown>>(result);
+      const imageId = (data.imageId ?? data.image_id ?? data.outputImageId) as string | undefined;
+      if (imageId) {
+        // Cache it in metadata for future use
+        updateAsset(asset.id, { metadata: { ...asset.metadata, image_id: imageId } });
+        return imageId;
+      }
+    } catch {
+      // Fall through
+    }
+    return null;
+  };
+
   const handleOrbAction = async (action: string) => {
     if (!selectedAssetId) return;
 
@@ -156,7 +179,7 @@ export function Canvas() {
     if (!asset) return;
 
     if (action === "delete") {
-      updateAssetPosition(asset.id, -10000, -10000); // Hacky delete if no proper removeAsset
+      updateAssetPosition(asset.id, -10000, -10000);
       setSelectedAssetId(null);
       toast.success("Asset removed from canvas");
       return;
@@ -165,13 +188,28 @@ export function Canvas() {
     toast.info(`Executing ${action} orchestration...`);
 
     try {
+      const imageId = await resolveImageId(asset);
+      if (!imageId) {
+        toast.error("Could not resolve image ID for this asset");
+        return;
+      }
+
       if (action === "enhance") {
-        await StudioEngine.smartEnhance(asset.id);
+        await callTool("img_enhance", { image_id: imageId, tier: "TIER_2K" });
         toast.success("Enhancement sequence initiated");
       }
+      if (action === "autotag") {
+        const result = await callTool("img_auto_tag", { image_id: imageId });
+        const data = parseToolResult<Record<string, unknown>>(result);
+        toast.success(`Auto-tagged: ${(data.tags as string[])?.join(", ") ?? "done"}`);
+      }
       if (action === "social") {
-        await StudioEngine.createSocialPack(asset.id);
+        await StudioEngine.createSocialPack(imageId);
         toast.success("Social pack appearing on canvas");
+      }
+      if (action === "upscale") {
+        await callTool("img_enhance", { image_id: imageId, tier: "TIER_4K" });
+        toast.success("Upscale initiated (4K tier)");
       }
     } catch (err: unknown) {
       toast.error(err instanceof Error ? err.message : String(err));
@@ -291,7 +329,7 @@ export function Canvas() {
       </div>
 
       {/* Details Panel Integration */}
-      <DetailsPanel asset={selectedAsset} onClose={() => setSelectedAssetId(null)} />
+      <DetailsPanel asset={selectedAsset} onClose={() => setSelectedAssetId(null)} onAction={handleOrbAction} />
 
       {/* Canvas Controls */}
       <div className="absolute top-20 right-4 md:top-auto md:bottom-8 md:left-1/2 md:-translate-x-1/2 glass-panel rounded-2xl p-1 md:p-1.5 flex flex-col md:flex-row items-center gap-1 md:gap-1.5 z-50 shadow-2xl transition-all">

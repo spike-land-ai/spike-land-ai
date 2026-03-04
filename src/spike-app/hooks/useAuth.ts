@@ -1,4 +1,4 @@
-import { useCallback } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { authClient } from "@/lib/auth";
 
 export interface AppUser {
@@ -9,8 +9,35 @@ export interface AppUser {
   preferred_username: string | null;
 }
 
+interface SessionResult {
+  data: { user: { id: string; name: string | null; email: string; image: string | null } } | null;
+  isPending: boolean;
+  error: Error | null;
+}
+
+function useSafeSession(): SessionResult {
+  const result = authClient.useSession();
+  const [authError, setAuthError] = useState<Error | null>(null);
+
+  useEffect(() => {
+    if (result.error && !authError) {
+      setAuthError(result.error as Error);
+    }
+  }, [result.error, authError]);
+
+  if (authError) {
+    return { data: null, isPending: false, error: authError };
+  }
+
+  return {
+    data: result.data as SessionResult["data"],
+    isPending: result.isPending,
+    error: result.error as Error | null,
+  };
+}
+
 export function useAuth() {
-  const { data: session, isPending, error } = authClient.useSession();
+  const { data: session, isPending, error } = useSafeSession();
 
   const isAuthenticated = !!session?.user;
 

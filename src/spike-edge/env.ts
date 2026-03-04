@@ -15,6 +15,7 @@ export interface Env {
   ALLOWED_ORIGINS: string;
   QUIZ_BADGE_SECRET: string;
   GA_MEASUREMENT_ID: string;
+  CACHE_VERSION: string;
   GA_API_SECRET: string;
   WHATSAPP_APP_SECRET: string;
   WHATSAPP_ACCESS_TOKEN: string;

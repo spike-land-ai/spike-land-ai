@@ -1,4 +1,4 @@
-import { useState, useEffect, lazy, Suspense } from "react";
+import { useState, useEffect, useCallback, useRef, lazy, Suspense } from "react";
 import Markdown from "react-markdown";
 import rehypeRaw from "rehype-raw";
 import remarkGfm from "remark-gfm";
@@ -226,7 +226,7 @@ export function BlogPostView({ slug, linkComponent }: { slug: string; linkCompon
         </Markdown>
       </div>
 
-      <SupportBanner title={post.title} slug={post.slug} />
+      <SupportWidget post={post} />
 
       <div className="mt-16 pt-8 border-t border-border">
         <h2 className="text-2xl font-display font-bold text-foreground mb-8 text-center">
@@ -238,16 +238,283 @@ export function BlogPostView({ slug, linkComponent }: { slug: string; linkCompon
   );
 }
 
-function SupportBanner({ title, slug }: { title: string; slug: string }) {
+// ─── Support Widget ─────────────────────────────────────────────────────────
+
+const SLIDER_STOPS = [
+  { amount: 0, label: "Moral support (we accept tears)", sub: "Free. Like our time, apparently." },
+  { amount: 1, label: "One mass-produced coffee", sub: "The kind that tastes like ambition and regret" },
+  { amount: 3, label: "A proper flat white", sub: "Brighton prices, obviously" },
+  { amount: 5, label: "Gian Pierre gets a treat", sub: "He has earned it. Unlike us." },
+  { amount: 10, label: "A week of domain renewals", sub: "spike.land does not host itself" },
+  { amount: 25, label: "One month of Cloudflare Workers", sub: "D1 queries are not free. Except the first billion." },
+  { amount: 50, label: "The 'holy shit someone actually paid' tier", sub: "We will screenshot this and frame it" },
+  { amount: 100, label: "Redundancy survival fund", sub: "One month closer to not having to explain the gap" },
+] as const;
+
+function getArticleCopy(category: string, tags: string[]): string {
+  const lc = category.toLowerCase();
+  const tagSet = new Set(tags.map((t) => t.toLowerCase()));
+
+  if (lc.includes("developer experience") || tagSet.has("developer-tools") || tagSet.has("dx")) {
+    return "This post was debugged with mass-produced coffee and questionable life choices.";
+  }
+  if (lc.includes("ai") || tagSet.has("agents") || tagSet.has("claude") || tagSet.has("llm")) {
+    return "Training AI costs money. Training the humans who wrangle AI costs dignity. Both are running low.";
+  }
+  if (lc.includes("architecture") || lc.includes("infrastructure") || tagSet.has("cloudflare")) {
+    return "Every Worker invocation is a prayer to the edge. Some prayers need funding.";
+  }
+  if (lc.includes("testing") || lc.includes("quality") || tagSet.has("vitest") || tagSet.has("qa")) {
+    return "We test in production because we cannot afford staging. Help us afford staging.";
+  }
+  return "Written by an independent developer in Brighton, UK. Recently made redundant. No VC, no team — just a laptop, a mass of MCP servers, and an ungodly amount of mass-produced coffee.";
+}
+
+function getClientId(): string {
+  const key = "spike_client_id";
+  let id = localStorage.getItem(key);
+  if (!id) {
+    id = crypto.randomUUID();
+    localStorage.setItem(key, id);
+  }
+  return id;
+}
+
+function SupportWidget({ post }: { post: BlogPost }) {
+  const slug = post.slug;
   const url = `https://spike.land/blog/${slug}`;
-  const xIntent = `https://x.com/intent/tweet?text=${encodeURIComponent(title)}&url=${encodeURIComponent(url)}`;
+  const xIntent = `https://x.com/intent/tweet?text=${encodeURIComponent(post.title)}&url=${encodeURIComponent(url)}`;
   const linkedInIntent = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`;
+
+  const [sliderIdx, setSliderIdx] = useState(3); // Default: $5
+  const [customAmount, setCustomAmount] = useState("");
+  const [showCustom, setShowCustom] = useState(false);
+  const [bumped, setBumped] = useState(false);
+  const [bumpCount, setBumpCount] = useState(0);
+  const [supporters, setSupporters] = useState(0);
+  const [bumpAnimating, setBumpAnimating] = useState(false);
+  const [donating, setDonating] = useState(false);
+  const [thankYou, setThankYou] = useState(false);
+  const bumpRef = useRef<HTMLButtonElement>(null);
+
+  // Check thank-you state from URL
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("supported") === "1") {
+      setThankYou(true);
+      // Clean the URL
+      const cleaned = window.location.pathname;
+      window.history.replaceState({}, "", cleaned);
+    }
+  }, []);
+
+  // Check if already bumped
+  useEffect(() => {
+    const bumpKey = `spike_bumped_${slug}`;
+    if (localStorage.getItem(bumpKey)) {
+      setBumped(true);
+    }
+  }, [slug]);
+
+  // Fetch engagement stats
+  useEffect(() => {
+    fetch(`/api/support/engagement/${encodeURIComponent(slug)}`)
+      .then((r) => r.ok ? r.json() as Promise<{ fistBumps: number; supporters: number }> : null)
+      .then((data) => {
+        if (data) {
+          setBumpCount(data.fistBumps);
+          setSupporters(data.supporters);
+        }
+      })
+      .catch(() => {});
+  }, [slug]);
+
+  const handleBump = useCallback(async () => {
+    if (bumped) return;
+    setBumpAnimating(true);
+    setTimeout(() => setBumpAnimating(false), 600);
+
+    try {
+      const res = await fetch("/api/support/fistbump", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ slug, clientId: getClientId() }),
+      });
+      const data = await res.json() as { count: number };
+      setBumpCount(data.count);
+      setBumped(true);
+      localStorage.setItem(`spike_bumped_${slug}`, "1");
+    } catch {
+      // Silent fail
+    }
+  }, [bumped, slug]);
+
+  const handleDonate = useCallback(async () => {
+    const stop = SLIDER_STOPS[sliderIdx];
+    const amount = showCustom
+      ? parseFloat(customAmount)
+      : stop?.amount ?? 5;
+
+    if (!amount || amount < 1) return;
+    setDonating(true);
+
+    try {
+      const res = await fetch("/api/support/donate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ slug, amount }),
+      });
+      const data = await res.json() as { url?: string; error?: string };
+      if (data.url) {
+        window.location.href = data.url;
+      }
+    } catch {
+      setDonating(false);
+    }
+  }, [sliderIdx, showCustom, customAmount, slug]);
+
+  const currentStop = SLIDER_STOPS[sliderIdx];
+  const copy = getArticleCopy(post.category, post.tags);
 
   return (
     <div className="border-t border-border mt-12 pt-8">
-      <p className="text-sm text-muted-foreground leading-relaxed mb-4">
-        Written by an independent developer in Brighton, UK. Recently made redundant. No VC, no team — just a laptop, a mass of MCP servers, and an mass of mass-produced coffee. If this post was useful, consider sharing it or supporting the work.
+      {/* Thank-you confetti state */}
+      {thankYou && (
+        <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-xl p-6 mb-6 text-center">
+          <p className="text-2xl mb-2">🎉</p>
+          <p className="text-green-900 dark:text-green-100 font-semibold">You absolute legend.</p>
+          <p className="text-green-700 dark:text-green-300 text-sm mt-1">
+            Your support means more than you know. Seriously. We might frame this.
+          </p>
+        </div>
+      )}
+
+      {/* Article-adapted copy */}
+      <p className="text-sm text-muted-foreground leading-relaxed mb-6">
+        {copy}
       </p>
+
+      {/* Engagement counters */}
+      <div className="flex flex-wrap items-center gap-4 text-xs text-muted-foreground/70 mb-6">
+        <span>👊 {bumpCount} fist bump{bumpCount !== 1 ? "s" : ""}</span>
+        {supporters > 0 && (
+          <span>💛 {supporters} supporter{supporters !== 1 ? "s" : ""}</span>
+        )}
+      </div>
+
+      {/* Fist Bump button */}
+      <div className="mb-6">
+        <button
+          ref={bumpRef}
+          onClick={handleBump}
+          disabled={bumped}
+          className={`
+            inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-medium
+            transition-all duration-200
+            ${bumped
+              ? "bg-muted text-muted-foreground cursor-default"
+              : "bg-foreground text-background hover:opacity-90 active:scale-95 cursor-pointer"
+            }
+            ${bumpAnimating ? "scale-110" : ""}
+          `}
+          style={{
+            transition: bumpAnimating
+              ? "transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)"
+              : "transform 0.2s ease, opacity 0.2s ease",
+          }}
+        >
+          <span className={`text-lg ${bumpAnimating ? "animate-bounce" : ""}`}>
+            {bumped ? "✊" : "👊"}
+          </span>
+          {bumped ? "Bumped!" : "Fist bump (free)"}
+        </button>
+      </div>
+
+      {/* Slider */}
+      <div className="bg-muted/30 border border-border rounded-xl p-5 mb-6">
+        <p className="text-xs text-muted-foreground mb-3 font-medium uppercase tracking-wide">
+          Sponsor Zoltan & Gian Pierre
+        </p>
+
+        <input
+          type="range"
+          min={0}
+          max={SLIDER_STOPS.length - 1}
+          step={1}
+          value={sliderIdx}
+          onChange={(e) => {
+            const idx = parseInt(e.target.value, 10);
+            setSliderIdx(idx);
+            setShowCustom(false);
+          }}
+          className="w-full h-2 bg-border rounded-full appearance-none cursor-pointer
+            [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:h-5
+            [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-primary [&::-webkit-slider-thumb]:cursor-pointer
+            [&::-webkit-slider-thumb]:shadow-md [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-background
+            [&::-moz-range-thumb]:w-5 [&::-moz-range-thumb]:h-5 [&::-moz-range-thumb]:rounded-full
+            [&::-moz-range-thumb]:bg-primary [&::-moz-range-thumb]:cursor-pointer [&::-moz-range-thumb]:border-2
+            [&::-moz-range-thumb]:border-background"
+        />
+
+        {/* Slider label */}
+        {currentStop && (
+          <div className="mt-3">
+            <div className="flex items-baseline gap-2">
+              <span className="text-2xl font-bold text-foreground">
+                {currentStop.amount === 0 ? "$0" : `$${currentStop.amount}`}
+              </span>
+              <span className="text-sm font-medium text-foreground">
+                {currentStop.label}
+              </span>
+            </div>
+            <p className="text-xs text-muted-foreground mt-1 italic">
+              {currentStop.sub}
+            </p>
+          </div>
+        )}
+
+        {/* Custom amount toggle */}
+        <button
+          onClick={() => setShowCustom(!showCustom)}
+          className="text-xs text-primary hover:opacity-80 mt-3 transition-colors"
+        >
+          {showCustom ? "← Back to presets" : "Name your price, champion →"}
+        </button>
+
+        {showCustom && (
+          <div className="flex items-center gap-2 mt-2">
+            <span className="text-sm text-muted-foreground">$</span>
+            <input
+              type="number"
+              min={1}
+              max={999}
+              value={customAmount}
+              onChange={(e) => setCustomAmount(e.target.value)}
+              placeholder="Your amount"
+              className="w-24 px-3 py-1.5 text-sm rounded-lg border border-border bg-background text-foreground"
+            />
+          </div>
+        )}
+
+        {/* Donate button — only for amounts > $0 */}
+        {(showCustom || (currentStop && currentStop.amount > 0)) && (
+          <button
+            onClick={handleDonate}
+            disabled={donating || (showCustom && (!customAmount || parseFloat(customAmount) < 1))}
+            className="mt-4 w-full px-4 py-2.5 rounded-lg bg-primary text-primary-foreground font-medium text-sm
+              hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed transition-opacity"
+          >
+            {donating
+              ? "Redirecting to Stripe..."
+              : showCustom
+                ? `Donate $${customAmount || "..."}`
+                : `Donate $${currentStop?.amount ?? 5}`
+            }
+          </button>
+        )}
+      </div>
+
+      {/* Share links */}
       <div className="flex flex-wrap items-center gap-4 text-sm">
         <a
           href={xIntent}
@@ -265,15 +532,7 @@ function SupportBanner({ title, slug }: { title: string; slug: string }) {
         >
           Share on LinkedIn
         </a>
-        <span className="text-muted-foreground/40">&bull;</span>
-        <a
-          href="/pricing"
-          className="text-primary hover:opacity-80 transition-colors font-medium"
-        >
-          Support this work
-        </a>
       </div>
-      <p className="text-xs text-muted-foreground/60 mt-3">Every little counts.</p>
     </div>
   );
 }

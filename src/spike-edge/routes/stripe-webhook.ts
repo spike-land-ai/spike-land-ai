@@ -158,6 +158,33 @@ stripeWebhook.post("/stripe/webhook", async (c) => {
     case "checkout.session.completed": {
       try {
         const session = event.data.object as unknown as StripeSession;
+
+        // Handle blog support donations (no userId required)
+        if (session.metadata?.type === "blog_support") {
+          const slug = session.metadata.slug;
+          const amountStr = session.metadata.amount;
+          const sessionId = (event.data.object as Record<string, unknown>).id as string | undefined;
+          if (slug && sessionId) {
+            // Update pending donation to completed
+            const updated = await db.prepare(
+              "UPDATE support_donations SET status = 'completed' WHERE stripe_session_id = ?",
+            ).bind(sessionId).run();
+            // If no pending record found, insert one
+            if (!updated.meta.changes || updated.meta.changes === 0) {
+              await db.prepare(
+                "INSERT INTO support_donations (id, slug, amount_cents, stripe_session_id, status, created_at) VALUES (?, ?, ?, ?, 'completed', ?)",
+              ).bind(
+                crypto.randomUUID(),
+                slug,
+                amountStr ? Math.round(parseFloat(amountStr) * 100) : 0,
+                sessionId,
+                Date.now(),
+              ).run();
+            }
+          }
+          break;
+        }
+
         const userId = session.metadata?.userId;
         if (!userId) {
           console.warn("[stripe-webhook] checkout.session.completed without userId in metadata");

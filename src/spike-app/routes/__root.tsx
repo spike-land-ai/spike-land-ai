@@ -1,13 +1,9 @@
 import { Link, Outlet, useRouterState } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useAnalytics } from "@/hooks/useAnalytics";
 import { useDarkMode } from "@/hooks/useDarkMode";
 import { useAuth } from "@/hooks/useAuth";
 import { LoginButton } from "@/components/LoginButton";
-import { ThemeSwitcher } from "@/components/ThemeSwitcher";
-import { WelcomeModal } from "@/components/WelcomeModal";
-
-const FOUNDER_EMAIL = "zoltan.erdos@spike.land";
 
 const DEFAULT_TITLE = "spike.land - MCP-First AI Development Platform";
 const DEFAULT_DESCRIPTION =
@@ -136,40 +132,13 @@ function injectJsonLd(id: string, content: string) {
   el.textContent = content;
 }
 
-const navItems = [
-  { to: "/blog", label: "Blog" },
-  { to: "/tools", label: "Tools" },
-  { to: "/apps", label: "MCP Tools" },
-  { to: "/store", label: "Store" },
-  { to: "/pricing", label: "Pricing" },
-  { to: "/learn", label: "Learn" },
-  { to: "/messages", label: "Messages" },
-  { to: "/analytics", label: "Analytics" },
-  { to: "/bugbook", label: "Bugbook" },
-  { to: "/dashboard/bazdmeg", label: "BAZDMEG" },
-  { to: "/settings", label: "Settings" },
-] as const;
-
 export function RootLayout() {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
   useAnalytics();
-  const { theme, setTheme } = useDarkMode();
-  const { user } = useAuth();
-  const isFounder = user?.email === FOUNDER_EMAIL;
+  useDarkMode();
+  useAuth();
 
   const location = useRouterState({ select: (s) => s.location });
   const { pathname, searchStr } = location;
-
-  // Auto-close sidebar on route change
-  useEffect(() => { setSidebarOpen(false); }, [pathname]);
-
-  // Close sidebar on Escape key
-  useEffect(() => {
-    if (!sidebarOpen) return;
-    const handler = (e: KeyboardEvent) => { if (e.key === "Escape") setSidebarOpen(false); };
-    document.addEventListener("keydown", handler);
-    return () => document.removeEventListener("keydown", handler);
-  }, [sidebarOpen]);
 
   // Inject JSON-LD structured data once on mount
   useEffect(() => {
@@ -232,85 +201,11 @@ export function RootLayout() {
 
   return (
     <div className="flex min-h-screen bg-background text-foreground">
-      <WelcomeModal userName={user?.name} />
-      {/* Sidebar overlay */}
-      {sidebarOpen && (
-        <div
-          className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm transition-opacity duration-300 cursor-pointer"
-          role="button"
-          tabIndex={-1}
-          onClick={() => setSidebarOpen(false)}
-          onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") setSidebarOpen(false); }}
-        />
-      )}
-
-      {/* Sidebar — Always a drawer */}
-      <aside
-        className={`fixed inset-y-0 left-0 z-50 w-64 transform border-r border-border bg-card shadow-2xl transition-transform duration-300 ease-in-out ${sidebarOpen ? "translate-x-0 pointer-events-auto" : "-translate-x-full pointer-events-none"
-          }`}
-      >
-        <div className="flex h-16 items-center justify-between border-b border-border px-6">
-          <Link to="/" className="text-xl font-bold hover:opacity-80" onClick={() => setSidebarOpen(false)}>
-            spike.land
-          </Link>
-          <button
-            onClick={() => setSidebarOpen(false)}
-            className="p-2 rounded-full hover:bg-muted"
-            aria-label="Close menu"
-          >
-            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
-        </div>
-
-        <nav className="flex flex-col gap-1 p-4 overflow-y-auto h-[calc(100vh-8rem)]">
-          {navItems.map((item) => (
-            <Link
-              key={item.to}
-              to={item.to}
-              className="flex items-center rounded-xl px-4 py-2.5 text-sm font-medium transition-all hover:bg-muted [&.active]:bg-primary/10 [&.active]:text-primary"
-              onClick={() => setSidebarOpen(false)}
-            >
-              {item.label}
-            </Link>
-          ))}
-          {isFounder && (
-            <Link
-              to="/cockpit"
-              className="flex items-center rounded-xl px-4 py-2.5 text-sm font-medium transition-all hover:bg-muted [&.active]:bg-primary/10 [&.active]:text-primary mt-2 border-t border-border pt-4"
-              onClick={() => setSidebarOpen(false)}
-            >
-              Cockpit
-            </Link>
-          )}
-        </nav>
-
-        <div className="mt-auto border-t border-border p-4 bg-card">
-          <div className="flex items-center justify-between mb-4">
-            <span className="text-xs text-muted-foreground uppercase font-bold">Theme</span>
-            <ThemeSwitcher theme={theme} setTheme={setTheme} />
-          </div>
-          <LoginButton />
-        </div>
-      </aside>
-
-      {/* Main content area */}
       <div className="flex flex-1 flex-col min-w-0">
         <header className="sticky top-0 z-30 flex h-16 items-center border-b border-border bg-card/80 backdrop-blur-md px-6">
-          <button
-            onClick={() => setSidebarOpen(true)}
-            className="mr-4 rounded-lg p-2 hover:bg-muted"
-            aria-label="Open navigation menu"
-          >
-            <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-            </svg>
-          </button>
-
           <div className="flex flex-1 items-center justify-between">
             <Link to="/" className="text-xl font-bold">spike.land</Link>
-            <div />
+            <LoginButton />
           </div>
         </header>
 

@@ -5,9 +5,10 @@ import type { StudioAsset } from "../../services/studio-engine";
 interface DetailsPanelProps {
   asset: StudioAsset | null;
   onClose: () => void;
+  onAction: (action: string) => void;
 }
 
-export function DetailsPanel({ asset, onClose }: DetailsPanelProps) {
+export function DetailsPanel({ asset, onClose, onAction }: DetailsPanelProps) {
   if (!asset) return null;
 
   return (
@@ -90,6 +91,7 @@ export function DetailsPanel({ asset, onClose }: DetailsPanelProps) {
             ].map((tool) => (
               <button
                 key={tool.id}
+                onClick={() => onAction(tool.id)}
                 className={`flex flex-col items-center gap-1.5 p-3 rounded-xl bg-white/5 border border-white/5 transition-all group ${tool.bg}`}
               >
                 <tool.icon
