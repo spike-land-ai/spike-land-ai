@@ -11,7 +11,9 @@ export type EloEventType =
   | "successful_tool_use"
   | "false_bug_report"
   | "rate_limit_hit"
-  | "abuse_flag";
+  | "abuse_flag"
+  | "whatsapp_productive_use"
+  | "bug_bounty_granted";
 
 const ELO_DELTAS: Record<EloEventType, number> = {
   report_valid_bug: 25,
@@ -20,6 +22,8 @@ const ELO_DELTAS: Record<EloEventType, number> = {
   false_bug_report: -15,
   rate_limit_hit: -5,
   abuse_flag: -50,
+  whatsapp_productive_use: 2,
+  bug_bounty_granted: 50,
 };
 
 const DAILY_GAIN_CAP = 100;
@@ -207,4 +211,29 @@ export async function getUserElo(db: D1Database, userId: string): Promise<UserEl
 /** Clear the in-memory cache (useful for testing). */
 export function clearEloCache(): void {
   eloCache.clear();
+}
+
+const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000;
+
+/**
+ * Grant a bug bounty reward to a user:
+ * - Inserts an access_grant with tier="pro" expiring in 7 days
+ * - Records a "bug_bounty_granted" ELO event
+ */
+export async function grantBugBounty(
+  db: D1Database,
+  userId: string,
+  bugId: string,
+): Promise<void> {
+  const now = Date.now();
+  const expiresAt = now + SEVEN_DAYS_MS;
+
+  await db
+    .prepare(
+      "INSERT INTO access_grants (id, user_id, grant_type, tier, reason, reference_id, expires_at, created_at) VALUES (lower(hex(randomblob(16))), ?, 'bug_bounty', 'pro', 'Bug bounty reward', ?, ?, ?)",
+    )
+    .bind(userId, bugId, expiresAt, now)
+    .run();
+
+  await recordEloEvent(db, userId, "bug_bounty_granted", bugId);
 }

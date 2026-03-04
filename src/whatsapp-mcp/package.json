@@ -1,0 +1,61 @@
+{
+  "name": "@spike-land-ai/whatsapp-mcp",
+  "version": "0.1.0",
+  "description": "MCP server for WhatsApp Business Cloud API",
+  "type": "module",
+  "bin": "dist/index.js",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/spike-land-ai/whatsapp-mcp.git"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint --quiet .",
+    "start": "node dist/index.js"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "1.27.1",
+    "@spike-land-ai/mcp-server-base": "workspace:*",
+    "zod": "4.3.6"
+  },
+  "devDependencies": {
+    "@changesets/cli": "2.30.0",
+    "@types/node": "25.3.3",
+    "@vitest/coverage-v8": "4.0.18",
+    "eslint": "10.0.2",
+    "typescript": "5.9.3",
+    "typescript-eslint": "8.56.1",
+    "vitest": "4.0.18"
+  },
+  "keywords": [
+    "mcp",
+    "whatsapp",
+    "meta",
+    "cloud-api"
+  ],
+  "license": "MIT",
+  "source": "./index.ts"
+}

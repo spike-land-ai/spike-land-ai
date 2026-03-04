@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import type { BlogPost } from "../../core/generated-posts";
+import type { BlogPost } from "../../core/types";
 
 type BlogMeta = Omit<BlogPost, "content">;
 

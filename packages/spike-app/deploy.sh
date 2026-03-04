@@ -40,22 +40,8 @@ if [ -f "$CACHE_DIR/app.treehash" ]; then
   CACHED_HASH="$(cat "$CACHE_DIR/app.treehash")"
 fi
 
-# Also hash block-website content (blog posts flow through it)
-CONTENT_HASH="$(git ls-tree -r HEAD -- ../../src/block-website/src/core/generated-posts.ts 2>/dev/null | git hash-object --stdin 2>/dev/null || echo "none")"
-CACHED_CONTENT=""
-if [ -f "$CACHE_DIR/content.treehash" ]; then
-  CACHED_CONTENT="$(cat "$CACHE_DIR/content.treehash")"
-fi
-
 NEED_BUILD=false
 if [ "$TREE_HASH" != "$CACHED_HASH" ] || [ ! -d "dist" ]; then
-  NEED_BUILD=true
-fi
-if [ "$CONTENT_HASH" != "$CACHED_CONTENT" ]; then
-  echo "Blog content changed — rebuilding block-website..."
-  (cd ../../src/block-website && npx tsx scripts/build-content.ts)
-  # Clear Vite dep cache so it picks up new block-website dist
-  rm -rf node_modules/.vite
   NEED_BUILD=true
 fi
 
@@ -63,7 +49,6 @@ if [ "$NEED_BUILD" = true ]; then
   echo "Building spike-app..."
   npx vite build
   echo "$TREE_HASH" > "$CACHE_DIR/app.treehash"
-  echo "$CONTENT_HASH" > "$CACHE_DIR/content.treehash"
 else
   echo "Source unchanged (tree hash: ${TREE_HASH:0:12}) — skipping build."
 fi
@@ -152,18 +137,8 @@ export R2_BUCKET
 
 find dist -type f -print0 | xargs -0 -P 1 -I {} bash -c 'upload_file "$@"' _ {}
 
-# ── 7. Upload blog JSON files to R2 ──
-BLOG_JSON_DIR="../../src/block-website/dist/blog"
-if [ -d "$BLOG_JSON_DIR" ]; then
-  echo "Uploading blog JSON files..."
-  for f in "$BLOG_JSON_DIR"/*.json; do
-    key="blog/$(basename "$f")"
-    yarn wrangler r2 object put "${R2_BUCKET}/${key}" \
-      --file "$f" \
-      --content-type "application/json" \
-      --remote
-  done
-  echo "Blog JSON uploaded."
-fi
+# ── 7. Seed blog posts to D1 and upload images to R2 ──
+echo "Seeding blog content to D1 + R2..."
+(cd ../.. && npx tsx scripts/seed-blog.ts --remote)
 
 echo "Deployed ${HEAD_SHA:0:12} @ ${COMMIT_TIME}"

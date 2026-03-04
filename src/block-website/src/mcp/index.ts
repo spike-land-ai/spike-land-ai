@@ -13,7 +13,7 @@ export const websiteTools = [
       limit: z.number().optional().describe("Max number of posts to return")
     })
     .handler(async ({ input }: { input: { tag?: string; category?: string; limit?: number } }) => {
-      const posts = getPosts(input).map(p => ({
+      const posts = (await getPosts(input)).map(p => ({
         slug: p.slug,
         title: p.title,
         description: p.description,
@@ -22,13 +22,13 @@ export const websiteTools = [
       }));
       return jsonResult({ posts });
     }),
-    
+
   procedure
     .tool("read_blog_post", "Read the full content of a specific blog post", {
       slug: z.string().describe("The slug of the blog post")
     })
     .handler(async ({ input }: { input: { slug: string } }) => {
-      const post = getPostBySlug(input.slug);
+      const post = await getPostBySlug(input.slug);
       if (!post) return errorResult("NOT_FOUND", `Post with slug ${input.slug} not found`);
       return jsonResult({ post });
     })

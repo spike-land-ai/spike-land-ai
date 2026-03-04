@@ -1,0 +1,16 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "outDir": "./dist",
+    "noEmit": false,
+    "declaration": true,
+    "declarationMap": true
+  },
+  "include": [
+    "index.ts",
+    "types.ts",
+    "clients/**/*.ts",
+    "tools/**/*.ts"
+  ],
+  "references": []
+}

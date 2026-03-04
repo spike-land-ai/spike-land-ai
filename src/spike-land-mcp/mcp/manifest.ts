@@ -88,6 +88,7 @@ import { registerEsbuildTools } from "../tools/esbuild";
 import { registerBuildFromGithubTools } from "../tools/build-from-github";
 import { registerQuizTools } from "../tools/quiz";
 import { registerBugbookFeedbackTools } from "../tools/bugbook-feedback";
+import { registerByokTools } from "../tools/byok";
 
 /**
  * Safely call a register function, catching and logging errors.
@@ -187,4 +188,5 @@ export async function registerAllTools(
   safeRegister(registerBuildFromGithubTools, "registerBuildFromGithubTools", registry, userId, db);
   safeRegister(registerQuizTools, "registerQuizTools", registry, userId, db, env);
   safeRegister(registerBugbookFeedbackTools, "registerBugbookFeedbackTools", registry, userId, db);
+  safeRegister(registerByokTools, "registerByokTools", registry, userId, db, env?.kv, env?.vaultSecret);
 }

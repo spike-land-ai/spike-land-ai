@@ -39,6 +39,10 @@ const ROUTE_META: Record<string, { title: string; description: string }> = {
     title: "Bugbook - spike.land",
     description: "Public bug tracker with ELO ranking - report, track, and fix bugs",
   },
+  "/pricing": {
+    title: "Pricing - spike.land",
+    description: "Simple, transparent pricing for spike.land — Free, Pro, and Elite plans",
+  },
   "/settings": {
     title: "Settings - spike.land",
     description: "Configure your spike.land account and preferences",
@@ -58,6 +62,7 @@ const navItems = [
   { to: "/tools", label: "Tools" },
   { to: "/apps", label: "MCP Tools" },
   { to: "/store", label: "Store" },
+  { to: "/pricing", label: "Pricing" },
   { to: "/learn", label: "Learn" },
   { to: "/messages", label: "Messages" },
   { to: "/analytics", label: "Analytics" },

@@ -21,36 +21,34 @@ export function registerBillingTools(registry: ToolRegistry, userId: string, db:
     t
       .tool(
         "billing_create_checkout",
-        "Create a Stripe checkout session for purchasing tokens, subscribing to a plan, or upgrading workspace tier.",
+        "Create a Stripe checkout session URL for subscribing to a paid plan.",
         {
-          type: z
-            .enum(["tokens", "subscription", "workspace_tier"])
-            .describe(
-              "Checkout type: tokens (one-time), subscription (recurring), or workspace_tier (workspace upgrade).",
-            ),
-          workspace_id: z.string().min(1).describe("Workspace ID to associate the checkout with."),
-          price_id: z
-            .string()
-            .optional()
-            .describe(
-              "Stripe Price ID (e.g. price_xxx). Required for subscription and workspace_tier types.",
-            ),
+          tier: z.enum(["pro", "elite"]).describe("Subscription tier to purchase: pro or elite."),
           success_url: z
             .string()
             .url()
             .optional()
-            .describe("URL to redirect to after successful checkout."),
+            .describe("URL to redirect to after successful checkout. Defaults to spike.land settings."),
           cancel_url: z
             .string()
             .url()
             .optional()
-            .describe("URL to redirect to if the user cancels checkout."),
+            .describe("URL to redirect to if the user cancels checkout. Defaults to spike.land pricing."),
         },
       )
       .meta({ category: "billing", tier: "free" })
-      .handler(async () => {
+      .handler(async ({ input, ctx }) => {
+        const successUrl = input.success_url ?? "https://spike.land/settings?tab=billing&success=1";
+        const cancelUrl = input.cancel_url ?? "https://spike.land/pricing";
+
+        // Return a checkout intent — actual Stripe session creation is handled
+        // by the edge proxy to keep the Stripe secret key out of MCP tools.
         return textResult(
-          `Billing managed at spike.land — visit https://spike.land/settings?tab=billing to create a checkout session.`,
+          `**Checkout Ready**\n\n` +
+            `**Tier:** ${input.tier}\n` +
+            `**User:** ${ctx.userId}\n\n` +
+            `To complete checkout, visit:\n` +
+            `https://spike.land/api/checkout?tier=${input.tier}&success_url=${encodeURIComponent(successUrl)}&cancel_url=${encodeURIComponent(cancelUrl)}`,
         );
       }),
   );
@@ -118,6 +116,62 @@ export function registerBillingTools(registry: ToolRegistry, userId: string, db:
         }
 
         return textResult(text);
+      }),
+  );
+
+  registry.registerBuilt(
+    t
+      .tool(
+        "billing_cancel_subscription",
+        "Cancel your active subscription. Your access continues until the end of the current billing period.",
+        {},
+      )
+      .meta({ category: "billing", tier: "free" })
+      .handler(async ({ ctx }) => {
+        const sub = await ctx.db
+          .select({
+            id: subscriptions.id,
+            status: subscriptions.status,
+            stripeSubscriptionId: subscriptions.stripeSubscriptionId,
+            currentPeriodEnd: subscriptions.currentPeriodEnd,
+          })
+          .from(subscriptions)
+          .where(
+            and(
+              eq(subscriptions.userId, ctx.userId),
+              eq(subscriptions.status, "active"),
+            ),
+          )
+          .limit(1);
+
+        if (sub.length === 0 || !sub[0]) {
+          return textResult("**No Active Subscription**\n\nYou don't have an active subscription to cancel.");
+        }
+
+        const s = sub[0];
+
+        if (!s.stripeSubscriptionId) {
+          return textResult(
+            "**Cannot Cancel**\n\nYour subscription has no associated Stripe subscription. Contact support.",
+          );
+        }
+
+        // Mark as canceled locally — Stripe webhook will confirm
+        const now = Date.now();
+        await ctx.db
+          .update(subscriptions)
+          .set({ status: "canceled", updatedAt: now })
+          .where(eq(subscriptions.id, s.id));
+
+        const endDate = s.currentPeriodEnd
+          ? new Date(s.currentPeriodEnd).toISOString().split("T")[0]
+          : "end of current period";
+
+        return textResult(
+          `**Subscription Canceled**\n\n` +
+            `Your subscription has been canceled. You'll retain access until **${endDate}**.\n\n` +
+            `To resubscribe, use \`billing_create_checkout\`.`,
+        );
       }),
   );
 }

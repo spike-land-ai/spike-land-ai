@@ -1,7 +1,7 @@
 import { useState, useEffect, lazy, Suspense } from "react";
 import Markdown from "react-markdown";
 import rehypeRaw from "rehype-raw";
-import type { BlogPost } from "../../core/generated-posts";
+import type { BlogPost } from "../../core/types";
 
 /**
  * Convert self-closing JSX/HTML tags for custom components to explicit

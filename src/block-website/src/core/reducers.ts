@@ -1,30 +1,35 @@
-import { posts } from "./generated-posts";
-import type { BlogPost } from "./generated-posts";
+import type { BlogPost } from "./types";
+
+const EDGE_BASE = "https://edge.spike.land";
 
 /**
- * Get all blog posts, optionally filtered.
+ * Fetch all blog posts from the edge API, optionally filtered.
  */
-export function getPosts(options?: { tag?: string; category?: string; limit?: number }): BlogPost[] {
-  let filtered = posts;
+export async function getPosts(options?: { tag?: string; category?: string; limit?: number }): Promise<BlogPost[]> {
+  const res = await fetch(`${EDGE_BASE}/api/blog`);
+  if (!res.ok) return [];
+  let posts: BlogPost[] = await res.json();
 
   if (options?.tag) {
-    filtered = filtered.filter(p => p.tags.includes(options.tag!));
+    posts = posts.filter(p => p.tags.includes(options.tag!));
   }
 
   if (options?.category) {
-    filtered = filtered.filter(p => p.category === options.category);
+    posts = posts.filter(p => p.category === options.category);
   }
 
   if (options?.limit) {
-    filtered = filtered.slice(0, options.limit);
+    posts = posts.slice(0, options.limit);
   }
 
-  return filtered;
+  return posts;
 }
 
 /**
- * Get a specific post by slug
+ * Fetch a specific post by slug from the edge API.
  */
-export function getPostBySlug(slug: string): BlogPost | undefined {
-  return posts.find(p => p.slug === slug);
+export async function getPostBySlug(slug: string): Promise<BlogPost | undefined> {
+  const res = await fetch(`${EDGE_BASE}/api/blog/${slug}`);
+  if (!res.ok) return undefined;
+  return res.json();
 }

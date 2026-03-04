@@ -1,4 +1,4 @@
-import { index, integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
+import { index, integer, sqliteTable, text, uniqueIndex } from "drizzle-orm/sqlite-core";
 import { relations } from "drizzle-orm";
 
 // ─── Users ───────────────────────────────────────────────────────────────────
@@ -351,6 +351,88 @@ export const registeredTools = sqliteTable(
   }),
 );
 
+// ─── WhatsApp Links ──────────────────────────────────────────────────────────
+
+export const whatsappLinks = sqliteTable(
+  "whatsapp_links",
+  {
+    id: text("id").primaryKey(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    phoneHash: text("phone_hash").notNull(), // SHA-256 of E.164
+    verifiedAt: integer("verified_at", { mode: "number" }),
+    linkCode: text("link_code"),
+    linkCodeExpiresAt: integer("link_code_expires_at", { mode: "number" }),
+    createdAt: integer("created_at", { mode: "number" }).notNull(),
+  },
+  (t) => ({
+    phoneHashIdx: uniqueIndex("whatsapp_links_phone_hash_idx").on(t.phoneHash),
+    userIdx: index("whatsapp_links_user_id_idx").on(t.userId),
+  }),
+);
+
+// ─── User API Key Vault ──────────────────────────────────────────────────────
+
+export const userApiKeyVault = sqliteTable(
+  "user_api_key_vault",
+  {
+    id: text("id").primaryKey(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    provider: text("provider").notNull(), // "anthropic" | "openai" | "google"
+    encryptedKey: text("encrypted_key").notNull(), // AES-GCM envelope
+    createdAt: integer("created_at", { mode: "number" }).notNull(),
+    updatedAt: integer("updated_at", { mode: "number" }).notNull(),
+  },
+  (t) => ({
+    userProviderIdx: uniqueIndex("user_api_key_vault_user_provider_idx").on(t.userId, t.provider),
+  }),
+);
+
+// ─── Access Grants ───────────────────────────────────────────────────────────
+
+export const accessGrants = sqliteTable(
+  "access_grants",
+  {
+    id: text("id").primaryKey(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    grantType: text("grant_type").notNull(), // "bug_bounty" | "referral" | "admin"
+    tier: text("tier").notNull(), // "pro" | "elite"
+    reason: text("reason").notNull(),
+    referenceId: text("reference_id"),
+    expiresAt: integer("expires_at", { mode: "number" }).notNull(),
+    createdAt: integer("created_at", { mode: "number" }).notNull(),
+  },
+  (t) => ({
+    userIdx: index("access_grants_user_id_idx").on(t.userId),
+    userExpiresIdx: index("access_grants_user_expires_idx").on(t.userId, t.expiresAt),
+  }),
+);
+
+// ─── WhatsApp Message Log ────────────────────────────────────────────────────
+
+export const whatsappMessageLog = sqliteTable(
+  "whatsapp_message_log",
+  {
+    id: text("id").primaryKey(),
+    userId: text("user_id"),
+    phoneHash: text("phone_hash").notNull(),
+    direction: text("direction").notNull(), // "inbound" | "outbound"
+    command: text("command"),
+    toolName: text("tool_name"),
+    status: text("status").notNull(),
+    createdAt: integer("created_at", { mode: "number" }).notNull(),
+  },
+  (t) => ({
+    userIdx: index("whatsapp_message_log_user_id_idx").on(t.userId),
+    phoneHashIdx: index("whatsapp_message_log_phone_hash_idx").on(t.phoneHash),
+  }),
+);
+
 // ─── Relations ────────────────────────────────────────────────────────────────
 
 export const usersRelations = relations(users, ({ many }) => ({
@@ -367,6 +449,9 @@ export const usersRelations = relations(users, ({ many }) => ({
   receivedMessages: many(directMessages, { relationName: "recipient" }),
   reminders: many(reminders),
   registeredTools: many(registeredTools),
+  whatsappLinks: many(whatsappLinks),
+  userApiKeys: many(userApiKeyVault),
+  accessGrants: many(accessGrants),
 }));
 
 export const apiKeysRelations = relations(apiKeys, ({ one }) => ({
@@ -452,4 +537,16 @@ export const skillUsageEventsRelations = relations(skillUsageEvents, ({ one }) =
     fields: [skillUsageEvents.userId],
     references: [users.id],
   }),
+}));
+
+export const whatsappLinksRelations = relations(whatsappLinks, ({ one }) => ({
+  user: one(users, { fields: [whatsappLinks.userId], references: [users.id] }),
+}));
+
+export const userApiKeyVaultRelations = relations(userApiKeyVault, ({ one }) => ({
+  user: one(users, { fields: [userApiKeyVault.userId], references: [users.id] }),
+}));
+
+export const accessGrantsRelations = relations(accessGrants, ({ one }) => ({
+  user: one(users, { fields: [accessGrants.userId], references: [users.id] }),
 }));

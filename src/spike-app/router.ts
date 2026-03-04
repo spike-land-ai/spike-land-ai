@@ -78,6 +78,12 @@ const settingsRoute = createRoute({
   component: withSuspense(() => import("./routes/settings"), "SettingsPage"),
 });
 
+const pricingRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/pricing",
+  component: withSuspense(() => import("./routes/pricing"), "PricingPage"),
+});
+
 const storeRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/store",
@@ -244,6 +250,7 @@ const routeTree = rootRoute.addChildren([
   privacyRoute,
   termsRoute,
   settingsRoute,
+  pricingRoute,
   storeRoute,
   versionRoute,
   appsRoute.addChildren([appsIndexRoute, appsNewRoute, appDetailRoute]),

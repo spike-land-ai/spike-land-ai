@@ -39,10 +39,35 @@ function sanitizeCallerHeaders(
   return safe;
 }
 
-const AI_PROVIDERS: Array<{ prefix: string; envKey: keyof Env; headerName: string }> = [
-  { prefix: "https://api.anthropic.com/", envKey: "CLAUDE_OAUTH_TOKEN", headerName: "x-api-key" },
-  { prefix: "https://generativelanguage.googleapis.com/", envKey: "GEMINI_API_KEY", headerName: "Authorization" },
+const AI_PROVIDERS: Array<{ prefix: string; envKey: keyof Env; headerName: string; byokProvider: string }> = [
+  { prefix: "https://api.anthropic.com/", envKey: "CLAUDE_OAUTH_TOKEN", headerName: "x-api-key", byokProvider: "anthropic" },
+  { prefix: "https://generativelanguage.googleapis.com/", envKey: "GEMINI_API_KEY", headerName: "Authorization", byokProvider: "google" },
 ];
+
+/**
+ * Attempt to resolve a BYOK key for the given user and provider via MCP_SERVICE.
+ * Returns the decrypted API key or null if none stored.
+ */
+async function resolveByokKey(
+  mcpService: Fetcher,
+  userId: string,
+  provider: string,
+): Promise<string | null> {
+  try {
+    const res = await mcpService.fetch(
+      new Request("https://mcp/internal/byok/get", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ userId, provider }),
+      }),
+    );
+    if (!res.ok) return null;
+    const data = await res.json<{ key?: string }>();
+    return data.key ?? null;
+  } catch {
+    return null;
+  }
+}
 
 proxy.post("/proxy/stripe", async (c) => {
   const body = await c.req.json<unknown>();
@@ -95,7 +120,19 @@ proxy.post("/proxy/ai", async (c) => {
     return c.json({ error: "Invalid AI API URL" }, 400);
   }
 
-  const apiKey = c.env[provider.envKey] as string;
+  // Try BYOK key first, fall back to platform key
+  const userId = c.get("userId" as never) as string | undefined;
+  let apiKey: string | null = null;
+  let usingByok = false;
+
+  if (userId) {
+    apiKey = await resolveByokKey(c.env.MCP_SERVICE, userId, provider.byokProvider);
+    if (apiKey) usingByok = true;
+  }
+
+  if (!apiKey) {
+    apiKey = c.env[provider.envKey] as string;
+  }
   if (!apiKey) {
     return c.json({ error: "AI provider not configured" }, 503);
   }
@@ -106,7 +143,7 @@ proxy.post("/proxy/ai", async (c) => {
       ? { "x-api-key": apiKey }
       : { Authorization: `Bearer ${apiKey}` };
 
-  const providerName = provider.prefix.includes("anthropic") ? "anthropic" : "gemini";
+  const providerName = provider.byokProvider;
   const start = Date.now();
   const response = await fetch(body.url, {
     method: body.method ?? "POST",
@@ -123,7 +160,7 @@ proxy.post("/proxy/ai", async (c) => {
       getClientId(c.req.raw).then((clientId) =>
         sendGA4Events(c.env, clientId, [{
           name: "proxy_api_call",
-          params: { provider: providerName, status: response.status, duration_ms: Date.now() - start },
+          params: { provider: providerName, status: response.status, duration_ms: Date.now() - start, byok: usingByok },
         }])
       ),
     );
