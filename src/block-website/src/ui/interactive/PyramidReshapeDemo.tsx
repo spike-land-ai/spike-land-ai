@@ -353,7 +353,7 @@ export function PyramidReshapeDemo() {
   return (
     <div
       ref={ref}
-      className="bg-slate-900/40 border border-slate-800/80 rounded-[2.5rem] p-10 md:p-16 my-20 backdrop-blur-md relative overflow-hidden group"
+      className="bg-card/40 border border-border/80 rounded-[2.5rem] p-10 md:p-16 my-20 backdrop-blur-md relative overflow-hidden group"
     >
       {/* Hover gradient overlay */}
       <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-1000 pointer-events-none" />
@@ -400,7 +400,7 @@ export function PyramidReshapeDemo() {
       </div>
 
       {/* Caption */}
-      <p className="relative z-10 text-[10px] text-slate-500 font-mono tracking-widest uppercase text-center mt-6">
+      <p className="relative z-10 text-[10px] text-muted-foreground font-mono tracking-widest uppercase text-center mt-6">
         {phaseLabel}
       </p>
     </div>
