@@ -1,0 +1,1010 @@
+{
+  ".tests/state-machine/visualizer-template.test.ts": {
+    "testHash": "35a93eeec3a58d076e44ba0a5e5a37a18789ac47352835b9192e58726c3e89c5",
+    "sourceHash": "0ea1d95fce55feab0954a7e5a8964270a0b44f575900baf59e4be484fc4b3c82",
+    "coverage": 0,
+    "success": true
+  },
+  ".tests/state-machine/persistence.test.ts": {
+    "testHash": "d9b5486398fe0fc9b9b58d0d2e0f346eac4cc7bfef0c8995dda7172922a57f05",
+    "sourceHash": "8d13e2b4449fffb1bbbcb6d0ef1785ce3fdc4a9a32720ec9d5b5656b6c7a80df",
+    "coverage": 0,
+    "success": true
+  },
+  ".tests/state-machine/parser.test.ts": {
+    "testHash": "77d2d339c2b6f69b7642186f3123a538ad2a9b2c5d40fc47add3cd3508853a08",
+    "sourceHash": "6f60e982f42fd7d76f96c9b08a8e7d43e166cf100a6c7d675e8c13ad389745c9",
+    "coverage": 0,
+    "success": true
+  },
+  ".tests/state-machine/index.test.ts": {
+    "testHash": "1eb3dc44c63cceb8360cfd06fdec20335e27eba1148e7259bb8b33e30ba50272",
+    "sourceHash": "24acba0e8a9cb8359069f4fd21d6b0cb8e8b8cbc3132b333e472d2e6e34e099a",
+    "coverage": 0,
+    "success": true
+  },
+  ".tests/state-machine/engine.test.ts": {
+    "testHash": "cd6e020822fc79411220c71f0c84e9ce30a7ec6cfda8aa38bf29751062b8dc5d",
+    "sourceHash": "69e9fdc56dacb4a3d788f29c386624a8bb02b7f332d1eae15654aebbb3d44ba7",
+    "coverage": 0,
+    "success": true
+  },
+  ".tests/state-machine/cli.test.ts": {
+    "testHash": "e17ed9b02d113a37bb78514ad3d991e187e7ca802175815b6e5177b6ce793c9e",
+    "sourceHash": "9694c18b72749c7f85621f58c8e0b68b35cc074c29193d09df3df6fbf3895b08",
+    "coverage": 0,
+    "success": true
+  },
+  ".tests/spike-land-mcp/app.test.ts": {
+    "testHash": "5e41f7d67b9fcb131953a0b46513b83334d7e4598ec11c6033947d3131914cb2",
+    "sourceHash": "9aaf8b6ff0b45157b7a9e95907ac2efa435b6fea4b22a8ba2c3d69925aac9e4c",
+    "coverage": 0,
+    "success": true
+  },
+  ".tests/spike-land-backend/largeValueStorage.test.ts": {
+    "testHash": "637b5e14e9392e0e1d6f072b6335801f2b7a0000361ea166520d9ca80849fb48",
+    "sourceHash": "f6c27c672189e1cca613f60615a5f0c6f90fd1ad5239f8bcce68e2bd9f2e1b19",
+    "coverage": 0,
+    "success": true
+  },
+  ".tests/spike-land-backend/chatRoom.test.ts": {
+    "testHash": "49f568c4971d86b3bc7375f4a1026aa921b7766c44df733d9a5617e5bd3f064b",
+    "sourceHash": "ea36717d03c195aab02cdb629ac55c110bc4ad9f926a7f7d03900412dc68e737",
+    "coverage": 0,
+    "success": true
+  },
+  ".tests/spike-review/types.test.ts": {
+    "testHash": "f0e303a1d99a16ea24e1916c8728087b080618191609910bc4ec7e8b57a44446",
+    "sourceHash": "8f188a734898fcbe892d55315d6b167dca67d864fad42442fb4e038e01875f1c",
+    "coverage": 0,
+    "success": true
+  },
+  ".tests/spike-review/index.test.ts": {
+    "testHash": "c1743d99c9abd65abd573d1cdc6930418f327ecb1da42ae00ac4e27399179b67",
+    "sourceHash": "49a67300f5815b907993526fb03adf1917a81f1acd15c4d6dc0f10f0db786740",
+    "coverage": 0,
+    "success": true
+  },
+  ".tests/spike-review/cli.test.ts": {
+    "testHash": "c7c4cec5809ace0919c9303fae9c2c5e90af82fc6aee29a0a57ec924e9b1019a",
+    "sourceHash": "33454f07598d9e57df50d7af67195a8d4c31b3614383b1651fb3cf9ea3b7a1a9",
+    "coverage": 0,
+    "success": true
+  },
+  ".tests/spike-cli/index.test.ts": {
+    "testHash": "e6cacc877735535e808e0ba362fdd8cb579a3662ff78d10567cebf310c5a5d0a",
+    "sourceHash": "5726ce90cd7e360211851b36eb2fba650e2e142398a0ea0b309de6f53ad6dc54",
+    "coverage": 0,
+    "success": true
+  },
+  ".tests/spike-cli/cli.test.ts": {
+    "testHash": "a12fa63284cfd687399123f2ec6853f58b388fe28448ecd8496bb3f30de7f292",
+    "sourceHash": "3e6ffb178afb80f1376dc96f07a8550e0dc6719308e226dea52513cb4e61c4f5",
+    "coverage": 0,
+    "success": true
+  },
+  ".tests/qa-studio/types.test.ts": {
+    "testHash": "29f1e5251767b3e7c84dc77aa9a25f9b3408c7612bfc26986ecf075dde72ba87",
+    "sourceHash": "aa71ea0fe12e0561758d1764c5f5444cf70b0f0aff3f7888a99b8ab35b2e001c",
+    "coverage": 0,
+    "success": true
+  },
+  ".tests/qa-studio/tools.test.ts": {
+    "testHash": "f12f59c1e017d724c26cbeb60801631c26e47e085909d9e77247182b3f01df5c",
+    "sourceHash": "bb8c7f53eed942e9099f305476c516437c31015e043ad7512e0cc3d0d8abf34b",
+    "coverage": 0,
+    "success": true
+  },
+  ".tests/qa-studio/narrate.test.ts": {
+    "testHash": "5191904660def8ed18213b9b7c074fe7674d835f3616ef1c6d247d9d0d0ce379",
+    "sourceHash": "261d6884396e59a9ad389aedef1829a350a471f97a1cea692c2e8f1b5eb0470d",
+    "coverage": 0,
+    "success": true
+  },
+  ".tests/qa-studio/browser-session.test.ts": {
+    "testHash": "5691b5285f7d7096ef303a43d0e2c191223cfa806c004cf3afd7d497a55af196",
+    "sourceHash": "ac5d548b669805e4275ba98327e2ad5847cbab0774d085700543cf669d77ac67",
+    "coverage": 0,
+    "success": true
+  },
+  ".tests/openclaw-mcp/translator.test.ts": {
+    "testHash": "f18c8ee449d517a987de9542c77ca96525c16febe7dc140dc7c0e509b8aff4c2",
+    "sourceHash": "094f3eb05e38e9d5273ac1dc50f1b2e86f744794f768246dd23422fbbc3789c0",
+    "coverage": 0,
+    "success": true
+  },
+  ".tests/openclaw-mcp/tool-adapter.test.ts": {
+    "testHash": "068b3da3c50580ef59d0b6b86972d3a3c06e849c20aa22a90d710b52b23fd02f",
+    "sourceHash": "fed21d49cb6fd859d7ca431e709f37c2841cb7744b34d4ea8431a99e31c8b121",
+    "coverage": 0,
+    "success": true
+  },
+  ".tests/openclaw-mcp/cli.test.ts": {
+    "testHash": "a3c60baeb98a3098227c2b7b3838b8be7d30455783eeadcdc48fb6196a68291c",
+    "sourceHash": "4a91e932922c7218a30a2fcf28b75cf96651f65764d05eb463f7f182108ef078",
+    "coverage": 0,
+    "success": true
+  },
+  ".tests/openclaw-mcp/bridge.test.ts": {
+    "testHash": "7e9f9f69b70b141d75c68dfb341838eb97b2e19709d468d1521ed51899d45fc0",
+    "sourceHash": "d61bf703b50cc6bb3175bcced85b8a1f6f2a12d3b3b217a1b4e4c3305fd857c4",
+    "coverage": 0,
+    "success": true
+  },
+  ".tests/mcp-server-base/index.test.ts": {
+    "testHash": "7fb5a1e569ea90dfe30ca5c4f0caec7a7762044eb7f84f7318eafa07e549f12d",
+    "sourceHash": "18edbe579f870f52af06761317a9fc1ca98c4244028de653bffa32853ced4a21",
+    "coverage": 0,
+    "success": true
+  },
+  ".tests/mcp-image-studio/validate.test.ts": {
+    "testHash": "374efc297e1cee1c5007bdde14896220f7da1cdf8cd30087f4d44689f534f3d6",
+    "sourceHash": "15e61392a72f4db2e60807db03813e5c045b7291fb72c3f7a599a11272287fad",
+    "coverage": 0,
+    "success": true
+  },
+  ".tests/mcp-image-studio/types.test.ts": {
+    "testHash": "434679afde0c7932d45f731d2e7d6eb28d5236548ce37ea4edf6c637d8ee371b",
+    "sourceHash": "2d7f6aadbdd055fb9a18866d694987ef3d48d253676dff079933b1f12833b3a7",
+    "coverage": 0,
+    "success": true
+  },
+  ".tests/mcp-image-studio/tool-manifest.test.ts": {
+    "testHash": "e059b0562d2370beb8387e6a944a239b82f587cc97e0040d8f9dabae0b69245d",
+    "sourceHash": "90c1c67c151ad9c7484599ec58bb4eff7846c62a56af10a95fda03710f5cf400",
+    "coverage": 0,
+    "success": true
+  },
+  ".tests/mcp-image-studio/register.test.ts": {
+    "testHash": "d56e1ba2a415e335de38397a89d41e172fd3c51dc142e132de7d98e2fa1448ef",
+    "sourceHash": "4aa9ceb63a5607439c5577aa55e88f1ce7206183729dd59916c5cf7fbc0b4369",
+    "coverage": 0,
+    "success": true
+  },
+  ".tests/mcp-image-studio/define-tool.test.ts": {
+    "testHash": "222bfe44b3774b8ed1e5f8679941c7b9af5c054d41ca81d3725f95f7dc8c2234",
+    "sourceHash": "5c1fb7b669b0968411b52bd6f76c26d74eb2c7e4b62d690eb47e2488c73cc407",
+    "coverage": 0,
+    "success": true
+  },
+  ".tests/mcp-auth/index.test.ts": {
+    "testHash": "ba884163403a918f7768933968ca40b57b53d202e0dc50a59faa666726148590",
+    "sourceHash": "46767e3fa07e8fdc672a4e3ff24fb3317bc64f53bbbca9142569094f0dac043e",
+    "coverage": 0,
+    "success": true
+  },
+  ".tests/mcp-auth/auth.test.ts": {
+    "testHash": "705521d3f69b5e6b0311901b0e172ffdade115ad244ab518c23e42d1ecfb1195",
+    "sourceHash": "314006d00706c9d3987c04e7ec60c353d3d5da6297b3b201bde13308179cf9f8",
+    "coverage": 0,
+    "success": true
+  },
+  ".tests/incremental-test-mcp/logic.test.ts": {
+    "testHash": "4dc2d3f3611a04543566ef9d4250ca3b7752a8ff1be845cd01cac357d04e29b5",
+    "sourceHash": "f20d2b2dd686ef2d72052af274893a0d40c9d2443bb78c0515184c9f2fbcde4f",
+    "coverage": 0,
+    "success": true
+  },
+  ".tests/esbuild-wasm-mcp/wasm-api.test.ts": {
+    "testHash": "040c402fae1ae29c18d25c8d589e84e38b74c7d03fd94c2782707a9a6e9e0a5b",
+    "sourceHash": "771b3264e16d0eedd3f292388a084dad0edb836ae2116fd9f49c9ef8c1b90fa8",
+    "coverage": 0,
+    "success": true
+  },
+  ".tests/esbuild-wasm-mcp/errors.test.ts": {
+    "testHash": "7d9f02f9ec2a870ee26bd5a7213b1d21ba5f191df98424da436ec860e1056079",
+    "sourceHash": "bbd7a2532df184b844df113d2a8bee20599c4db79c123b0b0318e6c755ab0c07",
+    "coverage": 0,
+    "success": true
+  },
+  ".tests/chess-engine/types.test.ts": {
+    "testHash": "296fb72cf9a6417c2f716b7280300e96521e8df2c64309b5d8e382173d07a652",
+    "sourceHash": "26fc6b73fbd98027a4901d61955daa7af5cb36c64d0844536a70f83a7404e9f5",
+    "coverage": 0,
+    "success": true
+  },
+  ".tests/chess-engine/player-manager.test.ts": {
+    "testHash": "dbc757bff7eb6e262f8f286c7466d1f4c8e474484dbeb3166c4e40a8d840ef5a",
+    "sourceHash": "f666ed3126c33123aff634dbf1d90e0e5ede594641f30485e7146676af67267d",
+    "coverage": 0,
+    "success": true
+  },
+  ".tests/chess-engine/game-manager.test.ts": {
+    "testHash": "65657e8ce25f521f41e31fd86015f9c9f4b792c4b5a59e7bc799c5e627ef084b",
+    "sourceHash": "fadbce187e9360496f17408d9b7a67f2208aba7f30cb93f43113a2f641bf01e8",
+    "coverage": 0,
+    "success": true
+  },
+  ".tests/chess-engine/engine.test.ts": {
+    "testHash": "55421b762e1ce047d58b4f8fdf2112df2a345c1efd285dfe6b2d8d54a071c202",
+    "sourceHash": "557638ac5d9838f7ffbfef65ab9d7cbc61fb6eb6bb40e91bbe17c92fb9fa9e31",
+    "coverage": 0,
+    "success": true
+  },
+  ".tests/chess-engine/elo.test.ts": {
+    "testHash": "a9a5cd236b1b23abfb0a220fc725ab845be3063e6b172778246d83debff2993c",
+    "sourceHash": "cd9d78a2b945f20b2bab8191484341bc8a97b3bbe34e3f96d1de6d564508faa6",
+    "coverage": 0,
+    "success": true
+  },
+  ".tests/chess-engine/challenge-manager.test.ts": {
+    "testHash": "19fa5d5b9c0a0c0e787b829a8824d3e9a4d66d5d3c4dbfa768ab401939137a38",
+    "sourceHash": "2b60e7dff941352092a696638f3e32511ede682c2cf9d1e38d239040d093a024",
+    "coverage": 0,
+    "success": true
+  },
+  ".tests/block-sdk/define-block.test.ts": {
+    "testHash": "d992f74a027509672e40b59f765819eabc2ff35aa768df13c7b26745b6851b7a",
+    "sourceHash": "814110a69946e38bc7bee03604bd5a04a87242dcd8406b75331ce8a823402227",
+    "coverage": 0,
+    "success": true
+  },
+  ".tests/bazdmeg-mcp/workspace-state.test.ts": {
+    "testHash": "08d6c0e77b43c75ed4b26450d17ad572b494a5eb87fe71ea0052235f5b5a7f83",
+    "sourceHash": "2620b6c6f31c61b0bdc29384c6efb42e11dcbe5ed5e37f26f9801453b0e307e7",
+    "coverage": 0,
+    "success": true
+  },
+  ".tests/bazdmeg-mcp/workspace-resolver.test.ts": {
+    "testHash": "96c7ee5c4dd34f243ec3fc55edbb69ef67cf3172746d40d4164a1606cc6a9aec",
+    "sourceHash": "24fa20fe62293ffeb922b189be5307e84b7b90effbc49421983801e5a335eaa6",
+    "coverage": 0,
+    "success": true
+  },
+  ".tests/bazdmeg-mcp/telemetry.test.ts": {
+    "testHash": "cf1cd8c9c423558cdbcb812954c5e518d669b7238a40c9f3602e6435116828fe",
+    "sourceHash": "5cf9addf93c3549e8123eefbd1315a8e21a5e5552fe0ddbecc12485eda1f4caf",
+    "coverage": 0,
+    "success": true
+  },
+  ".tests/bazdmeg-mcp/shell.test.ts": {
+    "testHash": "1598f7a58e1d23307db4cfd171082033d2ca03f336473962bfecc9fa3ae8ef8a",
+    "sourceHash": "e9d2b44168bb9ff2c883a029abfb46f903a95a82a62b455d466f1d856617f0bc",
+    "coverage": 0,
+    "success": true
+  },
+  ".tests/bazdmeg-mcp/manifest.test.ts": {
+    "testHash": "adbddaa57fc46265d5f85582d2c1f5c520f3fb32081f609961e3f20695e406ca",
+    "sourceHash": "43f05c05ebdf0fb11f2f36a3af21c34df64665b086347833854530c1f6c4625b",
+    "coverage": 0,
+    "success": true
+  },
+  ".tests/bazdmeg-mcp/context-bundle.test.ts": {
+    "testHash": "126680fd136fde070e338c06f052da7fdc7b01c681ac8c465de7b6582c81097d",
+    "sourceHash": "166609caf0a5c13e389654f0ac5f4614fec3b0d2e516ca1eff6516678aa8a165",
+    "coverage": 0,
+    "success": true
+  },
+  ".tests/spike-land-mcp/routes/well-known.test.ts": {
+    "testHash": "f8e9e3ef9788b2b20347b71d58d505c24be8d96b79b6bc954d8e04e76f7e593d",
+    "sourceHash": "7d2d3d9bf57cbdd2270f54b671763345563f7c28ee0c31805d0257aa8d7342c6",
+    "coverage": 0,
+    "success": true
+  },
+  ".tests/spike-land-mcp/routes/oauth.test.ts": {
+    "testHash": "d42c3c74047ad5691ce805b1c085282425dc8dd59a017bb7d862ff92981e5a28",
+    "sourceHash": "57ff917cd161607612ddeb610978f81312d9ad3bd6ecf94fe6371dfe8e0aa607",
+    "coverage": 0,
+    "success": true
+  },
+  ".tests/spike-land-mcp/routes/mcp.test.ts": {
+    "testHash": "f68454ddcc967c583e81407fe734203aa0b80a82e8a7b3886befed350e04d964",
+    "sourceHash": "4c7867f27b3f2ab74b32b7047bc2288c779e396c881cca18062aed7a9c10063e",
+    "coverage": 0,
+    "success": true
+  },
+  ".tests/spike-land-mcp/tools/tool-helpers.test.ts": {
+    "testHash": "63f60a764c014323fa383a82a2aa84d60a81e5fa099e82e7a88283aa9a54e1a4",
+    "sourceHash": "783554362fe6e4cd781714fbfdd703459458922ade4a8c95ec199e8bcaf9c00a",
+    "coverage": 0,
+    "success": true
+  },
+  ".tests/spike-land-mcp/tools/quiz.test.ts": {
+    "testHash": "1b860218db15e4de72454aca79e26dca7958db67355125c97435b30845a36737",
+    "sourceHash": "9a787779c32b153bbfd465b7506c3f55c0cfd6eecf076335ae1f4dbdb11610cc",
+    "coverage": 0,
+    "success": false
+  },
+  ".tests/spike-land-mcp/mcp/server.test.ts": {
+    "testHash": "332439afc651e0d9b163253ef90e6a0e1ee7e4508d741842b5a5788c6fe72c33",
+    "sourceHash": "996197a96a862026b2013c9c6553244baf71b8b21297122c203d66f2b156a365",
+    "coverage": 0,
+    "success": true
+  },
+  ".tests/spike-land-mcp/mcp/search.test.ts": {
+    "testHash": "8abdf9e97449da7fd16e333e64333c9859a88445b251ec0eb20a54464a653ac9",
+    "sourceHash": "ec2d0803e1901324d4a093f0555dc27d5e56af2275fb6f215e7844f67897dfe2",
+    "coverage": 0,
+    "success": true
+  },
+  ".tests/spike-land-mcp/mcp/schema-optimizer.test.ts": {
+    "testHash": "f4f78488b0a0d6299965dac3f25271a0a3da13098346bb3e5df0d4ece02bdff3",
+    "sourceHash": "73012b4cdc6736288ef54f0f3ced793da23e6232deefa5d9e48fdfec015a24b5",
+    "coverage": 0,
+    "success": true
+  },
+  ".tests/spike-land-mcp/mcp/registry.test.ts": {
+    "testHash": "6bff729b34b7b197afb8d1dc3048493ca0d14321d479b82afb52d48b337fd54e",
+    "sourceHash": "a0395d2cb3f27cc112477f342f250eef250ad8aa8b37f52b505d0e69923b78c7",
+    "coverage": 0,
+    "success": true
+  },
+  ".tests/spike-land-mcp/mcp/manifest.test.ts": {
+    "testHash": "a8ab33cf160205eae97ee14913bf4eb5471c2dbe38da2adba916d519b33053e4",
+    "sourceHash": "c55c044e11327063dad1facd47ddb23a61c434ba87e7380082d1a37b4aaf056b",
+    "coverage": 0,
+    "success": true
+  },
+  ".tests/spike-land-mcp/mcp/embeddings.test.ts": {
+    "testHash": "e8500348134bf1663c0d947c6875da3d1ef66d1ebe64ee63fbef0724895378fe",
+    "sourceHash": "5679d366b959e88259d40820bca2066e4138172e7598951c3216e0e7b0308a40",
+    "coverage": 0,
+    "success": true
+  },
+  ".tests/spike-land-mcp/kv/rate-limit.test.ts": {
+    "testHash": "f50d33652afeb28f38b81c1114810fd8e091b501bfb40200ecc92d326fa771b7",
+    "sourceHash": "8624e87fd67e738d64a925a6778d73bfd62cb1eaad7b0528657b384fe7e26da5",
+    "coverage": 0,
+    "success": true
+  },
+  ".tests/spike-land-mcp/kv/categories.test.ts": {
+    "testHash": "a70bcf57a054a30a4b6a41cb7b17f54246fca53f3957b0a870e047be8de05d9d",
+    "sourceHash": "093ef53b9b7a67ee2e724a5739f78f89eb3a1ee0bd18c61dae1d16568fce82c9",
+    "coverage": 0,
+    "success": true
+  },
+  ".tests/spike-land-mcp/auth/oauth-device.test.ts": {
+    "testHash": "dfe91d22b95ddf90360f6d03cbd8afd2ef7a24901dfb1085f5e6d9377cd4f8af",
+    "sourceHash": "f5c46f5813285c16d722a9dad4262495aa468ccf888f5530284a6cc81345b16c",
+    "coverage": 0,
+    "success": true
+  },
+  ".tests/spike-land-mcp/auth/middleware.test.ts": {
+    "testHash": "ba6a920aea0341a86f63d0ac465b66e0170ad2ef0dacd88768e9f8950661e7a0",
+    "sourceHash": "328deb2c75916f96642fe97862b4ac3baed5f8d5285bf6cf9a0fa0623f1d8235",
+    "coverage": 0,
+    "success": true
+  },
+  ".tests/spike-land-mcp/auth/jwt.test.ts": {
+    "testHash": "655c0bd1d666c5373074ef299a275bdb58cbcd3f7bb1a1ca3ab8070ea55adb5e",
+    "sourceHash": "5f57e42baa8e5dafb109533928d09dec96206092ff4bddae803b1821d6010e65",
+    "coverage": 0,
+    "success": true
+  },
+  ".tests/spike-land-mcp/auth/api-key.test.ts": {
+    "testHash": "a7d5a80b2726d9d26d4bb1680b645a7b8b7054c111e31282a0cbaac096321589",
+    "sourceHash": "d97c2907bbd4a79520a904b816ae37c46330dfa67bcfa7e9789ac08d137882c1",
+    "coverage": 0,
+    "success": true
+  },
+  ".tests/spike-review/worker/webhook-handler.test.ts": {
+    "testHash": "e1201dd79604cbb91f9a3e1c5b0a1656399d19c7b0a4987e060aba46f82d38d9",
+    "sourceHash": "6e1944243bb4ed20aa5a769c0879f75769d9ea1a54a9e9ab1eb64fb3d0562333",
+    "coverage": 0,
+    "success": true
+  },
+  ".tests/spike-review/worker/review-job.test.ts": {
+    "testHash": "6c8ae6fba427113b4f1301f6ade899f6076de1717b20b3d8c720e2ec27199618",
+    "sourceHash": "d02f1481f991161f4e8bc24ffa5e5dbe2443ddebef767f1b32415cd565a50c55",
+    "coverage": 0,
+    "success": true
+  },
+  ".tests/spike-review/worker/index.test.ts": {
+    "testHash": "7624efdd1926c9dfa9729bf3cf9c704acc05c375c256f058d823208a21be02ef",
+    "sourceHash": "24ee27892be09edf0e2095428b7251e96a2362866a60aa2b0ac8e24968d14770",
+    "coverage": 0,
+    "success": true
+  },
+  ".tests/spike-review/tools/review-pr.test.ts": {
+    "testHash": "55e869c7f53b19437c1afe628d36157fbffe88e2176fd18c7fd4238b5f3c1eed",
+    "sourceHash": "65ba7e72bcc627e6d66d47e7dec59b5b3c27826b753de6b8e2bab3bc36803bcb",
+    "coverage": 0,
+    "success": true
+  },
+  ".tests/spike-review/tools/check-gates.test.ts": {
+    "testHash": "59ff876784f6a434a35bf42824132fa9ad9a9d91a918dc48dbba9dd7555b3eb2",
+    "sourceHash": "3fc25c0f72f6486e57ebe445b6dbfd45d54785fb75a95a292268e3f494b9ad56",
+    "coverage": 0,
+    "success": true
+  },
+  ".tests/spike-review/rules/engine.test.ts": {
+    "testHash": "5aa78c6266b412c4418e98802b6b1a5a976fac8a0f51a3463677086d9131b13f",
+    "sourceHash": "3d9cd703227c17c0400c2bcaf250bce80908710bd63142fcfb0b8c8404d268fd",
+    "coverage": 0,
+    "success": false
+  },
+  ".tests/spike-review/rules/claude-md-parser.test.ts": {
+    "testHash": "70ccaf95c3b7ddc7a1909d8169762d3135a04d0a3d315a90113de9f7925cea45",
+    "sourceHash": "615bf9786af05420164bcf6bb43b6fce2041c76c7768163f2cfc33a2b81afe5c",
+    "coverage": 0,
+    "success": false
+  },
+  ".tests/spike-review/github/client.test.ts": {
+    "testHash": "0462ce9a03cf3b2c6d0b1799d32cf39265a42e51e1f45664711554e37712c657",
+    "sourceHash": "ba3cb0cb6022f51ae475911f93e03374bd8d7a7de7ffe2a7534c55d667e32097",
+    "coverage": 0,
+    "success": true
+  },
+  ".tests/spike-review/ai/prompts.test.ts": {
+    "testHash": "797d9500c71457181589f0c2e45160d98e76bb779387d005e8bc37c438fad3c9",
+    "sourceHash": "b9fe296d928805cf74617f3c8287d08af10ba56547b8074363953b538e769389",
+    "coverage": 0,
+    "success": true
+  },
+  ".tests/spike-review/ai/confidence.test.ts": {
+    "testHash": "ac3153c68e2a7c05e1292fe5fa92c7d11957ed9ac39579f8dc8eb468e953412a",
+    "sourceHash": "ce21b4e69f8a8fd2b8c1ea15044f6a52be18766c641c1342dd7b6de6e0906566",
+    "coverage": 0,
+    "success": true
+  },
+  ".tests/spike-cli/config/types.test.ts": {
+    "testHash": "71847550a4814d128f494f8f77af7053cbe1da6818f49b8dbf683c1761f81c4f",
+    "sourceHash": "95652486ffefb2358296064da43fae1aed9b8308e1c44eb01de22f454b55f623",
+    "coverage": 0,
+    "success": false
+  },
+  ".tests/spike-cli/commands/completions.test.ts": {
+    "testHash": "0424c44c02e88109ac3ee7972892aef341208a99796618a0affa1db024eeff95",
+    "sourceHash": "841ed0a236be03a82c48335c12a7f8fe7e02fa40caac5b34af1996755f6fe64e",
+    "coverage": 0,
+    "success": false
+  },
+  ".tests/spike-cli/commands/common.test.ts": {
+    "testHash": "88fb41a0c1b0f6f2ebab47f46fb7839898618b206a282a8c075137c8580b1512",
+    "sourceHash": "53a8055034a2e92a3f57101ae39ef7814e1f922bde3a66b74ad10228146076b3",
+    "coverage": 0,
+    "success": false
+  },
+  ".tests/spike-cli/commands/auth.test.ts": {
+    "testHash": "27ce87a170673080b0ee77416fdd7724f70c2da8294d3eeb12b7a74234e66ee5",
+    "sourceHash": "89fe2d69c8f1db8bfbd0ee64f63e968df8ef3e15a15e9de88296d162a8f58089",
+    "coverage": 0,
+    "success": false
+  },
+  ".tests/spike-cli/commands/agent.test.ts": {
+    "testHash": "6099d0ae28f7b2e60dae2e4f15b7abb98a4408eb4e1550cbae95adc171c148a6",
+    "sourceHash": "417fe084e8f3ab834b1b990efb7953ca7532186285ed160eedf107c0fb9d4ef0",
+    "coverage": 0,
+    "success": false
+  },
+  ".tests/spike-cli/alias/types.test.ts": {
+    "testHash": "c83c10987162655aa8c331bb97be8a5aa86498fa7e961173aa750068542d16ac",
+    "sourceHash": "652c42246f8bc44278baa313138f14c00172890f6578d1361233c6b1035efa7a",
+    "coverage": 0,
+    "success": false
+  },
+  ".tests/spike-app/lib/auth.test.ts": {
+    "testHash": "69cd141ad69107b5b565470f7a388fcce64e78272bf93175fa3f19b24b95cc94",
+    "sourceHash": "f3db19ad4c49c6d23f077332f450ae65b03d76fc79812baa7451974bc97d4612",
+    "coverage": 0,
+    "success": true
+  },
+  ".tests/spike-app/hooks/useAnalytics.test.ts": {
+    "testHash": "caa993b17847b8adb2706abf73b57528e04501b8e5924673730961925aa3a67e",
+    "sourceHash": "d323d645d7567741859c63f3536ebe9ed16c450ac7cd22aa1985dd788bb91806",
+    "coverage": 0,
+    "success": true
+  },
+  ".tests/shared/utils/index.test.ts": {
+    "testHash": "577163c5d9b6528d0027db9fd7c9c1b26a03741c855fd63bdcc8ca3a2af78a36",
+    "sourceHash": "d05263f9e451d5a6436a45429fa152187562d73276ec5437fb665a8229feba70",
+    "coverage": 0,
+    "success": true
+  },
+  ".tests/shared/validations/index.test.ts": {
+    "testHash": "2c068b877f49eae8dc3275d3222ed24ef86f1c1ffc21f6c1ff8b86d05ca4f0f9",
+    "sourceHash": "e76548581c0a4d9e84b6159d62d34ef2889279b6bb087c213af5ee05cf3b3c23",
+    "coverage": 0,
+    "success": true
+  },
+  ".tests/shared/types/social-api-guards.test.ts": {
+    "testHash": "29ca9f87b7896807cf174da8cb5e8de927fff4bb1ee377f28d7ec7810f95f6c3",
+    "sourceHash": "0eca9ae52c0d245008ffa115735e383741aa442c102ab2d43078d658131c12ae",
+    "coverage": 0,
+    "success": true
+  },
+  ".tests/shared/constants/index.test.ts": {
+    "testHash": "b1d5554380a7ad0fd49ad7b18b46c7a05b3da3cd69ab2c777da858b4ccc896cf",
+    "sourceHash": "b820265ccf9f7764dee14abd33c0474591cee02a5e56373f51b6964bbe80dabd",
+    "coverage": 0,
+    "success": true
+  },
+  ".tests/mcp-auth/db/schema.test.ts": {
+    "testHash": "3d26f31d1ea0ea523a0ae687c15abda7c850546cdd325053577e8bf5102a1f7d",
+    "sourceHash": "28593b0223439640ec4214677de3a84c04d9df856121ff18ecb3536a437a7692",
+    "coverage": 0,
+    "success": true
+  },
+  ".tests/image-studio-worker/deps/resolvers.test.ts": {
+    "testHash": "5d28ef0b7714ccda655f67c8a2d06a65aa861c712e95d2fd2e7d3d8483e23e29",
+    "sourceHash": "b7b08ddf9c798dc51aff6c7e1d4e888ab604b51b32bc9b1dcd5e42a41e11371c",
+    "coverage": 0,
+    "success": true
+  },
+  ".tests/image-studio-worker/deps/generation.test.ts": {
+    "testHash": "48c374673252a716cd3334dd0448b1d7a7f2e0ab20b9d2a23acaae52afe31700",
+    "sourceHash": "4999cf1847154ff58c1757c9ef6a8969971fc3c52484f6b33e8f86e68cd83867",
+    "coverage": 0,
+    "success": true
+  },
+  ".tests/image-studio-worker/deps/db.test.ts": {
+    "testHash": "61313ce20f283950f328c1ff736779fb4351ab60ce77e545af17b21d2d30b04f",
+    "sourceHash": "a4d8f3f836e4fc9466d98c1490c7d32b1ea0580a7478415c944985bcd5b78f5e",
+    "coverage": 0,
+    "success": true
+  },
+  ".tests/image-studio-worker/deps/credits.test.ts": {
+    "testHash": "6fc7628a7513cabad264764f73b7771bf49dde8fc0a71bffe6135afe11af8f01",
+    "sourceHash": "33b450a84504e17b905aafeebc760de7043a7e3d908df81d2ef45ccaf7969da1",
+    "coverage": 0,
+    "success": true
+  },
+  ".tests/mcp-image-studio/tools/watermark.test.ts": {
+    "testHash": "6e9740c3d281ff5bdb691e131f06f58df8061e4bea59aca27e1d0e1476f204db",
+    "sourceHash": "7643ce31d251326d60a83b56ea1609abc63292cfc7f50aaa753cd84319994569",
+    "coverage": 0,
+    "success": true
+  },
+  ".tests/mcp-image-studio/tools/versions.test.ts": {
+    "testHash": "c83409c9aeaa9851f4039b53eb65428883fdea43b8bd6914c019f7daea5d840c",
+    "sourceHash": "3858fcae26b5367f001643d4fe5212774c07324cc67b35afffd94b9ead6ed2e0",
+    "coverage": 0,
+    "success": true
+  },
+  ".tests/mcp-image-studio/tools/upload.test.ts": {
+    "testHash": "3960786f68e37557201d50728b6853f19181251a2b5df79b7fa0eed9787452d2",
+    "sourceHash": "c240c3eca591c34be31ccc23bee2cbdabec5c88aba72b389a4fa6ff87dda84ad",
+    "coverage": 0,
+    "success": true
+  },
+  ".tests/mcp-image-studio/tools/update.test.ts": {
+    "testHash": "7aecf72d913149e09d315dde55a23d57434fb367081c017dcc2ed25f15ed70dc",
+    "sourceHash": "d016db7026f6e5b720d0bf73b0ca433018b9f1f1b8b4e94b317cc185b0f8fd6c",
+    "coverage": 0,
+    "success": true
+  },
+  ".tests/mcp-image-studio/tools/try-catch.test.ts": {
+    "testHash": "fe7cdfb4c6815a38e632dff5074ffc8ac8e1a7090b08bebc838ed3c2c2b750e4",
+    "sourceHash": "86aa59eea1aa15d4e61f29ae93e0bcec0f98ffcbf2ecd837651cd0cf646ad1b2",
+    "coverage": 0,
+    "success": true
+  },
+  ".tests/mcp-image-studio/tools/subject-save.test.ts": {
+    "testHash": "24f709c9a2240843bfebc77e5cf468f0a7fc9b6775a6c2a375af66334f4673a7",
+    "sourceHash": "348ce17f564dd5f2693efa1d28bfc4459c7b501f2c2231cb99b556b69e4b8220",
+    "coverage": 0,
+    "success": true
+  },
+  ".tests/mcp-image-studio/tools/subject-list.test.ts": {
+    "testHash": "dcb95ac6b78d22d93b142783d88158366b45e40edab9dcbe23f553dd47c18652",
+    "sourceHash": "2c06e948f8f64a11a88867007a62f9269fad2f81327ffcd71c5057a868414ed8",
+    "coverage": 0,
+    "success": true
+  },
+  ".tests/mcp-image-studio/tools/subject-delete.test.ts": {
+    "testHash": "eaa7247a4d47335422a142be957f7537b6dbad7be17254944a1c337e969db826",
+    "sourceHash": "bb1f03ece9dda90bd19bbf91b8c4c663e83f30082f4a222d42d43aa61c9d2598",
+    "coverage": 0,
+    "success": true
+  },
+  ".tests/mcp-image-studio/tools/share.test.ts": {
+    "testHash": "98ad79fab866e6e18abfdef94313416a657dc611300f7857a36c861c4eaf415f",
+    "sourceHash": "679bf54ec09b8dc34593a54d3c3845d109440cd44e894229b40168739021fb10",
+    "coverage": 0,
+    "success": true
+  },
+  ".tests/shared/tool-builder/index.test.ts": {
+    "testHash": "9cb856620d86eefde13a26e4c82f3ea2dcf06e6b85c38135eaa5bc03ef5400e5",
+    "sourceHash": "5fe4a983d93130929d8226cac60b8ff1887093d022276feb5a39a5bebc264251",
+    "coverage": 0,
+    "success": true
+  },
+  ".tests/hackernews-mcp/tools/vote.test.ts": {
+    "testHash": "df0c8322ad952fda648653775e29ffc515b9ba3f6d043acaba186aad7f030780",
+    "sourceHash": "cb60749795a17aa8ceb6261e62a7af494c66c5c57386a7bb2af335cfbe5f9acf",
+    "coverage": 0,
+    "success": true
+  },
+  ".tests/hackernews-mcp/tools/user.test.ts": {
+    "testHash": "38df1262aaabfd995243eb7e3b6b55e4dd2f6ce1f5b384ce02cc766674f58cdf",
+    "sourceHash": "cd7842908c03c3e20419436b902ac2782a2ac56ddd24374e8c05514ac0c623d2",
+    "coverage": 0,
+    "success": true
+  },
+  ".tests/hackernews-mcp/tools/submit.test.ts": {
+    "testHash": "e50809a6ce68fdebff9e4f3dca4f6d1bd8ae4c96f3cbb024a3a154fd3cd29f02",
+    "sourceHash": "f00f8976787fc90c7c601957aaf740774ec341705520be30a8ace2465cd65a47",
+    "coverage": 0,
+    "success": true
+  },
+  ".tests/hackernews-mcp/tools/stories.test.ts": {
+    "testHash": "0d66be8a70c56b09b4c7a3f2005ae1cdf392fc041338b4fc6a11fd60a57e9eb2",
+    "sourceHash": "b6ba8508209ad4279b670c95c6847cad5f7212965e584be5740450313bc7f60b",
+    "coverage": 0,
+    "success": true
+  },
+  ".tests/hackernews-mcp/tools/search.test.ts": {
+    "testHash": "3cf8f6e86244dc51f1fad8af20c9bec00727e7488872106c6d1501a9e7ff6bee",
+    "sourceHash": "12985fd5e58828980102555eb5b59783940e79a449805d316af090d192d1c298",
+    "coverage": 0,
+    "success": true
+  },
+  ".tests/hackernews-mcp/tools/item.test.ts": {
+    "testHash": "29bd2f94654307248ce5279216d41ab3b2ae100229b0cc52dfcd3a6ed9b83a39",
+    "sourceHash": "b98766113bd398c68d116b74fc1859b115920f0cb60d15aaed1e71c6b2896f74",
+    "coverage": 0,
+    "success": true
+  },
+  ".tests/hackernews-mcp/tools/comment.test.ts": {
+    "testHash": "bda4e068d540d7795e6f361155d1b3bc37952db40d379acc3e9783e0d135388b",
+    "sourceHash": "df6b7017ecf183ed4c1b2133704bf20ffaffe279804a09a361cea1f84effa8af",
+    "coverage": 0,
+    "success": true
+  },
+  ".tests/hackernews-mcp/tools/auth.test.ts": {
+    "testHash": "9fed1534555bb139a13d454e7b472af26a61a59749ddeef1ff88d8d30dce1be7",
+    "sourceHash": "efa910bb12cff2b6d6e1f28308f68c38a543ff356d9270e42d34e4d08fae742e",
+    "coverage": 0,
+    "success": true
+  },
+  ".tests/mcp-image-studio/tools/screenshot.test.ts": {
+    "testHash": "ff8f92c4bd7700fa38deb11e788db090e6cba96311534b675a67c814f25f5ab6",
+    "sourceHash": "fc78f8dfe1a66b1dd213e954ccd2e5310568dafa5eac14e5f2b21a0646eae7e1",
+    "coverage": 0,
+    "success": true
+  },
+  ".tests/mcp-image-studio/tools/resize.test.ts": {
+    "testHash": "10050b9771914cb2e7afb49a609e806ec8774ce3df9444d63e23d6d91be6d718",
+    "sourceHash": "5751945b022191d3d5144fd285d155467086b621b1d2c4f8793b308ac011d4b1",
+    "coverage": 0,
+    "success": true
+  },
+  ".tests/mcp-image-studio/tools/remove-bg.test.ts": {
+    "testHash": "68091f82aa47c7dd8732472af825c2a7e2a9a1b8e75738dec07611afb6aebfd9",
+    "sourceHash": "e0d2f47a570f4710a284c735f24b6d04ea8a574ab491d693f96bc89aea728148",
+    "coverage": 0,
+    "success": false
+  },
+  ".tests/mcp-image-studio/tools/pipeline.test.ts": {
+    "testHash": "306b143974e5f69a466c899707c3188c50c8cdce9edb8a8cb5f0ba3d9dedd90c",
+    "sourceHash": "4465836f77b5e93fa4ffaa86b4fda6dd5d2100e1255708f6a74bcfd2321e329a",
+    "coverage": 0,
+    "success": false
+  },
+  ".tests/mcp-image-studio/tools/pipeline-save.test.ts": {
+    "testHash": "1cbb0acdae0798492c1392574bb2795af295afaffbdab9432f9378e7636c5ca3",
+    "sourceHash": "f10d5ba5728028ba393a5af8f868f00dac60ae41b6292f563cd7c78ec8bd07b5",
+    "coverage": 0,
+    "success": false
+  },
+  ".tests/mcp-image-studio/tools/pipeline-list.test.ts": {
+    "testHash": "92173528efc0d49b7cc959bc70e7082f349d3bfc154e1327cce6f0bea7645bd5",
+    "sourceHash": "76e0da41c4dcbb447e934728e3fb60e601fda597b303fc55b62ee34c510e89f2",
+    "coverage": 0,
+    "success": false
+  },
+  ".tests/mcp-image-studio/tools/pipeline-delete.test.ts": {
+    "testHash": "16d05ebc3b437f50b53da72e96a9606410ee9463b61b2e568350639934af3979",
+    "sourceHash": "95b15f9922be1339199cca8de500258ece417c43ee9a397a6f4cd0b762520c65",
+    "coverage": 0,
+    "success": false
+  },
+  ".tests/mcp-image-studio/tools/list.test.ts": {
+    "testHash": "1c3868be5a97d67d5a4948c2b3f88197c70160f74d1cc80f731e7010a4c70a55",
+    "sourceHash": "d0d8eb646e29c1a6c50102b40cfe7549efd4a29268182fedaacf97930c482710",
+    "coverage": 0,
+    "success": false
+  },
+  ".tests/mcp-image-studio/tools/job-status.test.ts": {
+    "testHash": "e1d7c4d37c209b239c048d510def11c57eacb849d34723657cc4e04f2f94f089",
+    "sourceHash": "160bca9d680f2e3f592650164fa9dba544351da581cd8352e222970ac5f40a0c",
+    "coverage": 0,
+    "success": false
+  },
+  ".tests/mcp-image-studio/tools/icon.test.ts": {
+    "testHash": "af1b00508df3c313464333ab7ebd370e2e03cad5b1b59873ad42f132e403ac72",
+    "sourceHash": "6eb821d27dbd3b2625ff7a2eac9b3700d521c78364ada829fd154a68e6734ca9",
+    "coverage": 0,
+    "success": false
+  },
+  ".tests/mcp-image-studio/tools/history.test.ts": {
+    "testHash": "4e3f0f3dae406cc65990f4a68bf9428026562bd071953c30bac4ed389cdfd4f6",
+    "sourceHash": "d6c762b1bf9edf1bf7990f63a14c38db6d72df455d2ccb863480ffdbd84ddd2e",
+    "coverage": 0,
+    "success": false
+  },
+  ".tests/mcp-image-studio/tools/generate.test.ts": {
+    "testHash": "80836cf0d6de9a72bbe483364694866e0814a0b2716553da77a613602906d66e",
+    "sourceHash": "c407a1e7d8b6441260853cb0d5caffcbd0a3e397b4d87d6b7be247bb4ddfb8d0",
+    "coverage": 0,
+    "success": false
+  },
+  ".tests/mcp-image-studio/tools/export.test.ts": {
+    "testHash": "c54cc8b771ebc29df6d266e723c97689ca434923bb7f0cb588c93eb1e80de20b",
+    "sourceHash": "692e887671f1207fac62d4a2b532daef0f52d76e763179212c9eddd54669a055",
+    "coverage": 0,
+    "success": false
+  },
+  ".tests/mcp-image-studio/tools/enhance.test.ts": {
+    "testHash": "9af535230d8a2a10d4727c624c6d494cebc8798792a2df249d3648675e665903",
+    "sourceHash": "0c40c8773b9f8cc3fb32e1791494a10c8c86021307e0f243049425af4a971ce6",
+    "coverage": 0,
+    "success": false
+  },
+  ".tests/mcp-image-studio/tools/edit.test.ts": {
+    "testHash": "38dfa4be6eaa4436b51a16fe540bc66461718074ee1a946954aabeab707f6410",
+    "sourceHash": "a9aabb7aa930f421eb36c9ae706d26cb157fe221957b82e685f58ecce73be9f6",
+    "coverage": 0,
+    "success": false
+  },
+  ".tests/mcp-image-studio/tools/duplicate.test.ts": {
+    "testHash": "0e989d60378c10edd643289e1898c5e782aa73d27a39f8a291574ed3290406a5",
+    "sourceHash": "5525ea5a744395ecf62173da00181df33de39736334284d7346721a3dee9c373",
+    "coverage": 0,
+    "success": false
+  },
+  ".tests/mcp-image-studio/tools/diagram.test.ts": {
+    "testHash": "1e86445d45f8a8682dbf005c2c4829972d6d6a38585362304efe3838063dc17f",
+    "sourceHash": "f60b68c2aa3f50ade24771614b98df1a9c63f1ae1f9193a3889991074812617a",
+    "coverage": 0,
+    "success": false
+  },
+  ".tests/mcp-image-studio/tools/delete.test.ts": {
+    "testHash": "06c6f5214204376d8680f54d93a84492d03c3678773575095e6a318dc0b2266a",
+    "sourceHash": "7e292102ac23137098b07e60e1dd3de1a985c742d19aad829f8e9edf4a842be2",
+    "coverage": 0,
+    "success": false
+  },
+  ".tests/mcp-image-studio/tools/crop.test.ts": {
+    "testHash": "c8eaa479a468820470f309bbd9c0a49bb76ab6bc4998d83aff6b04196a605c0c",
+    "sourceHash": "2b5afdd550c2c77f6cbcd6efd0e4d11ec5dbb58a12e69ce03d7bd174d583888c",
+    "coverage": 0,
+    "success": false
+  },
+  ".tests/mcp-image-studio/tools/credits.test.ts": {
+    "testHash": "28ae82cae462d0b50a7632a6c126536e66bd4146c269eedd3d3c6078d6b776ca",
+    "sourceHash": "1304aa25297496b774b4720e4ea73e1c29b68434079a4c4cb9aa15857f07764b",
+    "coverage": 0,
+    "success": false
+  },
+  ".tests/mcp-image-studio/tools/compare.test.ts": {
+    "testHash": "db68aeb6b22aa3ae9cc5ac2420cee004c16fb44fd86ce6be1157fa313ca20082",
+    "sourceHash": "926fd5ea10efddcfcbe4f17c295f48385794a91a373c0d7f4e0383ecd1a13ae3",
+    "coverage": 0,
+    "success": false
+  },
+  ".tests/mcp-image-studio/tools/bulk-delete.test.ts": {
+    "testHash": "3841c03831640afd7ff700359c3db582b6a8adb5c04b2cb8550b21e49c60c80d",
+    "sourceHash": "a0cef8a76315e0f9baa85b943a2eefca5328076530f52e5e3b953b765ce2c66f",
+    "coverage": 0,
+    "success": false
+  },
+  ".tests/mcp-image-studio/tools/blend.test.ts": {
+    "testHash": "89be3b6ab279285ce97f1aa17bb8882353340ca1c18dc8be29c05f2457344220",
+    "sourceHash": "57404ac36a505bb43949b07a640ab537223f99651675a6b9ed1aba684b9d0e6e",
+    "coverage": 0,
+    "success": false
+  },
+  ".tests/mcp-image-studio/tools/banner.test.ts": {
+    "testHash": "4bfafaf8581393c8eb179cc3a3fd0d4612eb259db455d877fade5faf30aba1c3",
+    "sourceHash": "ef28b93ef2fdf072ddf81336a68be6b6b77a56ef01c713fb1bb8d643b0e43c97",
+    "coverage": 0,
+    "success": false
+  },
+  ".tests/mcp-image-studio/tools/avatar.test.ts": {
+    "testHash": "b2de4274fadc47fc7ab3c0bf2aff133b4d367587a5a9b48c53466cf98d88d807",
+    "sourceHash": "be477c09b26ff99a715f05aec647f0429262d5f471bc209ba98f4bbd46f8f3e5",
+    "coverage": 0,
+    "success": false
+  },
+  ".tests/mcp-image-studio/tools/auto-tag.test.ts": {
+    "testHash": "77eec2bdc73d62aa1acfc42fa3be8174ba8067fedcba73e66ab351c949aca0f7",
+    "sourceHash": "7e5c528ffd1c36791cb07109530270e36ab6aea29c8aa4b0faf0bb51778540d7",
+    "coverage": 0,
+    "success": false
+  },
+  ".tests/mcp-image-studio/tools/analyze.test.ts": {
+    "testHash": "f2b2aaf5750c877f5c544d47332db166dbfa6ba29ebae9e766c7ec67a64dead7",
+    "sourceHash": "88dd01564ba7f0a9fd37df77ca6a4f499c269bc00e93da9a6ab5b4d36ebe1d88",
+    "coverage": 0,
+    "success": false
+  },
+  ".tests/mcp-image-studio/tools/album.test.ts": {
+    "testHash": "078b9b733adc84f305ad997ae126b8b49daa2f205a3d67a0954b87cc817201c5",
+    "sourceHash": "d97caf0888e04c0aa61497ea68c1dc2567e4cc1e71d9e7950250e818c2d59e58",
+    "coverage": 0,
+    "success": false
+  },
+  ".tests/mcp-image-studio/tools/album-update.test.ts": {
+    "testHash": "b99d25ecef80d25c87cae3b7f63727ccefb10acace9b4728898a32f481b18c5e",
+    "sourceHash": "ffbcbdbfc63899faece5d57dce4b2b4f225812489f9f4b12b245c9746264735d",
+    "coverage": 0,
+    "success": false
+  },
+  ".tests/mcp-image-studio/tools/album-reorder.test.ts": {
+    "testHash": "592d69d061b0f68c3a43b9a3ede8265aafeb8ce690feac6b465e56484cbcfd47",
+    "sourceHash": "40f0de97f2e35c1368d237f2160f3046999c4ae8cadded2ef5a7be4018f73625",
+    "coverage": 0,
+    "success": false
+  },
+  ".tests/mcp-image-studio/tools/album-list.test.ts": {
+    "testHash": "e6e9363e9999dcfc52a44cc0f81d250700a4916f75ea2f353a2e40dcf8bfab8b",
+    "sourceHash": "76bbea50e8aedfbf4d85e9e0b791184202baf1e2dcef149c7c7c6b21c4664ac6",
+    "coverage": 0,
+    "success": false
+  },
+  ".tests/mcp-image-studio/tools/album-images.test.ts": {
+    "testHash": "8890ce5e12153d5e5f1611b6280852a68e5477eef9fce5373f65283b928afc6d",
+    "sourceHash": "2e1bf3787ae7e3d85ad2cd8c9860aaccc0a9f3a0be141dd18c213b19fc4a9ed3",
+    "coverage": 0,
+    "success": false
+  },
+  ".tests/mcp-image-studio/tools/album-delete.test.ts": {
+    "testHash": "60deb71512196d773b39a7115417913ec9c37240a74481a12bc6f56837983095",
+    "sourceHash": "a9185ac5f2e7cfa0d9a875f11a28fc676dff6bce61f0dddb6863b6162909ffe6",
+    "coverage": 0,
+    "success": false
+  },
+  ".tests/mcp-image-studio/tools/album-create.test.ts": {
+    "testHash": "17e387fe3a0ef3e8f141aeac96fdd6ca60c8efadd86cba2b65a091fb8aee68c6",
+    "sourceHash": "9193157bc0da68bfdc951b7d2d99539141e3fe2fffb533429fbfe93683e41116",
+    "coverage": 0,
+    "success": false
+  },
+  ".tests/hackernews-mcp/session/session-manager.test.ts": {
+    "testHash": "b7a62c9b72f13261626600f0593c4128662cad571d9f163475b54b4d19e42d96",
+    "sourceHash": "dfad33375f683c7c007cf5f592ab68793100cbd9583abb7c95532e8c3fc0e089",
+    "coverage": 0,
+    "success": true
+  },
+  ".tests/hackernews-mcp/clients/hn-write-client.test.ts": {
+    "testHash": "37c1cf6d2c563d5b2c0fac452b42497902d2fa759cf8a6b77fb7c3cacf3a8d9b",
+    "sourceHash": "e85fdcf9387f754fdae580f146f87f57b57b72ea9338002493be2112f467560b",
+    "coverage": 0,
+    "success": false
+  },
+  ".tests/hackernews-mcp/clients/hn-read-client.test.ts": {
+    "testHash": "960900f7019672975f0d435ca7a06173faaf563d3ff015e71bb2b98ec1cf2cef",
+    "sourceHash": "9536ff32c20ebbf6abed89db8baa56e13b9b2dcdcf2881f956a9d56f31a1c8e7",
+    "coverage": 0,
+    "success": false
+  },
+  ".tests/esbuild-wasm-mcp/tools/transform.test.ts": {
+    "testHash": "cd775b22c4d804998c1989f989e7fe1f1c9b8de7d485cc626dc3f86f869c87ae",
+    "sourceHash": "7d3774bb8157bef97a381918221fc56ebfb6ce4f630559fd813efe5b158a86ec",
+    "coverage": 0,
+    "success": false
+  },
+  ".tests/esbuild-wasm-mcp/tools/status.test.ts": {
+    "testHash": "895d2e64d1452d3f8587449740b24d1f53ee4bb54b53bcc5f2ca619290d0db20",
+    "sourceHash": "d365d42a815eb17cd8a4232f8ffdee87ead44788b14e3766bfec3e02ce7bc8d3",
+    "coverage": 0,
+    "success": false
+  },
+  ".tests/esbuild-wasm-mcp/tools/initialize.test.ts": {
+    "testHash": "890713aba8677a63d2445d964aec5c68f4be330eb011fb9ea71677961ba84a64",
+    "sourceHash": "49fa1e544a8f199ecb063b77a8aa9958f3b4041e641450fae4caeda2cb3d872b",
+    "coverage": 0,
+    "success": false
+  },
+  ".tests/esbuild-wasm-mcp/tools/format-messages.test.ts": {
+    "testHash": "8eeca894ffd15f7f7b5f148935f04d878df583ffd8b9013657ceef60f014c168",
+    "sourceHash": "ef9c86821cace411cef680f93a41e564d5c100316d382785e47b9fd9862075f6",
+    "coverage": 0,
+    "success": false
+  },
+  ".tests/esbuild-wasm-mcp/tools/context.test.ts": {
+    "testHash": "cf6d8b1bf15109b07bc44010ad6af1e7618d0838766f98d585cfbc6c8ca42cb7",
+    "sourceHash": "536b164e348fac05d5d70dedcf797f4c95a5de0dba4f9bea4fd4524bae8a0c78",
+    "coverage": 0,
+    "success": false
+  },
+  ".tests/esbuild-wasm-mcp/tools/build.test.ts": {
+    "testHash": "936c34162c1aa43f734abdcd218499598d54f98e009d5e2b1724f86d49c7c727",
+    "sourceHash": "48b0331ef5e808b7c3f5530f106db72d6d466ccbca0bff3f1a1a11b579c90145",
+    "coverage": 0,
+    "success": false
+  },
+  ".tests/esbuild-wasm-mcp/tools/analyze.test.ts": {
+    "testHash": "190ebecc5f353b77acd2c333f6f05cc885e308511309a9fb52becda672cdc3f8",
+    "sourceHash": "ad9ff36a7f73340489feff46cd216c284091e0115aa473b637e028ace9b77a41",
+    "coverage": 0,
+    "success": false
+  },
+  ".tests/bazdmeg-mcp/tools/workspace.test.ts": {
+    "testHash": "eb192c0ac0ac2fe6e8bab93f1d60abc7d81e6a8bddfea006bd44ab2924b52e97",
+    "sourceHash": "dd1f861de729807617c4dbe0bc766255a363f429af1f9a363666785e919a2544",
+    "coverage": 0,
+    "success": false
+  },
+  ".tests/bazdmeg-mcp/tools/workflow.test.ts": {
+    "testHash": "ed808da3eb824a224111654cb3c214f30d0da8e572d9e027370e84698e8badcd",
+    "sourceHash": "082476fe50386044001906896c82d736e59534b3aba2b0d992680c4b51f1334c",
+    "coverage": 0,
+    "success": false
+  },
+  ".tests/bazdmeg-mcp/tools/ship.test.ts": {
+    "testHash": "ca07a747484ab69e962717b59e04b0db8919fd8b41853725148f370a8427281b",
+    "sourceHash": "e2402f2ef243e56e63efd18a7a87e8286343e641b9c6f8dab21b26737333985c",
+    "coverage": 0,
+    "success": false
+  },
+  ".tests/bazdmeg-mcp/tools/publish.test.ts": {
+    "testHash": "f6e543e01f741152bc2625348aed701ad4f599e2b62a4b0c3a60bd785dbcad3d",
+    "sourceHash": "f51887df67d49369f2f85142817712d0ce2e4edbf522524f520031231f8c9280",
+    "coverage": 0,
+    "success": false
+  },
+  ".tests/bazdmeg-mcp/tools/mirror.test.ts": {
+    "testHash": "777419154134d0f5f15b25b81cbd081a1271505efec3227cf2d2b7d47f1543f6",
+    "sourceHash": "c942f7ba34444737a8528914682c8c3ad0057739c5eb840885c6bf0919227a54",
+    "coverage": 0,
+    "success": false
+  },
+  ".tests/bazdmeg-mcp/tools/manifest.test.ts": {
+    "testHash": "08b7e9c9359536db51e12c9f958cbee7434b1b5a17b0c575aad88281fd459562",
+    "sourceHash": "517ce5583ff7de09033d4ac677f084587f5a146cf54f07d4405d1ac0594d5c01",
+    "coverage": 0,
+    "success": false
+  },
+  ".tests/bazdmeg-mcp/tools/gates.test.ts": {
+    "testHash": "5a5a63d26fac609fe748834d7e919bcaff68b5e66e2edca47f80590230990c80",
+    "sourceHash": "09d0e18f0993f88924969fd76f14e0c1c232fc6710c247c0cc2039f40fd61484",
+    "coverage": 0,
+    "success": false
+  },
+  ".tests/bazdmeg-mcp/tools/escalation.test.ts": {
+    "testHash": "3e43c1a6dd182fc0afd3a56e9ad7f992e300a9d02cbbcb317964838a3e98d2e1",
+    "sourceHash": "416d487d0c1811c2ef2f5a5a8b7ddaaa4b510a4d67b615546bb0b5d7b2c92451",
+    "coverage": 0,
+    "success": false
+  },
+  ".tests/bazdmeg-mcp/tools/deps.test.ts": {
+    "testHash": "39b34c7c293d82cf69a9020b577312b7cf483a81c41520c09ebdbf1a66270b3e",
+    "sourceHash": "23232614954d4801583fd7622732495d6e0228f605e264a5eaaba347a4037768",
+    "coverage": 0,
+    "success": false
+  },
+  ".tests/bazdmeg-mcp/tools/deploy.test.ts": {
+    "testHash": "a033fb6a5d880c6eaddd02ce7f1d8e6abecbe3f2380c8d0393c23fa0e333a3a2",
+    "sourceHash": "fd5a382bc5e61979e26910b32051546c686eee36efe19fcd38758c8b00a9605f",
+    "coverage": 0,
+    "success": false
+  },
+  ".tests/bazdmeg-mcp/tools/context.test.ts": {
+    "testHash": "d5f5a3a7939ea77054087358be04cf50b791871583b6bcc07f830d1d7a8736dc",
+    "sourceHash": "aa2c65c31d553f5aa9974eebf66909e3a62f1ca41d1872a4721c7701b948e4e3",
+    "coverage": 0,
+    "success": false
+  },
+  ".tests/bazdmeg-mcp/tools/build.test.ts": {
+    "testHash": "a36da6a7a532e3ae27f9272cc6cb8cfed5e84d7533cdd0fe099b6fa638e61c13",
+    "sourceHash": "f63ee84bbaa61cea68d18fbc6f33eed04ab4df3cda7b29da6d6d3366fff55ec2",
+    "coverage": 0,
+    "success": false
+  },
+  ".tests/bazdmeg-mcp/gates/engine.test.ts": {
+    "testHash": "84f1a5c0892967fa49f08c0668d8e091a116dcc4bd44d8e6c8bdedc485edb80c",
+    "sourceHash": "21a93b154873a644859acd8f54471ea441b2d7cbb8217ac8d303d3de22cd7f52",
+    "coverage": 0,
+    "success": false
+  },
+  ".tests/image-studio-worker/agent/system-prompt.test.ts": {
+    "testHash": "0485ba07bee5e982b17d239dd055a3057ecd5511d325535164d70436923ed9fa",
+    "sourceHash": "de76b614160dc5a39e5f0d8cf2faa199d4f1ec159de933c437dd538bb96cd1f9",
+    "coverage": 0,
+    "success": true
+  },
+  ".tests/image-studio-worker/agent/browser-tools.test.ts": {
+    "testHash": "7b8c3cb177c5a03b41ca8dcea9b0171e59d5ebce4847d5e4fbff3778992158f1",
+    "sourceHash": "442c6292222dd2161f826fa306d24f43f19d6b491db53d2d0224396fe480b1ce",
+    "coverage": 0,
+    "success": true
+  },
+  ".tests/spike-land-backend/mcp/tools/file-tools.test.ts": {
+    "testHash": "ee9b2b0a6c4a5d47bbd4c00b7cc998a0ee5d6914eb2d88f10ee8e1a84e6c3890",
+    "sourceHash": "f807e783bfaa82af794b8aa07d9d90b327aa8d7027b5ebe817b5bb20f60ce27a",
+    "coverage": 0,
+    "success": false
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "name": "@spike-land-ai/incremental-test-mcp",
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "1.27.1",
+    "zod": "4.3.6"
+  },
+  "devDependencies": {
+    "@spike-land-ai/tsconfig": "*",
+    "@types/node": "25.3.3",
+    "@vitest/coverage-v8": "4.0.18",
+    "typescript": "5.9.3",
+    "vitest": "4.0.18"
+  }
+}

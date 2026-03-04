@@ -1,8 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, lazy, Suspense } from "react";
 import Markdown from "react-markdown";
 import rehypeRaw from "rehype-raw";
 import type { BlogPost } from "../../core/generated-posts";
-import * as Interactive from "../interactive";
 
 /**
  * Convert self-closing JSX/HTML tags for custom components to explicit
@@ -15,29 +14,53 @@ function fixSelfClosingTags(markdown: string): string {
     (_, tag, attrs) => `<${tag}${attrs}></${tag}>`);
 }
 
-const COMPONENT_MAP = {
-  convergencedemo: Interactive.ConvergenceDemo,
-  dependencycascadedemo: Interactive.DependencyCascadeDemo,
-  stackcollapsedemo: Interactive.StackCollapseDemo,
-  agentcoordinationdemo: Interactive.AgentCoordinationDemo,
-  splitscreendemo: Interactive.SplitScreenDemo,
-  attentionspotlightdemo: Interactive.AttentionSpotlightDemo,
-  fivelayerstackdemo: Interactive.FiveLayerStackDemo,
-  darwiniantreedemo: Interactive.DarwinianTreeDemo,
-  recursivezoomdemo: Interactive.RecursiveZoomDemo,
-  modelcascadedemo: Interactive.ModelCascadeDemo,
-  bayesianconfidencedemo: Interactive.BayesianConfidenceDemo,
-  mcpterminaldemo: Interactive.MCPTerminalDemo,
-  scrollstorycard: Interactive.ScrollStoryCard,
-  mcpflowdiagram: Interactive.MCPFlowDiagram,
-  perspectivecarousel: Interactive.PerspectiveCarousel,
-  spikeclidemo: Interactive.SpikeCliDemo,
-  pyramidreshapedemo: Interactive.PyramidReshapeDemo,
-  testcodenamevenn: Interactive.TestCodeNameVenn,
-  hourglassmodeldemo: Interactive.HourglassModelDemo,
-  paradigmguilttimeline: Interactive.ParadigmGuiltTimeline,
-  effortinversiondemo: Interactive.EffortInversionDemo,
-  contextlayerbuilderdemo: Interactive.ContextLayerBuilderDemo,
+const DemoFallback = () => (
+  <div className="flex items-center justify-center py-8">
+    <div className="h-6 w-6 animate-spin rounded-full border-2 border-gray-300 border-t-blue-500" />
+  </div>
+);
+
+function lazyDemo(
+  load: () => Promise<Record<string, unknown>>,
+  name: string
+) {
+  const LazyComp = lazy(() =>
+    load().then((mod) => ({ default: mod[name] as React.ComponentType<Record<string, unknown>> }))
+  );
+  return function LazyDemoWrapper(props: Record<string, unknown>) {
+    return (
+      <Suspense fallback={<DemoFallback />}>
+        <LazyComp {...props} />
+      </Suspense>
+    );
+  };
+}
+
+const interactiveImport = () => import("../interactive") as Promise<Record<string, unknown>>;
+
+const COMPONENT_MAP: Record<string, React.ComponentType<Record<string, unknown>>> = {
+  convergencedemo: lazyDemo(interactiveImport, "ConvergenceDemo"),
+  dependencycascadedemo: lazyDemo(interactiveImport, "DependencyCascadeDemo"),
+  stackcollapsedemo: lazyDemo(interactiveImport, "StackCollapseDemo"),
+  agentcoordinationdemo: lazyDemo(interactiveImport, "AgentCoordinationDemo"),
+  splitscreendemo: lazyDemo(interactiveImport, "SplitScreenDemo"),
+  attentionspotlightdemo: lazyDemo(interactiveImport, "AttentionSpotlightDemo"),
+  fivelayerstackdemo: lazyDemo(interactiveImport, "FiveLayerStackDemo"),
+  darwiniantreedemo: lazyDemo(interactiveImport, "DarwinianTreeDemo"),
+  recursivezoomdemo: lazyDemo(interactiveImport, "RecursiveZoomDemo"),
+  modelcascadedemo: lazyDemo(interactiveImport, "ModelCascadeDemo"),
+  bayesianconfidencedemo: lazyDemo(interactiveImport, "BayesianConfidenceDemo"),
+  mcpterminaldemo: lazyDemo(interactiveImport, "MCPTerminalDemo"),
+  scrollstorycard: lazyDemo(interactiveImport, "ScrollStoryCard"),
+  mcpflowdiagram: lazyDemo(interactiveImport, "MCPFlowDiagram"),
+  perspectivecarousel: lazyDemo(interactiveImport, "PerspectiveCarousel"),
+  spikeclidemo: lazyDemo(interactiveImport, "SpikeCliDemo"),
+  pyramidreshapedemo: lazyDemo(interactiveImport, "PyramidReshapeDemo"),
+  testcodenamevenn: lazyDemo(interactiveImport, "TestCodeNameVenn"),
+  hourglassmodeldemo: lazyDemo(interactiveImport, "HourglassModelDemo"),
+  paradigmguilttimeline: lazyDemo(interactiveImport, "ParadigmGuiltTimeline"),
+  effortinversiondemo: lazyDemo(interactiveImport, "EffortInversionDemo"),
+  contextlayerbuilderdemo: lazyDemo(interactiveImport, "ContextLayerBuilderDemo"),
   callout: ({ children, type }: { children?: React.ReactNode; type?: string }) => (
     <div className={`p-4 my-6 rounded-xl border ${
       type === 'info' ? 'bg-blue-50 border-blue-200 dark:bg-blue-900/30 dark:border-blue-800 text-blue-900 dark:text-blue-100' :
@@ -46,9 +69,21 @@ const COMPONENT_MAP = {
       {children}
     </div>
   ),
+  img: ({ src, alt, ...rest }: React.ImgHTMLAttributes<HTMLImageElement>) => (
+    <img
+      src={src}
+      alt={alt ?? ""}
+      loading="lazy"
+      decoding="async"
+      width={1200}
+      height={630}
+      className="rounded-2xl shadow-2xl border border-border"
+      {...rest}
+    />
+  ),
 };
 
-export function BlogPostView({ slug }: { slug: string }) {
+export function BlogPostView({ slug, linkComponent }: { slug: string; linkComponent?: React.ComponentType<{ to: string; className?: string; children?: React.ReactNode }> }) {
   const [post, setPost] = useState<BlogPost | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
@@ -70,13 +105,13 @@ export function BlogPostView({ slug }: { slug: string }) {
     return (
       <div className="max-w-5xl mx-auto py-16 px-4 sm:px-6 lg:px-8 animate-pulse">
         <div className="text-center mb-12">
-          <div className="h-4 bg-[#2A2A28] rounded w-1/4 mx-auto mb-6" />
-          <div className="h-12 bg-[#2A2A28] rounded w-3/4 mx-auto mb-6" />
-          <div className="h-6 bg-[#2A2A28] rounded w-1/2 mx-auto" />
+          <div className="h-4 bg-muted rounded w-1/4 mx-auto mb-6" />
+          <div className="h-12 bg-muted rounded w-3/4 mx-auto mb-6" />
+          <div className="h-6 bg-muted rounded w-1/2 mx-auto" />
         </div>
         <div className="space-y-6">
           {Array.from({ length: 8 }).map((_, i) => (
-            <div key={i} className="h-5 bg-[#2A2A28] rounded" />
+            <div key={i} className="h-5 bg-muted rounded" />
           ))}
         </div>
       </div>
@@ -84,51 +119,58 @@ export function BlogPostView({ slug }: { slug: string }) {
   }
 
   if (error || !post) {
+    const BackLink = linkComponent;
     return (
       <div className="max-w-5xl mx-auto py-20 px-4 text-center">
-        <h1 className="text-4xl font-display font-bold text-[#F3F2EE]">Post not found</h1>
-        <p className="mt-6 text-xl text-[#A3A19C]">The post you are looking for does not exist.</p>
-        <a href="/blog" className="mt-8 inline-block text-[#D6FF38] hover:text-[#bce02b] transition-colors font-semibold">
-          ← Back to Blog
-        </a>
+        <h1 className="text-4xl font-display font-bold text-foreground">Post not found</h1>
+        <p className="mt-6 text-xl text-muted-foreground">The post you are looking for does not exist.</p>
+        {BackLink ? (
+          <BackLink to="/blog" className="mt-8 inline-block text-primary hover:opacity-80 transition-colors font-semibold">
+            ← Back to Blog
+          </BackLink>
+        ) : (
+          <a href="/blog" className="mt-8 inline-block text-primary hover:opacity-80 transition-colors font-semibold">
+            ← Back to Blog
+          </a>
+        )}
       </div>
     );
   }
 
   return (
     <article className="max-w-5xl mx-auto py-16 px-4 sm:px-6 lg:px-8 font-sans">
-      <header className="mb-16 text-center border-b border-[#2A2A28] pb-12">
-        <div className="flex justify-center items-center gap-3 text-sm text-[#8A8883] mb-6 font-medium tracking-wide uppercase">
+      <header className="mb-16 text-center border-b border-border pb-12">
+        <div className="flex justify-center items-center gap-3 text-sm text-muted-foreground mb-6 font-medium tracking-wide uppercase">
           <time dateTime={post.date}>{new Date(post.date).toLocaleDateString()}</time>
           {post.category && (
             <>
-              <span className="text-[#444]">•</span>
-              <span className="text-[#D6FF38]">{post.category}</span>
+              <span className="text-muted-foreground/40">•</span>
+              <span className="text-primary">{post.category}</span>
             </>
           )}
         </div>
-        <h1 className="text-5xl sm:text-7xl font-display font-extrabold text-[#F3F2EE] tracking-tight leading-tight mb-8 drop-shadow-sm">
+        <h1 className="text-5xl sm:text-7xl font-display font-extrabold text-foreground tracking-tight leading-tight mb-8 drop-shadow-sm">
           {post.title}
         </h1>
         {post.description && (
-          <p className="text-2xl text-[#A3A19C] max-w-3xl mx-auto leading-relaxed font-light">
+          <p className="text-2xl text-muted-foreground max-w-3xl mx-auto leading-relaxed font-light">
             {post.description}
           </p>
         )}
       </header>
 
-      <div className="prose prose-xl prose-invert max-w-none 
-        prose-headings:font-display prose-headings:font-bold prose-headings:text-[#F3F2EE] prose-headings:tracking-tight
+      <div className="prose prose-xl dark:prose-invert max-w-none
+        prose-headings:font-display prose-headings:font-bold prose-headings:text-foreground prose-headings:tracking-tight
         prose-h1:text-5xl prose-h2:text-4xl prose-h3:text-3xl
-        prose-p:text-[#A3A19C] prose-p:leading-loose prose-p:font-sans
-        prose-a:text-[#D6FF38] prose-a:no-underline hover:prose-a:underline hover:prose-a:text-[#bce02b]
-        prose-strong:text-[#F3F2EE] prose-strong:font-semibold
-        prose-blockquote:border-l-[#D6FF38] prose-blockquote:bg-[#1C1C1A] prose-blockquote:py-2 prose-blockquote:px-6 prose-blockquote:text-[#F3F2EE] prose-blockquote:font-medium prose-blockquote:italic
-        prose-code:text-[#D6FF38] prose-code:bg-[#1C1C1A] prose-code:px-2 prose-code:py-1 prose-code:rounded-md prose-code:before:content-none prose-code:after:content-none
-        prose-pre:bg-[#1C1C1A] prose-pre:border prose-pre:border-[#2A2A28]
-        prose-img:rounded-2xl prose-img:shadow-2xl prose-img:border prose-img:border-[#2A2A28]
-        prose-ul:text-[#A3A19C] prose-ol:text-[#A3A19C]
-        prose-li:marker:text-[#D6FF38]">
+        prose-p:text-muted-foreground prose-p:leading-loose prose-p:font-sans
+        prose-a:text-primary prose-a:no-underline hover:prose-a:underline hover:prose-a:opacity-80
+        prose-strong:text-foreground prose-strong:font-semibold
+        prose-blockquote:border-l-primary prose-blockquote:bg-muted/30 prose-blockquote:py-2 prose-blockquote:px-6 prose-blockquote:text-foreground prose-blockquote:font-medium prose-blockquote:italic
+        prose-code:text-primary prose-code:bg-muted/50 prose-code:px-2 prose-code:py-1 prose-code:rounded-md prose-code:before:content-none prose-code:after:content-none
+        prose-pre:bg-muted prose-pre:border prose-pre:border-border
+        prose-img:rounded-2xl prose-img:shadow-2xl prose-img:border prose-img:border-border
+        prose-ul:text-muted-foreground prose-ol:text-muted-foreground
+        prose-li:marker:text-primary">
         <Markdown rehypePlugins={[rehypeRaw]} components={COMPONENT_MAP as unknown as Record<string, React.ComponentType>}>
           {fixSelfClosingTags(post.content)}
         </Markdown>

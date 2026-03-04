@@ -18,9 +18,9 @@ export default function Home() {
   }, []);
 
   return (
-    <main className="relative min-h-screen bg-zinc-950 overflow-x-hidden text-white w-full">
+    <main className="relative min-h-screen bg-background overflow-x-hidden text-foreground w-full">
       {/* Ambient mesh gradient layer — static, non-interactive */}
-      <div aria-hidden="true" className="pointer-events-none fixed inset-0 z-0 overflow-hidden">
+      <div aria-hidden="true" className="pointer-events-none fixed inset-0 z-0 overflow-hidden opacity-50 dark:opacity-100">
         {/* Top-left violet orb */}
         <div className="absolute -top-40 -left-40 h-[700px] w-[700px] rounded-full bg-violet-600/10 blur-[180px]" />
         {/* Top-right cyan orb */}

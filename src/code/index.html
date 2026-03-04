@@ -21,6 +21,22 @@
       rel="stylesheet"
     />
 
+    <script>
+      (function() {
+        const darkModeMediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+        function updateTheme(e) {
+          if (e.matches) {
+            document.documentElement.classList.add("dark");
+            document.documentElement.classList.remove("light");
+          } else {
+            document.documentElement.classList.add("light");
+            document.documentElement.classList.remove("dark");
+          }
+        }
+        updateTheme(darkModeMediaQuery);
+        darkModeMediaQuery.addEventListener("change", updateTheme);
+      })();
+    </script>
     <style type="text/tailwindcss">
       @import "tailwindcss";
 

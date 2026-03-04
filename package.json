@@ -19,7 +19,8 @@
     "changeset": "changeset",
     "release": "changeset publish",
     "bazdmeg": "npx tsx scripts/bazdmeg.ts",
-    "bazdmeg:verbose": "npx tsx scripts/bazdmeg.ts --verbose"
+    "bazdmeg:verbose": "npx tsx scripts/bazdmeg.ts --verbose",
+    "COVERAGE:INCREMENTAL": "npx tsx scripts/incremental-coverage.ts"
   },
   "dependencies": {
     "rehype-raw": "^7.0.0",

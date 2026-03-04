@@ -223,15 +223,15 @@ function TerminalToolCall({
   const accent = accentMap[color] ?? accentMap.cyan;
 
   return (
-    <div className="w-full rounded-2xl overflow-hidden border border-slate-700/40 bg-slate-950/90 shadow-2xl backdrop-blur-md">
+    <div className="w-full rounded-2xl overflow-hidden border border-border/40 bg-card/90 shadow-2xl backdrop-blur-md">
       {/* Terminal chrome */}
-      <div className="flex items-center justify-between px-4 py-2.5 bg-slate-800/90 border-b border-slate-700/40">
+      <div className="flex items-center justify-between px-4 py-2.5 bg-muted/90 border-b border-border/40">
         <div className="flex gap-1.5">
           <div className="w-2.5 h-2.5 rounded-full bg-red-500/50" />
           <div className="w-2.5 h-2.5 rounded-full bg-yellow-500/50" />
           <div className="w-2.5 h-2.5 rounded-full bg-green-500/50" />
         </div>
-        <span className="text-[10px] font-mono text-slate-500 font-bold uppercase tracking-widest">
+        <span className="text-[10px] font-mono text-muted-foreground font-bold uppercase tracking-widest">
           spike-cli
         </span>
       </div>
@@ -242,13 +242,13 @@ function TerminalToolCall({
         <div className="flex items-start gap-2">
           <span className="text-green-400 select-none shrink-0">❯</span>
           <div className="flex-1 min-w-0">
-            <span className="text-slate-200 break-all">{displayed}</span>
+            <span className="text-foreground break-all">{displayed}</span>
             {!typingDone && (
               <motion.span
                 initial={{ opacity: 1 }}
                 animate={{ opacity: [1, 0] }}
                 transition={{ repeat: Infinity, duration: 0.6 }}
-                className="inline-block w-2 h-4 bg-slate-300 ml-0.5 align-text-bottom"
+                className="inline-block w-2 h-4 bg-muted ml-0.5 align-text-bottom"
               />
             )}
           </div>
@@ -267,7 +267,7 @@ function TerminalToolCall({
                 initial={{ scale: 1 }}
                 animate={{ scale: [1, 1.1, 1] }}
                 transition={{ repeat: Infinity, duration: 1 }}
-                className="px-2 py-0.5 text-[10px] rounded bg-slate-700 text-slate-400 border border-slate-600 font-sans"
+                className="px-2 py-0.5 text-[10px] rounded bg-muted text-muted-foreground border border-border font-sans"
               >
                 ↵ Enter
               </motion.kbd>
@@ -282,7 +282,7 @@ function TerminalToolCall({
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="flex items-center gap-2 pl-6 text-slate-500 text-xs"
+              className="flex items-center gap-2 pl-6 text-muted-foreground text-xs"
             >
               <motion.span
                 initial={{ rotate: 0 }}
@@ -293,8 +293,8 @@ function TerminalToolCall({
                 ⟳
               </motion.span>
               <span>
-                Calling <span className="text-slate-300">{terminal.toolName}</span> on{" "}
-                <span className="text-slate-300">{terminal.serverName}</span>…
+                Calling <span className="text-foreground">{terminal.toolName}</span> on{" "}
+                <span className="text-foreground">{terminal.serverName}</span>…
               </span>
             </motion.div>
           )}
@@ -310,7 +310,7 @@ function TerminalToolCall({
             transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
             className="overflow-hidden"
           >
-            <div className="border-t border-slate-700/40 bg-slate-900/60 px-5 py-4">
+            <div className="border-t border-border/40 bg-muted/60 px-5 py-4">
               {/* Response header */}
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2">
@@ -332,14 +332,14 @@ function TerminalToolCall({
                     initial={{ opacity: 0, y: 8 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: i * 0.08 }}
-                    className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl bg-slate-800/50 border border-slate-700/30"
+                    className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl bg-muted/50 border border-border/30"
                   >
                     <span className="text-base shrink-0">{field.icon}</span>
                     <div className="min-w-0">
-                      <p className="text-[10px] font-mono text-slate-500 uppercase tracking-wider leading-none mb-0.5">
+                      <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-wider leading-none mb-0.5">
                         {field.label}
                       </p>
-                      <p className="text-sm text-slate-200 font-semibold truncate">{field.value}</p>
+                      <p className="text-sm text-foreground font-semibold truncate">{field.value}</p>
                     </div>
                   </motion.div>
                 ))}
@@ -401,7 +401,7 @@ export function ScrollStoryCard({ title, illustration, mappings }: ScrollStoryCa
 
   return (
     <div ref={ref} className="min-h-[70vh] flex items-center py-16 px-4">
-      <div className="w-full max-w-2xl mx-auto bg-slate-900/60 border border-slate-800 rounded-[2.5rem] p-8 md:p-12 backdrop-blur-xl relative overflow-hidden ring-1 ring-white/5">
+      <div className="w-full max-w-2xl mx-auto bg-card/60 border border-border rounded-[2.5rem] p-8 md:p-12 backdrop-blur-xl relative overflow-hidden ring-1 ring-white/5">
         {/* Decorative Glow — inline styles avoid Tailwind JIT purge of dynamic classes */}
         <div
           className="absolute -top-24 -right-24 w-64 h-64 blur-[100px] rounded-full"
@@ -415,10 +415,10 @@ export function ScrollStoryCard({ title, illustration, mappings }: ScrollStoryCa
         {/* Header */}
         <div className="flex items-center justify-between mb-12">
           <div className="flex flex-col gap-1">
-            <span className="text-[10px] font-mono text-slate-500 uppercase tracking-[0.2em]">
+            <span className="text-[10px] font-mono text-muted-foreground uppercase tracking-[0.2em]">
               The Analogy
             </span>
-            <h3 className="text-2xl font-bold text-slate-100 tracking-tight">{title}</h3>
+            <h3 className="text-2xl font-bold text-foreground tracking-tight">{title}</h3>
           </div>
           <motion.div
             animate={{ rotate: isTerminalMode ? 180 : 0 }}
@@ -457,7 +457,7 @@ export function ScrollStoryCard({ title, illustration, mappings }: ScrollStoryCa
                     {data.subScene.substring(0, 2)}
                   </motion.span>
                 </div>
-                <p className="text-slate-300 text-lg font-medium text-center max-w-sm leading-relaxed">
+                <p className="text-muted-foreground text-lg font-medium text-center max-w-sm leading-relaxed">
                   {data.description}
                 </p>
               </motion.div>
@@ -481,16 +481,16 @@ export function ScrollStoryCard({ title, illustration, mappings }: ScrollStoryCa
         </div>
 
         {/* Mapping Section */}
-        <div className="pt-8 relative border-t border-slate-800/80">
+        <div className="pt-8 relative border-t border-border/80">
           <div className="flex items-center gap-3 mb-6">
-            <span className="text-[10px] font-mono text-slate-500 uppercase tracking-[0.3em]">
+            <span className="text-[10px] font-mono text-muted-foreground uppercase tracking-[0.3em]">
               Translation Map
             </span>
             {/* Gradient divider via inline style to avoid purged dynamic classes */}
             <div
               className="h-px flex-grow"
               style={{
-                background: `linear-gradient(to right, rgb(30,41,59), ${cs.glow1}, transparent)`,
+                background: `linear-gradient(to right, hsl(var(--muted)), ${cs.glow1}, transparent)`,
               }}
             />
           </div>
@@ -504,22 +504,22 @@ export function ScrollStoryCard({ title, illustration, mappings }: ScrollStoryCa
                   animate={{
                     opacity: active ? 1 : 0.2,
                     x: active ? 0 : -8,
-                    backgroundColor: active ? "rgba(30, 41, 59, 0.4)" : "rgba(30, 41, 59, 0)",
+                    backgroundColor: active ? "hsl(var(--muted) / 0.4)" : "transparent",
                   }}
                   transition={{ duration: 0.4, ease: "easeOut" }}
                   className={`grid grid-cols-2 items-center gap-4 px-4 py-3 rounded-xl border border-transparent ${
-                    active ? "border-slate-700/50" : ""
+                    active ? "border-border/50" : ""
                   }`}
                 >
                   <div className="flex items-center gap-3">
                     <div
                       className="w-1.5 h-1.5 rounded-full transition-colors"
                       style={{
-                        backgroundColor: active ? cs.dotActive : "rgb(51,65,85)",
+                        backgroundColor: active ? cs.dotActive : "hsl(var(--border))",
                         boxShadow: active ? `0 0 8px ${cs.dotActive}66` : "none",
                       }}
                     />
-                    <span className="text-sm text-slate-200 font-medium tracking-tight truncate">
+                    <span className="text-sm text-foreground font-medium tracking-tight truncate">
                       {row.left}
                     </span>
                   </div>

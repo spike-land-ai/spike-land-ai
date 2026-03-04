@@ -47,6 +47,9 @@ export function LoginButton() {
       <button
         onClick={() => setMenuOpen(!menuOpen)}
         className="flex items-center gap-2 rounded-lg px-2 py-1 hover:bg-gray-100"
+        aria-label={`Account menu for ${user.name ?? user.email ?? "User"}`}
+        aria-expanded={menuOpen}
+        aria-haspopup="menu"
       >
         {user.picture ? (
           <img src={user.picture} alt="" className="h-8 w-8 rounded-full" />

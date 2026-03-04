@@ -119,7 +119,7 @@ export function McpShowcaseSection() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 max-w-6xl relative">
           {/* Subtle glow behind code block */}
           <div
-            className="absolute top-1/2 left-1/4 -translate-y-1/2 -translate-x-1/2 w-[500px] h-[500px] bg-cyan-600/20 rounded-full blur-[140px] pointer-events-none mix-blend-screen animate-pulse"
+            className="absolute top-1/2 left-1/4 -translate-y-1/2 -translate-x-1/2 w-[500px] h-[500px] bg-cyan-600/20 rounded-full blur-[140px] pointer-events-none mix-blend-multiply dark:mix-blend-screen animate-pulse"
             style={{ animationDuration: "6s" }}
           />
 

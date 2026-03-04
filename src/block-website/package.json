@@ -49,6 +49,7 @@
     "typescript": "^5.9.3"
   },
   "peerDependencies": {
+    "@tanstack/react-router": "^1.0.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },

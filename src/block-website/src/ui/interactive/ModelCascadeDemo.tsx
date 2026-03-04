@@ -366,7 +366,7 @@ export function ModelCascadeDemo() {
   return (
     <div ref={ref} className="my-8 flex flex-col gap-6 group">
       {/* Main visualization */}
-      <div className="rounded-xl overflow-hidden border border-slate-800 shadow-2xl shadow-violet-900/10 bg-slate-950 relative p-4">
+      <div className="rounded-xl overflow-hidden border border-border shadow-2xl shadow-violet-900/10 bg-card relative p-4">
         <div className="absolute top-0 right-0 w-40 h-40 bg-violet-500/10 blur-3xl pointer-events-none" />
         <div className="absolute bottom-0 left-0 w-40 h-40 bg-sky-500/10 blur-3xl pointer-events-none" />
 

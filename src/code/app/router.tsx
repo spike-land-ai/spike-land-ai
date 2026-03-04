@@ -27,8 +27,11 @@ interface RouteParams {
 
 type SearchParams = Record<string, string>;
 
+import { useDarkMode } from "@/hooks/use-dark-mode";
+
 // Root layout component
 const RootLayout: React.FC = () => {
+  useDarkMode(); // Initialize global theme management
   return <Outlet />;
 };
 

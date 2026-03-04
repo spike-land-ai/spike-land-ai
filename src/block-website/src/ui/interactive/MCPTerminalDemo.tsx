@@ -177,7 +177,7 @@ export function MCPTerminalDemo() {
   return (
     <div ref={ref} className="my-8 flex flex-col gap-3">
       <div
-        className="rounded-xl overflow-hidden border border-border bg-slate-900 font-mono text-sm shadow-2xl"
+        className="rounded-xl overflow-hidden border border-border bg-card font-mono text-sm shadow-2xl"
         onMouseEnter={() => {
           if (playing) setPaused(true);
         }}
@@ -203,7 +203,7 @@ export function MCPTerminalDemo() {
               className={[
                 "px-4 py-2 text-xs tracking-wide transition-colors border-b-2 focus:outline-none focus:ring-2 focus:ring-cyan-500",
                 i === activeTab
-                  ? "text-cyan-400 border-cyan-400 bg-slate-900"
+                  ? "text-cyan-400 border-cyan-400 bg-card"
                   : "text-muted-foreground border-transparent hover:text-foreground hover:bg-muted/30",
               ].join(" ")}
             >

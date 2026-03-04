@@ -32,7 +32,7 @@ export function CreateCTASection() {
           className="max-w-5xl mx-auto relative"
         >
           {/* Subtle background glow behind text */}
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[300px] bg-gradient-to-r from-cyan-500/10 via-purple-500/10 to-pink-500/10 rounded-full blur-[100px] pointer-events-none mix-blend-screen" />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[300px] bg-gradient-to-r from-cyan-500/10 via-purple-500/10 to-pink-500/10 rounded-full blur-[100px] pointer-events-none mix-blend-multiply dark:mix-blend-screen" />
 
           <motion.h2
             initial={{ opacity: 0, y: 20 }}

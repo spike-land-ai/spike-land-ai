@@ -1,0 +1,8 @@
+{
+  "extends": "@spike-land-ai/tsconfig/tsconfig.mcp.json",
+  "compilerOptions": {
+    "outDir": "dist",
+    "rootDir": "."
+  },
+  "include": ["**/*.ts"]
+}

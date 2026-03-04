@@ -1,25 +1,31 @@
-import { useLocalStorage } from "@/hooks/use-local-storage";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
+/**
+ * Gets the initial dark mode preference based strictly on system settings.
+ * Ignores any previously stored localStorage preferences.
+ */
 export const getInitialDarkMode = (): boolean => {
   if (typeof window === "undefined") return false;
-  const storedDarkMode = localStorage.getItem("darkMode");
-  if (storedDarkMode !== null) {
-    return storedDarkMode === "true";
-  } else {
-    if (!window.matchMedia || typeof window.matchMedia !== "function") {
-      return false;
-    }
-    try {
-      return window.matchMedia("(prefers-color-scheme: dark)").matches;
-    } catch (_e) {
-      return false;
-    }
+
+  if (!window.matchMedia || typeof window.matchMedia !== "function") {
+    return false;
+  }
+
+  try {
+    return window.matchMedia("(prefers-color-scheme: dark)").matches;
+  } catch (_e) {
+    return false;
   }
 };
 
+/**
+ * Hook to handle dark mode based strictly on system settings.
+ * Automatically updates when system preference changes.
+ * No manual override allowed for now!
+ */
 export const useDarkMode = () => {
-  const [isDarkMode, setIsDarkMode] = useLocalStorage<boolean>("darkMode", getInitialDarkMode());
+  // Use a state variable to track the current preference
+  const [isDarkMode, setIsDarkMode] = useState<boolean>(getInitialDarkMode());
 
   useEffect(() => {
     if (
@@ -33,28 +39,42 @@ export const useDarkMode = () => {
     try {
       const darkModeMediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
 
+      // Handler for media query changes
       const handleChange = (event: MediaQueryListEvent) => {
-        // Only update if localStorage doesn't have a user-set preference
-        if (localStorage.getItem("darkMode") === null) {
-          setIsDarkMode(event.matches);
-        }
+        setIsDarkMode(event.matches);
       };
 
+      // Listen for system preference changes
       darkModeMediaQuery.addEventListener("change", handleChange);
       return () => darkModeMediaQuery.removeEventListener("change", handleChange);
     } catch (e) {
       console.error("Error setting up media query listener for dark mode:", e);
       return;
     }
-  }, [setIsDarkMode]);
+  }, []);
 
-  // The useEffect that previously toggled 'dark' class on documentElement
-  // and set body styles/CSS variables has been removed.
-  // This will now be handled by next-themes (class toggling)
-  // and index.css (styles based on the .dark class).
+  // Synchronize the DOM classes with the current state
+  useEffect(() => {
+    if (typeof document === "undefined") return;
 
+    const root = document.documentElement;
+
+    // Remove any potentially conflicting theme classes first
+    root.classList.remove("dark", "light", "theme-soft-light", "theme-deep-dark");
+
+    // Apply the correct class based on OS setting
+    if (isDarkMode) {
+      root.classList.add("dark");
+    } else {
+      root.classList.add("light");
+    }
+  }, [isDarkMode]);
+
+  // Disable manual toggle functionality as requested
   const toggleDarkMode = () => {
-    setIsDarkMode((prevMode: boolean) => !prevMode);
+    console.warn(
+      "The dark mode / light mode should follow the operating systems settings - without override for now!",
+    );
   };
 
   return { isDarkMode, toggleDarkMode };

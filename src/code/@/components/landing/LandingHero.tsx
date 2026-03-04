@@ -44,7 +44,7 @@ export function LandingHero() {
         </motion.div>
 
         <div className="relative inline-block py-4">
-          <div className="absolute -inset-20 bg-gradient-to-r from-cyan-500/40 via-purple-500/40 to-pink-500/40 blur-[140px] rounded-[100%] pointer-events-none mix-blend-screen opacity-80" />
+          <div className="absolute -inset-20 bg-gradient-to-r from-cyan-500/40 via-purple-500/40 to-pink-500/40 blur-[140px] rounded-[100%] pointer-events-none mix-blend-multiply dark:mix-blend-screen opacity-80" />
           <motion.h1
             initial={{ opacity: 0, filter: "blur(15px)", y: 30 }}
             animate={{ opacity: 1, filter: "blur(0px)", y: 0 }}
@@ -52,9 +52,9 @@ export function LandingHero() {
             className="relative text-6xl sm:text-8xl md:text-[10rem] text-foreground max-w-6xl mx-auto leading-[0.95] mb-10 tracking-tighter py-2 drop-shadow-2xl"
           >
             <span className="font-light">Less context.</span> <br />
-            <span className="bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 bg-clip-text text-transparent font-black drop-shadow-[0_0_80px_rgba(168,85,247,0.8)] mix-blend-lighten">
+            <span className="bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 bg-clip-text text-transparent font-black drop-shadow-[0_0_80px_rgba(168,85,247,0.8)] mix-blend-darken dark:mix-blend-lighten">
               Better AI.
-              <div className="absolute -inset-4 bg-gradient-to-r from-cyan-400/30 via-fuchsia-500/30 to-purple-600/30 blur-2xl -z-10 mix-blend-screen" />
+              <div className="absolute -inset-4 bg-gradient-to-r from-cyan-400/30 via-fuchsia-500/30 to-purple-600/30 blur-2xl -z-10 mix-blend-multiply dark:mix-blend-screen" />
             </span>
           </motion.h1>
         </div>

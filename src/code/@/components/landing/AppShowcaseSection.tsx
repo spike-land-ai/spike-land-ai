@@ -19,7 +19,7 @@ export function AppShowcaseSection({ apps }: AppShowcaseSectionProps) {
     <section className="relative py-32 overflow-hidden">
       {/* Animated Subtle Background Glow */}
       <div
-        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1200px] h-[600px] bg-[radial-gradient(ellipse_at_center,rgba(6,182,212,0.08)_0%,transparent_60%)] animate-pulse pointer-events-none mix-blend-screen"
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1200px] h-[600px] bg-[radial-gradient(ellipse_at_center,rgba(6,182,212,0.08)_0%,transparent_60%)] animate-pulse pointer-events-none mix-blend-multiply dark:mix-blend-screen"
         style={{ animationDuration: "6s" }}
       />
 

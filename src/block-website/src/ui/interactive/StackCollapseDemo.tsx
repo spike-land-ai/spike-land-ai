@@ -132,7 +132,7 @@ function ConnectionLines({ progress, width, height }: ConnectionLinesProps) {
     >
       <defs>
         <marker id="arrowhead" markerWidth="6" markerHeight="4" refX="6" refY="2" orient="auto">
-          <polygon points="0 0, 6 2, 0 4" fill="rgba(148,163,184,0.4)" />
+          <polygon points="0 0, 6 2, 0 4" fill="hsl(var(--muted-foreground) / 0.4)" />
         </marker>
       </defs>
       {CONNECTIONS.map(({ from, to }) => {
@@ -154,7 +154,7 @@ function ConnectionLines({ progress, width, height }: ConnectionLinesProps) {
             key={`${from}-${to}`}
             d={`M ${x1} ${y1} Q ${mx} ${my} ${x2} ${y2}`}
             fill="none"
-            stroke="rgba(148,163,184,0.25)"
+            stroke="hsl(var(--muted-foreground) / 0.25)"
             strokeWidth={1.5}
             strokeDasharray="4 3"
             markerEnd="url(#arrowhead)"
@@ -251,7 +251,7 @@ function ServiceBoxCard({
         <span
           style={{
             fontSize: 8.5,
-            color: "rgba(148,163,184,0.7)",
+            color: "hsl(var(--muted-foreground) / 0.7)",
             fontFamily: "JetBrains Mono, monospace",
             textAlign: "center",
             padding: "0 4px",
@@ -385,7 +385,7 @@ function SpacetimeBox({ progress }: SpacetimeBoxProps) {
               <span
                 style={{
                   fontSize: 10,
-                  color: "rgba(148,163,184,0.65)",
+                  color: "hsl(var(--muted-foreground) / 0.65)",
                 }}
               >
                 {value}
@@ -505,7 +505,7 @@ export function StackCollapseDemo() {
   return (
     <div
       ref={ref}
-      className="bg-slate-900/40 border border-slate-800/80 rounded-[2.5rem] p-10 md:p-16 my-20 backdrop-blur-md relative overflow-hidden group"
+      className="bg-card/40 border border-border/80 rounded-[2.5rem] p-10 md:p-16 my-20 backdrop-blur-md relative overflow-hidden group"
     >
       {/* Hover gradient overlay */}
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_0%,rgba(6,182,212,0.07),transparent_60%)] pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
@@ -514,14 +514,14 @@ export function StackCollapseDemo() {
 
       {/* Header */}
       <div className="text-center mb-10 relative z-10">
-        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-sm bg-slate-800/60 border border-slate-700 text-slate-400 text-[10px] font-bold mb-4 tracking-[0.18em] font-mono">
+        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-sm bg-muted/60 border border-border text-muted-foreground text-[10px] font-bold mb-4 tracking-[0.18em] font-mono">
           <span className="w-1.5 h-1.5 rounded-full bg-cyan-500 animate-pulse" />
           ARCHITECTURE MIGRATION
         </div>
-        <h3 className="text-slate-100 text-xl font-semibold tracking-tight">
+        <h3 className="text-foreground text-xl font-semibold tracking-tight">
           Five services collapse into one
         </h3>
-        <p className="text-slate-500 text-sm font-mono mt-1">Scroll to watch complexity dissolve</p>
+        <p className="text-muted-foreground text-sm font-mono mt-1">Scroll to watch complexity dissolve</p>
       </div>
 
       {/* Canvas */}
@@ -551,7 +551,7 @@ export function StackCollapseDemo() {
       </div>
 
       {/* Caption */}
-      <p className="text-center text-[11px] text-slate-600 font-mono tracking-widest uppercase mt-10 relative z-10">
+      <p className="text-center text-[11px] text-muted-foreground font-mono tracking-widest uppercase mt-10 relative z-10">
         SpacetimeDB · The database built for agents
       </p>
     </div>

@@ -174,7 +174,7 @@ function VennSvg({ progress, reducedMotion }: VennSvgProps) {
     >
       <defs>
         <pattern id={dotPatternId} width="20" height="20" patternUnits="userSpaceOnUse">
-          <circle cx="10" cy="10" r="0.8" fill="rgba(148,163,184,0.05)" />
+          <circle cx="10" cy="10" r="0.8" fill="hsl(var(--foreground) / 0.05)" />
         </pattern>
         <filter id="venn-glow" x="-50%" y="-50%" width="200%" height="200%">
           <feGaussianBlur stdDeviation="6" result="blur" />
@@ -193,7 +193,7 @@ function VennSvg({ progress, reducedMotion }: VennSvgProps) {
       </defs>
 
       {/* Background */}
-      <rect width="400" height="300" fill="#020817" />
+      <rect width="400" height="300" fill="hsl(var(--card))" />
       <rect width="400" height="300" fill={`url(#${dotPatternId})`} />
 
       {/* Ambient glow at center when converged */}
@@ -244,7 +244,7 @@ function VennSvg({ progress, reducedMotion }: VennSvgProps) {
       <CenterLabel glowOp={glowOp} />
 
       {/* Progress bar */}
-      <rect x={20} y={290} width={360} height={2} rx={1} fill="rgba(30,41,59,0.5)" />
+      <rect x={20} y={290} width={360} height={2} rx={1} fill="hsl(var(--muted) / 0.5)" />
       <rect x={20} y={290} width={360 * progress} height={2} rx={1} fill="rgba(6,182,212,0.6)" />
     </svg>
   );
@@ -268,7 +268,7 @@ export function TestCodeNameVenn() {
   return (
     <div
       ref={ref}
-      className="bg-slate-900/40 border border-slate-800/80 rounded-[2.5rem] p-10 md:p-16 my-20 backdrop-blur-md relative overflow-hidden group"
+      className="bg-card/40 border border-border/80 rounded-[2.5rem] p-10 md:p-16 my-20 backdrop-blur-md relative overflow-hidden group"
     >
       {/* Hover gradient */}
       <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-1000 pointer-events-none" />
@@ -280,21 +280,21 @@ export function TestCodeNameVenn() {
 
       {/* Header */}
       <div className="relative z-10 text-center mb-8">
-        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-sm bg-cyan-950/50 border border-cyan-800/60 text-cyan-400 text-[10px] font-bold mb-4 tracking-[0.2em] font-mono">
+        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-sm bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-[10px] font-bold mb-4 tracking-[0.2em] font-mono">
           <span
             className={`w-1.5 h-1.5 rounded-full bg-cyan-400 ${isConverged ? "animate-pulse" : ""}`}
           />
           CONVERGENCE DIAGRAM
         </div>
-        <h3 className="text-lg font-semibold text-slate-200 mb-1">Test · Code · Name</h3>
-        <p className="text-sm text-slate-400 font-mono">
+        <h3 className="text-lg font-semibold text-foreground mb-1">Test · Code · Name</h3>
+        <p className="text-sm text-muted-foreground font-mono">
           Three properties that collapse into one when you design for MCP
         </p>
       </div>
 
       {/* Venn SVG */}
       <motion.div
-        className="relative z-10 w-full max-w-md mx-auto aspect-[4/3] rounded-xl overflow-hidden border border-slate-800 shadow-2xl shadow-cyan-900/10 bg-[#020817]"
+        className="relative z-10 w-full max-w-md mx-auto aspect-[4/3] rounded-xl overflow-hidden border border-border shadow-2xl shadow-cyan-900/10 bg-card"
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, ease: "easeOut" }}
@@ -322,7 +322,7 @@ export function TestCodeNameVenn() {
       </div>
 
       {/* Caption */}
-      <p className="relative z-10 text-[10px] text-slate-500 font-mono tracking-widest uppercase text-center mt-6">
+      <p className="relative z-10 text-[10px] text-muted-foreground font-mono tracking-widest uppercase text-center mt-6">
         {phaseLabel}
       </p>
     </div>
