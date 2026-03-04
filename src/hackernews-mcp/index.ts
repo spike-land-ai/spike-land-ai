@@ -8,6 +8,7 @@
 
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
+import { wrapServerWithLogging } from "@spike-land-ai/mcp-server-base";
 import { SessionManager } from "./session/session-manager.js";
 import { HNReadClient } from "./clients/hn-read-client.js";
 import { HNWriteClient } from "./clients/hn-write-client.js";
@@ -24,6 +25,8 @@ const server = new McpServer({
   name: "hackernews-mcp",
   version: "0.1.0",
 });
+
+wrapServerWithLogging(server, "hackernews-mcp");
 
 // Shared state
 const session = new SessionManager();

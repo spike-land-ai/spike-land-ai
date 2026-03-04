@@ -172,17 +172,32 @@ export function createMcpBridge(opts: McpBridgeOptions): McpBridge {
   }
 
   async function callTool(name: string, args: Record<string, unknown>): Promise<McpCallResult> {
-    if (name === "chat") {
-      return executeChatTool(args);
+    const start = Date.now();
+    let outcome: "success" | "error" = "success";
+    try {
+      if (name === "chat") {
+        const result = await executeChatTool(args);
+        if (result.isError) outcome = "error";
+        return result;
+      }
+      const entry = toolRegistry.get(name);
+      if (!entry) {
+        outcome = "error";
+        return {
+          content: [{ type: "text", text: `Unknown tool: ${name}` }],
+          isError: true,
+        };
+      }
+      const result = await executeGatewayTool(entry, args);
+      if (result.isError) outcome = "error";
+      return result;
+    } catch (err) {
+      outcome = "error";
+      throw err;
+    } finally {
+      const durationMs = Date.now() - start;
+      log(`[mcp-analytics] openclaw-mcp/${name} ${outcome} ${durationMs}ms`);
     }
-    const entry = toolRegistry.get(name);
-    if (!entry) {
-      return {
-        content: [{ type: "text", text: `Unknown tool: ${name}` }],
-        isError: true,
-      };
-    }
-    return executeGatewayTool(entry, args);
   }
 
   async function serve(): Promise<void> {

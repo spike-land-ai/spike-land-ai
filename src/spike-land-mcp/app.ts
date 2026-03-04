@@ -9,6 +9,7 @@ import { oauthRoute } from "./routes/oauth";
 import { wellKnownRoute } from "./routes/well-known";
 import { publicToolsRoute } from "./routes/public-tools";
 import { internalByokRoute } from "./routes/internal-byok";
+import { internalAnalytics } from "./routes/internal-analytics";
 
 export function createApp(): Hono<{ Bindings: Env; Variables: AuthVariables }> {
   const app = new Hono<{ Bindings: Env; Variables: AuthVariables }>();
@@ -27,6 +28,7 @@ export function createApp(): Hono<{ Bindings: Env; Variables: AuthVariables }> {
 
   // Internal routes (service-binding only, no auth)
   app.route("/internal", internalByokRoute);
+  app.route("/internal", internalAnalytics);
 
   // Public routes
   app.route("/.well-known", wellKnownRoute);

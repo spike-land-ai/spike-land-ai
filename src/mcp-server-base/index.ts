@@ -207,6 +207,91 @@ export async function tryCatch<T>(promise: Promise<T>): Promise<Result<T>> {
   }
 }
 
+// ─── Tool Call Logging ────────────────────────────────────────────────────────
+
+export interface ToolCallLogEntry {
+  server: string;
+  tool: string;
+  durationMs: number;
+  outcome: "success" | "error";
+}
+
+/**
+ * Wrap an McpServer so that every `tool()` registration gets timing/outcome
+ * logging to stderr. Useful for stdio-based Node.js MCP servers that don't
+ * have a network endpoint to write analytics to.
+ *
+ * Call this **before** registering any tools:
+ * ```ts
+ * const server = createMcpServer({ name: "my-mcp", version: "1.0.0" });
+ * wrapServerWithLogging(server, "my-mcp");
+ * registerMyTools(server);
+ * ```
+ */
+export function wrapServerWithLogging(
+  server: McpServer,
+  serverName: string,
+  onLog?: (entry: ToolCallLogEntry) => void,
+): void {
+  const originalTool = server.tool.bind(server);
+
+  // McpServer.tool() has multiple overloads. We intercept by wrapping the
+  // function itself and detecting the handler (last argument that's a function).
+  server.tool = ((...args: unknown[]) => {
+    // Find the handler — it's always the last function argument
+    const handlerIdx = args.findIndex(
+      (a, i) => typeof a === "function" && i === args.length - 1,
+    );
+
+    if (handlerIdx === -1) {
+      // No handler found — pass through unchanged
+      return (originalTool as (...a: unknown[]) => unknown)(...args);
+    }
+
+    const toolName = typeof args[0] === "string" ? args[0] : "unknown";
+    const originalHandler = args[handlerIdx] as (...ha: unknown[]) => unknown;
+
+    const wrappedHandler = async (...handlerArgs: unknown[]) => {
+      const start = Date.now();
+      let outcome: "success" | "error" = "success";
+      try {
+        const result = await originalHandler(...handlerArgs);
+        if (
+          result &&
+          typeof result === "object" &&
+          "isError" in result &&
+          (result as Record<string, unknown>).isError
+        ) {
+          outcome = "error";
+        }
+        return result;
+      } catch (err) {
+        outcome = "error";
+        throw err;
+      } finally {
+        const durationMs = Date.now() - start;
+        const entry: ToolCallLogEntry = {
+          server: serverName,
+          tool: toolName,
+          durationMs,
+          outcome,
+        };
+        if (onLog) {
+          onLog(entry);
+        } else {
+          console.error(
+            `[mcp-analytics] ${serverName}/${toolName} ${outcome} ${durationMs}ms`,
+          );
+        }
+      }
+    };
+
+    const newArgs = [...args];
+    newArgs[handlerIdx] = wrappedHandler;
+    return (originalTool as (...a: unknown[]) => unknown)(...newArgs);
+  }) as typeof server.tool;
+}
+
 // ─── Server Factory ───────────────────────────────────────────────────────────
 
 /**

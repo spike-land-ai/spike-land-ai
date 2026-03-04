@@ -159,8 +159,8 @@ function createToolFromExport(
       required,
     },
     handler: async (input: unknown) => {
-      // The new BuiltTool.handler has its own internal validation and tryCatch logic.
-      // We just need to pass the context.
+      const start = Date.now();
+      let outcome: "success" | "error" = "success";
       try {
         const result = await toolExport.handler(input, ctx as unknown as Record<string, unknown>);
         if (
@@ -173,6 +173,7 @@ function createToolFromExport(
         }
         return { content: [{ type: "text", text: JSON.stringify(result) }] };
       } catch (err: unknown) {
+        outcome = "error";
         if (
           err &&
           typeof err === "object" &&
@@ -190,6 +191,11 @@ function createToolFromExport(
             },
           ],
         };
+      } finally {
+        const durationMs = Date.now() - start;
+        console.error(
+          `[mcp-analytics] mcp-image-studio/${toolName} ${outcome} ${durationMs}ms`,
+        );
       }
     },
   } as ToolDefinition<unknown>;

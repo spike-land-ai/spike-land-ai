@@ -4,6 +4,8 @@ import rehypeRaw from "rehype-raw";
 import remarkGfm from "remark-gfm";
 import type { BlogPost } from "../../core/types";
 import { BlogListView } from "./BlogList";
+import { ExperimentProvider, useExperiment } from "../hooks/useExperiment";
+import { useWidgetTracking } from "../hooks/useWidgetTracking";
 
 /**
  * Convert self-closing JSX/HTML tags for custom components to explicit
@@ -157,6 +159,7 @@ export function BlogPostView({ slug, linkComponent }: { slug: string; linkCompon
   const cleanContent = post.content.replace(/!\[[^\]]*\]\(https:\/\/placehold\.co\/[^)]+\)\n?/g, "");
 
   return (
+    <ExperimentProvider>
     <article className="max-w-3xl mx-auto py-10 px-4 sm:px-6 lg:px-8 font-sans">
       <div className="mb-6">
         {BackLink ? (
@@ -235,6 +238,7 @@ export function BlogPostView({ slug, linkComponent }: { slug: string; linkCompon
         <BlogListView linkComponent={linkComponent} limit={3} showHeader={false} />
       </div>
     </article>
+    </ExperimentProvider>
   );
 }
 
@@ -286,7 +290,10 @@ function SupportWidget({ post }: { post: BlogPost }) {
   const xIntent = `https://x.com/intent/tweet?text=${encodeURIComponent(post.title)}&url=${encodeURIComponent(url)}`;
   const linkedInIntent = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`;
 
-  const [sliderIdx, setSliderIdx] = useState(3); // Default: $5
+  const { assignments, config } = useExperiment();
+  const { widgetRef, track } = useWidgetTracking(slug, assignments);
+
+  const [sliderIdx, setSliderIdx] = useState(config.defaultSliderIdx);
   const [customAmount, setCustomAmount] = useState("");
   const [showCustom, setShowCustom] = useState(false);
   const [bumped, setBumped] = useState(false);
@@ -296,12 +303,22 @@ function SupportWidget({ post }: { post: BlogPost }) {
   const [donating, setDonating] = useState(false);
   const [thankYou, setThankYou] = useState(false);
   const bumpRef = useRef<HTMLButtonElement>(null);
+  const sliderStartedRef = useRef(false);
+  const sliderFinalTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Sync slider default when experiment config loads
+  useEffect(() => {
+    if (!sliderStartedRef.current) {
+      setSliderIdx(config.defaultSliderIdx);
+    }
+  }, [config.defaultSliderIdx]);
 
   // Check thank-you state from URL
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     if (params.get("supported") === "1") {
       setThankYou(true);
+      track("thankyou_viewed");
       // Clean the URL
       const cleaned = window.location.pathname;
       window.history.replaceState({}, "", cleaned);
@@ -331,6 +348,7 @@ function SupportWidget({ post }: { post: BlogPost }) {
 
   const handleBump = useCallback(async () => {
     if (bumped) return;
+    track("fistbump_click");
     setBumpAnimating(true);
     setTimeout(() => setBumpAnimating(false), 600);
 
@@ -356,9 +374,11 @@ function SupportWidget({ post }: { post: BlogPost }) {
       : stop?.amount ?? 5;
 
     if (!amount || amount < 1) return;
+    track("donate_click", { amount });
     setDonating(true);
 
     try {
+      track("checkout_started", { amount });
       const res = await fetch("/api/support/donate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -377,7 +397,7 @@ function SupportWidget({ post }: { post: BlogPost }) {
   const copy = getArticleCopy(post.category, post.tags);
 
   return (
-    <div className="border-t border-border mt-12 pt-8">
+    <div ref={widgetRef} className="border-t border-border mt-12 pt-8">
       {/* Thank-you confetti state */}
       {thankYou && (
         <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-xl p-6 mb-6 text-center">
@@ -394,13 +414,15 @@ function SupportWidget({ post }: { post: BlogPost }) {
         {copy}
       </p>
 
-      {/* Engagement counters */}
-      <div className="flex flex-wrap items-center gap-4 text-xs text-muted-foreground/70 mb-6">
-        <span>👊 {bumpCount} fist bump{bumpCount !== 1 ? "s" : ""}</span>
-        {supporters > 0 && (
-          <span>💛 {supporters} supporter{supporters !== 1 ? "s" : ""}</span>
-        )}
-      </div>
+      {/* Engagement counters — variant-controlled */}
+      {config.showSocialProof && (
+        <div className="flex flex-wrap items-center gap-4 text-xs text-muted-foreground/70 mb-6">
+          <span>👊 {config.socialProofStyle === "fuzzy" && bumpCount >= 10 ? `${Math.floor(bumpCount / 10) * 10}+` : config.socialProofStyle === "recent" ? "Recent" : bumpCount} fist bump{bumpCount !== 1 ? "s" : ""}</span>
+          {supporters > 0 && (
+            <span>💛 {config.socialProofStyle === "fuzzy" && supporters >= 10 ? `${Math.floor(supporters / 10) * 10}+` : config.socialProofStyle === "recent" ? `${Math.min(supporters, 3)} this week` : supporters} supporter{supporters !== 1 ? "s" : ""}</span>
+          )}
+        </div>
+      )}
 
       {/* Fist Bump button */}
       <div className="mb-6">
@@ -444,6 +466,16 @@ function SupportWidget({ post }: { post: BlogPost }) {
           value={sliderIdx}
           onChange={(e) => {
             const idx = parseInt(e.target.value, 10);
+            if (!sliderStartedRef.current) {
+              sliderStartedRef.current = true;
+              track("slider_start", { initial_idx: sliderIdx });
+            }
+            track("slider_change", { idx, amount: SLIDER_STOPS[idx]?.amount ?? 0 });
+            // Debounce slider_final (2s after last change)
+            if (sliderFinalTimerRef.current) clearTimeout(sliderFinalTimerRef.current);
+            sliderFinalTimerRef.current = setTimeout(() => {
+              track("slider_final", { idx, amount: SLIDER_STOPS[idx]?.amount ?? 0 });
+            }, 2000);
             setSliderIdx(idx);
             setShowCustom(false);
           }}
@@ -475,7 +507,7 @@ function SupportWidget({ post }: { post: BlogPost }) {
 
         {/* Custom amount toggle */}
         <button
-          onClick={() => setShowCustom(!showCustom)}
+          onClick={() => { if (!showCustom) track("custom_toggle"); setShowCustom(!showCustom); }}
           className="text-xs text-primary hover:opacity-80 mt-3 transition-colors"
         >
           {showCustom ? "← Back to presets" : "Name your price, champion →"}
@@ -489,7 +521,7 @@ function SupportWidget({ post }: { post: BlogPost }) {
               min={1}
               max={999}
               value={customAmount}
-              onChange={(e) => setCustomAmount(e.target.value)}
+              onChange={(e) => { setCustomAmount(e.target.value); track("custom_value", { amount: parseFloat(e.target.value) || 0 }); }}
               placeholder="Your amount"
               className="w-24 px-3 py-1.5 text-sm rounded-lg border border-border bg-background text-foreground"
             />
@@ -501,14 +533,15 @@ function SupportWidget({ post }: { post: BlogPost }) {
           <button
             onClick={handleDonate}
             disabled={donating || (showCustom && (!customAmount || parseFloat(customAmount) < 1))}
-            className="mt-4 w-full px-4 py-2.5 rounded-lg bg-primary text-primary-foreground font-medium text-sm
+            className="mt-4 w-full px-4 py-2.5 rounded-lg text-white font-medium text-sm
               hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed transition-opacity"
+            style={{ backgroundColor: config.ctaColor }}
           >
             {donating
               ? "Redirecting to Stripe..."
               : showCustom
-                ? `Donate $${customAmount || "..."}`
-                : `Donate $${currentStop?.amount ?? 5}`
+                ? config.ctaText.replace("${amount}", `$${customAmount || "..."}`).replace("{n}", String(supporters))
+                : config.ctaText.replace("${amount}", `$${currentStop?.amount ?? 5}`).replace("{n}", String(supporters))
             }
           </button>
         )}
@@ -521,6 +554,7 @@ function SupportWidget({ post }: { post: BlogPost }) {
           target="_blank"
           rel="noopener noreferrer"
           className="text-muted-foreground hover:text-foreground transition-colors"
+          onClick={() => track("share_click", { target: "x" })}
         >
           Share on X
         </a>
@@ -529,6 +563,7 @@ function SupportWidget({ post }: { post: BlogPost }) {
           target="_blank"
           rel="noopener noreferrer"
           className="text-muted-foreground hover:text-foreground transition-colors"
+          onClick={() => track("share_click", { target: "linkedin" })}
         >
           Share on LinkedIn
         </a>

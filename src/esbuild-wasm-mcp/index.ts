@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { createMcpServer, startMcpServer } from "@spike-land-ai/mcp-server-base";
+import { createMcpServer, startMcpServer, wrapServerWithLogging } from "@spike-land-ai/mcp-server-base";
 import { registerInitializeTool } from "./tools/initialize.js";
 import { registerStatusTool } from "./tools/status.js";
 import { registerTransformTool } from "./tools/transform.js";
@@ -12,6 +12,8 @@ const server = createMcpServer({
   name: "esbuild-wasm-mcp",
   version: "0.27.4",
 });
+
+wrapServerWithLogging(server, "esbuild-wasm-mcp");
 
 registerInitializeTool(server);
 registerStatusTool(server);

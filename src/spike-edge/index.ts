@@ -24,6 +24,7 @@ import { cockpit } from "./routes/cockpit.js";
 import { credits } from "./routes/credits.js";
 import { creditMeterMiddleware } from "./middleware/credit-meter.js";
 import { support } from "./routes/support.js";
+import { experiments } from "./routes/experiments.js";
 import { spa } from "./routes/spa.js";
 
 const app = new Hono<{ Bindings: Env }>();
@@ -151,6 +152,7 @@ app.route("/", apiKeys);
 app.route("/", cockpit);
 app.route("/", credits);
 app.route("/", support);
+app.route("/", experiments);
 
 // MCP tools listing proxy (public, no auth required)
 app.get("/mcp/tools", async (c) => {

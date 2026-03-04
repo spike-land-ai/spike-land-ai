@@ -1,4 +1,4 @@
-import { index, integer, sqliteTable, text, uniqueIndex } from "drizzle-orm/sqlite-core";
+import { index, integer, primaryKey, sqliteTable, text, uniqueIndex } from "drizzle-orm/sqlite-core";
 import { relations } from "drizzle-orm";
 
 // ─── Users ───────────────────────────────────────────────────────────────────
@@ -272,6 +272,7 @@ export const skillUsageEvents = sqliteTable(
       onDelete: "set null",
     }),
     skillName: text("skill_name").notNull(),
+    serverName: text("server_name").notNull().default("spike-land-mcp"),
     category: text("category"),
     outcome: text("outcome").notNull().default("success"), // "success" | "error"
     durationMs: integer("duration_ms"),
@@ -283,6 +284,42 @@ export const skillUsageEvents = sqliteTable(
   (t) => ({
     userIdx: index("skill_usage_user_id_idx").on(t.userId),
     skillIdx: index("skill_usage_skill_name_idx").on(t.skillName),
+  }),
+);
+
+// ─── Tool Call Daily Rollup ─────────────────────────────────────────────────
+
+export const toolCallDaily = sqliteTable(
+  "tool_call_daily",
+  {
+    userId: text("user_id").notNull(),
+    toolName: text("tool_name").notNull(),
+    serverName: text("server_name").notNull(),
+    day: integer("day").notNull(),
+    callCount: integer("call_count").notNull().default(0),
+    errorCount: integer("error_count").notNull().default(0),
+    totalMs: integer("total_ms").notNull().default(0),
+  },
+  (t) => ({
+    pk: primaryKey({ columns: [t.userId, t.toolName, t.serverName, t.day] }),
+    userDayIdx: index("idx_tcd_user_day").on(t.userId, t.day),
+    toolDayIdx: index("idx_tcd_tool_day").on(t.toolName, t.day),
+  }),
+);
+
+// ─── Tool User Daily (unique user-tool dedup) ──────────────────────────────
+
+export const toolUserDaily = sqliteTable(
+  "tool_user_daily",
+  {
+    toolName: text("tool_name").notNull(),
+    serverName: text("server_name").notNull(),
+    userId: text("user_id").notNull(),
+    day: integer("day").notNull(),
+  },
+  (t) => ({
+    pk: primaryKey({ columns: [t.toolName, t.serverName, t.userId, t.day] }),
+    toolDayIdx: index("idx_tud_tool_day").on(t.toolName, t.day),
   }),
 );
 
