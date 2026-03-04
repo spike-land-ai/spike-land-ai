@@ -181,9 +181,9 @@ export function RootLayout() {
     // Match exact path first, then strip dynamic segments for a best-effort match
     let meta = ROUTE_META[pathname] ??
       ROUTE_META[pathname.replace(/\/[^/]+$/, "")] ?? {
-        title: DEFAULT_TITLE,
-        description: DEFAULT_DESCRIPTION,
-      };
+      title: DEFAULT_TITLE,
+      description: DEFAULT_DESCRIPTION,
+    };
 
     // Special handling for dynamic app pages
     if (pathname.startsWith("/apps/") && pathname !== "/apps/new") {
@@ -246,9 +246,8 @@ export function RootLayout() {
 
       {/* Sidebar — Always a drawer */}
       <aside
-        className={`fixed inset-y-0 left-0 z-50 w-64 transform border-r border-border bg-card shadow-2xl transition-transform duration-300 ease-in-out ${
-          sidebarOpen ? "translate-x-0" : "-translate-x-full"
-        }`}
+        className={`fixed inset-y-0 left-0 z-50 w-64 transform border-r border-border bg-card shadow-2xl transition-transform duration-300 ease-in-out ${sidebarOpen ? "translate-x-0 pointer-events-auto" : "-translate-x-full pointer-events-none"
+          }`}
       >
         <div className="flex h-16 items-center justify-between border-b border-border px-6">
           <Link to="/" className="text-xl font-bold hover:opacity-80" onClick={() => setSidebarOpen(false)}>

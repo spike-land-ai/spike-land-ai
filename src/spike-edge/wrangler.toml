@@ -1,0 +1,51 @@
+name = "spike-edge"
+main = "index.ts"
+compatibility_date = "2025-01-01"
+compatibility_flags = ["nodejs_compat"]
+workers_dev = true
+
+[[r2_buckets]]
+binding = "R2"
+bucket_name = "spike-platform"
+
+[[r2_buckets]]
+binding = "SPA_ASSETS"
+bucket_name = "spike-app-assets"
+
+[durable_objects]
+bindings = [
+  { name = "LIMITERS", class_name = "RateLimiter" }
+]
+
+[[migrations]]
+tag = "v1"
+new_classes = ["RateLimiter"]
+
+[[d1_databases]]
+binding = "DB"
+database_name = "spike-edge-analytics"
+database_id = "f7219e86-7dc6-4627-92ad-17fce49ae35a"
+migrations_dir = "db/migrations"
+
+[vars]
+GA_MEASUREMENT_ID = "G-9WNEM9ZHE7"
+
+[[services]]
+binding = "AUTH_MCP"
+service = "mcp-auth"
+
+[[services]]
+binding = "MCP_SERVICE"
+service = "spike-land-mcp"
+
+[[routes]]
+pattern = "edge.spike.land"
+custom_domain = true
+
+[[routes]]
+pattern = "spike.land/*"
+zone_name = "spike.land"
+
+[[routes]]
+pattern = "www.spike.land/*"
+zone_name = "spike.land"
