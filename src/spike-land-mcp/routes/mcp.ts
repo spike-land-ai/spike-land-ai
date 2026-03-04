@@ -14,6 +14,8 @@ import { loadEnabledCategories } from "../kv/categories";
 import { checkRateLimit } from "../kv/rate-limit";
 import { hashClientId, sendGA4Events } from "../lib/ga4";
 import type { GA4Event } from "../lib/ga4";
+import { trackPlatformEvents } from "../lib/analytics";
+import type { AnalyticsEvent } from "../lib/analytics";
 
 export const mcpRoute = new Hono<{ Bindings: Env; Variables: AuthVariables }>();
 
@@ -88,22 +90,38 @@ mcpRoute.post("/", async (c) => {
       parsedBody: body,
     });
 
-    // Track MCP request via GA4
+    // Track MCP request via GA4 and platform analytics
     const durationMs = Date.now() - startTime;
     const method = (body as { method?: string })?.method ?? "unknown";
-    const events: GA4Event[] = [
+    
+    // 1. Send to GA4
+    const ga4Events: GA4Event[] = [
       { name: "mcp_request", params: { method, user_id: userId, duration_ms: durationMs } },
     ];
     if (method === "tools/call") {
       const toolName = (body as { params?: { name?: string } })?.params?.name ?? "unknown";
-      events.push({
+      ga4Events.push({
         name: "mcp_tool_call",
         params: { tool_name: toolName, user_id: userId, duration_ms: durationMs },
       });
     }
     c.executionCtx.waitUntil(
-      hashClientId(userId).then((clientId) => sendGA4Events(c.env, clientId, events)),
+      hashClientId(userId).then((clientId) => sendGA4Events(c.env, clientId, ga4Events)),
     );
+
+    // 2. Send to platform analytics (D1)
+    const platformEvents: AnalyticsEvent[] = [
+      { source: "spike-land-mcp", eventType: "mcp_request", metadata: { method, durationMs } },
+    ];
+    if (method === "tools/call") {
+      const toolName = (body as { params?: { name?: string } })?.params?.name ?? "unknown";
+      platformEvents.push({
+        source: "spike-land-mcp",
+        eventType: "tool_use", // This matches the key in spike-edge analytics.ts
+        metadata: { toolName, durationMs },
+      });
+    }
+    c.executionCtx.waitUntil(trackPlatformEvents(c.env.SPIKE_EDGE, platformEvents));
 
     return new Response(response.body, {
       status: response.status,
