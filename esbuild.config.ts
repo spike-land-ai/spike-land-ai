@@ -10,7 +10,7 @@
  *   npx tsx esbuild.config.ts --kind=mcp-server
  */
 
-import { readFileSync } from "node:fs";
+import { readFileSync, existsSync } from "node:fs";
 import { join, resolve } from "node:path";
 import * as esbuild from "esbuild";
 import YAML from "yaml";
@@ -154,9 +154,28 @@ export function createBuildConfig(opts: BuildOptions): esbuild.BuildOptions {
 
   const external = resolveExternals(allPackages[packageName]!, allPackages, profile.external);
 
+  let entryPoints: string[] = [entryPoint];
+  const pkgDef = allPackages[packageName];
+  if (pkgDef?.exports && profile.bundle === false) {
+    entryPoints = [];
+    for (const v of Object.values(pkgDef.exports)) {
+      const cleanPath = v.replace(/^\.\//, "");
+      const fullPath = join(srcDir, cleanPath);
+      // Fallback to searching in src/ if it exists (e.g. block-website has inner src)
+      if (existsSync(fullPath)) {
+        entryPoints.push(fullPath);
+      } else if (existsSync(join(srcDir, "src", cleanPath))) {
+        entryPoints.push(join(srcDir, "src", cleanPath));
+      } else {
+        console.warn(`Warning: Missing source file for export ${v} in ${packageName}`);
+      }
+    }
+  }
+
   return {
-    entryPoints: [entryPoint],
+    entryPoints,
     outdir: outDir,
+    outbase: srcDir,
     platform: profile.platform,
     bundle: profile.bundle,
     splitting: profile.splitting,
@@ -164,7 +183,7 @@ export function createBuildConfig(opts: BuildOptions): esbuild.BuildOptions {
     format: profile.format,
     sourcemap: true,
     target: "es2022",
-    external: external.length > 0 ? external : undefined,
+    external: (profile.bundle && external.length > 0) ? external : undefined,
     banner: profile.banner,
     tsconfig: resolve("tsconfig.json"),
     logLevel: "info",
