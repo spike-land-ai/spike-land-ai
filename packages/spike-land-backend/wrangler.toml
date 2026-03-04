@@ -1,7 +1,7 @@
 # :schema node_modules/wrangler/config-schema.json
 
 name = "spike-land"
-main = "chat.ts"
+main = "../../src/spike-land-backend/chat.ts"
 compatibility_flags = ["nodejs_compat"]
 
 # SECURITY: Account ID should be set via environment variable, not hardcoded

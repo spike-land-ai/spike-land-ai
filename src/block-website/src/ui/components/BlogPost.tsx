@@ -152,14 +152,39 @@ export function BlogPostView({ slug, linkComponent }: { slug: string; linkCompon
     );
   }
 
+  const BackLink = linkComponent;
+  const cleanContent = post.content.replace(/!\[[^\]]*\]\(https:\/\/placehold\.co\/[^)]+\)\n?/g, "");
+
   return (
     <article className="max-w-3xl mx-auto py-10 px-4 sm:px-6 lg:px-8 font-sans">
-      <header className="mb-10 text-center border-b border-border pb-8">
+      <div className="mb-6">
+        {BackLink ? (
+          <BackLink to="/blog" className="text-sm text-muted-foreground hover:text-primary transition-colors">
+            &larr; Blog
+          </BackLink>
+        ) : (
+          <a href="/blog" className="text-sm text-muted-foreground hover:text-primary transition-colors">
+            &larr; Blog
+          </a>
+        )}
+      </div>
+
+      {post.heroImage && (
+        <img
+          src={post.heroImage}
+          alt={post.title}
+          loading="eager"
+          decoding="async"
+          className="w-full rounded-2xl shadow-2xl border border-border mb-8"
+        />
+      )}
+
+      <header className="mb-8 text-center border-b border-border pb-6">
         <div className="flex justify-center items-center gap-3 text-sm text-muted-foreground mb-6 font-medium tracking-wide uppercase">
           <time dateTime={post.date}>{new Date(post.date).toLocaleDateString()}</time>
           {post.category && (
             <>
-              <span className="text-muted-foreground/40">•</span>
+              <span className="text-muted-foreground/40">&bull;</span>
               <span className="text-primary">{post.category}</span>
             </>
           )}
@@ -167,6 +192,11 @@ export function BlogPostView({ slug, linkComponent }: { slug: string; linkCompon
         <h1 className="text-3xl sm:text-5xl font-display font-extrabold text-foreground tracking-tight leading-tight mb-6 drop-shadow-sm">
           {post.title}
         </h1>
+        {post.primer && (
+          <p className="text-base text-muted-foreground italic mb-4">
+            {post.primer}
+          </p>
+        )}
         {post.description && (
           <p className="text-lg sm:text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed font-light">
             {post.description}
@@ -174,10 +204,10 @@ export function BlogPostView({ slug, linkComponent }: { slug: string; linkCompon
         )}
       </header>
 
-      <div className="prose prose-lg dark:prose-invert max-w-none
+      <div className="prose dark:prose-invert max-w-none
         prose-headings:font-display prose-headings:font-bold prose-headings:text-foreground prose-headings:tracking-tight
         prose-h1:text-3xl prose-h2:text-2xl prose-h3:text-xl
-        prose-p:text-muted-foreground prose-p:leading-loose prose-p:font-sans
+        prose-p:text-muted-foreground prose-p:leading-relaxed prose-p:font-sans
         prose-a:text-primary prose-a:no-underline hover:prose-a:underline hover:prose-a:opacity-80
         prose-strong:text-foreground prose-strong:font-semibold
         prose-blockquote:border-l-primary prose-blockquote:bg-muted/30 prose-blockquote:py-2 prose-blockquote:px-6 prose-blockquote:text-foreground prose-blockquote:font-medium prose-blockquote:italic
@@ -187,7 +217,7 @@ export function BlogPostView({ slug, linkComponent }: { slug: string; linkCompon
         prose-ul:text-muted-foreground prose-ol:text-muted-foreground
         prose-li:marker:text-primary">
         <Markdown rehypePlugins={[rehypeRaw]} components={COMPONENT_MAP as unknown as Record<string, React.ComponentType>}>
-          {fixSelfClosingTags(post.content)}
+          {fixSelfClosingTags(cleanContent)}
         </Markdown>
       </div>
     </article>

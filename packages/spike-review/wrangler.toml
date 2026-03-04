@@ -1,7 +1,7 @@
 # :schema node_modules/wrangler/config-schema.json
 
 name = "spike-review"
-main = "worker/index.ts"
+main = "../../src/spike-review/worker/index.ts"
 compatibility_flags = ["nodejs_compat"]
 compatibility_date = "2025-07-12"
 

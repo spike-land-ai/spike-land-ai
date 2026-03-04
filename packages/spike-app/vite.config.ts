@@ -50,7 +50,14 @@ function invalidateDepCache(): import("vite").Plugin {
 export default defineConfig({
   plugins: [invalidateDepCache(), react(), tailwindcss()],
   resolve: {
-    alias: { "@": resolve(import.meta.dirname, ".") },
+    alias: {
+      "@": resolve(import.meta.dirname, "../../src/spike-app"),
+      "@spike-land-ai/block-website/ui": resolve(import.meta.dirname, "../../src/block-website/src/ui/index.ts"),
+      "@spike-land-ai/block-website/core": resolve(import.meta.dirname, "../../src/block-website/src/core/index.ts"),
+      "@spike-land-ai/block-website/mcp": resolve(import.meta.dirname, "../../src/block-website/src/mcp/index.ts"),
+      "@spike-land-ai/block-website": resolve(import.meta.dirname, "../../src/block-website/src/index.ts"),
+      "@spike-land-ai/shared": resolve(import.meta.dirname, "../../src/shared/index.ts"),
+    },
   },
   server: {
     proxy: {

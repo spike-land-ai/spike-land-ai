@@ -1,7 +1,7 @@
 # :schema node_modules/wrangler/config-schema.json
 
 name = "spike-land-mcp"
-main = "index.ts"
+main = "../../src/spike-land-mcp/index.ts"
 compatibility_date = "2025-07-12"
 compatibility_flags = ["nodejs_compat"]
 workers_dev = true

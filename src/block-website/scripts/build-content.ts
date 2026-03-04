@@ -26,16 +26,38 @@ async function buildContent() {
       
       const { data, content } = matter(fileContent);
       
+      let heroImage: string | null = data.heroImage || null;
+      let body = content.trim();
+
+      // Auto-detect hero image from first 5 lines if not in frontmatter
+      if (!heroImage) {
+        const lines = body.split("\n").slice(0, 5);
+        for (const line of lines) {
+          const match = line.match(/^!\[.*?\]\((\/blog\/[^)]+)\)$/);
+          if (match?.[1] && !line.includes("placehold.co")) {
+            heroImage = match[1];
+            body = body.replace(line + "\n", "").replace(line, "").trim();
+            break;
+          }
+        }
+      } else {
+        // Strip hero image line from body if it matches the frontmatter heroImage
+        const escapedHero = heroImage.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+        body = body.replace(new RegExp(`^!\\[.*?\\]\\(${escapedHero}\\)\\n?`, "m"), "").trim();
+      }
+
       posts.push({
         slug: data.slug || entry.name.replace(".mdx", ""),
         title: data.title || entry.name,
         description: data.description || "",
+        primer: data.primer || "",
         date: data.date || "",
         author: data.author || "",
         category: data.category || "",
         tags: data.tags || [],
         featured: data.featured || false,
-        content: content.trim()
+        heroImage,
+        content: body,
       });
     }
   }
@@ -48,11 +70,13 @@ export interface BlogPost {
   slug: string;
   title: string;
   description: string;
+  primer: string;
   date: string;
   author: string;
   category: string;
   tags: string[];
   featured: boolean;
+  heroImage: string | null;
   content: string;
 }
 

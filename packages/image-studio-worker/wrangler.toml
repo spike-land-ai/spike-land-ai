@@ -1,5 +1,5 @@
 name = "image-studio-mcp"
-main = "index.ts"
+main = "../../src/image-studio-worker/index.ts"
 compatibility_date = "2025-02-28"
 compatibility_flags = ["nodejs_compat"]
 
