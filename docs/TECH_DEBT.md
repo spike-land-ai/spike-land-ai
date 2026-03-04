@@ -1,6 +1,6 @@
 # Tech Debt Registry
 
-> Last updated: 2026-02-26 Last audit: 2026-02-26 (Sprint 4 Cleanup)
+> Last updated: 2026-03-04 Last audit: 2026-02-26 (Sprint 4 Cleanup)
 
 ## Overview
 
@@ -13,11 +13,11 @@ are prioritized P0 (critical) through P3 (minor/nice-to-have).
 
 #### TD-P0-1: next-auth on beta.30
 
-- **Status**: Open
+- **Status**: Superseded
 - **Impact**: Production running on pre-release version
 - **Details**: `next-auth` is pinned to `5.0.0-beta.30` in root `package.json`.
   Beta releases may contain breaking changes, missing fixes, or undocumented
-  behavior.
+  behavior. Superseded by migration to Better Auth on Cloudflare Workers (March 2026). NextAuth is legacy-only (packages/spike.land).
 - **Action**: Monitor next-auth releases; upgrade when stable v5 is available.
 
 #### TD-P0-2: Test coverage below targets
@@ -86,6 +86,27 @@ are prioritized P0 (critical) through P3 (minor/nice-to-have).
 - **Details**: ~420 dead code files removed in Feb 2026 cleanup. 14 packages
   extracted to external repos. Only `src/store-apps` remains.
 - **Action**: Continue reviewing remaining unused files in `src/`.
+
+#### TD-P1-6: block-sdk schema DSL limitations
+
+- **Status**: Open
+- **Impact**: Developers must use Drizzle for anything beyond simple CRUD tables
+- **Details**: `defineTable()` supports only 5 column types with `primaryKey()` and `optional()` modifiers. Missing: foreign keys, indexes, composite primary keys, column defaults, check constraints.
+- **Action**: Extend schema DSL with `.default()`, `.index()`, `.references()` methods.
+
+#### TD-P1-7: block-sdk IDB adapter — regex SQL parser
+
+- **Status**: Open
+- **Impact**: Browser-side blocks limited to basic CRUD patterns
+- **Details**: The IDB adapter (`src/block-sdk/adapters/idb.ts`, ~350 lines) uses regex matching instead of a real SQL parser. No JOINs, ORDER BY, LIMIT, GROUP BY, subqueries, or OR conditions. Works for `defineBlock()` patterns but breaks on anything more complex.
+- **Action**: Add ORDER BY and LIMIT support (most requested). Consider sql.js WASM for full SQL in browser.
+
+#### TD-P1-8: block-sdk has no SQLite adapter for Node.js
+
+- **Status**: Open
+- **Impact**: Node.js testing doesn't exercise real SQL semantics
+- **Details**: The memory adapter uses an in-memory Map with the same regex parser as IDB. No adapter wrapping better-sqlite3 or sql.js exists. Integration tests can't verify SQL behavior matches D1 production.
+- **Action**: Create `sqliteAdapter()` using better-sqlite3 for local dev and integration testing.
 
 ### P2 - Medium Priority
 

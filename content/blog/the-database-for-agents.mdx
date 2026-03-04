@@ -18,7 +18,7 @@ featured: true
 - The patterns were right: tables = schema, reducers = API, `ctx.sender` = auth, subscriptions = real-time
 - I rebuilt those same patterns on Cloudflare Workers as `block-sdk` — a `defineBlock()` DSL that packages storage schema + business logic + MCP tools into composable units
 - `defineBlock()` runs on CF Workers (D1), in the browser (IndexedDB), or in Node.js (memory) — same code, three runtimes
-- The full migration from Next.js happened over a weekend: 27 packages, 80+ MCP tools, zero AWS
+- The full migration from Next.js happened over a weekend: 29 packages, 80+ MCP tools, zero AWS
 </Callout>
 
 ## The Sequel
@@ -80,7 +80,7 @@ I tried vinext too. It was still Next.js underneath, just with a different build
 | Redis pub/sub | Durable Objects (when needed) |
 | PostgreSQL + Prisma client | D1 + Drizzle ORM |
 | AWS (ECS + Aurora + Redis + CloudFront) | Cloudflare (Workers + D1 + R2 + DO) |
-| One monolith, 520 routes | 27 packages, each does one thing |
+| One monolith, 520 routes | 29 packages, each does one thing |
 
 ## defineBlock(): The Syntax I Wanted
 
@@ -205,12 +205,12 @@ Three implementations, same interface:
 │   CF Workers (D1)   │   Browser (IDB)      │   Node.js (Memory)   │
 ├─────────────────────┼──────────────────────┼──────────────────────┤
 │ kv  → KV namespace  │ kv  → object store   │ kv  → Map<string,T>  │
-│ sql → D1 database   │ sql → sql.js / WASM  │ sql → better-sqlite3 │
+│ sql → D1 database   │ sql → regex parser   │ sql → in-memory Map  │
 │ blob→ R2 bucket     │ blob→ OPFS           │ blob→ fs (optional)  │
 └─────────────────────┴──────────────────────┴──────────────────────┘
 ```
 
-The D1 adapter wraps Cloudflare's D1 binding. The IDB adapter wraps IndexedDB with sql.js for SQL support. The memory adapter uses in-memory Maps — perfect for tests. Your block code never knows which one it's talking to.
+The D1 adapter wraps Cloudflare's D1 binding. The IDB adapter wraps IndexedDB with a lightweight regex-based SQL parser (~350 lines) that handles INSERT/SELECT/UPDATE/DELETE patterns. The memory adapter uses in-memory Maps for testing. Note: a SQLite adapter (e.g. via better-sqlite3 or sql.js) is declared in the design but not yet implemented. Your block code never knows which one it's talking to.
 
 ## A Real Block: task-queue
 
@@ -338,6 +338,8 @@ Here is the full stack, running entirely on Cloudflare:
                                    └───────┘
 ```
 
+> **Note:** The platform runs 8 Cloudflare Workers total: spike-edge, spike-land-mcp, mcp-auth, spike-land-backend, transpile, code, spike-review, and image-studio-worker.
+
 The spike-edge service is the edge gateway — here is its actual route structure:
 
 ```typescript
@@ -369,10 +371,10 @@ app.route("/", spa);          // SPA catch-all → R2
 - SpacetimeDB (lasted exactly one day)
 
 **Deployed:**
-- 27 packages, each does one thing
+- 29 packages, each does one thing
 - D1 database with 17 tables in spike-land-mcp alone (Drizzle-managed)
 - 80+ MCP tools
-- 5 Cloudflare Workers (spike-edge, spike-land-mcp, mcp-auth, spike-land-backend, transpile)
+- 8 Cloudflare Workers (spike-edge, spike-land-mcp, mcp-auth, spike-land-backend, transpile, code, spike-review, image-studio-worker)
 - 0 servers to manage
 
 | What | Before | After |
@@ -447,6 +449,8 @@ I am not going to pretend this is strictly better. Here is the honest assessment
 
 **block-sdk is custom and young.** No community. No ecosystem. No Stack Overflow answers. If I get hit by a bus, the next developer reads my code or starts over. But: I own every line. I can read every line. I can change it on a Tuesday. That matters more to me than ecosystem size at this scale.
 
+**Schema DSL limitations.** The `defineTable()` DSL supports column types (`string`, `number`, `boolean`, `u64`, `enum`) with `primaryKey()` and `optional()` modifiers, but has no support for foreign keys, indexes, composite primary keys, or column defaults. For schemas that need these features, use Drizzle directly — `block-sdk` is designed for simple per-block CRUD tables, not relational modeling.
+
 **SpacetimeDB's developer experience was genuinely good.** The Rust module system, the auto-generated bindings, the single-binary deployment — these are well-designed. If SpacetimeDB had been a Cloudflare product, I might still be using it. The reason I left was not quality. It was that I was adding a dependency I didn't need on top of infrastructure I already had.
 
 ## Closing
@@ -455,7 +459,7 @@ The best architecture is the one you stole the patterns from and rebuilt on infr
 
 SpacetimeDB showed me what a good data abstraction looks like: schema and API and auth converging into one thing. I just didn't need SpacetimeDB to build it. The patterns were universal. The implementation was portable. The weekend was well spent.
 
-Twenty-seven packages. Eighty-plus MCP tools. Five Cloudflare Workers. Zero servers. One `defineBlock()` call that packages schema, business logic, and MCP tools into a composable unit that runs anywhere.
+Twenty-nine packages. Eighty-plus MCP tools. Eight Cloudflare Workers. Zero servers. One `defineBlock()` call that packages schema, business logic, and MCP tools into a composable unit that runs anywhere.
 
 Published on March 8 — International Women's Day, and also Zoltan's nameday. Boldog nevnapot!
 

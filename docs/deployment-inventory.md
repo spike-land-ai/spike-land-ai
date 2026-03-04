@@ -4,10 +4,9 @@
 
 | Platform                | Count | Services                                                                                     |
 | ----------------------- | ----- | -------------------------------------------------------------------------------------------- |
-| Cloudflare Workers      | 6     | spike-land-backend, transpile, spike-land-mcp, mcp-auth, mcp-image-studio, spike-edge        |
+| Cloudflare Workers      | 8     | spike-land-backend, transpile, spike-land-mcp, mcp-auth, spike-edge, code, spike-review, image-studio-worker |
 | Cloudflare Pages/Assets | 1     | spike-app (via spike-edge)                                                                   |
-| AWS ECS                 | 1     | spike.land (legacy Next.js)                                                                  |
-| npm (GitHub Packages)   | 25    | All @spike-land-ai/* packages                                                                |
+| npm (GitHub Packages)   | 29    | All @spike-land-ai/* packages                                                                |
 | MCP stdio servers       | 5     | esbuild-wasm-mcp, hackernews-mcp, mcp-image-studio, openclaw-mcp, spike-cli                  |
 
 ## Service Details
@@ -49,16 +48,17 @@
    - Config: `src/spike-edge/wrangler.toml`
    - Deploy: `npm run w:deploy:prod`
 
-### AWS ECS (Legacy)
+7. **code** — Monaco-based code editor with live preview
+   - Config: `src/code/wrangler.toml`
+   - Deploy: `npm run w:deploy:prod`
 
-7. **spike.land** — Next.js 16 platform (being replaced)
-   - Cluster: spike-land (production), staging-spike-land (staging)
-   - CloudFront: E1KTB6IUPSQ4AJ (production), E2RU3YWINB8MGM (staging)
-   - Database: PostgreSQL (RDS)
-   - URLs: https://spike.land, https://staging.spike.land
-   - Deploy: `.github/workflows/deploy.yml` in spike-land-ai/spike.land
-   - Manual deploy:
-     `gh workflow run deploy.yml --repo spike-land-ai/spike.land -f target_environment=production`
+8. **spike-review** — AI code review bot with GitHub integration
+   - Config: `src/spike-review/wrangler.toml`
+   - Deploy: `npm run w:deploy:prod`
+
+### Legacy (spike.land)
+
+> **Note:** AWS ECS infrastructure was decommissioned on 2026-03-02. spike.land (Next.js 16) is now legacy-only and not actively deployed. See `packages/spike.land/` for the legacy codebase.
 
 ### MCP stdio Servers (local process, not deployed)
 
@@ -90,14 +90,12 @@ deployed as standalone services:
 These packages are published to npm but not deployed as services:
 
 - **chess-engine** — Chess ELO engine with game/player/challenge managers
-- **code** — Monaco-based code editor with live preview
 - **eslint-config** — Shared ESLint configuration
 - **mcp-server-base** — Shared base utilities for MCP servers
 - **qa-studio** — Browser automation utilities (Playwright)
 - **react-ts-worker** — From-scratch React implementation (Fiber reconciler,
   scheduler, multi-target rendering)
 - **shared** — Shared types, validations, constants, utilities
-- **spike-review** — AI code review bot with GitHub integration
 - **state-machine** — Statechart engine with guard parser and CLI
 - **tsconfig** — Shared TypeScript configuration
 - **vibe-dev** — Docker-based dev workflow tool
@@ -236,18 +234,12 @@ bash .github/scripts/verify-deps.sh
 ### Deployments by Package Type
 
 **Cloudflare Workers**: spike-land-backend, transpile, spike-land-mcp, mcp-auth,
-mcp-image-studio, spike-edge
+mcp-image-studio, spike-edge, code, spike-review
 
 - Deploy command: `npm run w:deploy:prod`
 - Config: `wrangler.toml` in each package
 
-**AWS ECS**: spike.land (legacy)
-
-- Deploy: Manual via GitHub workflow or push to main
-- Cluster: spike-land (production)
-- ALB: spike-land-alb
-
-**npm Registry**: All 25 packages
+**npm Registry**: All 29 packages
 
 - Deploy: Automatic via Changesets on main branch
 - Registry: npm.pkg.github.com/@spike-land-ai
@@ -257,8 +249,8 @@ spike-cli
 
 - Deploy method: npm installation + local execution
 
-**npm-only (no deployment)**: chess-engine, code, eslint-config,
-mcp-server-base, qa-studio, react-ts-worker, shared, spike-review,
+**npm-only (no deployment)**: chess-engine, eslint-config,
+mcp-server-base, qa-studio, react-ts-worker, shared,
 state-machine, tsconfig, vibe-dev, video, bazdmeg-mcp
 
 - Deploy method: npm publication only

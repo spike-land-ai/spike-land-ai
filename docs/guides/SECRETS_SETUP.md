@@ -4,7 +4,7 @@ This is the **single source of truth** for all secrets and environment variables
 used in the Spike Land platform. All other documentation should reference this
 file rather than duplicating secrets information.
 
-**Last Updated**: December 2025
+**Last Updated**: March 2026
 
 ---
 
@@ -44,7 +44,7 @@ yarn dev
 
 | Secret                   | Local | GH Actions | Vercel  | Required Level |
 | ------------------------ | :---: | :--------: | :-----: | :------------: |
-| DATABASE_URL             |  Yes  |    Yes     |   Yes   |  **Required**  |
+| DATABASE_URL             |  Yes  |    Yes     |   Yes   |  Legacy only   |
 | AUTH_SECRET              |  Yes  |    Yes     |   Yes   |  **Required**  |
 | USER_ID_SALT             |  Yes  |     No     |   Yes   |  **Required**  |
 | GITHUB_ID/SECRET         |  Yes  |     No     |   Yes   |  **Required**  |
@@ -404,6 +404,32 @@ intentionally commented out. Never hardcode Cloudflare credentials in version
 control. The Cloudflare Worker packages are now in external repos under the
 `@spike-land-ai` npm org.
 
+#### Wrangler Secrets (Per-Worker)
+
+Each Cloudflare Worker can have its own secrets set via:
+
+```bash
+# Set a secret for a specific worker
+wrangler secret put SECRET_NAME --name worker-name
+
+# List secrets for a worker
+wrangler secret list --name worker-name
+```
+
+Common worker secrets:
+
+| Worker | Secret | Purpose |
+|---|---|---|
+| mcp-auth | `BETTER_AUTH_SECRET` | Session encryption |
+| mcp-auth | `GOOGLE_CLIENT_ID/SECRET` | Google OAuth |
+| mcp-auth | `GITHUB_CLIENT_ID/SECRET` | GitHub OAuth |
+| spike-edge | `STRIPE_SECRET_KEY` | Stripe payments |
+| image-studio-worker | `GEMINI_API_KEY` | Image analysis |
+| image-studio-worker | `CF_AIG_TOKEN` | Cloudflare AI Gateway |
+| spike-land-mcp | (varies) | Per-tool secrets |
+
+See [deployment-inventory.md](../deployment-inventory.md) for the full secrets inventory per worker.
+
 #### Cloudflare Images API (Optional)
 
 For image transformation and CDN delivery.
@@ -686,7 +712,7 @@ echo -n "your-secret" | wc -c  # Should be 32+ characters
 | Local Dev   | `.env.local` (gitignored)                  |
 | GitHub CI   | GitHub Secrets (encrypted at rest)         |
 | Vercel      | Environment Variables (encrypted, scoped)  |
-| Production  | Consider: AWS Secrets Manager, Vault, etc. |
+| Production  | Wrangler secrets (encrypted, per-worker)   |
 
 ### Audit Checklist
 

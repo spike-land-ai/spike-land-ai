@@ -24,7 +24,8 @@ security incident occurs or as part of regular security hygiene.
 | Service           | Variables                                        | Priority | Rotation URL                                         |
 | ----------------- | ------------------------------------------------ | -------- | ---------------------------------------------------- |
 | Stripe            | STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET         | CRITICAL | https://dashboard.stripe.com/apikeys                 |
-| Database (Neon)   | DATABASE_URL, DATABASE_URL_UNPOOLED              | CRITICAL | https://console.neon.tech                            |
+| Database (Legacy) | DATABASE_URL, DATABASE_URL_UNPOOLED              | Legacy   | (legacy spike.land only)                             |
+| Cloudflare API    | CLOUDFLARE_API_TOKEN                             | HIGH     | https://dash.cloudflare.com/profile/api-tokens       |
 | Auth Secret       | AUTH_SECRET                                      | HIGH     | Generate locally                                     |
 | GitHub PAT        | GH_PAT_TOKEN                                     | HIGH     | https://github.com/settings/tokens                   |
 | GitHub OAuth      | GITHUB_ID, GITHUB_SECRET                         | HIGH     | https://github.com/settings/developers               |

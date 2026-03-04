@@ -1,6 +1,6 @@
 # Spike Land - Development Roadmap
 
-> **Last Updated**: 2026-02-26 **Current Phase**: Platform Launch & Growth
+> **Last Updated**: 2026-03-04 **Current Phase**: Platform Launch & Growth
 > **Business Structure**: UK Limited Company (SPIKE LAND LTD - Company
 > #16906682)
 
@@ -37,7 +37,7 @@ small teams
 
 ---
 
-## Current State (February 2026)
+## Current State (March 2026)
 
 ### What's Built
 
@@ -51,34 +51,29 @@ small teams
 | **QA Studio**          | Production | Browser automation, WCAG a11y audits, test runner, coverage                                            |
 | **CleanSweep**         | Production | ADHD-friendly gamified cleaning, 14 MCP tools                                                          |
 | **Career Navigator**   | Production | Skills assessment, ESCO taxonomy, salary data                                                          |
-| **Auth**               | Production | NextAuth v5 (GitHub, Google, Facebook, Apple)                                                          |
+| **Auth**               | Production | Better Auth (GitHub, Google, Facebook, Apple)                                                          |
 | **Stripe**             | 75%        | Subscriptions + one-time payments                                                                      |
 | **Dev Workflow Tools** | Production | 5 MCP tools for local development                                                                      |
-| **Security**           | Hardened   | Redis-backed rate limiting, command injection prevention                                               |
+| **Security**           | Hardened   | Durable Object rate limiting, command injection prevention                                               |
 
 ### Tech Stack
 
-- **Framework**: Next.js 16 (App Router) | **Language**: TypeScript 5.9 (strict)
-- **Database**: PostgreSQL + Prisma 7.4 | **Cache**: Upstash Redis
+- **Frontend**: spike-app (Vite + React + TanStack Router)
+- **Edge API**: spike-edge, spike-land-mcp, mcp-auth (Cloudflare Workers + Hono)
+- **Database**: D1 (SQLite at edge) + Drizzle ORM
+- **Auth**: Better Auth (sessions, OAuth, device flow)
 - **AI**: Google Gemini (gemini-3-flash), Anthropic Claude (Agent SDK)
 - **Testing**: Vitest 4.0 (80% line/function coverage enforced in CI)
 - **Payments**: Stripe | **Email**: Resend
-- **Infra**: Vercel (web) + Cloudflare Workers (code editor, transpiler,
-  backend)
+- **Infra**: Cloudflare Workers (8 total) — zero AWS
 
 ### Scale
 
-- ~557 Next.js page routes (App Router)
-- 147 MCP tool files in `src/lib/mcp/server/tools/`
-- 150 MCP test files (100% file coverage)
-- 18 Store app listings across 6 categories (180 declared tools)
-- 19 first-party app directories under `src/app/apps/`
-- 46 Storybook pages for app components
-- 16 error.tsx boundaries, 23 loading.tsx boundaries
-- 8 packages (code, js.spike.land, testing.spike.land, shared, react-ts-worker,
-  vibe-dev, video, spike-cli)
-- 233 Prisma models
-- 100+ lib modules
+- 29 packages in `src/` (monorepo)
+- 8 Cloudflare Workers (spike-edge, spike-land-mcp, mcp-auth, spike-land-backend, transpile, code, spike-review, image-studio-worker)
+- 80+ MCP tools
+- D1 database with 17 tables in spike-land-mcp (Drizzle-managed)
+- block-sdk for composable storage blocks
 
 ---
 
@@ -169,7 +164,6 @@ Merge all credits into "Spike Credits":
 
 #### Phase 10: Recent Feature Completions (February 2026)
 
-- [x] EC2 provisioning (Box/BoxTier models, sync-box-status cron, VNC sessions)
 - [x] TikTok social integration (4 API routes: connect, callback, metrics,
       posts)
 - [x] 12 app storybook pages with components and unit tests (46 storybooks
