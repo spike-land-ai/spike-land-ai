@@ -22,7 +22,7 @@ const appMetadata: Record<string, {
       "Lighthouse performance audits integrated into every run",
       "No-code test recording and maintenance"
     ],
-    photoUrl: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&q=80&w=1200&h=800",
+    photoUrl: "/apps/qa-studio.svg",
     ctaPrompt: "Build a premium dark mode dashboard called QA Studio. It should record and run browser tests using Playwright."
   },
   "chess-engine": {
@@ -35,7 +35,7 @@ const appMetadata: Record<string, {
       "Online multiplayer and ELO tracking",
       "Game history and PGN export"
     ],
-    photoUrl: "https://images.unsplash.com/photo-1529697210530-8c4bb1358ce5?auto=format&fit=crop&q=80&w=1200&h=800",
+    photoUrl: "/apps/chess-engine.svg",
     ctaPrompt: "Build a competitive chess arena called Chess Engine. Integrate chess-game and arena MCPs."
   },
   "audio-mixer": {
@@ -48,7 +48,7 @@ const appMetadata: Record<string, {
       "High-fidelity export options",
       "Collaborative session editing"
     ],
-    photoUrl: "https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?auto=format&fit=crop&q=80&w=1200&h=800",
+    photoUrl: "/apps/audio-mixer.svg",
     ctaPrompt: "Build a professional web-based audio editor called Audio Studio using the audio MCP."
   }
 };

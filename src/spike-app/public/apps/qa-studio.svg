@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/Base/1999/xlink" viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#052e16" />
+      <stop offset="100%" stop-color="#064e3b" />
+    </linearGradient>
+    <linearGradient id="primary" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#34d399" />
+      <stop offset="100%" stop-color="#10b981" />
+    </linearGradient>
+    <filter id="shadow">
+      <feDropShadow dx="0" dy="10" stdDeviation="15" flood-color="#000" flood-opacity="0.5"/>
+    </filter>
+  </defs>
+  <rect width="1200" height="800" fill="url(#bg)" />
+  
+  <!-- Grid -->
+  <g opacity="0.05" stroke="#fff" stroke-width="1">
+    <path d="M 0,100 L 1200,100 M 0,200 L 1200,200 M 0,300 L 1200,300 M 0,400 L 1200,400 M 0,500 L 1200,500 M 0,600 L 1200,600 M 0,700 L 1200,700" />
+    <path d="M 100,0 L 100,800 M 200,0 L 200,800 M 300,0 L 300,800 M 400,0 L 400,800 M 500,0 L 500,800 M 600,0 L 600,800 M 700,0 L 700,800 M 800,0 L 800,800 M 900,0 L 900,800 M 1000,0 L 1000,800 M 1100,0 L 1100,800" />
+  </g>
+
+  <!-- Browser Window Frame -->
+  <g transform="translate(150, 150)" filter="url(#shadow)">
+    <rect width="900" height="500" rx="15" fill="#0f172a" />
+    <!-- Toolbar -->
+    <path d="M 0,15 Q 0,0 15,0 L 885,0 Q 900,0 900,15 L 900,40 L 0,40 Z" fill="#1e293b" />
+    <circle cx="30" cy="20" r="6" fill="#ef4444" />
+    <circle cx="50" cy="20" r="6" fill="#f59e0b" />
+    <circle cx="70" cy="20" r="6" fill="#10b981" />
+    <rect x="120" y="10" width="660" height="20" rx="10" fill="#0f172a" opacity="0.5" />
+    
+    <!-- Code Blocks / Checkmarks inside Window -->
+    <rect x="50" y="80" width="300" height="40" rx="5" fill="#1e293b" />
+    <rect x="60" y="95" width="200" height="10" rx="5" fill="#cbd5e1" opacity="0.3" />
+    <circle cx="320" cy="100" r="12" fill="url(#primary)" />
+    <path d="M 315,100 L 319,104 L 325,96" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+
+    <rect x="50" y="140" width="300" height="40" rx="5" fill="#1e293b" />
+    <rect x="60" y="155" width="240" height="10" rx="5" fill="#cbd5e1" opacity="0.3" />
+    <circle cx="320" cy="160" r="12" fill="url(#primary)" />
+    <path d="M 315,160 L 319,164 L 325,156" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+
+    <rect x="50" y="200" width="300" height="40" rx="5" fill="#1e293b" />
+    <rect x="60" y="215" width="180" height="10" rx="5" fill="#cbd5e1" opacity="0.3" />
+    <circle cx="320" cy="220" r="12" fill="url(#primary)" />
+    <path d="M 315,220 L 319,224 L 325,216" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+
+    <!-- Visual Diff Section -->
+    <rect x="420" y="80" width="430" height="370" rx="10" fill="#1e293b" />
+    <rect x="450" y="110" width="180" height="310" rx="5" fill="#0f172a" />
+    <rect x="640" y="110" width="180" height="310" rx="5" fill="#0f172a" />
+    
+    <!-- Image placeholder diffing -->
+    <rect x="470" y="130" width="140" height="80" rx="5" fill="#cbd5e1" opacity="0.2" />
+    <rect x="660" y="130" width="140" height="80" rx="5" fill="#cbd5e1" opacity="0.2" />
+    
+    <!-- Highlights in diff -->
+    <rect x="680" y="150" width="100" height="40" rx="5" fill="#ef4444" opacity="0.4" stroke="#ef4444" stroke-width="2" />
+    
+    <path d="M 540,260 L 730,260" stroke="#10b981" stroke-width="3" stroke-dasharray="5,5" />
+    <path d="M 540,320 L 730,320" stroke="#10b981" stroke-width="3" stroke-dasharray="5,5" />
+  </g>
+
+  <!-- Decorative QA elements -->
+  <path d="M 1000,700 L 1050,650 L 1100,700" stroke="url(#primary)" stroke-width="4" fill="none" opacity="0.6" />
+  <circle cx="1050" cy="650" r="5" fill="#10b981" />
+</svg>

@@ -34,16 +34,18 @@ spa.get("/*", async (c) => {
     let html = await fallback.text();
 
     // Inject dynamic metadata for /apps/:appId routes
-    if (path.startsWith("/apps/") && path !== "/apps/new") {
-      const appId = path.split("/")[2];
+    const appId = path.startsWith("/apps/") && path !== "/apps/new"
+      ? path.split("/")[2]
+      : undefined;
+    if (appId) {
       const url = new URL(c.req.url);
       const tab = url.searchParams.get("tab") || "App";
-      
+
       // Better capitalization for known apps
       let appName = appId.replace(/-/g, " ").replace(/\b\w/g, (l) => l.toUpperCase());
       if (appId === "qa-studio") appName = "QA Studio";
       if (appId === "mcp-auth") appName = "MCP Auth";
-      
+
       const title = `${appName} (${tab}) — spike.land`;
       const description = `Explore ${appName} on spike.land — the AI multi-agent operating system.`;
 
@@ -53,7 +55,7 @@ spa.get("/*", async (c) => {
         /<meta name="description" content="[^"]*" \/>/,
         `<meta name="description" content="${description}" />`,
       );
-      
+
       // Inject OG and Twitter tags if not present or update them
       const metaTags = `
         <meta property="og:title" content="${title}" />
