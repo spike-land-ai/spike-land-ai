@@ -85,6 +85,33 @@ Sitemap: ${new URL(request.url).origin}/sitemap.xml
     live: async () => handleLiveRequest(path, request, env),
   };
 
+  // Serve manifest.webmanifest inline (referenced by index.html)
+  if (path.join("/") === "assets/manifest.webmanifest") {
+    return new Response(
+      JSON.stringify({
+        name: "spike.land",
+        description: "A platform for spiking, streaming, and sharing content",
+        background_color: "#fff",
+        theme_color: "#4285f4",
+        display: "standalone",
+        orientation: "portrait",
+        scope: "/",
+        start_url: "/",
+        lang: "en-US",
+        icons: [
+          { src: "/assets/favicons/android-chrome-192x192.png", sizes: "192x192", type: "image/png" },
+          { src: "/assets/favicons/android-chrome-512x512.png", sizes: "512x512", type: "image/png" },
+        ],
+      }),
+      {
+        headers: {
+          "Content-Type": "application/manifest+json",
+          "Cache-Control": "public, max-age=86400",
+        },
+      },
+    );
+  }
+
   const firstPath = path[0];
   if (!firstPath) {
     return redirectToEsmCdn(request);

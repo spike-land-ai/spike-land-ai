@@ -49,10 +49,12 @@ deleted_classes = ["Users"]
 [env.testing]
 logpush = true
 name = "testing-spike-land"
-
 kv_namespaces = [
   { binding = "KV", id = "7cafeba860c9485bbfca337099c82ce3", preview_id = "e2b898af453c46e2ac584745ea92424d" },
 ]
+
+[env.testing.vars]
+GA_MEASUREMENT_ID = "G-9WNEM9ZHE7"
 
 [[env.testing.migrations]]
 tag = "v1"
@@ -70,8 +72,8 @@ bindings = [
 
 [[env.testing.r2_buckets]]
 binding = "R2"
-bucket_name = "esm"
-preview_bucket_name = "esm"
+bucket_name = "npmprod"
+preview_bucket_name = "npmprod"
 
 [[env.testing.r2_buckets]]
 binding = "X9"
