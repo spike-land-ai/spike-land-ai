@@ -46,7 +46,7 @@ function makeR2Object(body: string, contentType = "image/png"): R2ObjectBody {
     uploaded: new Date(),
     httpMetadata: { contentType },
     customMetadata: {},
-    storageClass: "Standard" as R2StorageClass,
+    storageClass: "Standard",
     writeHttpMetadata: () => {},
     range: undefined as unknown as R2Range,
   } as unknown as R2ObjectBody;
@@ -162,10 +162,10 @@ describe("GET /api/blog", () => {
     } as unknown as Env);
 
     expect(res.status).toBe(200);
-    const body = await res.json();
+    const body = await res.json() as Array<Record<string, unknown>>;
     expect(body).toHaveLength(2);
-    expect(body[0].slug).toBe("newer");
-    expect(body[1].slug).toBe("older");
+    expect(body[0]!.slug).toBe("newer");
+    expect(body[1]!.slug).toBe("older");
   });
 
   it("returns posts without content field", async () => {
@@ -177,8 +177,8 @@ describe("GET /api/blog", () => {
       SPA_ASSETS: mockR2(),
     } as unknown as Env);
 
-    const body = await res.json();
-    expect(body[0]).not.toHaveProperty("content");
+    const body = await res.json() as Array<Record<string, unknown>>;
+    expect(body[0]!).not.toHaveProperty("content");
   });
 
   it("returns 404 when no posts exist", async () => {
@@ -213,7 +213,7 @@ describe("GET /api/blog/:slug", () => {
     } as unknown as Env);
 
     expect(res.status).toBe(200);
-    const body = await res.json();
+    const body = await res.json() as Record<string, unknown>;
     expect(body.slug).toBe("my-post");
     expect(body.content).toBe("Full body content");
   });

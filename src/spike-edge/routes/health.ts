@@ -52,11 +52,14 @@ health.get("/health", async (c) => {
     result.mcpService = mcpResult.status === "fulfilled" ? mcpResult.value : "degraded";
   }
 
-  const overall = Object.values(result).every(
-    (v) => v === "ok" || typeof v !== "string",
-  )
-    ? "ok"
-    : "degraded";
+  const statusFields = [r2Status, d1Status];
+  if (deep) {
+    statusFields.push(
+      result.authMcp as string,
+      result.mcpService as string,
+    );
+  }
+  const overall = statusFields.every((s) => s === "ok") ? "ok" : "degraded";
   result.status = overall;
 
   return c.json(result, overall === "ok" ? 200 : 503);

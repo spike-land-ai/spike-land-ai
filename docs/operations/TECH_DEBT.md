@@ -1,6 +1,6 @@
 # Tech Debt Registry
 
-> Last updated: 2026-03-04 Last audit: 2026-02-26 (Sprint 4 Cleanup)
+> Last updated: 2026-03-05 Last audit: 2026-02-26 (Sprint 4 Cleanup)
 
 ## Overview
 
@@ -15,10 +15,8 @@ are prioritized P0 (critical) through P3 (minor/nice-to-have).
 
 - **Status**: Open
 - **Impact**: Bugs ship undetected, refactoring is risky
-- **Details**: CI coverage thresholds are well below the 100% target stated in
-  CLAUDE.md. Several modules have 0% coverage including
-  `src/lib/feature-flags/`, `src/lib/learnit/`, `src/lib/mcp/server/`,
-  `src/lib/validation/`, and `src/lib/sync/clients/`.
+- **Details**: CI coverage thresholds are well below targets across several
+  packages. Run `npm run test:coverage` per-package to identify gaps.
 - **Action**: Incrementally increase thresholds as coverage improves; prioritize
   business-critical modules.
 
@@ -105,11 +103,10 @@ are prioritized P0 (critical) through P3 (minor/nice-to-have).
 
 - **Status**: Open
 - **Impact**: Using deprecated function pattern
-- **Details**: `analyzeImage` in `src/lib/ai/gemini-client.ts` is deprecated in
-  favor of `analyzeImageV2`. Still called from
-  `src/workflows/enhance-image.direct.ts`.
-- **Action**: Migrate callers to `analyzeImageV2`, then remove the deprecated
-  function.
+- **Details**: `analyzeImage` deprecated in favor of `analyzeImageV2` in the
+  legacy spike.land codebase (now deleted). May still exist in mcp-image-studio.
+- **Action**: Verify if this pattern persists in any current package; close if
+  not.
 
 #### TD-P2-2: @ai-sdk/anthropic not in root package.json
 

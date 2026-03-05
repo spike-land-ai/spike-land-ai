@@ -21,7 +21,7 @@ different set of recommended apps, homepage layout, and hero copy. Workspaces
 diverge further over time as users build tools, install apps, and configure
 themes.
 
-- **Source**: `src/lib/onboarding/personas.ts`, `src/app/onboarding/`
+- **Source**: `src/spike-land-mcp/tools/` (onboarding tools)
 - **Question flow**: Code? → Solo/Team → Learning/Shipping → specific persona
 - **Non-dev branch**: Business/Personal → Solo/Team → specific persona
 
@@ -31,7 +31,7 @@ Agents register custom HTTP proxy tools scoped to a workspace at runtime. Tool
 handlers are declarative specs (URL, method, headers, body template) — no
 arbitrary code execution.
 
-- **Source**: `src/lib/mcp/server/tools/tool-factory.ts`
+- **Source**: `src/spike-land-mcp/tools/` (tool factory)
 - **Security**: HTTPS-only, SSRF prevention (private IP blocking), template
   variable validation (`{{secrets.KEY}}`, `{{input.FIELD}}` only)
 - **Limits**: 5 tools (free), 500 tools (premium)
@@ -41,8 +41,7 @@ arbitrary code execution.
 z-test with pooled proportions. 95% confidence threshold. Runs on prompts, UI
 layouts, app configurations, and MCP tool outputs.
 
-- **Source**: `src/lib/mcp/server/tools/ab-testing.ts`,
-  `src/lib/mcp/server/tools/store-ab.ts`
+- **Source**: `src/spike-land-mcp/tools/store/ab.ts`
 - **Tools**: create test, get results, check significance, declare winner, list
   active tests
 
@@ -50,7 +49,7 @@ layouts, app configurations, and MCP tool outputs.
 
 5 MCP tools that generate complete pages from text prompts.
 
-- **Source**: `src/lib/mcp/server/tools/page-ai.ts`
+- **Source**: `src/spike-land-mcp/tools/` (page-ai tools)
 - **Tools**: generate page, enhance block, suggest layout, generate theme,
   populate store
 - **Layouts**: Landing, Feature, Store, Dashboard, Article, Gallery, Custom
@@ -61,7 +60,7 @@ layouts, app configurations, and MCP tool outputs.
 CSS custom properties generated from workspace config. Tailwind-compatible.
 Runtime theme objects for React.
 
-- **Source**: `src/lib/white-label/theme-builder.ts`
+- **Source**: `src/spike-land-mcp/tools/` (theme tools)
 - **Features**: Primary/secondary/accent colors, custom fonts, logo/favicon,
   "powered by" toggle, alpha channel support
 

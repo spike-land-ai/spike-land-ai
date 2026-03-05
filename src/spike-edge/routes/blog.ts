@@ -180,5 +180,10 @@ blog.get("/blog/:slug/:filename", async (c, next) => {
   });
 });
 
-export { blog, rowToPost };
+/** Fetch a single blog post row from D1 (no caching, for SSR injection). */
+async function getBlogPostRow(db: D1Database, slug: string): Promise<BlogPostRow | null> {
+  return db.prepare("SELECT * FROM blog_posts WHERE slug = ?").bind(slug).first<BlogPostRow>();
+}
+
+export { blog, rowToPost, getBlogPostRow };
 export type { BlogPostRow };

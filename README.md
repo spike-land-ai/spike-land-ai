@@ -9,9 +9,7 @@
 <!-- Runtimes -->
 ![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white)
 ![Node.js](https://img.shields.io/badge/Node.js_24-339933?style=for-the-badge&logo=node.js&logoColor=white)
-![SpacetimeDB](https://img.shields.io/badge/SpacetimeDB_2.0-FF6B35?style=for-the-badge&logoColor=white)
 ![Cloudflare Workers](https://img.shields.io/badge/CF_Workers-F38020?style=for-the-badge&logo=cloudflare&logoColor=white)
-![AWS ECS](https://img.shields.io/badge/AWS_ECS-FF9900?style=for-the-badge&logo=amazon-ecs&logoColor=white)
 ![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)
 
 <!-- Frameworks -->
@@ -31,7 +29,9 @@
 
 ---
 
-spike-land-ai is an AI-native development platform built across 27 independent repos — powered by SpacetimeDB 2.0 as the real-time data backbone, with a Vite + TanStack Router frontend, Cloudflare Workers edge services, and a growing MCP ecosystem of 80+ tools. It includes a from-scratch React Fiber implementation, edge transpilation workers, and spans browser, edge, and server runtimes, all published under `@spike-land-ai` on GitHub Packages with automated dependency cascade CI.
+spike-land-ai is an AI-native development platform — a consolidated monorepo with 28 packages under `src/`. Powered by Cloudflare Workers + D1 as the data backbone, with a Vite + TanStack Router frontend, Hono edge services, and a growing MCP ecosystem of 80+ tools. It includes a from-scratch React Fiber implementation, edge transpilation workers, and spans browser, edge, and server runtimes, all published under `@spike-land-ai` on GitHub Packages with automated dependency cascade CI.
+
+See [docs/](docs/README.md) for full documentation.
 
 ---
 
@@ -53,18 +53,11 @@ spike-land-ai is an AI-native development platform built across 27 independent r
 
 ## Packages
 
-### SpacetimeDB (real-time backbone)
+### Platform Stack
 
 | Package | Runtime | Description | Status |
 |---------|---------|-------------|--------|
-| [spacetimedb-platform](https://github.com/spike-land-ai/spacetimedb-platform) | SpacetimeDB 2.0 (WASM) | **Platform Module**: Core data layer with 14 tables, 30+ reducers for users, tools, apps, agents, content, and messaging. | [![CI](https://img.shields.io/github/actions/workflow/status/spike-land-ai/spacetimedb-platform/ci-publish.yml?branch=main&label=CI)](https://github.com/spike-land-ai/spacetimedb-platform/actions) |
-| [spacetimedb-mcp](https://github.com/spike-land-ai/spacetimedb-mcp) | Node.js | **Agent Coordination**: MCP server for real-time messaging, tasks, and agent coordination via SpacetimeDB. | [![CI](https://img.shields.io/github/actions/workflow/status/spike-land-ai/spacetimedb-mcp/ci-publish.yml?branch=main&label=CI)](https://github.com/spike-land-ai/spacetimedb-mcp/actions) |
-
-### New Platform Stack
-
-| Package | Runtime | Description | Status |
-|---------|---------|-------------|--------|
-| [spike-app](https://github.com/spike-land-ai/spike-app) | Browser (Vite + TanStack Router) | **Frontend SPA**: New frontend replacing Next.js UI, with TanStack Router and SpacetimeDB integration. | [![CI](https://img.shields.io/github/actions/workflow/status/spike-land-ai/spike-app/ci-publish.yml?branch=main&label=CI)](https://github.com/spike-land-ai/spike-app/actions) |
+| [spike-app](https://github.com/spike-land-ai/spike-app) | Browser (Vite + TanStack Router) | **Frontend SPA**: Frontend with TanStack Router, Vite, and React. | [![CI](https://img.shields.io/github/actions/workflow/status/spike-land-ai/spike-app/ci-publish.yml?branch=main&label=CI)](https://github.com/spike-land-ai/spike-app/actions) |
 | [spike-edge](https://github.com/spike-land-ai/spike-edge) | Cloudflare Workers | **Edge API**: Primary edge API service using Hono framework. | [![CI](https://img.shields.io/github/actions/workflow/status/spike-land-ai/spike-edge/ci-publish.yml?branch=main&label=CI)](https://github.com/spike-land-ai/spike-edge/actions) |
 | [spike-land-mcp](https://github.com/spike-land-ai/spike-land-mcp) | CF Workers + D1 | **MCP Registry**: Tool registry with 80+ tools, D1-backed storage. | [![CI](https://img.shields.io/github/actions/workflow/status/spike-land-ai/spike-land-mcp/ci-publish.yml?branch=main&label=CI)](https://github.com/spike-land-ai/spike-land-mcp/actions) |
 | [mcp-auth](https://github.com/spike-land-ai/mcp-auth) | Cloudflare Workers | **Auth Service**: Authentication MCP server using Better Auth + Drizzle. | [![CI](https://img.shields.io/github/actions/workflow/status/spike-land-ai/mcp-auth/ci-publish.yml?branch=main&label=CI)](https://github.com/spike-land-ai/mcp-auth/actions) |
@@ -102,18 +95,9 @@ spike-land-ai is an AI-native development platform built across 27 independent r
 | [vibe-dev](https://github.com/spike-land-ai/vibe-dev) | Node.js CLI | **Vibe Workflow**: Docker-based development workflow optimizer for vibe-coded applications. | [![CI](https://img.shields.io/github/actions/workflow/status/spike-land-ai/vibe-dev/ci-publish.yml?branch=main&label=CI)](https://github.com/spike-land-ai/vibe-dev/actions) |
 | [video](https://github.com/spike-land-ai/video) | Remotion | **Programmatic Video**: Educational and promotional video assets built using React and Remotion. | [![CI](https://img.shields.io/github/actions/workflow/status/spike-land-ai/video/ci-publish.yml?branch=main&label=CI)](https://github.com/spike-land-ai/video/actions) |
 
-### Legacy
-
-| Package | Runtime | Description | Status |
-|---------|---------|-------------|--------|
-| [spike.land](https://github.com/spike-land-ai/spike.land) | Next.js 16 / AWS ECS | **Legacy Platform**: Being replaced by SpacetimeDB stack. MCP registry, app store, auth, payments. | [![CI](https://img.shields.io/github/actions/workflow/status/spike-land-ai/spike.land/ci-publish.yml?branch=main&label=CI)](https://github.com/spike-land-ai/spike.land/actions) |
-
 ## Repository Deep Dive
 
-### The Data Backbone
-The core of the platform is **SpacetimeDB 2.0** (`spacetimedb-platform`), which provides real-time state management with 14 tables and 30+ reducers. The `spacetimedb-mcp` module enables agent coordination, messaging, and task management on top of SpacetimeDB.
-
-### The New Stack
+### Platform Stack
 - **spike-app**: Vite + React + TanStack Router frontend replacing the Next.js UI
 - **spike-edge**: Primary edge API on Cloudflare Workers (Hono)
 - **spike-land-mcp**: MCP registry with 80+ tools (CF Workers + D1)
@@ -122,62 +106,52 @@ The core of the platform is **SpacetimeDB 2.0** (`spacetimedb-platform`), which 
 ### AI & MCP Layer
 We embrace the Model Context Protocol (MCP) as our primary integration interface. Repositories prefixed with `mcp-` or suffixed with `-mcp` provide specialized capabilities:
 - **spike-land-mcp**: The tool registry (80+ tools).
-- **spacetimedb-mcp**: Agent coordination and real-time messaging.
 - **mcp-image-studio**: The visual intelligence layer (Pixel Studio).
 - **esbuild-wasm-mcp**: The builder layer.
 - **hackernews-mcp**: Information retrieval layer.
 - **mcp-server-base**: Shared utilities for building MCP servers.
 
 ### Infrastructure & Tooling
-- **Dependency Cascade**: We use a custom automated system to propagate dependency updates across 27 repositories, ensuring architectural consistency without manual toil.
+- **Dependency Cascade**: We use a custom automated system to propagate dependency updates across 28 packages, ensuring architectural consistency without manual toil.
 - **Edge Computing**: We leverage Cloudflare Workers for ultra-low latency tasks like transpilation, MCP registry, auth, and real-time collaboration.
 - **BAZDMEG Quality Gates**: Our automated review system (**spike-review**) ensures that every PR meets our rigorous engineering standards.
 
 
 ## Quick Start
 
-Each directory is a separate git repo. Clone the one you need:
+All packages live under `src/`. Clone the repo and work from there:
 
 ```bash
-# SpacetimeDB platform module
-git clone https://github.com/spike-land-ai/spacetimedb-platform
-cd spacetimedb-platform
-npm install
-spacetime build
-spacetime publish rightful-dirt-5033
+git clone https://github.com/spike-land-ai/spike-land-ai
+cd spike-land-ai
 
 # Frontend SPA (Vite + TanStack Router)
-git clone https://github.com/spike-land-ai/spike-app
-cd spike-app
+cd src/spike-app
 npm install
 npm run dev
 
 # Node.js / MCP servers (most packages)
-git clone https://github.com/spike-land-ai/<package>
-cd <package>
+cd src/<package>
 npm install
 npm run build
 npm test
 
 # Cloudflare Workers (spike-edge, spike-land-mcp, mcp-auth, spike-land-backend, transpile)
+cd src/<worker>
 npm install
 npm run dev           # local wrangler
 npm run dev:remote    # remote wrangler
 
 # Monaco editor (code)
+cd src/code
 npm install
 npm run dev:vite      # Vite dev server
 
 # Custom React (react-ts-worker)
+cd src/react-ts-worker
 yarn install
 yarn build
 yarn test
-
-# Legacy platform (spike.land — Next.js 16)
-git clone https://github.com/spike-land-ai/spike.land
-cd spike.land
-yarn install
-yarn dev              # http://localhost:3000
 ```
 
 Org-wide health check (PRs, CI status, dep drift):
@@ -193,7 +167,7 @@ make health
   <img src="https://raw.githubusercontent.com/spike-land-ai/.github/main/assets/ci-pipeline.svg" alt="CI/CD Pipeline" width="100%" />
 </p>
 
-All repos share a reusable workflow at `.github/.github/workflows/ci-publish.yml` running on Node 24. Changesets manages versioning; packages publish to GitHub Packages on every merge to `main`. spike.land (legacy) uses its own extended pipeline: ESLint, TypeScript, Vitest (4 shards), Next.js build, then AWS ECS deploy via Depot remote builds.
+All packages share a reusable workflow at `.github/.github/workflows/ci-publish.yml` running on Node 24. Changesets manages versioning; packages publish to GitHub Packages on every merge to `main`.
 
 ## Dependency Cascade
 
@@ -209,14 +183,12 @@ bash .github/scripts/verify-deps.sh
 
 | Source | Consumers |
 |--------|-----------|
-| `esbuild-wasm` | esbuild-wasm-mcp, code, transpile, spike-land-backend, spike.land |
+| `esbuild-wasm` | esbuild-wasm-mcp, code, transpile, spike-land-backend |
 | `esbuild-wasm-mcp` | code, spike-land-backend |
 | `code` | transpile, spike-land-backend |
-| `shared` | mcp-image-studio, spike-land-mcp, spike.land |
-| `react-ts-worker` | spike.land |
-| `spike-cli` | spike.land |
-| `eslint-config` | chess-engine, code, esbuild-wasm-mcp, hackernews-mcp, mcp-image-studio, mcp-server-base, openclaw-mcp, react-ts-worker, shared, spacetimedb-platform, spike-app, spike-cli, spike-edge, spike-review, state-machine, spike.land |
-| `tsconfig` | chess-engine, code, esbuild-wasm-mcp, hackernews-mcp, mcp-image-studio, mcp-server-base, openclaw-mcp, react-ts-worker, shared, spike-cli, spike-review, state-machine, spike.land |
+| `shared` | mcp-image-studio, spike-land-mcp |
+| `eslint-config` | chess-engine, code, esbuild-wasm-mcp, hackernews-mcp, mcp-image-studio, mcp-server-base, openclaw-mcp, react-ts-worker, shared, spike-app, spike-cli, spike-edge, spike-review, state-machine |
+| `tsconfig` | chess-engine, code, esbuild-wasm-mcp, hackernews-mcp, mcp-image-studio, mcp-server-base, openclaw-mcp, react-ts-worker, shared, spike-cli, spike-review, state-machine |
 
 ## Development
 
@@ -228,20 +200,9 @@ npm run test:coverage # Tests with coverage thresholds
 npm run typecheck     # tsc --noEmit
 npm run lint          # ESLint
 
-# SpacetimeDB
-spacetime build                      # Compile WASM module
-spacetime publish rightful-dirt-5033 # Deploy
-spacetime generate --lang=typescript # Regen bindings
-
 # spike-app (Vite frontend)
 npm run dev           # Vite dev server
 npm run build         # Production build
-
-# spike.land (legacy, Yarn)
-yarn dev              # Dev server (localhost:3000)
-yarn build            # Production build
-yarn typecheck        # TypeScript check
-yarn test:coverage    # Vitest with enforced thresholds
 
 # Cloudflare Workers
 npm run dev           # Local wrangler dev
@@ -255,7 +216,6 @@ npm run w:deploy:prod # Deploy to production
 - Never use `eslint-disable`, `@ts-ignore`, or `@ts-nocheck`
 - Version and publish via [Changesets](https://github.com/changesets/changesets) — do not manually bump `package.json` versions
 - MCP servers follow the pattern: `@modelcontextprotocol/sdk` + Zod schema + tool handler + matching test file
-- Most packages use npm. spike.land (legacy) uses Yarn.
 
 ## License
 

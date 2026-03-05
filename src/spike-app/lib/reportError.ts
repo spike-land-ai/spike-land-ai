@@ -11,7 +11,7 @@ interface ErrorEntry {
   severity?: "warning" | "error" | "fatal";
 }
 
-let buffer: ErrorEntry[] = [];
+const buffer: ErrorEntry[] = [];
 let flushTimer: ReturnType<typeof setTimeout> | null = null;
 let sentThisMinute = 0;
 let minuteStart = Date.now();

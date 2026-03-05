@@ -749,7 +749,7 @@ export function createD1Db(env: Env): ImageStudioDeps["db"] {
           img_h: number;
         }>();
 
-      return result.results.map((r: any) => ({
+      return result.results.map((r) => ({
         id: r.id,
         albumId: r.albumId,
         imageId: r.imageId as ImageId,
@@ -1012,7 +1012,7 @@ export function createD1Db(env: Env): ImageStudioDeps["db"] {
           updatedAt: string;
         }>();
 
-      return result.results.map((r: any) => ({
+      return result.results.map((r) => ({
         id: r.id,
         userId: r.userId,
         toolName: r.toolName,

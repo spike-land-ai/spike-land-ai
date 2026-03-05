@@ -226,7 +226,7 @@ mcp-image-studio, spike-edge, code, spike-review
 - Deploy command: `npm run w:deploy:prod`
 - Config: `wrangler.toml` in each package
 
-**npm Registry**: All 29 packages
+**npm Registry**: All 28 packages
 
 - Deploy: Automatic via Changesets on main branch
 - Registry: npm.pkg.github.com/@spike-land-ai

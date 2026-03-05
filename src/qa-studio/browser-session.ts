@@ -265,8 +265,70 @@ export async function getPageSnapshot(): Promise<{
   const tab = getActiveTab();
   if (!tab) return null;
   const { page } = tab;
-  const tree = await page.accessibility.snapshot({ interestingOnly: false });
+  let tree: AccessibilityNode | null = null;
+  
+  try {
+    const client = await page.context().newCDPSession(page);
+    const result = await client.send("Accessibility.getFullAXTree");
+    if (result && result.nodes) {
+      tree = rebuildTree(result.nodes);
+    }
+  } catch (err) {
+    console.error("Failed to get accessibility tree via CDP:", err);
+  }
+
   const title = await page.title();
   const url = page.url();
   return { tree, title, url, page };
+}
+
+interface CdpAxNode {
+  nodeId: string;
+  childIds?: string[];
+  role?: { value: string };
+  name?: { value: string };
+  value?: { value: string | number };
+  properties?: Array<{ name: string; value: { value: unknown } }>;
+}
+
+function rebuildTree(nodes: CdpAxNode[]): AccessibilityNode | null {
+  const nodeMap = new Map<string, AccessibilityNode>();
+  
+  // Create all nodes first
+  for (const cdpNode of nodes) {
+    const node: AccessibilityNode = {
+      role: cdpNode.role?.value || "generic",
+      name: cdpNode.name?.value,
+      value: cdpNode.value?.value?.toString(),
+    };
+    
+    // Map properties
+    if (cdpNode.properties) {
+      for (const prop of cdpNode.properties) {
+        switch (prop.name) {
+          case "checked": node.checked = prop.value.value === "true" ? true : prop.value.value === "mixed" ? "mixed" : false; break;
+          case "disabled": node.disabled = !!prop.value.value; break;
+          case "expanded": node.expanded = !!prop.value.value; break;
+          case "selected": node.selected = !!prop.value.value; break;
+          case "pressed": node.pressed = prop.value.value === "true" ? true : prop.value.value === "mixed" ? "mixed" : false; break;
+          case "level": node.level = Number(prop.value.value); break;
+        }
+      }
+    }
+    
+    nodeMap.set(cdpNode.nodeId, node);
+  }
+  
+  // Link children
+  for (const cdpNode of nodes) {
+    const node = nodeMap.get(cdpNode.nodeId);
+    if (node && cdpNode.childIds) {
+      node.children = cdpNode.childIds
+        .map(id => nodeMap.get(id))
+        .filter((n): n is AccessibilityNode => !!n);
+    }
+  }
+  
+  // The first node is usually the RootWebArea
+  return nodeMap.get(nodes[0]?.nodeId) || null;
 }

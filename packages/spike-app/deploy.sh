@@ -50,6 +50,10 @@ fi
 if [ "$NEED_BUILD" = true ]; then
   echo "Building spike-app..."
   "$VITE" build
+  
+  echo "Prerendering static HTML for SEO..."
+  ./node_modules/.bin/tsx scripts/prerender.ts
+
   echo "$TREE_HASH" > "$CACHE_DIR/app.treehash"
 else
   echo "Source unchanged (tree hash: ${TREE_HASH:0:12}) — skipping build."

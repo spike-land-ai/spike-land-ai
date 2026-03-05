@@ -2,7 +2,7 @@
 
 ## Overview
 
-The **spike-land-ai** monorepo contains 29 packages under the `src/` directory,
+The **spike-land-ai** monorepo contains 28 packages under the `src/` directory,
 managed as a single Yarn workspace. The root `package.json` declares workspaces
 as `["src/*"]`.
 

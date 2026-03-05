@@ -2,6 +2,7 @@ import { Hono } from "hono";
 import type { Env } from "../env.js";
 import { getClientId, sendGA4Events } from "../lib/ga4.js";
 import { safeCtx, withEdgeCache } from "../lib/edge-cache.js";
+import { getBlogPostRow } from "./blog.js";
 
 const spa = new Hono<{ Bindings: Env }>();
 
@@ -50,8 +51,21 @@ spa.get("/*", async (c) => {
   const object = await c.env.SPA_ASSETS.get(key);
 
   if (!object) {
-    // SPA fallback: serve index.html for non-file paths (navigation routes only)
-    const fallback = await c.env.SPA_ASSETS.get("index.html");
+    // 1. First attempt: check if a prerendered HTML file exists for this route path
+    // For example /blog -> blog.html, or /blog/ -> blog/index.html
+    let prerenderedKey = key.endsWith("/") ? `${key}index.html` : `${key}.html`;
+    let fallback = await c.env.SPA_ASSETS.get(prerenderedKey);
+
+    // 2. Second attempt: check reverse (some static generators output /about/index.html for /about)
+    if (!fallback && !key.endsWith("/")) {
+      fallback = await c.env.SPA_ASSETS.get(`${key}/index.html`);
+    }
+
+    // 3. Last fallback: the SPA generic index.html shell
+    if (!fallback) {
+      fallback = await c.env.SPA_ASSETS.get("index.html");
+    }
+
     if (!fallback) {
       return c.text("Not Found", 404);
     }
@@ -90,6 +104,63 @@ spa.get("/*", async (c) => {
         <link rel="canonical" href="https://spike.land${path}${url.search}" />
       `;
       html = html.replace("</head>", `${metaTags}</head>`);
+    }
+
+    // Inject blog post metadata + content for crawlers on /blog/:slug routes
+    const blogSlugMatch = path.match(/^\/blog\/([a-z0-9-]+)$/);
+    const blogSlug = blogSlugMatch?.[1];
+    if (blogSlug) {
+      try {
+        const row = await getBlogPostRow(c.env.DB, blogSlug);
+        if (row) {
+          const postTitle = escapeHtml(row.title);
+          const postDesc = escapeHtml(row.description);
+          const postAuthor = escapeHtml(row.author);
+          const postImage = row.hero_image
+            ? `https://spike.land${row.hero_image}`
+            : "https://spike.land/og-image.png";
+          const postUrl = `https://spike.land${path}`;
+
+          html = html.replace(/<title>[^<]*<\/title>/, `<title>${postTitle} — spike.land</title>`);
+          html = html.replace(
+            /<meta name="description" content="[^"]*" \/>/,
+            `<meta name="description" content="${postDesc}" />`,
+          );
+
+          const blogMeta = `
+        <meta property="og:type" content="article" />
+        <meta property="og:title" content="${postTitle}" />
+        <meta property="og:description" content="${postDesc}" />
+        <meta property="og:image" content="${escapeHtml(postImage)}" />
+        <meta property="og:url" content="${postUrl}" />
+        <meta property="article:published_time" content="${escapeHtml(row.date)}" />
+        <meta property="article:author" content="${postAuthor}" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="${postTitle}" />
+        <meta name="twitter:description" content="${postDesc}" />
+        <meta name="twitter:image" content="${escapeHtml(postImage)}" />
+        <link rel="canonical" href="${postUrl}" />
+        <script type="application/ld+json">${JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "BlogPosting",
+            headline: row.title,
+            description: row.description,
+            image: postImage,
+            datePublished: row.date,
+            author: { "@type": "Person", name: row.author },
+            publisher: { "@type": "Organization", name: "spike.land" },
+            url: postUrl,
+          })}</script>`;
+          html = html.replace("</head>", `${blogMeta}\n</head>`);
+
+          // Inject article content for crawlers (hidden, React hydrates over root div)
+          const articleHtml = markdownToBasicHtml(row.content);
+          html = html.replace(
+            "</body>",
+            `<article id="ssr-blog" style="display:none"><h1>${postTitle}</h1>${articleHtml}</article>\n</body>`,
+          );
+        }
+      } catch { /* D1 unavailable — serve SPA shell without blog metadata */ }
     }
 
     const response = new Response(html, {
@@ -135,5 +206,124 @@ spa.get("/*", async (c) => {
 
   return new Response(object.body, { headers });
 });
+
+function escapeHtml(s: string): string {
+  return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+}
+
+/** Minimal markdown→HTML for crawler-visible content. Handles headings, paragraphs, bold, italic, links, images, lists, code blocks, and horizontal rules. */
+function markdownToBasicHtml(md: string): string {
+  // Strip frontmatter
+  const content = md.replace(/^---[\s\S]*?---\s*/, "");
+
+  const lines = content.split("\n");
+  const out: string[] = [];
+  let inCodeBlock = false;
+  let inList = false;
+  let listType: "ul" | "ol" = "ul";
+
+  for (const line of lines) {
+    // Fenced code blocks
+    if (line.trimStart().startsWith("```")) {
+      if (inCodeBlock) {
+        out.push("</code></pre>");
+        inCodeBlock = false;
+      } else {
+        if (inList) { out.push(`</${listType}>`); inList = false; }
+        out.push("<pre><code>");
+        inCodeBlock = true;
+      }
+      continue;
+    }
+    if (inCodeBlock) {
+      out.push(escapeHtml(line));
+      continue;
+    }
+
+    const trimmed = line.trim();
+
+    // Empty line — close list if open
+    if (!trimmed) {
+      if (inList) { out.push(`</${listType}>`); inList = false; }
+      continue;
+    }
+
+    // Horizontal rule
+    if (/^(-{3,}|\*{3,}|_{3,})$/.test(trimmed)) {
+      if (inList) { out.push(`</${listType}>`); inList = false; }
+      out.push("<hr />");
+      continue;
+    }
+
+    // Headings
+    const headingMatch = trimmed.match(/^(#{1,6})\s+(.*)$/);
+    if (headingMatch?.[1] && headingMatch[2] !== undefined) {
+      if (inList) { out.push(`</${listType}>`); inList = false; }
+      const level = headingMatch[1].length;
+      out.push(`<h${level}>${inlineMarkdown(headingMatch[2])}</h${level}>`);
+      continue;
+    }
+
+    // Unordered list items
+    if (/^[-*+]\s+/.test(trimmed)) {
+      if (!inList || listType !== "ul") {
+        if (inList) out.push(`</${listType}>`);
+        out.push("<ul>");
+        inList = true;
+        listType = "ul";
+      }
+      out.push(`<li>${inlineMarkdown(trimmed.replace(/^[-*+]\s+/, ""))}</li>`);
+      continue;
+    }
+
+    // Ordered list items
+    const olMatch = trimmed.match(/^(\d+)\.\s+(.*)/);
+    if (olMatch?.[2]) {
+      if (!inList || listType !== "ol") {
+        if (inList) out.push(`</${listType}>`);
+        out.push("<ol>");
+        inList = true;
+        listType = "ol";
+      }
+      out.push(`<li>${inlineMarkdown(olMatch[2])}</li>`);
+      continue;
+    }
+
+    // Images on their own line (before paragraph catch-all)
+    const imgMatch = trimmed.match(/^!\[([^\]]*)\]\(([^)]+)\)$/);
+    if (imgMatch?.[1] !== undefined && imgMatch[2]) {
+      if (inList) { out.push(`</${listType}>`); inList = false; }
+      out.push(`<img alt="${escapeHtml(imgMatch[1])}" src="${escapeHtml(imgMatch[2])}" />`);
+      continue;
+    }
+
+    // Default: paragraph
+    if (inList) { out.push(`</${listType}>`); inList = false; }
+    out.push(`<p>${inlineMarkdown(trimmed)}</p>`);
+  }
+
+  if (inCodeBlock) out.push("</code></pre>");
+  if (inList) out.push(`</${listType}>`);
+
+  return out.join("\n");
+}
+
+/** Convert inline markdown (bold, italic, code, links, images) to HTML. */
+function inlineMarkdown(text: string): string {
+  let s = escapeHtml(text);
+  // Images
+  s = s.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '<img alt="$1" src="$2" />');
+  // Links
+  s = s.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>');
+  // Bold
+  s = s.replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
+  s = s.replace(/__(.+?)__/g, "<strong>$1</strong>");
+  // Italic
+  s = s.replace(/\*(.+?)\*/g, "<em>$1</em>");
+  s = s.replace(/_(.+?)_/g, "<em>$1</em>");
+  // Inline code
+  s = s.replace(/`([^`]+)`/g, "<code>$1</code>");
+  return s;
+}
 
 export { spa };

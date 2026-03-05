@@ -37,6 +37,8 @@
   },
   "devDependencies": {
     "@changesets/cli": "2.30.0",
+    "@spike-land-ai/eslint-config": "workspace:^",
+    "@spike-land-ai/tsconfig": "workspace:^",
     "@types/node": "25.3.3",
     "@vitest/coverage-v8": "4.0.18",
     "eslint": "10.0.2",
