@@ -53,7 +53,7 @@ spa.get("/*", async (c) => {
   if (!object) {
     // 1. First attempt: check if a prerendered HTML file exists for this route path
     // For example /blog -> blog.html, or /blog/ -> blog/index.html
-    let prerenderedKey = key.endsWith("/") ? `${key}index.html` : `${key}.html`;
+    const prerenderedKey = key.endsWith("/") ? `${key}index.html` : `${key}.html`;
     let fallback = await c.env.SPA_ASSETS.get(prerenderedKey);
 
     // 2. Second attempt: check reverse (some static generators output /about/index.html for /about)

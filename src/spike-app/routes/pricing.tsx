@@ -44,7 +44,7 @@ const PLANS: PricingPlan[] = [
     description: "Unlock professional tools and higher limits.",
     features: [
       { text: "500 AI credits/day" },
-      { text: "All 74 MCP tools" },
+      { text: "All 80+ MCP tools" },
       { text: "Priority support" },
       { text: "API key vault (BYOK)" },
       { text: "Advanced analytics" },
@@ -62,7 +62,7 @@ const PLANS: PricingPlan[] = [
     description: "Unlimited access and dedicated support for teams.",
     features: [
       { text: "Unlimited AI credits" },
-      { text: "All 74 MCP tools" },
+      { text: "All 80+ MCP tools" },
       { text: "Dedicated support" },
       { text: "Team management" },
       { text: "Custom integrations" },
@@ -93,7 +93,7 @@ const FAQ_ITEMS = [
   {
     question: "What MCP tools are available?",
     answer:
-      "The platform currently offers 74 MCP tools covering code generation, image processing, data analysis, browser automation, and more. Free users can access 10 core tools; Pro and Business users get all 74.",
+      "The platform currently offers 80+ MCP tools covering code generation, image processing, data analysis, browser automation, and more. Free users can access 10 core tools; Pro and Business users get all 80+.",
   },
   {
     question: "How does the marketplace revenue share work?",

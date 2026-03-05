@@ -204,7 +204,15 @@ export function RootLayout() {
       <div className="flex flex-1 flex-col min-w-0">
         <header className="sticky top-0 z-30 flex h-16 items-center border-b border-border bg-card/80 backdrop-blur-md px-6">
           <div className="flex flex-1 items-center justify-between">
-            <Link to="/" className="text-xl font-bold">spike.land</Link>
+            <div className="flex items-center gap-8">
+              <Link to="/" className="text-xl font-bold">spike.land</Link>
+              <nav className="hidden md:flex items-center gap-6">
+                <Link to="/tools" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">Tools</Link>
+                <Link to="/pricing" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">Pricing</Link>
+                <Link to="/blog" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">Blog</Link>
+                <a href="https://github.com/spike-land-ai/spike-land-ai/tree/main/docs" target="_blank" rel="noopener noreferrer" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">Docs</a>
+              </nav>
+            </div>
             <LoginButton />
           </div>
         </header>
