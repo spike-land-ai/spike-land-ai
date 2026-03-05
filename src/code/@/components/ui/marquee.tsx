@@ -30,26 +30,39 @@ interface MarqueeProps extends ComponentPropsWithoutRef<"div"> {
    * @default 4
    */
   repeat?: number;
+
+  /**
+   * Optional boolean to add a fade effect at the edges.
+   * @default true
+   */
+  fade?: boolean;
 }
 
 export function Marquee({
   className,
   reverse,
-  pauseOnHover = false,
+  pauseOnHover = true,
   children,
   vertical = false,
   repeat = 4,
+  fade = true,
   ...props
 }: MarqueeProps) {
   return (
     <div
       {...props}
       className={cn(
-        "group flex overflow-hidden p-2 [--duration:40s] [--gap:1rem] [gap:var(--gap)]",
+        "group flex overflow-hidden p-2 [--duration:40s] [--gap:1.5rem] [gap:var(--gap)] relative",
         {
           "flex-row": !vertical,
           "flex-col": vertical,
         },
+        fade && [
+          "after:content-[''] after:absolute after:inset-0 after:z-10",
+          !vertical 
+            ? "after:bg-gradient-to-r after:from-background after:via-transparent after:to-background" 
+            : "after:bg-gradient-to-b after:from-background after:via-transparent after:to-background"
+        ],
         className,
       )}
     >

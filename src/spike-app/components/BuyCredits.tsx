@@ -1,5 +1,8 @@
 import { useState } from "react";
 import { apiUrl } from "@/lib/api";
+import { Button } from "@/shared/ui/button";
+import { Zap, Coins, Trophy, CreditCard, Sparkles, Check } from "lucide-react";
+import { cn } from "@/shared/utils/cn";
 
 interface CreditPack {
   id: string;
@@ -7,12 +10,13 @@ interface CreditPack {
   price: number;
   credits: number;
   highlighted: boolean;
+  icon: typeof Zap;
 }
 
 const PACKS: CreditPack[] = [
-  { id: "starter", label: "Starter", price: 5, credits: 500, highlighted: false },
-  { id: "popular", label: "Popular", price: 20, credits: 2500, highlighted: true },
-  { id: "power", label: "Power", price: 50, credits: 7500, highlighted: false },
+  { id: "starter", label: "Starter", price: 5, credits: 500, highlighted: false, icon: Coins },
+  { id: "popular", label: "Popular", price: 20, credits: 2500, highlighted: true, icon: Zap },
+  { id: "power", label: "Power", price: 50, credits: 7500, highlighted: false, icon: Trophy },
 ];
 
 async function purchaseCredits(credits: number): Promise<void> {
@@ -38,6 +42,7 @@ function PackCard({ pack }: { pack: CreditPack }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const perCredit = (pack.price / pack.credits).toFixed(3);
+  const Icon = pack.icon;
 
   async function handleBuy() {
     setLoading(true);
@@ -52,70 +57,100 @@ function PackCard({ pack }: { pack: CreditPack }) {
 
   return (
     <div
-      className={`relative flex flex-col rounded-2xl border p-6 shadow-sm ${
+      className={cn(
+        "relative flex flex-col rounded-3xl border p-8 transition-all duration-300 group",
         pack.highlighted
-          ? "border-primary bg-primary/5 ring-2 ring-primary"
-          : "border-border bg-card"
-      }`}
+          ? "border-primary bg-primary/5 shadow-xl shadow-primary/10 ring-1 ring-primary/20 scale-105 z-10"
+          : "border-border bg-card hover:border-primary/20 hover:shadow-lg"
+      )}
     >
       {pack.highlighted && (
-        <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-primary px-3 py-0.5 text-xs font-semibold text-primary-foreground">
+        <div className="absolute -top-4 left-1/2 -translate-x-1/2 rounded-full bg-primary px-4 py-1 text-[10px] font-black uppercase tracking-widest text-primary-foreground shadow-lg flex items-center gap-1.5">
+          <Sparkles className="size-3" />
           Best Value
-        </span>
+        </div>
       )}
 
-      <h3 className="text-lg font-bold text-foreground">{pack.label}</h3>
-
-      <div className="mt-3 flex items-baseline gap-1">
-        <span className="text-3xl font-extrabold text-foreground">${pack.price}</span>
+      <div className="flex items-center justify-between mb-6">
+        <div className={cn(
+          "p-3 rounded-2xl transition-colors",
+          pack.highlighted ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground group-hover:bg-primary/10 group-hover:text-primary"
+        )}>
+          <Icon className="size-6" />
+        </div>
+        <div className="text-right">
+          <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/50">Pack</p>
+          <h3 className="text-xl font-black tracking-tight text-foreground">{pack.label}</h3>
+        </div>
       </div>
 
-      <div className="mt-2 space-y-1">
-        <p className="text-sm font-semibold text-foreground">
-          {pack.credits.toLocaleString()} credits
-        </p>
-        <p className="text-xs text-muted-foreground">${perCredit} per credit</p>
+      <div className="flex items-baseline gap-1 mb-1">
+        <span className="text-4xl font-black tracking-tighter text-foreground">${pack.price}</span>
+        <span className="text-sm font-bold text-muted-foreground/60 tracking-tight uppercase">USD</span>
+      </div>
+      <p className="text-xs font-bold text-muted-foreground/40 mb-6 uppercase tracking-wider">
+        ${perCredit} per credit
+      </p>
+
+      <div className="space-y-4 mb-8">
+        <div className="flex items-center gap-2 text-sm font-bold text-foreground">
+          <div className="bg-primary/10 p-1 rounded-full text-primary">
+            <Check className="size-3" />
+          </div>
+          {pack.credits.toLocaleString()} Credits
+        </div>
+        <div className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
+          <div className="bg-muted p-1 rounded-full">
+            <Check className="size-3" />
+          </div>
+          Universal Usage
+        </div>
+        <div className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
+          <div className="bg-muted p-1 rounded-full">
+            <Check className="size-3" />
+          </div>
+          Never Expires
+        </div>
       </div>
 
       {error && (
-        <p className="mt-3 text-xs text-red-600 dark:text-red-400" role="alert">
+        <p className="mb-4 text-xs font-bold text-destructive animate-bounce" role="alert">
           {error}
         </p>
       )}
 
-      <button
-        type="button"
+      <Button
         onClick={handleBuy}
-        disabled={loading}
-        aria-label={`Buy ${pack.credits.toLocaleString()} credits for $${pack.price}`}
-        className={`mt-6 w-full rounded-lg px-4 py-2.5 text-sm font-semibold transition disabled:cursor-not-allowed disabled:opacity-60 ${
-          pack.highlighted
-            ? "bg-primary text-primary-foreground hover:bg-primary/90"
-            : "bg-muted text-foreground hover:bg-muted/80"
-        }`}
+        loading={loading}
+        variant={pack.highlighted ? "default" : "outline"}
+        className={cn(
+          "w-full rounded-2xl h-12 font-black uppercase tracking-widest text-xs transition-transform active:scale-95 shadow-md",
+          pack.highlighted && "shadow-primary/20"
+        )}
       >
-        {loading ? "Redirecting..." : `Buy for $${pack.price}`}
-      </button>
+        <CreditCard className="mr-2 size-4" />
+        {loading ? "Processing..." : `Buy Now`}
+      </Button>
     </div>
   );
 }
 
 export function BuyCredits() {
   return (
-    <section aria-labelledby="buy-credits-heading">
-      <div className="mb-6">
+    <section aria-labelledby="buy-credits-heading" className="py-12">
+      <div className="max-w-xl mb-12">
         <h2
           id="buy-credits-heading"
-          className="text-xl font-bold text-foreground"
+          className="text-3xl font-black tracking-tight text-foreground mb-3"
         >
-          Buy Credits
+          Power Up Your Apps
         </h2>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Credits never expire. Use them for AI tool calls beyond your daily limit.
+        <p className="text-muted-foreground leading-relaxed">
+          Need more throughput? Purchase credits to enable high-frequency AI tool calls across the entire platform. Credits are added instantly to your balance.
         </p>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-3">
+      <div className="grid gap-8 sm:grid-cols-3 items-center">
         {PACKS.map((pack) => (
           <PackCard key={pack.id} pack={pack} />
         ))}

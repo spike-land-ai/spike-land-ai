@@ -1,0 +1,6 @@
+# TypeScript build artifacts (tsc outputs to root when consumed by other packages)
+*.js
+*.d.ts
+*.d.ts.map
+*.js.map
+!*.test.ts

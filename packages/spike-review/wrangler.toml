@@ -6,7 +6,6 @@ compatibility_flags = ["nodejs_compat"]
 compatibility_date = "2025-07-12"
 
 workers_dev = true
-logpush = true
 
 # Secrets (set via `wrangler secret put`):
 # - GITHUB_TOKEN

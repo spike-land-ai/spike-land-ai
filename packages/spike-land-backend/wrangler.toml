@@ -10,8 +10,6 @@ compatibility_flags = ["nodejs_compat"]
 # account_id = "your-account-id-here"
 compatibility_date = "2025-07-12"
 
-logpush = true
-
 kv_namespaces = [
   { binding = "KV", id = "e05276b573af4afd905bc6ac1ed371d5", preview_id = "9db106837d4d437a962612dd04197581" },
 ]
@@ -47,7 +45,6 @@ tag = "v5"
 deleted_classes = ["Users"]
 
 [env.testing]
-logpush = true
 name = "testing-spike-land"
 kv_namespaces = [
   { binding = "KV", id = "7cafeba860c9485bbfca337099c82ce3", preview_id = "e2b898af453c46e2ac584745ea92424d" },

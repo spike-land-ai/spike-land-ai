@@ -22,7 +22,6 @@ export class StripeClient {
       method: "GET",
       headers: {
         "Authorization": `Bearer ${this.apiKey}`,
-        "Content-Type": "application/x-www-form-urlencoded",
       },
     });
 

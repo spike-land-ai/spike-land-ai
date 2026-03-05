@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import { apiUrl } from "@/lib/api";
+import { Button } from "@/shared/ui/button";
+import { Zap, AlertTriangle } from "lucide-react";
 
 interface CreditBalance {
   balance: number;
@@ -24,7 +26,7 @@ function getResetHours(): number {
   const now = new Date();
   const midnight = new Date();
   midnight.setUTCHours(24, 0, 0, 0);
-  return Math.ceil((midnight.getTime() - now.getTime()) / (1000 * 60 * 60));
+  return Math.max(1, Math.ceil((midnight.getTime() - now.getTime()) / (1000 * 60 * 60)));
 }
 
 export function CreditWidget() {
@@ -45,22 +47,35 @@ export function CreditWidget() {
 
   if (loading) {
     return (
-      <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
-        <h3 className="mb-4 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-          Credit Balance
-        </h3>
-        <div className="h-16 animate-pulse rounded bg-muted" />
+      <div className="rounded-xl border border-border bg-card p-6 shadow-sm animate-pulse">
+        <div className="mb-4 flex items-center justify-between">
+          <div className="h-4 w-24 rounded bg-muted" />
+          <div className="h-5 w-12 rounded-full bg-muted" />
+        </div>
+        <div className="mb-3 h-8 w-32 rounded bg-muted" />
+        <div className="mb-1 h-2 w-full rounded-full bg-muted" />
+        <div className="mb-6 flex justify-between">
+          <div className="h-3 w-20 rounded bg-muted" />
+          <div className="h-3 w-20 rounded bg-muted" />
+        </div>
+        <div className="h-10 w-full rounded-lg bg-muted" />
       </div>
     );
   }
 
   if (error || !data) {
     return (
-      <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
-        <h3 className="mb-4 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-          Credit Balance
-        </h3>
-        <p className="text-sm text-muted-foreground">Unable to load credits.</p>
+      <div className="rounded-xl border border-destructive/20 bg-destructive/5 p-6 shadow-sm">
+        <div className="flex items-center gap-2 text-destructive mb-2">
+          <AlertTriangle className="size-4" />
+          <h3 className="text-sm font-semibold uppercase tracking-wide">
+            Balance Error
+          </h3>
+        </div>
+        <p className="text-sm text-muted-foreground mb-4">Unable to load your credit balance at this time.</p>
+        <Button variant="outline" size="sm" onClick={() => window.location.reload()}>
+          Retry
+        </Button>
       </div>
     );
   }
@@ -75,29 +90,28 @@ export function CreditWidget() {
   return (
     <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
       <div className="mb-4 flex items-center justify-between">
-        <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+        <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground flex items-center gap-2">
+          <Zap className="size-3.5 fill-current" />
           Credit Balance
         </h3>
-        <span className="rounded-full bg-muted px-2 py-0.5 text-xs font-medium capitalize text-foreground">
+        <span className="rounded-full bg-muted px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-muted-foreground border border-border/50">
           {data.tier}
         </span>
       </div>
 
-      {/* Balance */}
-      <div className="mb-3 flex items-baseline gap-1">
-        <span className={`text-2xl font-bold ${textColor}`}>
+      <div className="mb-3 flex items-baseline gap-1.5">
+        <span className={`text-3xl font-bold tracking-tight ${textColor}`}>
           {data.balance.toLocaleString()}
         </span>
-        <span className="text-sm text-muted-foreground">credits remaining</span>
+        <span className="text-sm font-medium text-muted-foreground">credits remaining</span>
       </div>
 
-      {/* Usage meter */}
       {isUnlimited ? (
-        <p className="mb-3 text-sm text-muted-foreground">Unlimited daily credits</p>
+        <p className="mb-4 text-sm text-muted-foreground">Unlimited daily credits included</p>
       ) : (
         <>
           <div
-            className="mb-1 h-2 w-full overflow-hidden rounded-full bg-muted"
+            className="mb-1.5 h-2 w-full overflow-hidden rounded-full bg-muted/50"
             role="progressbar"
             aria-valuenow={usedPct}
             aria-valuemin={0}
@@ -105,28 +119,26 @@ export function CreditWidget() {
             aria-label="Daily credit usage"
           >
             <div
-              className={`h-full rounded-full transition-all duration-500 ${barColor}`}
+              className={`h-full rounded-full transition-all duration-1000 ease-out ${barColor}`}
               style={{ width: `${usedPct}%` }}
             />
           </div>
-          <div className="mb-3 flex justify-between text-xs text-muted-foreground">
+          <div className="mb-4 flex justify-between text-[11px] font-medium text-muted-foreground">
             <span>{data.usedToday.toLocaleString()} used today</span>
             <span>{data.dailyLimit.toLocaleString()} daily limit</span>
           </div>
         </>
       )}
 
-      {/* Reset time */}
-      <p className="mb-4 text-xs text-muted-foreground">
-        Resets in {resetHours} {resetHours === 1 ? "hour" : "hours"}
+      <p className="mb-6 text-[11px] text-muted-foreground bg-muted/30 px-2 py-1 rounded-md w-fit">
+        Resets in <strong>{resetHours} {resetHours === 1 ? "hour" : "hours"}</strong>
       </p>
 
-      <a
-        href="/settings?tab=billing"
-        className="block w-full rounded-lg bg-primary px-4 py-2 text-center text-sm font-semibold text-primary-foreground transition hover:bg-primary/90"
-      >
-        Buy More Credits
-      </a>
+      <Button asChild className="w-full font-bold">
+        <a href="/settings?tab=billing">
+          Buy More Credits
+        </a>
+      </Button>
     </div>
   );
 }

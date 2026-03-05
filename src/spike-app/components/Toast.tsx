@@ -1,5 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";
+import { CheckCircle2, AlertCircle, Info, X } from "lucide-react";
 
 type ToastVariant = "success" | "error" | "info";
 
@@ -22,27 +23,15 @@ export function useToast() {
 }
 
 const ICONS: Record<ToastVariant, ReactNode> = {
-  success: (
-    <svg className="h-4 w-4 text-green-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-    </svg>
-  ),
-  error: (
-    <svg className="h-4 w-4 text-destructive flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-    </svg>
-  ),
-  info: (
-    <svg className="h-4 w-4 text-primary flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01" />
-    </svg>
-  ),
+  success: <CheckCircle2 className="h-5 w-5 text-green-500 shrink-0" />,
+  error: <AlertCircle className="h-5 w-5 text-destructive shrink-0" />,
+  info: <Info className="h-5 w-5 text-primary shrink-0" />,
 };
 
 const VARIANT_STYLES: Record<ToastVariant, string> = {
-  success: "border-green-500/30 bg-card",
-  error: "border-destructive/30 bg-card",
-  info: "border-primary/30 bg-card",
+  success: "border-green-500/30 bg-card shadow-green-500/5",
+  error: "border-destructive/30 bg-card shadow-destructive/5",
+  info: "border-primary/30 bg-card shadow-primary/5",
 };
 
 export function ToastProvider({ children }: { children: ReactNode }) {
@@ -61,7 +50,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   const showToast = useCallback((message: string, variant: ToastVariant = "info") => {
     const id = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
     setToasts((prev) => [...prev.slice(-4), { id, message, variant }]);
-    const timer = setTimeout(() => dismiss(id), 4500);
+    const timer = setTimeout(() => dismiss(id), 5000);
     timers.current.set(id, timer);
   }, [dismiss]);
 
@@ -75,28 +64,25 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   return (
     <ToastContext.Provider value={{ showToast }}>
       {children}
-      {/* Toast container */}
       <div
         aria-live="polite"
         aria-label="Notifications"
-        className="fixed bottom-4 right-4 z-50 flex flex-col gap-2 pointer-events-none"
+        className="fixed bottom-4 right-4 z-[100] flex flex-col gap-2 pointer-events-none"
       >
         {toasts.map((toast) => (
           <div
             key={toast.id}
             role="status"
-            className={`pointer-events-auto flex items-center gap-3 rounded-xl border px-4 py-3 shadow-lg min-w-[260px] max-w-sm text-sm text-foreground animate-in slide-in-from-right-5 fade-in transition-all ${VARIANT_STYLES[toast.variant]}`}
+            className={`pointer-events-auto flex items-center gap-3 rounded-xl border px-4 py-3 shadow-lg min-w-[300px] max-w-md text-sm text-foreground animate-in slide-in-from-right-5 fade-in duration-300 transition-all ${VARIANT_STYLES[toast.variant]}`}
           >
             {ICONS[toast.variant]}
-            <p className="flex-1">{toast.message}</p>
+            <p className="flex-1 font-medium leading-relaxed">{toast.message}</p>
             <button
               onClick={() => dismiss(toast.id)}
-              className="ml-1 rounded-full p-0.5 text-muted-foreground hover:text-foreground transition-colors"
-              aria-label="Dismiss"
+              className="ml-1 rounded-md p-1 text-muted-foreground hover:text-foreground hover:bg-muted transition-colors focus:outline-none focus:ring-2 focus:ring-ring"
+              aria-label="Dismiss notification"
             >
-              <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
+              <X className="h-4 w-4" />
             </button>
           </div>
         ))}

@@ -2,7 +2,6 @@ name = "image-studio-mcp"
 main = "../../src/image-studio-worker/index.ts"
 compatibility_date = "2025-02-28"
 compatibility_flags = ["nodejs_compat"]
-logpush = true
 
 [[d1_databases]]
 binding = "IMAGE_DB"

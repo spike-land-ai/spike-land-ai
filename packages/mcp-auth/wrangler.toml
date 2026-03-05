@@ -2,7 +2,6 @@ name = "mcp-auth"
 main = "../../src/mcp-auth/index.ts"
 compatibility_date = "2025-02-28"
 compatibility_flags = ["nodejs_compat"]
-logpush = true
 
 route = { pattern = "auth-mcp.spike.land", custom_domain = true }
 

@@ -3,6 +3,8 @@ import { Terminal } from "@xterm/xterm";
 import { FitAddon } from "@xterm/addon-fit";
 import "@xterm/xterm/css/xterm.css";
 import { mcpUrl } from "@/lib/api";
+import { Terminal as TerminalIcon, Info, Copy, Check, List } from "lucide-react";
+import { Button } from "@/shared/ui/button";
 
 interface McpTerminalProps {
   appId?: string;
@@ -24,6 +26,7 @@ export function McpTerminal({ appId }: McpTerminalProps) {
   const historyRef = useRef<string[]>([]);
   const historyIndexRef = useRef(-1);
   const [tools, setTools] = useState<McpTool[]>([]);
+  const [copied, setCopied] = useState(false);
 
   const fetchTools = useCallback(async (): Promise<McpTool[]> => {
     try {
@@ -151,18 +154,27 @@ export function McpTerminal({ appId }: McpTerminalProps) {
     term.write(PROMPT);
   }, [appId, fetchTools, callTool, writeOutput]);
 
+  const handleCopy = useCallback(() => {
+    if (!terminalRef.current) return;
+    const text = terminalRef.current.getSelection() || tools.map(t => `${t.name}: ${t.description}`).join("\n");
+    navigator.clipboard.writeText(text);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  }, [tools]);
+
   useEffect(() => {
     if (!containerRef.current) return;
 
     const term = new Terminal({
       cursorBlink: true,
-      fontSize: 14,
-      fontFamily: "'JetBrains Mono', 'Fira Code', 'Cascadia Code', Menlo, monospace",
+      fontSize: 13,
+      fontFamily: "JetBrains Mono, Fira Code, Cascadia Code, Menlo, monospace",
+      lineHeight: 1.2,
       theme: {
         background: "#0f172a",
         foreground: "#e2e8f0",
         cursor: "#38bdf8",
-        selectionBackground: "#334155",
+        selectionBackground: "rgba(56, 189, 248, 0.3)",
         black: "#0f172a",
         red: "#f87171",
         green: "#4ade80",
@@ -182,7 +194,6 @@ export function McpTerminal({ appId }: McpTerminalProps) {
     terminalRef.current = term;
     fitAddonRef.current = fitAddon;
 
-    // Welcome message
     term.writeln("\x1b[1;36m  spike.land MCP Terminal\x1b[0m");
     term.writeln("\x1b[2m  Type \"help\" for commands, \"tools\" to list available MCP tools\x1b[0m");
     if (appId) {
@@ -191,28 +202,23 @@ export function McpTerminal({ appId }: McpTerminalProps) {
     term.writeln("");
     term.write(PROMPT);
 
-    // Input handling
     term.onData((data) => {
       const code = data.charCodeAt(0);
 
       if (data === "\r") {
-        // Enter
         term.write("\r\n");
         const cmd = lineBufferRef.current;
         lineBufferRef.current = "";
         handleCommand(term, cmd);
       } else if (code === 127 || data === "\b") {
-        // Backspace
         if (lineBufferRef.current.length > 0) {
           lineBufferRef.current = lineBufferRef.current.slice(0, -1);
           term.write("\b \b");
         }
       } else if (data === "\x1b[A") {
-        // Up arrow — history
         if (historyRef.current.length > 0) {
           const newIdx = Math.min(historyIndexRef.current + 1, historyRef.current.length - 1);
           historyIndexRef.current = newIdx;
-          // Clear current line
           while (lineBufferRef.current.length > 0) {
             term.write("\b \b");
             lineBufferRef.current = lineBufferRef.current.slice(0, -1);
@@ -222,7 +228,6 @@ export function McpTerminal({ appId }: McpTerminalProps) {
           term.write(histLine);
         }
       } else if (data === "\x1b[B") {
-        // Down arrow — history
         while (lineBufferRef.current.length > 0) {
           term.write("\b \b");
           lineBufferRef.current = lineBufferRef.current.slice(0, -1);
@@ -236,12 +241,10 @@ export function McpTerminal({ appId }: McpTerminalProps) {
           historyIndexRef.current = -1;
         }
       } else if (code === 3) {
-        // Ctrl+C
         lineBufferRef.current = "";
         term.write("^C\r\n");
         term.write(PROMPT);
       } else if (code >= 32) {
-        // Printable characters
         lineBufferRef.current += data;
         term.write(data);
       }
@@ -257,23 +260,41 @@ export function McpTerminal({ appId }: McpTerminalProps) {
   }, [appId, handleCommand]);
 
   return (
-    <div className="flex h-full min-h-[400px] flex-col">
-      <div className="flex items-center justify-between border-b border-border bg-card px-3 py-2">
-        <div className="flex items-center gap-2">
-          <div className="flex gap-1.5">
-            <div className="h-3 w-3 rounded-full bg-destructive" />
-            <div className="h-3 w-3 rounded-full bg-warning" />
-            <div className="h-3 w-3 rounded-full bg-success" />
+    <div className="flex h-full min-h-[400px] flex-col rounded-xl border border-border overflow-hidden shadow-2xl bg-[#0f172a]">
+      <div className="flex items-center justify-between border-b border-white/5 bg-white/5 px-4 py-2.5 backdrop-blur-md">
+        <div className="flex items-center gap-3">
+          <div className="flex gap-1.5 group">
+            <div className="h-3 w-3 rounded-full bg-[#ff5f56] shadow-inner" title="Close" />
+            <div className="h-3 w-3 rounded-full bg-[#ffbd2e] shadow-inner" title="Minimize" />
+            <div className="h-3 w-3 rounded-full bg-[#27c93f] shadow-inner" title="Maximize" />
           </div>
-          <span className="ml-2 text-xs text-muted-foreground">
-            MCP Terminal {appId ? `— ${appId}` : ""}
-          </span>
+          <div className="h-4 w-[1px] bg-white/10 mx-1" />
+          <div className="flex items-center gap-2 text-white/70">
+            <TerminalIcon className="size-3.5" />
+            <span className="text-xs font-medium tracking-tight">
+              {appId ? `Terminal — ${appId}` : "MCP Terminal"}
+            </span>
+          </div>
         </div>
-        <span className="text-xs text-muted-foreground">
-          {tools.length > 0 ? `${tools.length} tools loaded` : ""}
-        </span>
+        <div className="flex items-center gap-2">
+          {tools.length > 0 && (
+            <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-white/5 text-[10px] text-white/50 border border-white/5">
+              <List className="size-3" />
+              <span>{tools.length} tools</span>
+            </div>
+          )}
+          <Button
+            variant="ghost"
+            size="icon"
+            className="size-7 text-white/50 hover:text-white hover:bg-white/10"
+            onClick={handleCopy}
+            title="Copy selection or tool list"
+          >
+            {copied ? <Check className="size-3.5 text-green-400" /> : <Copy className="size-3.5" />}
+          </Button>
+        </div>
       </div>
-      <div ref={containerRef} className="flex-1 bg-[#0f172a]" />
+      <div ref={containerRef} className="flex-1 p-2" />
     </div>
   );
 }

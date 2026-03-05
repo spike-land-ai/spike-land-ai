@@ -1,6 +1,6 @@
 # Tech Debt Registry
 
-> Last updated: 2026-03-05 Last audit: 2026-02-26 (Sprint 4 Cleanup)
+> Last updated: 2026-03-05 Last audit: 2026-03-05 (Sprint 5 Cleanup)
 
 ## Overview
 
@@ -94,12 +94,13 @@ are prioritized P0 (critical) through P3 (minor/nice-to-have).
 
 #### TD-P2-1: Deprecated analyzeImage in gemini-client.ts
 
-- **Status**: Open
+- **Status**: Resolved (2026-03-05)
 - **Impact**: Using deprecated function pattern
 - **Details**: `analyzeImage` deprecated in favor of `analyzeImageV2` in the
-  legacy spike.land codebase (now deleted). May still exist in mcp-image-studio.
-- **Action**: Verify if this pattern persists in any current package; close if
-  not.
+  legacy spike.land codebase (now deleted).
+- **Resolution**: Legacy spike.land fully deleted (2026-03-04). Current image
+  analysis in mcp-image-studio uses modern `@google/genai` SDK with
+  `describeImage()` and `extractPalette()`. No `analyzeImage` references remain.
 
 #### TD-P2-2: @ai-sdk/anthropic not in root package.json
 
@@ -135,12 +136,12 @@ are prioritized P0 (critical) through P3 (minor/nice-to-have).
 
 #### TD-P2-8: esbuild resolution pins may be obsolete
 
-- **Status**: Open (needs investigation)
+- **Status**: Resolved (2026-03-05)
 - **Impact**: May prevent esbuild upgrades
-- **Details**: Root `package.json` has resolutions pinning `esbuild@0.14.47` to
-  `0.25.0`. The `resolutions-comments` field notes this "may be obsolete."
-- **Action**: Test removing the `esbuild@0.14.47` resolution; verify
-  esbuild-wasm still works.
+- **Details**: Root `package.json` previously had a resolution pinning
+  `esbuild@0.23.1` to `0.25.0` (TECH_DEBT.md incorrectly referenced 0.14.47).
+- **Resolution**: Resolution was removed when `@tanstack/router-generator`
+  dependency was dropped. Current esbuild is `^0.27.3` with no pinning issues.
 
 ### P3 - Low Priority / Nice-to-Have
 
@@ -184,6 +185,16 @@ are prioritized P0 (critical) through P3 (minor/nice-to-have).
 
 - **Status**: Moved to external repo
 - **Action**: Track in `@spike-land-ai/testing.spike.land` repo.
+
+## Resolved Items (Sprint 5 - 2026-03-05)
+
+| Item                                       | Resolution                                                       | Date       |
+| ------------------------------------------ | ---------------------------------------------------------------- | ---------- |
+| Logpush with no destination (9 workers)    | Removed `logpush = true` from all 9 wrangler.toml files         | 2026-03-05 |
+| analyzeImage deprecation (TD-P2-1)         | Confirmed fully removed with legacy spike.land deletion          | 2026-03-05 |
+| esbuild resolution pins (TD-P2-8)          | Confirmed removed; current esbuild ^0.27.3 with no conflicts    | 2026-03-05 |
+| Build artifacts in src/mcp-server-base/    | Added .gitignore for tsc output artifacts                        | 2026-03-05 |
+| stripe-analytics-mcp export bug            | Fixed .js → .ts export in packages/stripe-analytics-mcp/index.ts | 2026-03-05 |
 
 ## Resolved Items (Sprint 4 - 2026-02-26)
 
@@ -239,6 +250,7 @@ Storage Keys:
 | Sprint 2 | 2026-01-27 (target) | Continuation                                                         | Abandoned -- superseded by Sprint 3 |
 | Sprint 3 | 2026-02-14          | Comprehensive inventory and cleanup                                  | Completed                           |
 | Sprint 4 | 2026-02-26          | Dead code removal, logger refactoring, error boundaries, CSS XSS fix | Completed                           |
+| Sprint 5 | 2026-03-05          | Logpush cleanup, tech debt audit, build artifact fixes, export bugs  | Completed                           |
 
 ## Contributing
 

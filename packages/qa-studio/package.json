@@ -54,7 +54,9 @@
     "playwright": ">=1.0.0"
   },
   "peerDependenciesMeta": {
-    "playwright": { "optional": true }
+    "playwright": {
+      "optional": true
+    }
   },
   "keywords": [
     "qa",

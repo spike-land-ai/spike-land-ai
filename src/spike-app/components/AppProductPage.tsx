@@ -1,8 +1,13 @@
-import { Shield, Zap, Layout, CheckCircle, Terminal } from "lucide-react";
+import { Shield, Zap, Layout, CheckCircle, Terminal, Package, Globe, Cpu, Github, ChevronRight } from "lucide-react";
+import { Button } from "@/shared/ui/button";
+import { cn } from "@/shared/utils/cn";
+import { Link } from "@tanstack/react-router";
 
 interface AppProductPageProps {
   appId: string;
 }
+
+const CAPABILITY_ICONS = [Shield, Zap, Layout, CheckCircle, Terminal, Globe, Cpu];
 
 const toolMetadata: Record<string, {
   name: string;
@@ -67,93 +72,154 @@ export function AppProductPage({ appId }: AppProductPageProps) {
   };
 
   return (
-    <div className="flex flex-col space-y-10 p-8 lg:p-12">
-      {/* Header */}
-      <div className="space-y-4">
-        <div className="inline-flex items-center gap-2 rounded-full bg-info/10 px-4 py-1.5 text-sm font-semibold text-info-foreground">
-          <Terminal className="h-4 w-4" />
-          <span>MCP Tool</span>
+    <div className="flex flex-col space-y-12 p-6 lg:p-16 max-w-7xl mx-auto">
+      {/* Breadcrumbs */}
+      <nav className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-muted-foreground/50">
+        <Link to="/apps" className="hover:text-primary transition-colors">Apps</Link>
+        <ChevronRight className="size-3" />
+        <span className="text-foreground/70">{meta.name}</span>
+      </nav>
+
+      {/* Header Section */}
+      <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8">
+        <div className="space-y-6 max-w-3xl">
+          <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-1.5 text-xs font-black uppercase tracking-widest text-primary border border-primary/10">
+            <Terminal className="h-3.5 w-3.5" />
+            <span>MCP Tool Package</span>
+          </div>
+          <h1 className="text-5xl lg:text-7xl font-black tracking-tight text-foreground leading-[0.9]">
+            {meta.name}
+          </h1>
+          <p className="text-lg lg:text-xl text-muted-foreground leading-relaxed">
+            {meta.description}
+          </p>
         </div>
-        <h1 className="text-4xl font-extrabold tracking-tight text-foreground sm:text-5xl leading-tight">
-          {meta.name}
-        </h1>
-        <p className="text-xl text-muted-foreground leading-relaxed max-w-2xl">
-          {meta.description}
-        </p>
-        <div className="flex flex-col sm:flex-row gap-4 pt-2">
-          <button
+        
+        <div className="flex flex-col sm:flex-row gap-4 shrink-0">
+          <Button
+            size="lg"
             onClick={() => {
               window.dispatchEvent(new CustomEvent("change-tab", { detail: "Terminal" }));
             }}
-            className="inline-flex items-center justify-center gap-2 rounded-xl bg-foreground px-8 py-4 text-lg font-bold text-background shadow-lg transition hover:bg-foreground/90 hover:scale-[1.02] active:scale-[0.98]"
+            className="rounded-2xl h-14 px-8 text-lg font-bold shadow-xl shadow-primary/20"
           >
-            <Terminal className="h-5 w-5" />
+            <Terminal className="mr-2 h-5 w-5" />
             Open Terminal
-          </button>
+          </Button>
           {appId === "qa-studio" && (
-            <a
-              href="/apps/qa-studio"
-              className="inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-8 py-4 text-lg font-bold text-primary-foreground shadow-lg transition hover:bg-primary/90 hover:scale-[1.02] active:scale-[0.98]"
+            <Button
+              variant="outline"
+              size="lg"
+              asChild
+              className="rounded-2xl h-14 px-8 text-lg font-bold"
             >
-              <Layout className="h-5 w-5" />
-              Launch UI
-            </a>
+              <Link to="/apps/qa-studio">
+                <Layout className="mr-2 h-5 w-5" />
+                Launch UI
+              </Link>
+            </Button>
           )}
         </div>
       </div>
 
-      {/* Tool Names */}
+      {/* Tools Section */}
       {meta.toolNames.length > 0 && (
-        <div className="space-y-3">
-          <h2 className="text-lg font-bold text-foreground">Available Tools</h2>
-          <div className="flex flex-wrap gap-2">
+        <div className="space-y-4">
+          <div className="flex items-center gap-2">
+            <div className="h-px flex-1 bg-border" />
+            <h2 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/40">Available Tool Methods</h2>
+            <div className="h-px flex-1 bg-border" />
+          </div>
+          <div className="flex flex-wrap gap-2 justify-center">
             {meta.toolNames.map((name) => (
               <code
                 key={name}
-                className="rounded-lg bg-muted px-3 py-1.5 text-sm font-mono text-foreground"
+                className="rounded-xl bg-muted/50 border border-border px-4 py-2 text-sm font-mono text-foreground hover:border-primary/30 transition-colors cursor-default"
               >
-                {name}
+                {name}()
               </code>
             ))}
           </div>
         </div>
       )}
 
-      {/* Capabilities Grid */}
-      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        {meta.capabilities.map((capability, i) => (
-            <div key={i} className="flex flex-col gap-3 rounded-2xl border border-border bg-card p-5 shadow-sm transition hover:shadow-md">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-info/10 text-info-foreground">
-                {i % 5 === 0 && <Shield className="h-5 w-5" />}
-                {i % 5 === 1 && <Zap className="h-5 w-5" />}
-                {i % 5 === 2 && <Layout className="h-5 w-5" />}
-                {i % 5 === 3 && <CheckCircle className="h-5 w-5" />}
-                {i % 5 === 4 && <Terminal className="h-5 w-5" />}
-              </div>
-              <p className="text-muted-foreground leading-snug">{capability}</p>
-            </div>
-          ))}
-      </div>
+      {/* Main Content Grid */}
+      <div className="grid gap-12 lg:grid-cols-3">
+        {/* Capabilities Column */}
+        <div className="lg:col-span-2 space-y-6">
+          <h2 className="text-2xl font-black tracking-tight">Capabilities</h2>
+          <div className="grid gap-4 sm:grid-cols-2">
+            {meta.capabilities.map((capability, i) => {
+              const Icon = CAPABILITY_ICONS[i % CAPABILITY_ICONS.length]!;
+              return (
+                <div key={i} className="group flex items-start gap-4 rounded-3xl border border-border bg-card p-6 transition-all hover:shadow-lg hover:border-primary/20">
+                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-muted group-hover:bg-primary/10 group-hover:text-primary transition-colors">
+                    <Icon className="h-6 w-6" />
+                  </div>
+                  <p className="text-sm font-medium leading-relaxed text-muted-foreground group-hover:text-foreground transition-colors">
+                    {capability}
+                  </p>
+                </div>
+              );
+            })}
+          </div>
+        </div>
 
-      {/* Package Info */}
-      <div className="rounded-2xl bg-muted p-6 text-sm text-muted-foreground border border-border">
-        <h3 className="font-bold text-foreground mb-2">Package Info</h3>
-        <div className="grid gap-2 sm:grid-cols-2">
-          <div>
-            <span className="text-muted-foreground">Package: </span>
-            <code className="text-foreground">@spike-land-ai/{appId}</code>
+        {/* Sidebar Info */}
+        <div className="space-y-8">
+          <div className="rounded-3xl border border-border bg-muted/30 p-8 space-y-6">
+            <h3 className="text-sm font-black uppercase tracking-widest text-foreground/40">Technical Details</h3>
+            
+            <div className="space-y-4">
+              <div className="flex flex-col gap-1">
+                <span className="text-[10px] font-bold text-muted-foreground/60 uppercase">Package</span>
+                <div className="flex items-center gap-2 text-sm font-mono text-foreground break-all">
+                  <Package className="size-3.5 text-primary" />
+                  @spike-land-ai/{appId}
+                </div>
+              </div>
+              
+              <div className="flex flex-col gap-1">
+                <span className="text-[10px] font-bold text-muted-foreground/60 uppercase">Source Path</span>
+                <div className="flex items-center gap-2 text-sm font-mono text-foreground break-all">
+                  <Github className="size-3.5 text-primary" />
+                  {meta.packagePath}
+                </div>
+              </div>
+
+              <div className="flex flex-col gap-1">
+                <span className="text-[10px] font-bold text-muted-foreground/60 uppercase">Architecture</span>
+                <div className="flex items-center gap-2 text-sm font-semibold text-foreground">
+                  <Globe className="size-3.5 text-primary" />
+                  MCP Edge Module
+                </div>
+              </div>
+
+              <div className="flex flex-col gap-1">
+                <span className="text-[10px] font-bold text-muted-foreground/60 uppercase">Runtime</span>
+                <div className="flex items-center gap-2 text-sm font-semibold text-foreground">
+                  <Cpu className="size-3.5 text-primary" />
+                  Cloudflare Workers
+                </div>
+              </div>
+            </div>
+
+            <Button variant="outline" className="w-full rounded-2xl font-bold" asChild>
+              <a href={`https://github.com/spike-land-ai/spike-land-ai/tree/main/${meta.packagePath}`} target="_blank" rel="noopener noreferrer">
+                <Github className="mr-2 size-4" />
+                View Source
+              </a>
+            </Button>
           </div>
-          <div>
-            <span className="text-muted-foreground">Source: </span>
-            <code className="text-foreground">{meta.packagePath}</code>
-          </div>
-          <div>
-            <span className="text-muted-foreground">Protocol: </span>
-            <span>Model Context Protocol (MCP)</span>
-          </div>
-          <div>
-            <span className="text-muted-foreground">Runtime: </span>
-            <span>Node.js / Cloudflare Workers</span>
+
+          <div className="rounded-3xl border border-primary/10 bg-primary/5 p-8 text-center space-y-4">
+            <div className="bg-primary/10 size-12 rounded-2xl flex items-center justify-center mx-auto text-primary">
+              <Zap className="size-6" />
+            </div>
+            <h4 className="text-sm font-bold text-primary">Need customization?</h4>
+            <p className="text-xs text-primary/60 leading-relaxed">
+              This package is open source. You can fork it and deploy your own version with custom tools.
+            </p>
           </div>
         </div>
       </div>

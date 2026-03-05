@@ -9,8 +9,8 @@ export function registerRevenueTools(server: McpServer, client: StripeClient): v
     name: "stripe_revenue_summary",
     description: "Fetch balance transactions for a period and aggregate revenue by type (charge, refund, fee, payout)",
     schema: {
-      start_date: z.string().describe("Start date in YYYY-MM-DD format"),
-      end_date: z.string().describe("End date in YYYY-MM-DD format"),
+      start_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Must be YYYY-MM-DD").describe("Start date in YYYY-MM-DD format"),
+      end_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Must be YYYY-MM-DD").describe("End date in YYYY-MM-DD format"),
       currency: z.string().default("usd").describe("Currency code (default: usd)"),
     },
     async handler(args) {

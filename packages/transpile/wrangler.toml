@@ -6,7 +6,6 @@ name = "esbuild"
 compatibility_date = "2024-12-01"
 compatibility_flags = ["nodejs_compat"]
 main = "index.ts"
-logpush = true
 
 [env.production]
 routes = [{ pattern = "js.spike.land", custom_domain = true }]

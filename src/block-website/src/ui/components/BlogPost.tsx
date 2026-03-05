@@ -6,12 +6,30 @@ import type { BlogPost } from "../../core/types";
 import { BlogListView } from "./BlogList";
 import { ExperimentProvider, useExperiment } from "../hooks/useExperiment";
 import { useWidgetTracking } from "../hooks/useWidgetTracking";
+import { 
+  ChevronLeft,
+  Share2,
+  Twitter,
+  Linkedin,
+  ArrowLeft,
+  Heart,
+  Coffee,
+  Gift,
+  Zap,
+  Shield,
+  FileWarning,
+  Clock,
+  Info,
+  CheckCircle2,
+  AlertTriangle,
+  Tag
+} from "lucide-react";
+import { Button } from "@/shared/ui/button";
+import { cn } from "@/shared/utils/cn";
 
 /**
  * Convert self-closing JSX/HTML tags for custom components to explicit
- * open/close pairs. HTML5 only treats void elements (img, br, hr, etc.)
- * as self-closing — `<Foo />` is parsed as `<Foo>` by rehype-raw,
- * which swallows all subsequent content as children.
+ * open/close pairs.
  */
 function fixSelfClosingTags(markdown: string): string {
   return markdown.replace(/<([A-Z][a-zA-Z]*)((?:\s+[a-zA-Z-]+=(?:"[^"]*"|'[^']*'|{[^}]*}))*)\s*\/>/g,
@@ -19,8 +37,9 @@ function fixSelfClosingTags(markdown: string): string {
 }
 
 const DemoFallback = () => (
-  <div className="flex items-center justify-center py-8">
-    <div className="h-6 w-6 animate-spin rounded-full border-2 border-gray-300 border-t-blue-500" />
+  <div className="flex flex-col items-center justify-center py-12 bg-muted/30 rounded-3xl border border-border/50">
+    <div className="h-10 w-10 animate-spin rounded-full border-2 border-primary/20 border-t-primary" />
+    <p className="mt-4 text-xs font-bold uppercase tracking-widest text-muted-foreground/50">Initializing Demo...</p>
   </div>
 );
 
@@ -34,7 +53,9 @@ function lazyDemo(
   return function LazyDemoWrapper(props: Record<string, unknown>) {
     return (
       <Suspense fallback={<DemoFallback />}>
-        <LazyComp {...props} />
+        <div className="my-12 overflow-hidden rounded-3xl border border-border/50 shadow-2xl bg-card">
+          <LazyComp {...props} />
+        </div>
       </Suspense>
     );
   };
@@ -71,40 +92,73 @@ const COMPONENT_MAP: Record<string, React.ComponentType<Record<string, unknown>>
   typereveal: lazyDemo(interactiveImport, "TypeReveal"),
   glitchtext: lazyDemo(interactiveImport, "GlitchText"),
   tldr: ({ children, title }: { children?: React.ReactNode; title?: string }) => (
-    <div className="bg-muted/50 border border-border rounded-xl p-6 mb-8">
-      <h3 className="text-lg font-semibold mb-3 text-foreground">{title ?? "TL;DR"}</h3>
-      <div className="text-muted-foreground space-y-2 [&>ul]:space-y-2 [&>ul]:list-none [&>ul]:pl-0 [&>p]:leading-relaxed">
+    <div className="bg-primary/[0.03] border-2 border-primary/10 rounded-[2rem] p-8 my-12 relative overflow-hidden">
+      <div className="absolute top-0 right-0 p-4 opacity-5 rotate-12">
+        <Zap size={80} className="text-primary" />
+      </div>
+      <h3 className="text-lg font-black uppercase tracking-widest mb-4 text-primary flex items-center gap-2">
+        <Zap className="size-4" />
+        {title ?? "The Quick Version"}
+      </h3>
+      <div className="text-foreground/80 font-medium space-y-3 leading-relaxed">
         {children}
       </div>
     </div>
   ),
-  callout: ({ children, type }: { children?: React.ReactNode; type?: string }) => (
-    <div className={`p-4 my-6 rounded-xl border ${type === 'info' ? 'bg-blue-50 border-blue-200 dark:bg-blue-900/30 dark:border-blue-800 text-blue-900 dark:text-blue-100' :
-        type === 'success' ? 'bg-green-50 border-green-200 dark:bg-green-900/30 dark:border-green-800 text-green-900 dark:text-green-100' :
-          type === 'warning' ? 'bg-amber-50 border-amber-200 dark:bg-amber-900/30 dark:border-amber-800 text-amber-900 dark:text-amber-100' :
-            'bg-gray-50 border-gray-200 dark:bg-gray-800/50 dark:border-gray-700'
-      }`}>
-      {children}
-    </div>
-  ),
+  callout: ({ children, type }: { children?: React.ReactNode; type?: string }) => {
+    const isInfo = type === 'info' || !type;
+    const isSuccess = type === 'success';
+    const isWarning = type === 'warning';
+    
+    return (
+      <div className={cn(
+        "p-6 my-10 rounded-2xl border-l-4 shadow-sm",
+        isInfo && "bg-blue-500/[0.03] border-l-blue-500 border-y border-r border-blue-500/10 text-blue-900 dark:text-blue-100",
+        isSuccess && "bg-emerald-500/[0.03] border-l-emerald-500 border-y border-r border-emerald-500/10 text-emerald-900 dark:text-emerald-100",
+        isWarning && "bg-amber-500/[0.03] border-l-amber-500 border-y border-r border-amber-500/10 text-amber-900 dark:text-amber-100",
+      )}>
+        <div className="flex gap-4">
+          <div className="shrink-0 mt-1">
+            {isInfo && <Info size={20} className="text-blue-500" />}
+            {isSuccess && <CheckCircle2 size={20} className="text-emerald-500" />}
+            {isWarning && <AlertTriangle size={20} className="text-amber-500" />}
+          </div>
+          <div className="font-medium leading-relaxed italic">{children}</div>
+        </div>
+      </div>
+    );
+  },
   img: ({ src, alt, ...rest }: React.ImgHTMLAttributes<HTMLImageElement>) => (
-    <img
-      src={src}
-      alt={alt ?? ""}
-      loading="lazy"
-      decoding="async"
-      width={1200}
-      height={630}
-      className="rounded-2xl shadow-2xl border border-border"
-      {...rest}
-    />
+    <div className="my-12">
+      <img
+        src={src}
+        alt={alt ?? ""}
+        loading="lazy"
+        decoding="async"
+        className="rounded-3xl shadow-2xl border border-border/50 mx-auto transition-transform hover:scale-[1.01] duration-500"
+        {...rest}
+      />
+      {alt && <p className="mt-4 text-center text-xs font-bold uppercase tracking-widest text-muted-foreground/40">{alt}</p>}
+    </div>
   ),
 };
 
-export function BlogPostView({ slug, linkComponent }: { slug: string; linkComponent?: React.ComponentType<{ to: string; className?: string | undefined; children?: React.ReactNode | undefined }> | undefined }) {
+export function BlogPostView({ slug, linkComponent }: { slug: string; linkComponent?: React.ComponentType<{ to: string; className?: string; children: React.ReactNode }> | "a" }) {
   const [post, setPost] = useState<BlogPost | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
+  const [scrollProgress, setScrollProgress] = useState(0);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+      const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+      const scrolled = (winScroll / height) * 100;
+      setScrollProgress(scrolled);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   useEffect(() => {
     setLoading(true);
@@ -121,123 +175,140 @@ export function BlogPostView({ slug, linkComponent }: { slug: string; linkCompon
 
   if (loading) {
     return (
-      <div className="max-w-3xl mx-auto py-10 px-4 sm:px-6 lg:px-8 animate-pulse">
-        <div className="text-center mb-12">
-          <div className="h-4 bg-muted rounded w-1/4 mx-auto mb-6" />
-          <div className="h-12 bg-muted rounded w-3/4 mx-auto mb-6" />
-          <div className="h-6 bg-muted rounded w-1/2 mx-auto" />
-        </div>
+      <div className="max-w-4xl mx-auto py-20 px-6 animate-pulse space-y-12">
         <div className="space-y-6">
-          {Array.from({ length: 8 }).map((_, i) => (
-            <div key={i} className="h-5 bg-muted rounded" />
-          ))}
+          <div className="h-4 bg-muted rounded w-24 mx-auto" />
+          <div className="h-16 bg-muted rounded-[2rem] w-full" />
+          <div className="h-6 bg-muted rounded w-2/3 mx-auto" />
+        </div>
+        <div className="aspect-[21/9] bg-muted rounded-[3rem]" />
+        <div className="space-y-4 pt-12">
+          {[1, 2, 3, 4, 5, 6].map(i => <div key={i} className="h-4 bg-muted rounded w-full" />)}
         </div>
       </div>
     );
   }
 
   if (error || !post) {
-    const BackLink = linkComponent;
     return (
-      <div className="max-w-3xl mx-auto py-20 px-4 text-center">
-        <h1 className="text-4xl font-display font-bold text-foreground">Post not found</h1>
-        <p className="mt-6 text-xl text-muted-foreground">The post you are looking for does not exist.</p>
-        {BackLink ? (
-          <BackLink to="/blog" className="mt-8 inline-block text-primary hover:opacity-80 transition-colors font-semibold">
-            ← Back to Blog
-          </BackLink>
-        ) : (
-          <a href="/blog" className="mt-8 inline-block text-primary hover:opacity-80 transition-colors font-semibold">
-            ← Back to Blog
+      <div className="max-w-xl mx-auto py-32 px-6 text-center">
+        <div className="inline-flex size-20 items-center justify-center rounded-3xl bg-destructive/5 text-destructive mb-8">
+          <FileWarning size={40} />
+        </div>
+        <h1 className="text-4xl font-black text-foreground tracking-tighter mb-4 leading-none">Story missing in action</h1>
+        <p className="text-muted-foreground mb-10 text-lg">We couldn't find the blog post you're looking for. It might have been archived or moved.</p>
+        <Button variant="default" className="rounded-2xl px-8 font-bold" asChild>
+          <a href="/blog">
+            <ArrowLeft className="mr-2 size-4" />
+            Back to All Stories
           </a>
-        )}
+        </Button>
       </div>
     );
   }
 
-  const BackLink = linkComponent;
   const cleanContent = post.content.replace(/!\[[^\]]*\]\(https:\/\/placehold\.co\/[^)]+\)\n?/g, "");
 
   return (
     <ExperimentProvider>
-    <article className="max-w-3xl mx-auto py-10 px-4 sm:px-6 lg:px-8 font-sans">
-      <div className="mb-6">
-        {BackLink ? (
-          <BackLink to="/blog" className="text-sm text-muted-foreground hover:text-primary transition-colors">
-            &larr; Blog
-          </BackLink>
-        ) : (
-          <a href="/blog" className="text-sm text-muted-foreground hover:text-primary transition-colors">
-            &larr; Blog
-          </a>
-        )}
-      </div>
-
-      {post.heroImage && (
-        <img
-          src={post.heroImage}
-          alt={post.title}
-          loading="eager"
-          decoding="async"
-          className="w-full rounded-2xl shadow-2xl border border-border mb-8"
+      {/* Progress Bar */}
+      <div className="fixed top-0 left-0 w-full h-1.5 z-[100] bg-transparent">
+        <div 
+          className="h-full bg-primary shadow-[0_0_10px_hsl(var(--primary)/0.5)] transition-all duration-100" 
+          style={{ width: `${scrollProgress}%` }} 
         />
-      )}
+      </div>
 
-      <header className="mb-8 text-center border-b border-border pb-6">
-        <div className="flex justify-center items-center gap-3 text-sm text-muted-foreground mb-6 font-medium tracking-wide uppercase">
-          <time dateTime={post.date}>{new Date(post.date).toLocaleDateString()}</time>
-          {post.category && (
-            <>
-              <span className="text-muted-foreground/40">&bull;</span>
-              <span className="text-primary">{post.category}</span>
-            </>
-          )}
+      <article className="max-w-4xl mx-auto py-12 px-6 font-sans">
+        <div className="mb-12 flex items-center justify-between">
+          <Button variant="ghost" className="rounded-xl text-muted-foreground font-bold hover:text-primary group" asChild>
+            <a href="/blog">
+              <ChevronLeft className="mr-1 size-4 transition-transform group-hover:-translate-x-1" />
+              Stories
+            </a>
+          </Button>
+          <div className="flex items-center gap-2">
+            <Button variant="ghost" size="icon" className="rounded-xl text-muted-foreground hover:text-foreground">
+              <Share2 size={18} />
+            </Button>
+          </div>
         </div>
-        <h1 className="text-3xl sm:text-5xl font-display font-extrabold text-foreground tracking-tight leading-tight mb-6 drop-shadow-sm">
-          {post.title}
-        </h1>
-        {post.primer && (
-          <p className="text-base text-muted-foreground italic mb-4">
-            {post.primer}
-          </p>
+
+        {post.heroImage && (
+          <div className="mb-16 rounded-[3rem] overflow-hidden shadow-2xl ring-1 ring-border/5">
+            <img
+              src={post.heroImage}
+              alt={post.title}
+              loading="eager"
+              decoding="async"
+              className="w-full aspect-[21/9] object-cover"
+            />
+          </div>
         )}
-        {post.description && (
-          <p className="text-lg sm:text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed font-light">
-            {post.description}
-          </p>
-        )}
-      </header>
 
-      <div className="prose dark:prose-invert max-w-none
-        prose-headings:font-display prose-headings:font-bold prose-headings:text-foreground prose-headings:tracking-tight
-        prose-h1:text-3xl prose-h2:text-2xl prose-h3:text-xl
-        prose-p:text-muted-foreground prose-p:leading-relaxed prose-p:font-sans
-        prose-a:text-primary prose-a:no-underline hover:prose-a:underline hover:prose-a:opacity-80
-        prose-strong:text-foreground prose-strong:font-semibold
-        prose-blockquote:border-l-primary prose-blockquote:bg-muted/30 prose-blockquote:py-2 prose-blockquote:px-6 prose-blockquote:text-foreground prose-blockquote:font-medium prose-blockquote:italic
-        prose-code:text-primary prose-code:bg-muted/50 prose-code:px-2 prose-code:py-1 prose-code:rounded-md prose-code:before:content-none prose-code:after:content-none
-        prose-pre:bg-muted prose-pre:border prose-pre:border-border
-        prose-img:rounded-2xl prose-img:shadow-2xl prose-img:border prose-img:border-border
-        prose-table:w-full prose-table:border-collapse
-        prose-thead:bg-muted/50
-        prose-th:border prose-th:border-border prose-th:px-4 prose-th:py-2 prose-th:text-left prose-th:text-foreground prose-th:font-semibold
-        prose-td:border prose-td:border-border prose-td:px-4 prose-td:py-2 prose-td:text-muted-foreground
-        prose-ul:text-muted-foreground prose-ol:text-muted-foreground
-        prose-li:marker:text-primary">
-        <Markdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]} components={COMPONENT_MAP as unknown as Record<string, React.ComponentType>}>
-          {fixSelfClosingTags(cleanContent)}
-        </Markdown>
-      </div>
+        <header className="mb-16 max-w-3xl mx-auto space-y-8">
+          <div className="flex items-center gap-4 text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/60">
+            <div className="flex items-center gap-1.5 bg-primary/10 text-primary px-3 py-1 rounded-full border border-primary/10">
+              <Tag size={12} />
+              <span>{post.category}</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <Clock size={12} />
+              <span>{new Date(post.date).toLocaleDateString([], { month: 'long', day: 'numeric', year: 'numeric' })}</span>
+            </div>
+          </div>
+          
+          <h1 className="text-5xl sm:text-7xl font-black text-foreground tracking-tighter leading-[0.85] text-balance">
+            {post.title}
+          </h1>
+          
+          {post.primer && (
+            <p className="text-xl sm:text-2xl text-muted-foreground/80 font-medium leading-relaxed italic border-l-4 border-primary/20 pl-6">
+              "{post.primer}"
+            </p>
+          )}
+          
+          <div className="flex items-center gap-3 pt-4 border-t border-border/50">
+            <div className="size-10 rounded-2xl bg-primary flex items-center justify-center text-xs font-black text-primary-foreground shadow-lg shadow-primary/20">
+              {post.author?.[0] || "S"}
+            </div>
+            <div>
+              <p className="text-xs font-black uppercase tracking-widest text-foreground">{post.author || "Spike land Team"}</p>
+              <p className="text-[10px] font-bold text-muted-foreground/60 uppercase tracking-tighter">Independent Developer & Researcher</p>
+            </div>
+          </div>
+        </header>
 
-      <SupportWidget post={post} />
+        <div className="prose dark:prose-invert max-w-3xl mx-auto
+          prose-headings:font-black prose-headings:text-foreground prose-headings:tracking-tighter
+          prose-h1:text-4xl prose-h2:text-3xl prose-h2:mt-16 prose-h2:mb-8
+          prose-h3:text-2xl prose-h3:mt-12 prose-h3:mb-6
+          prose-p:text-lg prose-p:text-muted-foreground prose-p:leading-relaxed prose-p:font-medium
+          prose-a:text-primary prose-a:font-bold prose-a:no-underline hover:prose-a:underline
+          prose-strong:text-foreground prose-strong:font-black
+          prose-blockquote:border-l-4 prose-blockquote:border-primary/30 prose-blockquote:bg-primary/[0.02] prose-blockquote:py-6 prose-blockquote:px-8 prose-blockquote:rounded-r-3xl prose-blockquote:text-foreground prose-blockquote:font-bold prose-blockquote:italic
+          prose-code:text-primary prose-code:bg-primary/[0.05] prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded-lg prose-code:before:content-none prose-code:after:content-none prose-code:font-bold
+          prose-pre:bg-muted/50 prose-pre:border-2 prose-pre:border-border/50 prose-pre:rounded-[2rem] prose-pre:p-8
+          prose-li:text-muted-foreground prose-li:font-medium
+          prose-ul:list-disc prose-ol:list-decimal
+          prose-img:rounded-[2.5rem] prose-img:shadow-2xl prose-img:border prose-img:border-border/50
+          selection:bg-primary selection:text-primary-foreground">
+          <Markdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]} components={COMPONENT_MAP as Record<string, React.ComponentType<Record<string, unknown>>>}>
+            {fixSelfClosingTags(cleanContent)}
+          </Markdown>
+        </div>
 
-      <div className="mt-16 pt-8 border-t border-border">
-        <h2 className="text-2xl font-display font-bold text-foreground mb-8 text-center">
-          More from the blog
-        </h2>
-        <BlogListView linkComponent={linkComponent} limit={3} showHeader={false} />
-      </div>
-    </article>
+        <div className="max-w-3xl mx-auto">
+          <SupportWidget post={post} />
+        </div>
+
+        <div className="mt-32 pt-16 border-t border-border/50">
+          <h2 className="text-3xl font-black tracking-tight text-center mb-16">
+            Continue Reading
+          </h2>
+          <BlogListView linkComponent={linkComponent} limit={3} showHeader={false} />
+        </div>
+      </article>
     </ExperimentProvider>
   );
 }
@@ -245,33 +316,16 @@ export function BlogPostView({ slug, linkComponent }: { slug: string; linkCompon
 // ─── Support Widget ─────────────────────────────────────────────────────────
 
 const SLIDER_STOPS = [
-  { amount: 0, label: "Moral support (we accept tears)", sub: "Free. Like our time, apparently." },
-  { amount: 1, label: "One mass-produced coffee", sub: "The kind that tastes like ambition and regret" },
-  { amount: 3, label: "A proper flat white", sub: "Brighton prices, obviously" },
-  { amount: 5, label: "Gian Pierre gets a treat", sub: "He has earned it. Unlike us." },
-  { amount: 10, label: "A week of domain renewals", sub: "spike.land does not host itself" },
-  { amount: 25, label: "One month of Cloudflare Workers", sub: "D1 queries are not free. Except the first billion." },
-  { amount: 50, label: "The 'holy shit someone actually paid' tier", sub: "We will screenshot this and frame it" },
-  { amount: 100, label: "Redundancy survival fund", sub: "One month closer to not having to explain the gap" },
+  { amount: 0, label: "Moral support", sub: "Keep building awesome stuff!", icon: Heart },
+  { amount: 1, label: "A tiny coffee", sub: "Fuel for the next MCP tool.", icon: Coffee },
+  { amount: 5, label: "The proper brew", sub: "A high-end Brighton flat white.", icon: Coffee },
+  { amount: 10, label: "Server runtime", sub: "Covers our edge hosting for a week.", icon: Zap },
+  { amount: 25, label: "Growth Fund", sub: "Help us build more complex agents.", icon: Shield },
+  { amount: 100, label: "Legend Tier", sub: "We will name a variable after you.", icon: Gift },
 ] as const;
 
 function getArticleCopy(category: string, tags: string[]): string {
-  const lc = category.toLowerCase();
-  const tagSet = new Set(tags.map((t) => t.toLowerCase()));
-
-  if (lc.includes("developer experience") || tagSet.has("developer-tools") || tagSet.has("dx")) {
-    return "This post was debugged with mass-produced coffee and questionable life choices.";
-  }
-  if (lc.includes("ai") || tagSet.has("agents") || tagSet.has("claude") || tagSet.has("llm")) {
-    return "Training AI costs money. Training the humans who wrangle AI costs dignity. Both are running low.";
-  }
-  if (lc.includes("architecture") || lc.includes("infrastructure") || tagSet.has("cloudflare")) {
-    return "Every Worker invocation is a prayer to the edge. Some prayers need funding.";
-  }
-  if (lc.includes("testing") || lc.includes("quality") || tagSet.has("vitest") || tagSet.has("qa")) {
-    return "We test in production because we cannot afford staging. Help us afford staging.";
-  }
-  return "Written by an independent developer in Brighton, UK. Recently made redundant. No VC, no team — just a laptop, a mass of MCP servers, and an ungodly amount of mass-produced coffee.";
+  return "Independent development is a labor of love. No VC funding, no bloated team—just code, mass-produced coffee, and a vision for an agentic future. If you find value in these tools, consider supporting the journey.";
 }
 
 function getClientId(): string {
@@ -302,38 +356,15 @@ function SupportWidget({ post }: { post: BlogPost }) {
   const [bumpAnimating, setBumpAnimating] = useState(false);
   const [donating, setDonating] = useState(false);
   const [thankYou, setThankYou] = useState(false);
-  const bumpRef = useRef<HTMLButtonElement>(null);
-  const sliderStartedRef = useRef(false);
-  const sliderFinalTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  
+  const currentStop = SLIDER_STOPS[sliderIdx] || SLIDER_STOPS[0];
+  const Icon = currentStop.icon;
 
-  // Sync slider default when experiment config loads
   useEffect(() => {
-    if (!sliderStartedRef.current) {
-      setSliderIdx(config.defaultSliderIdx);
-    }
-  }, [config.defaultSliderIdx]);
-
-  // Check thank-you state from URL
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    if (params.get("supported") === "1") {
-      setThankYou(true);
-      track("thankyou_viewed");
-      // Clean the URL
-      const cleaned = window.location.pathname;
-      window.history.replaceState({}, "", cleaned);
-    }
-  }, [track]);
-
-  // Check if already bumped
-  useEffect(() => {
-    const bumpKey = `spike_bumped_${slug}`;
-    if (localStorage.getItem(bumpKey)) {
-      setBumped(true);
-    }
+    if (!localStorage.getItem(`spike_bumped_${slug}`)) return;
+    setBumped(true);
   }, [slug]);
 
-  // Fetch engagement stats
   useEffect(() => {
     fetch(`/api/support/engagement/${encodeURIComponent(slug)}`)
       .then((r) => r.ok ? r.json() as Promise<{ fistBumps: number; supporters: number }> : null)
@@ -348,10 +379,8 @@ function SupportWidget({ post }: { post: BlogPost }) {
 
   const handleBump = useCallback(async () => {
     if (bumped) return;
-    track("fistbump_click");
     setBumpAnimating(true);
     setTimeout(() => setBumpAnimating(false), 600);
-
     try {
       const res = await fetch("/api/support/fistbump", {
         method: "POST",
@@ -362,211 +391,124 @@ function SupportWidget({ post }: { post: BlogPost }) {
       setBumpCount(data.count);
       setBumped(true);
       localStorage.setItem(`spike_bumped_${slug}`, "1");
-    } catch {
-      // Silent fail
-    }
-  }, [bumped, slug, track]);
+    } catch {}
+  }, [bumped, slug]);
 
   const handleDonate = useCallback(async () => {
-    const stop = SLIDER_STOPS[sliderIdx];
-    const amount = showCustom
-      ? parseFloat(customAmount)
-      : stop?.amount ?? 5;
-
+    const amount = showCustom ? parseFloat(customAmount) : currentStop.amount;
     if (!amount || amount < 1) return;
-    track("donate_click", { amount });
     setDonating(true);
-
     try {
-      track("checkout_started", { amount });
       const res = await fetch("/api/support/donate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ slug, amount, clientId: getClientId() }),
       });
-      const data = await res.json() as { url?: string; error?: string };
-      if (data.url) {
-        window.location.href = data.url;
-      }
+      const data = await res.json() as { url?: string };
+      if (data.url) window.location.href = data.url;
     } catch {
       setDonating(false);
     }
-  }, [sliderIdx, showCustom, customAmount, slug, track]);
-
-  const currentStop = SLIDER_STOPS[sliderIdx];
-  const copy = getArticleCopy(post.category, post.tags);
+  }, [currentStop.amount, showCustom, customAmount, slug]);
 
   return (
-    <div ref={widgetRef} className="border-t border-border mt-12 pt-8">
-      {/* Thank-you confetti state */}
-      {thankYou && (
-        <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-xl p-6 mb-6 text-center">
-          <p className="text-2xl mb-2">🎉</p>
-          <p className="text-green-900 dark:text-green-100 font-semibold">You absolute legend.</p>
-          <p className="text-green-700 dark:text-green-300 text-sm mt-1">
-            Your support means more than you know. Seriously. We might frame this.
-          </p>
-        </div>
-      )}
-
-      {/* Article-adapted copy */}
-      <p className="text-sm text-muted-foreground leading-relaxed mb-6">
-        {copy}
-      </p>
-
-      {/* Engagement counters — variant-controlled */}
-      {config.showSocialProof && (
-        <div className="flex flex-wrap items-center gap-4 text-xs text-muted-foreground/70 mb-6">
-          <span>👊 {config.socialProofStyle === "fuzzy" && bumpCount >= 10 ? `${Math.floor(bumpCount / 10) * 10}+` : config.socialProofStyle === "recent" ? "Recent" : bumpCount} fist bump{bumpCount !== 1 ? "s" : ""}</span>
-          {supporters > 0 && (
-            <span>💛 {config.socialProofStyle === "fuzzy" && supporters >= 10 ? `${Math.floor(supporters / 10) * 10}+` : config.socialProofStyle === "recent" ? `${Math.min(supporters, 3)} this week` : supporters} supporter{supporters !== 1 ? "s" : ""}</span>
-          )}
-        </div>
-      )}
-
-      {/* Fist Bump button */}
-      <div className="mb-6">
-        <button
-          ref={bumpRef}
-          onClick={handleBump}
-          disabled={bumped}
-          className={`
-            inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-medium
-            transition-all duration-200
-            ${bumped
-              ? "bg-muted text-muted-foreground cursor-default"
-              : "bg-foreground text-background hover:opacity-90 active:scale-95 cursor-pointer"
-            }
-            ${bumpAnimating ? "scale-110" : ""}
-          `}
-          style={{
-            transition: bumpAnimating
-              ? "transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)"
-              : "transform 0.2s ease, opacity 0.2s ease",
-          }}
-        >
-          <span className={`text-lg ${bumpAnimating ? "animate-bounce" : ""}`}>
-            {bumped ? "✊" : "👊"}
-          </span>
-          {bumped ? "Bumped!" : "Fist bump (free)"}
-        </button>
+    <div ref={widgetRef} className="mt-20 p-8 sm:p-12 rounded-[3rem] bg-card border border-border/50 shadow-2xl relative overflow-hidden">
+      <div className="absolute top-0 right-0 p-8 opacity-[0.03] pointer-events-none">
+        <Heart size={200} fill="currentColor" />
       </div>
 
-      {/* Slider */}
-      <div className="bg-muted/30 border border-border rounded-xl p-5 mb-6">
-        <p className="text-xs text-muted-foreground mb-3 font-medium uppercase tracking-wide">
-          Sponsor Zoltan & Gian Pierre
+      <div className="max-w-2xl relative z-10">
+        <h3 className="text-3xl font-black tracking-tight mb-4">Support the Journey</h3>
+        <p className="text-lg text-muted-foreground/80 font-medium leading-relaxed mb-10">
+          {getArticleCopy(post.category, post.tags)}
         </p>
 
-        <input
-          type="range"
-          min={0}
-          max={SLIDER_STOPS.length - 1}
-          step={1}
-          value={sliderIdx}
-          onChange={(e) => {
-            const idx = parseInt(e.target.value, 10);
-            if (!sliderStartedRef.current) {
-              sliderStartedRef.current = true;
-              track("slider_start", { initial_idx: sliderIdx });
-            }
-            track("slider_change", { idx, amount: SLIDER_STOPS[idx]?.amount ?? 0 });
-            // Debounce slider_final (2s after last change)
-            if (sliderFinalTimerRef.current) clearTimeout(sliderFinalTimerRef.current);
-            sliderFinalTimerRef.current = setTimeout(() => {
-              track("slider_final", { idx, amount: SLIDER_STOPS[idx]?.amount ?? 0 });
-            }, 2000);
-            setSliderIdx(idx);
-            setShowCustom(false);
-          }}
-          className="w-full h-2 bg-border rounded-full appearance-none cursor-pointer
-            [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:h-5
-            [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-primary [&::-webkit-slider-thumb]:cursor-pointer
-            [&::-webkit-slider-thumb]:shadow-md [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-background
-            [&::-moz-range-thumb]:w-5 [&::-moz-range-thumb]:h-5 [&::-moz-range-thumb]:rounded-full
-            [&::-moz-range-thumb]:bg-primary [&::-moz-range-thumb]:cursor-pointer [&::-moz-range-thumb]:border-2
-            [&::-moz-range-thumb]:border-background"
-        />
-
-        {/* Slider label */}
-        {currentStop && (
-          <div className="mt-3">
-            <div className="flex items-baseline gap-2">
-              <span className="text-2xl font-bold text-foreground">
-                {currentStop.amount === 0 ? "$0" : `$${currentStop.amount}`}
-              </span>
-              <span className="text-sm font-medium text-foreground">
-                {currentStop.label}
-              </span>
-            </div>
-            <p className="text-xs text-muted-foreground mt-1 italic">
-              {currentStop.sub}
-            </p>
-          </div>
-        )}
-
-        {/* Custom amount toggle */}
-        <button
-          onClick={() => { if (!showCustom) track("custom_toggle"); setShowCustom(!showCustom); }}
-          className="text-xs text-primary hover:opacity-80 mt-3 transition-colors"
-        >
-          {showCustom ? "← Back to presets" : "Name your price, champion →"}
-        </button>
-
-        {showCustom && (
-          <div className="flex items-center gap-2 mt-2">
-            <span className="text-sm text-muted-foreground">$</span>
-            <input
-              type="number"
-              min={1}
-              max={999}
-              value={customAmount}
-              onChange={(e) => { setCustomAmount(e.target.value); track("custom_value", { amount: parseFloat(e.target.value) || 0 }); }}
-              placeholder="Your amount"
-              className="w-24 px-3 py-1.5 text-sm rounded-lg border border-border bg-background text-foreground"
-            />
-          </div>
-        )}
-
-        {/* Donate button — only for amounts > $0 */}
-        {(showCustom || (currentStop && currentStop.amount > 0)) && (
-          <button
-            onClick={handleDonate}
-            disabled={donating || (showCustom && (!customAmount || parseFloat(customAmount) < 1))}
-            className="mt-4 w-full px-4 py-2.5 rounded-lg text-white font-medium text-sm
-              hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed transition-opacity"
-            style={{ backgroundColor: config.ctaColor }}
+        <div className="flex flex-col sm:flex-row gap-6 mb-12">
+          <Button 
+            variant={bumped ? "outline" : "default"}
+            className={cn(
+              "rounded-2xl h-14 px-8 font-black uppercase tracking-widest text-xs transition-all duration-500",
+              !bumped && "shadow-xl shadow-primary/20 hover:scale-105 active:scale-95"
+            )}
+            onClick={handleBump}
+            disabled={bumped}
           >
-            {donating
-              ? "Redirecting to Stripe..."
-              : showCustom
-                ? config.ctaText.replace("${amount}", `$${customAmount || "..."}`).replace("{n}", String(supporters))
-                : config.ctaText.replace("${amount}", `$${currentStop?.amount ?? 5}`).replace("{n}", String(supporters))
-            }
-          </button>
-        )}
-      </div>
+            <Heart className={cn("mr-2 size-4", bumpAnimating && "animate-ping")} fill={bumped ? "currentColor" : "none"} />
+            {bumped ? "Sent Love" : "Fist Bump"}
+          </Button>
+          <div className="flex flex-col justify-center">
+            <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/40">Engagement</p>
+            <p className="text-sm font-bold text-foreground">{bumpCount} fist bumps &middot; {supporters} supporters</p>
+          </div>
+        </div>
 
-      {/* Share links */}
-      <div className="flex flex-wrap items-center gap-4 text-sm">
-        <a
-          href={xIntent}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-muted-foreground hover:text-foreground transition-colors"
-          onClick={() => track("share_click", { target: "x" })}
-        >
-          Share on X
-        </a>
-        <a
-          href={linkedInIntent}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-muted-foreground hover:text-foreground transition-colors"
-          onClick={() => track("share_click", { target: "linkedin" })}
-        >
-          Share on LinkedIn
-        </a>
+        <div className="space-y-8 bg-muted/30 rounded-[2rem] p-8 border border-border/50">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <div className="size-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary">
+                <Icon className="size-6" />
+              </div>
+              <div>
+                <p className="text-2xl font-black leading-none">${showCustom ? customAmount || '0' : currentStop.amount}</p>
+                <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest mt-1">{currentStop.label}</p>
+              </div>
+            </div>
+            <button 
+              onClick={() => setShowCustom(!showCustom)}
+              className="text-[10px] font-black uppercase tracking-widest text-primary hover:opacity-80 transition-opacity"
+            >
+              {showCustom ? "Presets" : "Custom"}
+            </button>
+          </div>
+
+          {!showCustom && (
+            <input
+              type="range"
+              min={0}
+              max={SLIDER_STOPS.length - 1}
+              step={1}
+              value={sliderIdx}
+              onChange={(e) => setSliderIdx(parseInt(e.target.value))}
+              className="w-full h-2 bg-border rounded-full appearance-none cursor-pointer accent-primary"
+            />
+          )}
+
+          {showCustom && (
+            <div className="relative">
+              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground/50 font-black">$</span>
+              <input 
+                type="number" 
+                value={customAmount}
+                onChange={(e) => setCustomAmount(e.target.value)}
+                placeholder="0.00"
+                className="w-full h-14 bg-background border-2 border-border/50 rounded-2xl px-8 font-black text-xl focus:border-primary focus:outline-none transition-all"
+              />
+            </div>
+          )}
+
+          <p className="text-xs font-medium text-muted-foreground italic leading-relaxed">
+            "{currentStop.sub}"
+          </p>
+
+          <Button 
+            className="w-full rounded-2xl h-14 font-black uppercase tracking-widest text-xs shadow-xl shadow-primary/20"
+            onClick={handleDonate}
+            loading={donating}
+            disabled={!showCustom && currentStop.amount === 0}
+          >
+            {donating ? "Redirecting..." : "Support Development"}
+          </Button>
+        </div>
+
+        <div className="mt-12 flex flex-wrap items-center gap-6">
+          <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/40">Spread the Word</p>
+          <a href={xIntent} target="_blank" rel="noopener noreferrer" className="text-xs font-bold text-muted-foreground hover:text-primary transition-colors flex items-center gap-1.5">
+            <Twitter size={14} /> X / Twitter
+          </a>
+          <a href={linkedInIntent} target="_blank" rel="noopener noreferrer" className="text-xs font-bold text-muted-foreground hover:text-primary transition-colors flex items-center gap-1.5">
+            <Linkedin size={14} /> LinkedIn
+          </a>
+        </div>
       </div>
     </div>
   );

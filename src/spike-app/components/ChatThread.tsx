@@ -1,4 +1,7 @@
-import { type KeyboardEvent, useEffect, useRef, useState } from "react";
+import { type KeyboardEvent, useEffect, useRef, useState, useCallback } from "react";
+import { Button } from "@/shared/ui/button";
+import { Send, Copy, Check, User, Bot, Loader2 } from "lucide-react";
+import { cn } from "@/shared/utils/cn";
 
 interface Message {
   id: string;
@@ -13,6 +16,64 @@ interface ChatThreadProps {
   isLoading?: boolean;
 }
 
+function MessageItem({ msg }: { msg: Message }) {
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = useCallback(() => {
+    navigator.clipboard.writeText(msg.content);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  }, [msg.content]);
+
+  return (
+    <div
+      className={cn(
+        "group flex w-full flex-col gap-2 mb-4",
+        msg.role === "user" ? "items-end" : "items-start"
+      )}
+    >
+      <div className="flex items-center gap-2 px-1">
+        {msg.role === "assistant" && <Bot className="size-3.5 text-primary" />}
+        <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/50">
+          {msg.role}
+        </span>
+        {msg.role === "user" && <User className="size-3.5 text-muted-foreground" />}
+      </div>
+      <div
+        className={cn(
+          "relative max-w-[85%] rounded-2xl px-4 py-3 text-sm shadow-sm transition-all",
+          msg.role === "user"
+            ? "bg-primary text-primary-foreground rounded-tr-none"
+            : "bg-card border border-border text-foreground rounded-tl-none hover:border-primary/30"
+        )}
+      >
+        <p className="whitespace-pre-wrap leading-relaxed">{msg.content}</p>
+        
+        {msg.role === "assistant" && (
+          <button
+            onClick={handleCopy}
+            className="absolute -right-8 top-0 p-1.5 opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-primary"
+            title="Copy message"
+          >
+            {copied ? <Check className="size-3.5 text-green-500" /> : <Copy className="size-3.5" />}
+          </button>
+        )}
+
+        {msg.timestamp && (
+          <p
+            className={cn(
+              "mt-2 text-[10px] font-medium",
+              msg.role === "user" ? "text-primary-foreground/60" : "text-muted-foreground/60"
+            )}
+          >
+            {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+          </p>
+        )}
+      </div>
+    </div>
+  );
+}
+
 export function ChatThread({ messages, onSendMessage, isLoading }: ChatThreadProps) {
   const [input, setInput] = useState("");
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -20,7 +81,10 @@ export function ChatThread({ messages, onSendMessage, isLoading }: ChatThreadPro
 
   useEffect(() => {
     if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+      scrollRef.current.scrollTo({
+        top: scrollRef.current.scrollHeight,
+        behavior: "smooth",
+      });
     }
   }, [messages.length, isLoading]);
 
@@ -29,76 +93,82 @@ export function ChatThread({ messages, onSendMessage, isLoading }: ChatThreadPro
     if (!trimmed || isLoading) return;
     onSendMessage(trimmed);
     setInput("");
+    if (inputRef.current) {
+      inputRef.current.style.height = "auto";
+    }
     inputRef.current?.focus();
   }
 
   function handleKeyDown(e: KeyboardEvent<HTMLTextAreaElement>) {
-    if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) {
+    if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       handleSend();
     }
   }
 
+  const handleInput = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setInput(e.target.value);
+    e.target.style.height = "auto";
+    e.target.style.height = `${Math.min(e.target.scrollHeight, 200)}px`;
+  };
+
   return (
-    <div className="flex h-full flex-col">
-      <div ref={scrollRef} className="flex-1 space-y-3 overflow-y-auto p-4">
+    <div className="flex h-full flex-col bg-muted/30">
+      <div 
+        ref={scrollRef} 
+        role="log"
+        aria-label="Chat history"
+        className="flex-1 overflow-y-auto p-4 md:p-6"
+      >
         {messages.length === 0 && (
-          <div className="py-12 text-center text-sm text-muted-foreground">
-            No messages yet. Start a conversation.
+          <div className="flex flex-col items-center justify-center h-full text-center space-y-4 py-12">
+            <div className="p-4 rounded-full bg-primary/5">
+              <Bot className="size-8 text-primary/40" />
+            </div>
+            <div>
+              <h3 className="text-sm font-semibold text-foreground">No messages yet</h3>
+              <p className="text-xs text-muted-foreground mt-1 max-w-[200px]">
+                Start a conversation with the AI assistant to build your application.
+              </p>
+            </div>
           </div>
         )}
         {messages.map((msg) => (
-          <div
-            key={msg.id}
-            className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
-          >
-            <div
-              className={`max-w-[75%] rounded-2xl px-4 py-2.5 text-sm ${
-                msg.role === "user" ? "bg-primary text-primary-foreground" : "bg-muted text-foreground"
-              }`}
-            >
-              <p className="whitespace-pre-wrap">{msg.content}</p>
-              {msg.timestamp && (
-                <p
-                  className={`mt-1 text-[10px] ${
-                    msg.role === "user" ? "text-primary-foreground/70" : "text-muted-foreground"
-                  }`}
-                >
-                  {new Date(msg.timestamp).toLocaleTimeString()}
-                </p>
-              )}
-            </div>
-          </div>
+          <MessageItem key={msg.id} msg={msg} />
         ))}
         {isLoading && (
-          <div className="flex justify-start">
-            <div className="flex items-center gap-1 rounded-2xl bg-muted px-4 py-3">
-              <span className="h-2 w-2 animate-bounce rounded-full bg-muted-foreground [animation-delay:0ms]" />
-              <span className="h-2 w-2 animate-bounce rounded-full bg-muted-foreground [animation-delay:150ms]" />
-              <span className="h-2 w-2 animate-bounce rounded-full bg-muted-foreground [animation-delay:300ms]" />
+          <div className="flex items-start gap-3 mb-4">
+            <div className="flex items-center gap-2 rounded-2xl bg-card border border-border px-4 py-3 shadow-sm">
+              <Loader2 className="size-4 animate-spin text-primary" />
+              <span className="text-xs font-medium text-muted-foreground animate-pulse">Assistant is thinking...</span>
             </div>
           </div>
         )}
       </div>
-      <div className="border-t border-border p-3">
-        <div className="flex gap-2">
+      
+      <div className="border-t border-border bg-card p-4 shadow-[0_-4px_12px_rgba(0,0,0,0.02)]">
+        <div className="mx-auto max-w-4xl relative flex items-end gap-2">
           <textarea
             ref={inputRef}
             value={input}
-            onChange={(e) => setInput(e.target.value)}
+            onChange={handleInput}
             onKeyDown={handleKeyDown}
-            placeholder="Type a message... (Ctrl+Enter to send)"
-            rows={2}
-            className="flex-1 resize-none rounded-lg border border-border bg-card px-3 py-2 text-sm text-card-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+            placeholder="Describe what you want to build..."
+            rows={1}
+            className="flex-1 resize-none rounded-xl border border-border bg-muted/50 px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:bg-card focus:outline-none focus:ring-4 focus:ring-primary/5 transition-all min-h-[46px]"
           />
-          <button
+          <Button
             onClick={handleSend}
             disabled={!input.trim() || isLoading}
-            className="self-end rounded-lg bg-primary px-4 py-2 text-sm text-primary-foreground hover:bg-primary/90 disabled:opacity-50 transition-colors"
+            size="icon"
+            className="shrink-0 size-[46px] rounded-xl shadow-lg shadow-primary/20"
           >
-            Send
-          </button>
+            <Send className="size-4" />
+          </Button>
         </div>
+        <p className="text-[10px] text-center text-muted-foreground mt-2">
+          Press <strong>Enter</strong> to send, <strong>Shift+Enter</strong> for new line
+        </p>
       </div>
     </div>
   );

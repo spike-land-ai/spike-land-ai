@@ -25,19 +25,19 @@ export function registerCustomerTools(server: McpServer, client: StripeClient): 
         const charges = result.data.filter((c) => c.status === "succeeded");
         const totalSpend = charges.reduce((sum, c) => sum + c.amount, 0);
 
-        const firstCharge = charges[charges.length - 1];
-        const lastCharge = charges[0];
+        const earliestCharge = charges[charges.length - 1];
+        const latestCharge = charges[0];
 
         return jsonResult({
           customer_id: String(args.customer_id),
           total_spend: totalSpend,
           charge_count: charges.length,
           average_charge: charges.length > 0 ? totalSpend / charges.length : 0,
-          first_charge: firstCharge
-            ? new Date(firstCharge.created * 1000).toISOString()
+          first_charge: earliestCharge
+            ? new Date(earliestCharge.created * 1000).toISOString()
             : null,
-          last_charge: lastCharge
-            ? new Date(lastCharge.created * 1000).toISOString()
+          last_charge: latestCharge
+            ? new Date(latestCharge.created * 1000).toISOString()
             : null,
         });
       }
@@ -109,8 +109,8 @@ export function registerCustomerTools(server: McpServer, client: StripeClient): 
             currency: result.data.currency,
           });
         } else {
-          // Some customers may not have upcoming invoices
-          if (!result.error.message.includes("404")) {
+          // Some customers may not have upcoming invoices (Stripe returns 404)
+          if (!result.error.message.includes("404") && !result.error.message.includes("invoice_upcoming_none")) {
             errors.push(`${customerId}: ${result.error.message}`);
           }
         }

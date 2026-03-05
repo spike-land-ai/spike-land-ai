@@ -1,12 +1,22 @@
+import type { ReactNode } from "react";
+import { 
+  HelpCircle, 
+  Pencil, 
+  Settings, 
+  Circle, 
+  Square, 
+  X 
+} from "lucide-react";
+
 type AppStatus = "prompting" | "drafting" | "building" | "live" | "archived" | "deleted";
 
-const statusConfig: Record<AppStatus, { color: string; icon: string }> = {
-  prompting: { color: "bg-warning text-warning-foreground", icon: "?" },
-  drafting: { color: "bg-info text-info-foreground", icon: "\u270E" },
-  building: { color: "bg-warning text-warning-foreground", icon: "\u2699" },
-  live: { color: "bg-success text-success-foreground", icon: "\u25CF" },
-  archived: { color: "bg-muted text-muted-foreground", icon: "\u25A0" },
-  deleted: { color: "bg-destructive text-destructive-foreground", icon: "\u2715" },
+const statusConfig: Record<AppStatus, { color: string; icon: ReactNode }> = {
+  prompting: { color: "bg-warning text-warning-foreground", icon: <HelpCircle className="size-3" /> },
+  drafting: { color: "bg-info text-info-foreground", icon: <Pencil className="size-3" /> },
+  building: { color: "bg-warning text-warning-foreground", icon: <Settings className="size-3 animate-spin-slow" /> },
+  live: { color: "bg-success text-success-foreground", icon: <Circle className="size-3 fill-current" /> },
+  archived: { color: "bg-muted text-muted-foreground", icon: <Square className="size-3" /> },
+  deleted: { color: "bg-destructive text-destructive-foreground", icon: <X className="size-3" /> },
 };
 
 interface StatusBadgeProps {
@@ -17,10 +27,12 @@ export function StatusBadge({ status }: StatusBadgeProps) {
   const config = statusConfig[status] ?? statusConfig.drafting;
   return (
     <span
-      className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium ${config.color}`}
+      role="status"
+      aria-label={`Status: ${status}`}
+      className={`inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-xs font-medium transition-colors ${config.color}`}
     >
-      <span className="text-[10px]">{config.icon}</span>
-      {status}
+      {config.icon}
+      <span className="capitalize">{status}</span>
     </span>
   );
 }

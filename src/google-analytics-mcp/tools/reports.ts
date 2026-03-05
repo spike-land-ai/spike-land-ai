@@ -74,8 +74,8 @@ export function registerReportTools(
     schema: {
       dimensions: z.array(z.string()).describe('Dimension names, e.g. ["date","country"]'),
       metrics: z.array(z.string()).describe('Metric names, e.g. ["sessions","activeUsers"]'),
-      date_range_start: z.string().describe("Start date (YYYY-MM-DD)"),
-      date_range_end: z.string().describe("End date (YYYY-MM-DD)"),
+      date_range_start: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Must be YYYY-MM-DD").describe("Start date (YYYY-MM-DD)"),
+      date_range_end: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Must be YYYY-MM-DD").describe("End date (YYYY-MM-DD)"),
       dimension_filter: DimensionFilterSchema.optional().describe("Optional dimension filter"),
       metric_filter: MetricFilterSchema.optional().describe("Optional metric filter"),
       limit: z.number().int().min(1).max(100000).default(1000).describe("Max rows to return"),
@@ -84,7 +84,7 @@ export function registerReportTools(
     handler: async (args) => {
       const headers = await auth.authHeaders();
       const body = buildReportBody(args as Parameters<typeof buildReportBody>[0]);
-      const url = `https://analyticsdata.googleapis.com/v1beta/properties/${propertyId}:runReport`;
+      const url = `https://analyticsdata.googleapis.com/v1/properties/${propertyId}:runReport`;
 
       const result = await tryCatch(
         fetch(url, { method: "POST", headers, body: JSON.stringify(body) }),
@@ -114,8 +114,8 @@ export function registerReportTools(
           z.object({
             dimensions: z.array(z.string()).describe("Dimension names"),
             metrics: z.array(z.string()).describe("Metric names"),
-            date_range_start: z.string().describe("Start date (YYYY-MM-DD)"),
-            date_range_end: z.string().describe("End date (YYYY-MM-DD)"),
+            date_range_start: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Must be YYYY-MM-DD").describe("Start date (YYYY-MM-DD)"),
+            date_range_end: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Must be YYYY-MM-DD").describe("End date (YYYY-MM-DD)"),
             limit: z.number().int().min(1).max(100000).default(1000).optional(),
           }),
         )
@@ -140,7 +140,7 @@ export function registerReportTools(
         limit: r.limit ?? 1000,
       }));
 
-      const url = `https://analyticsdata.googleapis.com/v1beta/properties/${propertyId}:batchRunReports`;
+      const url = `https://analyticsdata.googleapis.com/v1/properties/${propertyId}:batchRunReports`;
       const result = await tryCatch(
         fetch(url, { method: "POST", headers, body: JSON.stringify({ requests }) }),
       );

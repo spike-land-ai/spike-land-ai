@@ -5,7 +5,6 @@ main = "../../src/spike-land-mcp/index.ts"
 compatibility_date = "2025-07-12"
 compatibility_flags = ["nodejs_compat"]
 workers_dev = true
-logpush = true
 
 kv_namespaces = [
   { binding = "KV", id = "adf12f5b631b445086eb029abae41b24", preview_id = "dc475d2a8f3f4273af0ab533441071f6" },

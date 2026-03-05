@@ -19,7 +19,7 @@ export function registerMetadataTools(
     schema: {},
     handler: async () => {
       const headers = await auth.authHeaders();
-      const url = `https://analyticsdata.googleapis.com/v1beta/properties/${propertyId}/metadata`;
+      const url = `https://analyticsdata.googleapis.com/v1/properties/${propertyId}/metadata`;
 
       const result = await tryCatch(fetch(url, { method: "GET", headers }));
       if (!result.ok) {
@@ -54,7 +54,7 @@ export function registerMetadataTools(
       const params = new URLSearchParams();
       if (filter) params.set("filter", filter);
       const qs = params.toString();
-      const url = `https://analyticsadmin.googleapis.com/v1beta/properties${qs ? `?${qs}` : ""}`;
+      const url = `https://analyticsadmin.googleapis.com/v1/properties${qs ? `?${qs}` : ""}`;
 
       const result = await tryCatch(fetch(url, { method: "GET", headers }));
       if (!result.ok) {
