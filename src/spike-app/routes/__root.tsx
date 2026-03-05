@@ -59,6 +59,14 @@ const ROUTE_META: Record<string, { title: string; description: string; ogImage?:
     title: "Terms of Service - spike.land",
     description: "Read the spike.land Terms of Service. Learn about acceptable use, subscription billing, intellectual property rights, and our SaaS agreement.",
   },
+  "/terms-build": {
+    title: "AI App Builder Terms - spike.land",
+    description: "Terms of Service for the spike.land AI App Builder service. 48-hour MVP build, deliverables, payment, IP ownership, revisions, and warranty.",
+  },
+  "/terms-workshop": {
+    title: "MCP Workshop Terms - spike.land",
+    description: "Terms and Conditions for spike.land MCP Workshops for Dev Teams. Pricing, cancellation policy, recording policy, IP, and completion certificates.",
+  },
   "/privacy": {
     title: "Privacy Policy - spike.land",
     description: "spike.land Privacy Policy. GDPR-aware data handling, cookies, third-party services (Stripe, Cloudflare), and your rights as a user.",
@@ -75,6 +83,10 @@ const ROUTE_META: Record<string, { title: string; description: string; ogImage?:
     title: "Settings - spike.land",
     description: "Configure your spike.land account, billing, API keys, and preferences.",
   },
+  "/build": {
+    title: "AI App Builder — We Build Your App in 48 Hours | spike.land",
+    description: "Get a working 3-screen MVP built in 48 hours for £1,997. MCP-first development with AI agents. Source code included.",
+  },
   "/login": {
     title: "Sign In - spike.land",
     description: "Sign in to spike.land with GitHub or Google to access your AI development platform.",
@@ -82,6 +94,10 @@ const ROUTE_META: Record<string, { title: string; description: string; ogImage?:
   "/version": {
     title: "Version - spike.land",
     description: "View build version, deployed assets, and download links for spike.land.",
+  },
+  "/workshop": {
+    title: "MCP Workshop for Dev Teams | spike.land",
+    description: "2-hour hands-on MCP workshop for dev teams. Learn AI-assisted development with 80+ tools. £497/seat or £1,997/team.",
   },
 };
 

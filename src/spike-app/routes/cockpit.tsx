@@ -488,27 +488,85 @@ function DevHealth() {
 
 // ── Metrics Dashboard ──────────────────────────────────────────────────────
 
+interface CockpitMetrics {
+  userCount: number;
+  activeSubscriptions: number;
+  toolCount: number;
+  mrr: number;
+  recentSignups: Array<{ id: string; email: string; created_at: string }>;
+  servicePurchases: number;
+  recentServicePurchases: Array<{ service: string; email: string | null; status: string; created_at: number }>;
+}
+
 function MetricsDashboard() {
+  const [data, setData] = useState<CockpitMetrics | null>(null);
+
+  useEffect(() => {
+    fetch("/api/cockpit/metrics")
+      .then((r) => {
+        if (!r.ok) throw new Error("Failed to fetch");
+        return r.json() as Promise<CockpitMetrics>;
+      })
+      .then(setData)
+      .catch(() => {});
+  }, []);
+
+  const fmt = (n: number) => n.toLocaleString();
   const metrics = [
-    { label: "Total Users", value: "--", note: "Will wire to /api/cockpit/metrics" },
-    { label: "Active Subscriptions", value: "--", note: "Stripe live data" },
-    { label: "Tool Calls (30d)", value: "--", note: "spike-land-mcp usage" },
-    { label: "MRR", value: "--", note: "Monthly recurring revenue" },
-    { label: "Free Users", value: "--", note: "Users on free tier" },
-    { label: "Pro Users", value: "--", note: "Users on Pro plan" },
-    { label: "Business Users", value: "--", note: "Users on Business plan" },
-    { label: "Churn Rate", value: "--", note: "30-day rolling" },
+    { label: "Total Users", value: data ? fmt(data.userCount) : "--" },
+    { label: "Active Subscriptions", value: data ? fmt(data.activeSubscriptions) : "--" },
+    { label: "MCP Tools", value: data ? fmt(data.toolCount) : "--" },
+    { label: "MRR", value: data ? `$${fmt(data.mrr)}` : "--" },
+    { label: "Service Purchases", value: data ? fmt(data.servicePurchases) : "--" },
   ];
 
   return (
-    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-      {metrics.map((m) => (
-        <div key={m.label} className="rounded-xl border border-border bg-card p-4">
-          <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-1">{m.label}</p>
-          <p className="text-2xl font-bold text-foreground">{m.value}</p>
-          <p className="mt-1 text-xs text-muted-foreground">{m.note}</p>
+    <div className="space-y-4">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {metrics.map((m) => (
+          <div key={m.label} className="rounded-xl border border-border bg-card p-4">
+            <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-1">{m.label}</p>
+            <p className="text-2xl font-bold text-foreground">{m.value}</p>
+          </div>
+        ))}
+      </div>
+
+      {data && data.recentSignups.length > 0 && (
+        <div className="rounded-xl border border-border bg-card p-4">
+          <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-3">Recent Signups</p>
+          <div className="space-y-2">
+            {data.recentSignups.map((u) => (
+              <div key={u.id} className="flex items-center justify-between text-sm">
+                <span className="text-foreground">{u.email}</span>
+                <span className="text-xs text-muted-foreground">
+                  {new Date(u.created_at).toLocaleDateString()}
+                </span>
+              </div>
+            ))}
+          </div>
         </div>
-      ))}
+      )}
+
+      {data && data.recentServicePurchases.length > 0 && (
+        <div className="rounded-xl border border-border bg-card p-4">
+          <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-3">Service Purchases</p>
+          <div className="space-y-2">
+            {data.recentServicePurchases.map((p, i) => (
+              <div key={i} className="flex items-center justify-between text-sm">
+                <div className="flex items-center gap-2">
+                  <span className="rounded-full bg-green-100 px-2 py-0.5 text-[10px] font-semibold text-green-800 dark:bg-green-900/30 dark:text-green-400">
+                    {p.service.replace(/_/g, " ")}
+                  </span>
+                  <span className="text-foreground">{p.email ?? "guest"}</span>
+                </div>
+                <span className="text-xs text-muted-foreground">
+                  {new Date(p.created_at).toLocaleDateString()}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

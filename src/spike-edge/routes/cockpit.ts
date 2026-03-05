@@ -31,6 +31,17 @@ interface RecentSignupRow {
   created_at: string;
 }
 
+interface ServiceRevenueRow {
+  total: number | null;
+}
+
+interface ServicePurchaseRow {
+  service: string;
+  email: string | null;
+  status: string;
+  created_at: number;
+}
+
 cockpit.get("/api/cockpit/metrics", async (c) => {
   const userId = c.get("userId" as never) as string | undefined;
   if (!userId) {
@@ -48,7 +59,18 @@ cockpit.get("/api/cockpit/metrics", async (c) => {
     return c.json({ error: "Forbidden" }, 403);
   }
 
-  const [userCountRow, activeSubsRow, toolCountRow, mrrRow, recentSignupsResult] =
+  // Wrap service_purchases queries in try/catch since table may not exist yet
+  let serviceRevenueTotal = 0;
+  let servicePurchases: ServicePurchaseRow[] = [];
+  const serviceRevenueQuery = c.env.DB.prepare(
+    `SELECT COUNT(*) as total FROM service_purchases WHERE status = 'completed'`,
+  ).first<ServiceRevenueRow>().catch(() => null);
+
+  const servicePurchasesQuery = c.env.DB.prepare(
+    `SELECT service, email, status, created_at FROM service_purchases ORDER BY created_at DESC LIMIT 20`,
+  ).all<ServicePurchaseRow>().catch(() => ({ results: [] as ServicePurchaseRow[] }));
+
+  const [userCountRow, activeSubsRow, toolCountRow, mrrRow, recentSignupsResult, serviceRevenueRow, servicePurchasesResult] =
     await Promise.all([
       c.env.DB.prepare(`SELECT COUNT(*) as count FROM users`)
         .first<CountRow>(),
@@ -70,7 +92,12 @@ cockpit.get("/api/cockpit/metrics", async (c) => {
       c.env.DB.prepare(
         `SELECT id, email, created_at FROM users ORDER BY created_at DESC LIMIT 10`,
       ).all<RecentSignupRow>(),
+      serviceRevenueQuery,
+      servicePurchasesQuery,
     ]);
+
+  serviceRevenueTotal = serviceRevenueRow?.total ?? 0;
+  servicePurchases = servicePurchasesResult.results ?? [];
 
   return c.json({
     userCount: userCountRow?.count ?? 0,
@@ -78,6 +105,8 @@ cockpit.get("/api/cockpit/metrics", async (c) => {
     toolCount: toolCountRow?.count ?? 0,
     mrr: mrrRow?.mrr ?? 0,
     recentSignups: recentSignupsResult.results,
+    servicePurchases: serviceRevenueTotal,
+    recentServicePurchases: servicePurchases,
   });
 });
 

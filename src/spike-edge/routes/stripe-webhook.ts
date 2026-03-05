@@ -178,6 +178,28 @@ stripeWebhook.post("/stripe/webhook", async (c) => {
       try {
         const session = event.data.object as unknown as StripeSession;
 
+        // Handle service purchases (app_builder, workshop)
+        if (session.metadata?.type === "service_purchase") {
+          const serviceName = session.metadata.service;
+          const sessionId = (event.data.object as Record<string, unknown>).id as string | undefined;
+          const customerEmail = session.customer_email ?? (session.metadata.email || null);
+          const metaUserId = session.metadata.userId ?? null;
+          if (serviceName && sessionId) {
+            await db.prepare(
+              `INSERT INTO service_purchases (id, service, stripe_session_id, user_id, email, status, created_at)
+               VALUES (?, ?, ?, ?, ?, 'completed', ?)`,
+            ).bind(
+              crypto.randomUUID(),
+              serviceName,
+              sessionId,
+              metaUserId,
+              customerEmail,
+              Date.now(),
+            ).run();
+          }
+          break;
+        }
+
         // Handle blog support donations (no userId required)
         if (session.metadata?.type === "blog_support") {
           const slug = session.metadata.slug;
