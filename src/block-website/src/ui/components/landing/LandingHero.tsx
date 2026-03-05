@@ -1,5 +1,3 @@
-"use client";
-
 import { Link } from "../ui/link";
 
 export const TOTAL_TOOL_COUNT = 80;
@@ -12,7 +10,6 @@ export function LandingHero() {
         >
             <div
                 className="mb-8 inline-block px-4 py-1.5 border border-border rounded-full text-xs font-semibold text-muted-foreground tracking-widest bg-muted/50"
-                role="text"
                 aria-label="Features: Open AI App Ecosystem, Instant Deploys"
             >
                 OPEN AI APP ECOSYSTEM · INSTANT DEPLOYS
@@ -39,7 +36,6 @@ export function LandingHero() {
                 <Link
                     href="/tools"
                     className="w-full sm:w-auto px-8 py-4 bg-foreground text-background text-lg font-medium rounded-xl hover:opacity-90 transition-opacity focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-foreground active:opacity-80"
-                    aria-label="Get Started Free or Browse Apps"
                 >
                     Get Started Free
                 </Link>
@@ -80,10 +76,12 @@ export function LandingHero() {
                 <div className="hidden sm:block w-1.5 h-1.5 rounded-full bg-border" aria-hidden="true" />
                 <div className="flex gap-2.5 items-center">
                     <dt className="sr-only">Pricing</dt>
-                    <Link href="/pricing" className="hover:text-foreground hover:underline transition-colors flex gap-2.5 items-center">
-                        <dd className="font-semibold text-foreground text-base">Free</dd>
-                        <span>to start</span>
-                    </Link>
+                    <dd className="font-semibold text-foreground text-base">
+                        <Link href="/pricing" className="hover:text-foreground hover:underline transition-colors flex gap-2.5 items-center">
+                            <span>Free</span>
+                            <span>to start</span>
+                        </Link>
+                    </dd>
                 </div>
             </dl>
         </section>

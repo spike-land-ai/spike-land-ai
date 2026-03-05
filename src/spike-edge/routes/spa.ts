@@ -78,15 +78,17 @@ spa.get("/*", async (c) => {
       : undefined;
     if (appId) {
       const url = new URL(c.req.url);
-      const tab = url.searchParams.get("tab") || "App";
+      const tab = escapeHtml(url.searchParams.get("tab") || "App");
 
       // Better capitalization for known apps
-      let appName = appId.replace(/-/g, " ").replace(/\b\w/g, (l) => l.toUpperCase());
+      let appName = escapeHtml(appId.replace(/-/g, " ").replace(/\b\w/g, (l) => l.toUpperCase()));
       if (appId === "qa-studio") appName = "QA Studio";
       if (appId === "mcp-auth") appName = "MCP Auth";
 
       const title = `${appName} (${tab}) — spike.land`;
       const description = `Explore ${appName} on spike.land — the AI multi-agent operating system.`;
+      const canonicalPath = escapeHtml(path);
+      const canonicalSearch = escapeHtml(url.search);
 
       // Replace title and inject meta tags
       html = html.replace(/<title>[^<]*<\/title>/, `<title>${title}</title>`);
@@ -101,7 +103,7 @@ spa.get("/*", async (c) => {
         <meta property="og:description" content="${description}" />
         <meta name="twitter:title" content="${title}" />
         <meta name="twitter:description" content="${description}" />
-        <link rel="canonical" href="https://spike.land${path}${url.search}" />
+        <link rel="canonical" href="https://spike.land${canonicalPath}${canonicalSearch}" />
       `;
       html = html.replace("</head>", `${metaTags}</head>`);
     }
@@ -208,7 +210,7 @@ spa.get("/*", async (c) => {
 });
 
 function escapeHtml(s: string): string {
-  return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+  return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
 }
 
 /** Minimal markdown→HTML for crawler-visible content. Handles headings, paragraphs, bold, italic, links, images, lists, code blocks, and horizontal rules. */
@@ -308,13 +310,23 @@ function markdownToBasicHtml(md: string): string {
   return out.join("\n");
 }
 
+/** Only allow safe URL schemes in markdown links/images. */
+function isSafeUrl(url: string): boolean {
+  const decoded = url.replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, '"').replace(/&#39;/g, "'");
+  const trimmed = decoded.trim().toLowerCase();
+  if (trimmed.startsWith("http://") || trimmed.startsWith("https://") || trimmed.startsWith("/") || trimmed.startsWith("#") || trimmed.startsWith("mailto:")) return true;
+  return false;
+}
+
 /** Convert inline markdown (bold, italic, code, links, images) to HTML. */
 function inlineMarkdown(text: string): string {
   let s = escapeHtml(text);
-  // Images
-  s = s.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '<img alt="$1" src="$2" />');
-  // Links
-  s = s.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>');
+  // Images — only safe URLs
+  s = s.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, (_match, alt: string, src: string) =>
+    isSafeUrl(src) ? `<img alt="${alt}" src="${src}" />` : escapeHtml(`![${alt}](${src})`));
+  // Links — only safe URLs
+  s = s.replace(/\[([^\]]+)\]\(([^)]+)\)/g, (_match, label: string, href: string) =>
+    isSafeUrl(href) ? `<a href="${href}">${label}</a>` : escapeHtml(`[${label}](${href})`));
   // Bold
   s = s.replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
   s = s.replace(/__(.+?)__/g, "<strong>$1</strong>");

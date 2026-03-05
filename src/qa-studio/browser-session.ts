@@ -46,6 +46,9 @@ type PlaywrightPage = {
   mouse: {
     wheel: (deltaX: number, deltaY: number) => Promise<void>;
   };
+  context: () => {
+    newCDPSession: (page: PlaywrightPage) => Promise<{ send: (method: string) => Promise<{ nodes?: Array<{ nodeId: string; role?: { value?: string }; name?: { value?: string }; description?: { value?: string }; value?: { value?: string }; properties?: Array<{ name: string; value: { value?: unknown } }>; childIds?: string[] }> }> }>;
+  };
   viewportSize: () => { width: number; height: number } | null;
 };
 
@@ -330,5 +333,6 @@ function rebuildTree(nodes: CdpAxNode[]): AccessibilityNode | null {
   }
   
   // The first node is usually the RootWebArea
-  return nodeMap.get(nodes[0]?.nodeId) || null;
+  const firstNodeId = nodes[0]?.nodeId;
+  return firstNodeId ? nodeMap.get(firstNodeId) ?? null : null;
 }
