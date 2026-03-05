@@ -120,6 +120,24 @@ const appDetailRoute = createRoute({
   component: withSuspense(() => import("./routes/apps/$appId"), "AppDetailPage"),
 });
 
+// Docs routes
+const docsRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/docs",
+});
+
+const docsIndexRoute = createRoute({
+  getParentRoute: () => docsRoute,
+  path: "/",
+  component: withSuspense(() => import("./routes/docs/index"), "DocsIndexPage"),
+});
+
+const docsSlugRoute = createRoute({
+  getParentRoute: () => docsRoute,
+  path: "/$slug",
+  component: withSuspense(() => import("./routes/docs/$slug"), "DocPage"),
+});
+
 // Blog routes
 const blogRoute = createRoute({
   getParentRoute: () => rootRoute,
@@ -267,6 +285,7 @@ const routeTree = rootRoute.addChildren([
   storeRoute,
   versionRoute,
   appsRoute.addChildren([appsIndexRoute, appsNewRoute, appDetailRoute]),
+  docsRoute.addChildren([docsIndexRoute, docsSlugRoute]),
   blogRoute.addChildren([blogIndexRoute, blogPostRoute]),
   bugbookRoute.addChildren([
     bugbookIndexRoute,

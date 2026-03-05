@@ -52,3 +52,36 @@ export const verification = sqliteTable("verification", {
   createdAt: integer("createdAt", { mode: "timestamp" }),
   updatedAt: integer("updatedAt", { mode: "timestamp" }),
 });
+
+export const organization = sqliteTable("organization", {
+  id: text("id").primaryKey(),
+  name: text("name").notNull(),
+  slug: text("slug").notNull().unique(),
+  plan: text("plan").default("enterprise"),
+  createdAt: integer("createdAt", { mode: "timestamp" }).notNull(),
+  updatedAt: integer("updatedAt", { mode: "timestamp" }).notNull(),
+});
+
+export const orgMember = sqliteTable("org_member", {
+  id: text("id").primaryKey(),
+  orgId: text("orgId")
+    .notNull()
+    .references(() => organization.id),
+  userId: text("userId")
+    .notNull()
+    .references(() => user.id),
+  role: text("role").default("member"),
+  createdAt: integer("createdAt", { mode: "timestamp" }).notNull(),
+  updatedAt: integer("updatedAt", { mode: "timestamp" }).notNull(),
+});
+
+export const orgInvite = sqliteTable("org_invite", {
+  id: text("id").primaryKey(),
+  orgId: text("orgId")
+    .notNull()
+    .references(() => organization.id),
+  email: text("email").notNull(),
+  role: text("role").default("member"),
+  expiresAt: integer("expiresAt", { mode: "timestamp" }).notNull(),
+  createdAt: integer("createdAt", { mode: "timestamp" }).notNull(),
+});

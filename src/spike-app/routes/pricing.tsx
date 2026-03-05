@@ -73,6 +73,25 @@ const PLANS: PricingPlan[] = [
     tier: "business",
     highlighted: false,
   },
+  {
+    name: "Enterprise",
+    monthlyPrice: "Custom",
+    annualPrice: "Custom",
+    annualTotal: "",
+    description: "SSO, RBAC, and dedicated support for large teams.",
+    features: [
+      { text: "Everything in Business" },
+      { text: "SSO / SAML authentication" },
+      { text: "Custom RBAC & permissions" },
+      { text: "SLA guarantee (99.9%)" },
+      { text: "Dedicated support engineer" },
+      { text: "Audit logs & compliance" },
+      { text: "Custom integrations" },
+    ],
+    cta: "Contact Sales",
+    ctaHref: "mailto:enterprise@spike.land",
+    highlighted: false,
+  },
 ];
 
 const FAQ_ITEMS = [
@@ -248,7 +267,7 @@ export function PricingPage() {
       <div className="text-center space-y-3">
         <h1 className="text-3xl font-bold text-foreground">Simple, Transparent Pricing</h1>
         <p className="text-muted-foreground max-w-xl mx-auto">
-          Choose the plan that fits your workflow. All plans include access to the core platform.
+          Choose the plan that fits your workflow. From free to enterprise-grade.
         </p>
 
         {/* Billing toggle */}
@@ -285,25 +304,18 @@ export function PricingPage() {
         </div>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-3">
+      <div className="grid gap-6 lg:grid-cols-4">
         {PLANS.map((plan) => (
           <PlanCard key={plan.name} plan={plan} annual={annual} isAuthenticated={isAuthenticated} />
         ))}
       </div>
 
-      <div className="mx-auto max-w-lg text-center rounded-2xl border border-border bg-card p-8 space-y-4">
-        <h2 className="text-xl font-bold text-foreground">Need more?</h2>
-        <p className="text-sm text-muted-foreground">
-          Looking for SSO, custom integrations, SLA guarantees, or dedicated support?
-          Let's talk about an Enterprise plan.
-        </p>
-        <a
-          href="mailto:enterprise@spike.land"
-          className="inline-block rounded-lg bg-primary px-6 py-2.5 text-sm font-semibold text-primary-foreground hover:bg-primary/90 transition-colors"
-        >
-          Contact Sales
+      <p className="text-center text-sm text-muted-foreground">
+        Need a custom plan?{" "}
+        <a href="mailto:enterprise@spike.land" className="text-primary underline hover:text-primary/80">
+          Talk to our team
         </a>
-      </div>
+      </p>
 
       <p className="text-center text-sm text-muted-foreground">
         Pricing and limits are subject to change.

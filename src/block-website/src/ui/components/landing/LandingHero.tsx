@@ -1,8 +1,19 @@
+import { useState, useEffect } from "react";
 import { Link } from "../ui/link";
 
 export const TOTAL_TOOL_COUNT = 80;
 
 export function LandingHero() {
+    const [stars, setStars] = useState<number | null>(null);
+
+    useEffect(() => {
+        fetch("/api/github/stars")
+            .then(res => res.json() as Promise<{ stars: number | null }>)
+            .then((data) => {
+                if (data.stars !== null) setStars(data.stars);
+            })
+            .catch(() => { /* graceful fallback — don't show stars */ });
+    }, []);
     return (
         <section
             aria-labelledby="hero-heading"
@@ -55,6 +66,19 @@ export function LandingHero() {
                 className="mt-20 pt-10 border-t border-border flex flex-col sm:flex-row items-center justify-center gap-6 sm:gap-8 text-sm text-muted-foreground"
                 aria-label="Platform Statistics"
             >
+                {stars !== null && (
+                    <>
+                        <div className="flex gap-2.5 items-center">
+                            <dt className="sr-only">GitHub Stars</dt>
+                            <dd className="font-semibold text-foreground text-base flex items-center gap-1.5">
+                                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .587l3.668 7.568 8.332 1.151-6.064 5.828 1.48 8.279-7.416-3.967-7.417 3.967 1.481-8.279-6.064-5.828 8.332-1.151z"/></svg>
+                                {stars.toLocaleString()}
+                            </dd>
+                            <span>on GitHub</span>
+                        </div>
+                        <div className="hidden sm:block w-1.5 h-1.5 rounded-full bg-border" aria-hidden="true" />
+                    </>
+                )}
                 <div className="flex gap-2.5 items-center">
                     <dt className="sr-only">Available Apps</dt>
                     <dd className="font-semibold text-foreground text-base">{TOTAL_TOOL_COUNT}+</dd>

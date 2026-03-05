@@ -27,14 +27,7 @@ export function AppFooter() {
             <p className="font-semibold text-foreground mb-4">Resources</p>
             <ul className="space-y-2 text-sm">
               <li>
-                <a
-                  href="https://github.com/spike-land-ai/spike-land-ai/tree/main/docs"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  Documentation
-                </a>
+                <Link to="/docs" className="text-muted-foreground hover:text-foreground transition-colors">Documentation</Link>
               </li>
               <li><Link to="/blog" className="text-muted-foreground hover:text-foreground transition-colors">Blog</Link></li>
               <li><Link to="/about" className="text-muted-foreground hover:text-foreground transition-colors">About Us</Link></li>

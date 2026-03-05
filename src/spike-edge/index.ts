@@ -30,6 +30,8 @@ import { experiments } from "./routes/experiments.js";
 import { spa } from "./routes/spa.js";
 import { wellKnown } from "./routes/well-known.js";
 import { sitemap } from "./routes/sitemap.js";
+import { githubStars } from "./routes/github-stars.js";
+import { docsApi } from "./routes/docs-api.js";
 import { handleScheduled } from "./scheduled.js";
 
 const log = createLogger("spike-edge");
@@ -331,6 +333,8 @@ app.all("/api/auth/*", async (c) => {
 
 app.route("/", wellKnown);
 app.route("/", sitemap);
+app.route("/", githubStars);
+app.route("/", docsApi);
 
 // Catch-all for unmatched API routes — return JSON 404 instead of SPA HTML
 app.all("/api/*", (c) => {

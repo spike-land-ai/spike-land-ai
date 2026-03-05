@@ -5,6 +5,7 @@ import { useDarkMode } from "@/hooks/useDarkMode";
 import { useAuth } from "@/hooks/useAuth";
 import { LoginButton } from "@/components/LoginButton";
 import { AppFooter } from "@/components/AppFooter";
+import { CookieConsent } from "@/components/CookieConsent";
 
 const DEFAULT_TITLE = "spike.land - MCP-First AI Development Platform";
 const DEFAULT_DESCRIPTION =
@@ -64,6 +65,10 @@ const ROUTE_META: Record<string, { title: string; description: string; ogImage?:
   "/blog": {
     title: "Blog - spike.land",
     description: "Articles, tutorials, and engineering insights from the spike.land team. Learn about MCP, AI development, and edge computing.",
+  },
+  "/docs": {
+    title: "Documentation - spike.land",
+    description: "Technical documentation, API reference, MCP tools guide, and architecture overview for spike.land.",
   },
   "/settings": {
     title: "Settings - spike.land",
@@ -137,6 +142,7 @@ const NAV_LINKS = [
   { to: "/tools", label: "Tools" },
   { to: "/store", label: "Store" },
   { to: "/pricing", label: "Pricing" },
+  { to: "/docs", label: "Docs" },
   { to: "/blog", label: "Blog" },
   { to: "/about", label: "About" },
 ] as const;
@@ -241,14 +247,6 @@ export function RootLayout() {
                     {label}
                   </Link>
                 ))}
-                <a
-                  href="https://github.com/spike-land-ai/spike-land-ai/tree/main/docs"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  Docs
-                </a>
               </nav>
             </div>
             <div className="flex items-center gap-3">
@@ -298,15 +296,6 @@ export function RootLayout() {
                   {label}
                 </Link>
               ))}
-              <a
-                href="https://github.com/spike-land-ai/spike-land-ai/tree/main/docs"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="block py-3 text-lg font-medium border-b border-border text-muted-foreground hover:text-foreground transition-colors"
-                onClick={() => setMobileNavOpen(false)}
-              >
-                Docs
-              </a>
             </nav>
           </div>
         )}
@@ -322,6 +311,7 @@ export function RootLayout() {
         </main>
 
         <AppFooter />
+        <CookieConsent />
       </div>
     </div>
   );
