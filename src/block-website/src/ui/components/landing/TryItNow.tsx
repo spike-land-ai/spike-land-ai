@@ -31,7 +31,7 @@ export function TryItNow() {
   }, [copied]);
 
   return (
-    <section className="py-12 bg-background border-y border-border">
+    <section className="py-20 sm:py-24 bg-background border-y border-border">
       <div className="max-w-4xl mx-auto px-4 sm:px-6">
         <div className="bg-card rounded-2xl border border-border overflow-hidden shadow-xl">
           <div className="p-6 sm:p-8 border-b border-border relative">
@@ -149,9 +149,9 @@ export function TryItNow() {
             </div>
 
             <div className="flex justify-center sm:justify-start">
-              <Link href="/tools" className="inline-flex items-center gap-2 text-sm font-medium text-foreground hover:text-cyan-600 transition-colors">
+              <Link href="/tools" className="inline-flex items-center gap-2 text-sm font-medium text-foreground hover:text-foreground/80 transition-colors group">
                 Browse all tools 
-                <span aria-hidden="true">&rarr;</span>
+                <span className="group-hover:translate-x-1 transition-transform" aria-hidden="true">&rarr;</span>
               </Link>
             </div>
           </div>

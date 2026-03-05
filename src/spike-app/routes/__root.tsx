@@ -252,7 +252,7 @@ export function RootLayout() {
               </nav>
               <button
                 type="button"
-                className="hidden md:flex items-center gap-2 px-3 py-1.5 text-sm text-muted-foreground bg-muted/50 border border-border rounded-md hover:bg-muted hover:text-foreground transition-colors"
+                className="hidden md:flex items-center gap-2 px-3 py-1.5 text-sm text-muted-foreground bg-muted/50 border border-border rounded-md hover:bg-muted hover:text-foreground transition-all duration-200 active:scale-[0.98]"
                 aria-label="Search site"
                 onClick={() => alert("Search coming soon!")}
               >

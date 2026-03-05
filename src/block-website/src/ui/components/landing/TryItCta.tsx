@@ -19,7 +19,7 @@ export function TryItCta() {
   }, [copied]);
 
   return (
-    <section className="py-16 bg-background border-t border-border">
+    <section className="py-20 sm:py-24 bg-background border-t border-border">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 text-center">
         <h2 className="text-2xl font-bold tracking-tight text-foreground mb-6">
           Ready to try?

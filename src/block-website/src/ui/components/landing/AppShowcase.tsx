@@ -59,7 +59,7 @@ export function AppShowcase() {
                                     <li key={app.name}>
                                         <Link
                                             href={`/tools/${app.name}`}
-                                            className="block p-4 rounded-xl border border-border bg-muted/20 hover:bg-muted/50 hover:border-muted-foreground/30 transition-all hover:shadow-md group"
+                                            className="block p-4 rounded-xl border border-border/50 bg-muted/10 hover:bg-muted/40 hover:border-border hover:shadow-md hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98] transition-all duration-200 group"
                                         >
                                             <div className="flex items-center gap-3">
                                                 <span className="text-2xl" role="img" aria-label={app.name}>{app.icon}</span>
@@ -84,7 +84,7 @@ export function AppShowcase() {
                 <div className="mt-16 text-center">
                     <Link
                         href="/tools"
-                        className="inline-flex items-center justify-center px-6 py-3 border border-border text-foreground text-sm font-medium rounded-xl hover:bg-muted/50 transition-colors"
+                        className="inline-flex items-center justify-center px-6 py-3 border border-border/50 bg-background text-foreground text-sm font-medium rounded-xl hover:bg-muted/30 hover:border-border hover:shadow-sm hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98] transition-all duration-200"
                     >
                         Browse all tools &rarr;
                     </Link>

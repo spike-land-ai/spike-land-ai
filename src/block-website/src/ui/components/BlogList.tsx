@@ -67,7 +67,7 @@ function FeaturedCard({ post, LinkComp }: { post: BlogMeta; LinkComp: React.Comp
   );
 
   return (
-    <article className="group relative bg-card rounded-2xl border border-border shadow-sm hover:border-primary/40 hover:shadow-lg transition-all duration-200 overflow-hidden mb-6">
+    <article className="group relative bg-card rounded-2xl border border-border/50 shadow-sm hover:border-primary/40 hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98] transition-all duration-200 overflow-hidden mb-6">
       {LinkComp === "a" ? (
         <a href={`/blog/${post.slug}`} className="block h-full w-full">{content}</a>
       ) : (
@@ -100,7 +100,7 @@ function BlogCard({ post, LinkComp }: { post: BlogMeta; LinkComp: React.Componen
   );
 
   return (
-    <article className="group relative bg-card rounded-2xl border border-border shadow-sm hover:border-primary/40 hover:shadow-lg transition-all duration-200 overflow-hidden flex flex-col">
+    <article className="group relative bg-card rounded-2xl border border-border/50 shadow-sm hover:border-primary/40 hover:shadow-md hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98] transition-all duration-200 overflow-hidden flex flex-col">
       {LinkComp === "a" ? (
         <a href={`/blog/${post.slug}`} className="block h-full w-full flex flex-col flex-1">{content}</a>
       ) : (
