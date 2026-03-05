@@ -228,7 +228,5 @@ their own spike.land account, then you invite them to your workspace.
 
 ## Related Documentation
 
-- [Database Schema](../architecture/DATABASE_SCHEMA.md) - Full schema reference
-- [API Reference](../architecture/API_REFERENCE.md) - Endpoint documentation
-- [Token System](../architecture/TOKEN_SYSTEM.md) - Platform credit
-  documentation
+- [Features](./FEATURES.md) - Platform features overview
+- [D1 Quick Start](../develop/D1_QUICK_START.md) - Database setup guide

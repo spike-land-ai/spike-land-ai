@@ -498,23 +498,19 @@ pages were added in February 2026 with accompanying unit tests.
 | Framework     | Next.js 16 (App Router)                          |
 | Language      | TypeScript (strict mode)                         |
 | Styling       | Tailwind CSS 4 + shadcn/ui                       |
-| Database      | PostgreSQL + Prisma ORM                          |
-| Auth          | NextAuth.js v5 (GitHub, Google, Facebook, Apple) |
+| Database      | Cloudflare D1 + Drizzle ORM                      |
+| Auth          | Better Auth (GitHub, Google, Facebook, Apple)    |
 | Payments      | Stripe (subscriptions + one-time)                |
-| Cache         | Redis (Upstash)                                  |
+| Cache         | Cloudflare KV                                    |
 | Workers       | Cloudflare Workers + Durable Objects             |
 | Real-time     | WebSockets, PeerJS                               |
 | Transpilation | esbuild-wasm                                     |
 | AI            | Claude Opus 4.6, Gemini, Stable Diffusion        |
-| CI/CD         | GitHub Actions + AWS ECS + Depot                 |
+| CI/CD         | GitHub Actions + Cloudflare Workers              |
 
 ## Related docs
 
-| Topic              | Document                                                                 |
-| ------------------ | ------------------------------------------------------------------------ |
-| Subscription Tiers | [SUBSCRIPTION_TIERS.md](./SUBSCRIPTION_TIERS.md)                         |
-| API Reference      | [../architecture/API_REFERENCE.md](../architecture/API_REFERENCE.md)     |
-| Database Schema    | [../architecture/DATABASE_SCHEMA.md](../architecture/DATABASE_SCHEMA.md) |
-| Token System       | [../architecture/TOKEN_SYSTEM.md](../architecture/TOKEN_SYSTEM.md)       |
-| Business Structure | [../business/BUSINESS_STRUCTURE.md](../business/BUSINESS_STRUCTURE.md)   |
-| Roadmap            | [../ROADMAP.md](../ROADMAP.md)                                           |
+| Topic              | Document                                                               |
+| ------------------ | ---------------------------------------------------------------------- |
+| Subscription Tiers | [SUBSCRIPTION_TIERS.md](./SUBSCRIPTION_TIERS.md)                       |
+| Business Structure | [../business/BUSINESS_STRUCTURE.md](../business/BUSINESS_STRUCTURE.md) |

@@ -47,6 +47,8 @@ vi.mock("commander", async (importOriginal) => {
   // Use exitOverride so commander throws instead of calling process.exit
   // This prevents Vitest from complaining about unexpected process.exit calls
   prog.exitOverride();
+  // Suppress help/error output to avoid polluting test console
+  prog.configureOutput({ writeOut: () => {}, writeErr: () => {} });
 
   // Wrap command() to intercept action() calls
   const origCmd = prog.command.bind(prog);

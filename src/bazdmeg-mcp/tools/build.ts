@@ -25,7 +25,7 @@ export function registerBuildTools(server: McpServer): void {
       };
 
       const repoRoot = process.cwd();
-      const pkgDir = `${repoRoot}/packages/${packageName}`;
+      const pkgDir = `${repoRoot}/src/${packageName}`;
 
       // Read manifest to get build profile
       const pkg = await getManifestPackage(packageName, repoRoot);
@@ -111,7 +111,7 @@ export function registerBuildTools(server: McpServer): void {
       }
 
       // Single package typecheck
-      const pkgDir = `${repoRoot}/packages/${packageName}`;
+      const pkgDir = `${repoRoot}/src/${packageName}`;
       const has = await hasScript(pkgDir, "typecheck");
 
       let report = `## Typecheck Report — ${packageName}\n\n`;

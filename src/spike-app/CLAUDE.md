@@ -78,7 +78,7 @@ configuration in `app.css`. Path alias `@/` maps to the package root.
 ### Dev Proxy
 
 `vite.config.ts` proxies `/api/*` to `http://localhost:8787` (spike-edge). Start
-spike-edge with `npm run dev` in `packages/spike-edge` before running the
+spike-edge with `npm run dev` in `src/spike-edge` before running the
 frontend for full-stack local dev.
 
 ## Environment Variables

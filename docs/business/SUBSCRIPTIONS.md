@@ -41,14 +41,14 @@ excluded from the fixed total.
 | **Why This Provider**    | First-party Next.js support, instant preview URLs for CI, edge middleware, built-in analytics                                         |
 | **Cheaper Alternatives** | Self-hosted on AWS/Fly.io (more ops overhead), Netlify ($19/mo, weaker Next.js support), Coolify (self-hosted, free but requires VPS) |
 
-### 3. Neon Database (Serverless PostgreSQL)
+### 3. Cloudflare D1 (Serverless SQLite)
 
-| Field                    | Detail                                                                                                                |
-| ------------------------ | --------------------------------------------------------------------------------------------------------------------- |
-| **Cost**                 | $0-19/mo (~£0-15/mo)                                                                                                  |
-| **What We Use**          | Primary PostgreSQL database (Prisma ORM), branch-per-PR for staging, serverless auto-scaling                          |
-| **Why This Provider**    | Serverless scale-to-zero, database branching for staging, compatible with Vercel edge                                 |
-| **Cheaper Alternatives** | Supabase (free tier, less branching), Railway ($5/mo), PlanetScale (MySQL only), self-hosted Postgres on VPS (~£5/mo) |
+| Field                    | Detail                                                                                                          |
+| ------------------------ | --------------------------------------------------------------------------------------------------------------- |
+| **Cost**                 | $0/mo (included in Workers plan, free tier generous)                                                            |
+| **What We Use**          | Primary database (Drizzle ORM), serverless SQLite at the edge, automatic replication                            |
+| **Why This Provider**    | Zero-latency D1 binding from Workers, no connection pooling needed, free tier, automatic read replicas          |
+| **Cheaper Alternatives** | None cheaper — D1 is included in the Workers plan                                                               |
 
 ### 4. GitHub (Repository + Actions CI/CD)
 
@@ -225,7 +225,7 @@ platform.
 | -- | ----------------------------- | -----------: | ----------: | -------- |
 | 1  | Cloudflare (Workers/R2/KV/DO) |           £4 |         £48 | Fixed    |
 | 2  | Vercel Pro                    |          £16 |        £192 | Fixed    |
-| 3  | Neon Database                 |        £0-15 |      £0-180 | Usage    |
+| 3  | Cloudflare D1                 |           £0 |          £0 | Included |
 | 4  | GitHub                        |           £0 |          £0 | Free     |
 | 5  | Claude Max 20x                |         £160 |      £1,920 | Fixed    |
 | 6  | Google Gemini API             |     Variable |    Variable | Usage    |
@@ -252,8 +252,8 @@ platform.
    the $20 tier suffices. Consider caching Docker layers aggressively to reduce
    build time.
 
-3. **Neon free tier** - If database usage stays under 0.5 GB and 100 compute
-   hours/mo, the free tier is sufficient. Monitor before upgrading.
+3. **D1 free tier** - Database is included in the Cloudflare Workers plan at no
+   additional cost.
 
 4. **Sentry** - Evaluate whether the free tier (5K errors/mo) is sufficient
    before committing to Team plan. Session Replay is the main driver of the paid
@@ -277,4 +277,3 @@ platform.
 | ------------------------------------------------------------------ | -------------------------------------------- |
 | [BUSINESS_STRUCTURE.md](./BUSINESS_STRUCTURE.md)                   | Company formation, tax structure, compliance |
 | [../../.env.example](../../.env.example)                           | All environment variables and provider setup |
-| [../architecture/TOKEN_SYSTEM.md](../architecture/TOKEN_SYSTEM.md) | Token pricing and Stripe integration         |

@@ -1,6 +1,5 @@
 /**
- * Shared types extracted from Prisma schema for use in mobile and web apps
- * This is a subset of the full Prisma types, containing only what's needed for the mobile app
+ * Shared types for use in mobile and web apps
  */
 
 // ============================================================================
@@ -327,91 +326,3 @@ export interface FeaturedGalleryItem {
   isActive: boolean;
 }
 
-// ============================================================================
-// Type Safety Improvements (#797)
-// ============================================================================
-
-// Social Platform API Types
-export type {
-  DiscordRateLimitHeaders,
-  FacebookAppUsageHeader,
-  FacebookBusinessUsageHeader,
-  FacebookErrorResponse,
-  LinkedInErrorResponse,
-  SocialPlatformErrorResponse,
-  TwitterErrorResponse,
-  TwitterRateLimitHeaders,
-} from "./social-api-responses";
-
-// Social API Type Guards
-export {
-  isFacebookErrorResponse,
-  isLinkedInErrorResponse,
-  isSocialPlatformErrorResponse,
-  isTwitterErrorResponse,
-} from "./social-api-guards";
-
-// Pipeline Configuration Types
-export type {
-  AnalysisConfig,
-  AutoCropConfig,
-  DefectKey,
-  DefectOverrides,
-  GenerationConfig,
-  PipelineConfig,
-  PromptConfig,
-  ReferenceImage,
-  ValidatedPipelineConfigs,
-} from "./pipeline";
-
-// Cache Types
-export type { CacheEntry, CacheKey, CacheMap } from "./cache";
-
-// Health Event Types
-export type {
-  HealthEventDetails,
-  RateLimitEventInfo,
-  TokenEventInfo,
-} from "./health-events";
-
-// Attribution Types
-export type {
-  AttributionModelType,
-  AttributionWeight,
-  JourneyStep,
-  PlatformTransition,
-  PositionBasedConfig,
-  TimeDecayConfig,
-} from "./attribution";
-
-// Organic-to-Ad Conversion Types
-export type {
-  AdaptCreativeRequest,
-  AdaptCreativeResponse,
-  AdFormat,
-  AdPlacement,
-  AnalyzeAudienceRequest,
-  AnalyzeAudienceResponse,
-  BudgetRecommendation,
-  ConversionAnalytics,
-  ConversionStatus,
-  ConvertToAdRequest,
-  ConvertToAdResponse,
-  CreativeVariant,
-  EngagementData,
-  EngagerDemographics,
-  FetchEngagementRequest,
-  FetchEngagementResponse,
-  RecommendBudgetRequest,
-  RecommendBudgetResponse,
-  TargetingSuggestion,
-} from "./organic-to-ad";
-// Boost Analytics Types
-export type {
-  BoostCampaignData,
-  BoostEffectivenessAnalysis,
-  BoostPerformanceMetrics,
-  BoostStatus,
-  OrganicMetricsSnapshot,
-  TargetingCriteria,
-} from "./boost-analytics";
