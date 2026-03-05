@@ -27,7 +27,7 @@ export { createErrorReporter, type ErrorReporter, type ErrorReport } from "./uti
 export { cn } from "./utils/cn.js";
 
 // UI Components
-export { Button, buttonVariants, Link } from "./ui/index.js";
+export { Button, buttonVariants, Link, ScrollContainer } from "./ui/index.js";
 
 // Async Utilities
 export { tryCatch, type Result as TryCatchResult } from "./utils/try-catch.js";

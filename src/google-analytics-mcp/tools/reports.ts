@@ -84,7 +84,7 @@ export function registerReportTools(
     handler: async (args) => {
       const headers = await auth.authHeaders();
       const body = buildReportBody(args as Parameters<typeof buildReportBody>[0]);
-      const url = `https://analyticsdata.googleapis.com/v1/properties/${propertyId}:runReport`;
+      const url = `https://analyticsdata.googleapis.com/v1beta/properties/${propertyId}:runReport`;
 
       const result = await tryCatch(
         fetch(url, { method: "POST", headers, body: JSON.stringify(body) }),
@@ -140,7 +140,7 @@ export function registerReportTools(
         limit: r.limit ?? 1000,
       }));
 
-      const url = `https://analyticsdata.googleapis.com/v1/properties/${propertyId}:batchRunReports`;
+      const url = `https://analyticsdata.googleapis.com/v1beta/properties/${propertyId}:batchRunReports`;
       const result = await tryCatch(
         fetch(url, { method: "POST", headers, body: JSON.stringify({ requests }) }),
       );

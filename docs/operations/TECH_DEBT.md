@@ -11,15 +11,6 @@ are prioritized P0 (critical) through P3 (minor/nice-to-have).
 
 ### P0 - Critical
 
-#### TD-P0-2: Test coverage below targets
-
-- **Status**: Open
-- **Impact**: Bugs ship undetected, refactoring is risky
-- **Details**: CI coverage thresholds are well below targets across several
-  packages. Run `npm run test:coverage` per-package to identify gaps.
-- **Action**: Incrementally increase thresholds as coverage improves; prioritize
-  business-critical modules.
-
 #### TD-P0-3: Sentry integration (REMOVED)
 
 - **Status**: Resolved — Sentry fully removed (Feb 2026). Error querying now
@@ -145,41 +136,12 @@ are prioritized P0 (critical) through P3 (minor/nice-to-have).
 
 ### P3 - Low Priority / Nice-to-Have
 
-#### TD-P3-1: Scripts directory cleanup
-
-- **Status**: Open
-- **Impact**: Developer confusion, maintenance overhead
-- **Details**: 34 scripts in `/scripts/` directory. Some are one-off migrations
-  that have been completed (e.g., `migrate-users-to-stable-ids.ts`,
-  `fix-user-tier.ts`, `fix-user-tokens.ts`).
-- **Action**: Review each script, archive completed migration scripts to
-  `scripts/archive/`.
-
-#### TD-P3-2: Magic numbers and strings throughout codebase
-
-- **Status**: Open
-- **Impact**: Reduced readability, harder to maintain
-- **Details**: Hardcoded browser dimensions (1920x1080) in `chatRoom.ts`,
-  animation timings in `AgentProgressIndicator.tsx`, and other numeric literals
-  scattered across the codebase.
-- **Action**: Extract to named constants with descriptive names.
-
 #### TD-P3-3: Inconsistent async patterns
 
 - **Status**: Moved to external repo
 - **Details**: Some handlers in `liveRoutes.ts` (testing.spike.land) are marked
   `async` but contain no `await` expressions.
 - **Action**: Track in `@spike-land-ai/testing.spike.land` repo.
-
-#### TD-P3-4: CSS flexbox scroll container pattern not standardized
-
-- **Status**: Open
-- **Impact**: Recurring UI bugs with scroll containers
-- **Details**: The `h-full` vs `absolute inset-0` pattern for scroll containers
-  in flex layouts (seen in `my-apps/[codeSpace]/page.tsx`). Fix was applied
-  ad-hoc.
-- **Action**: Create a reusable `ScrollContainer` component that handles this
-  pattern correctly.
 
 #### TD-P3-5: TypeScript config issues in testing.spike.land
 
@@ -190,6 +152,10 @@ are prioritized P0 (critical) through P3 (minor/nice-to-have).
 
 | Item                                       | Resolution                                                       | Date       |
 | ------------------------------------------ | ---------------------------------------------------------------- | ---------- |
+| Test coverage gaps (TD-P0-2)               | Fixed coverage for mcp-auth (98%), gates/engine (100%), schema-optimizer (96%) | 2026-03-05 |
+| Scripts cleanup (TD-P3-1)                  | Deleted 6 unused prompt versions, archived stripe-setup.ts       | 2026-03-05 |
+| Magic animation timings (TD-P3-2)          | Extracted UI_ANIMATIONS constants and updated 5+ files           | 2026-03-05 |
+| ScrollContainer component (TD-P3-4)        | Created reusable ScrollContainer and updated 4+ files            | 2026-03-05 |
 | Logpush with no destination (9 workers)    | Removed `logpush = true` from all 9 wrangler.toml files         | 2026-03-05 |
 | analyzeImage deprecation (TD-P2-1)         | Confirmed fully removed with legacy spike.land deletion          | 2026-03-05 |
 | esbuild resolution pins (TD-P2-8)          | Confirmed removed; current esbuild ^0.27.3 with no conflicts    | 2026-03-05 |

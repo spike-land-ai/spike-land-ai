@@ -2,6 +2,7 @@ import { type KeyboardEvent, useEffect, useRef, useState, useCallback } from "re
 import { Button } from "@/shared/ui/button";
 import { Send, Copy, Check, User, Bot, Loader2 } from "lucide-react";
 import { cn } from "@/shared/utils/cn";
+import { UI_ANIMATIONS, ScrollContainer } from "@spike-land-ai/shared";
 
 interface Message {
   id: string;
@@ -22,7 +23,7 @@ function MessageItem({ msg }: { msg: Message }) {
   const handleCopy = useCallback(() => {
     navigator.clipboard.writeText(msg.content);
     setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    setTimeout(() => setCopied(false), UI_ANIMATIONS.COPY_FEEDBACK_MS);
   }, [msg.content]);
 
   return (
@@ -114,11 +115,11 @@ export function ChatThread({ messages, onSendMessage, isLoading }: ChatThreadPro
 
   return (
     <div className="flex h-full flex-col bg-muted/30">
-      <div 
+      <ScrollContainer 
         ref={scrollRef} 
         role="log"
         aria-label="Chat history"
-        className="flex-1 overflow-y-auto p-4 md:p-6"
+        className="p-4 md:p-6"
       >
         {messages.length === 0 && (
           <div className="flex flex-col items-center justify-center h-full text-center space-y-4 py-12">
@@ -144,7 +145,7 @@ export function ChatThread({ messages, onSendMessage, isLoading }: ChatThreadPro
             </div>
           </div>
         )}
-      </div>
+      </ScrollContainer>
       
       <div className="border-t border-border bg-card p-4 shadow-[0_-4px_12px_rgba(0,0,0,0.02)]">
         <div className="mx-auto max-w-4xl relative flex items-end gap-2">

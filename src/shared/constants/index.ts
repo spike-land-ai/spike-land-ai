@@ -161,3 +161,24 @@ export const REVENUECAT_PRODUCTS = {
     PREMIUM_MONTHLY: "sub_premium_monthly",
   },
 } as const;
+
+// ============================================================================
+// UI Animations & Timings
+// ============================================================================
+
+export const UI_ANIMATIONS = {
+  /** Default duration for copy feedback (2 seconds) */
+  COPY_FEEDBACK_MS: 2000,
+  /** Standard toast duration (5 seconds) */
+  TOAST_DURATION_MS: 5000,
+  /** Long feedback duration (e.g. "Saved!" message) */
+  LONG_FEEDBACK_MS: 3000,
+  /** Modal or transition duration */
+  TRANSITION_MS: 200,
+  /** Entrance delay for UI elements */
+  ENTRANCE_DELAY_MS: 1000,
+  /** Loading state minimum duration */
+  MIN_LOADING_MS: 500,
+  /** Very quick feedback or micro-interaction */
+  QUICK_FEEDBACK_MS: 100,
+} as const;

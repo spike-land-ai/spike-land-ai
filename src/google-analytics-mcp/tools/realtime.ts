@@ -59,7 +59,7 @@ export function registerRealtimeTool(
         body.dimensionFilter = dimension_filter;
       }
 
-      const url = `https://analyticsdata.googleapis.com/v1/properties/${propertyId}:runRealtimeReport`;
+      const url = `https://analyticsdata.googleapis.com/v1beta/properties/${propertyId}:runRealtimeReport`;
       const result = await tryCatch(
         fetch(url, { method: "POST", headers, body: JSON.stringify(body) }),
       );

@@ -165,7 +165,7 @@ const bazdmegRules: ReviewRule[] = [
           msg: "Hardcoded password",
         },
         {
-          pattern: /(secret|token)\s*[:=]\s*["'][A-Za-z0-9+/=]{10,}["']/i,
+          pattern: /(secret|token)\s*[:=]\s*["'][A-Za-z0-9+/_=-]{10,}["']/i,
           msg: "Potential secret/token",
         },
         { pattern: /innerHTML\s*=/, msg: "innerHTML assignment (XSS risk)" },

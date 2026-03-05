@@ -3,6 +3,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/components/Toast";
 import { apiUrl } from "@/lib/api";
+import { UI_ANIMATIONS } from "@spike-land-ai/shared/constants";
 
 type SettingsTab = "profile" | "whatsapp" | "keys" | "billing" | "access";
 
@@ -49,7 +50,7 @@ function ProfileTab() {
       });
       if (!res.ok) throw new Error(`Failed to save: ${res.status}`);
       setSaved(true);
-      setTimeout(() => setSaved(false), 3000);
+      setTimeout(() => setSaved(false), UI_ANIMATIONS.LONG_FEEDBACK_MS);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Unknown error");
     } finally {

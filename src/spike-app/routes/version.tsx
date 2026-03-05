@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { apiUrl } from "@/lib/api";
+import { UI_ANIMATIONS } from "@spike-land-ai/shared/constants";
 
 interface VersionAsset {
   key: string;
@@ -88,7 +89,7 @@ export function VersionPage() {
   const handleCopy = () => {
     navigator.clipboard.writeText(data.sha).then(() => {
       setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+      setTimeout(() => setCopied(false), UI_ANIMATIONS.COPY_FEEDBACK_MS);
     });
   };
 

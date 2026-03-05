@@ -90,10 +90,14 @@ const makeEnv = (): Env => ({
   AUTH_DB: {} as D1Database,
   BETTER_AUTH_SECRET: "test-secret",
   APP_URL: "https://example.com",
+  MCP_INTERNAL_SECRET: "test-mcp-secret",
 });
 
 const makeRequest = (method: string, path: string, headers?: Record<string, string>): Request =>
   new Request(`https://example.com${path}`, { method, headers });
+
+const makeMcpRequest = (method: string = "POST", headers: Record<string, string> = {}): Request =>
+  makeRequest(method, "/mcp", { "X-Internal-Secret": "test-mcp-secret", ...headers });
 
 describe("worker fetch handler", () => {
   beforeEach(() => {
@@ -295,14 +299,14 @@ describe("worker fetch handler", () => {
 
   describe("/mcp endpoint", () => {
     it("calls transport.handleRequest and returns response", async () => {
-      const req = makeRequest("POST", "/mcp");
+      const req = makeMcpRequest("POST");
       const res = await worker.fetch(req, makeEnv());
       expect(mockHandleRequest).toHaveBeenCalled();
       expect(res.status).toBe(200);
     });
 
     it("adds CORS headers to the MCP response", async () => {
-      const req = makeRequest("POST", "/mcp");
+      const req = makeMcpRequest("POST");
       const res = await worker.fetch(req, makeEnv());
       // No Origin header → falls back to first allowed origin
       expect(res.headers.get("Access-Control-Allow-Origin")).toBe(
@@ -311,13 +315,13 @@ describe("worker fetch handler", () => {
     });
 
     it("connects McpServer to transport before handling request", async () => {
-      const req = makeRequest("POST", "/mcp");
+      const req = makeMcpRequest("POST");
       await worker.fetch(req, makeEnv());
       expect(mockMcpConnect).toHaveBeenCalled();
     });
 
     it("registers verify-session and get-user-by-email tools", async () => {
-      const req = makeRequest("POST", "/mcp");
+      const req = makeMcpRequest("POST");
       await worker.fetch(req, makeEnv());
       const toolNames = registeredTools.map((t) => t.name);
       expect(toolNames).toContain("verify-session");
@@ -333,10 +337,7 @@ describe("worker fetch handler", () => {
           headers: { "x-custom-header": "custom-value" },
         }),
       );
-      const req = new Request("https://example.com/mcp", {
-        method: "POST",
-        headers: { Origin: "https://auth-mcp.spike.land" },
-      });
+      const req = makeMcpRequest("POST", { Origin: "https://auth-mcp.spike.land" });
       const res = await worker.fetch(req, makeEnv());
       expect(res.headers.get("Access-Control-Allow-Origin")).toBe("https://auth-mcp.spike.land");
       expect(res.headers.get("x-custom-header")).toBe("custom-value");
@@ -345,7 +346,7 @@ describe("worker fetch handler", () => {
 
     it("preserves response body after applying CORS", async () => {
       mockHandleRequest.mockResolvedValueOnce(new Response("hello world", { status: 200 }));
-      const req = makeRequest("POST", "/mcp");
+      const req = makeMcpRequest("POST");
       const res = await worker.fetch(req, makeEnv());
       expect(await res.text()).toBe("hello world");
     });
@@ -360,7 +361,7 @@ describe("MCP tool: verify-session", () => {
   });
 
   async function getVerifySessionTool() {
-    const req = makeRequest("POST", "/mcp");
+    const req = makeMcpRequest("POST");
     await worker.fetch(req, makeEnv());
     return registeredTools.find((t) => t.name === "verify-session");
   }
@@ -430,7 +431,7 @@ describe("MCP tool: get-user-by-email", () => {
   });
 
   async function getEmailTool() {
-    const req = makeRequest("POST", "/mcp");
+    const req = makeMcpRequest("POST");
     await worker.fetch(req, makeEnv());
     return registeredTools.find((t) => t.name === "get-user-by-email");
   }

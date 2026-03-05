@@ -40,25 +40,25 @@ export function shortenDescription(desc: string): string {
   else if (lower.startsWith("a ")) shortened = shortened.slice(2).trim();
   else if (lower.startsWith("an ")) shortened = shortened.slice(3).trim();
   
+  // Remove trailing period BEFORE truncation/ellipsis
+  if (shortened.endsWith(".")) {
+    shortened = shortened.slice(0, -1);
+  }
+  
   // Truncate to first sentence if > 80 chars
   if (shortened.length > 80) {
     const periodIndex = shortened.indexOf(". ");
-    if (periodIndex !== -1 && periodIndex < 80) {
+    if (periodIndex !== -1) {
       shortened = shortened.slice(0, periodIndex);
     } else {
       // Find a reasonable break point or just hard truncate
-      const breakIndex = shortened.indexOf(" ", 70);
-      if (breakIndex !== -1 && breakIndex < 85) {
+      const breakIndex = shortened.lastIndexOf(" ", 80);
+      if (breakIndex !== -1 && breakIndex > 50) {
          shortened = shortened.slice(0, breakIndex) + "...";
       } else {
          shortened = shortened.slice(0, 77) + "...";
       }
     }
-  }
-  
-  // Remove trailing period
-  if (shortened.endsWith(".")) {
-    shortened = shortened.slice(0, -1);
   }
   
   // Capitalize first letter
@@ -130,7 +130,7 @@ function optimizeNode(node: unknown, propertyName: string | undefined): unknown 
 }
 
 function isRedundantDescription(propertyName: string, description: string, enumValues?: unknown[]): boolean {
-  const normalized = description.toLowerCase().trim();
+  const normalized = description.toLowerCase().trim().replace(/[_-]/g, " ");
   const normalizedName = propertyName.toLowerCase().replace(/[_-]/g, " ");
 
   // Exact match: description is just the property name
@@ -145,6 +145,9 @@ function isRedundantDescription(propertyName: string, description: string, enumV
   // "The <words> of the <name>" or "The <words> for the <name>"
   if (normalized.endsWith(` of the ${normalizedName}`) || normalized.endsWith(` for the ${normalizedName}`)) return true;
   if (normalized.endsWith(` of ${normalizedName}`) || normalized.endsWith(` for ${normalizedName}`)) return true;
+
+  // "ID for <name>" or "ID of <name>"
+  if (normalized === `id for ${normalizedName}` || normalized === `id of ${normalizedName}`) return true;
 
   // Boolean patterns
   if (normalized === `whether to ${normalizedName}` || 
