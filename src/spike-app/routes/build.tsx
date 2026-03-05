@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
+import { apiUrl } from "@/lib/api";
 
 const DELIVERABLES = [
   { title: "3-screen working MVP", description: "A functional app with up to 3 core screens tailored to your brief." },
@@ -96,7 +97,7 @@ async function handleServiceCheckout(email: string, isAuthenticated: boolean) {
     body["email"] = email;
   }
 
-  const res = await fetch("/api/checkout/service", {
+  const res = await fetch(apiUrl("/checkout/service"), {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),

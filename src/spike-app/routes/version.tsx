@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { apiUrl } from "@/lib/api";
 
 interface VersionAsset {
   key: string;
@@ -47,7 +48,7 @@ export function VersionPage() {
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
-    fetch("/api/version")
+    fetch(apiUrl("/version"))
       .then((r) => {
         if (!r.ok) throw new Error(`HTTP ${r.status}`);
         return r.json() as Promise<VersionData>;

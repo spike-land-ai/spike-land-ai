@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Navigate } from "@tanstack/react-router";
 import { useAuth } from "@/hooks/useAuth";
 import { ChatThread } from "@/components/ChatThread";
+import { apiUrl } from "@/lib/api";
 import type { Message } from "@/components/ChatThread";
 
 const FOUNDER_EMAIL = "zoltan.erdos@spike.land";
@@ -294,7 +295,7 @@ function ExperimentCard({ exp }: { exp: DashboardExperiment }) {
 
   useEffect(() => {
     if (!expanded) return;
-    fetch(`/api/experiments/${exp.id}/metrics`)
+    fetch(apiUrl(`/experiments/${exp.id}/metrics`))
       .then((r) => r.json() as Promise<ExperimentMetrics>)
       .then(setMetrics)
       .catch(() => {});
@@ -303,7 +304,7 @@ function ExperimentCard({ exp }: { exp: DashboardExperiment }) {
   const runEvaluation = async () => {
     setEvaluating(true);
     try {
-      const res = await fetch(`/api/experiments/${exp.id}/evaluate`, { method: "POST" });
+      const res = await fetch(apiUrl(`/experiments/${exp.id}/evaluate`), { method: "POST" });
       const data = (await res.json()) as EvalResult;
       setEvalResult(data);
     } catch {
@@ -406,7 +407,7 @@ function ExperimentsDashboard() {
   const [data, setData] = useState<{ experiments: DashboardExperiment[]; revenue24h: number } | null>(null);
 
   useEffect(() => {
-    fetch("/api/experiments/dashboard")
+    fetch(apiUrl("/experiments/dashboard"))
       .then((r) => r.json() as Promise<{ experiments: DashboardExperiment[]; revenue24h: number }>)
       .then(setData)
       .catch(() => {});
@@ -502,7 +503,7 @@ function MetricsDashboard() {
   const [data, setData] = useState<CockpitMetrics | null>(null);
 
   useEffect(() => {
-    fetch("/api/cockpit/metrics")
+    fetch(apiUrl("/cockpit/metrics"))
       .then((r) => {
         if (!r.ok) throw new Error("Failed to fetch");
         return r.json() as Promise<CockpitMetrics>;

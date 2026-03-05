@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { apiUrl } from "@/lib/api";
 
 interface CreditBalance {
   balance: number;
@@ -32,7 +33,7 @@ export function CreditWidget() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetch("/api/credits/balance", { credentials: "include" })
+    fetch(apiUrl("/credits/balance"), { credentials: "include" })
       .then((r) => {
         if (!r.ok) throw new Error("Failed to load credits");
         return r.json() as Promise<CreditBalance>;

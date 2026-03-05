@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { apiUrl } from "@/lib/api";
 
 interface CreditPack {
   id: string;
@@ -15,7 +16,7 @@ const PACKS: CreditPack[] = [
 ];
 
 async function purchaseCredits(credits: number): Promise<void> {
-  const res = await fetch("/api/credits/purchase", {
+  const res = await fetch(apiUrl("/credits/purchase"), {
     method: "POST",
     credentials: "include",
     headers: { "Content-Type": "application/json" },

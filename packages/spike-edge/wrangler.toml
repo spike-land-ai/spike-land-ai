@@ -54,6 +54,10 @@ zone_name = "spike.land"
 pattern = "www.spike.land/*"
 zone_name = "spike.land"
 
+[[routes]]
+pattern = "api.spike.land"
+custom_domain = true
+
 [[analytics_engine_datasets]]
 binding = "ANALYTICS"
 dataset = "spike_analytics"

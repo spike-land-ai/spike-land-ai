@@ -264,9 +264,21 @@ const toolsCategoryRoute = createRoute({
   component: withSuspense(() => import("./routes/tools/$toolName"), "ToolsCategoryPage"),
 });
 
-const mcpAuthorizeRoute = createRoute({
+// MCP routes
+const mcpRoute = createRoute({
   getParentRoute: () => rootRoute,
-  path: "/mcp/authorize",
+  path: "/mcp",
+});
+
+const mcpIndexRoute = createRoute({
+  getParentRoute: () => mcpRoute,
+  path: "/",
+  component: withSuspense(() => import("./routes/mcp/index"), "McpPage"),
+});
+
+const mcpAuthorizeRoute = createRoute({
+  getParentRoute: () => mcpRoute,
+  path: "authorize",
   component: withSuspense(() => import("./routes/mcp/authorize"), "McpAuthorizePage"),
 });
 
@@ -302,7 +314,7 @@ const routeTree = rootRoute.addChildren([
   learnRoute.addChildren([learnIndexRoute, learnSessionRoute, learnBadgeRoute]),
   messagesRoute.addChildren([messagesIndexRoute, messageThreadRoute]),
   toolsRoute.addChildren([toolsIndexRoute, toolsCategoryRoute]),
-  mcpAuthorizeRoute,
+  mcpRoute.addChildren([mcpIndexRoute, mcpAuthorizeRoute]),
 ]);
 
 export const router = createRouter({

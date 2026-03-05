@@ -1,4 +1,5 @@
 import { Link, useParams } from "@tanstack/react-router";
+import { apiUrl } from "@/lib/api";
 import { useEffect, useState } from "react";
 
 interface DocDetail {
@@ -16,7 +17,7 @@ export function DocPage() {
   const [error, setError] = useState(false);
 
   useEffect(() => {
-    fetch(`/api/docs/${slug}`)
+    fetch(apiUrl(`/docs/${slug}`))
       .then(res => {
         if (!res.ok) throw new Error("Not found");
         return res.json();

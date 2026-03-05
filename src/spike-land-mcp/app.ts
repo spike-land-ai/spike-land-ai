@@ -18,9 +18,11 @@ export function createApp(): Hono<{ Bindings: Env; Variables: AuthVariables }> {
   app.use(
     "*",
     cors({
-      origin: ["https://spike.land"],
-      allowHeaders: ["Authorization", "Content-Type", "X-Internal-Secret"],
+      origin: ["https://spike.land", "https://local.spike.land:5173"],
+      allowHeaders: ["Authorization", "Content-Type", "X-Internal-Secret", "Mcp-Session-Id", "Mcp-Protocol-Version", "Accept"],
       allowMethods: ["GET", "POST", "DELETE", "OPTIONS"],
+      exposeHeaders: ["Mcp-Session-Id"],
+      maxAge: 86400,
     }),
   );
   app.use("*", logger());

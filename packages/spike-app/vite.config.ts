@@ -36,11 +36,16 @@ export default defineConfig({
       : {}),
     proxy: {
       "/api": {
-        target: "https://spike.land",
+        target: "https://api.spike.land",
         changeOrigin: true,
         secure: true,
       },
       "/mcp": {
+        target: "https://spike.land",
+        changeOrigin: true,
+        secure: true,
+      },
+      "/oauth": {
         target: "https://spike.land",
         changeOrigin: true,
         secure: true,

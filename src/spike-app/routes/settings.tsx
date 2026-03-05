@@ -2,6 +2,7 @@ import { useNavigate, useSearch } from "@tanstack/react-router";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/components/Toast";
+import { apiUrl } from "@/lib/api";
 
 type SettingsTab = "profile" | "whatsapp" | "keys" | "billing" | "access";
 
@@ -38,7 +39,7 @@ function ProfileTab() {
     setSaving(true);
     setError(null);
     try {
-      const res = await fetch("/api/user/profile", {
+      const res = await fetch(apiUrl("/user/profile"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -211,7 +212,7 @@ function ApiKeysTab() {
   useEffect(() => {
     async function fetchKeys() {
       try {
-        const res = await fetch("/api/keys");
+        const res = await fetch(apiUrl("/keys"));
         if (!res.ok) return;
         const data = await res.json() as { keys: ApiKey[] };
         setKeys(data.keys);
@@ -229,7 +230,7 @@ function ApiKeysTab() {
     setSaving(true);
     setError(null);
     try {
-      const res = await fetch("/api/keys", {
+      const res = await fetch(apiUrl("/keys"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ provider: selectedProvider, encryptedKey: newKeyValue }),
@@ -251,7 +252,7 @@ function ApiKeysTab() {
   async function handleTest(key: ApiKey) {
     setTestingId(key.id);
     try {
-      const res = await fetch(`/api/keys/${key.id}/test`, { method: "POST" });
+      const res = await fetch(apiUrl(`/keys/${key.id}/test`), { method: "POST" });
       const data = await res.json() as { valid: boolean; status?: number };
       setTestResults((prev) => ({
         ...prev,
@@ -266,7 +267,7 @@ function ApiKeysTab() {
 
   async function handleDelete(id: string) {
     try {
-      await fetch(`/api/keys/${id}`, { method: "DELETE" });
+      await fetch(apiUrl(`/keys/${id}`), { method: "DELETE" });
       setKeys((prev) => prev.filter((k) => k.id !== id));
       setTestResults((prev) => {
         const next = { ...prev };
@@ -403,7 +404,7 @@ function BillingTab() {
   useEffect(() => {
     async function fetchBilling() {
       try {
-        const res = await fetch("/api/billing/status");
+        const res = await fetch(apiUrl("/billing/status"));
         if (!res.ok) return;
         const data = await res.json() as BillingStatus;
         setBilling(data);
@@ -430,7 +431,7 @@ function BillingTab() {
   async function handleUpgrade(tier: "pro" | "business") {
     setUpgrading(true);
     try {
-      const res = await fetch("/api/checkout", {
+      const res = await fetch(apiUrl("/checkout"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ tier }),
@@ -450,7 +451,7 @@ function BillingTab() {
   async function handleManageSubscription() {
     setManagingPortal(true);
     try {
-      const res = await fetch("/api/billing/cancel", { method: "POST" });
+      const res = await fetch(apiUrl("/billing/cancel"), { method: "POST" });
       if (!res.ok) {
         const err = (await res.json()) as { error?: string };
         showToast(err.error ?? "Failed to open billing portal", "error");

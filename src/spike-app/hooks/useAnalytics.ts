@@ -60,7 +60,16 @@ function scheduleFlush() {
   }
 }
 
+function hasAnalyticsConsent(): boolean {
+  try {
+    return localStorage.getItem("cookie_consent") === "accepted";
+  } catch {
+    return false;
+  }
+}
+
 function enqueueEvent(event: string, data: Record<string, unknown>) {
+  if (!hasAnalyticsConsent()) return;
   // Deduplicate consecutive page_view for the same path
   if (event === "page_view") {
     const path = data.path as string | undefined;

@@ -2,6 +2,7 @@ import { useEffect, useRef, useCallback, useState } from "react";
 import { Terminal } from "@xterm/xterm";
 import { FitAddon } from "@xterm/addon-fit";
 import "@xterm/xterm/css/xterm.css";
+import { mcpUrl } from "@/lib/api";
 
 interface McpTerminalProps {
   appId?: string;
@@ -26,7 +27,7 @@ export function McpTerminal({ appId }: McpTerminalProps) {
 
   const fetchTools = useCallback(async (): Promise<McpTool[]> => {
     try {
-      const res = await fetch("/mcp/tools");
+      const res = await fetch(mcpUrl("/tools"));
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data: { tools?: McpTool[] } = await res.json();
       return data.tools ?? [];
@@ -36,7 +37,7 @@ export function McpTerminal({ appId }: McpTerminalProps) {
   }, []);
 
   const callTool = useCallback(async (toolName: string, args: Record<string, unknown>) => {
-    const res = await fetch("/mcp", {
+    const res = await fetch(mcpUrl("/mcp"), {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({

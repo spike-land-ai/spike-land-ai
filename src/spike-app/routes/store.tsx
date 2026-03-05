@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "@tanstack/react-router";
+import { apiUrl } from "@/lib/api";
 
 interface StoreTool {
   name: string;
@@ -70,7 +71,7 @@ export function StorePage() {
   const [search, setSearch] = useState("");
 
   useEffect(() => {
-    fetch("/api/store/tools")
+    fetch(apiUrl("/store/tools"))
       .then((res) => {
         if (!res.ok) throw new Error(`Failed to load store (${res.status})`);
         return res.json<StoreData>();

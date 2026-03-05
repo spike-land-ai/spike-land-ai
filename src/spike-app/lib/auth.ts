@@ -1,6 +1,6 @@
 import { createAuthClient } from "better-auth/react";
 
-const baseURL = import.meta.env.VITE_AUTH_URL || "https://spike.land";
+const baseURL = import.meta.env.VITE_AUTH_URL || "";
 
 export const authClient = createAuthClient({
   baseURL,

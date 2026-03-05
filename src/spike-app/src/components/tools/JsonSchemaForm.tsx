@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
+import { apiUrl } from "@/lib/api";
 
 interface JsonSchemaProperty {
   type: string;
@@ -28,8 +29,8 @@ export function JsonSchemaForm({ schema, onChange, onSubmit, isPending }: JsonSc
   useEffect(() => {
     if (schema.properties?.content_url) {
       Promise.all([
-        fetch("/api/blog").then(res => res.ok ? res.json() : []).catch(() => []),
-        fetch("/api/learnit/recent?limit=20").then(res => res.ok ? res.json() : []).catch(() => [])
+        fetch(apiUrl("/blog")).then(res => res.ok ? res.json() : []).catch(() => []),
+        fetch(apiUrl("/learnit/recent?limit=20")).then(res => res.ok ? res.json() : []).catch(() => [])
       ]).then(([blogs, learnits]) => {
          const options: {url: string, label: string}[] = [];
          if (Array.isArray(blogs)) {

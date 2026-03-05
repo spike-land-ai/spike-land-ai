@@ -1,7 +1,6 @@
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { useCookieConsent } from "@/hooks/useCookieConsent";
-import { useFocusTrap } from "@/hooks/useFocusTrap";
 
 export function CookieConsent() {
   const { consentGiven, accept, reject } = useCookieConsent();
@@ -15,39 +14,35 @@ export function CookieConsent() {
     }
   }, [consentGiven]);
 
-  const isOpen = consentGiven === null && visible;
-  const onClose = useCallback(() => reject(), [reject]);
-  const trapRef = useFocusTrap(isOpen, onClose);
-
   if (consentGiven !== null) {
     return null;
   }
 
   return (
     <div
-      ref={trapRef}
-      className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="cookie-consent-title"
+      className="fixed bottom-0 inset-x-0 z-50"
+      role="region"
+      aria-label="Cookie consent"
       style={{
         opacity: visible ? 1 : 0,
         transition: "opacity 0.2s ease-in-out",
       }}
     >
-      <div className="bg-card rounded-2xl border border-border shadow-2xl p-8 max-w-md mx-4">
-        <h2
-          id="cookie-consent-title"
-          className="text-lg font-bold text-foreground"
-        >
-          Cookie Preferences
-        </h2>
-        <p className="text-sm text-muted-foreground mt-3">
-          We use cookies to enhance your experience. Essential cookies are
-          required for the platform to function. Analytics cookies help us
-          improve the service.
-        </p>
-        <div className="flex gap-3 mt-6">
+      <div className="bg-card border-t border-border shadow-2xl px-6 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 max-w-screen-xl mx-auto">
+        <div className="flex-1 min-w-0">
+          <p className="text-sm text-muted-foreground">
+            We use cookies to enhance your experience. Essential cookies are
+            required for the platform to function. Analytics cookies help us
+            improve the service.{" "}
+            <Link
+              to="/privacy"
+              className="text-xs text-muted-foreground underline"
+            >
+              Learn more
+            </Link>
+          </p>
+        </div>
+        <div className="flex gap-3 shrink-0">
           <button
             type="button"
             onClick={accept}
@@ -63,12 +58,6 @@ export function CookieConsent() {
             Reject Non-Essential
           </button>
         </div>
-        <Link
-          to="/privacy"
-          className="text-xs text-muted-foreground underline mt-4 block text-center"
-        >
-          Learn more
-        </Link>
       </div>
     </div>
   );

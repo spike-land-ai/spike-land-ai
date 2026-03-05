@@ -41,17 +41,30 @@ const app = new Hono<{ Bindings: Env }>();
 // Request ID middleware (must run before everything else)
 app.use("*", requestIdMiddleware);
 
+// api.spike.land rewrite: strip subdomain prefix, prepend /api/
+app.use("*", async (c, next) => {
+  const host = c.req.header("host") ?? "";
+  if (host.startsWith("api.spike.land") && !c.req.path.startsWith("/api/")) {
+    const url = new URL(c.req.url);
+    url.pathname = `/api${url.pathname}`;
+    const res = await app.fetch(new Request(url.toString(), c.req.raw), c.env, c.executionCtx);
+    return new Response(res.body, res);
+  }
+  return next();
+});
+
 // CORS middleware
 app.use("*", async (c, next) => {
   const allowedOrigins = c.env.ALLOWED_ORIGINS
     ? c.env.ALLOWED_ORIGINS.split(",").map((o) => o.trim())
-    : ["https://spike.land"];
+    : ["https://spike.land", "https://local.spike.land:5173"];
 
   const corsMiddleware = cors({
     origin: allowedOrigins,
     allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowHeaders: ["Content-Type", "Authorization", "Mcp-Session-Id", "Mcp-Protocol-Version", "Accept"],
-    exposeHeaders: ["Mcp-Session-Id"],
+    allowHeaders: ["Content-Type", "Authorization", "Mcp-Session-Id", "Mcp-Protocol-Version", "Accept", "Cookie"],
+    exposeHeaders: ["Mcp-Session-Id", "Set-Cookie"],
+    credentials: true,
     maxAge: 86400,
   });
 
@@ -94,7 +107,7 @@ app.use("*", async (c, next) => {
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
       "img-src 'self' https://*.r2.dev https://*.r2.cloudflarestorage.com https://avatars.githubusercontent.com https://*.googleusercontent.com data: blob:",
       "font-src 'self' https://fonts.gstatic.com data:",
-      "connect-src 'self' https://edge.spike.land https://auth-mcp.spike.land https://mcp.spike.land https://checkout.stripe.com wss://spike.land blob: data:",
+      "connect-src 'self' https://api.spike.land https://edge.spike.land https://auth-mcp.spike.land https://mcp.spike.land https://checkout.stripe.com wss://spike.land blob: data:",
       "worker-src 'self' blob:",
       "frame-src 'self' https://edge.spike.land",
       "object-src 'none'",
@@ -324,10 +337,17 @@ app.all("/api/auth/*", async (c) => {
   newRequest.headers.set("X-Request-Id", c.get("requestId" as never) as string);
 
   const response = await c.env.AUTH_MCP.fetch(newRequest);
+  // Strip CORS headers from upstream — spike-edge's own CORS middleware handles them
+  const headers = new Headers(response.headers);
+  headers.delete("Access-Control-Allow-Origin");
+  headers.delete("Access-Control-Allow-Methods");
+  headers.delete("Access-Control-Allow-Headers");
+  headers.delete("Access-Control-Allow-Credentials");
+  headers.delete("Access-Control-Expose-Headers");
   return new Response(response.body, {
     status: response.status,
     statusText: response.statusText,
-    headers: new Headers(response.headers),
+    headers,
   });
 });
 

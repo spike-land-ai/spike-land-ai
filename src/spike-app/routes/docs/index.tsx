@@ -1,4 +1,5 @@
 import { Link } from "@tanstack/react-router";
+import { apiUrl } from "@/lib/api";
 import { useEffect, useState } from "react";
 
 interface DocEntry {
@@ -18,7 +19,7 @@ export function DocsIndexPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("/api/docs")
+    fetch(apiUrl("/docs"))
       .then(res => res.json())
       .then((data: { categories: DocsCategory[] }) => {
         setCategories(data.categories);
