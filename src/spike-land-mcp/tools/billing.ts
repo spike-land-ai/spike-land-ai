@@ -1,18 +1,25 @@
 /**
  * Billing Management MCP Tools (CF Workers)
  *
- * Subscription status and checkout intent.
- * Ported from spike.land — uses Drizzle D1 instead of Prisma.
+ * Thin adapter layer — delegates to lib/billing-service for data + formatting.
  * Note: Actual Stripe checkout is handled by spike.land API routes.
  */
 
 import { z } from "zod";
-import { and, eq } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import type { ToolRegistry } from "../mcp/registry";
 import { freeTool } from "../procedures/index";
 import { textResult } from "./tool-helpers";
 import type { DrizzleDB } from "../db/index";
-import { subscriptions, workspaceMembers, workspaces } from "../db/schema";
+import { subscriptions } from "../db/schema";
+import {
+  getBillingStatus,
+  getActiveSubscription,
+  formatBillingStatus,
+  formatPlanList,
+  formatCancellationPreview,
+  formatCancellationConfirm,
+} from "../lib/billing-service";
 
 export function registerBillingTools(registry: ToolRegistry, userId: string, db: DrizzleDB): void {
   const t = freeTool(userId, db);
@@ -49,8 +56,6 @@ export function registerBillingTools(registry: ToolRegistry, userId: string, db:
           return textResult("**Error:** cancel_url must be a spike.land URL (https://spike.land/... or https://edge.spike.land/...).");
         }
 
-        // Return a checkout intent — actual Stripe session creation is handled
-        // by the edge proxy to keep the Stripe secret key out of MCP tools.
         return textResult(
           `**Checkout Ready**\n\n` +
             `**Tier:** ${input.tier}\n` +
@@ -70,60 +75,8 @@ export function registerBillingTools(registry: ToolRegistry, userId: string, db:
       )
       .meta({ category: "billing", tier: "free" })
       .handler(async ({ ctx }) => {
-        // Get user's subscription
-        const sub = await ctx.db
-          .select({
-            plan: subscriptions.plan,
-            status: subscriptions.status,
-            stripeSubscriptionId: subscriptions.stripeSubscriptionId,
-            currentPeriodEnd: subscriptions.currentPeriodEnd,
-          })
-          .from(subscriptions)
-          .where(eq(subscriptions.userId, ctx.userId))
-          .limit(1);
-
-        let text = `**Billing Status**\n\n`;
-
-        if (sub.length > 0 && sub[0]) {
-          const s = sub[0];
-          text += `### Subscription\n`;
-          text += `**Plan:** ${s.plan}\n`;
-          text += `**Status:** ${s.status}\n`;
-          text += `**Active Stripe Subscription:** ${s.stripeSubscriptionId ? "Yes" : "No"}\n`;
-          if (s.currentPeriodEnd) {
-            text += `**Current Period End:** ${new Date(s.currentPeriodEnd).toISOString()}\n`;
-          }
-        } else {
-          text += `### Subscription\n`;
-          text += `**Plan:** free\n`;
-          text += `**Status:** No active subscription\n`;
-        }
-
-        // Fetch workspaces the user belongs to
-        const userWorkspaces = await ctx.db
-          .select({
-            id: workspaces.id,
-            name: workspaces.name,
-            plan: workspaces.plan,
-          })
-          .from(workspaces)
-          .innerJoin(
-            workspaceMembers,
-            and(
-              eq(workspaceMembers.workspaceId, workspaces.id),
-              eq(workspaceMembers.userId, ctx.userId),
-            ),
-          );
-
-        if (userWorkspaces.length > 0) {
-          text += `\n### Workspaces (${userWorkspaces.length})\n\n`;
-          for (const ws of userWorkspaces) {
-            text += `**${ws.name}** (${ws.id})\n`;
-            text += `- Plan: ${ws.plan}\n\n`;
-          }
-        }
-
-        return textResult(text);
+        const data = await getBillingStatus(ctx.db, ctx.userId);
+        return textResult(formatBillingStatus(data));
       }),
   );
 
@@ -138,61 +91,29 @@ export function registerBillingTools(registry: ToolRegistry, userId: string, db:
       )
       .meta({ category: "billing", tier: "free" })
       .handler(async ({ input, ctx }) => {
-        const sub = await ctx.db
-          .select({
-            id: subscriptions.id,
-            status: subscriptions.status,
-            stripeSubscriptionId: subscriptions.stripeSubscriptionId,
-            currentPeriodEnd: subscriptions.currentPeriodEnd,
-          })
-          .from(subscriptions)
-          .where(
-            and(
-              eq(subscriptions.userId, ctx.userId),
-              eq(subscriptions.status, "active"),
-            ),
-          )
-          .limit(1);
+        const sub = await getActiveSubscription(ctx.db, ctx.userId);
 
-        if (sub.length === 0 || !sub[0]) {
+        if (!sub) {
           return textResult("**No Active Subscription**\n\nYou don't have an active subscription to cancel.");
         }
 
-        const s = sub[0];
-
         if (!input.confirm) {
-          const endDate = s.currentPeriodEnd
-            ? new Date(s.currentPeriodEnd).toISOString().split("T")[0]
-            : "end of current period";
-          return textResult(
-            `**Cancellation Preview**\n\n` +
-              `Your subscription will be canceled. Access continues until **${endDate}**.\n\n` +
-              `To proceed, call again with \`confirm: true\`.`,
-          );
+          return textResult(formatCancellationPreview(sub));
         }
 
-        if (!s.stripeSubscriptionId) {
+        if (!sub.stripeSubscriptionId) {
           return textResult(
             "**Cannot Cancel**\n\nYour subscription has no associated Stripe subscription. Contact support.",
           );
         }
 
-        // Mark as canceled locally — Stripe webhook will confirm
         const now = Date.now();
         await ctx.db
           .update(subscriptions)
           .set({ status: "canceled", updatedAt: now })
-          .where(eq(subscriptions.id, s.id));
+          .where(eq(subscriptions.id, sub.id));
 
-        const endDate = s.currentPeriodEnd
-          ? new Date(s.currentPeriodEnd).toISOString().split("T")[0]
-          : "end of current period";
-
-        return textResult(
-          `**Subscription Canceled**\n\n` +
-            `Your subscription has been canceled. You'll retain access until **${endDate}**.\n\n` +
-            `To resubscribe, use \`billing_create_checkout\`.`,
-        );
+        return textResult(formatCancellationConfirm(sub));
       }),
   );
 
@@ -205,27 +126,7 @@ export function registerBillingTools(registry: ToolRegistry, userId: string, db:
       )
       .meta({ category: "billing", tier: "free" })
       .handler(async () => {
-        return textResult(
-          `**spike.land Plans**\n\n` +
-            `### Free\n` +
-            `- Up to 5 apps\n` +
-            `- 25 vault secrets\n` +
-            `- Basic AI tools\n` +
-            `- Community support\n\n` +
-            `### Pro — $19/month\n` +
-            `- Unlimited apps\n` +
-            `- 500 vault secrets\n` +
-            `- Priority AI models\n` +
-            `- Advanced analytics\n` +
-            `- Email support\n\n` +
-            `### Business — $49/month\n` +
-            `- Everything in Pro\n` +
-            `- Team workspaces with RBAC\n` +
-            `- Full audit logs (90-day retention)\n` +
-            `- Dedicated support\n` +
-            `- Custom integrations\n\n` +
-            `Use \`billing_create_checkout\` with tier "pro" or "business" to subscribe.`,
-        );
+        return textResult(formatPlanList());
       }),
   );
 }

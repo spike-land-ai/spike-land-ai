@@ -8,47 +8,12 @@
 import { Hono } from "hono";
 import type { Env } from "../env.js";
 import { createLogger } from "@spike-land-ai/shared";
+import { stripePost, stripeGet } from "../lib/stripe-client.js";
+import { VALID_LOOKUP_KEYS, SERVICE_PRODUCTS } from "../lib/pricing.js";
 
 const log = createLogger("spike-edge");
 
 const checkout = new Hono<{ Bindings: Env }>();
-
-const VALID_LOOKUP_KEYS = new Set([
-  "pro_monthly",
-  "pro_annual",
-  "business_monthly",
-  "business_annual",
-]);
-
-async function stripePost(
-  key: string,
-  path: string,
-  body: Record<string, string>,
-): Promise<{ ok: boolean; data: Record<string, unknown> }> {
-  const res = await fetch(`https://api.stripe.com${path}`, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${key}`,
-      "Content-Type": "application/x-www-form-urlencoded",
-    },
-    body: new URLSearchParams(body).toString(),
-  });
-  const data = (await res.json()) as Record<string, unknown>;
-  return { ok: res.ok, data };
-}
-
-async function stripeGet(
-  key: string,
-  path: string,
-  params: Record<string, string>,
-): Promise<{ ok: boolean; data: Record<string, unknown> }> {
-  const qs = new URLSearchParams(params).toString();
-  const res = await fetch(`https://api.stripe.com${path}?${qs}`, {
-    headers: { Authorization: `Bearer ${key}` },
-  });
-  const data = (await res.json()) as Record<string, unknown>;
-  return { ok: res.ok, data };
-}
 
 checkout.post("/api/checkout", async (c) => {
   const stripeKey = c.env.STRIPE_SECRET_KEY;
@@ -126,12 +91,6 @@ checkout.post("/api/checkout", async (c) => {
 });
 
 // ─── One-time Service Payments ──────────────────────────────────────────────
-
-const SERVICE_PRODUCTS: Record<string, { lookupKey: string; successPath: string; label: string }> = {
-  app_builder: { lookupKey: "app_builder_1997", successPath: "/build?success=1", label: "AI App Builder" },
-  workshop_seat: { lookupKey: "workshop_seat_497", successPath: "/workshop?success=1", label: "MCP Workshop (Seat)" },
-  workshop_team: { lookupKey: "workshop_team_1997", successPath: "/workshop?success=1", label: "MCP Workshop (Team)" },
-};
 
 checkout.post("/api/checkout/service", async (c) => {
   const stripeKey = c.env.STRIPE_SECRET_KEY;

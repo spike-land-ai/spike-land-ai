@@ -2,9 +2,19 @@ import { Hono } from "hono";
 import type { Env } from "../env.js";
 import { authMiddleware } from "../middleware/auth.js";
 import { calculateBugEloChange } from "../lib/elo.js";
-import { ensureUserElo, getUserElo, recordEloEvent } from "../lib/elo-service.js";
+import { ensureUserElo, getUserElo, recordEloEvent, type EloEventType } from "../lib/elo-service.js";
 import { ensureAgentElo, getAgentElo, recordAgentEloEvent } from "../lib/agent-elo-service.js";
 import { eloThrottleMiddleware } from "../middleware/elo-throttle.js";
+import {
+  buildBugListQuery,
+  buildBugCountQuery,
+  buildFindExistingBugByError,
+  buildFindExistingBugByTitle,
+  buildInsertBug,
+  buildBumpBugReportCount,
+  buildInsertBugReport,
+  buildRandomCompetitor,
+} from "../lib/bugbook-queries.js";
 
 const bugbook = new Hono<{ Bindings: Env }>();
 
@@ -18,37 +28,13 @@ bugbook.get("/bugbook", async (c) => {
   const limit = Math.min(parseInt(c.req.query("limit") ?? "50", 10), 200);
   const offset = parseInt(c.req.query("offset") ?? "0", 10);
 
-  let query = "SELECT id, title, category, status, severity, elo, report_count, first_seen_at, last_seen_at FROM bugs WHERE 1=1";
-  const params: (string | number)[] = [];
+  const listQ = buildBugListQuery({ status, category, sort, limit, offset });
+  const countQ = buildBugCountQuery({ status, category });
 
-  if (status) {
-    query += " AND status = ?";
-    params.push(status);
-  }
-  if (category) {
-    query += " AND category = ?";
-    params.push(category);
-  }
-
-  const orderCol = sort === "recent" ? "last_seen_at" : "elo";
-  query += ` ORDER BY ${orderCol} DESC LIMIT ? OFFSET ?`;
-  params.push(limit, offset);
-
-  const result = await c.env.DB.prepare(query).bind(...params).all();
-
-  // Get total count for pagination
-  let countQuery = "SELECT COUNT(*) as total FROM bugs WHERE 1=1";
-  const countParams: (string | number)[] = [];
-  if (status) {
-    countQuery += " AND status = ?";
-    countParams.push(status);
-  }
-  if (category) {
-    countQuery += " AND category = ?";
-    countParams.push(category);
-  }
-
-  const countResult = await c.env.DB.prepare(countQuery).bind(...countParams).first<{ total: number }>();
+  const [result, countResult] = await Promise.all([
+    c.env.DB.prepare(listQ.sql).bind(...listQ.params).all(),
+    c.env.DB.prepare(countQ.sql).bind(...countQ.params).first<{ total: number }>(),
+  ]);
 
   return c.json({
     bugs: result.results,
@@ -141,16 +127,13 @@ bugbook.post("/bugbook/report", authMiddleware, eloThrottleMiddleware, async (c)
   let existingBug: Record<string, unknown> | null = null;
 
   if (body.error_code) {
-    const metadataLike = `%"error_code":"${body.error_code}"%`;
-    existingBug = await c.env.DB.prepare(
-      "SELECT * FROM bugs WHERE category = ? AND metadata LIKE ? AND status != 'DEPRECATED' LIMIT 1",
-    ).bind(body.service_name, metadataLike).first();
+    const q = buildFindExistingBugByError(body.service_name, body.error_code);
+    existingBug = await c.env.DB.prepare(q.sql).bind(...q.params).first();
   }
 
   if (!existingBug) {
-    existingBug = await c.env.DB.prepare(
-      "SELECT * FROM bugs WHERE title = ? AND category = ? AND status != 'DEPRECATED' LIMIT 1",
-    ).bind(body.title, body.service_name).first();
+    const q = buildFindExistingBugByTitle(body.title, body.service_name);
+    existingBug = await c.env.DB.prepare(q.sql).bind(...q.params).first();
   }
 
   let bugId: string;
@@ -160,43 +143,25 @@ bugbook.post("/bugbook/report", authMiddleware, eloThrottleMiddleware, async (c)
     bugId = existingBug.id as string;
     isNewBug = false;
 
-    // Update existing bug
-    await c.env.DB.prepare(
-      "UPDATE bugs SET report_count = report_count + 1, last_seen_at = ?, status = CASE WHEN report_count >= 2 AND status = 'CANDIDATE' THEN 'ACTIVE' ELSE status END WHERE id = ?",
-    ).bind(now, bugId).run();
+    const bumpQ = buildBumpBugReportCount(now, bugId);
+    await c.env.DB.prepare(bumpQ.sql).bind(...bumpQ.params).run();
   } else {
-    // Create new bug
-    const result = await c.env.DB.prepare(
-      "INSERT INTO bugs (title, description, category, severity, metadata) VALUES (?, ?, ?, ?, ?) RETURNING id",
-    ).bind(
-      body.title,
-      body.description,
-      body.service_name,
-      severity,
-      body.error_code ? JSON.stringify({ error_code: body.error_code }) : "{}",
-    ).first<{ id: string }>();
+    const insertQ = buildInsertBug(body.title, body.description, body.service_name, severity, body.error_code);
+    const result = await c.env.DB.prepare(insertQ.sql).bind(...insertQ.params).first<{ id: string }>();
 
     bugId = result!.id;
     isNewBug = true;
   }
 
-  // Insert bug report
-  await c.env.DB.prepare(
-    "INSERT INTO bug_reports (bug_id, reporter_id, service_name, description, reproduction_steps, severity, metadata) VALUES (?, ?, ?, ?, ?, ?, ?)",
-  ).bind(
-    bugId,
-    userId,
-    body.service_name,
-    body.description,
-    body.reproduction_steps ?? null,
-    severity,
-    body.metadata ? JSON.stringify(body.metadata) : "{}",
-  ).run();
+  const reportQ = buildInsertBugReport(
+    bugId, userId, body.service_name, body.description,
+    body.reproduction_steps ?? null, severity, body.metadata,
+  );
+  await c.env.DB.prepare(reportQ.sql).bind(...reportQ.params).run();
 
   // Bug-vs-Bug ELO: pick a random same-category competitor
-  const competitor = await c.env.DB.prepare(
-    "SELECT id, elo, report_count FROM bugs WHERE category = ? AND id != ? AND status IN ('CANDIDATE', 'ACTIVE') ORDER BY RANDOM() LIMIT 1",
-  ).bind(body.service_name, bugId).first<{ id: string; elo: number; report_count: number }>();
+  const compQ = buildRandomCompetitor(body.service_name, bugId);
+  const competitor = await c.env.DB.prepare(compQ.sql).bind(...compQ.params).first<{ id: string; elo: number; report_count: number }>();
 
   if (competitor) {
     const currentBug = await c.env.DB.prepare(
@@ -256,10 +221,9 @@ bugbook.post("/bugbook/:id/confirm", authMiddleware, eloThrottleMiddleware, asyn
   }
 
   const now = Date.now();
+  const bumpQ = buildBumpBugReportCount(now, bugId);
   await c.env.DB.batch([
-    c.env.DB.prepare(
-      "UPDATE bugs SET report_count = report_count + 1, last_seen_at = ?, status = CASE WHEN report_count >= 2 AND status = 'CANDIDATE' THEN 'ACTIVE' ELSE status END WHERE id = ?",
-    ).bind(now, bugId),
+    c.env.DB.prepare(bumpQ.sql).bind(...bumpQ.params),
     c.env.DB.prepare(
       "INSERT INTO bug_reports (bug_id, reporter_id, service_name, description, severity) VALUES (?, ?, ?, 'Confirmed by user', ?)",
     ).bind(bugId, userId, bug.category as string, bug.severity as string),
@@ -403,7 +367,7 @@ bugbook.post("/internal/agent-elo/event", async (c) => {
     c.env.DB,
     body.agentId,
     body.ownerUserId,
-    body.eventType as any,
+    body.eventType as EloEventType,
     body.referenceId,
   );
 

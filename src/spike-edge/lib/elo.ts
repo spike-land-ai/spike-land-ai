@@ -1,17 +1,10 @@
 /**
- * Generic ELO rating engine.
- * Adapted from @spike-land-ai/chess-engine/elo.ts — pure math, no domain deps.
+ * ELO rating engine — domain wrappers around shared core.
  */
 
-export function expectedScore(playerElo: number, opponentElo: number): number {
-  return 1 / (1 + Math.pow(10, (opponentElo - playerElo) / 400));
-}
+import { expectedScore, getKFactor } from "@spike-land-ai/shared";
 
-export function getKFactor(elo: number, eventCount: number): number {
-  if (elo > 2400) return 16;
-  if (eventCount < 30) return 40;
-  return 32;
-}
+export { expectedScore, getKFactor };
 
 /** Clamp ELO to [0, 3000]. */
 export function applyEloDelta(currentElo: number, delta: number): number {

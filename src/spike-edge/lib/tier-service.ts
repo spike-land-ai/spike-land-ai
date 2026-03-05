@@ -11,6 +11,24 @@
 
 import { eloToTier } from "./elo.js";
 
+// ─── Stripe Plan Mapping ───────────────────────────────────────────────────
+
+interface StripeSubscriptionForTier {
+  items?: {
+    data?: Array<{ price?: { lookup_key?: string; product?: string } }>;
+  };
+  metadata?: Record<string, string>;
+}
+
+export function mapStripePlanToTier(subscription: StripeSubscriptionForTier): string {
+  const lookupKey = subscription.items?.data?.[0]?.price?.lookup_key;
+  if (lookupKey?.includes("business")) return "business";
+  if (lookupKey?.includes("pro")) return "pro";
+  const metaTier = subscription.metadata?.tier;
+  if (metaTier === "business" || metaTier === "pro") return metaTier;
+  return "pro"; // default paid tier
+}
+
 type Tier = "free" | "pro" | "business";
 
 export async function resolveEffectiveTier(

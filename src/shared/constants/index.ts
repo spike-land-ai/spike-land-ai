@@ -9,9 +9,17 @@
 
 export const ENHANCEMENT_COSTS = {
   FREE: 0, // Nano model, 1024px output, no cost
+  TIER_0_5K: 1, // 512px max dimension
   TIER_1K: 2, // 1024px max dimension
   TIER_2K: 5, // 2048px max dimension
   TIER_4K: 10, // 4096px max dimension
+} as const;
+
+export const ADVANCED_FEATURE_COSTS = {
+  subjectRef: 1, // per reference image
+  text: 1, // text rendering
+  grounding: 2, // Google Search grounding
+  compare: 1, // image comparison
 } as const;
 
 export const MCP_GENERATION_COSTS = {
@@ -50,6 +58,7 @@ export const IMAGE_CONSTRAINTS = {
   /** Output dimensions per tier */
   TIER_DIMENSIONS: {
     FREE: 1024,
+    TIER_0_5K: 512,
     TIER_1K: 1024,
     TIER_2K: 2048,
     TIER_4K: 4096,

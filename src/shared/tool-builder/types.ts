@@ -61,14 +61,14 @@ export interface ToolExample {
 }
 
 export interface ToolMeta {
-  category?: string;
-  tier?: "free" | "workspace";
-  complexity?: "primitive" | "composed" | "workflow";
-  annotations?: Record<string, unknown>;
-  alwaysEnabled?: boolean;
-  examples?: ToolExample[];
-  version?: string;
-  stability?: "stable" | "beta" | "experimental" | "deprecated" | "not-implemented";
+  category?: string | undefined;
+  tier?: "free" | "workspace" | undefined;
+  complexity?: "primitive" | "composed" | "workflow" | undefined;
+  annotations?: Record<string, unknown> | undefined;
+  alwaysEnabled?: boolean | undefined;
+  examples?: ToolExample[] | undefined;
+  version?: string | undefined;
+  stability?: "stable" | "beta" | "experimental" | "deprecated" | "not-implemented" | undefined;
 }
 
 // ─── Built tool (output of builder) ───
@@ -77,7 +77,7 @@ export interface BuiltTool<TInput = unknown, TOutput = CallToolResult> {
   name: string;
   description: string;
   inputSchema: z.ZodRawShape;
-  outputSchema?: z.ZodType<TOutput>;
+  outputSchema?: z.ZodType<TOutput> | undefined;
   meta: ToolMeta;
   handler: (input: TInput, ctx?: Record<string, unknown>) => Promise<CallToolResult>;
 }

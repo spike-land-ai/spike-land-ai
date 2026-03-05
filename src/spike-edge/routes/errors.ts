@@ -1,24 +1,10 @@
 import { Hono } from "hono";
 import type { Env } from "../env.js";
+import { createRateLimiter } from "../lib/in-memory-rate-limiter.js";
 
 const errors = new Hono<{ Bindings: Env }>();
 
-// In-memory rate limiter for error ingestion (defense-in-depth: resets on isolate recycle,
-// but limits burst abuse within a single isolate lifetime)
-const rateLimitMap = new Map<string, { count: number; windowStart: number }>();
-const RATE_WINDOW_MS = 60_000;
-const RATE_MAX = 10;
-
-function isRateLimited(ip: string): boolean {
-  const now = Date.now();
-  const entry = rateLimitMap.get(ip);
-  if (!entry || now - entry.windowStart > RATE_WINDOW_MS) {
-    rateLimitMap.set(ip, { count: 1, windowStart: now });
-    return false;
-  }
-  entry.count++;
-  return entry.count > RATE_MAX;
-}
+const isRateLimited = createRateLimiter({ windowMs: 60_000, maxRequests: 10 });
 
 interface ErrorLogEntry {
   service_name: string;

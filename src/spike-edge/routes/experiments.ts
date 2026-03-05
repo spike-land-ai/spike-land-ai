@@ -11,50 +11,12 @@
 
 import { Hono } from "hono";
 import type { Env } from "../env.js";
+import { assignVariant, computeConversionRates, evaluateExperiment } from "../lib/experiment-engine.js";
+import { createRateLimiter } from "../lib/in-memory-rate-limiter.js";
 
 const experiments = new Hono<{ Bindings: Env }>();
 
-// ─── FNV-1a hash ────────────────────────────────────────────────────────────
-
-function fnv1a(str: string): number {
-  let hash = 0x811c9dc5;
-  for (let i = 0; i < str.length; i++) {
-    hash ^= str.charCodeAt(i);
-    hash = (hash * 0x01000193) >>> 0;
-  }
-  return hash;
-}
-
-function assignVariant(
-  clientId: string,
-  experimentId: string,
-  variants: Array<{ id: string; weight: number }>,
-): string {
-  const bucket = fnv1a(clientId + experimentId) % 10000;
-  let cumulative = 0;
-  for (const v of variants) {
-    cumulative += v.weight * 100; // weight 25 → 2500 out of 10000
-    if (bucket < cumulative) return v.id;
-  }
-  return variants[variants.length - 1]?.id ?? "control";
-}
-
-// ─── Rate limiting (in-memory, same pattern as analytics.ts) ────────────────
-
-const rateLimitMap = new Map<string, { count: number; windowStart: number }>();
-const RATE_WINDOW_MS = 60_000;
-const RATE_MAX = 20;
-
-function isRateLimited(ip: string): boolean {
-  const now = Date.now();
-  const entry = rateLimitMap.get(ip);
-  if (!entry || now - entry.windowStart > RATE_WINDOW_MS) {
-    rateLimitMap.set(ip, { count: 1, windowStart: now });
-    return false;
-  }
-  entry.count++;
-  return entry.count > RATE_MAX;
-}
+const isRateLimited = createRateLimiter({ windowMs: 60_000, maxRequests: 20 });
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
@@ -90,6 +52,30 @@ const VALID_EVENT_TYPES = new Set([
   "checkout_started",
   "thankyou_viewed",
 ]);
+
+// ─── Helpers ────────────────────────────────────────────────────────────────
+
+type MetricRow = {
+  variant_id: string;
+  metric_name: string;
+  metric_value: number;
+  sample_size: number;
+};
+
+function groupMetricsByVariant(
+  metrics: MetricRow[],
+): Record<string, Record<string, { value: number; sampleSize: number }>> {
+  const byVariant: Record<string, Record<string, { value: number; sampleSize: number }>> = {};
+  for (const m of metrics) {
+    if (!byVariant[m.variant_id]) byVariant[m.variant_id] = {};
+    const variantBucket = byVariant[m.variant_id]!;
+    variantBucket[m.metric_name] = {
+      value: m.metric_value,
+      sampleSize: m.sample_size,
+    };
+  }
+  return byVariant;
+}
 
 // ─── POST /api/experiments/assign ───────────────────────────────────────────
 
@@ -307,12 +293,7 @@ experiments.get("/api/experiments/:id/metrics", async (c) => {
         "SELECT variant_id, metric_name, metric_value, sample_size FROM experiment_metrics WHERE experiment_id = ?",
       )
       .bind(id)
-      .all<{
-        variant_id: string;
-        metric_name: string;
-        metric_value: number;
-        sample_size: number;
-      }>(),
+      .all<MetricRow>(),
   ]);
 
   if (!expRow) {
@@ -320,41 +301,11 @@ experiments.get("/api/experiments/:id/metrics", async (c) => {
   }
 
   const variants: VariantDef[] = JSON.parse(expRow.variants);
-  const metrics = metricsRows.results ?? [];
+  const byVariant = groupMetricsByVariant(metricsRows.results ?? []);
 
-  // Group metrics by variant
-  const byVariant: Record<
-    string,
-    Record<string, { value: number; sampleSize: number }>
-  > = {};
-  for (const m of metrics) {
-    if (!byVariant[m.variant_id]) byVariant[m.variant_id] = {};
-    const variantBucket = byVariant[m.variant_id]!;
-    variantBucket[m.metric_name] = {
-      value: m.metric_value,
-      sampleSize: m.sample_size,
-    };
-  }
-
-  const variantMetrics = variants.map((v) => {
-    const vm = byVariant[v.id] ?? {};
-    const impressions = vm.impressions?.value ?? 0;
-    const donations = vm.donations?.value ?? 0;
-    const revenue = vm.revenue_cents?.value ?? 0;
-    const fistbumps = vm.fistbumps?.value ?? 0;
-
-    return {
-      variantId: v.id,
-      impressions,
-      donations,
-      revenue,
-      fistbumps,
-      donateRate: impressions > 0 ? donations / impressions : 0,
-      revenuePerImpression: impressions > 0 ? revenue / impressions : 0,
-      conversionRate:
-        impressions > 0 ? (donations + fistbumps) / impressions : 0,
-    };
-  });
+  const variantMetrics = variants.map((v) =>
+    computeConversionRates(v.id, byVariant[v.id] ?? {}),
+  );
 
   return c.json({
     experimentId: id,
@@ -396,26 +347,9 @@ experiments.post("/api/experiments/:id/evaluate", async (c) => {
       "SELECT variant_id, metric_name, metric_value, sample_size FROM experiment_metrics WHERE experiment_id = ?",
     )
     .bind(id)
-    .all<{
-      variant_id: string;
-      metric_name: string;
-      metric_value: number;
-      sample_size: number;
-    }>();
+    .all<MetricRow>();
 
-  const metrics = metricsRows.results ?? [];
-  const byVariant: Record<
-    string,
-    Record<string, { value: number; sampleSize: number }>
-  > = {};
-  for (const m of metrics) {
-    if (!byVariant[m.variant_id]) byVariant[m.variant_id] = {};
-    const variantBucket = byVariant[m.variant_id]!;
-    variantBucket[m.metric_name] = {
-      value: m.metric_value,
-      sampleSize: m.sample_size,
-    };
-  }
+  const byVariant = groupMetricsByVariant(metricsRows.results ?? []);
 
   // Check min sample size (500 impressions per variant)
   for (const v of variants) {
@@ -428,81 +362,36 @@ experiments.post("/api/experiments/:id/evaluate", async (c) => {
     }
   }
 
-  // Beta-Binomial Bayesian model for primary metric (donation rate)
-  // Prior: Beta(1,1), Posterior: Beta(1 + successes, 1 + failures)
-  const NUM_DRAWS = 10000;
-  const wins = new Map<string, number>();
-
-  // Prepare posterior parameters for each variant
-  const posteriors = variants.map((v) => {
+  // Build input for Bayesian evaluation
+  const variantData = variants.map((v) => {
     const vm = byVariant[v.id] ?? {};
-    const impressions = vm.impressions?.value ?? 0;
-    const donations = vm.donations?.value ?? 0;
-    const alpha = 1 + donations;
-    const beta = 1 + (impressions - donations);
-    return { id: v.id, alpha, beta, donateRate: impressions > 0 ? donations / impressions : 0 };
+    return {
+      id: v.id,
+      impressions: vm.impressions?.value ?? 0,
+      donations: vm.donations?.value ?? 0,
+    };
   });
 
-  // Monte Carlo simulation
-  for (let draw = 0; draw < NUM_DRAWS; draw++) {
-    let bestId = "";
-    let bestVal = -1;
+  const result = evaluateExperiment(variantData);
 
-    for (const p of posteriors) {
-      const sample = sampleBeta(p.alpha, p.beta);
-      if (sample > bestVal) {
-        bestVal = sample;
-        bestId = p.id;
-      }
-    }
-
-    wins.set(bestId, (wins.get(bestId) ?? 0) + 1);
-  }
-
-  const probabilities: Record<string, number> = {};
-  for (const v of variants) {
-    probabilities[v.id] = (wins.get(v.id) ?? 0) / NUM_DRAWS;
-  }
-
-  // Find best variant
-  let bestVariant = "";
-  let bestProb = 0;
-  for (const [vid, prob] of Object.entries(probabilities)) {
-    if (prob > bestProb) {
-      bestProb = prob;
-      bestVariant = vid;
-    }
-  }
-
-  // Check if winner is ≥10% better than control
-  const controlRate =
-    posteriors.find((p) => p.id === "control")?.donateRate ?? 0;
-  const winnerRate =
-    posteriors.find((p) => p.id === bestVariant)?.donateRate ?? 0;
-  const improvement =
-    controlRate > 0 ? (winnerRate - controlRate) / controlRate : 0;
-
-  const shouldGraduate =
-    bestProb > 0.95 && (bestVariant === "control" || improvement >= 0.1);
-
-  if (shouldGraduate) {
+  if (result.shouldGraduate) {
     const now = Date.now();
     await db
       .prepare(
         "UPDATE experiments SET status = 'graduated', winner_variant_id = ?, updated_at = ? WHERE id = ?",
       )
-      .bind(bestVariant, now, id)
+      .bind(result.bestVariant, now, id)
       .run();
   }
 
   return c.json({
     ready: true,
-    graduated: shouldGraduate,
-    winner: shouldGraduate ? bestVariant : null,
-    probabilities,
-    improvement: Math.round(improvement * 1000) / 10,
-    controlRate: Math.round(controlRate * 10000) / 100,
-    winnerRate: Math.round(winnerRate * 10000) / 100,
+    graduated: result.shouldGraduate,
+    winner: result.shouldGraduate ? result.bestVariant : null,
+    probabilities: result.probabilities,
+    improvement: Math.round(result.improvement * 1000) / 10,
+    controlRate: Math.round(result.controlRate * 10000) / 100,
+    winnerRate: Math.round(result.winnerRate * 10000) / 100,
   });
 });
 
@@ -602,40 +491,5 @@ experiments.get("/api/experiments/monitor", async (c) => {
     activeExperiments: active.length,
   });
 });
-
-// ─── Beta distribution sampling (Box-Muller + Gamma) ────────────────────────
-
-function sampleGamma(shape: number): number {
-  // Marsaglia and Tsang's method
-  if (shape < 1) {
-    return sampleGamma(shape + 1) * Math.pow(Math.random(), 1 / shape);
-  }
-  const d = shape - 1 / 3;
-  const c = 1 / Math.sqrt(9 * d);
-  for (;;) {
-    let x: number;
-    let v: number;
-    do {
-      x = randn();
-      v = 1 + c * x;
-    } while (v <= 0);
-    v = v * v * v;
-    const u = Math.random();
-    if (u < 1 - 0.0331 * (x * x) * (x * x)) return d * v;
-    if (Math.log(u) < 0.5 * x * x + d * (1 - v + Math.log(v))) return d * v;
-  }
-}
-
-function randn(): number {
-  const u1 = Math.random();
-  const u2 = Math.random();
-  return Math.sqrt(-2 * Math.log(u1)) * Math.cos(2 * Math.PI * u2);
-}
-
-function sampleBeta(alpha: number, beta: number): number {
-  const x = sampleGamma(alpha);
-  const y = sampleGamma(beta);
-  return x / (x + y);
-}
 
 export { experiments };

@@ -10,7 +10,7 @@ import { IMAGE_CONSTRAINTS, SUPPORTED_ASPECT_RATIOS } from "../constants";
 // Enhancement Validations
 // ============================================================================
 
-export const EnhancementTierSchema = z.enum(["FREE", "TIER_1K", "TIER_2K", "TIER_4K"]);
+export const EnhancementTierSchema = z.enum(["FREE", "TIER_0_5K", "TIER_1K", "TIER_2K", "TIER_4K"]);
 
 export const EnhanceImageRequestSchema = z.object({
   imageId: z.string().min(1),

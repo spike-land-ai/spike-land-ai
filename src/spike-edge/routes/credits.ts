@@ -15,46 +15,12 @@ import type { Env } from "../env.js";
 import { getBalance, getUsedToday } from "../lib/credit-service.js";
 import { resolveEffectiveTier } from "../lib/tier-service.js";
 import { createLogger } from "@spike-land-ai/shared";
+import { stripePost, stripeGet } from "../lib/stripe-client.js";
+import { CREDIT_PACKS } from "../lib/pricing.js";
 
 const log = createLogger("spike-edge");
 
 const credits = new Hono<{ Bindings: Env }>();
-
-const CREDIT_PACKS: Array<{ credits: number; priceCents: number; lookupKey: string }> = [
-  { credits: 500, priceCents: 500, lookupKey: "credits_500" },
-  { credits: 2500, priceCents: 2000, lookupKey: "credits_2500" },
-  { credits: 7500, priceCents: 5000, lookupKey: "credits_7500" },
-];
-
-async function stripePost(
-  key: string,
-  path: string,
-  body: Record<string, string>,
-): Promise<{ ok: boolean; data: Record<string, unknown> }> {
-  const res = await fetch(`https://api.stripe.com${path}`, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${key}`,
-      "Content-Type": "application/x-www-form-urlencoded",
-    },
-    body: new URLSearchParams(body).toString(),
-  });
-  const data = (await res.json()) as Record<string, unknown>;
-  return { ok: res.ok, data };
-}
-
-async function stripeGet(
-  key: string,
-  path: string,
-  params: Record<string, string>,
-): Promise<{ ok: boolean; data: Record<string, unknown> }> {
-  const qs = new URLSearchParams(params).toString();
-  const res = await fetch(`https://api.stripe.com${path}?${qs}`, {
-    headers: { Authorization: `Bearer ${key}` },
-  });
-  const data = (await res.json()) as Record<string, unknown>;
-  return { ok: res.ok, data };
-}
 
 credits.get("/api/credits/balance", async (c) => {
   const userId = c.get("userId" as never) as string | undefined;

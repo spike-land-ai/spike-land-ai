@@ -1,4 +1,5 @@
 import { Hono } from "hono";
+import { generateBadgeToken } from "@spike-land-ai/shared";
 import type { Env } from "../env.js";
 
 const quizBadge = new Hono<{ Bindings: Env }>();
@@ -12,7 +13,6 @@ quizBadge.get("/quiz/badge/:token", async (c) => {
     return c.json({ error: "Badge service not configured" }, 500);
   }
 
-  // Decode and verify the badge token
   const parts = token.split(".");
   if (parts.length !== 2) {
     return c.json({ error: "Invalid badge token" }, 400);
@@ -31,14 +31,8 @@ quizBadge.get("/quiz/badge/:token", async (c) => {
     return c.json({ error: "Invalid badge payload" }, 400);
   }
 
-  // Verify signature
-  let hash = 0;
-  const signInput = JSON.stringify(payload) + secret;
-  for (let i = 0; i < signInput.length; i++) {
-    const char = signInput.charCodeAt(i);
-    hash = ((hash << 5) - hash + char) | 0;
-  }
-  const expectedSig = btoa(String(Math.abs(hash)));
+  const expectedToken = generateBadgeToken(payload, secret);
+  const expectedSig = expectedToken.split(".")[1];
   if (sigB64 !== expectedSig) {
     return c.json({ error: "Invalid badge signature" }, 403);
   }

@@ -1,24 +1,24 @@
 export interface ErrorReport {
   message: string;
-  stack?: string;
+  stack?: string | undefined;
   severity: "warning" | "error" | "fatal";
   source: string;
-  metadata?: Record<string, unknown>;
+  metadata?: Record<string, unknown> | undefined;
 }
 
 export interface ErrorReporter {
   report(error: ErrorReport): void;
   reportException(error: unknown, extra?: {
-    severity?: "warning" | "error" | "fatal";
-    code?: string;
-    metadata?: Record<string, unknown>;
+    severity?: "warning" | "error" | "fatal" | undefined;
+    code?: string | undefined;
+    metadata?: Record<string, unknown> | undefined;
   }): void;
 }
 
 export function createErrorReporter(options: {
   service: string;
-  endpoint?: string;
-  waitUntil?: (promise: Promise<unknown>) => void;
+  endpoint?: string | undefined;
+  waitUntil?: ((promise: Promise<unknown>) => void) | undefined;
 }): ErrorReporter {
   const { service, endpoint, waitUntil } = options;
 
@@ -51,9 +51,9 @@ export function createErrorReporter(options: {
   function reportException(
     error: unknown,
     extra?: {
-      severity?: "warning" | "error" | "fatal";
-      code?: string;
-      metadata?: Record<string, unknown>;
+      severity?: "warning" | "error" | "fatal" | undefined;
+      code?: string | undefined;
+      metadata?: Record<string, unknown> | undefined;
     },
   ): void {
     const message = error instanceof Error ? error.message : String(error);

@@ -1,129 +1,29 @@
 /**
- * Stripe Webhook Handler
+ * Stripe Webhook Handler — thin HTTP adapter.
  *
- * Verifies Stripe webhook signatures and handles subscription lifecycle events.
- * Uses raw D1 SQL (spike-edge pattern, not Drizzle).
+ * Parses request, verifies signature, dispatches to service functions.
  */
 
 import { Hono } from "hono";
 import type { Env } from "../env.js";
 import { createLogger } from "@spike-land-ai/shared";
+import { verifyStripeSignature } from "../lib/stripe-signature.js";
+import {
+  checkIdempotency,
+  logWebhookError,
+  handleCheckoutCompleted,
+  handleSubscriptionUpdated,
+  handleSubscriptionDeleted,
+  handleInvoicePaid,
+  handleInvoicePaymentFailed,
+  type StripeEvent,
+  type StripeSession,
+} from "../lib/subscription-service.js";
+import { handleBlogDonation } from "../lib/donation-service.js";
 
 const log = createLogger("spike-edge");
 
 const stripeWebhook = new Hono<{ Bindings: Env }>();
-
-// ─── Stripe Signature Verification ──────────────────────────────────────────
-
-async function verifyStripeSignature(
-  rawBody: string,
-  signature: string,
-  secret: string,
-): Promise<boolean> {
-  const parts = signature.split(",").reduce<Record<string, string>>((acc, part) => {
-    const [key, value] = part.split("=");
-    if (key && value) acc[key] = value;
-    return acc;
-  }, {});
-
-  const timestamp = parts.t;
-  const v1Signature = parts.v1;
-  if (!timestamp || !v1Signature) return false;
-
-  // Reject timestamps older than 5 minutes
-  const age = Math.floor(Date.now() / 1000) - parseInt(timestamp, 10);
-  if (age > 300) return false;
-
-  const payload = `${timestamp}.${rawBody}`;
-  const encoder = new TextEncoder();
-  const key = await crypto.subtle.importKey(
-    "raw",
-    encoder.encode(secret),
-    { name: "HMAC", hash: "SHA-256" },
-    false,
-    ["sign"],
-  );
-  const signed = await crypto.subtle.sign("HMAC", key, encoder.encode(payload));
-
-  // HIGH-01: Use constant-time comparison to prevent timing attacks.
-  // crypto.subtle.timingSafeEqual is Node-only; implement manually for CF Workers.
-  const expectedHex = Array.from(new Uint8Array(signed))
-    .map((b) => b.toString(16).padStart(2, "0"))
-    .join("");
-
-  if (expectedHex.length !== v1Signature.length) return false;
-
-  // XOR each character code and accumulate — never short-circuit
-  let diff = 0;
-  for (let i = 0; i < expectedHex.length; i++) {
-    diff |= expectedHex.charCodeAt(i) ^ v1Signature.charCodeAt(i);
-  }
-  return diff === 0;
-}
-
-// ─── Event Types ────────────────────────────────────────────────────────────
-
-interface StripeEvent {
-  id: string;
-  type: string;
-  data: {
-    object: Record<string, unknown>;
-  };
-}
-
-interface StripeSession {
-  customer_email?: string;
-  customer?: string;
-  subscription?: string;
-  metadata?: Record<string, string>;
-}
-
-interface StripeSubscription {
-  id: string;
-  customer: string;
-  status: string;
-  items?: {
-    data?: Array<{ price?: { lookup_key?: string; product?: string } }>;
-  };
-  current_period_end?: number;
-  metadata?: Record<string, string>;
-}
-
-interface StripeInvoice {
-  customer?: string;
-  subscription?: string;
-  period_end?: number;
-}
-
-// ─── Helpers ────────────────────────────────────────────────────────────────
-
-function mapStripePlanToTier(subscription: StripeSubscription): string {
-  const lookupKey = subscription.items?.data?.[0]?.price?.lookup_key;
-  if (lookupKey?.includes("business")) return "business";
-  if (lookupKey?.includes("pro")) return "pro";
-  // Check metadata fallback
-  const metaTier = subscription.metadata?.tier;
-  if (metaTier === "business" || metaTier === "pro") return metaTier;
-  return "pro"; // default paid tier
-}
-
-/** Persist webhook handler errors to error_logs (fire-and-forget). */
-function logWebhookError(
-  db: D1Database,
-  ctx: ExecutionContext | undefined,
-  eventType: string,
-  message: string,
-  stack: string | null,
-) {
-  try {
-    const work = db.prepare(
-      "INSERT INTO error_logs (service_name, error_code, message, stack_trace, metadata, client_id, severity) VALUES (?, ?, ?, ?, ?, ?, ?)",
-    ).bind("stripe-webhook", eventType, message, stack, null, null, "error").run().catch(() => {});
-    try { ctx?.waitUntil(work); } catch { /* no ctx in tests */ }
-  } catch { /* DB unavailable */ }
-}
-
-// ─── Webhook Route ──────────────────────────────────────────────────────────
 
 stripeWebhook.post("/stripe/webhook", async (c) => {
   const signature = c.req.header("stripe-signature");
@@ -152,288 +52,43 @@ stripeWebhook.post("/stripe/webhook", async (c) => {
 
   const db = c.env.DB;
 
-  // ── Idempotency: skip events already processed ───────────────────────────
-  try {
-    const already = await db.prepare(
-      "SELECT id FROM webhook_events WHERE id = ? LIMIT 1",
-    ).bind(event.id).first<{ id: string }>();
-
-    if (already) {
-      return c.json({ received: true, duplicate: true });
-    }
-
-    await db.prepare(
-      "INSERT INTO webhook_events (id, processed_at) VALUES (?, ?)",
-    ).bind(event.id, Date.now()).run();
-  } catch (idempotencyError) {
-    const msg = idempotencyError instanceof Error ? idempotencyError.message : "Unknown error";
-    log.error("Idempotency check failed", { error: msg });
-    // Continue processing — the webhook_events table may not exist yet in dev
+  // Idempotency check
+  const { duplicate } = await checkIdempotency(db, event.id);
+  if (duplicate) {
+    return c.json({ received: true, duplicate: true });
   }
 
-  // ── Event handlers ───────────────────────────────────────────────────────
-
-  switch (event.type) {
-    case "checkout.session.completed": {
-      try {
+  // Dispatch to service handlers
+  try {
+    switch (event.type) {
+      case "checkout.session.completed": {
         const session = event.data.object as unknown as StripeSession;
-
-        // Handle service purchases (app_builder, workshop)
-        if (session.metadata?.type === "service_purchase") {
-          const serviceName = session.metadata.service;
-          const sessionId = (event.data.object as Record<string, unknown>).id as string | undefined;
-          const customerEmail = session.customer_email ?? (session.metadata.email || null);
-          const metaUserId = session.metadata.userId ?? null;
-          if (serviceName && sessionId) {
-            await db.prepare(
-              `INSERT INTO service_purchases (id, service, stripe_session_id, user_id, email, status, created_at)
-               VALUES (?, ?, ?, ?, ?, 'completed', ?)`,
-            ).bind(
-              crypto.randomUUID(),
-              serviceName,
-              sessionId,
-              metaUserId,
-              customerEmail,
-              Date.now(),
-            ).run();
-          }
-          break;
-        }
-
-        // Handle blog support donations (no userId required)
         if (session.metadata?.type === "blog_support") {
-          const slug = session.metadata.slug;
-          const amountStr = session.metadata.amount;
-          const sessionId = (event.data.object as Record<string, unknown>).id as string | undefined;
-          if (slug && sessionId) {
-            // Update pending donation to completed
-            const updated = await db.prepare(
-              "UPDATE support_donations SET status = 'completed' WHERE stripe_session_id = ?",
-            ).bind(sessionId).run();
-            // If no pending record found, insert one
-            if (!updated.meta.changes || updated.meta.changes === 0) {
-              await db.prepare(
-                "INSERT INTO support_donations (id, slug, amount_cents, stripe_session_id, status, created_at) VALUES (?, ?, ?, ?, 'completed', ?)",
-              ).bind(
-                crypto.randomUUID(),
-                slug,
-                amountStr ? Math.round(parseFloat(amountStr) * 100) : 0,
-                sessionId,
-                Date.now(),
-              ).run();
-            }
-          }
-
-          // ── Experiment tracking: inject checkout_completed events ──────
-          try {
-            const metaClientId = session.metadata?.client_id;
-            const amountCents = amountStr ? Math.round(parseFloat(amountStr) * 100) : 0;
-            if (metaClientId && amountCents > 0) {
-              const assignmentRows = await db
-                .prepare(
-                  "SELECT experiment_id, variant_id FROM experiment_assignments WHERE client_id = ?",
-                )
-                .bind(metaClientId)
-                .all<{ experiment_id: string; variant_id: string }>();
-
-              const assignments = assignmentRows.results ?? [];
-              if (assignments.length > 0) {
-                const now = Date.now();
-                const trackingStmts: D1PreparedStatement[] = [];
-
-                for (const a of assignments) {
-                  // Insert checkout_completed event
-                  trackingStmts.push(
-                    db
-                      .prepare(
-                        "INSERT INTO widget_events (id, client_id, slug, event_type, event_data, experiment_id, variant_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-                      )
-                      .bind(
-                        crypto.randomUUID(),
-                        metaClientId,
-                        slug ?? "",
-                        "checkout_completed",
-                        JSON.stringify({ amount: amountCents / 100 }),
-                        a.experiment_id,
-                        a.variant_id,
-                        now,
-                      ),
-                  );
-
-                  // Upsert revenue_cents metric
-                  trackingStmts.push(
-                    db
-                      .prepare(
-                        `INSERT INTO experiment_metrics (id, experiment_id, variant_id, metric_name, metric_value, sample_size, updated_at)
-                         VALUES (?, ?, ?, 'revenue_cents', ?, 1, ?)
-                         ON CONFLICT (experiment_id, variant_id, metric_name)
-                         DO UPDATE SET metric_value = metric_value + ?, sample_size = sample_size + 1, updated_at = ?`,
-                      )
-                      .bind(
-                        crypto.randomUUID(),
-                        a.experiment_id,
-                        a.variant_id,
-                        amountCents,
-                        now,
-                        amountCents,
-                        now,
-                      ),
-                  );
-
-                  // Upsert donations metric
-                  trackingStmts.push(
-                    db
-                      .prepare(
-                        `INSERT INTO experiment_metrics (id, experiment_id, variant_id, metric_name, metric_value, sample_size, updated_at)
-                         VALUES (?, ?, ?, 'donations', 1, 1, ?)
-                         ON CONFLICT (experiment_id, variant_id, metric_name)
-                         DO UPDATE SET metric_value = metric_value + 1, sample_size = sample_size + 1, updated_at = ?`,
-                      )
-                      .bind(
-                        crypto.randomUUID(),
-                        a.experiment_id,
-                        a.variant_id,
-                        now,
-                        now,
-                      ),
-                  );
-                }
-
-                await db.batch(trackingStmts);
-              }
-            }
-          } catch (trackingErr) {
-            const msg = trackingErr instanceof Error ? trackingErr.message : "Unknown";
-            log.error("Experiment tracking failed (non-fatal)", { error: msg });
-          }
-
-          break;
-        }
-
-        const userId = session.metadata?.userId;
-        if (!userId) {
-          log.warn("checkout.session.completed without userId in metadata");
-          break;
-        }
-
-        const stripeCustomerId = typeof session.customer === "string" ? session.customer : null;
-        const stripeSubscriptionId = typeof session.subscription === "string" ? session.subscription : null;
-        const now = Date.now();
-
-        // Derive tier from session metadata (set by checkout endpoint)
-        const rawTier = session.metadata?.tier;
-        const plan = rawTier === "business" || rawTier === "pro" ? rawTier : "pro";
-
-        // Check if user already has a subscription
-        const existing = await db.prepare(
-          "SELECT id FROM subscriptions WHERE user_id = ? LIMIT 1",
-        ).bind(userId).first<{ id: string }>();
-
-        if (existing) {
-          await db.prepare(
-            `UPDATE subscriptions SET stripe_customer_id = ?, stripe_subscription_id = ?, status = 'active', plan = ?, updated_at = ?
-             WHERE id = ?`,
-          ).bind(stripeCustomerId, stripeSubscriptionId, plan, now, existing.id).run();
+          await handleBlogDonation(db, event);
         } else {
-          await db.prepare(
-            `INSERT INTO subscriptions (id, user_id, stripe_customer_id, stripe_subscription_id, status, plan, created_at, updated_at)
-             VALUES (?, ?, ?, ?, 'active', ?, ?, ?)`,
-          ).bind(crypto.randomUUID(), userId, stripeCustomerId, stripeSubscriptionId, plan, now, now).run();
+          await handleCheckoutCompleted(db, event);
         }
-
-        // Sync customer email if present in session
-        const customerEmail = session.customer_email;
-        if (customerEmail && customerEmail.length > 0) {
-          await db.prepare(
-            "UPDATE users SET email = ?, updated_at = ? WHERE id = ? AND email != ?",
-          ).bind(customerEmail, now, userId, customerEmail).run();
-        }
-      } catch (error) {
-        const msg = error instanceof Error ? error.message : "Unknown error";
-        log.error("Error handling checkout.session.completed", { error: msg });
-        logWebhookError(db, c.executionCtx, "checkout.session.completed", msg, error instanceof Error ? error.stack ?? null : null);
+        break;
       }
-      break;
+      case "customer.subscription.updated":
+        await handleSubscriptionUpdated(db, event);
+        break;
+      case "customer.subscription.deleted":
+        await handleSubscriptionDeleted(db, event);
+        break;
+      case "invoice.paid":
+        await handleInvoicePaid(db, event);
+        break;
+      case "invoice.payment_failed":
+        await handleInvoicePaymentFailed(db, event);
+        break;
+      default:
+        break;
     }
-
-    case "customer.subscription.updated": {
-      try {
-        const sub = event.data.object as unknown as StripeSubscription;
-        const tier = mapStripePlanToTier(sub);
-        const status = sub.status === "active" ? "active" : sub.status === "past_due" ? "past_due" : sub.status;
-        const periodEnd = sub.current_period_end ? sub.current_period_end * 1000 : null;
-        const now = Date.now();
-
-        await db.prepare(
-          `UPDATE subscriptions SET status = ?, plan = ?, current_period_end = ?, updated_at = ?
-           WHERE stripe_subscription_id = ?`,
-        ).bind(status, tier, periodEnd, now, sub.id).run();
-      } catch (error) {
-        const msg = error instanceof Error ? error.message : "Unknown error";
-        log.error("Error handling customer.subscription.updated", { error: msg });
-        logWebhookError(db, c.executionCtx, "customer.subscription.updated", msg, error instanceof Error ? error.stack ?? null : null);
-      }
-      break;
-    }
-
-    case "customer.subscription.deleted": {
-      try {
-        const sub = event.data.object as unknown as StripeSubscription;
-        const now = Date.now();
-        await db.prepare(
-          `UPDATE subscriptions SET status = 'canceled', plan = 'free', updated_at = ?
-           WHERE stripe_subscription_id = ?`,
-        ).bind(now, sub.id).run();
-      } catch (error) {
-        const msg = error instanceof Error ? error.message : "Unknown error";
-        log.error("Error handling customer.subscription.deleted", { error: msg });
-        logWebhookError(db, c.executionCtx, "customer.subscription.deleted", msg, error instanceof Error ? error.stack ?? null : null);
-      }
-      break;
-    }
-
-    case "invoice.paid": {
-      try {
-        const invoice = event.data.object as unknown as StripeInvoice;
-        const subId = typeof invoice.subscription === "string" ? invoice.subscription : null;
-        if (subId) {
-          const periodEnd = typeof invoice.period_end === "number" ? invoice.period_end * 1000 : null;
-          const now = Date.now();
-          await db.prepare(
-            `UPDATE subscriptions SET current_period_end = ?, status = 'active', updated_at = ?
-             WHERE stripe_subscription_id = ?`,
-          ).bind(periodEnd, now, subId).run();
-        }
-      } catch (error) {
-        const msg = error instanceof Error ? error.message : "Unknown error";
-        log.error("Error handling invoice.paid", { error: msg });
-        logWebhookError(db, c.executionCtx, "invoice.paid", msg, error instanceof Error ? error.stack ?? null : null);
-      }
-      break;
-    }
-
-    case "invoice.payment_failed": {
-      try {
-        const invoice = event.data.object as Record<string, unknown>;
-        const subId = typeof invoice.subscription === "string" ? invoice.subscription : null;
-        if (subId) {
-          const now = Date.now();
-          await db.prepare(
-            `UPDATE subscriptions SET status = 'past_due', updated_at = ?
-             WHERE stripe_subscription_id = ?`,
-          ).bind(now, subId).run();
-        }
-      } catch (error) {
-        const msg = error instanceof Error ? error.message : "Unknown error";
-        log.error("Error handling invoice.payment_failed", { error: msg });
-        logWebhookError(db, c.executionCtx, "invoice.payment_failed", msg, error instanceof Error ? error.stack ?? null : null);
-      }
-      break;
-    }
-
-    default:
-      // Unhandled event type — acknowledge receipt
-      break;
+  } catch (error) {
+    const msg = error instanceof Error ? error.message : "Unknown error";
+    log.error(`Error handling ${event.type}`, { error: msg });
+    logWebhookError(db, c.executionCtx, event.type, msg, error instanceof Error ? error.stack ?? null : null);
   }
 
   return c.json({ received: true });
