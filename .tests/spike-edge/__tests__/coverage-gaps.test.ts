@@ -457,15 +457,15 @@ describe("stripe-webhook.ts — error catch branches", () => {
       STRIPE_WEBHOOK_SECRET: secret,
       DB: {
         prepare: vi.fn().mockImplementation((sql: string) => {
-          if (sql.includes("webhook_events")) {
+          if (sql.includes("webhook_events") || sql.includes("error_logs")) {
             return {
               bind: vi.fn().mockReturnThis(),
               first: vi.fn().mockResolvedValue(null),
               run: vi.fn().mockResolvedValue({ success: true }),
             };
           }
-          // UPDATE subscriptions throws
-          throw new Error("DB error on UPDATE");
+          // UPDATE subscriptions throws to trigger the catch block
+          throw new Error("DB error on UPDATE subscriptions");
         }),
         batch: vi.fn().mockResolvedValue([]),
       } as unknown as D1Database,
@@ -473,16 +473,22 @@ describe("stripe-webhook.ts — error catch branches", () => {
 
     const app = new Hono<{ Bindings: Env }>();
     app.route("/", stripeWebhook);
+    const ctx = makeCtx();
 
-    const res = await app.request("/stripe/webhook", {
-      method: "POST",
-      body: payload,
-      headers: {
-        "stripe-signature": sig,
-        "content-type": "application/json",
+    const res = await app.request(
+      "/stripe/webhook",
+      {
+        method: "POST",
+        body: payload,
+        headers: {
+          "stripe-signature": sig,
+          "content-type": "application/json",
+        },
       },
-    }, env);
-    // Should return 200 (error is caught internally)
+      env,
+      ctx as unknown as ExecutionContext,
+    );
+    // Should return 200 (error is caught internally by the try/catch in invoice.paid handler)
     expect(res.status).toBe(200);
   });
 
@@ -499,7 +505,7 @@ describe("stripe-webhook.ts — error catch branches", () => {
       STRIPE_WEBHOOK_SECRET: secret,
       DB: {
         prepare: vi.fn().mockImplementation((sql: string) => {
-          if (sql.includes("webhook_events")) {
+          if (sql.includes("webhook_events") || sql.includes("error_logs")) {
             return {
               bind: vi.fn().mockReturnThis(),
               first: vi.fn().mockResolvedValue(null),
@@ -507,7 +513,7 @@ describe("stripe-webhook.ts — error catch branches", () => {
             };
           }
           // UPDATE subscriptions throws
-          throw new Error("DB error on UPDATE");
+          throw new Error("DB error on UPDATE subscriptions");
         }),
         batch: vi.fn().mockResolvedValue([]),
       } as unknown as D1Database,
@@ -515,15 +521,21 @@ describe("stripe-webhook.ts — error catch branches", () => {
 
     const app = new Hono<{ Bindings: Env }>();
     app.route("/", stripeWebhook);
+    const ctx = makeCtx();
 
-    const res = await app.request("/stripe/webhook", {
-      method: "POST",
-      body: payload,
-      headers: {
-        "stripe-signature": sig,
-        "content-type": "application/json",
+    const res = await app.request(
+      "/stripe/webhook",
+      {
+        method: "POST",
+        body: payload,
+        headers: {
+          "stripe-signature": sig,
+          "content-type": "application/json",
+        },
       },
-    }, env);
+      env,
+      ctx as unknown as ExecutionContext,
+    );
     expect(res.status).toBe(200);
   });
 
@@ -602,46 +614,49 @@ describe("stripe-webhook.ts — error catch branches", () => {
 
 // ── cockpit.ts — null coalescence branches ────────────────────────────────────
 
-describe("cockpit.ts — null value branches", () => {
-  it("returns zeros when all DB rows are null", async () => {
+describe("cockpit.ts — null value branches (lines 76-79)", () => {
+  it("returns zeros when all DB metric rows are null", async () => {
+    // DB returns admin email for user lookup, but null for all metric queries
+    const ADMIN_EMAIL = "zoltan.erdos@spike.land";
     const env = createMockEnv({
-      AUTH_MCP: {
-        // Simulate successful auth: returns user session
-        fetch: vi.fn().mockResolvedValue(
-          new Response(JSON.stringify({ session: { id: "s1" }, user: { id: "u1" } }), { status: 200 }),
-        ),
-      } as unknown as Fetcher,
       DB: {
-        prepare: vi.fn().mockReturnValue({
-          bind: vi.fn().mockReturnThis(),
-          first: vi.fn().mockResolvedValue(null), // all null
-          all: vi.fn().mockResolvedValue({ results: [] }),
-          run: vi.fn().mockResolvedValue({}),
+        prepare: vi.fn().mockImplementation((sql: string) => {
+          if (sql.includes("WHERE id = ?")) {
+            // User lookup — return admin user
+            return {
+              bind: vi.fn().mockReturnThis(),
+              first: vi.fn().mockResolvedValue({ email: ADMIN_EMAIL }),
+              all: vi.fn().mockResolvedValue({ results: [] }),
+              run: vi.fn().mockResolvedValue({}),
+            };
+          }
+          // All metric queries return null / empty
+          return {
+            bind: vi.fn().mockReturnThis(),
+            first: vi.fn().mockResolvedValue(null),
+            all: vi.fn().mockResolvedValue({ results: [] }),
+            run: vi.fn().mockResolvedValue({}),
+          };
         }),
-        batch: vi.fn().mockResolvedValue([null, null, null, null, { results: [] }]),
+        batch: vi.fn().mockResolvedValue([]),
       } as unknown as D1Database,
     });
 
     const app = new Hono<{ Bindings: Env }>();
-    // Cockpit requires auth middleware - add manually
+    // Inject userId so auth check passes
     app.use("/api/cockpit/*", async (c, next) => {
-      c.set("userId" as never, "user-123" as never);
+      c.set("userId" as never, "user-admin" as never);
       await next();
     });
     app.route("/", cockpit);
 
-    const res = await app.request("/api/cockpit/stats", {
-      headers: { authorization: "Bearer sess-token" },
-    }, env);
-
-    if (res.status === 200) {
-      const body = await res.json<{ userCount: number; mrr: number }>();
-      // With null DB results, fallback to 0
-      expect(body.userCount).toBe(0);
-      expect(body.mrr).toBe(0);
-    } else {
-      // May fail auth or return error - that's also acceptable for branch coverage
-      expect([200, 401, 500]).toContain(res.status);
-    }
+    const res = await app.request("/api/cockpit/metrics", {}, env);
+    expect(res.status).toBe(200);
+    const body = await res.json<{ userCount: number; activeSubscriptions: number; toolCount: number; mrr: number }>();
+    // All null DB rows → fallback to 0 via ?? operator
+    expect(body.userCount).toBe(0);
+    expect(body.activeSubscriptions).toBe(0);
+    expect(body.toolCount).toBe(0);
+    expect(body.mrr).toBe(0);
   });
 });

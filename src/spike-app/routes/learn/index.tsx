@@ -80,9 +80,9 @@ export function LearnIndexPage() {
   return (
     <div className="mx-auto max-w-2xl space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-foreground">Learn & Verify</h1>
+        <h1 className="text-2xl font-bold text-foreground">LearnIt Quiz Tool</h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          Paste a URL or content, read the article, then prove your understanding through a quiz.
+          This is an AI-powered learning and quiz tool (not platform documentation). Paste a URL or content, read the article, then prove your understanding through a quiz.
           Earn a shareable badge when you master all concepts.
         </p>
       </div>

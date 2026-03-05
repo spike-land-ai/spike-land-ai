@@ -40,7 +40,7 @@ export function TryItNow() {
             
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-cyan-500/10 text-cyan-600 text-xs font-semibold tracking-wide uppercase mb-4">
               <span className="w-1.5 h-1.5 rounded-full bg-cyan-500 animate-pulse"></span>
-              {TOTAL_TOOL_COUNT}+ MCP Tools · No Account Needed
+              {TOTAL_TOOL_COUNT}+ MCP Tools · Instant Access
             </div>
             
             <h2 className="text-3xl font-bold mb-3 text-foreground tracking-tight">Try spike.land in one command</h2>

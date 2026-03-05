@@ -96,6 +96,11 @@ const PLANS: PricingPlan[] = [
 
 const FAQ_ITEMS = [
   {
+    question: "What can I build? Do I need to code?",
+    answer:
+      "You can build AI assistants that interact with databases, read web pages, process images, and more. While some familiarity with coding helps (like using our CLI), our pre-built MCP tools mean you don't need to write the integration logic yourself.",
+  },
+  {
     question: "What's included in the free plan?",
     answer:
       "The free plan gives you 50 AI requests per day, access to 10 MCP tools, a basic dashboard, and community support. It's a great way to explore the platform before committing to a paid plan.",
@@ -318,7 +323,9 @@ export function PricingPage() {
       </p>
 
       <p className="text-center text-sm text-muted-foreground">
-        Pricing and limits are subject to change.
+        Pricing and limits are subject to change. Prices in USD. VAT may apply.
+        <br />
+        Students and educators: <a href="mailto:education@spike.land" className="text-primary underline hover:text-primary/80">Contact us for academic pricing</a>.
       </p>
 
       {/* FAQ */}
