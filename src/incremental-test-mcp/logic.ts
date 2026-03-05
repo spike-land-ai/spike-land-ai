@@ -31,8 +31,8 @@ export async function loadCache(cachePath: string): Promise<Cache> {
   try {
     const data = await fs.readFile(cachePath, 'utf8');
     return JSON.parse(data);
-  } catch (error: unknown) {
-    if (error instanceof Error && 'code' in error && (error as NodeJS.ErrnoException).code === 'ENOENT') {
+  } catch (error: any) {
+    if (error?.code === 'ENOENT') {
       return {};
     }
     throw error;

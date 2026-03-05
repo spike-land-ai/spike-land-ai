@@ -2,7 +2,7 @@ import { readdir, readFile, mkdir, writeFile } from 'node:fs/promises';
 import { join, dirname } from 'node:path';
 import { GoogleGenAI } from '@google/genai';
 
-const GEMINI_API_KEY = "AIzaSyCHyx57SkNhMTpdjL0QeWJPBPKiuCnTu54";
+const GEMINI_API_KEY = "AIzaSyBI5sIrfqz8e41LElePt4oUXd-qrRyzsBI";
 
 async function generateImages() {
   const blogDir = 'content/blog';
