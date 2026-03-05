@@ -72,7 +72,10 @@ export function ToolsIndexPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-foreground">Tool Registry</h1>
+        <div>
+          <h1 className="text-2xl font-bold text-foreground">Tools Registry</h1>
+          <p className="text-sm text-muted-foreground mt-1">Explore developer tools, MCP schemas, and endpoints.</p>
+        </div>
         <span className="inline-flex items-center rounded-md bg-success/10 px-2 py-1 text-xs font-medium text-success-foreground ring-1 ring-inset ring-success/20">
           {data?.tools?.length || 0} Live Tools
         </span>

@@ -140,8 +140,11 @@ export function StorePage() {
   return (
     <div className="space-y-8">
       <div className="flex items-baseline justify-between">
-        <h1 className="text-2xl font-bold">Tool Store</h1>
-        <span className="text-sm text-muted-foreground">{data?.total} tools</span>
+        <div>
+          <h1 className="text-2xl font-bold">App Store</h1>
+          <p className="text-sm text-muted-foreground mt-1">Discover, install, rate, and review AI applications.</p>
+        </div>
+        <span className="text-sm text-muted-foreground">{data?.total} apps</span>
       </div>
 
       <input
