@@ -1,6 +1,9 @@
 import { Hono } from "hono";
 import type { Env } from "../env.js";
 import { getClientId, sendGA4Events } from "../lib/ga4.js";
+import { createLogger } from "@spike-land-ai/shared";
+
+const log = createLogger("spike-edge");
 
 const proxy = new Hono<{ Bindings: Env }>();
 
@@ -65,7 +68,7 @@ async function resolveByokKey(
     const data = await res.json<{ key?: string }>();
     return data.key ?? null;
   } catch (err) {
-    console.error("[proxy] BYOK key resolution failed:", err);
+    log.error("BYOK key resolution failed", { error: String(err) });
     return null;
   }
 }

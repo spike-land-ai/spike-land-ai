@@ -1,6 +1,7 @@
 import { Hono } from "hono";
 import { cors } from "hono/cors";
 import type { Env } from "./env.js";
+import { createLogger } from "@spike-land-ai/shared";
 import { RateLimiter } from "./rate-limiter.js";
 import { authMiddleware } from "./middleware/auth.js";
 import { health } from "./routes/health.js";
@@ -23,11 +24,18 @@ import { apiKeys } from "./routes/api-keys.js";
 import { cockpit } from "./routes/cockpit.js";
 import { credits } from "./routes/credits.js";
 import { creditMeterMiddleware } from "./middleware/credit-meter.js";
+import { requestIdMiddleware } from "./middleware/request-id.js";
 import { support } from "./routes/support.js";
 import { experiments } from "./routes/experiments.js";
 import { spa } from "./routes/spa.js";
+import { handleScheduled } from "./scheduled.js";
+
+const log = createLogger("spike-edge");
 
 const app = new Hono<{ Bindings: Env }>();
+
+// Request ID middleware (must run before everything else)
+app.use("*", requestIdMiddleware);
 
 // CORS middleware
 app.use("*", async (c, next) => {
@@ -128,17 +136,17 @@ app.post("/api/experiments/*/evaluate", authMiddleware);
 
 // Error handling middleware
 app.onError((err, c) => {
-  console.error(`[spike-edge] ${c.req.method} ${c.req.path}:`, err.message);
+  log.error(`${c.req.method} ${c.req.path}: ${err.message}`);
   try {
     const metadata = JSON.stringify({
       method: c.req.method,
       path: c.req.path,
-      requestId: c.req.header("x-request-id") ?? null,
+      requestId: (c.get("requestId" as never) as string | undefined) ?? c.req.header("x-request-id") ?? null,
     });
     const clientId = c.req.header("cf-connecting-ip") ?? null;
     const logWork = c.env.DB.prepare(
       "INSERT INTO error_logs (service_name, error_code, message, stack_trace, metadata, client_id, severity) VALUES (?, ?, ?, ?, ?, ?, ?)",
-    ).bind("spike-edge", "INTERNAL_ERROR", err.message, err.stack ?? null, metadata, clientId, "error").run().catch((e) => console.error("[spike-edge] error_logs write failed:", e));
+    ).bind("spike-edge", "INTERNAL_ERROR", err.message, err.stack ?? null, metadata, clientId, "error").run().catch((e) => log.error("error_logs write failed", { error: String(e) }));
     try { c.executionCtx.waitUntil(logWork); } catch { /* no ExecutionContext in tests */ }
   } catch { /* DB unavailable — skip error logging to prevent double-error */ }
   return c.json({ error: "Internal Server Error" }, 500);
@@ -170,7 +178,10 @@ app.route("/", experiments);
 // MCP tools listing proxy (public, no auth required)
 app.get("/mcp/tools", async (c) => {
   const url = new URL("https://mcp.spike.land/tools");
-  const response = await c.env.MCP_SERVICE.fetch(new Request(url.toString()));
+  const requestId = c.get("requestId" as never) as string;
+  const response = await c.env.MCP_SERVICE.fetch(new Request(url.toString(), {
+    headers: { "X-Request-Id": requestId },
+  }));
   return new Response(response.body, {
     status: response.status,
     statusText: response.statusText,
@@ -180,8 +191,11 @@ app.get("/mcp/tools", async (c) => {
 
 // Store tools endpoint — groups MCP registry tools by category for the store UI
 app.get("/api/store/tools", async (c) => {
+  const requestId = c.get("requestId" as never) as string;
   const response = await c.env.MCP_SERVICE.fetch(
-    new Request("https://mcp.spike.land/tools"),
+    new Request("https://mcp.spike.land/tools", {
+      headers: { "X-Request-Id": requestId },
+    }),
   );
   if (!response.ok) {
     return c.json({ error: "Failed to fetch tools" }, 502);
@@ -224,6 +238,7 @@ app.post("/mcp", async (c) => {
   url.protocol = "https:";
 
   const newRequest = new Request(url.toString(), c.req.raw);
+  newRequest.headers.set("X-Request-Id", c.get("requestId" as never) as string);
   const response = await c.env.MCP_SERVICE.fetch(newRequest);
   return new Response(response.body, {
     status: response.status,
@@ -242,6 +257,7 @@ app.all("/api/auth/*", async (c) => {
   const newRequest = new Request(url.toString(), c.req.raw);
   newRequest.headers.set("X-Forwarded-Host", "spike.land");
   newRequest.headers.set("X-Forwarded-Proto", "https");
+  newRequest.headers.set("X-Request-Id", c.get("requestId" as never) as string);
 
   const response = await c.env.AUTH_MCP.fetch(newRequest);
   return new Response(response.body, {
@@ -254,4 +270,9 @@ app.all("/api/auth/*", async (c) => {
 app.route("/", spa);
 
 export { RateLimiter };
-export default app;
+export default {
+  fetch: app.fetch,
+  scheduled: (_event: ScheduledEvent, env: Env, ctx: ExecutionContext) => {
+    ctx.waitUntil(handleScheduled(env));
+  },
+};

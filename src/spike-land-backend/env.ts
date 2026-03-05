@@ -20,4 +20,5 @@ export default interface Env {
   DEBUG_ANTHROPIC_PROXY?: string; // Set to "true" to enable debug logging in Anthropic proxy
   GA_MEASUREMENT_ID: string;
   GA_API_SECRET: string;
+  ERROR_INGEST_ENDPOINT?: string;
 }

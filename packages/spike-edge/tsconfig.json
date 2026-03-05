@@ -4,7 +4,8 @@
     "outDir": "./dist",
     "noEmit": false,
     "declaration": true,
-    "declarationMap": true
+    "declarationMap": true,
+    "types": ["@cloudflare/workers-types"]
   },
   "include": ["index.ts"],
   "references": []

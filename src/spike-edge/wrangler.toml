@@ -4,6 +4,9 @@ compatibility_date = "2025-01-01"
 compatibility_flags = ["nodejs_compat"]
 workers_dev = true
 
+[triggers]
+crons = ["*/15 * * * *"]
+
 [[r2_buckets]]
 binding = "R2"
 bucket_name = "spike-platform"

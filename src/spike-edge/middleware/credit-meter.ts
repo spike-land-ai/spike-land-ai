@@ -10,6 +10,9 @@ import type { MiddlewareHandler } from "hono";
 import type { Env } from "../env.js";
 import { getBalance, deductCredit } from "../lib/credit-service.js";
 import { resolveEffectiveTier } from "../lib/tier-service.js";
+import { createLogger } from "@spike-land-ai/shared";
+
+const log = createLogger("spike-edge");
 
 export const creditMeterMiddleware: MiddlewareHandler<{ Bindings: Env }> = async (c, next) => {
   const userId = c.get("userId" as never) as string | undefined;
@@ -45,12 +48,12 @@ export const creditMeterMiddleware: MiddlewareHandler<{ Bindings: Env }> = async
 
   // Deduct only on success (2xx)
   if (c.res.status >= 200 && c.res.status < 300) {
-    const requestId = c.req.header("x-request-id") ?? crypto.randomUUID();
+    const requestId = (c.get("requestId" as never) as string | undefined) ?? crypto.randomUUID();
     try {
       await deductCredit(c.env.DB, userId, required, "AI proxy call", requestId);
     } catch {
       // Non-fatal — log but don't fail the response
-      console.error(`[credit-meter] Failed to deduct credit for user ${userId}`);
+      log.error("Failed to deduct credit", { userId });
     }
   }
 };

@@ -140,6 +140,20 @@ servers: esbuild-wasm-mcp, hackernews-mcp, mcp-image-studio, openclaw-mcp.
 - `qa-studio` — Browser automation utilities (Playwright)
 - `state-machine` — Statechart engine with guard parser and CLI
 
+## Directory Layout: src/ vs packages/
+
+Source code lives in `src/`. The `packages/` directory contains **deploy shims**
+— thin `wrangler.toml` and `package.json` files that reference source in `src/`
+via relative paths (e.g., `main = "../../src/spike-edge/index.ts"`).
+
+| Directory    | Purpose                                           | When to use                       |
+| ------------ | ------------------------------------------------- | --------------------------------- |
+| `src/`       | Source of truth — all TypeScript source, tests     | Development, editing, reading     |
+| `packages/`  | Deploy shims — wrangler.toml + thin package.json   | CI deployment, `wrangler deploy`  |
+
+**Rule:** Always edit files in `src/`. Only modify `packages/` for wrangler
+config changes (bindings, routes, migrations, environment settings).
+
 ## CI/CD
 
 - Shared workflow: `.github/.github/workflows/ci-publish.yml` (reusable across

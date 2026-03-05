@@ -106,6 +106,14 @@ const handlePostRequest = async (request: Request, ctx?: ExecutionContext) => {
 export default {
   async fetch(request: Request, _env: unknown, ctx: ExecutionContext) {
     const url = new URL(request.url);
+
+    if (url.pathname === "/health" && request.method === "GET") {
+      return new Response(
+        JSON.stringify({ status: "ok", service: "transpile", timestamp: new Date().toISOString() }),
+        { status: 200, headers: { "Content-Type": "application/json" } },
+      );
+    }
+
     const params = url.searchParams;
     const codeSpace = params.get("codeSpace") || "empty";
     const originParam = params.get("origin");

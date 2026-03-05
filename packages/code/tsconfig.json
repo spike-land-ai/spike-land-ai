@@ -6,6 +6,11 @@
     "declaration": true,
     "declarationMap": true
   },
-  "include": ["index.ts"],
+  "include": [
+    "index.ts",
+    "../../src/code/**/*.ts",
+    "../../src/code/**/*.tsx",
+    "../../src/code/**/*.d.ts"
+  ],
   "references": []
 }

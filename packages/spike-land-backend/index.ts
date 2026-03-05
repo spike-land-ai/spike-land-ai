@@ -1,1 +1,1 @@
-export * from "../../src/spike-land-backend/index.ts";
+export * from "../../src/spike-land-backend/chat.ts";

@@ -235,10 +235,9 @@ experiments.post("/api/experiments/track", async (c) => {
           metricName: "fistbumps",
           value: 1,
         });
-        }
-        }
-        }
-        }
+      }
+    }
+  }
 
   // Upsert metrics
   for (const m of metricsUpdates) {

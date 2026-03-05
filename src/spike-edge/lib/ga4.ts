@@ -1,3 +1,7 @@
+import { createLogger } from "@spike-land-ai/shared";
+
+const log = createLogger("spike-edge");
+
 const GA4_COLLECT_URL = "https://www.google-analytics.com/mp/collect";
 const MAX_EVENTS_PER_BATCH = 25;
 const MAX_STRING_PARAM_LENGTH = 500;
@@ -84,7 +88,7 @@ export async function sendGA4Events(
       body,
     });
     if (!response.ok) {
-      console.error(`[ga4] send failed: ${response.status} ${response.statusText}`);
+      log.error("GA4 send failed", { status: response.status, statusText: response.statusText });
     }
   }
 }

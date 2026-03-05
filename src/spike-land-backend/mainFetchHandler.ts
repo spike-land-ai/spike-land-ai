@@ -76,6 +76,39 @@ export async function handleMainFetch(
   return handleErrors(request, async () => {
     const url = new URL(request.url);
 
+    if (url.pathname === "/health" && request.method === "GET") {
+      const deep = url.searchParams.get("deep") === "true";
+      let kvStatus = "ok";
+      let r2Status = "ok";
+
+      if (deep) {
+        try {
+          await env.KV.get("__health_check__");
+        } catch {
+          kvStatus = "degraded";
+        }
+        try {
+          await env.R2.head("__health_check__");
+        } catch {
+          r2Status = "degraded";
+        }
+      }
+
+      const overall = kvStatus === "ok" && r2Status === "ok" ? "ok" : "degraded";
+      return new Response(
+        JSON.stringify({
+          status: overall,
+          service: "spike-land-backend",
+          timestamp: new Date().toISOString(),
+          ...(deep ? { kv: kvStatus, r2: r2Status } : {}),
+        }),
+        {
+          status: overall === "ok" ? 200 : 503,
+          headers: { "Content-Type": "application/json" },
+        },
+      );
+    }
+
     const redirect = routes[url.pathname as keyof typeof routes];
     if (redirect) {
       const response = await handleFetchApi(["live", redirect, "embed"], request, env, ctx);
@@ -87,5 +120,8 @@ export async function handleMainFetch(
     const response = await handleFetchApi(path, request, env, ctx);
     const finalResponse = response || new Response("Not Found", { status: 404 });
     return addSecurityHeaders(finalResponse);
+  }, {
+    waitUntil: (p) => ctx.waitUntil(p),
+    errorEndpoint: env.ERROR_INGEST_ENDPOINT,
   });
 }

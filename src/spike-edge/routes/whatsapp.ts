@@ -1,6 +1,9 @@
 import { Hono } from "hono";
 import type { Env } from "../env.js";
 import { resolveEffectiveTier } from "../lib/tier-service.js";
+import { createLogger } from "@spike-land-ai/shared";
+
+const log = createLogger("spike-edge");
 import { recordEloEvent } from "../lib/elo-service.js";
 import { parseCommand, dispatchCommand } from "../lib/whatsapp-commands.js";
 import type { Tier } from "../lib/whatsapp-commands.js";
@@ -323,7 +326,7 @@ whatsapp.post("/whatsapp/webhook", async (c) => {
   try {
     reply = await dispatchCommand(cmd, ctx);
   } catch (err) {
-    console.error("[whatsapp] Command dispatch error:", err);
+    log.error("Command dispatch error", { error: String(err) });
     reply = "An error occurred processing your request. Please try again.";
   }
 

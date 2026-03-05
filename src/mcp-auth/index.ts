@@ -50,7 +50,38 @@ export default {
 
     const url = new URL(request.url);
 
-    // Health check / root redirect
+    // Health endpoint
+    if (url.pathname === "/health") {
+      const deep = url.searchParams.get("deep") === "true";
+      let d1Status = "ok";
+
+      if (deep) {
+        try {
+          await env.AUTH_DB.prepare("SELECT 1").first();
+        } catch {
+          d1Status = "degraded";
+        }
+      }
+
+      const overall = d1Status === "ok" ? "ok" : "degraded";
+      return withCors(
+        new Response(
+          JSON.stringify({
+            status: overall,
+            service: "mcp-auth",
+            timestamp: new Date().toISOString(),
+            ...(deep ? { d1: d1Status } : {}),
+          }),
+          {
+            status: overall === "ok" ? 200 : 503,
+            headers: { "Content-Type": "application/json" },
+          },
+        ),
+        request,
+      );
+    }
+
+    // Root redirect
     if (url.pathname === "/") {
       return withCors(new Response(null, {
         status: 302,

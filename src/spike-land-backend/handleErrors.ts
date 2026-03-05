@@ -1,7 +1,25 @@
+import { createErrorReporter, type ErrorReporter } from "@spike-land-ai/shared";
+
 // Generic error message for client responses - never expose internal details
 const GENERIC_ERROR_MESSAGE = "An internal error occurred. Please try again later.";
 
-export function handleErrors(request: Request, cb: () => Promise<Response>): Promise<Response> {
+export function handleErrors(
+  request: Request,
+  cb: () => Promise<Response>,
+  options?: {
+    waitUntil?: (promise: Promise<unknown>) => void;
+    errorEndpoint?: string;
+  },
+): Promise<Response> {
+  let reporter: ErrorReporter | undefined;
+  if (options?.waitUntil && options?.errorEndpoint) {
+    reporter = createErrorReporter({
+      service: "spike-land-backend",
+      endpoint: options.errorEndpoint,
+      waitUntil: options.waitUntil,
+    });
+  }
+
   return cb().catch((err: unknown) => {
     // Always log full error details server-side for debugging
     // This information stays on the server and is never sent to clients
@@ -13,6 +31,19 @@ export function handleErrors(request: Request, cb: () => Promise<Response>): Pro
       });
     } else {
       console.error("[handleErrors] Uncaught non-Error exception:", err);
+    }
+
+    // Report error to ingestion endpoint (non-blocking)
+    if (reporter) {
+      reporter.reportException(err, {
+        code: "UNCAUGHT_EXCEPTION",
+        severity: "fatal",
+        metadata: {
+          url: request.url,
+          method: request.method,
+          isWebSocket: request.headers.get("Upgrade") === "websocket",
+        },
+      });
     }
 
     if (request.headers.get("Upgrade") === "websocket") {

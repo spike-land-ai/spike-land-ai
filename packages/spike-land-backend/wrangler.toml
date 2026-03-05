@@ -79,3 +79,7 @@ preview_bucket_name = "npmprod"
 binding = "X9"
 bucket_name = "code-chain"
 preview_bucket_name = "code-chain"
+
+[env.staging]
+name = "spike-land-backend-staging"
+vars = { APP_ENV = "staging" }

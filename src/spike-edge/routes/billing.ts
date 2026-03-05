@@ -8,6 +8,9 @@
 
 import { Hono } from "hono";
 import type { Env } from "../env.js";
+import { createLogger } from "@spike-land-ai/shared";
+
+const log = createLogger("spike-edge");
 
 const billing = new Hono<{ Bindings: Env }>();
 
@@ -84,7 +87,7 @@ billing.post("/api/billing/cancel", async (c) => {
 
   const data = (await res.json()) as Record<string, unknown>;
   if (!res.ok) {
-    console.error("[billing] Failed to create portal session:", data);
+    log.error("Failed to create billing portal session", { data: String(data) });
     return c.json({ error: "Failed to create billing portal session" }, 502);
   }
 

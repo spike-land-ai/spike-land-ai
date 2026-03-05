@@ -19,3 +19,9 @@ export * from "./utils";
 
 // Tool Builder
 export * from "./tool-builder";
+
+// Logger
+export { createLogger, type Logger, type LogLevel, type LogEntry } from "./utils/logger.js";
+
+// Error Reporter
+export { createErrorReporter, type ErrorReporter, type ErrorReport } from "./utils/error-reporter.js";

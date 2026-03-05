@@ -30,12 +30,14 @@ export async function authMiddleware(
   }
 
   // Validate session via AUTH_MCP service binding (sub-1ms internal call)
+  const requestId = c.get("requestId" as never) as string | undefined;
   const sessionReq = new Request("https://auth-mcp.spike.land/api/auth/get-session", {
     headers: {
       ...(cookie ? { cookie } : {}),
       ...(authHeader ? { authorization: authHeader } : {}),
       "X-Forwarded-Host": "spike.land",
       "X-Forwarded-Proto": "https",
+      ...(requestId ? { "X-Request-Id": requestId } : {}),
     },
   });
 

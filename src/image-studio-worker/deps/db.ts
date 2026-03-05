@@ -603,7 +603,7 @@ export function createD1Db(env: Env): ImageStudioDeps["db"] {
         .all<D1AlbumRow>();
 
       return Promise.all(
-        result.results.map(async (row) => {
+        result.results.map(async (row: D1AlbumRow) => {
           const countRow = await db
             .prepare("SELECT COUNT(*) as count FROM album_images WHERE albumId = ?")
             .bind(row.id)
@@ -749,7 +749,7 @@ export function createD1Db(env: Env): ImageStudioDeps["db"] {
           img_h: number;
         }>();
 
-      return result.results.map((r) => ({
+      return result.results.map((r: any) => ({
         id: r.id,
         albumId: r.albumId,
         imageId: r.imageId as ImageId,
@@ -1012,7 +1012,7 @@ export function createD1Db(env: Env): ImageStudioDeps["db"] {
           updatedAt: string;
         }>();
 
-      return result.results.map((r) => ({
+      return result.results.map((r: any) => ({
         id: r.id,
         userId: r.userId,
         toolName: r.toolName,

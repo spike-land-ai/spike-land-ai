@@ -8,6 +8,9 @@
 
 import { Hono } from "hono";
 import type { Env } from "../env.js";
+import { createLogger } from "@spike-land-ai/shared";
+
+const log = createLogger("spike-edge");
 
 const support = new Hono<{ Bindings: Env }>();
 
@@ -49,7 +52,7 @@ support.post("/api/support/fistbump", async (c) => {
       ).bind(slug).first<{ cnt: number }>();
       return c.json({ count: count?.cnt ?? 0, alreadyBumped: true });
     }
-    console.error("[support] fistbump error:", msg);
+    log.error("fistbump error", { error: msg });
     return c.json({ error: "Failed to record fist bump" }, 500);
   }
 
@@ -143,7 +146,7 @@ support.post("/api/support/donate", async (c) => {
   const data = (await res.json()) as Record<string, unknown>;
 
   if (!res.ok) {
-    console.error("[support] Stripe checkout error:", data);
+    log.error("Stripe checkout error", { error: String(data) });
     return c.json({ error: "Failed to create checkout session" }, 502);
   }
 
@@ -156,7 +159,7 @@ support.post("/api/support/donate", async (c) => {
       "INSERT INTO support_donations (id, slug, amount_cents, stripe_session_id, status, created_at) VALUES (?, ?, ?, ?, 'pending', ?)",
     ).bind(donationId, slug, amountCents, sessionId, Date.now()).run();
   } catch (err) {
-    console.error("[support] donation record error:", err instanceof Error ? err.message : err);
+    log.error("donation record error", { error: err instanceof Error ? err.message : String(err) });
   }
 
   return c.json({ url: data.url as string });

@@ -14,6 +14,9 @@ import { Hono } from "hono";
 import type { Env } from "../env.js";
 import { getBalance, getUsedToday } from "../lib/credit-service.js";
 import { resolveEffectiveTier } from "../lib/tier-service.js";
+import { createLogger } from "@spike-land-ai/shared";
+
+const log = createLogger("spike-edge");
 
 const credits = new Hono<{ Bindings: Env }>();
 
@@ -103,7 +106,7 @@ credits.post("/api/credits/purchase", async (c) => {
   });
 
   if (!priceRes.ok) {
-    console.error("[credits] Failed to look up price:", priceRes.data);
+    log.error("Failed to look up price", { data: String(priceRes.data) });
     return c.json({ error: "Failed to look up price" }, 502);
   }
 
@@ -128,7 +131,7 @@ credits.post("/api/credits/purchase", async (c) => {
   });
 
   if (!sessionRes.ok) {
-    console.error("[credits] Failed to create session:", sessionRes.data);
+    log.error("Failed to create credits checkout session", { data: String(sessionRes.data) });
     return c.json({ error: "Failed to create checkout session" }, 502);
   }
 

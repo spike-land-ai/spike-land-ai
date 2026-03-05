@@ -4,7 +4,10 @@
     "outDir": "./dist",
     "noEmit": false,
     "declaration": true,
-    "declarationMap": true
+    "declarationMap": true,
+    "paths": {
+      "@/*": ["../../src/chess-engine/*"]
+    }
   },
   "include": ["index.ts"],
   "references": []

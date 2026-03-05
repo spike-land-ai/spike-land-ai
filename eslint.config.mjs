@@ -50,6 +50,7 @@ export default tseslint.config(
       "src/esbuild-wasm/**",
       "**/*.d.ts",
       ".yarn/**",
+      "**/routeTree.gen.ts",
     ],
   },
   // TypeScript files (non-React)

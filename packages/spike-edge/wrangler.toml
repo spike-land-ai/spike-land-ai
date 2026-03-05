@@ -52,3 +52,11 @@ zone_name = "spike.land"
 [[routes]]
 pattern = "www.spike.land/*"
 zone_name = "spike.land"
+
+[env.staging]
+name = "spike-edge-staging"
+vars = { APP_ENV = "staging" }
+
+[[env.staging.routes]]
+pattern = "staging-edge.spike.land/*"
+zone_name = "spike.land"
