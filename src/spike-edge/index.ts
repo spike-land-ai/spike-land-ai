@@ -29,6 +29,7 @@ import { support } from "./routes/support.js";
 import { experiments } from "./routes/experiments.js";
 import { spa } from "./routes/spa.js";
 import { wellKnown } from "./routes/well-known.js";
+import { sitemap } from "./routes/sitemap.js";
 import { handleScheduled } from "./scheduled.js";
 
 const log = createLogger("spike-edge");
@@ -329,6 +330,7 @@ app.all("/api/auth/*", async (c) => {
 });
 
 app.route("/", wellKnown);
+app.route("/", sitemap);
 app.route("/", spa);
 
 export { RateLimiter };
