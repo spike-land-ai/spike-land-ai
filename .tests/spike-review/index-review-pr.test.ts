@@ -31,6 +31,10 @@ vi.mock("@spike-land-ai/mcp-server-base", () => ({
     },
   })),
   startMcpServer: vi.fn(),
+  registerFeedbackTool: vi.fn(),
+  createErrorShipper: vi.fn(() => ({
+    shipError: vi.fn(),
+  })),
 }));
 
 const { createServer } = await import("../../src/spike-review/index.js");

@@ -17,7 +17,10 @@ export function createGeminiGeneration(
   });
   const useGateway = !userApiKey && env.CF_AIG_TOKEN;
 
-  const IMAGE_MODELS = [preferredImageModel || "gemini-3.1-flash-image-preview"];
+  const IMAGE_MODELS = [
+    preferredImageModel || "gemini-2.0-flash-preview-image-generation",
+    "gemini-2.0-flash-exp",
+  ];
 
   async function callGeminiOnce(
     model: string,
@@ -282,7 +285,7 @@ export function createGeminiGeneration(
         });
 
         const response = await ai.models.generateContent({
-          model: "gemini-3-flash-preview",
+          model: "gemini-2.0-flash",
           contents: [
             {
               role: "user",
@@ -342,7 +345,7 @@ export function createGeminiGeneration(
         });
 
         const response = await ai.models.generateContent({
-          model: "gemini-3-flash-preview",
+          model: "gemini-2.0-flash",
           contents: [
             {
               role: "user",
@@ -414,7 +417,7 @@ export function createGeminiGeneration(
         });
 
         const response = await ai.models.generateContent({
-          model: "gemini-3-flash-preview",
+          model: "gemini-2.0-flash",
           contents: [{ role: "user", parts }],
         });
 

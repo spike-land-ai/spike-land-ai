@@ -47,7 +47,7 @@ export const authMiddleware = createMiddleware<{
       c.set("userRole", "user" as UserRole);
       return next();
     }
-  } catch (e) {
+  } catch (_e) {
     // Ignore parse errors, let regular auth or downstream handle it
   }
 

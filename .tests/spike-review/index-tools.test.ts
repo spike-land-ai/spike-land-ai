@@ -48,6 +48,10 @@ vi.mock("@spike-land-ai/mcp-server-base", () => ({
     },
   })),
   startMcpServer: vi.fn(),
+  registerFeedbackTool: vi.fn(),
+  createErrorShipper: vi.fn(() => ({
+    shipError: vi.fn(),
+  })),
 }));
 
 const capturedHandlers: Record<string, (...args: unknown[]) => Promise<unknown>> = {};

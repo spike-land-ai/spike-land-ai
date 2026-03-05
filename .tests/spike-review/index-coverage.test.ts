@@ -16,6 +16,10 @@ const mockStartMcpServer = vi.fn().mockResolvedValue(undefined);
 vi.mock("@spike-land-ai/mcp-server-base", () => ({
   createMcpServer: mockCreateMcpServer,
   startMcpServer: mockStartMcpServer,
+  registerFeedbackTool: vi.fn(),
+  createErrorShipper: vi.fn(() => ({
+    shipError: vi.fn(),
+  })),
 }));
 
 // Mock Octokit

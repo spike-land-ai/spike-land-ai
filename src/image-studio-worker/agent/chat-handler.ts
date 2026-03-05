@@ -33,8 +33,8 @@ export async function handleChatStream(
     apiKey: userGeminiKey || env.GEMINI_API_KEY,
   });
 
-  const primaryModel = modelName || "gemini-3-flash-preview";
-  const fallbackModel = "gemini-3.1-pro-preview";
+  const primaryModel = modelName || "gemini-2.0-flash";
+  const fallbackModel = "gemini-1.5-pro";
 
   // Prepare tools in the format required by the new SDK
   const functionDeclarations = [

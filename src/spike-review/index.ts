@@ -275,7 +275,11 @@ export function createServer(githubToken: string): McpServer {
 export async function startServer(): Promise<void> {
   const shipper = createErrorShipper();
   process.on('uncaughtException', (err) => shipper.shipError({ service_name: "spike-review", message: err.message, stack_trace: err.stack, severity: "high" }));
-  process.on('unhandledRejection', (err: any) => shipper.shipError({ service_name: "spike-review", message: err?.message || String(err), stack_trace: err?.stack, severity: "high" }));
+  process.on('unhandledRejection', (err: unknown) => {
+    const message = err instanceof Error ? err.message : String(err);
+    const stack_trace = err instanceof Error ? err.stack : undefined;
+    shipper.shipError({ service_name: "spike-review", message, stack_trace, severity: "high" });
+  });
 
   const token = process.env.GITHUB_TOKEN;
   if (!token) {

@@ -110,19 +110,19 @@ const appsIndexRoute = createRoute({
 
 const appsNewRoute = createRoute({
   getParentRoute: () => appsRoute,
-  path: "/new",
+  path: "new",
   component: withSuspense(() => import("./routes/apps/new"), "AppsNewPage"),
 });
 
 const appsQaStudioRoute = createRoute({
   getParentRoute: () => appsRoute,
-  path: "/qa-studio",
+  path: "qa-studio",
   component: withSuspense(() => import("./routes/apps/qa-studio"), "QaStudioPage"),
 });
 
 const appDetailRoute = createRoute({
   getParentRoute: () => appsRoute,
-  path: "/$appId",
+  path: "$appId",
   component: withSuspense(() => import("./routes/apps/$appId"), "AppDetailPage"),
 });
 
@@ -140,7 +140,7 @@ const docsIndexRoute = createRoute({
 
 const docsSlugRoute = createRoute({
   getParentRoute: () => docsRoute,
-  path: "/$slug",
+  path: "$slug",
   component: withSuspense(() => import("./routes/docs/$slug"), "DocPage"),
 });
 
@@ -158,7 +158,7 @@ const blogIndexRoute = createRoute({
 
 const blogPostRoute = createRoute({
   getParentRoute: () => blogRoute,
-  path: "/$slug",
+  path: "$slug",
   component: withSuspense(() => import("./routes/blog/$slug"), "BlogPostPage"),
 });
 
@@ -176,13 +176,13 @@ const bugbookIndexRoute = createRoute({
 
 const bugbookDetailRoute = createRoute({
   getParentRoute: () => bugbookRoute,
-  path: "/$bugId",
+  path: "$bugId",
   component: withSuspense(() => import("./routes/bugbook/$bugId"), "BugbookDetailPage"),
 });
 
 const bugbookLeaderboardRoute = createRoute({
   getParentRoute: () => bugbookRoute,
-  path: "/leaderboard",
+  path: "leaderboard",
   component: withSuspense(() => import("./routes/bugbook/leaderboard"), "BugbookLeaderboardPage"),
 });
 
@@ -200,7 +200,7 @@ const dashboardIndexRoute = createRoute({
 
 const bazdmegDashboardRoute = createRoute({
   getParentRoute: () => dashboardRoute,
-  path: "/bazdmeg",
+  path: "bazdmeg",
   component: withSuspense(() => import("./routes/dashboard/bazdmeg"), "BazdmegDashboardPage"),
 });
 
@@ -218,13 +218,13 @@ const learnIndexRoute = createRoute({
 
 const learnSessionRoute = createRoute({
   getParentRoute: () => learnRoute,
-  path: "/$sessionId",
+  path: "$sessionId",
   component: withSuspense(() => import("./routes/learn/$sessionId"), "LearnSessionPage"),
 });
 
 const learnBadgeRoute = createRoute({
   getParentRoute: () => learnRoute,
-  path: "/badge/$token",
+  path: "badge/$token",
   component: withSuspense(() => import("./routes/learn/badge/$token"), "BadgePage"),
 });
 
@@ -242,7 +242,7 @@ const messagesIndexRoute = createRoute({
 
 const messageThreadRoute = createRoute({
   getParentRoute: () => messagesRoute,
-  path: "/$userId",
+  path: "$userId",
   component: withSuspense(() => import("./routes/messages/$userId"), "MessageThreadPage"),
 });
 
@@ -260,7 +260,7 @@ const toolsIndexRoute = createRoute({
 
 const toolsCategoryRoute = createRoute({
   getParentRoute: () => toolsRoute,
-  path: "/$toolName",
+  path: "$toolName",
   component: withSuspense(() => import("./routes/tools/$toolName"), "ToolsCategoryPage"),
 });
 

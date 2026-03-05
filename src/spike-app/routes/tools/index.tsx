@@ -7,12 +7,17 @@ export function ToolsIndexPage() {
   const [search, setSearch] = useState("");
 
   const categorizedTools = useMemo(() => {
-    if (!data?.tools) return [];
-    return data.tools.map(tool => ({
+    // Gracefully handle both { tools: [...] } and direct array responses
+    const toolsArray = Array.isArray(data) ? data : data?.tools;
+    if (!toolsArray || !Array.isArray(toolsArray)) return [];
+    
+    return toolsArray.map((tool: any) => ({
       ...tool,
       category: tool.category || "General",
+      name: tool.name || "Unknown Tool",
+      description: tool.description || "",
     }));
-  }, [data?.tools]);
+  }, [data]);
 
   const categories = ["All", ...Array.from(new Set(categorizedTools.map(t => t.category)))].sort();
   const [activeCategory, setActiveCategory] = useState("All");
@@ -77,7 +82,7 @@ export function ToolsIndexPage() {
           <p className="text-sm text-muted-foreground mt-1">Explore developer tools, MCP schemas, and endpoints.</p>
         </div>
         <span className="inline-flex items-center rounded-md bg-success/10 px-2 py-1 text-xs font-medium text-success-foreground ring-1 ring-inset ring-success/20">
-          {data?.tools?.length || 0} Live Tools
+          {categorizedTools.length} Live Tools
         </span>
       </div>
 

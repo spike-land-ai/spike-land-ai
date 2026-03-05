@@ -1,3 +1,5 @@
+declare const process: any;
+
 export interface ErrorEntry {
   service_name: string;
   error_code?: string;

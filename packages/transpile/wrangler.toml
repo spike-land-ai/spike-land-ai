@@ -5,7 +5,7 @@ name = "esbuild"
 # account_id = "your-account-id-here"
 compatibility_date = "2024-12-01"
 compatibility_flags = ["nodejs_compat"]
-main = "../../node_modules/@spike-land-ai/code/cf-esbuild.mjs"
+main = "index.ts"
 logpush = true
 
 [[rules]]
