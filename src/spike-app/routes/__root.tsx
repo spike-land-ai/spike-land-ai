@@ -6,6 +6,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { LoginButton } from "@/components/LoginButton";
 import { AppFooter } from "@/components/AppFooter";
 import { CookieConsent } from "@/components/CookieConsent";
+import { ThemeSwitcher } from "@/components/ThemeSwitcher";
 
 const DEFAULT_TITLE = "spike.land - MCP-First AI Development Platform";
 const DEFAULT_DESCRIPTION =
@@ -149,7 +150,7 @@ const NAV_LINKS = [
 
 export function RootLayout() {
   useAnalytics();
-  useDarkMode();
+  const { theme, setTheme } = useDarkMode();
   useAuth();
 
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
@@ -240,16 +241,30 @@ export function RootLayout() {
                   <Link
                     key={to}
                     to={to}
+                    aria-current={pathname === to ? "page" : undefined}
                     className={`text-sm font-medium transition-colors hover:text-foreground ${
-                      pathname === to ? "text-foreground" : "text-muted-foreground"
+                      pathname === to ? "text-foreground underline underline-offset-4 decoration-primary/50" : "text-muted-foreground"
                     }`}
                   >
                     {label}
                   </Link>
                 ))}
               </nav>
+              <button
+                type="button"
+                className="hidden md:flex items-center gap-2 px-3 py-1.5 text-sm text-muted-foreground bg-muted/50 border border-border rounded-md hover:bg-muted hover:text-foreground transition-colors"
+                aria-label="Search site"
+                onClick={() => alert("Search coming soon!")}
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+                <span>Search...</span>
+                <kbd className="hidden lg:inline-flex items-center gap-1 font-sans text-[10px] bg-background border border-border rounded px-1.5 py-0.5 opacity-70">
+                  ⌘K
+                </kbd>
+              </button>
             </div>
             <div className="flex items-center gap-3">
+              <ThemeSwitcher theme={theme} setTheme={setTheme} />
               <LoginButton />
               {/* Mobile hamburger */}
               <button

@@ -167,15 +167,15 @@ spa.get("/*", async (c) => {
 
     // Inject route-specific metadata for known routes (if not already injected by app/blog handlers)
     if (!appId && !blogSlug) {
-      const routeMeta: Record<string, { title: string; description: string }> = {
-        "/": { title: "spike.land - Open App Ecosystem for AI", description: "Connect your AI to real-world tools. Browse, build, and share AI-powered applications with 80+ tools on spike.land." },
-        "/tools": { title: "AI Tools - spike.land", description: "Browse 80+ AI tools on spike.land. Find tools for code review, image generation, data analysis, and more." },
+      const routeMeta: Record<string, { title: string; description: string; ssrContent?: string }> = {
+        "/": { title: "spike.land - Open App Ecosystem for AI", description: "Connect your AI to real-world tools. Browse, build, and share AI-powered applications with 80+ tools on spike.land.", ssrContent: "<h1>spike.land - Build, run, and share AI apps instantly</h1><p>Connect your AI agent to the real world using the Model Context Protocol (MCP).</p>" },
+        "/tools": { title: "AI Tools - spike.land", description: "Browse 80+ AI tools on spike.land. Find tools for code review, image generation, data analysis, and more.", ssrContent: "<h1>AI Tools Registry</h1><p>Browse and connect 80+ MCP tools.</p>" },
         "/store": { title: "Tool Store - spike.land", description: "Discover and install AI-powered tools from the spike.land store." },
-        "/pricing": { title: "Pricing - spike.land", description: "Simple, transparent pricing. Free plan for individuals, Pro at $29/mo, Business at $99/mo." },
-        "/about": { title: "About spike.land", description: "Learn about spike.land — who we are, our mission, and how we're building an open platform for AI tools." },
+        "/pricing": { title: "Pricing - spike.land", description: "Simple, transparent pricing. Free plan for individuals, Pro at $29/mo, Business at $99/mo.", ssrContent: "<h1>Pricing</h1><p>Simple, transparent pricing. Free, Pro, and Business plans available.</p>" },
+        "/about": { title: "About spike.land", description: "Learn about spike.land — who we are, our mission, and how we're building an open platform for AI tools.", ssrContent: "<h1>About spike.land</h1><p>An open platform where AI agents connect to real-world tools.</p>" },
         "/login": { title: "Sign In - spike.land", description: "Sign in to spike.land to access your AI development tools." },
-        "/privacy": { title: "Privacy Policy - spike.land", description: "spike.land Privacy Policy. How we handle your data, cookies, and your rights." },
-        "/terms": { title: "Terms of Service - spike.land", description: "spike.land Terms of Service. Acceptable use, billing, and legal terms." },
+        "/privacy": { title: "Privacy Policy - spike.land", description: "spike.land Privacy Policy. How we handle your data, cookies, and your rights.", ssrContent: "<h1>Privacy Policy</h1><p>We respect your privacy. Read our policy on data handling, GDPR compliance, and cookies.</p>" },
+        "/terms": { title: "Terms of Service - spike.land", description: "spike.land Terms of Service. Acceptable use, billing, and legal terms.", ssrContent: "<h1>Terms of Service</h1><p>Read our acceptable use, subscription, and platform terms.</p>" },
         "/learn": { title: "Learn &amp; Verify - spike.land", description: "Learn from any content and prove your understanding through AI-powered quizzes." },
         "/blog": { title: "Blog - spike.land", description: "Articles and tutorials from the spike.land team about AI, MCP, and edge computing." },
         "/apps": { title: "MCP Tools & Apps - spike.land", description: "Browse and interact with AI-powered applications on spike.land." },
@@ -197,6 +197,10 @@ spa.get("/*", async (c) => {
         <meta name="twitter:title" content="${escapeHtml(meta.title)}" />
         <meta name="twitter:description" content="${escapeHtml(meta.description)}" />`;
         html = html.replace("</head>", `${ogTags}\n</head>`);
+        
+        if (meta.ssrContent) {
+          html = html.replace("</body>", `<div id="ssr-content" style="display:none">${meta.ssrContent}</div>\n</body>`);
+        }
       }
     }
 

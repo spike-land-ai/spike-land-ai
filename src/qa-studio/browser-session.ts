@@ -288,10 +288,10 @@ export async function getPageSnapshot(): Promise<{
 interface CdpAxNode {
   nodeId: string;
   childIds?: string[];
-  role?: { value: string };
-  name?: { value: string };
-  value?: { value: string | number };
-  properties?: Array<{ name: string; value: { value: unknown } }>;
+  role?: { value?: string };
+  name?: { value?: string };
+  value?: { value?: string | number };
+  properties?: Array<{ name: string; value: { value?: unknown } }>;
 }
 
 function rebuildTree(nodes: CdpAxNode[]): AccessibilityNode | null {

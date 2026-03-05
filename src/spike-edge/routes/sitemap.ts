@@ -16,6 +16,9 @@ const STATIC_ROUTES = [
   "/privacy",
   "/terms",
   "/login",
+  "/docs",
+  "/bugbook",
+  "/version",
 ];
 
 function buildSitemapXml(

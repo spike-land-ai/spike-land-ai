@@ -74,6 +74,9 @@ export function LoginPage() {
             Continue with Google
           </button>
         </div>
+        <p className="mt-3 text-center text-xs text-muted-foreground">
+          Email and password sign-in is coming soon.
+        </p>
 
         <div className="relative">
           <div className="absolute inset-0 flex items-center">
@@ -88,7 +91,7 @@ export function LoginPage() {
           <Link to="/" className="text-sm text-muted-foreground hover:text-foreground hover:underline">
             Continue as guest
           </Link>
-          <p className="mt-1 text-xs text-muted-foreground">Browse tools and pricing without signing in</p>
+          <p className="mt-1 text-xs text-muted-foreground">Browse 80+ tools, read docs, and view pricing without signing in</p>
         </div>
       </div>
     </div>

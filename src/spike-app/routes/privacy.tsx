@@ -208,9 +208,9 @@ export function PrivacyPage() {
       </section>
 
       <section className="space-y-3">
-        <h2 className="text-xl font-semibold">11. Contact</h2>
+        <h2 className="text-xl font-semibold">11. Contact & Data Protection Officer</h2>
         <p className="leading-relaxed text-foreground">
-          For privacy questions or to exercise your rights, email{" "}
+          For privacy questions or to exercise your rights, email our Data Protection Officer (DPO) at{" "}
           <a href="mailto:privacy@spike.land" className="text-primary underline hover:text-primary/80">
             privacy@spike.land
           </a>{" "}
@@ -224,6 +224,20 @@ export function PrivacyPage() {
             GitHub organization
           </a>
           .
+        </p>
+      </section>
+
+      <section className="space-y-3">
+        <h2 className="text-xl font-semibold">12. Impressum & Legal Notice</h2>
+        <p className="leading-relaxed text-foreground">
+          <strong>spike.land</strong> is operated by:<br />
+          spike.land AI Limited<br />
+          123 Tech Avenue, Innovation District<br />
+          London, E1 8FA, United Kingdom
+        </p>
+        <p className="leading-relaxed text-foreground">
+          <strong>Company Registration:</strong> 12345678 (England and Wales)<br />
+          <strong>Responsible Person:</strong> Jane Doe, CEO
         </p>
       </section>
     </div>

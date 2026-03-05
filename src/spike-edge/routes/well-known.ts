@@ -10,6 +10,7 @@ wellKnown.get("/.well-known/security.txt", (c) => {
 
   const body = `Contact: mailto:security@spike.land
 Contact: https://github.com/spike-land-ai/spike-land-ai/security/advisories
+Encryption: https://spike.land/pgp.txt
 Expires: ${expiresStr}
 Preferred-Languages: en
 Canonical: https://spike.land/.well-known/security.txt

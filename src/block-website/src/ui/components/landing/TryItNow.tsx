@@ -27,6 +27,7 @@ export function TryItNow() {
       const timer = setTimeout(() => setCopied(false), 2000);
       return () => clearTimeout(timer);
     }
+    return undefined;
   }, [copied]);
 
   return (
@@ -121,6 +122,10 @@ export function TryItNow() {
                 </button>
               </div>
             </div>
+            
+            <p className="mt-4 text-center text-sm text-muted-foreground">
+              This installs the spike.land CLI or configures your editor. Requires Node.js 18+.
+            </p>
           </div>
 
           <div className="p-6 sm:p-8 bg-muted/30">

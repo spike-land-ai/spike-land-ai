@@ -51,7 +51,7 @@
   --card-bg: #ffffff;
   --card-fg: #111827;
   --muted-bg: #f3f4f6;
-  --muted-fg: #6b7280;
+  --muted-fg: #4b5563;
   --border-color: #e5e7eb;
   --input-color: #d1d5db;
   --ring-color: #2563eb;
@@ -85,7 +85,7 @@
   --card-bg: #18181b;
   --card-fg: #fafafa;
   --muted-bg: #27272a;
-  --muted-fg: #a1a1aa;
+  --muted-fg: #d4d4d8;
   --border-color: #3f3f46;
   --input-color: #3f3f46;
   --ring-color: #3b82f6;
@@ -94,7 +94,7 @@
   --primary-fg: #ffffff;
 
   --secondary-bg: #27272a;
-  --secondary-fg: #a1a1aa;
+  --secondary-fg: #d4d4d8;
 
   --accent-bg: #1e293b;
   --accent-fg: #93c5fd;

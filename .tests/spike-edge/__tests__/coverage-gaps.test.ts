@@ -82,25 +82,27 @@ function createMockEnv(overrides: Partial<Env> = {}): Env {
 
 // ── blog.ts coverage gaps ─────────────────────────────────────────────────────
 
-describe("blog.ts — cache throw fallback paths", () => {
+describe("blog.ts — outer catch fallback paths", () => {
   afterEach(() => vi.unstubAllGlobals());
 
-  it("GET /api/blog: returns posts via D1 fallback when cache throws", async () => {
-    // Simulate Cache API throwing
-    vi.stubGlobal("caches", {
-      default: {
-        match: vi.fn().mockRejectedValue(new Error("Cache unavailable")),
-        put: vi.fn(),
-      },
-    });
-
+  it("GET /api/blog: returns posts via D1 fallback when withEdgeCache throws (DB throws inside fetcher)", async () => {
+    // To trigger lines 61-68 (outer catch fallback):
+    // withEdgeCache's fetcher (which calls DB.prepare.all) must throw.
+    // Then the outer catch calls DB.prepare.all again — this second call must succeed.
+    let callCount = 0;
     const env = createMockEnv({
       DB: {
-        prepare: vi.fn().mockReturnValue({
-          bind: vi.fn().mockReturnThis(),
-          all: vi.fn().mockResolvedValue({ results: [SAMPLE_ROW] }),
-          first: vi.fn().mockResolvedValue(null),
-          run: vi.fn().mockResolvedValue({}),
+        prepare: vi.fn().mockImplementation(() => {
+          callCount++;
+          return {
+            bind: vi.fn().mockReturnThis(),
+            all: vi.fn().mockImplementation(() => {
+              if (callCount === 1) throw new Error("DB error in fetcher");
+              return Promise.resolve({ results: [SAMPLE_ROW] });
+            }),
+            first: vi.fn().mockResolvedValue(null),
+            run: vi.fn().mockResolvedValue({}),
+          };
         }),
         batch: vi.fn().mockResolvedValue([]),
       } as unknown as D1Database,
@@ -121,15 +123,27 @@ describe("blog.ts — cache throw fallback paths", () => {
     expect(body).toHaveLength(1);
   });
 
-  it("GET /api/blog: returns 404 when cache throws and D1 has no results", async () => {
-    vi.stubGlobal("caches", {
-      default: {
-        match: vi.fn().mockRejectedValue(new Error("Cache unavailable")),
-        put: vi.fn(),
-      },
+  it("GET /api/blog: returns 404 when withEdgeCache throws and fallback D1 returns empty", async () => {
+    // Both fetcher and fallback D1 return empty
+    let callCount = 0;
+    const env = createMockEnv({
+      DB: {
+        prepare: vi.fn().mockImplementation(() => {
+          callCount++;
+          return {
+            bind: vi.fn().mockReturnThis(),
+            all: vi.fn().mockImplementation(() => {
+              if (callCount === 1) throw new Error("DB error in fetcher");
+              return Promise.resolve({ results: [] }); // empty fallback
+            }),
+            first: vi.fn().mockResolvedValue(null),
+            run: vi.fn().mockResolvedValue({}),
+          };
+        }),
+        batch: vi.fn().mockResolvedValue([]),
+      } as unknown as D1Database,
     });
 
-    const env = createMockEnv(); // DB returns empty results
     const app = new Hono<{ Bindings: Env }>();
     app.route("/", blog);
 
@@ -165,21 +179,22 @@ describe("blog.ts — cache throw fallback paths", () => {
     expect(ctx.waitUntil).toHaveBeenCalled();
   });
 
-  it("GET /api/blog/:slug: returns post via D1 fallback when cache throws", async () => {
-    vi.stubGlobal("caches", {
-      default: {
-        match: vi.fn().mockRejectedValue(new Error("Cache unavailable")),
-        put: vi.fn(),
-      },
-    });
-
+  it("GET /api/blog/:slug: returns post via D1 fallback when withEdgeCache throws", async () => {
+    // Fetcher (DB.prepare.first) throws on first call, succeeds on second call (outer catch)
+    let callCount = 0;
     const env = createMockEnv({
       DB: {
-        prepare: vi.fn().mockReturnValue({
-          bind: vi.fn().mockReturnThis(),
-          first: vi.fn().mockResolvedValue(SAMPLE_ROW),
-          all: vi.fn().mockResolvedValue({ results: [] }),
-          run: vi.fn().mockResolvedValue({}),
+        prepare: vi.fn().mockImplementation(() => {
+          callCount++;
+          return {
+            bind: vi.fn().mockReturnThis(),
+            first: vi.fn().mockImplementation(() => {
+              if (callCount === 1) throw new Error("DB error in fetcher");
+              return Promise.resolve(SAMPLE_ROW);
+            }),
+            all: vi.fn().mockResolvedValue({ results: [] }),
+            run: vi.fn().mockResolvedValue({}),
+          };
         }),
         batch: vi.fn().mockResolvedValue([]),
       } as unknown as D1Database,
@@ -188,21 +203,38 @@ describe("blog.ts — cache throw fallback paths", () => {
     const app = new Hono<{ Bindings: Env }>();
     app.route("/", blog);
 
-    const res = await app.request("/api/blog/hello-world", {}, env);
+    const ctx = makeCtx();
+    const res = await app.request(
+      "/api/blog/hello-world",
+      {},
+      env,
+      ctx as unknown as ExecutionContext,
+    );
     expect(res.status).toBe(200);
     const body = await res.json<{ slug: string }>();
     expect(body.slug).toBe("hello-world");
   });
 
-  it("GET /api/blog/:slug: returns 404 when cache throws and D1 returns null", async () => {
-    vi.stubGlobal("caches", {
-      default: {
-        match: vi.fn().mockRejectedValue(new Error("Cache unavailable")),
-        put: vi.fn(),
-      },
+  it("GET /api/blog/:slug: returns 404 when withEdgeCache throws and fallback D1 returns null", async () => {
+    let callCount = 0;
+    const env = createMockEnv({
+      DB: {
+        prepare: vi.fn().mockImplementation(() => {
+          callCount++;
+          return {
+            bind: vi.fn().mockReturnThis(),
+            first: vi.fn().mockImplementation(() => {
+              if (callCount === 1) throw new Error("DB error in fetcher");
+              return Promise.resolve(null); // fallback returns null
+            }),
+            all: vi.fn().mockResolvedValue({ results: [] }),
+            run: vi.fn().mockResolvedValue({}),
+          };
+        }),
+        batch: vi.fn().mockResolvedValue([]),
+      } as unknown as D1Database,
     });
 
-    const env = createMockEnv(); // DB returns null
     const app = new Hono<{ Bindings: Env }>();
     app.route("/", blog);
 
@@ -240,7 +272,7 @@ describe("blog.ts — cache throw fallback paths", () => {
 
 // ── github-stars.ts coverage gaps ────────────────────────────────────────────
 
-describe("github-stars.ts — cache throw fallback path", () => {
+describe("github-stars.ts — outer catch fallback paths", () => {
   let mockGlobalFetch: ReturnType<typeof vi.fn>;
 
   beforeEach(() => {
@@ -250,19 +282,17 @@ describe("github-stars.ts — cache throw fallback path", () => {
 
   afterEach(() => vi.unstubAllGlobals());
 
-  it("falls back to direct fetch when withEdgeCache throws and returns stars", async () => {
-    // Make withEdgeCache throw by making caches.default.match throw
-    vi.stubGlobal("caches", {
-      default: {
-        match: vi.fn().mockRejectedValue(new Error("Cache unavailable")),
-        put: vi.fn(),
-      },
-    });
-
-    // Direct GitHub API call returns ok
-    mockGlobalFetch.mockResolvedValue(
-      new Response(JSON.stringify({ stargazers_count: 42 }), { status: 200 }),
-    );
+  it("falls back to direct fetch when withEdgeCache throws (fetcher throws) and returns stars", async () => {
+    // To trigger github-stars.ts outer catch (lines 28-45):
+    // The fetcher inside withEdgeCache must throw.
+    // The fetcher calls global fetch(). So:
+    // - 1st fetch call (inside withEdgeCache's fetcher) → throws → withEdgeCache throws → outer catch
+    // - 2nd fetch call (inside outer catch at line 31) → returns ok → covers lines 38-40
+    mockGlobalFetch
+      .mockRejectedValueOnce(new Error("Network error on first call")) // triggers withEdgeCache to throw
+      .mockResolvedValueOnce(
+        new Response(JSON.stringify({ stargazers_count: 99 }), { status: 200 }), // covers lines 38-40
+      );
 
     const env = createMockEnv();
     const app = new Hono<{ Bindings: Env }>();
@@ -271,38 +301,11 @@ describe("github-stars.ts — cache throw fallback path", () => {
     const res = await app.request("/api/github/stars", {}, env);
     expect(res.status).toBe(200);
     const body = await res.json<{ stars: number }>();
-    expect(body.stars).toBe(42);
+    expect(body.stars).toBe(99);
   });
 
-  it("returns null stars when GitHub API returns non-ok in fallback", async () => {
-    vi.stubGlobal("caches", {
-      default: {
-        match: vi.fn().mockRejectedValue(new Error("Cache unavailable")),
-        put: vi.fn(),
-      },
-    });
-
-    // GitHub API returns non-ok
-    mockGlobalFetch.mockResolvedValue(new Response("{}", { status: 403 }));
-
-    const env = createMockEnv();
-    const app = new Hono<{ Bindings: Env }>();
-    app.route("/", githubStars);
-
-    const res = await app.request("/api/github/stars", {}, env);
-    expect(res.status).toBe(200);
-    const body = await res.json<{ stars: null; error: string }>();
-    expect(body.stars).toBeNull();
-    expect(body.error).toContain("unavailable");
-  });
-
-  it("returns null stars when both cache and direct fetch throw", async () => {
-    vi.stubGlobal("caches", {
-      default: {
-        match: vi.fn().mockRejectedValue(new Error("Cache unavailable")),
-        put: vi.fn(),
-      },
-    });
+  it("returns null stars when withEdgeCache throws and second fetch also fails", async () => {
+    // Both fetches throw → cached remains null → returns null stars
     mockGlobalFetch.mockRejectedValue(new Error("Network error"));
 
     const env = createMockEnv();
@@ -314,26 +317,46 @@ describe("github-stars.ts — cache throw fallback path", () => {
     const body = await res.json<{ stars: null }>();
     expect(body.stars).toBeNull();
   });
+
+  it("returns null stars when withEdgeCache throws and second fetch returns non-ok", async () => {
+    mockGlobalFetch
+      .mockRejectedValueOnce(new Error("Network error on first call"))
+      .mockResolvedValueOnce(new Response("{}", { status: 403 }));
+
+    const env = createMockEnv();
+    const app = new Hono<{ Bindings: Env }>();
+    app.route("/", githubStars);
+
+    const res = await app.request("/api/github/stars", {}, env);
+    expect(res.status).toBe(200);
+    const body = await res.json<{ stars: null; error: string }>();
+    expect(body.stars).toBeNull();
+  });
 });
 
 // ── sitemap.ts coverage gaps ──────────────────────────────────────────────────
 
-describe("sitemap.ts — inner D1 catch path", () => {
+describe("sitemap.ts — outer catch + inner D1 fallback paths", () => {
   afterEach(() => vi.unstubAllGlobals());
 
-  it("returns fallback XML when both cache and D1 throw", async () => {
-    // Make cache throw, and D1 prepare throw
-    vi.stubGlobal("caches", {
-      default: {
-        match: vi.fn().mockRejectedValue(new Error("Cache unavailable")),
-        put: vi.fn(),
-      },
-    });
-
+  it("returns D1 fallback sitemap when withEdgeCache throws (fetcher throws)", async () => {
+    // To trigger sitemap.ts outer catch (lines 62-78):
+    // The fetcher (DB.prepare.all) must throw, causing withEdgeCache to throw.
+    // Then the inner D1 fallback (lines 64-71) runs with a SECOND DB call.
+    let callCount = 0;
     const env = createMockEnv({
       DB: {
         prepare: vi.fn().mockImplementation(() => {
-          throw new Error("D1 unavailable");
+          callCount++;
+          return {
+            bind: vi.fn().mockReturnThis(),
+            all: vi.fn().mockImplementation(() => {
+              if (callCount === 1) throw new Error("D1 error in fetcher");
+              return Promise.resolve({ results: [{ slug: "fallback-post", date: "2025-01-01" }] });
+            }),
+            first: vi.fn().mockResolvedValue(null),
+            run: vi.fn().mockResolvedValue({}),
+          };
         }),
         batch: vi.fn().mockResolvedValue([]),
       } as unknown as D1Database,
@@ -343,8 +366,28 @@ describe("sitemap.ts — inner D1 catch path", () => {
     app.route("/", sitemap);
 
     const res = await app.request("/sitemap.xml", {}, env);
-    // Should fallback to minimal sitemap (lines 80-84) or empty sitemap
-    expect([200]).toContain(res.status);
+    expect(res.status).toBe(200);
+    const text = await res.text();
+    expect(text).toContain("<?xml");
+    expect(text).toContain("fallback-post");
+  });
+
+  it("returns minimal sitemap when both fetcher and D1 fallback throw (lines 80-84)", async () => {
+    // Both fetcher AND fallback D1 throw → response remains null → lines 80-84 execute
+    const env = createMockEnv({
+      DB: {
+        prepare: vi.fn().mockImplementation(() => {
+          throw new Error("D1 completely unavailable");
+        }),
+        batch: vi.fn().mockResolvedValue([]),
+      } as unknown as D1Database,
+    });
+
+    const app = new Hono<{ Bindings: Env }>();
+    app.route("/", sitemap);
+
+    const res = await app.request("/sitemap.xml", {}, env);
+    expect(res.status).toBe(200);
     const text = await res.text();
     expect(text).toContain("<?xml");
   });

@@ -15,6 +15,7 @@ export function TryItCta() {
       const timer = setTimeout(() => setCopied(false), 2000);
       return () => clearTimeout(timer);
     }
+    return undefined;
   }, [copied]);
 
   return (
@@ -32,6 +33,7 @@ export function TryItCta() {
             </div>
             <button
               onClick={handleCopy}
+              aria-label="Copy command to clipboard"
               className="shrink-0 flex items-center justify-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 text-slate-200 rounded-md transition-colors text-sm font-medium w-full sm:w-auto"
             >
               {copied ? (

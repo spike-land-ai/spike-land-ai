@@ -63,13 +63,22 @@ export function AppFooter() {
         </div>
         <div className="mt-12 pt-8 border-t border-border flex flex-col sm:flex-row justify-between items-center gap-4">
           <p className="text-xs text-muted-foreground">
-            &copy; {currentYear} spike.land. All rights reserved. Built on Cloudflare Workers.
+            &copy; {currentYear} spike.land. All rights reserved. Built on Cloudflare Workers.<br />
+            Available in English.
           </p>
           <div className="flex gap-6">
-            <span className="text-xs text-muted-foreground flex items-center gap-1.5">
+            <a
+              href="https://github.com/spike-land-ai/spike-land-ai/releases"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+            >
+              Changelog
+            </a>
+            <a href="https://github.com/spike-land-ai" target="_blank" rel="noopener noreferrer" className="text-xs text-muted-foreground flex items-center gap-1.5 hover:text-foreground transition-colors">
               <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
-              <span role="status">All systems operational</span>
-            </span>
+              <span role="status">View Status</span>
+            </a>
           </div>
         </div>
       </div>
