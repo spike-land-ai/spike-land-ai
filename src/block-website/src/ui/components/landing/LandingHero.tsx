@@ -10,7 +10,7 @@ export function LandingHero() {
         fetch("/api/github/stars")
             .then(res => res.json() as Promise<{ stars: number | null }>)
             .then((data) => {
-                if (data.stars !== null) setStars(data.stars);
+                if (data.stars != null) setStars(data.stars);
             })
             .catch(() => { /* graceful fallback — don't show stars */ });
     }, []);
@@ -63,7 +63,7 @@ export function LandingHero() {
                 className="mt-20 pt-10 border-t border-border flex flex-col sm:flex-row items-center justify-center gap-6 sm:gap-8 text-sm text-muted-foreground"
                 aria-label="Platform Statistics"
             >
-                {stars !== null && (
+                {stars != null && (
                     <>
                         <div className="flex gap-2.5 items-center">
                             <dt className="sr-only">GitHub Stars</dt>
