@@ -34,7 +34,7 @@ platform documentation.
 | Automate E2E setup        | [develop/AUTOMATED_SETUP.md](./develop/AUTOMATED_SETUP.md)           |
 | Manage dependencies       | [develop/DEPENDENCY_MANAGEMENT.md](./develop/DEPENDENCY_MANAGEMENT.md) |
 | Build MCP servers         | [mcp/SERVER_DEVELOPMENT.md](./mcp/SERVER_DEVELOPMENT.md)             |
-| Use spike-cli             | `npx @spike-land-ai/spike-cli` (external package)                    |
+| Use spike-cli             | `claude mcp add spike-land --transport http https://spike.land/mcp` or `npx @spike-land-ai/spike-cli shell` |
 
 ### For Project Setup
 

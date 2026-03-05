@@ -552,7 +552,9 @@ A standalone MCP server package for Claude Desktop and Claude Code.
 **Installation**:
 
 ```bash
-npx @spike-land-ai/spike-cli
+claude mcp add spike-land --transport http https://spike.land/mcp
+# Or interactive CLI:
+npx @spike-land-ai/spike-cli shell
 ```
 
 **Configuration** (Claude Desktop):

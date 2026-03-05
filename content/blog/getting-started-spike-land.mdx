@@ -17,7 +17,7 @@ heroImage: "/blog/getting-started-spike-land/hero.png"
 
 - Sign up at spike.land — free tier, no credit card required
 - Browse 80+ tools in the store, organized by category and tier
-- Connect via `npx @spike-land-ai/spike-cli shell` in under 60 seconds
+- Connect via `claude mcp add spike-land --transport http https://spike.land/mcp` in under 60 seconds
 - Add your API keys (BYOK) or use proxy credits for model-backed tools
 - Upgrade to Pro ($29/mo) or Business ($99/mo) when you need more credits or team features
 
@@ -88,13 +88,21 @@ Invite team members, assign roles, share API key pools, and manage tool access b
 
 spike-cli is an MCP multiplexer — one shell that connects your AI agent to spike.land and any other MCP server you configure.
 
-### Quick start (no install)
+### Quick start (Claude Code)
+
+```bash
+claude mcp add spike-land --transport http https://spike.land/mcp
+```
+
+This adds spike.land as an MCP server in Claude Code. You are connected to all spike.land tools immediately.
+
+### Alternative: Interactive CLI
 
 ```bash
 npx @spike-land-ai/spike-cli shell
 ```
 
-This downloads and runs spike-cli, authenticates you, and opens an interactive shell. You are connected to all spike.land tools immediately.
+This downloads and runs spike-cli, authenticates you, and opens an interactive shell.
 
 ### Global install (recommended)
 
@@ -360,7 +368,7 @@ You have hit your daily limit. Credits reset at midnight UTC. Upgrade to Pro for
 Check that the key is active in **Dashboard > API Keys** and that the toggle next to it is enabled. Inactive keys are stored but not used.
 
 **`npx` is slow on first run**
-The first `npx @spike-land-ai/spike-cli` download takes 10-20 seconds. Subsequent runs use the cache. Install globally to skip this: `npm install -g @spike-land-ai/spike-cli`.
+The first `npx @spike-land-ai/spike-cli shell` download takes 10-20 seconds. Subsequent runs use the cache. Install globally to skip this: `npm install -g @spike-land-ai/spike-cli`.
 
 ---
 

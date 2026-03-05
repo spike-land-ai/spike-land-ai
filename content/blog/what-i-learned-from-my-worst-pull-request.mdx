@@ -85,6 +85,10 @@ Then a more senior developer reviewed the PR. She was direct. The PR was essenti
 
 The basket was server-side. That was the architecture. The backend was the single source of truth. The ID from the cancellation app was just for double-checking against what was already stored on the server. There was no need to call the Basket API at all.
 
+<div className="my-10">
+  <img src="/blog/what-i-learned-from-my-worst-pull-request/pr-rejection-frustration.svg" alt="Animated illustration of a code screen being overwhelmed by flashing red REJECTED flags" className="w-full rounded-xl border border-gray-800 shadow-2xl" />
+</div>
+
 I sat there, staring at my screen. I had no answer for why I wrote this code. Because I did not write it. Claude did. And I approved it without understanding.
 
 ---
@@ -123,13 +127,15 @@ My effort distribution is completely different now. 30% planning. 50% testing. 2
 
 ## The Aftermath
 
-I stopped producing slop. My PRs are now high quality.
+I stopped producing slop. My PRs became high quality again.
 
-But my reputation at work is still damaged. My PRs still take longer to review than my colleagues' PRs. The trust I broke takes time to rebuild.
+But the damage was already done. The trust I broke took time to rebuild, and in the corporate world, time is rarely guaranteed. Shortly after this incident, I was fired from VMO2. 
 
-That is the hidden cost of bad PRs. It is not just bad code. It is broken trust. And trust rebuilds slowly.
+That is the hidden cost of bad PRs. It is not just bad code. It is broken trust. When you use AI as a shortcut instead of a tool, you aren't just risking a bug in production — you're risking your reputation and livelihood. 
 
-Despite this, I am positive. The system works. The quality is there. Each good PR adds a little trust back.
+If you want to see what happens when someone gets this right — someone with absolutely zero coding experience but a perfect understanding of the problem space — you should read about [how a chemist built three production apps in a few evenings](/blog/a-chemist-walked-into-a-codebase). He didn't use AI as a shortcut; he used it to bypass the pointless ceremony we've built up around software engineering.
+
+Despite losing my job, I remain positive. The system I eventually developed works. The quality is there. Each good PR I write now — even if it's for my own projects — proves that.
 
 ---
 

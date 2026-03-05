@@ -3,10 +3,13 @@
  * spike — MCP multiplexer CLI
  *
  * Usage:
+ *   spike shell                     Interactive MCP tool explorer REPL
+ *   spike status                    Health check for configured servers
  *   spike auth login|logout|status  Manage authentication
  *   spike alias set|remove|list     Manage aliases
  *   spike completions install|uninstall  Shell tab completions
  *   spike registry search|add       Browse MCP server registry
+ *   spike agent                     Run as MCP server for AI agents
  */
 
 import { config } from "dotenv";
@@ -16,6 +19,8 @@ import { registerAliasCommand } from "./commands/alias";
 import { registerCompletionsCommand } from "./commands/completions";
 import { registerRegistryCommand } from "./commands/registry";
 import { registerAgentCommand } from "./commands/agent";
+import { registerShellCommand } from "./commands/shell";
+import { registerStatusCommand } from "./commands/status";
 import { setVerbose } from "./util/logger";
 import { loadAliases } from "./alias/store";
 
@@ -49,7 +54,7 @@ function handleGenerateCompletions(): boolean {
   const idx = process.argv.indexOf("--generate-completions");
   if (idx === -1) return false;
 
-  const commands = ["auth", "alias", "completions", "registry"];
+  const commands = ["shell", "status", "auth", "alias", "completions", "registry", "agent"];
   const globalOptions = ["--verbose", "--base-url", "--help", "--version"];
 
   // Output all commands and options for the completion script to filter
@@ -82,6 +87,8 @@ export async function main(): Promise<void> {
       }
     });
 
+  registerShellCommand(program);
+  registerStatusCommand(program);
   registerAuthCommand(program);
   registerAliasCommand(program);
   registerCompletionsCommand(program);

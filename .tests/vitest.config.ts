@@ -72,6 +72,12 @@ export default defineConfig({
         src("spike-land-backend/mcp/tools/edit-tools.ts"),
         src("spike-land-backend/mcp/tools/find-tools.ts"),
         src("spike-land-backend/utils/jsonSchemaToZod.ts"),
+
+        // Monaco DOM-only files (untestable in Node.js/jsdom without full Monaco)
+        src("code/@/lib/ws.ts"),
+        src("code/@/lib/shared-w-polyfill.ts"),
+        src("code/@/lib/code-session.ts"),
+        src("code/@/services/editorUtils.ts"),
       ],
     },
     projects: [
@@ -133,6 +139,7 @@ export default defineConfig({
         "@spike-land-ai/block-sdk/storage": src("block-sdk/storage/index.ts"),
         "@spike-land-ai/block-sdk": src("block-sdk/index.ts"),
         "@spike-land-ai/block-tasks": src("block-tasks/index.ts"),
+        "@spike-land-ai/shared/tool-builder": src("shared/tool-builder/index.ts"),
         "@spike-land-ai/shared": src("shared/index.ts"),
         "@spike-land-ai/mcp-server-base": src("mcp-server-base/index.ts"),
       },
@@ -698,6 +705,7 @@ export default defineConfig({
       name: "video",
       environment: "jsdom",
       ...forksPoolConfig,
+      setupFiles: [tests("video/setup.ts")],
       include: [tests("video/**/*.test.ts"), tests("video/**/*.test.tsx")],
       reporters: [path.join(root, "vitest-minimal-reporter.ts")],
       coverage: {

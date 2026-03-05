@@ -20,7 +20,7 @@ heroImage: "/blog/mcp-explained-universal-adapter-for-ai-tools/hero.png"
 - The full cycle: discover capabilities → call with typed params → get narrative, structured responses back.
 - **The context window problem:** an LLM presented with hundreds of tool descriptions wastes context parsing tools it will never use. Smaller, relevant toolsets mean sharper reasoning and lower cost.
 - spike-cli is an MCP multiplexer — one shell connecting spike-land (<ToolCount /> tools), vitest, and filesystem servers, all namespaced. **Lazy toolset loading** means agents see only the tools they request. Today that is 100% Tools. Resources and Prompts are next.
-- Try it: `npx @spike-land-ai/spike-cli shell`
+- Try it: `claude mcp add spike-land --transport http https://spike.land/mcp`
 
 </Tldr>
 
@@ -259,6 +259,12 @@ Think of it as the difference between a warehouse and a shelf. A warehouse has e
 ### Quick Start
 
 ```bash
+claude mcp add spike-land --transport http https://spike.land/mcp
+```
+
+Or use the interactive CLI:
+
+```bash
 npx @spike-land-ai/spike-cli shell
 ```
 
@@ -387,8 +393,10 @@ Not sure it clicks yet? 16 professionals explain MCP through their own lens:
 ## Get Started
 
 ```bash
-npx @spike-land-ai/spike-cli shell
+claude mcp add spike-land --transport http https://spike.land/mcp
 ```
+
+Alternative: Interactive CLI — `npx @spike-land-ai/spike-cli shell`
 
 - [MCP specification](https://modelcontextprotocol.io) — full spec including Tools, Resources, and Prompts
 - [spike.land MCP endpoint](/api/mcp) — <ToolCount /> tools, Resources and Prompts coming soon

@@ -19,7 +19,7 @@ heroImage: "/blog/spike-land-launch/hero.png"
 - **Free tier** to start. **Pro ($29/mo)**: 500 credits/day, priority support. **Business ($99/mo)**: unlimited credits, team management
 - **MCP Tool Marketplace** launching with a 70/30 revenue share — tool authors keep 70%
 - **API Gateway**: bring your own API keys (BYOK) or use spike.land proxy credits for OpenAI, Anthropic, and Replicate
-- One protocol, zero custom integrations. Connect via `npx @spike-land-ai/spike-cli shell`
+- One protocol, zero custom integrations. Connect via `claude mcp add spike-land --transport http https://spike.land/mcp`
 
 </Tldr>
 
@@ -181,10 +181,10 @@ We wrote more about this in [MCP Explained](/blog/mcp-explained-universal-adapte
 ## Get Started
 
 ```bash
-npx @spike-land-ai/spike-cli shell
+claude mcp add spike-land --transport http https://spike.land/mcp
 ```
 
-That one command connects you to all 80+ tools. No signup required for free-tier tools. For Pro and Business features, [create an account](https://spike.land/login).
+That one command connects you to all 80+ tools. No signup required for free-tier tools. Alternatively, use the interactive CLI: `npx @spike-land-ai/spike-cli shell`. For Pro and Business features, [create an account](https://spike.land/login).
 
 If you want to build on the platform — publish tools, integrate the MCP endpoint into your own product, or join the marketplace waitlist — [read the developer docs](https://spike.land/docs) or reach out directly.
 

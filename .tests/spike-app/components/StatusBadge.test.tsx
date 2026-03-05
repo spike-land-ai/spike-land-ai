@@ -33,13 +33,13 @@ describe("StatusBadge", () => {
   it("applies color classes for live status", () => {
     render(<StatusBadge status="live" />);
     const badge = screen.getByText("live").closest("span");
-    expect(badge?.className).toContain("bg-green-100");
-    expect(badge?.className).toContain("text-green-700");
+    expect(badge?.className).toContain("bg-success");
+    expect(badge?.className).toContain("text-success-foreground");
   });
 
   it("applies color classes for archived status", () => {
     render(<StatusBadge status="archived" />);
     const badge = screen.getByText("archived").closest("span");
-    expect(badge?.className).toContain("bg-gray-100");
+    expect(badge?.className).toContain("bg-muted");
   });
 });

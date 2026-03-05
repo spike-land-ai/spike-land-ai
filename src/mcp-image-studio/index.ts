@@ -1,7 +1,7 @@
 /**
  * Image Studio MCP Server — Standalone Entry Point
  *
- * Run: node packages/mcp-image-studio/dist/index.js
+ * Run: node src/mcp-image-studio/dist/index.js
  * Starts a stdio MCP server with all img tools registered.
  */
 

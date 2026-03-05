@@ -6,19 +6,19 @@ import { LivePreview } from "../../../src/spike-app/components/LivePreview";
 describe("LivePreview", () => {
   it("renders iframe with correct src", () => {
     render(<LivePreview appId="my-app" />);
-    const iframe = screen.getByTitle("Preview my-app") as HTMLIFrameElement;
-    expect(iframe.src).toBe("https://edge.spike.land/live/my-app");
+    const iframe = screen.getByTitle(/Preview my-app/) as HTMLIFrameElement;
+    expect(iframe.src).toBe("https://edge.spike.land/live/my-app/index.html");
   });
 
   it("uses custom edgeUrl", () => {
     render(<LivePreview appId="app1" edgeUrl="https://custom.edge" />);
-    const iframe = screen.getByTitle("Preview app1") as HTMLIFrameElement;
-    expect(iframe.src).toBe("https://custom.edge/live/app1");
+    const iframe = screen.getByTitle(/Preview app1/) as HTMLIFrameElement;
+    expect(iframe.src).toBe("https://custom.edge/live/app1/index.html");
   });
 
   it("displays the URL in toolbar", () => {
     render(<LivePreview appId="my-app" />);
-    expect(screen.getByText("https://edge.spike.land/live/my-app")).toBeInTheDocument();
+    expect(screen.getByText("https://edge.spike.land/live/my-app/index.html")).toBeInTheDocument();
   });
 
   it("iframe has sandbox attributes", () => {

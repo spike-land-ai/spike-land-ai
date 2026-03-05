@@ -4,11 +4,11 @@
  * Shared base utilities for @spike-land-ai MCP server packages.
  *
  * Extracted from common patterns in:
- *  - packages/esbuild-wasm-mcp
- *  - packages/hackernews-mcp
- *  - packages/mcp-nanobanana
- *  - packages/openclaw-mcp
- *  - packages/spike-review
+ *  - src/esbuild-wasm-mcp
+ *  - src/hackernews-mcp
+ *  - src/mcp-nanobanana
+ *  - src/openclaw-mcp
+ *  - src/spike-review
  */
 
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";

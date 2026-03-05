@@ -89,7 +89,7 @@ describe("Core Components Smoke Tests", () => {
   });
 
   it("renders BayesianConfidenceCore stats", () => {
-    render(
+    const { container } = render(
       <BayesianConfidenceCore
         progress={1}
         successes={10}
@@ -98,8 +98,14 @@ describe("Core Components Smoke Tests", () => {
         height={1080}
       />,
     );
-    expect(screen.getByText("10")).toBeTruthy(); // Successes count
-    expect(screen.getByText("2")).toBeTruthy(); // Failures count
+    // Use container.textContent to check for presence of numbers
+    // or be more specific about which text element we want
+    const textElements = Array.from(container.querySelectorAll("text"));
+    const hasSuccessCount = textElements.some(el => el.textContent === "10");
+    const hasFailureCount = textElements.some(el => el.textContent === "2");
+    
+    expect(hasSuccessCount).toBe(true);
+    expect(hasFailureCount).toBe(true);
   });
 
   it("renders ModelCascadeCore rows", () => {

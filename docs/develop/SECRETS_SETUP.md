@@ -44,7 +44,7 @@ yarn dev
 
 | Secret                   | Local | GH Actions | Vercel  | Required Level |
 | ------------------------ | :---: | :--------: | :-----: | :------------: |
-| DATABASE_URL             |  Yes  |    Yes     |   Yes   |  Legacy only   |
+| DATABASE_URL             |  No   |     No     |    No   |  Removed (D1)  |
 | AUTH_SECRET              |  Yes  |    Yes     |   Yes   |  **Required**  |
 | USER_ID_SALT             |  Yes  |     No     |   Yes   |  **Required**  |
 | GITHUB_ID/SECRET         |  Yes  |     No     |   Yes   |  **Required**  |
@@ -75,7 +75,7 @@ yarn dev
 
 #### AUTH_SECRET (Required)
 
-Used by NextAuth.js to sign and encrypt session tokens.
+Used by Better Auth to sign and encrypt session tokens.
 
 ```bash
 # Generate:
@@ -108,33 +108,9 @@ USER_ID_SALT=your-user-id-salt
 
 ### Database Configuration
 
-#### DATABASE_URL (Required)
-
-PostgreSQL connection string.
-
-```bash
-# Local development:
-DATABASE_URL=postgresql://postgres:password@localhost:5432/spike_land?schema=public
-
-# Neon (production):
-DATABASE_URL=postgresql://[USER]:[PASSWORD]@[HOST]/[DATABASE]?sslmode=require
-
-# Supabase:
-DATABASE_URL=postgresql://postgres:[YOUR-PASSWORD]@db.[PROJECT-REF].supabase.co:5432/postgres
-```
-
-**For serverless/edge environments**, use connection pooling:
-
-```bash
-# Pooled connection (for queries)
-DATABASE_URL=postgresql://user:pass@host:6543/db?pgbouncer=true
-
-# Direct connection (for migrations only)
-DIRECT_URL=postgresql://user:pass@host:5432/db
-```
-
-See [DATABASE_SETUP.md](./DATABASE_SETUP.md) for detailed database
-configuration.
+Database is managed via Cloudflare D1 (serverless SQLite). No DATABASE_URL
+needed — D1 bindings are configured in `wrangler.toml`. See
+[D1_QUICK_START.md](./D1_QUICK_START.md) for setup details.
 
 ### OAuth Providers
 
@@ -523,7 +499,7 @@ secret**
 #### AUTH_SECRET
 
 - **Used by**: `ci-cd.yml` (E2E tests)
-- **Purpose**: NextAuth session signing
+- **Purpose**: Better Auth session signing
 
 #### E2E_BYPASS_SECRET
 

@@ -140,7 +140,7 @@ describe("ChatThread", () => {
     render(<ChatThread messages={msgs} onSendMessage={mockSend} />);
 
     const msgEl = screen.getByText("User msg").closest("div[class*='bg-']");
-    expect(msgEl?.className).toContain("bg-blue-600");
+    expect(msgEl?.className).toContain("bg-primary");
   });
 
   it("applies assistant message styling", () => {
@@ -154,6 +154,6 @@ describe("ChatThread", () => {
     render(<ChatThread messages={msgs} onSendMessage={mockSend} />);
 
     const msgEl = screen.getByText("Bot msg").closest("div[class*='bg-']");
-    expect(msgEl?.className).toContain("bg-gray-100");
+    expect(msgEl?.className).toContain("bg-muted");
   });
 });

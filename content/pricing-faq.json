@@ -83,7 +83,7 @@
     {
       "id": "how-to-connect-ai-agent",
       "question": "How do I connect my AI agent to spike.land?",
-      "answer": "The fastest way is spike-cli: run `npx @spike-land-ai/spike-cli shell` and you are connected immediately. For Claude Code and other MCP clients, add the spike.land endpoint to your .mcp.json config with your API access token from Dashboard > API Keys. For custom agents using the Anthropic SDK or OpenAI Assistants, call the HTTP endpoint at https://spike.land/api/mcp directly.",
+      "answer": "The fastest way is Claude Code: run `claude mcp add spike-land --transport http https://spike.land/mcp` and you are connected immediately. Alternatively, use the interactive CLI: `npx @spike-land-ai/spike-cli shell`. For other MCP clients, add the spike.land endpoint to your .mcp.json config with your API access token from Dashboard > API Keys. For custom agents using the Anthropic SDK or OpenAI Assistants, call the HTTP endpoint at https://spike.land/api/mcp directly.",
       "tags": ["integration", "spike-cli", "claude", "api", "setup"]
     },
     {
