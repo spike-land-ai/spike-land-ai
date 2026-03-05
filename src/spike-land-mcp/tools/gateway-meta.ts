@@ -376,4 +376,110 @@ export function registerGatewayMetaTools(
         return { content: [{ type: "text", text }] };
       }),
   );
+
+  // get_tool_help
+  registry.registerBuilt(
+    t
+      .tool("get_tool_help", "Get detailed help for a specific tool, including descriptions, examples, and version information.", {
+        tool_name: z.string().describe("The name of the tool to get help for")
+      })
+      .meta({ category: "gateway-meta", tier: "free" })
+      .handler(async ({ input }) => {
+        const { tool_name } = input;
+        const definitions = registry.getToolDefinitions();
+        const def = definitions.find((d) => d.name === tool_name);
+        
+        if (!def) {
+          return { content: [{ type: "text", text: `Tool not found: ${tool_name}` }], isError: true };
+        }
+        
+        let text = `**Tool:** ${def.name}\n`;
+        text += `**Description:** ${def.description}\n`;
+        text += `**Category:** ${def.category}\n`;
+        text += `**Version:** ${def.version}\n`;
+        text += `**Stability:** ${def.stability}\n\n`;
+        
+        if (def.inputSchema) {
+          text += `**Input Schema:**\n`;
+          for (const [key, field] of Object.entries(def.inputSchema)) {
+            const zField = field as any;
+            const desc = zField.description || "No description";
+            const isOptional = zField.isOptional ? zField.isOptional() : false;
+            text += `- \`${key}\`${isOptional ? " (optional)" : ""}: ${desc}\n`;
+          }
+          text += "\n";
+        }
+        
+        if (def.examples && def.examples.length > 0) {
+          text += `**Examples:**\n`;
+          for (const ex of def.examples) {
+            text += `- **${ex.name}**: ${ex.description}\n  \`\`\`json\n  ${JSON.stringify(ex.input, null, 2)}\n  \`\`\`\n`;
+          }
+        } else {
+          text += `*No examples provided for this tool.*\n`;
+        }
+        
+        return { content: [{ type: "text", text }] };
+      })
+  );
+
+  // search_tools_by_stability
+  registry.registerBuilt(
+    t
+      .tool("search_tools_by_stability", "Find and automatically enable tools matching a specific stability tag (e.g., beta, experimental).", {
+        stability: z.enum(["stable", "beta", "experimental", "deprecated", "not-implemented"]).describe("The stability level to search for"),
+        limit: z.number().optional().describe("Max results to show")
+      })
+      .meta({ category: "gateway-meta", tier: "free" })
+      .handler(async ({ input }) => {
+        const { stability, limit } = input;
+        const matching = registry.filterByStability(stability as any);
+        
+        if (matching.length === 0) {
+          return { content: [{ type: "text", text: `No tools found with stability: ${stability}` }] };
+        }
+        
+        registry.enableByStability(stability as any);
+        void saveEnabledCategories(userId, registry.getEnabledCategories(), kv);
+        
+        let text = `**Found and activated ${matching.length} tool(s) with stability: ${stability}**\n\n`;
+        
+        const displayLimit = limit || 20;
+        const displayTools = matching.slice(0, displayLimit);
+        
+        for (const def of displayTools) {
+          text += `- **${def.name}** (v${def.version ?? "1.0.0"})\n  ${def.description}\n`;
+        }
+        
+        if (matching.length > displayLimit) {
+          text += `\n... and ${matching.length - displayLimit} more.`;
+        }
+        
+        return { content: [{ type: "text", text }] };
+      })
+  );
+
+  // list_tool_versions
+  registry.registerBuilt(
+    t
+      .tool("list_tool_versions", "List all registered versions of a specific tool.", {
+        tool_name: z.string().describe("The name of the tool")
+      })
+      .meta({ category: "gateway-meta", tier: "free" })
+      .handler(async ({ input }) => {
+        const { tool_name } = input;
+        const versions = registry.listVersions(tool_name);
+        
+        if (versions.length === 0) {
+          return { content: [{ type: "text", text: `No versions found for tool: ${tool_name}` }], isError: true };
+        }
+        
+        let text = `**Versions for ${tool_name}:**\n\n`;
+        for (const v of versions) {
+          text += `- v${v.version} (${v.stability})\n`;
+        }
+        
+        return { content: [{ type: "text", text }] };
+      })
+  );
 }

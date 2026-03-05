@@ -68,7 +68,7 @@ export interface ToolMeta {
   alwaysEnabled?: boolean;
   examples?: ToolExample[];
   version?: string;
-  stability?: "stable" | "beta" | "experimental" | "deprecated";
+  stability?: "stable" | "beta" | "experimental" | "deprecated" | "not-implemented";
 }
 
 // ─── Built tool (output of builder) ───

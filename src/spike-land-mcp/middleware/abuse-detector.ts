@@ -49,8 +49,8 @@ export async function detectAbuse(
 }
 
 export async function reportAbuseFlag(
-  env: Env,
-  userId: string,
+  _env: Env,
+  _userId: string,
   isAgent: boolean,
 ) {
   try {

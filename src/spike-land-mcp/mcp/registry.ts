@@ -35,6 +35,27 @@ export function validateSchemaDescriptions(inputSchema: z.ZodRawShape | undefine
   return missing;
 }
 
+export function formatExamplesAsDescription(description: string, examples: ToolExample[]): string {
+  if (!examples || examples.length === 0) return description;
+  let formatted = `${description}\n\n### Examples\n`;
+  for (const ex of examples) {
+    formatted += `- **${ex.name}**: ${ex.description}\n  \`\`\`json\n  ${JSON.stringify(ex.input)}\n  \`\`\`\n`;
+  }
+  return formatted;
+}
+
+export function compareSemver(a: string, b: string): number {
+  const pa = (a.split('-')[0] ?? "").split('.').map(Number);
+  const pb = (b.split('-')[0] ?? "").split('.').map(Number);
+  for (let i = 0; i < Math.max(pa.length, pb.length); i++) {
+    const na = pa[i] || 0;
+    const nb = pb[i] || 0;
+    if (na > nb) return 1;
+    if (nb > na) return -1;
+  }
+  return 0;
+}
+
 export type ToolComplexity = "primitive" | "composed" | "workflow";
 
 export type ToolStability = "stable" | "beta" | "experimental" | "deprecated" | "not-implemented";
@@ -88,6 +109,8 @@ export interface SearchResult {
   enabled: boolean;
   score?: number;
   suggestedParams?: Record<string, string>;
+  version?: string;
+  stability?: ToolStability;
 }
 
 export interface CategoryInfo {
@@ -106,6 +129,7 @@ interface TrackedTool {
 
 export class ToolRegistry {
   private tools = new Map<string, TrackedTool>();
+  private versionedTools = new Map<string, TrackedTool>();
   private categoryIndex = new Set<string>(); // O(1) hasCategory lookup
   private mcpServer: McpServer;
   protected userId: string;
@@ -114,10 +138,12 @@ export class ToolRegistry {
   private callerElo: number | undefined;
   private callerTier: EloTier | undefined;
   private callerRole: string | undefined;
+  private injectExamples: boolean;
 
-  constructor(mcpServer: McpServer, userId: string) {
+  constructor(mcpServer: McpServer, userId: string, options?: { injectExamples?: boolean }) {
     this.mcpServer = mcpServer;
     this.userId = userId;
+    this.injectExamples = options?.injectExamples ?? false;
   }
 
   getUserId(): string {
@@ -145,12 +171,39 @@ export class ToolRegistry {
       console.warn(msg);
     }
 
-    const version = def.version ?? "1.0.0";
-    const stability = def.stability ?? "stable";
+    let version = def.version ?? "1.0.0";
+    let stability = def.stability ?? "stable";
 
     // Skip registration of not-implemented tools — they stay in code but are invisible
     if (stability === "not-implemented") {
       return;
+    }
+
+    const versionKey = `${def.name}@${version}`;
+
+    // Semver check for tools map to keep only the latest version active
+    let isLatest = true;
+    const existingLatest = this.tools.get(def.name);
+    if (existingLatest) {
+       const existingVersion = existingLatest.definition.version ?? "1.0.0";
+       if (compareSemver(existingVersion, version) > 0) {
+           isLatest = false;
+       } else if (compareSemver(existingVersion, version) < 0) {
+           // We are newer. Deprecate the old version in the versionedTools map if it exists
+           const oldKey = `${def.name}@${existingVersion}`;
+           const oldTool = this.versionedTools.get(oldKey);
+           if (oldTool) {
+               oldTool.definition.stability = "deprecated";
+               if (oldTool.registered && oldTool.registered._meta) {
+                 oldTool.registered._meta.stability = "deprecated";
+               }
+           }
+       }
+    }
+
+    let finalDescription = def.description;
+    if (this.injectExamples && def.examples && def.examples.length > 0) {
+      finalDescription = formatExamplesAsDescription(def.description, def.examples);
     }
 
     // Optimize inputSchema to reduce token usage in LLM tool selection
@@ -188,25 +241,37 @@ export class ToolRegistry {
       return def.handler(input);
     };
 
-    const registered = this.mcpServer.registerTool(
-      def.name,
-      {
-        description: def.description,
-        ...(optimizedInputSchema !== undefined ? { inputSchema: optimizedInputSchema } : {}),
-        ...(def.annotations !== undefined ? { annotations: def.annotations } : {}),
-        ...(def.examples !== undefined ? { examples: def.examples } : {}),
-        _meta: { category: def.category, tier: def.tier, version, stability },
-      },
-      wrappedHandler as unknown as Parameters<McpServer["registerTool"]>[2],
-    );
+    // If it's the latest version, we register it with the MCP server using its normal name
+    let registered: RegisteredTool | undefined;
+    
+    if (isLatest) {
+      registered = this.mcpServer.registerTool(
+        def.name,
+        {
+          description: finalDescription,
+          ...(optimizedInputSchema !== undefined ? { inputSchema: optimizedInputSchema } : {}),
+          ...(def.annotations !== undefined ? { annotations: def.annotations } : {}),
+          ...(def.examples !== undefined ? { examples: def.examples } : {}),
+          _meta: { category: def.category, tier: def.tier, version, stability },
+        },
+        wrappedHandler as unknown as Parameters<McpServer["registerTool"]>[2],
+      );
 
-    if (!def.alwaysEnabled) {
-      registered.disable();
+      if (!def.alwaysEnabled) {
+        registered.disable();
+      }
+
+      this.tools.set(def.name, { definition: def, registered });
+      this.categoryIndex.add(def.category);
+      this.toolSearch.index(def.name, def.category, finalDescription, version, stability);
     }
 
-    this.tools.set(def.name, { definition: def, registered });
-    this.categoryIndex.add(def.category);
-    this.toolSearch.index(def.name, def.category, def.description);
+    // Always store in versionedTools (even if it's not the latest, we might just store a mock RegisteredTool or omit it if not strictly required, but TrackedTool requires it).
+    // For non-latest, we don't register it to the active MCP server endpoints, but we keep the definition.
+    this.versionedTools.set(versionKey, { 
+      definition: def, 
+      registered: registered || ({} as RegisteredTool) // fallback if not registered actively
+    });
   }
 
   /**
@@ -240,19 +305,40 @@ export class ToolRegistry {
     });
   }
 
-  async searchTools(query: string, limit = 10): Promise<SearchResult[]> {
-    return this.toolSearch.search(this.tools, query, limit);
+  getToolExamples(name: string): ToolExample[] | undefined {
+    return this.tools.get(name)?.definition.examples;
   }
 
-  searchToolsSemantic(query: string, limit = 10): SearchResult[] {
-    return this.toolSearch.searchSemantic(this.tools, query, limit);
+  getToolByVersion(name: string, version: string): ToolDefinition | undefined {
+    return this.versionedTools.get(`${name}@${version}`)?.definition;
+  }
+
+  listVersions(name: string): Array<{ version: string; stability: string }> {
+    const versions: Array<{ version: string; stability: string }> = [];
+    for (const [key, tool] of this.versionedTools) {
+      if (key.startsWith(`${name}@`)) {
+        versions.push({
+          version: tool.definition.version ?? "1.0.0",
+          stability: tool.definition.stability ?? "stable"
+        });
+      }
+    }
+    return versions.sort((a, b) => compareSemver(b.version, a.version));
+  }
+
+  async searchTools(query: string, limit = 10, includeDeprecated = false): Promise<SearchResult[]> {
+    return this.toolSearch.search(this.tools, query, limit, includeDeprecated);
+  }
+
+  searchToolsSemantic(query: string, limit = 10, includeDeprecated = false): SearchResult[] {
+    return this.toolSearch.searchSemantic(this.tools, query, limit, includeDeprecated);
   }
 
   enableTools(names: string[]): string[] {
     const enabled: string[] = [];
     for (const name of names) {
       const tracked = this.tools.get(name);
-      if (tracked && !tracked.registered.enabled) {
+      if (tracked && tracked.registered.enabled !== undefined && !tracked.registered.enabled) {
         tracked.registered.enable();
         enabled.push(name);
       }
@@ -263,7 +349,7 @@ export class ToolRegistry {
   enableCategory(category: string): string[] {
     const enabled: string[] = [];
     for (const [, { definition, registered }] of this.tools) {
-      if (definition.category === category && !registered.enabled) {
+      if (definition.category === category && registered.enabled !== undefined && !registered.enabled) {
         registered.enable();
         enabled.push(definition.name);
       }
@@ -390,15 +476,23 @@ export class ToolRegistry {
     name: string,
     input: Record<string, unknown>,
     userTier?: EloTier,
+    version?: string
   ): Promise<CallToolResult> {
-    const tracked = this.tools.get(name);
+    let tracked = this.tools.get(name);
+    if (version) {
+      tracked = this.versionedTools.get(`${name}@${version}`);
+    }
+    
     if (!tracked) {
       return {
-        content: [{ type: "text", text: `Tool not found: ${name}` }],
+        content: [{ type: "text", text: `Tool not found: ${name}${version ? `@${version}` : ''}` }],
         isError: true,
       };
     }
-    if (!tracked.registered.enabled) {
+    
+    // Skip enabled check if accessing a specific older version, or enforce it?
+    // We enforce it for the latest version.
+    if (!version && tracked.registered.enabled !== undefined && !tracked.registered.enabled) {
       return {
         content: [{ type: "text", text: `Tool disabled: ${name}` }],
         isError: true,
@@ -460,7 +554,7 @@ export class ToolRegistry {
     const enabled: string[] = [];
     for (const [, { definition, registered }] of this.tools) {
       const toolStability = definition.stability ?? "stable";
-      if (toolStability === stability && !registered.enabled) {
+      if (toolStability === stability && registered.enabled !== undefined && !registered.enabled) {
         registered.enable();
         enabled.push(definition.name);
       }
@@ -475,7 +569,7 @@ export class ToolRegistry {
   enableAll(): number {
     let count = 0;
     for (const [, { registered }] of this.tools) {
-      if (!registered.enabled) {
+      if (registered.enabled !== undefined && !registered.enabled) {
         registered.enable();
         count++;
       }

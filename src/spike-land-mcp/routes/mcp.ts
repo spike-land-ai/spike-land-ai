@@ -38,7 +38,7 @@ mcpRoute.post("/", async (c) => {
 
   try {
     if (agentId) {
-      const res = await c.env.SPIKE_EDGE.fetch(\`https://edge.spike.land/internal/agent-elo/\${agentId}\`, {
+      const res = await c.env.SPIKE_EDGE.fetch(`https://edge.spike.land/internal/agent-elo/${agentId}`, {
         headers: { "x-internal-secret": c.env.MCP_INTERNAL_SECRET },
       });
       if (res.ok) {
@@ -48,7 +48,7 @@ mcpRoute.post("/", async (c) => {
         isAgent = true;
       }
     } else {
-      const res = await c.env.SPIKE_EDGE.fetch(\`https://edge.spike.land/internal/elo/\${userId}\`, {
+      const res = await c.env.SPIKE_EDGE.fetch(`https://edge.spike.land/internal/elo/${userId}`, {
         headers: { "x-internal-secret": c.env.MCP_INTERNAL_SECRET },
       });
       if (res.ok) {
@@ -62,7 +62,7 @@ mcpRoute.post("/", async (c) => {
   }
 
   // Rate limit by userId (120 req/60s)
-  const { isLimited, resetAt } = await checkRateLimit(\`mcp-rpc:\${userId}\`, c.env.KV, 120, 60000, eloRateMultiplier(callerElo));
+  const { isLimited, resetAt } = await checkRateLimit(`mcp-rpc:${userId}`, c.env.KV, 120, 60000, eloRateMultiplier(callerElo));
   if (isLimited) {
     return c.json(
       {
@@ -182,7 +182,7 @@ mcpRoute.post("/", async (c) => {
       const endpoint = isAgent ? "/internal/agent-elo/event" : "/internal/elo/event";
       const payload = isAgent ? { agentId, ownerUserId: userId, eventType: "abuse_flag" } : { userId, eventType: "abuse_flag" };
       c.executionCtx.waitUntil(
-        c.env.SPIKE_EDGE.fetch(\`https://edge.spike.land\${endpoint}\`, {
+        c.env.SPIKE_EDGE.fetch(`https://edge.spike.land${endpoint}`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

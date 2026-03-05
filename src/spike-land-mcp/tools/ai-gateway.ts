@@ -415,6 +415,18 @@ export function registerAiGatewayTools(
         },
       )
       .meta({ category: "ai-gateway", tier: "workspace" })
+      .examples([
+        {
+          name: "basic_chat",
+          input: { message: "Explain quantum computing in one sentence." },
+          description: "Send a basic message to the default provider"
+        },
+        {
+          name: "specific_model",
+          input: { message: "Write a python script to parse JSON", model: "opus", temperature: 0.2 },
+          description: "Use a specific model with low temperature"
+        }
+      ])
       .handler(async ({ input }) => {
         const { message, provider, model, system_prompt, max_tokens, temperature } = input;
         return safeToolCall("ai_chat", async () => {

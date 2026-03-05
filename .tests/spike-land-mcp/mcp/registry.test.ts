@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { ToolRegistry, validateSchemaDescriptions } from "../../../src/spike-land-mcp/mcp/registry";
+import { ToolRegistry, validateSchemaDescriptions, formatExamplesAsDescription, compareSemver } from "../../../src/spike-land-mcp/mcp/registry";
 import type { McpServer, RegisteredTool } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 
@@ -45,6 +45,37 @@ describe("validateSchemaDescriptions", () => {
       age: z.number().describe("An age"),
     };
     expect(validateSchemaDescriptions(schema)).toEqual([]);
+  });
+});
+
+describe("compareSemver", () => {
+  it("compares basic semver strings correctly", () => {
+    expect(compareSemver("1.0.0", "1.0.0")).toBe(0);
+    expect(compareSemver("1.0.1", "1.0.0")).toBe(1);
+    expect(compareSemver("1.0.0", "1.0.1")).toBe(-1);
+    expect(compareSemver("2.0.0", "1.9.9")).toBe(1);
+    expect(compareSemver("0.9.0", "1.0.0")).toBe(-1);
+    expect(compareSemver("1.10.0", "1.2.0")).toBe(1);
+  });
+
+  it("ignores pre-release tags for now", () => {
+    expect(compareSemver("1.0.0-beta", "1.0.0")).toBe(0);
+  });
+});
+
+describe("formatExamplesAsDescription", () => {
+  it("returns original description if no examples", () => {
+    expect(formatExamplesAsDescription("Desc", [])).toBe("Desc");
+  });
+
+  it("appends examples block", () => {
+    const res = formatExamplesAsDescription("Desc", [
+      { name: "ex1", description: "desc1", input: { a: 1 } }
+    ]);
+    expect(res).toContain("Desc");
+    expect(res).toContain("### Examples");
+    expect(res).toContain("- **ex1**: desc1");
+    expect(res).toContain('{"a":1}');
   });
 });
 
@@ -260,7 +291,7 @@ describe("ToolRegistry", () => {
 
   it("handles tools with inputSchema, annotations, and examples", () => {
     const server = createMockMcpServer();
-    const registry = new ToolRegistry(server, "user-1");
+    const registry = new ToolRegistry(server, "user-1", { injectExamples: true });
 
     registry.register({
       name: "full",
@@ -279,6 +310,52 @@ describe("ToolRegistry", () => {
         inputSchema: expect.any(Object),
         annotations: { "mcp.priority": 1 },
         examples: expect.any(Array),
+      }),
+      expect.any(Function),
+    );
+  });
+  
+  it("injects examples into description when injectExamples is true", () => {
+    const server = createMockMcpServer();
+    const registry = new ToolRegistry(server, "user-1", { injectExamples: true });
+
+    registry.register({
+      name: "tool_with_examples",
+      description: "Original description",
+      category: "test",
+      tier: "free",
+      examples: [{ name: "ex1", input: {}, description: "An example" }],
+      handler: () => ({ content: [] }),
+    });
+
+    // The registered description should include "Examples"
+    expect(server.registerTool).toHaveBeenCalledWith(
+      "tool_with_examples",
+      expect.objectContaining({
+        description: expect.stringContaining("### Examples"),
+      }),
+      expect.any(Function),
+    );
+  });
+
+  it("does not inject examples into description when injectExamples is false", () => {
+    const server = createMockMcpServer();
+    const registry = new ToolRegistry(server, "user-1", { injectExamples: false });
+
+    registry.register({
+      name: "tool_without_injected_examples",
+      description: "Original description",
+      category: "test",
+      tier: "free",
+      examples: [{ name: "ex1", input: {}, description: "An example" }],
+      handler: () => ({ content: [] }),
+    });
+
+    // The registered description should be exactly the original
+    expect(server.registerTool).toHaveBeenCalledWith(
+      "tool_without_injected_examples",
+      expect.objectContaining({
+        description: "Original description",
       }),
       expect.any(Function),
     );
@@ -314,5 +391,137 @@ describe("ToolRegistry", () => {
     expect(defs).toHaveLength(1);
     expect(defs[0].name).toBe("t");
     expect(defs[0].enabled).toBe(false); // default
+  });
+
+  it("can get examples for a tool", () => {
+    const server = createMockMcpServer();
+    const registry = new ToolRegistry(server, "user-1");
+    registry.register({
+      name: "ex_tool",
+      description: "d",
+      category: "c",
+      tier: "free",
+      examples: [{ name: "test", description: "test", input: {} }],
+      handler: () => ({ content: [] }),
+    });
+
+    const examples = registry.getToolExamples("ex_tool");
+    expect(examples).toBeDefined();
+    expect(examples![0].name).toBe("test");
+  });
+
+  describe("Versioning", () => {
+    it("registers multiple versions and resolves latest", () => {
+      const server = createMockMcpServer();
+      const registry = new ToolRegistry(server, "user-1");
+
+      registry.register({
+        name: "v_tool",
+        description: "v1",
+        category: "c",
+        tier: "free",
+        version: "1.0.0",
+        handler: () => ({ content: [{ type: "text", text: "v1" }] }),
+      });
+
+      registry.register({
+        name: "v_tool",
+        description: "v2",
+        category: "c",
+        tier: "free",
+        version: "2.0.0",
+        handler: () => ({ content: [{ type: "text", text: "v2" }] }),
+      });
+
+      // The latest in the main map should be v2
+      const defs = registry.getToolDefinitions();
+      expect(defs).toHaveLength(1);
+      expect(defs[0].version).toBe("2.0.0");
+      
+      // Auto-deprecation: v1 should be marked deprecated
+      const v1Def = registry.getToolByVersion("v_tool", "1.0.0");
+      expect(v1Def?.stability).toBe("deprecated");
+    });
+
+    it("does not overwrite latest if older version is registered later", () => {
+      const server = createMockMcpServer();
+      const registry = new ToolRegistry(server, "user-1");
+
+      registry.register({
+        name: "v_tool",
+        description: "v2",
+        category: "c",
+        tier: "free",
+        version: "2.0.0",
+        handler: () => ({ content: [{ type: "text", text: "v2" }] }),
+      });
+
+      registry.register({
+        name: "v_tool",
+        description: "v1",
+        category: "c",
+        tier: "free",
+        version: "1.0.0",
+        handler: () => ({ content: [{ type: "text", text: "v1" }] }),
+      });
+
+      // The latest in the main map should still be v2
+      const defs = registry.getToolDefinitions();
+      expect(defs).toHaveLength(1);
+      expect(defs[0].version).toBe("2.0.0");
+      
+      // The older one can still be accessed via version
+      const v1Def = registry.getToolByVersion("v_tool", "1.0.0");
+      expect(v1Def?.version).toBe("1.0.0");
+    });
+
+    it("listVersions returns sorted list of versions", () => {
+      const server = createMockMcpServer();
+      const registry = new ToolRegistry(server, "user-1");
+
+      registry.register({ name: "v_tool", description: "v1", category: "c", tier: "free", version: "1.0.0", handler: () => ({ content: [] }) });
+      registry.register({ name: "v_tool", description: "v2", category: "c", tier: "free", version: "2.0.0", handler: () => ({ content: [] }) });
+      registry.register({ name: "v_tool", description: "v1.5", category: "c", tier: "free", version: "1.5.0", handler: () => ({ content: [] }) });
+
+      const versions = registry.listVersions("v_tool");
+      expect(versions).toHaveLength(3);
+      expect(versions[0].version).toBe("2.0.0");
+      expect(versions[1].version).toBe("1.5.0");
+      expect(versions[2].version).toBe("1.0.0");
+      expect(versions[2].stability).toBe("deprecated");
+    });
+
+    it("can call specific version directly", async () => {
+      const server = createMockMcpServer();
+      const registry = new ToolRegistry(server, "user-1");
+
+      registry.register({
+        name: "v_tool",
+        description: "v1",
+        category: "c",
+        tier: "free",
+        version: "1.0.0",
+        alwaysEnabled: true,
+        handler: () => ({ content: [{ type: "text" as const, text: "v1 response" }] }),
+      });
+
+      registry.register({
+        name: "v_tool",
+        description: "v2",
+        category: "c",
+        tier: "free",
+        version: "2.0.0",
+        alwaysEnabled: true,
+        handler: () => ({ content: [{ type: "text" as const, text: "v2 response" }] }),
+      });
+
+      registry.enableAll();
+
+      const r2 = await registry.callToolDirect("v_tool", {});
+      expect(r2.content[0].text).toBe("v2 response");
+
+      const r1 = await registry.callToolDirect("v_tool", {}, undefined, "1.0.0");
+      expect(r1.content[0].text).toBe("v1 response");
+    });
   });
 });

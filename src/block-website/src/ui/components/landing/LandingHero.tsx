@@ -20,7 +20,7 @@ export function LandingHero() {
             className="py-24 sm:py-32 px-4 sm:px-6 max-w-3xl mx-auto text-center font-sans"
         >
             <div
-                className="mb-8 inline-block px-4 py-1.5 border border-border rounded-full text-xs font-semibold text-muted-foreground tracking-widest bg-muted/50"
+                className="mb-8 inline-block px-4 py-1.5 border border-border/50 rounded-full text-xs font-semibold text-muted-foreground tracking-widest bg-muted/30 hover:bg-muted/50 transition-colors shadow-sm backdrop-blur-sm"
                 aria-label="Features: Open-Source AI App Ecosystem, Instant Deploys"
             >
                 OPEN-SOURCE AI APP ECOSYSTEM · INSTANT DEPLOYS
@@ -47,13 +47,13 @@ export function LandingHero() {
             >
                 <Link
                     href="/tools"
-                    className="w-full sm:w-auto px-8 py-4 bg-foreground text-background text-lg font-medium rounded-xl hover:opacity-90 transition-opacity focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-foreground active:opacity-80"
+                    className="w-full sm:w-auto px-8 py-4 bg-foreground text-background text-lg font-medium rounded-xl hover:opacity-90 hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98] transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-foreground"
                 >
                     I'm a developer
                 </Link>
                 <Link
                     href="/store"
-                    className="w-full sm:w-auto px-8 py-4 bg-background border border-border text-foreground text-lg font-medium rounded-xl hover:bg-muted/50 hover:border-muted-foreground/30 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-foreground active:bg-muted inline-flex items-center justify-center gap-2"
+                    className="w-full sm:w-auto px-8 py-4 bg-background border border-border/50 text-foreground text-lg font-medium rounded-xl hover:bg-muted/50 hover:border-border hover:shadow-sm hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98] transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-foreground inline-flex items-center justify-center gap-2"
                 >
                     I'm exploring
                 </Link>

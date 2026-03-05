@@ -107,6 +107,18 @@ export function registerVaultTools(registry: ToolRegistry, userId: string, db: D
         },
       )
       .meta({ category: "vault", tier: "free" })
+      .examples([
+        {
+          name: "store_openai_key",
+          input: { name: "OPENAI_API_KEY", value: "sk-proj-1234567890" },
+          description: "Store an OpenAI API key"
+        },
+        {
+          name: "store_github_token",
+          input: { name: "GITHUB_TOKEN", value: "ghp_abcdefghijklmno" },
+          description: "Store a GitHub personal access token"
+        }
+      ])
       .handler(async ({ input, ctx }) => {
         try {
           const [count, limit] = await Promise.all([
@@ -186,6 +198,13 @@ export function registerVaultTools(registry: ToolRegistry, userId: string, db: D
         {},
       )
       .meta({ category: "vault", tier: "free" })
+      .examples([
+        {
+          name: "list_secrets",
+          input: {},
+          description: "List all stored secrets"
+        }
+      ])
       .handler(async ({ ctx }) => {
         try {
           const secrets = await ctx.db

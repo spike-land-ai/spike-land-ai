@@ -71,7 +71,7 @@ import { registerDecisionsTools } from "../tools/decisions";
 import { registerSwarmTools } from "../tools/swarm";
 import { registerSwarmMonitoringTools } from "../tools/swarm-monitoring";
 import { registerMcpObservabilityTools } from "../tools/mcp-observability";
-import { registerSentryBridgeTools } from "../tools/sentry-bridge";
+import { registerErrorQueryTools } from "../tools/error-query";
 import { registerGitHubAdminTools } from "../tools/github-admin";
 import { registerGitHubIssueSearchTools } from "../tools/github-issue-search";
 import { registerAuditTools } from "../tools/audit";
@@ -171,7 +171,7 @@ export async function registerAllTools(
   safeRegister(registerSwarmTools, "registerSwarmTools", registry, userId, db);
   safeRegister(registerSwarmMonitoringTools, "registerSwarmMonitoringTools", registry, userId, db);
   safeRegister(registerMcpObservabilityTools, "registerMcpObservabilityTools", registry, userId, db);
-  safeRegister(registerSentryBridgeTools, "registerSentryBridgeTools", registry, userId, db);
+  safeRegister(registerErrorQueryTools, "registerErrorQueryTools", registry, userId, db);
   safeRegister(registerGitHubAdminTools, "registerGitHubAdminTools", registry, userId, db);
   safeRegister(registerGitHubIssueSearchTools, "registerGitHubIssueSearchTools", registry, userId, db);
   safeRegister(registerAuditTools, "registerAuditTools", registry, userId, db);

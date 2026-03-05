@@ -43,6 +43,13 @@ export function registerMarketplaceTools(
         },
       )
       .meta({ category: "marketplace", tier: "free" })
+      .examples([
+        {
+          name: "search_for_weather_tool",
+          input: { query: "weather forecast" },
+          description: "Search the marketplace for weather tools"
+        }
+      ])
       .handler(async ({ input, ctx }) => {
         const { query, limit } = input;
         const pattern = `%${query}%`;

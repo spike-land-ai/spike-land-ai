@@ -50,6 +50,18 @@ export function registerAppsTools(
         },
       )
       .meta({ category: "apps", tier: "free" })
+      .examples([
+        {
+          name: "create_todo_app",
+          input: { prompt: "Create a simple todo list app with local storage." },
+          description: "Create a basic app"
+        },
+        {
+          name: "create_with_template",
+          input: { prompt: "Make it a dark theme analytics dashboard.", template_id: "dashboard" },
+          description: "Start from a dashboard template"
+        }
+      ])
       .handler(async ({ input }) => {
         const { prompt, codespace_id, image_ids, template_id } = input;
 
@@ -111,6 +123,18 @@ export function registerAppsTools(
         },
       )
       .meta({ category: "apps", tier: "free" })
+      .examples([
+        {
+          name: "list_active",
+          input: { limit: 10 },
+          description: "List up to 10 active apps"
+        },
+        {
+          name: "list_live_apps",
+          input: { status: "LIVE" },
+          description: "List only published apps"
+        }
+      ])
       .handler(async ({ input }) => {
         const { status, limit } = input;
         const params = new URLSearchParams();

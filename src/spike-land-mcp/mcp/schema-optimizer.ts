@@ -15,6 +15,60 @@ export function optimizeSchema(schema: object): object {
   return optimizeNode(schema, undefined) as object;
 }
 
+/**
+ * Measures the approximate token savings by comparing JSON lengths.
+ * (Assuming ~4 chars per token)
+ */
+export function measureTokenSavings(original: object, optimized: object): { originalLength: number; optimizedLength: number; savedLength: number; approximateTokensSaved: number } {
+  const originalLength = JSON.stringify(original).length;
+  const optimizedLength = JSON.stringify(optimized).length;
+  const savedLength = originalLength - optimizedLength;
+  return {
+    originalLength,
+    optimizedLength,
+    savedLength,
+    approximateTokensSaved: Math.round(savedLength / 4),
+  };
+}
+
+export function shortenDescription(desc: string): string {
+  let shortened = desc.trim();
+  
+  // Strip leading "The " or "A " or "An " from descriptions
+  const lower = shortened.toLowerCase();
+  if (lower.startsWith("the ")) shortened = shortened.slice(4).trim();
+  else if (lower.startsWith("a ")) shortened = shortened.slice(2).trim();
+  else if (lower.startsWith("an ")) shortened = shortened.slice(3).trim();
+  
+  // Truncate to first sentence if > 80 chars
+  if (shortened.length > 80) {
+    const periodIndex = shortened.indexOf(". ");
+    if (periodIndex !== -1 && periodIndex < 80) {
+      shortened = shortened.slice(0, periodIndex);
+    } else {
+      // Find a reasonable break point or just hard truncate
+      const breakIndex = shortened.indexOf(" ", 70);
+      if (breakIndex !== -1 && breakIndex < 85) {
+         shortened = shortened.slice(0, breakIndex) + "...";
+      } else {
+         shortened = shortened.slice(0, 77) + "...";
+      }
+    }
+  }
+  
+  // Remove trailing period
+  if (shortened.endsWith(".")) {
+    shortened = shortened.slice(0, -1);
+  }
+  
+  // Capitalize first letter
+  if (shortened.length > 0) {
+    shortened = shortened.charAt(0).toUpperCase() + shortened.slice(1);
+  }
+  
+  return shortened;
+}
+
 function optimizeNode(node: unknown, propertyName: string | undefined): unknown {
   if (node === null || typeof node !== "object") {
     return node;
@@ -33,11 +87,17 @@ function optimizeNode(node: unknown, propertyName: string | undefined): unknown 
       continue;
     }
 
-    // Strip descriptions that match the property name (redundant)
-    if (key === "description" && typeof value === "string" && propertyName) {
-      if (isRedundantDescription(propertyName, value)) {
-        continue;
+    // Process descriptions
+    if (key === "description" && typeof value === "string") {
+      if (propertyName && isRedundantDescription(propertyName, value, obj.enum as unknown[] | undefined)) {
+        continue; // strip entirely
       }
+      
+      const shortened = shortenDescription(value);
+      if (shortened.length > 0) {
+        result[key] = shortened;
+      }
+      continue;
     }
 
     // Recurse into properties object, passing property names down
@@ -69,7 +129,7 @@ function optimizeNode(node: unknown, propertyName: string | undefined): unknown 
   return result;
 }
 
-function isRedundantDescription(propertyName: string, description: string): boolean {
+function isRedundantDescription(propertyName: string, description: string, enumValues?: unknown[]): boolean {
   const normalized = description.toLowerCase().trim();
   const normalizedName = propertyName.toLowerCase().replace(/[_-]/g, " ");
 
@@ -81,6 +141,33 @@ function isRedundantDescription(propertyName: string, description: string): bool
 
   // "A <name>" or "An <name>" pattern
   if (normalized === `a ${normalizedName}` || normalized === `an ${normalizedName}`) return true;
+  
+  // "The <words> of the <name>" or "The <words> for the <name>"
+  if (normalized.endsWith(` of the ${normalizedName}`) || normalized.endsWith(` for the ${normalizedName}`)) return true;
+  if (normalized.endsWith(` of ${normalizedName}`) || normalized.endsWith(` for ${normalizedName}`)) return true;
+
+  // Boolean patterns
+  if (normalized === `whether to ${normalizedName}` || 
+      normalized === `true if ${normalizedName}` || 
+      normalized === `if true, ${normalizedName}`) return true;
+
+  // Enum self-describing
+  if (Array.isArray(enumValues) && enumValues.length > 0) {
+    const enumStrs = enumValues.map(v => String(v).toLowerCase());
+    const enumStr = enumStrs.join(", ");
+    const enumStr2 = enumStrs.join(" or ");
+    const enumStr3 = enumStrs.join("/");
+    
+    // If the description just lists the enum values
+    if (normalized === enumStr || 
+        normalized === enumStr2 || 
+        normalized === enumStr3 ||
+        normalized === `one of: ${enumStr}` ||
+        normalized === `one of ${enumStr}` ||
+        normalized.includes(`[${enumStr}]`)) {
+      return true;
+    }
+  }
 
   return false;
 }

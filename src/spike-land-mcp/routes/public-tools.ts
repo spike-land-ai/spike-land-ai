@@ -40,6 +40,7 @@ publicToolsRoute.get("/", async (c) => {
       : { type: "object" as const },
     version: t.version,
     stability: t.stability,
+    examples: t.examples,
   }));
 
   const response = c.json({ tools });

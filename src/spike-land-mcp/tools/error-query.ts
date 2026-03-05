@@ -2,7 +2,7 @@
  * Error Query MCP Tools (CF Workers)
  *
  * Query error events from skill_usage_events table (outcome='error').
- * Replaces the Sentry bridge stub with D1-backed error querying.
+ * D1-backed error querying.
  */
 
 import { z } from "zod";
@@ -12,7 +12,7 @@ import { freeTool, textResult } from "../procedures/index";
 import { skillUsageEvents } from "../db/schema";
 import type { DrizzleDB } from "../db/index";
 
-export function registerSentryBridgeTools(
+export function registerErrorQueryTools(
   registry: ToolRegistry,
   userId: string,
   db: DrizzleDB,

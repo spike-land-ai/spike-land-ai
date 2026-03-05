@@ -54,8 +54,7 @@ export interface BlockClientOptions {
  * Create a BlockClient for a given block and storage adapter.
  *
  * The client handles procedure dispatch and storage subscriptions.
- * In a SpacetimeDB target, subscriptions would be native push.
- * In D1/IDB targets, subscriptions use polling.
+ * The client handles procedure dispatch and storage subscriptions via polling.
  */
 export function createBlockClient<
   TStorage extends Record<string, TableDef>,

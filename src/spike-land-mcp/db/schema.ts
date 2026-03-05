@@ -409,6 +409,8 @@ export const registeredTools = sqliteTable(
     schema: text("schema").notNull().default("{}"), // JSON input schema
     endpoint: text("endpoint"),
     status: text("status").notNull().default("draft"), // "draft" | "published"
+    version: text("version").notNull().default("1.0.0"),
+    stability: text("stability").notNull().default("stable"),
     installCount: integer("install_count").notNull().default(0),
     priceCents: integer("price_cents").notNull().default(0),
     createdAt: integer("created_at", { mode: "number" }).notNull(),

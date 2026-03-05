@@ -2,7 +2,6 @@
  * Telemetry
  *
  * Logs all MCP tool calls and events to a local JSONL file.
- * A companion script can batch-upload these to SpacetimeDB.
  */
 
 import { appendFile, writeFile } from "node:fs/promises";
