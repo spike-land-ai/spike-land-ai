@@ -178,6 +178,10 @@ spa.get("/*", async (c) => {
         "/terms": { title: "Terms of Service - spike.land", description: "spike.land Terms of Service. Acceptable use, billing, and legal terms." },
         "/learn": { title: "Learn &amp; Verify - spike.land", description: "Learn from any content and prove your understanding through AI-powered quizzes." },
         "/blog": { title: "Blog - spike.land", description: "Articles and tutorials from the spike.land team about AI, MCP, and edge computing." },
+        "/apps": { title: "MCP Tools & Apps - spike.land", description: "Browse and interact with AI-powered applications on spike.land." },
+        "/bugbook": { title: "Bugbook - spike.land", description: "Public bug tracker with ELO-based prioritization on spike.land." },
+        "/settings": { title: "Settings - spike.land", description: "Configure your spike.land account, billing, and API keys." },
+        "/version": { title: "Version - spike.land", description: "View the current spike.land build version and deployed assets." },
       };
       const meta = routeMeta[path];
       if (meta) {
