@@ -1,0 +1,16 @@
+{
+  "name": "spike.land",
+  "short_name": "spike.land",
+  "description": "MCP-First AI Development Platform",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0a0a0a",
+  "theme_color": "#0a0a0a",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "48x48",
+      "type": "image/x-icon"
+    }
+  ]
+}
