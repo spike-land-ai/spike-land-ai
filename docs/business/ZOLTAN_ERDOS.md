@@ -79,7 +79,7 @@ Development (TDD), and staying current with the latest tech trends.
 | Category  | Technologies                  |
 | --------- | ----------------------------- |
 | Languages | TypeScript, JavaScript (ES6+) |
-| Frontend  | React, Next.js 15, Angular    |
+| Frontend  | React, Vite, TanStack Router  |
 | Backend   | Node.js, Deno, .NET Core      |
 | Styling   | Tailwind CSS, CSS-in-JS       |
 | State     | Zustand, React Query          |

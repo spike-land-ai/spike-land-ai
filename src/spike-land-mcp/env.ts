@@ -8,7 +8,7 @@ export interface Env {
 
   // Secrets
   MCP_JWT_SECRET: string;
-  MCP_INTERNAL_SECRET: string; // Used for Next.js → CF Workers device approve
+  MCP_INTERNAL_SECRET: string; // Used for spike-app → CF Workers device approve
 
   // AI provider API keys
   ANTHROPIC_API_KEY: string;

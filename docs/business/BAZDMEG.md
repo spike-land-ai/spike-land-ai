@@ -186,7 +186,7 @@ poorly, you get AI slop -- code that looks correct but breaks everything.
 
 | Layer           | What It Provides                          | Example                                                           |
 | --------------- | ----------------------------------------- | ----------------------------------------------------------------- |
-| **Identity**    | Who is the AI in this interaction         | "Senior TypeScript developer on a Next.js 15 app with App Router" |
+| **Identity**    | Who is the AI in this interaction         | "Senior TypeScript developer on a CF Workers + React platform"    |
 | **Knowledge**   | What the model knows about your situation | Learning notes, codebase patterns, domain specifics               |
 | **Examples**    | Calibration data for expected output      | Skill prompts, reference implementations, matched by category     |
 | **Constraints** | Boundary conditions and rules             | Output spec, fix rules, what NOT to do                            |

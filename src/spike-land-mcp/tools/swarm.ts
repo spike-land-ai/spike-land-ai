@@ -4,7 +4,7 @@
  * Tools for managing AI agents in the swarm: list, inspect, spawn, stop,
  * redirect, broadcast, send_message, read_messages, and delegate_task.
  *
- * Ported from Next.js/Prisma to Cloudflare Workers/Drizzle.
+ * Runs on Cloudflare Workers with Drizzle ORM.
  * The D1 schema uses a simplified claudeCodeAgents table — fields like
  * deletedAt, trustScore, totalTokensUsed are stored in the metadata JSON.
  */

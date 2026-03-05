@@ -2,7 +2,7 @@
  * Image Studio MCP Package — Shared Types
  *
  * Dependency injection interface, branded ID types, and strict parameter types.
- * No direct Prisma/Next.js imports — everything is injected.
+ * No direct Prisma imports — everything is injected.
  */
 
 // ─── Branded Type Infrastructure ───

@@ -22,7 +22,7 @@ All packages live under `src/`:
 
 | Directory             | Package                          | Runtime                          | Purpose                                 |
 | --------------------- | -------------------------------- | -------------------------------- | --------------------------------------- |
-| `src/spike-app`       | `@spike-land-ai/spike-app`       | Browser (Vite + TanStack Router) | Frontend SPA replacing Next.js UI       |
+| `src/spike-app`       | `@spike-land-ai/spike-app`       | Browser (Vite + TanStack Router) | Frontend SPA                            |
 | `src/spike-edge`      | `@spike-land-ai/spike-edge`      | Cloudflare Workers               | Edge API service (Hono)                 |
 | `src/spike-land-mcp`  | `@spike-land-ai/spike-land-mcp`  | Cloudflare Workers + D1          | MCP registry with 80+ tools             |
 | `src/mcp-auth`        | `@spike-land-ai/mcp-auth`        | Cloudflare Workers               | Auth MCP server (Better Auth + Drizzle) |
@@ -111,7 +111,7 @@ yarn typecheck        # Type check only
 
 ### Frontend (spike-app)
 
-Vite + React + TanStack Router SPA replacing the Next.js UI. Talks to spike-edge.
+Vite + React + TanStack Router SPA. Talks to spike-edge.
 
 ### Edge Services (spike-edge, spike-land-mcp, mcp-auth, spike-land-backend, transpile)
 

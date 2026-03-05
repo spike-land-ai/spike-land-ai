@@ -3,9 +3,8 @@
  *
  * Search, classify, and manage AI-generated React apps from the /create feature.
  *
- * Most operations delegate to the spike.land API since they depend on
- * Prisma models (createdApp) and Next.js-specific modules (slug-classifier,
- * codespace-health) not available in this worker.
+ * Most operations delegate to the spike.land API for app management
+ * (slug-classifier, codespace-health) not available in this worker.
  */
 
 import { z } from "zod";

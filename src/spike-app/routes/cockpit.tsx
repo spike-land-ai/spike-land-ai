@@ -74,7 +74,7 @@ const MILESTONES: Milestone[] = [
   {
     id: "m8",
     title: "spike-app launch",
-    description: "Vite SPA fully replaces Next.js. Deploy to Cloudflare Pages.",
+    description: "Vite SPA deployed to Cloudflare Pages.",
     status: "done",
     priority: "high",
   },

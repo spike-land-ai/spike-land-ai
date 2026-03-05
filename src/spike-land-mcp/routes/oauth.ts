@@ -62,7 +62,7 @@ oauthRoute.post("/token", async (c) => {
   });
 });
 
-// POST /oauth/device/approve — called by Next.js spike.land after user approves
+// POST /oauth/device/approve — called by spike-app after user approves
 // Protected by MCP_INTERNAL_SECRET header
 oauthRoute.post("/device/approve", async (c) => {
   const secret = c.req.header("X-Internal-Secret");

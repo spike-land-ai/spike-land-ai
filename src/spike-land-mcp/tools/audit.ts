@@ -2,7 +2,7 @@
  * Audit MCP Tools
  *
  * Query audit logs, export records, and inspect activity trails.
- * Ported from Next.js/Prisma to Cloudflare Workers/Drizzle.
+ * Runs on Cloudflare Workers with Drizzle ORM.
  */
 
 import { z } from "zod";

@@ -98,7 +98,7 @@ MCP development:
 | `api-design.md`         | API design principles                  | Tool and resource schemas     |
 | `state-management.md`   | State management patterns              | Managing server state         |
 | `cicd-pipelines.md`     | CI/CD automation                       | Deployment automation         |
-| `nextjs-15.md`          | Next.js specific patterns              | Frontend integration with MCP |
+
 
 ---
 

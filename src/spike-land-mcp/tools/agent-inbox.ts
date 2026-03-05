@@ -4,9 +4,8 @@
  * Bidirectional chat bridge for external agents (e.g., Claude Code via MCP).
  * Allows an external agent to poll for messages, read full context, and respond.
  *
- * Ported from Next.js/Prisma to Cloudflare Workers/Drizzle.
- * Note: The original used appMessage/bazdmegChatMessage tables and SSE broadcasting
- * which don't exist in the D1 schema. This port uses agentMessages + claudeCodeAgents
+ * Runs on Cloudflare Workers with Drizzle ORM.
+ * Uses agentMessages + claudeCodeAgents
  * tables and delegates app-specific operations to the spike.land API.
  */
 

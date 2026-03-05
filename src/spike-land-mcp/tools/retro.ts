@@ -154,12 +154,12 @@ export function registerRetroTools(registry: ToolRegistry, userId: string, db: D
         "retro_get_recommendations",
         "Get improvement recommendations based on accumulated knowledge.",
         {
-          project_type: z.string().optional().describe("Project type (default nextjs)."),
+          project_type: z.string().optional().describe("Project type (default react-spa)."),
         },
       )
       .meta({ category: "retro", tier: "free" })
       .handler(async ({ input }) => {
-        return jsonResult("General recommendations for " + (input.project_type ?? "nextjs"), [
+        return jsonResult("General recommendations for " + (input.project_type ?? "react-spa"), [
           "Use server actions for data mutations",
           "Ensure high test coverage for core business logic",
         ]);

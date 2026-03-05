@@ -216,7 +216,7 @@ are prioritized P0 (critical) through P3 (minor/nice-to-have).
 
 > **Note**: The Cloudflare Worker (testing.spike.land) is now in the external
 > `@spike-land-ai/testing.spike.land` repository. These notes are kept for
-> reference since the Next.js app integrates with it.
+> reference since spike-edge integrates with it.
 
 The `Code` class in `chatRoom.ts` manages session state with this structure:
 

@@ -2,7 +2,7 @@
  * Agent Management MCP Tools
  *
  * List, get details, check message queues, and send messages to agents.
- * Ported from Next.js/Prisma to Cloudflare Workers/Drizzle.
+ * Runs on Cloudflare Workers with Drizzle ORM.
  */
 
 import { z } from "zod";

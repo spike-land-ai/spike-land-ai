@@ -171,8 +171,8 @@ export class ToolRegistry {
       console.warn(msg);
     }
 
-    let version = def.version ?? "1.0.0";
-    let stability = def.stability ?? "stable";
+    const version = def.version ?? "1.0.0";
+    const stability = def.stability ?? "stable";
 
     // Skip registration of not-implemented tools — they stay in code but are invisible
     if (stability === "not-implemented") {

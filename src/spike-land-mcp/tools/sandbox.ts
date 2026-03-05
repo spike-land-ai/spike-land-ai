@@ -4,7 +4,7 @@
  * Tools for ephemeral sandbox environments — create sandboxes,
  * execute code (simulated), read/write files, and tear down.
  *
- * Ported from Next.js to Cloudflare Workers. Uses in-memory storage.
+ * Runs on Cloudflare Workers. Uses in-memory storage.
  * Code execution is simulated — CF Workers cannot spawn processes.
  * For real execution, use the spike.land platform.
  */

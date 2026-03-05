@@ -98,7 +98,7 @@ See [docs/](docs/README.md) for full documentation.
 ## Repository Deep Dive
 
 ### Platform Stack
-- **spike-app**: Vite + React + TanStack Router frontend replacing the Next.js UI
+- **spike-app**: Vite + React + TanStack Router frontend
 - **spike-edge**: Primary edge API on Cloudflare Workers (Hono)
 - **spike-land-mcp**: MCP registry with 80+ tools (CF Workers + D1)
 - **mcp-auth**: Authentication service (Better Auth + Drizzle on CF Workers)

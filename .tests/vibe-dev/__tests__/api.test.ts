@@ -32,17 +32,8 @@ describe("API Client", () => {
       });
     });
 
-    it("should fallback to NEXT_PUBLIC_APP_URL if SPIKE_LAND_API_URL is missing", () => {
-      delete process.env.SPIKE_LAND_API_URL;
-      process.env.NEXT_PUBLIC_APP_URL = "https://public.example.com";
-      const config = api.getApiConfig();
-      expect(config.baseUrl).toBe("https://public.example.com");
-      delete process.env.NEXT_PUBLIC_APP_URL;
-    });
-
     it("should fallback to default URL if all env vars are missing", () => {
       delete process.env.SPIKE_LAND_API_URL;
-      delete process.env.NEXT_PUBLIC_APP_URL;
       const config = api.getApiConfig();
       expect(config.baseUrl).toBe("https://spike.land");
     });

@@ -60,7 +60,7 @@ export interface ApiConfig {
  */
 export function getApiConfig(): ApiConfig {
   const baseUrl =
-    process.env.SPIKE_LAND_API_URL || process.env.NEXT_PUBLIC_APP_URL || "https://spike.land";
+    process.env.SPIKE_LAND_API_URL || "https://spike.land";
   const apiKey = process.env.AGENT_API_KEY;
 
   if (!apiKey) {

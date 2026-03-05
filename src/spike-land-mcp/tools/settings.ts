@@ -2,7 +2,7 @@
  * Settings MCP Tools
  *
  * API key management: list, create, and revoke user API keys.
- * Ported from Next.js/Prisma to Cloudflare Workers/Drizzle.
+ * Runs on Cloudflare Workers with Drizzle ORM.
  */
 
 import { z } from "zod";

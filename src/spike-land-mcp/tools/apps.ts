@@ -4,8 +4,8 @@
  * Full lifecycle management for user apps: create, list, get, chat,
  * messages, status, bin, restore, permanent delete, versions, batch.
  *
- * Most operations delegate to the spike.land API since app management
- * requires Next.js-specific features (codespace transpilation, AI agent).
+ * Most operations delegate to the spike.land API for codespace
+ * transpilation and AI agent features.
  */
 
 import { z } from "zod";
@@ -620,7 +620,7 @@ export function registerAppsTools(
       )
       .meta({ category: "apps", tier: "free" })
       .handler(async () => {
-        // Simple ID generation without depending on Next.js module
+        // Simple ID generation
         const adjectives = [
           "bright",
           "calm",

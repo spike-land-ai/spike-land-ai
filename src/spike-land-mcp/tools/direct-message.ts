@@ -2,7 +2,7 @@
  * Direct Message MCP Tools
  *
  * Send, list, and manage private messages between users.
- * Ported from Next.js/Prisma to Cloudflare Workers/Drizzle.
+ * Runs on Cloudflare Workers with Drizzle ORM.
  */
 
 import { z } from "zod";

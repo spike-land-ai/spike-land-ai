@@ -2,7 +2,7 @@
 
 ## Overview
 
-Vite + React 19 + TanStack Router SPA replacing the Next.js UI (`spike.land`).
+Vite + React 19 + TanStack Router SPA for the spike.land frontend.
 Talks to `spike-edge` (via `/api` proxy). Published as
 `@spike-land-ai/spike-app`.
 

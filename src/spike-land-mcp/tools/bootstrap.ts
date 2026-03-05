@@ -5,8 +5,8 @@
  * store integration credentials, and deploy apps.
  *
  * DB operations use Drizzle ORM + D1.
- * Next.js-specific features (codespace creation, transpilation)
- * are stubbed to call spike.land API.
+ * Codespace creation and transpilation features
+ * delegate to the spike.land API.
  */
 
 import { z } from "zod";

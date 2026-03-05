@@ -32,16 +32,7 @@ excluded from the fixed total.
 | **Why This Provider**    | Edge-first runtime, zero-egress R2, Durable Objects for stateful WebSocket sessions, generous free tier                                                                               |
 | **Cheaper Alternatives** | AWS Lambda@Edge (more expensive, no Durable Objects equivalent), Fly.io (no built-in KV/R2)                                                                                           |
 
-### 2. Vercel (Next.js Hosting)
-
-| Field                    | Detail                                                                                                                                |
-| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------- |
-| **Cost**                 | $20/mo (~£16/mo) Pro plan                                                                                                             |
-| **What We Use**          | Next.js 16 App Router hosting, preview deploys per PR, serverless functions, edge middleware, Vercel Analytics                        |
-| **Why This Provider**    | First-party Next.js support, instant preview URLs for CI, edge middleware, built-in analytics                                         |
-| **Cheaper Alternatives** | Self-hosted on AWS/Fly.io (more ops overhead), Netlify ($19/mo, weaker Next.js support), Coolify (self-hosted, free but requires VPS) |
-
-### 3. Cloudflare D1 (Serverless SQLite)
+### 2. Cloudflare D1 (Serverless SQLite)
 
 | Field                    | Detail                                                                                                          |
 | ------------------------ | --------------------------------------------------------------------------------------------------------------- |

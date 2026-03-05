@@ -147,7 +147,7 @@ export function registerCodegenTools(registry: ToolRegistry, userId: string, db:
         if (!bundle) throw new Error(`Bundle ${input.bundle_id} not found`);
         const prompt = buildZeroShotPrompt(
           bundle,
-          input.role ?? "Senior React/Next.js Engineer",
+          input.role ?? "Senior React/TypeScript Engineer",
           input.output_format ?? "Multi-file fenced blocks",
         );
         return jsonResult(`Prompt built for bundle ${input.bundle_id}`, {

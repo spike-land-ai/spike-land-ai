@@ -2,7 +2,7 @@
  * Swarm Monitoring MCP Tools (CF Workers)
  *
  * Tools for monitoring AI agent swarm performance, costs, and health status.
- * Ported from Next.js/Prisma to Cloudflare Workers/Drizzle.
+ * Runs on Cloudflare Workers with Drizzle ORM.
  *
  * The D1 schema has a simplified claudeCodeAgents table without audit logs,
  * so metrics/replay tools work with available data (agent status + metadata).

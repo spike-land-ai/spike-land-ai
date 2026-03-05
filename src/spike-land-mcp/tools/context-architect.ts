@@ -4,7 +4,7 @@
  * Tools for indexing GitHub repositories, selecting relevant files
  * for a task, and analyzing import dependency graphs.
  *
- * Ported from Next.js to Cloudflare Workers. Mostly computation — no DB
+ * Runs on Cloudflare Workers. Mostly computation — no DB
  * or Docker dependencies. Uses in-memory storage for indexed repos.
  */
 
@@ -82,11 +82,6 @@ function detectTechStack(files: FileEntry[]): string[] {
   if (extensions.has("kt")) stack.add("Kotlin");
 
   if (paths.some((p) => p === "package.json")) stack.add("Node.js");
-  if (
-    paths.some((p) => p === "next.config.js" || p === "next.config.ts" || p === "next.config.mjs")
-  ) {
-    stack.add("Next.js");
-  }
   if (paths.some((p) => p === "vite.config.ts" || p === "vite.config.js")) {
     stack.add("Vite");
   }

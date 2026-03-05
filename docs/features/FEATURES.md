@@ -496,7 +496,7 @@ pages were added in February 2026 with accompanying unit tests.
 
 | Layer         | Technology                                       |
 | ------------- | ------------------------------------------------ |
-| Framework     | Next.js 16 (App Router)                          |
+| Framework     | Vite + React 19                                  |
 | Language      | TypeScript (strict mode)                         |
 | Styling       | Tailwind CSS 4 + shadcn/ui                       |
 | Database      | Cloudflare D1 + Drizzle ORM                      |

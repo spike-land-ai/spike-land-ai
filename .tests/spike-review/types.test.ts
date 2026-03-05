@@ -46,7 +46,7 @@ describe("types", () => {
     it("PRParamsSchema validates valid input", () => {
       const result = PRParamsSchema.safeParse({
         owner: "zerdos",
-        repo: "spike-land-nextjs",
+        repo: "spike-land-app",
         prNumber: 42,
       });
       expect(result.success).toBe(true);
@@ -55,7 +55,7 @@ describe("types", () => {
     it("PRParamsSchema rejects invalid prNumber", () => {
       const result = PRParamsSchema.safeParse({
         owner: "zerdos",
-        repo: "spike-land-nextjs",
+        repo: "spike-land-app",
         prNumber: -1,
       });
       expect(result.success).toBe(false);

@@ -213,7 +213,7 @@ bash .github/scripts/verify-deps.sh
 | ---------------------------- | -------------------- | ------------------------------------------------------ | -------------- |
 | Auth in mcp-image-studio     | Embedded Better Auth | Delegated to auth-mcp.spike.land                       | In progress    |
 | Domain data (images, albums) | D1 in CF Worker      | Keep D1 (CF Worker path)                                | Done           |
-| Frontend                     | spike.land (Next.js) | spike-app (Vite + TanStack Router)                     | In progress    |
+| Frontend                     | (deleted)            | spike-app (Vite + TanStack Router)                     | Done           |
 | Edge API                     | spike-land-backend   | spike-edge                                             | In progress    |
 
 ## Quick Reference

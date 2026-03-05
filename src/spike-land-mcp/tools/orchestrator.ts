@@ -4,8 +4,8 @@
  * Tools for creating execution plans, dispatching subtasks,
  * tracking status, submitting results, and merging final output.
  *
- * Ported from Next.js to Cloudflare Workers. Uses in-memory plan storage
- * (same as the original). No DB or Docker dependencies.
+ * Runs on Cloudflare Workers. Uses in-memory plan storage.
+ * No DB or Docker dependencies.
  */
 
 import { z } from "zod";

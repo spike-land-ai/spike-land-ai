@@ -80,7 +80,7 @@ const NODES: NodeDef[] = [
   {
     id: "spike.land",
     label: "spike.land",
-    sublabel: "Next.js platform",
+    sublabel: "Vite + CF Workers",
     x: 590,
     y: 370,
     activateAt: 0.7,

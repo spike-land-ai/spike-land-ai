@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { HistoryItem } from "../../hooks/useQaStudioMcp";
+import type { HistoryItem } from "../../hooks/useQaStudioMcp";
 import { ChevronDown, ChevronUp, Terminal } from "lucide-react";
 
 export function ConsolePanel({ history }: { history: HistoryItem[] }) {
