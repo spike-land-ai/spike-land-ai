@@ -317,7 +317,7 @@ export function PricingPage() {
         </div>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-4">
+      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
         {PLANS.map((plan) => (
           <PlanCard key={plan.name} plan={plan} annual={annual} isAuthenticated={isAuthenticated} />
         ))}
