@@ -35,6 +35,8 @@ export function parseMdxContent(
 ): BlogPost | null {
   const { data, content } = matter(rawContent);
 
+  if (data.draft) return null;
+
   let heroImage: string | null = data.heroImage || null;
   let body = content.trim();
 
