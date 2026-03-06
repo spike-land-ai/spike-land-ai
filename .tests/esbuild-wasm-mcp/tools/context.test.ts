@@ -6,7 +6,7 @@ const mockContext = vi.hoisted(() => vi.fn());
 const mockRebuild = vi.hoisted(() => vi.fn());
 const mockDispose = vi.hoisted(() => vi.fn());
 
-vi.mock("@spike-land-ai/esbuild-wasm", () => ({
+vi.mock("esbuild-wasm", () => ({
   context: mockContext,
   version: "0.27.4",
   initialize: vi.fn().mockResolvedValue(undefined),

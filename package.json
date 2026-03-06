@@ -27,7 +27,10 @@
     "seed:blog:remote": "npx tsx scripts/seed-blog.ts --remote",
     "reorganize": "npx tsx scripts/reorganize.ts",
     "test:reorganize": "vitest run --config scripts/__tests__/vitest.config.ts",
-    "dev": "bash scripts/dev-local.sh"
+    "dev": "bash scripts/dev-local.sh",
+    "docker:setup": "bash docker/scripts/setup-certs.sh && bash docker/scripts/setup-dns.sh",
+    "docker:dev": "docker compose -f docker/docker-compose.yml -f docker/docker-compose.dev.yml up -d",
+    "docker:down": "docker compose -f docker/docker-compose.yml down"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.27.1",

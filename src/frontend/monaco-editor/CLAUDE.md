@@ -41,8 +41,8 @@ npm run test:coverage # Tests with coverage
 **Key technologies**: Vite, Monaco Editor, TanStack Router, esbuild-wasm
 (in-browser compilation), Web Workers.
 
-**Dependencies**: `@spike-land-ai/esbuild-wasm`,
-`@spike-land-ai/esbuild-wasm-mcp`, `@spike-land-ai/shared`
+**Dependencies**: `esbuild-wasm`,
+`esbuild-wasm-mcp`, `@spike-land-ai/shared`
 
 ## Code Quality Rules
 

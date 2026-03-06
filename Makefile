@@ -12,7 +12,9 @@ ROOT := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 
 .PHONY: build-all test-all lint-all check-all health status validate \
         build test test-watch test-coverage typecheck lint \
-        rollback-worker rollback-spa rollback-spa-list
+        rollback-worker rollback-spa rollback-spa-list \
+        docker-setup docker-dev docker-ci docker-staging docker-prod \
+        docker-down docker-ps docker-logs
 
 build-all:
 	yarn workspaces foreach -Apt run build
@@ -68,3 +70,32 @@ status:
 			else echo "$$dir ($$branch) — clean"; fi; \
 		fi; \
 	done
+
+# ─── Docker ──────────────────────────────────────────────────────────────────
+COMPOSE_BASE := docker compose -f docker/docker-compose.yml
+
+docker-setup:
+	bash docker/scripts/setup-certs.sh
+	bash docker/scripts/setup-dns.sh
+
+docker-dev:
+	$(COMPOSE_BASE) -f docker/docker-compose.dev.yml up -d
+
+docker-ci:
+	$(COMPOSE_BASE) -f docker/docker-compose.ci.yml up --abort-on-container-exit
+
+docker-staging:
+	$(COMPOSE_BASE) -f docker/docker-compose.staging.yml up -d
+
+docker-prod:
+	$(COMPOSE_BASE) -f docker/docker-compose.prod.yml up -d
+
+docker-down:
+	$(COMPOSE_BASE) down
+
+docker-ps:
+	$(COMPOSE_BASE) ps --format table
+
+docker-logs:
+	@test -n "$(SVC)" || (echo "Usage: make docker-logs SVC=spike-edge" && exit 1)
+	$(COMPOSE_BASE) logs -f $(SVC)

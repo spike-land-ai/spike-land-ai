@@ -44,8 +44,8 @@ All packages live under `src/`:
 | `src/spike-land-backend` | `@spike-land-ai/spike-land-backend` | Cloudflare Workers   | Backend API with Durable Objects, Hono framework                                        |
 | `src/transpile`          | `@spike-land-ai/transpile`          | Cloudflare Workers   | On-demand JS/TS transpilation via esbuild-wasm                                          |
 | `src/react-ts-worker`    | `@spike-land-ai/react-ts-worker`    | Browser/Workers/Node | From-scratch React implementation (Fiber reconciler, scheduler, multi-target rendering) |
-| `src/esbuild-wasm`       | `@spike-land-ai/esbuild-wasm`       | Browser (WASM)       | Cross-platform esbuild WASM binary                                                      |
-| `src/esbuild-wasm-mcp`   | `@spike-land-ai/esbuild-wasm-mcp`   | Node.js              | MCP server wrapping esbuild-wasm                                                        |
+| `src/esbuild-wasm`       | `esbuild-wasm`       | Browser (WASM)       | Cross-platform esbuild WASM binary                                                      |
+| `src/esbuild-wasm-mcp`   | `esbuild-wasm-mcp`   | Node.js              | MCP server wrapping esbuild-wasm                                                        |
 | `src/shared`             | `@spike-land-ai/shared`             | Node/Browser         | Shared types, validations, constants, utilities                                         |
 
 ### MCP Servers & Tools
@@ -178,8 +178,8 @@ receive a PR bumping the version.
 
 | Source package                    | Consuming repos                                                                                                                                                                                                                 |
 | --------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `@spike-land-ai/esbuild-wasm`     | esbuild-wasm-mcp, code, transpile, spike-land-backend                                                                    |
-| `@spike-land-ai/esbuild-wasm-mcp` | code, spike-land-backend                                                                                                 |
+| `esbuild-wasm`     | esbuild-wasm-mcp, code, transpile, spike-land-backend                                                                    |
+| `esbuild-wasm-mcp` | code, spike-land-backend                                                                                                 |
 | `@spike-land-ai/code`             | transpile, spike-land-backend                                                                                            |
 | `@spike-land-ai/shared`           | mcp-image-studio, spike-land-mcp                                                                                         |
 | `@spike-land-ai/eslint-config`    | chess-engine, code, esbuild-wasm-mcp, hackernews-mcp, mcp-image-studio, mcp-server-base, openclaw-mcp, react-ts-worker, shared, spike-app, spike-cli, spike-edge, spike-review, state-machine |

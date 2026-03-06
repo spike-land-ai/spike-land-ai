@@ -1,5 +1,4 @@
-// Vite build entry point: imports the esbuild WASM binary URL from the
-// @spike-land-ai/esbuild-wasm package and re-exports it as `wasmFile`.
-// This lets the in-browser esbuild initializer locate the WASM asset.
-import wasmUrl from "@spike-land-ai/esbuild-wasm/esbuild.wasm";
+// Vite needs the `?url` query for third-party WASM assets. We only need the
+// resolved asset URL so the browser-side esbuild initializer can fetch it.
+import wasmUrl from "esbuild-wasm/esbuild.wasm?url";
 export { wasmUrl as wasmFile };

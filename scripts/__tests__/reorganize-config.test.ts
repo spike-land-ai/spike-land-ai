@@ -126,7 +126,7 @@ describe("getDependencyGroupName", () => {
 
   it("does NOT produce raw dep names like 'spike-land-ai-esbuild-wasm-async-mutex'", () => {
     const result = getDependencyGroupName(
-      new Set(["@spike-land-ai/esbuild-wasm", "async-mutex"]),
+      new Set(["esbuild-wasm", "async-mutex"]),
     );
     expect(result).not.toContain("spike-land-ai");
     // async-mutex is in the semantic map → "concurrency"

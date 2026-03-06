@@ -1,5 +1,5 @@
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import type { TransformOptions } from "@spike-land-ai/esbuild-wasm";
+import type { TransformOptions } from "esbuild-wasm";
 import { getEsbuildWasm } from "../node-sys/wasm-api.js";
 import { formatEsbuildError, tryCatch } from "../mcp/errors.js";
 import { CommonSchema, prepareBuildOptions, TransformOnlySchema } from "../core-logic/schemas.js";

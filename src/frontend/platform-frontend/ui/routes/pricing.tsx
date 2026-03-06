@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useAuth } from "../hooks/useAuth";
-import { apiUrl } from "../../core-logic/api";
+import { apiFetch } from "../../core-logic/api";
 
 interface PricingFeature {
   text: string;
@@ -149,7 +149,7 @@ async function handleCheckout(tier: "pro" | "business", annual: boolean, isAuthe
     return;
   }
   const lookupKey = annual ? `${tier}_annual` : `${tier}_monthly`;
-  const res = await fetch(apiUrl("/checkout"), {
+  const res = await apiFetch("/checkout", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ tier, lookup_key: lookupKey }),

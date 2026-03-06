@@ -1,0 +1,96 @@
+{
+	auto_https off
+	admin 0.0.0.0:2019
+	servers {
+		protocols h1 h2 h3
+	}
+}
+
+# Frontend SPA
+https://local.spike.land, https://app.local.spike.land {
+	tls /certs/local.spike.land.pem /certs/local.spike.land-key.pem
+	reverse_proxy spike-app:5173
+}
+
+# Edge API
+https://edge.local.spike.land {
+	tls /certs/local.spike.land.pem /certs/local.spike.land-key.pem
+	reverse_proxy spike-edge:8787
+}
+
+# Backend (Durable Objects)
+https://backend.local.spike.land {
+	tls /certs/local.spike.land.pem /certs/local.spike.land-key.pem
+	reverse_proxy spike-land-backend:8788
+}
+
+# Transpile
+https://js.local.spike.land {
+	tls /certs/local.spike.land.pem /certs/local.spike.land-key.pem
+	reverse_proxy transpile:8789
+}
+
+# MCP Registry
+https://mcp.local.spike.land {
+	tls /certs/local.spike.land.pem /certs/local.spike.land-key.pem
+	reverse_proxy spike-land-mcp:8790
+}
+
+# Auth
+https://auth.local.spike.land {
+	tls /certs/local.spike.land.pem /certs/local.spike.land-key.pem
+	reverse_proxy mcp-auth:8791
+}
+
+# MCP Servers
+https://mcp-image-studio.local.spike.land {
+	tls /certs/local.spike.land.pem /certs/local.spike.land-key.pem
+	reverse_proxy mcp-image-studio:3100
+}
+
+https://mcp-hackernews.local.spike.land {
+	tls /certs/local.spike.land.pem /certs/local.spike.land-key.pem
+	reverse_proxy hackernews-mcp:3101
+}
+
+https://mcp-esbuild.local.spike.land {
+	tls /certs/local.spike.land.pem /certs/local.spike.land-key.pem
+	reverse_proxy esbuild-wasm-mcp:3102
+}
+
+https://mcp-review.local.spike.land {
+	tls /certs/local.spike.land.pem /certs/local.spike.land-key.pem
+	reverse_proxy spike-review:3103
+}
+
+https://mcp-openclaw.local.spike.land {
+	tls /certs/local.spike.land.pem /certs/local.spike.land-key.pem
+	reverse_proxy openclaw-mcp:3104
+}
+
+https://mcp-bazdmeg.local.spike.land {
+	tls /certs/local.spike.land.pem /certs/local.spike.land-key.pem
+	reverse_proxy bazdmeg-mcp:3105
+}
+
+https://mcp-ga.local.spike.land {
+	tls /certs/local.spike.land.pem /certs/local.spike.land-key.pem
+	reverse_proxy google-analytics-mcp:3106
+}
+
+https://mcp-stripe.local.spike.land {
+	tls /certs/local.spike.land.pem /certs/local.spike.land-key.pem
+	reverse_proxy stripe-analytics-mcp:3107
+}
+
+# CLI Aggregator
+https://cli.local.spike.land {
+	tls /certs/local.spike.land.pem /certs/local.spike.land-key.pem
+	reverse_proxy spike-cli:3005
+}
+
+# Docker Compose MCP
+https://mcp-docker.local.spike.land {
+	tls /certs/local.spike.land.pem /certs/local.spike.land-key.pem
+	reverse_proxy docker-compose-mcp:3200
+}

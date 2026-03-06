@@ -1,0 +1,10 @@
+local.spike.land:53 {
+    file /zones/local.spike.land.db
+    log
+    errors
+}
+
+.:53 {
+    forward . 8.8.8.8 8.8.4.4
+    cache 30
+}

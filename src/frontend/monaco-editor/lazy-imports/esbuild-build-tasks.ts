@@ -298,7 +298,7 @@ export async function buildMainBundle(wasmFile: string): Promise<void> {
       ...buildOptions.alias,
       "@src/swVersion": "/swVersion.mjs",
 
-      "@spike-land-ai/esbuild-wasm/esbuild.wasm": `./${wasmFile}`,
+      "esbuild-wasm/esbuild.wasm": `./${wasmFile}`,
       // ...(isProduction ? {} : {
       // "react": "preact/compat",
       // "react-dom": "preact/compat",
@@ -309,10 +309,10 @@ export async function buildMainBundle(wasmFile: string): Promise<void> {
       "string_decoder",
       "node-html-parser",
       ...(buildOptions.external ?? []),
-      "@spike-land-ai/esbuild-wasm",
+      "esbuild-wasm",
       "/swVersion.mjs",
       `./${wasmFile}`,
-      "@spike-land-ai/esbuild-wasm/esbuild.wasm",
+      "esbuild-wasm/esbuild.wasm",
     ],
   });
 

@@ -1,7 +1,14 @@
 import type { Environment } from "../../lazy-imports/esbuild-build-tasks.ts";
 
 export type { Environment };
-export const environment = process.env.NODE_ENV as Environment;
+const nodeEnv =
+  typeof process !== "undefined" &&
+  typeof process.env !== "undefined" &&
+  typeof process.env.NODE_ENV === "string"
+    ? process.env.NODE_ENV
+    : "development";
+
+export const environment = nodeEnv as Environment;
 
 export const makeEnv = (
   environment: Environment,

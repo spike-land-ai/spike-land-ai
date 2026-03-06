@@ -1,0 +1,33 @@
+# Dev overrides — hot reload, HMR, persistence
+# Usage: docker compose -f docker-compose.yml -f docker-compose.dev.yml up
+
+services:
+  spike-app:
+    environment:
+      - VITE_HMR_HOST=app.local.spike.land
+      - VITE_HMR_PROTOCOL=wss
+      - VITE_HMR_PORT=443
+
+  spike-edge:
+    command: sh -c "corepack enable && npx wrangler dev --port 8787 --host 0.0.0.0 --live-reload"
+
+  spike-land-backend:
+    command: sh -c "corepack enable && npx wrangler dev --port 8788 --host 0.0.0.0 --live-reload"
+    volumes:
+      - wrangler_state:/app/.wrangler
+
+  transpile:
+    command: sh -c "corepack enable && npx wrangler dev --port 8789 --host 0.0.0.0 --live-reload"
+
+  spike-land-mcp:
+    command: sh -c "corepack enable && npx wrangler dev --port 8790 --host 0.0.0.0 --live-reload"
+    volumes:
+      - wrangler_state:/app/.wrangler
+
+  mcp-auth:
+    command: sh -c "corepack enable && npx wrangler dev --port 8791 --host 0.0.0.0 --live-reload"
+    volumes:
+      - wrangler_state:/app/.wrangler
+
+volumes:
+  wrangler_state:

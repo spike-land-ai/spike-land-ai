@@ -2,7 +2,7 @@
   "name": "esbuild-wasm",
   "category": "mcp-tools",
   "dependencies": [
-    "@spike-land-ai/esbuild-wasm",
+    "esbuild-wasm",
     "@spike-land-ai/mcp-server-base",
     "node:fs"
   ],

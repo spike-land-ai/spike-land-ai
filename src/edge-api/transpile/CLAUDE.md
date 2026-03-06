@@ -28,7 +28,7 @@ npm run lint         # ESLint
 **Runtime**: Cloudflare Workers. Receives code via HTTP, transpiles with
 esbuild-wasm, returns result.
 
-**Dependencies**: `@spike-land-ai/code`, `@spike-land-ai/esbuild-wasm`
+**Dependencies**: `@spike-land-ai/code`, `esbuild-wasm`
 
 ## Code Quality Rules
 

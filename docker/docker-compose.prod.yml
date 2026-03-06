@@ -1,0 +1,39 @@
+# Production overrides — pre-built images, resource limits, static serving
+# Usage: docker compose -f docker-compose.yml -f docker-compose.prod.yml up
+
+services:
+  spike-app:
+    image: spike-app:latest
+    command: []
+    volumes: []
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          cpus: "0.5"
+    restart: always
+
+  caddy:
+    volumes:
+      - ./Caddyfile.prod:/etc/caddy/Caddyfile
+      - ../packages/spike-app/dist:/srv/app:ro
+      - ../.dev-certs:/certs:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    restart: always
+
+  spike-edge:
+    restart: always
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: "1.0"
+
+  spike-land-backend:
+    restart: always
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: "1.0"

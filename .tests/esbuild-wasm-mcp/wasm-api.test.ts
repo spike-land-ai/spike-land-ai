@@ -5,7 +5,7 @@ const mockInitialize = vi.hoisted(() => vi.fn());
 const mockVersion = vi.hoisted(() => "0.27.4");
 const mockReadFile = vi.hoisted(() => vi.fn());
 
-vi.mock("@spike-land-ai/esbuild-wasm", () => ({
+vi.mock("esbuild-wasm", () => ({
   initialize: mockInitialize,
   version: mockVersion,
   build: vi.fn(),

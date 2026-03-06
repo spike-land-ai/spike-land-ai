@@ -6,6 +6,8 @@ interface TranspileResult {
   isTranspiling: boolean;
 }
 
+const TRANSPILE_ENDPOINT = "https://js.spike.land";
+
 /**
  * Post-process transpiled code so it can run in an inline module script.
  * - Named default exports (`export default function App`) keep the binding.
@@ -75,6 +77,12 @@ function buildPreviewHtml(transpiledCode: string): string {
 <body>
   <div id="root"></div>
   <div id="error-display" style="display:none;padding:1rem;color:#ef4444;font-family:ui-monospace,monospace;font-size:13px;white-space:pre-wrap;background:#fef2f2;border:1px solid #fecaca;margin:1rem;border-radius:8px;"></div>
+  <script>
+  globalThis.process ??= { env: {} };
+  globalThis.process.env ??= {};
+  globalThis.process.env.NODE_ENV ??= "development";
+  globalThis.global ??= globalThis;
+  </script>
   <script type="module">
   window.addEventListener("error", (e) => {
     const el = document.getElementById("error-display");
@@ -104,23 +112,32 @@ function buildPreviewHtml(transpiledCode: string): string {
 </html>`;
 }
 
+async function fetchTranspiledCode(source: string, originToUse: string): Promise<string> {
+  const response = await fetch(TRANSPILE_ENDPOINT, {
+    method: "POST",
+    headers: {
+      "Content-Type": "text/plain",
+      TR_ORIGIN: originToUse,
+    },
+    body: source,
+  });
+
+  const text = await response.text();
+
+  if (!response.ok) {
+    throw new Error(text || `HTTP ${response.status}`);
+  }
+
+  return text;
+}
+
 export function useTranspiler(source: string, debounceMs = 300): TranspileResult {
   const [result, setResult] = useState<TranspileResult>({
     html: null,
     error: null,
     isTranspiling: false,
   });
-  const tsRef = useRef<typeof import("typescript") | null>(null);
   const timeoutRef = useRef<ReturnType<typeof setTimeout>>();
-
-  // Load TypeScript compiler once
-  useEffect(() => {
-    let active = true;
-    import("typescript").then((ts) => {
-      if (active) tsRef.current = ts;
-    });
-    return () => { active = false; };
-  }, []);
 
   // Debounced transpilation
   useEffect(() => {
@@ -134,35 +151,22 @@ export function useTranspiler(source: string, debounceMs = 300): TranspileResult
     setResult((prev) => ({ ...prev, isTranspiling: true }));
 
     timeoutRef.current = setTimeout(() => {
-      const ts = tsRef.current;
-      if (!ts) {
-        // TypeScript not loaded yet — retry shortly
-        setResult((prev) => ({ ...prev, isTranspiling: true }));
-        return;
-      }
+      void (async () => {
+        const originToUse =
+          typeof window !== "undefined" ? window.location.origin : "https://spike.land";
 
-      try {
-        const output = ts.transpileModule(source, {
-          compilerOptions: {
-            target: ts.ScriptTarget.ES2020,
-            module: ts.ModuleKind.ES2020,
-            jsx: ts.JsxEmit.ReactJSX,
-            jsxImportSource: "react",
-            esModuleInterop: true,
-            allowSyntheticDefaultImports: true,
-          },
-          fileName: "App.tsx",
-        });
-
-        const html = buildPreviewHtml(output.outputText);
-        setResult({ html, error: null, isTranspiling: false });
-      } catch (err) {
-        setResult({
-          html: null,
-          error: err instanceof Error ? err.message : String(err),
-          isTranspiling: false,
-        });
-      }
+        try {
+          const transpiledCode = await fetchTranspiledCode(source, originToUse);
+          const html = buildPreviewHtml(transpiledCode);
+          setResult({ html, error: null, isTranspiling: false });
+        } catch (err) {
+          setResult({
+            html: null,
+            error: `Transpiler failed: ${err instanceof Error ? err.message : String(err)}`,
+            isTranspiling: false,
+          });
+        }
+      })();
     }, debounceMs);
 
     return () => {

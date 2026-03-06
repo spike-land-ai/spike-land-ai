@@ -14,7 +14,7 @@
     "@radix-ui/react-tooltip",
     "@react-three/fiber",
     "@react-three/rapier",
-    "@spike-land-ai/esbuild-wasm",
+    "esbuild-wasm",
     "@spike-land-ai/shared",
     "@tanstack/react-router",
     "@typescript/ata",

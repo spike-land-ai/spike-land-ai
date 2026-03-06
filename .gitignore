@@ -37,3 +37,7 @@ terraform.tfvars
 # Reorganize backup and artifacts
 src-old/
 src/.mapping.json
+
+# Docker
+docker/caddy_data/
+docker/caddy_config/

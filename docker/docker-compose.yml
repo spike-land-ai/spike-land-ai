@@ -1,0 +1,300 @@
+# Base docker-compose for spike-land-ai local development
+# Usage: docker compose up
+# Override with: docker compose -f docker-compose.yml -f docker-compose.dev.yml up
+
+x-node-service: &node-service
+  image: node:24-alpine
+  volumes:
+    - ..:/app
+  networks:
+    - spike-net
+
+x-common-env: &common-env
+  NODE_ENV: development
+
+networks:
+  spike-net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.28.0.0/16
+
+volumes:
+  caddy_data:
+  caddy_config:
+
+services:
+  # ─── Infrastructure ───────────────────────────────────────────────
+  coredns:
+    image: coredns/coredns:latest
+    ports:
+      - "53:53/udp"
+      - "53:53/tcp"
+    volumes:
+      - ./coredns/Corefile:/Corefile
+      - ./coredns/zones:/zones
+    networks:
+      spike-net:
+        ipv4_address: 172.28.0.2
+
+  caddy:
+    image: caddy:2-alpine
+    ports:
+      - "80:80"
+      - "443:443"
+      - "2019:2019"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - ../.dev-certs:/certs:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - coredns
+    networks:
+      spike-net:
+        ipv4_address: 172.28.0.3
+
+  # ─── Platform Services (Vite / Wrangler) ──────────────────────────
+  spike-app:
+    <<: *node-service
+    working_dir: /app/packages/spike-app
+    command: sh -c "corepack enable && yarn dev"
+    environment:
+      <<: *common-env
+    expose:
+      - "5173"
+    labels:
+      spike.subdomain: app
+      spike.port: "5173"
+      spike.type: frontend
+    depends_on:
+      - caddy
+
+  spike-edge:
+    <<: *node-service
+    working_dir: /app/packages/spike-edge
+    command: sh -c "corepack enable && npx wrangler dev --port 8787 --host 0.0.0.0"
+    environment:
+      <<: *common-env
+    expose:
+      - "8787"
+    labels:
+      spike.subdomain: edge
+      spike.port: "8787"
+      spike.type: worker
+    depends_on:
+      - caddy
+
+  spike-land-backend:
+    <<: *node-service
+    working_dir: /app/packages/spike-land-backend
+    command: sh -c "corepack enable && npx wrangler dev --port 8788 --host 0.0.0.0"
+    environment:
+      <<: *common-env
+    expose:
+      - "8788"
+    labels:
+      spike.subdomain: backend
+      spike.port: "8788"
+      spike.type: worker
+    depends_on:
+      - caddy
+
+  transpile:
+    <<: *node-service
+    working_dir: /app/packages/transpile
+    command: sh -c "corepack enable && npx wrangler dev --port 8789 --host 0.0.0.0"
+    environment:
+      <<: *common-env
+    expose:
+      - "8789"
+    labels:
+      spike.subdomain: js
+      spike.port: "8789"
+      spike.type: worker
+    depends_on:
+      - caddy
+
+  spike-land-mcp:
+    <<: *node-service
+    working_dir: /app/packages/spike-land-mcp
+    command: sh -c "corepack enable && npx wrangler dev --port 8790 --host 0.0.0.0"
+    environment:
+      <<: *common-env
+    expose:
+      - "8790"
+    labels:
+      spike.subdomain: mcp
+      spike.port: "8790"
+      spike.type: worker
+    depends_on:
+      - caddy
+
+  mcp-auth:
+    <<: *node-service
+    working_dir: /app/packages/mcp-auth
+    command: sh -c "corepack enable && npx wrangler dev --port 8791 --host 0.0.0.0"
+    environment:
+      <<: *common-env
+    expose:
+      - "8791"
+    labels:
+      spike.subdomain: auth
+      spike.port: "8791"
+      spike.type: worker
+    depends_on:
+      - caddy
+
+  # ─── MCP Servers (via mcp-http-bridge) ─────────────────────────────
+  mcp-image-studio:
+    <<: *node-service
+    working_dir: /app
+    command: sh -c "corepack enable && npx tsx docker/lib/mcp-http-bridge.ts src/mcp-tools/mcp-image-studio/mcp/cli-server.ts 3100"
+    environment:
+      <<: *common-env
+    expose:
+      - "3100"
+    labels:
+      spike.subdomain: mcp-image-studio
+      spike.port: "3100"
+      spike.type: mcp
+    depends_on:
+      - caddy
+
+  hackernews-mcp:
+    <<: *node-service
+    working_dir: /app
+    command: sh -c "corepack enable && npx tsx docker/lib/mcp-http-bridge.ts src/mcp-tools/hackernews/mcp/index.ts 3101"
+    environment:
+      <<: *common-env
+    expose:
+      - "3101"
+    labels:
+      spike.subdomain: mcp-hackernews
+      spike.port: "3101"
+      spike.type: mcp
+    depends_on:
+      - caddy
+
+  esbuild-wasm-mcp:
+    <<: *node-service
+    working_dir: /app
+    command: sh -c "corepack enable && npx tsx docker/lib/mcp-http-bridge.ts src/mcp-tools/esbuild-wasm/mcp/index.ts 3102"
+    environment:
+      <<: *common-env
+    expose:
+      - "3102"
+    labels:
+      spike.subdomain: mcp-esbuild
+      spike.port: "3102"
+      spike.type: mcp
+    depends_on:
+      - caddy
+
+  spike-review:
+    <<: *node-service
+    working_dir: /app
+    command: sh -c "corepack enable && npx tsx docker/lib/mcp-http-bridge.ts src/mcp-tools/spike-review/mcp/index.ts 3103"
+    environment:
+      <<: *common-env
+    expose:
+      - "3103"
+    labels:
+      spike.subdomain: mcp-review
+      spike.port: "3103"
+      spike.type: mcp
+    depends_on:
+      - caddy
+
+  openclaw-mcp:
+    <<: *node-service
+    working_dir: /app
+    command: sh -c "corepack enable && npx tsx docker/lib/mcp-http-bridge.ts src/mcp-tools/openclaw/mcp/index.ts 3104"
+    environment:
+      <<: *common-env
+    expose:
+      - "3104"
+    labels:
+      spike.subdomain: mcp-openclaw
+      spike.port: "3104"
+      spike.type: mcp
+    depends_on:
+      - caddy
+
+  bazdmeg-mcp:
+    <<: *node-service
+    working_dir: /app
+    command: sh -c "corepack enable && npx tsx docker/lib/mcp-http-bridge.ts src/mcp-tools/bazdmeg/mcp/index.ts 3105"
+    environment:
+      <<: *common-env
+    expose:
+      - "3105"
+    labels:
+      spike.subdomain: mcp-bazdmeg
+      spike.port: "3105"
+      spike.type: mcp
+    depends_on:
+      - caddy
+
+  google-analytics-mcp:
+    <<: *node-service
+    working_dir: /app
+    command: sh -c "corepack enable && npx tsx docker/lib/mcp-http-bridge.ts src/mcp-tools/google-analytics/mcp/index.ts 3106"
+    environment:
+      <<: *common-env
+    expose:
+      - "3106"
+    labels:
+      spike.subdomain: mcp-ga
+      spike.port: "3106"
+      spike.type: mcp
+    depends_on:
+      - caddy
+
+  stripe-analytics-mcp:
+    <<: *node-service
+    working_dir: /app
+    command: sh -c "corepack enable && npx tsx docker/lib/mcp-http-bridge.ts src/mcp-tools/stripe-analytics/mcp/index.ts 3107"
+    environment:
+      <<: *common-env
+    expose:
+      - "3107"
+    labels:
+      spike.subdomain: mcp-stripe
+      spike.port: "3107"
+      spike.type: mcp
+    depends_on:
+      - caddy
+
+  spike-cli:
+    <<: *node-service
+    working_dir: /app
+    command: sh -c "corepack enable && npx tsx src/cli/spike-cli/cli.ts serve --port 3005 --host 0.0.0.0"
+    environment:
+      <<: *common-env
+    expose:
+      - "3005"
+    labels:
+      spike.subdomain: cli
+      spike.port: "3005"
+      spike.type: aggregator
+    depends_on:
+      - caddy
+
+  docker-compose-mcp:
+    <<: *node-service
+    working_dir: /app
+    command: sh -c "corepack enable && npx tsx docker/lib/mcp-http-bridge.ts src/mcp-tools/docker-compose/index.ts 3200"
+    environment:
+      <<: *common-env
+    expose:
+      - "3200"
+    volumes:
+      - ..:/app
+      - /var/run/docker.sock:/var/run/docker.sock
+    labels:
+      spike.subdomain: mcp-docker
+      spike.port: "3200"
+      spike.type: mcp
+    depends_on:
+      - caddy

@@ -1,6 +1,6 @@
 # spike-land-ai Central Package Manifest
 # Package configs live in packages/, TypeScript source in src/.
-# Used by MCP tools for build, publish, deploy, and mirror operations.
+# Used by MCP tools for build, publish, deploy, and deploy operations.
 
 defaults:
   scope: "@spike-land-ai"
@@ -22,7 +22,6 @@ packages:
     deps: [shared]
     publish:
       registries: [github]
-    mirror: spike-land-ai/block-website
 
   block-sdk:
     kind: library
@@ -39,7 +38,6 @@ packages:
     deps: [shared, mcp-server-base]
     publish:
       registries: [github]
-    mirror: spike-land-ai/block-sdk
 
   block-tasks:
     kind: block
@@ -53,7 +51,6 @@ packages:
     deps: [block-sdk, shared]
     publish:
       registries: [github]
-    mirror: spike-land-ai/block-tasks
     block:
       storage: d1
       ui: true
@@ -73,7 +70,6 @@ packages:
       "./schemas": ./schemas/index.ts
     publish:
       registries: [github, npm]
-    mirror: spike-land-ai/shared
 
   mcp-server-base:
     kind: library
@@ -83,7 +79,6 @@ packages:
     deps: []
     publish:
       registries: [github, npm]
-    mirror: spike-land-ai/mcp-server-base
 
   esbuild-wasm:
     kind: library
@@ -93,7 +88,6 @@ packages:
     type: commonjs
     publish:
       registries: [github, npm]
-    mirror: spike-land-ai/esbuild-wasm
 
   react-ts-worker:
     kind: library
@@ -110,7 +104,6 @@ packages:
       "./scheduler": ./scheduler/index.ts
     publish:
       registries: [github, npm]
-    mirror: spike-land-ai/react-ts-worker
 
   # ─── MCP Servers ────────────────────────────────────────────────────────────
   google-analytics-mcp:
@@ -143,6 +136,16 @@ packages:
     publish:
       registries: [github]
 
+  docker-compose-mcp:
+    kind: mcp-server
+    version: 0.1.0
+    description: Docker Compose service manager with Caddy subdomain routing
+    entry: index.ts
+    bin: index.js
+    deps: [mcp-server-base]
+    publish:
+      registries: [github]
+
   bazdmeg-mcp:
     kind: mcp-server
     version: 1.0.0
@@ -162,7 +165,6 @@ packages:
     deps: [esbuild-wasm, mcp-server-base]
     publish:
       registries: [github, npm]
-    mirror: spike-land-ai/esbuild-wasm-mcp
 
   hackernews-mcp:
     kind: mcp-server
@@ -173,7 +175,6 @@ packages:
     deps: [mcp-server-base]
     publish:
       registries: [github, npm]
-    mirror: spike-land-ai/hackernews-mcp
 
   mcp-image-studio:
     kind: mcp-server
@@ -184,7 +185,6 @@ packages:
     deps: [mcp-server-base, shared]
     publish:
       registries: [github, npm]
-    mirror: spike-land-ai/mcp-image-studio
 
   openclaw-mcp:
     kind: mcp-server
@@ -194,7 +194,6 @@ packages:
     bin: cli.js
     publish:
       registries: [github, npm]
-    mirror: spike-land-ai/openclaw-mcp
 
   spike-review:
     kind: mcp-server
@@ -207,7 +206,6 @@ packages:
       "./worker": ./worker/index.ts
     publish:
       registries: [github]
-    mirror: spike-land-ai/spike-review
     worker:
       name: spike-review
       entry: worker/index.ts
@@ -225,7 +223,6 @@ packages:
     deps: []
     publish:
       registries: [github, npm]
-    mirror: spike-land-ai/spike-cli
 
   vibe-dev:
     kind: cli
@@ -236,7 +233,6 @@ packages:
     binName: vibe-dev
     publish:
       registries: [github]
-    mirror: spike-land-ai/vibe-dev
 
   # ─── Domain Packages ────────────────────────────────────────────────────────
   chess-engine:
@@ -382,7 +378,6 @@ packages:
     deps: [esbuild-wasm, esbuild-wasm-mcp]
     publish:
       registries: [github]
-    mirror: spike-land-ai/code
     worker:
       name: spike-land-frontend
       entry: worker.ts

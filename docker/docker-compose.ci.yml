@@ -1,0 +1,24 @@
+# CI overrides — no volumes, internal TLS, test runner
+# Usage: docker compose -f docker-compose.yml -f docker-compose.ci.yml up
+
+services:
+  coredns:
+    profiles: ["disabled"]
+
+  caddy:
+    volumes:
+      - ./Caddyfile.ci:/etc/caddy/Caddyfile
+
+  spike-app:
+    volumes: []
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.ci
+      target: spike-app
+
+  spike-edge:
+    volumes: []
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.ci
+      target: spike-edge

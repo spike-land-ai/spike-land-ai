@@ -46,8 +46,8 @@ npm run lint         # ESLint
 
 **Runtime**: Cloudflare Workers + Durable Objects + R2 + Hono framework.
 
-**Dependencies**: `@spike-land-ai/esbuild-wasm-mcp`, `@spike-land-ai/shared`,
-`@spike-land-ai/esbuild-wasm`, `@spike-land-ai/code` (dev), AI SDKs (Anthropic,
+**Dependencies**: `esbuild-wasm-mcp`, `@spike-land-ai/shared`,
+`esbuild-wasm`, `@spike-land-ai/code` (dev), AI SDKs (Anthropic,
 Google, Vercel AI)
 
 ## Code Quality Rules

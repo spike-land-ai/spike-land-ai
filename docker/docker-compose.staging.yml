@@ -1,0 +1,28 @@
+# Staging overrides — remote workers, auto HTTPS
+# Usage: docker compose -f docker-compose.yml -f docker-compose.staging.yml up
+
+services:
+  spike-edge:
+    command: sh -c "corepack enable && npx wrangler dev --remote --env staging --port 8787 --host 0.0.0.0"
+    environment:
+      - CLOUDFLARE_API_TOKEN=${CLOUDFLARE_API_TOKEN}
+
+  spike-land-backend:
+    command: sh -c "corepack enable && npx wrangler dev --remote --env staging --port 8788 --host 0.0.0.0"
+    environment:
+      - CLOUDFLARE_API_TOKEN=${CLOUDFLARE_API_TOKEN}
+
+  transpile:
+    command: sh -c "corepack enable && npx wrangler dev --remote --env staging --port 8789 --host 0.0.0.0"
+    environment:
+      - CLOUDFLARE_API_TOKEN=${CLOUDFLARE_API_TOKEN}
+
+  spike-land-mcp:
+    command: sh -c "corepack enable && npx wrangler dev --remote --env staging --port 8790 --host 0.0.0.0"
+    environment:
+      - CLOUDFLARE_API_TOKEN=${CLOUDFLARE_API_TOKEN}
+
+  mcp-auth:
+    command: sh -c "corepack enable && npx wrangler dev --remote --env staging --port 8791 --host 0.0.0.0"
+    environment:
+      - CLOUDFLARE_API_TOKEN=${CLOUDFLARE_API_TOKEN}

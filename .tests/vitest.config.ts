@@ -294,7 +294,7 @@ const packages: Record<string, PkgConfig> = {
       "snakecase-keys": src("edge-api/backend/__mocks__/snakecase-keys.js"),
       "cookie": src("edge-api/backend/__mocks__/cookie.js"),
       "@spike-land-ai/code": src("edge-api/backend/__mocks__/@spike-land-ai/code.js"),
-      "@spike-land-ai/esbuild-wasm": path.join(root, "node_modules/@spike-land-ai/esbuild-wasm"),
+      "esbuild-wasm": path.join(root, "node_modules/esbuild-wasm"),
     },
     reporters: process.env["COVERAGE"]
       ? [reporter]

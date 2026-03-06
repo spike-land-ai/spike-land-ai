@@ -50,7 +50,7 @@ Standalone MCP servers and CLI tools.
 | `@spike-land-ai/hackernews-mcp` | `src/hackernews-mcp` | MCP server for HackerNews read/write |
 | `@spike-land-ai/mcp-image-studio` | `src/mcp-image-studio` | AI image generation, enhancement, albums and pipelines |
 | `@spike-land-ai/openclaw-mcp` | `src/openclaw-mcp` | MCP bridge for OpenClaw gateway |
-| `@spike-land-ai/esbuild-wasm-mcp` | `src/esbuild-wasm-mcp` | MCP server wrapping esbuild-wasm |
+| `esbuild-wasm-mcp` | `src/esbuild-wasm-mcp` | MCP server wrapping esbuild-wasm |
 | `@spike-land-ai/vibe-dev` | `src/vibe-dev` | Docker-based dev workflow tool |
 
 ### Domain Packages
@@ -72,7 +72,7 @@ Shared runtime libraries consumed by other packages.
 | `@spike-land-ai/shared` | `src/shared` | Shared types, validations, constants, utilities |
 | `@spike-land-ai/react-ts-worker` | `src/react-ts-worker` | From-scratch React implementation (Fiber reconciler) |
 | `@spike-land-ai/block-sdk` | `src/block-sdk` | Block SDK with StorageAdapter (D1/IDB) |
-| `@spike-land-ai/esbuild-wasm` | `src/esbuild-wasm` | Cross-platform esbuild WASM binary |
+| `esbuild-wasm` | `src/esbuild-wasm` | Cross-platform esbuild WASM binary |
 
 ### Block Packages
 

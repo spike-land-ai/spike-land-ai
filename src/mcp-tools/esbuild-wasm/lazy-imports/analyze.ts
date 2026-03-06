@@ -1,5 +1,5 @@
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import type { Metafile } from "@spike-land-ai/esbuild-wasm";
+import type { Metafile } from "esbuild-wasm";
 import { z } from "zod";
 import { getEsbuildWasm } from "../node-sys/wasm-api.js";
 import { errorResult, formatEsbuildError, tryCatch } from "../mcp/errors.js";

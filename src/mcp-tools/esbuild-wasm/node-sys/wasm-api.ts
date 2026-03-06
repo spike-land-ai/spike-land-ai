@@ -1,4 +1,4 @@
-import * as esbuildWasm from "@spike-land-ai/esbuild-wasm";
+import * as esbuildWasm from "esbuild-wasm";
 import { readFile } from "node:fs/promises";
 
 export interface WasmInitOptions {
