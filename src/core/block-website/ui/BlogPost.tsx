@@ -353,7 +353,7 @@ function SupportWidget({ post }: { post: BlogPost }) {
   const linkedInIntent = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`;
 
   const { assignments, config } = useExperiment();
-  const { widgetRef } = useWidgetTracking(slug, assignments);
+  const { widgetRef, track } = useWidgetTracking(slug, assignments);
 
   const [sliderIdx, setSliderIdx] = useState(config.defaultSliderIdx);
   const [customAmount, setCustomAmount] = useState("");
@@ -386,6 +386,7 @@ function SupportWidget({ post }: { post: BlogPost }) {
 
   const handleBump = useCallback(async () => {
     if (bumped) return;
+    track("fistbump_click");
     setBumpAnimating(true);
     setTimeout(() => setBumpAnimating(false), 600);
     try {
@@ -399,11 +400,12 @@ function SupportWidget({ post }: { post: BlogPost }) {
       setBumped(true);
       localStorage.setItem(`spike_bumped_${slug}`, "1");
     } catch { /* best-effort — fistbump is non-critical */ }
-  }, [bumped, slug]);
+  }, [bumped, slug, track]);
 
   const handleDonate = useCallback(async () => {
     const amount = showCustom ? parseFloat(customAmount) : currentStop.amount;
     if (!amount || amount < 1) return;
+    track("donate_click", { amount });
     setDonating(true);
     try {
       const res = await fetch(apiUrl("/support/donate"), {
@@ -412,11 +414,14 @@ function SupportWidget({ post }: { post: BlogPost }) {
         body: JSON.stringify({ slug, amount, clientId: getClientId() }),
       });
       const data = await res.json() as { url?: string };
-      if (data.url) window.location.href = data.url;
+      if (data.url) {
+        track("checkout_started", { amount });
+        window.location.href = data.url;
+      }
     } catch {
       setDonating(false);
     }
-  }, [currentStop.amount, showCustom, customAmount, slug]);
+  }, [currentStop.amount, showCustom, customAmount, slug, track]);
 
   return (
     <div ref={widgetRef} className="mt-20 p-8 sm:p-12 rounded-[3rem] bg-card border border-border/50 shadow-2xl relative overflow-hidden">
@@ -460,8 +465,12 @@ function SupportWidget({ post }: { post: BlogPost }) {
                 <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest mt-1">{currentStop.label}</p>
               </div>
             </div>
-            <button 
-              onClick={() => setShowCustom(!showCustom)}
+            <button
+              onClick={() => {
+                const next = !showCustom;
+                setShowCustom(next);
+                track("custom_toggle", { showCustom: next });
+              }}
               className="text-[10px] font-black uppercase tracking-widest text-primary hover:opacity-80 transition-opacity"
             >
               {showCustom ? "Presets" : "Custom"}
@@ -475,7 +484,13 @@ function SupportWidget({ post }: { post: BlogPost }) {
               max={SLIDER_STOPS.length - 1}
               step={1}
               value={sliderIdx}
-              onChange={(e) => setSliderIdx(parseInt(e.target.value))}
+              onPointerDown={() => track("slider_start", { idx: sliderIdx })}
+              onChange={(e) => {
+                const idx = parseInt(e.target.value);
+                setSliderIdx(idx);
+                track("slider_change", { idx });
+              }}
+              onPointerUp={() => track("slider_final", { idx: sliderIdx, amount: SLIDER_STOPS[sliderIdx]?.amount })}
               className="w-full h-2 bg-border rounded-full appearance-none cursor-pointer accent-primary"
             />
           )}
@@ -509,10 +524,10 @@ function SupportWidget({ post }: { post: BlogPost }) {
 
         <div className="mt-12 flex flex-wrap items-center gap-6">
           <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/40">Spread the Word</p>
-          <a href={xIntent} target="_blank" rel="noopener noreferrer" className="text-xs font-bold text-muted-foreground hover:text-primary transition-colors flex items-center gap-1.5">
+          <a href={xIntent} target="_blank" rel="noopener noreferrer" onClick={() => track("share_click", { platform: "x" })} className="text-xs font-bold text-muted-foreground hover:text-primary transition-colors flex items-center gap-1.5">
             <Twitter size={14} /> X / Twitter
           </a>
-          <a href={linkedInIntent} target="_blank" rel="noopener noreferrer" className="text-xs font-bold text-muted-foreground hover:text-primary transition-colors flex items-center gap-1.5">
+          <a href={linkedInIntent} target="_blank" rel="noopener noreferrer" onClick={() => track("share_click", { platform: "linkedin" })} className="text-xs font-bold text-muted-foreground hover:text-primary transition-colors flex items-center gap-1.5">
             <Linkedin size={14} /> LinkedIn
           </a>
         </div>

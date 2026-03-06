@@ -162,8 +162,8 @@ experiments.post("/api/experiments/track", async (c) => {
     return c.json({ error: "events array required" }, 400);
   }
 
-  // Cap batch size
-  const batch = events.slice(0, 50);
+  // Cap batch size (allows ~16 user actions × 3 experiments per flush)
+  const batch = events.slice(0, 150);
   const db = c.env.DB;
   const now = Date.now();
 

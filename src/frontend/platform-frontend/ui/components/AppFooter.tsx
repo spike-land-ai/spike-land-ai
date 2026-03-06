@@ -5,13 +5,16 @@ export function AppFooter() {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="bg-card/80 backdrop-blur-xl border-t border-border py-16 px-6 mt-32 overflow-hidden relative">
+    <footer
+      className="bg-card/80 backdrop-blur-xl border-t border-border py-16 px-6 mt-32 overflow-hidden relative"
+      style={{ contentVisibility: "auto", containIntrinsicSize: "auto 500px" }}
+    >
       {/* Decorative background element */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-6xl h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
 
       <div className="max-w-7xl mx-auto">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-12 lg:gap-8">
-          <div className="col-span-1 sm:col-span-2 lg:col-span-2 space-y-6">
+          <div className="col-span-1 sm:col-span-2 lg:col-span-2 space-y-6 min-h-[160px]">
             <Link to="/" className="text-2xl font-black tracking-tighter text-foreground flex items-center gap-2 group">
               <div className="bg-primary size-8 rounded-lg flex items-center justify-center text-primary-foreground group-hover:rotate-12 transition-transform shadow-lg shadow-primary/20">
                 S

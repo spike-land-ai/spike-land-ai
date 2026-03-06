@@ -1,9 +1,10 @@
+import type { Context } from "hono";
 import { Hono } from "hono";
 import type { Env } from "../../core-logic/env.js";
 
 const health = new Hono<{ Bindings: Env }>();
 
-health.get("/health", async (c) => {
+async function healthHandler(c: Context<{ Bindings: Env }>) {
   const deep = c.req.query("deep") === "true";
 
   let r2Status = "ok";
@@ -63,6 +64,9 @@ health.get("/health", async (c) => {
   result.status = overall;
 
   return c.json(result, overall === "ok" ? 200 : 503);
-});
+}
+
+health.get("/health", healthHandler);
+health.get("/api/health", healthHandler);
 
 export { health };

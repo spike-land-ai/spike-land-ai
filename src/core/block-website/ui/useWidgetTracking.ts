@@ -32,7 +32,7 @@ interface ExperimentAssignment {
 
 const CLIENT_ID_KEY = "spike_client_id";
 const FLUSH_INTERVAL_MS = 5_000;
-const RATE_LIMIT_MAX = 20;
+const RATE_LIMIT_MAX = 60;
 const RATE_LIMIT_WINDOW_MS = 60_000; // 1 minute
 
 function readClientId(): string {
@@ -43,15 +43,13 @@ function readClientId(): string {
   }
 }
 
-function getFirstAssignment(
+function getAllAssignments(
   assignments: Record<string, ExperimentAssignment>,
-): { experimentId: string | null; variantId: string | null } {
-  const firstKey = Object.keys(assignments)[0] ?? null;
-  if (!firstKey) return { experimentId: null, variantId: null };
-  return {
-    experimentId: firstKey,
-    variantId: assignments[firstKey]?.variantId ?? null,
-  };
+): Array<{ experimentId: string; variantId: string }> {
+  return Object.entries(assignments).map(([experimentId, a]) => ({
+    experimentId,
+    variantId: a.variantId,
+  }));
 }
 
 export function useWidgetTracking(
@@ -65,7 +63,7 @@ export function useWidgetTracking(
   const visibilityEntryTimeRef = useRef<number | null>(null);
   const assignmentsRef = useRef(assignments);
 
-  // Rolling window of event timestamps for rate limiting (max 20/min)
+  // Rolling window of event timestamps for rate limiting
   const eventTimestampsRef = useRef<number[]>([]);
 
   // Keep assignments ref current without triggering re-renders
@@ -106,29 +104,42 @@ export function useWidgetTracking(
         (t) => now - t < RATE_LIMIT_WINDOW_MS,
       );
 
-      // Enforce max 20 events per minute
+      // Enforce rate limit
       if (eventTimestampsRef.current.length >= RATE_LIMIT_MAX) {
         return;
       }
 
-      eventTimestampsRef.current.push(now);
-
       const clientId = readClientId();
-      const { experimentId, variantId } = getFirstAssignment(
-        assignmentsRef.current,
-      );
+      const pairs = getAllAssignments(assignmentsRef.current);
 
-      const event: TrackedEvent = {
-        clientId,
-        slug,
-        eventType,
-        eventData,
-        experimentId,
-        variantId,
-        timestamp: now,
-      };
+      if (pairs.length === 0) {
+        // No experiments active — still record the event untagged
+        eventTimestampsRef.current.push(now);
+        queueRef.current.push({
+          clientId,
+          slug,
+          eventType,
+          eventData,
+          experimentId: null,
+          variantId: null,
+          timestamp: now,
+        });
+        return;
+      }
 
-      queueRef.current.push(event);
+      // Emit one event per active experiment so every experiment gets metrics
+      for (const { experimentId, variantId } of pairs) {
+        eventTimestampsRef.current.push(now);
+        queueRef.current.push({
+          clientId,
+          slug,
+          eventType,
+          eventData,
+          experimentId,
+          variantId,
+          timestamp: now,
+        });
+      }
     },
     [slug],
   );

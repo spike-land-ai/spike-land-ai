@@ -43,6 +43,9 @@ function rowToPost(row: BlogPostRow, includeContent = false) {
   return post;
 }
 
+// /api/blog/posts is a common alias — redirect before :slug catches "posts"
+blog.get("/api/blog/posts", (c) => c.redirect("/api/blog", 301));
+
 blog.get("/api/blog", async (c) => {
   let cached: Response | null = null;
   try {

@@ -4,6 +4,12 @@ import { apiUrl } from "../core-logic/api";
 
 export const TOTAL_TOOL_COUNT = 80;
 
+function setThemeDirectly(theme: "light" | "dark") {
+    localStorage.setItem("theme-preference", theme);
+    document.documentElement.classList.toggle("dark", theme === "dark");
+    document.documentElement.classList.toggle("light", theme === "light");
+}
+
 export function LandingHero() {
     const [stars, setStars] = useState<number | null>(null);
 
@@ -49,18 +55,20 @@ export function LandingHero() {
                 role="group"
                 aria-label="Primary actions"
             >
-                {/* Primary CTA — teal in dark mode */}
+                {/* Primary CTA — clicking "I'm a developer" sets dark mode (devs love dark mode) */}
                 <Link
                     href="/tools"
+                    onClick={() => setThemeDirectly("dark")}
                     className="w-full sm:w-auto px-8 py-4 text-lg font-medium rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2
                                bg-foreground text-background hover:opacity-90 hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98] focus:ring-foreground
                                dark:bg-primary dark:text-primary-foreground dark:hover:bg-primary-light glow-primary dark:focus:ring-primary"
                 >
                     I'm a developer
                 </Link>
-                {/* Secondary CTA — glass in dark mode */}
+                {/* Secondary CTA — explorers get to keep the light */}
                 <Link
                     href="/store"
+                    onClick={() => setThemeDirectly("light")}
                     className="w-full sm:w-auto px-8 py-4 text-lg font-medium rounded-xl inline-flex items-center justify-center gap-2 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2
                                bg-background border border-border/50 text-foreground hover:bg-muted/50 hover:border-border hover:shadow-sm hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98] focus:ring-foreground
                                dark:bg-white/10 dark:border-white/20 dark:text-white dark:hover:bg-white/15 dark:backdrop-blur-md dark:hover:-translate-y-0.5 dark:focus:ring-white/30"

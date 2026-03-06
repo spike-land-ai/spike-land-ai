@@ -104,11 +104,11 @@ describe("SPA — index.html fallback", () => {
     expect(res.status).toBe(404);
   });
 
-  it("serves index.html for unknown routes when available", async () => {
+  it("serves index.html for known routes when available", async () => {
     const htmlObj = makeR2Object(BASE_HTML);
     const env = createMockEnv({ "index.html": htmlObj });
     const app = makeApp();
-    const res = await app.request("https://spike.land/some-route", {}, env);
+    const res = await app.request("https://spike.land/settings", {}, env);
     expect(res.status).toBe(200);
     expect(res.headers.get("content-type")).toContain("text/html");
     expect(res.headers.get("cache-control")).toBe("no-cache");
@@ -391,7 +391,7 @@ describe("SPA — cookie consent tracking", () => {
     const htmlObj = makeR2Object(BASE_HTML);
     const env = createMockEnv({ "index.html": htmlObj });
     const app = makeApp();
-    const res = await app.request("https://spike.land/some-route", {
+    const res = await app.request("https://spike.land/settings", {
       headers: { cookie: "cookie_consent=accepted" },
     }, env);
     expect(res.status).toBe(200);
@@ -403,7 +403,7 @@ describe("SPA — cookie consent tracking", () => {
     const htmlObj = makeR2Object(BASE_HTML);
     const env = createMockEnv({ "index.html": htmlObj });
     const app = makeApp();
-    const res = await app.request("https://spike.land/some-route", {}, env);
+    const res = await app.request("https://spike.land/settings", {}, env);
     const setCookie = res.headers.get("set-cookie");
     expect(setCookie).toBeNull();
   });
@@ -412,7 +412,7 @@ describe("SPA — cookie consent tracking", () => {
     const htmlObj = makeR2Object(BASE_HTML);
     const env = createMockEnv({ "index.html": htmlObj });
     const app = makeApp();
-    const res = await app.request("https://spike.land/some-route", {
+    const res = await app.request("https://spike.land/settings", {
       headers: { cookie: "cookie_consent=accepted; spike_client_id=existing-id" },
     }, env);
     const setCookie = res.headers.get("set-cookie");
