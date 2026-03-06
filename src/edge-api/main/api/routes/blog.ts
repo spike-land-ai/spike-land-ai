@@ -22,6 +22,9 @@ interface BlogPostRow {
 }
 
 function rowToPost(row: BlogPostRow, includeContent = false) {
+  let tags: unknown = [];
+  try { tags = JSON.parse(row.tags); } catch { /* default to empty */ }
+
   const post: Record<string, unknown> = {
     slug: row.slug,
     title: row.title,
@@ -30,7 +33,7 @@ function rowToPost(row: BlogPostRow, includeContent = false) {
     date: row.date,
     author: row.author,
     category: row.category,
-    tags: JSON.parse(row.tags),
+    tags,
     featured: Boolean(row.featured),
     heroImage: row.hero_image,
   };

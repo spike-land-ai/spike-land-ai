@@ -151,19 +151,37 @@ export function BlogListView({ linkComponent, limit, showHeader = true }: { link
   const [error, setError] = useState(false);
 
   useEffect(() => {
-    fetch("/api/blog")
-      .then((r) => r.json() as Promise<BlogMeta[]>)
-      .then((data) => {
-        if (limit) {
-          const featured = data.filter((p) => p.featured);
-          const rest = data.filter((p) => !p.featured);
-          setPosts([...featured, ...rest].slice(0, limit));
-        } else {
-          setPosts(data);
+    let cancelled = false;
+    let attempt = 0;
+
+    async function load() {
+      while (attempt < 2) {
+        try {
+          const r = await fetch("/api/blog");
+          if (!r.ok) throw new Error(`HTTP ${r.status}`);
+          const data = await r.json() as unknown;
+          if (!Array.isArray(data)) throw new Error("Unexpected response shape");
+          if (cancelled) return;
+          const posts = data as BlogMeta[];
+          if (limit) {
+            const featured = posts.filter((p) => p.featured);
+            const rest = posts.filter((p) => !p.featured);
+            setPosts([...featured, ...rest].slice(0, limit));
+          } else {
+            setPosts(posts);
+          }
+          setError(false);
+          return;
+        } catch {
+          attempt++;
+          if (attempt < 2) await new Promise((r) => setTimeout(r, 1000));
         }
-      })
-      .catch(() => { setPosts([]); setError(true); })
-      .finally(() => setLoading(false));
+      }
+      if (!cancelled) { setPosts([]); setError(true); }
+    }
+
+    load().finally(() => { if (!cancelled) setLoading(false); });
+    return () => { cancelled = true; };
   }, [limit]);
 
   if (loading) {
