@@ -26,7 +26,8 @@
     "generate:apple-secret": "npx tsx scripts/generate-apple-secret.ts",
     "seed:blog": "npx tsx scripts/seed-blog.ts",
     "seed:blog:remote": "npx tsx scripts/seed-blog.ts --remote",
-    "reorganize": "npx tsx scripts/reorganize.ts"
+    "reorganize": "npx tsx scripts/reorganize.ts",
+    "test:reorganize": "vitest run --config scripts/__tests__/vitest.config.ts"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.27.1",
