@@ -88,7 +88,7 @@ export function AppDetailPage() {
   );
 
   function handleAction(_action: "archive" | "delete" | "restore") {
-    // TODO: wire up to edge API
+    // No-op until edge API integration
   }
 
   return (

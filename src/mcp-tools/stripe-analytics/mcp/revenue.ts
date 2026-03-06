@@ -13,9 +13,9 @@ export function registerRevenueTools(server: McpServer, client: StripeClient): v
       end_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Must be YYYY-MM-DD").describe("End date in YYYY-MM-DD format"),
       currency: z.string().default("usd").describe("Currency code (default: usd)"),
     },
-    async handler(args) {
-      const startUnix = Math.floor(new Date(String(args.start_date)).getTime() / 1000);
-      const endUnix = Math.floor(new Date(String(args.end_date)).getTime() / 1000);
+    async handler({ start_date, end_date, currency }) {
+      const startUnix = Math.floor(new Date(start_date).getTime() / 1000);
+      const endUnix = Math.floor(new Date(end_date).getTime() / 1000);
 
       if (isNaN(startUnix) || isNaN(endUnix)) {
         return errorResult("INVALID_INPUT", "Invalid date format. Use YYYY-MM-DD.");
@@ -25,7 +25,7 @@ export function registerRevenueTools(server: McpServer, client: StripeClient): v
         client.getAll<BalanceTransaction>("balance_transactions", {
           "created[gte]": String(startUnix),
           "created[lte]": String(endUnix),
-          "currency": String(args.currency),
+          "currency": currency,
         }),
       );
 
@@ -61,8 +61,8 @@ export function registerRevenueTools(server: McpServer, client: StripeClient): v
       }
 
       return jsonResult({
-        period: { start_date: String(args.start_date), end_date: String(args.end_date) },
-        currency: String(args.currency),
+        period: { start_date, end_date },
+        currency,
         total_revenue: totalRevenue,
         total_fees: totalFees,
         total_refunds: totalRefunds,
@@ -80,12 +80,12 @@ export function registerRevenueTools(server: McpServer, client: StripeClient): v
       limit: z.number().int().min(1).max(100).default(10).describe("Number of payouts to fetch"),
       status: z.enum(["paid", "pending", "in_transit", "canceled", "failed"]).optional().describe("Filter by payout status"),
     },
-    async handler(args) {
+    async handler({ limit = 10, status }) {
       const params: Record<string, string> = {
-        limit: String(args.limit ?? 10),
+        limit: String(limit),
       };
-      if (args.status) {
-        params.status = String(args.status);
+      if (status) {
+        params.status = status;
       }
 
       const result = await tryCatch(
@@ -119,10 +119,10 @@ export function registerRevenueTools(server: McpServer, client: StripeClient): v
     schema: {
       status: z.enum(["needs_response", "under_review", "won", "lost"]).optional().describe("Filter by dispute status"),
     },
-    async handler(args) {
+    async handler({ status }) {
       const params: Record<string, string> = {};
-      if (args.status) {
-        params.status = String(args.status);
+      if (status) {
+        params.status = status;
       }
 
       const result = await tryCatch(

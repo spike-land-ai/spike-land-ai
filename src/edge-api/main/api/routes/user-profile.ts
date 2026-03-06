@@ -6,12 +6,12 @@
  */
 
 import { Hono } from "hono";
-import type { Env } from "../../core-logic/env.js";
+import type { Env, Variables } from "../../core-logic/env.js";
 
-const userProfile = new Hono<{ Bindings: Env }>();
+const userProfile = new Hono<{ Bindings: Env; Variables: Variables }>();
 
 userProfile.post("/api/user/profile", async (c) => {
-  const userId = c.get("userId" as never) as string | undefined;
+  const userId = c.get("userId") as string | undefined;
   if (!userId) {
     return c.json({ error: "Unauthorized" }, 401);
   }

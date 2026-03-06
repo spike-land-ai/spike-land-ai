@@ -33,7 +33,7 @@ export function ToolsCategoryPage() {
 
   if (!tool) {
     return (
-      <div className="rounded-xl border border-destructive/30 bg-destructive/10 p-8 text-center text-destructive">
+      <div className="rounded-2xl border border-destructive/30 bg-destructive/10 p-8 text-center text-destructive">
         <h2 className="text-lg font-bold">Tool Not Found</h2>
         <p className="mt-2">The tool "{toolName}" does not exist in the current MCP registry.</p>
         <Link to="/tools" className="mt-4 inline-block text-destructive hover:underline">
@@ -56,7 +56,7 @@ export function ToolsCategoryPage() {
       <div className="grid gap-6 lg:grid-cols-2">
         {/* Input Form Column */}
         <div className="space-y-6">
-          <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
+          <div className="rounded-2xl border border-border bg-card dark:glass-card p-6 shadow-sm">
             <h2 className="text-lg font-semibold mb-2 text-foreground">Description</h2>
             <p className="text-muted-foreground text-sm mb-6">{tool.description}</p>
 
@@ -69,7 +69,7 @@ export function ToolsCategoryPage() {
             />
           </div>
 
-          <div className="rounded-xl border border-border bg-muted p-4 shadow-sm">
+          <div className="rounded-2xl border border-border bg-muted p-4 shadow-sm">
              <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-2">Generated Payload</h3>
              <pre className="overflow-x-auto text-xs text-foreground">
                {JSON.stringify({ name: toolName, arguments: formData }, null, 2)}
@@ -78,7 +78,7 @@ export function ToolsCategoryPage() {
         </div>
 
         {/* Execution Result Column */}
-        <div className="rounded-xl border border-border bg-card shadow-sm flex flex-col overflow-hidden">
+        <div className="rounded-2xl border border-border bg-card dark:glass-card shadow-sm flex flex-col overflow-hidden">
           <div className="border-b border-border bg-muted px-4 py-3">
             <h2 className="text-sm font-semibold text-foreground">Execution Result</h2>
           </div>

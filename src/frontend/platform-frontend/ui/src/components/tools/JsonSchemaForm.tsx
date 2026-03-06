@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import { type FormEvent, useState, useEffect, useCallback } from "react";
 import { apiUrl } from "../../../../core-logic/api";
 
 interface JsonSchemaProperty {
@@ -76,7 +76,7 @@ export function JsonSchemaForm({ schema, onChange, onSubmit, isPending }: JsonSc
     onChange(newData);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     onSubmit();
   };

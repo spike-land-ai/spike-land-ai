@@ -5,6 +5,7 @@ import { useMcpTools } from "../../src/hooks/useMcp";
 export function ToolsIndexPage() {
   const { data, isLoading, isError, error } = useMcpTools();
   const [search, setSearch] = useState("");
+  const [activeCategory, setActiveCategory] = useState("All");
 
   const categorizedTools = useMemo(() => {
     const toolsArray = data?.tools;
@@ -18,16 +19,23 @@ export function ToolsIndexPage() {
     }));
   }, [data]);
 
-  const categories = ["All", ...Array.from(new Set(categorizedTools.map(t => t.category)))].sort();
-  const [activeCategory, setActiveCategory] = useState("All");
+  const categories = useMemo(
+    () => ["All", ...Array.from(new Set(categorizedTools.map((t) => t.category))).sort()],
+    [categorizedTools],
+  );
 
-  const filtered = categorizedTools.filter((tool) => {
-    const matchesSearch =
-      tool.name.toLowerCase().includes(search.toLowerCase()) ||
-      tool.description.toLowerCase().includes(search.toLowerCase());
-    const matchesCategory = activeCategory === "All" || tool.category === activeCategory;
-    return matchesSearch && matchesCategory;
-  });
+  const filtered = useMemo(
+    () =>
+      categorizedTools.filter((tool) => {
+        const q = search.toLowerCase();
+        const matchesSearch =
+          tool.name.toLowerCase().includes(q) ||
+          tool.description.toLowerCase().includes(q);
+        const matchesCategory = activeCategory === "All" || tool.category === activeCategory;
+        return matchesSearch && matchesCategory;
+      }),
+    [categorizedTools, search, activeCategory],
+  );
 
   if (isLoading) {
     return (
@@ -112,9 +120,9 @@ export function ToolsIndexPage() {
               params={{
                 toolName: tool.name,
               }}
-              className="group rounded-xl border border-border bg-card p-5 shadow-sm transition hover:shadow-md hover:bg-muted/50"
+              className="group rounded-2xl border border-border bg-card dark:glass-card p-5 shadow-sm transition hover:shadow-md hover:scale-[1.01] hover:border-primary/30"
             >
-              <h3 className="font-mono text-sm font-semibold text-info-foreground group-hover:text-primary">
+              <h3 className="font-mono text-sm font-semibold text-info-foreground group-hover:text-primary transition-colors">
                 {tool.name}
               </h3>
               <p className="mt-2 text-sm text-muted-foreground line-clamp-2" title={tool.description}>

@@ -472,11 +472,11 @@ export async function resolve<T>(
 ): Promise<{ ok: true; value: T } | { ok: false; result: CallToolResult }> {
   try {
     return { ok: true, value: await fn() };
-  } catch (e) {
-    if (e instanceof ImageStudioResolverError) {
-      return { ok: false, result: e.result };
+  } catch (error) {
+    if (error instanceof ImageStudioResolverError) {
+      return { ok: false, result: error.result };
     }
-    throw e;
+    throw error;
   }
 }
 

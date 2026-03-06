@@ -37,7 +37,7 @@ export class ErrorBoundary extends Component<Props, State> {
       if (this.props.fallback) return this.props.fallback;
 
       return (
-        <div className="flex min-h-[400px] w-full flex-col items-center justify-center p-8 text-center bg-card dark:bg-white/5 dark:backdrop-blur-[16px] rounded-2xl dark:rounded-[24px] border border-border dark:border-white/10 shadow-xl dark:shadow-black/40 animate-in fade-in zoom-in-95 duration-500">
+        <div className="flex min-h-[400px] w-full flex-col items-center justify-center p-8 text-center bg-card dark:glass-card rounded-2xl border border-border shadow-xl animate-in fade-in zoom-in-95 duration-500">
           <div className="flex h-20 w-20 items-center justify-center rounded-full bg-destructive/10 text-destructive mb-6 relative">
             <AlertTriangle className="h-10 w-10 animate-pulse" />
             <div className="absolute inset-0 rounded-full bg-destructive/5 animate-ping duration-1000" />
@@ -53,7 +53,7 @@ export class ErrorBoundary extends Component<Props, State> {
             </p>
             
             {this.state.error && (
-              <div className="rounded-xl bg-muted dark:bg-white/5 border border-border dark:border-white/10 p-4 text-left overflow-hidden">
+              <div className="rounded-2xl bg-muted dark:bg-white/5 border border-border dark:border-white/10 p-4 text-left overflow-hidden">
                 <p className="text-[11px] font-bold uppercase tracking-wider text-destructive/70 mb-1">
                   Error Details
                 </p>

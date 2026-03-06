@@ -133,7 +133,7 @@ function ToolCallCard({
       className={cn(
         "mt-3 rounded-2xl border text-[11px] overflow-hidden transition-all",
         isDarkMode
-          ? "border-primary/10 bg-primary/5 backdrop-blur-sm"
+          ? "dark:glass-card border-primary/10"
           : "bg-muted border-border",
       )}
     >
@@ -237,7 +237,7 @@ function ToolCallCard({
 // Loading dots — shown when the assistant message is completely empty
 // ---------------------------------------------------------------------------
 
-function LoadingDots({ isDarkMode: _isDarkMode }: { isDarkMode: boolean }) {
+function LoadingDots() {
   return (
     <span className="inline-flex gap-1.5 items-center px-2 py-1">
       <span
@@ -446,14 +446,14 @@ export function AiChatMessage({ message, isStreaming }: AiChatMessageProps) {
           isDarkMode
             ? isUser
               ? "bg-primary text-primary-foreground rounded-3xl rounded-tr-lg shadow-[0_10px_30px_var(--primary-glow)]"
-              : "bg-white/5 backdrop-blur-md border border-white/10 text-gray-200 rounded-3xl rounded-tl-lg shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]"
+              : "dark:glass-card text-gray-200 rounded-3xl rounded-tl-lg"
             : isUser
             ? "bg-primary text-primary-foreground rounded-2xl rounded-tr-sm"
             : "bg-card border border-border text-card-foreground rounded-2xl rounded-tl-sm",
         )}
       >
         {isEmpty ? (
-          <LoadingDots isDarkMode={isDarkMode} />
+          <LoadingDots />
         ) : (
           <div className="flex gap-4">
             <div className="flex-1 space-y-3 overflow-hidden">

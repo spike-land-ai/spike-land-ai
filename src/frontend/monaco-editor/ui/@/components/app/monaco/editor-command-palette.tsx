@@ -7,7 +7,7 @@ import {
   CommandList,
 } from "../../ui/command";
 import { useCallback, useState } from "react";
-import { editorCommands } from "../../../../../core-logic/@/components/app/monaco/editor-commands";
+import { editorCommands } from "../../../../../core-logic/components/app/monaco/editor-commands";
 
 export function EditorCommandPalette() {
   const [open, setOpen] = useState(false);

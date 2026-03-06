@@ -83,7 +83,7 @@ export function registerReportTools(
     },
     handler: async (args) => {
       const headers = await auth.authHeaders();
-      const body = buildReportBody(args as Parameters<typeof buildReportBody>[0]);
+      const body = buildReportBody(args);
       const url = `https://analyticsdata.googleapis.com/v1beta/properties/${propertyId}:runReport`;
 
       const result = await tryCatch(
@@ -123,14 +123,7 @@ export function registerReportTools(
         .max(5)
         .describe("Array of report configurations (max 5)"),
     },
-    handler: async (args) => {
-      const { reports } = args as { reports: Array<{
-        dimensions: string[];
-        metrics: string[];
-        date_range_start: string;
-        date_range_end: string;
-        limit?: number;
-      }> };
+    handler: async ({ reports }) => {
       const headers = await auth.authHeaders();
 
       const requests = reports.map((r) => ({

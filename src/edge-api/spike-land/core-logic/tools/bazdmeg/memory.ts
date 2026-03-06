@@ -11,7 +11,7 @@
 import { z } from "zod";
 import type { ToolRegistryAdapter } from "../../../lazy-imports/types";
 import { freeTool } from "../../../lazy-imports/procedures-index.ts";
-import { apiRequest, safeToolCall, textResult } from "../../../db-mcp/tool-helpers";
+import { apiRequest, safeToolCall, textResult } from "../../lib/tool-helpers";
 import type { DrizzleDB } from "../../../db/db/db-index.ts";
 
 export function registerBazdmegMemoryTools(

@@ -38,7 +38,7 @@ export default {
         // Fire and forget — don't block the webhook response
         ctx.waitUntil(
           runReviewJob(result.context, env).catch((err) => {
-            console.error("Review job failed:", err);
+            process.stderr.write(`Review job failed: ${err instanceof Error ? err.message : String(err)}\n`);
           }),
         );
       }

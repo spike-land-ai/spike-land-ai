@@ -25,7 +25,7 @@ export class HNReadClient {
   }
 
   private logApiError(status: number, url: string): void {
-    console.error(`HN API error ${status} for ${url}`);
+    process.stderr.write(`HN API error ${status} for ${url}\n`);
   }
 
   async getItem(id: number): Promise<HNItem | null> {

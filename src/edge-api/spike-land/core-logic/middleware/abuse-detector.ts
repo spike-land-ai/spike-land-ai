@@ -24,7 +24,9 @@ export async function detectAbuse(
   if (raw) {
     try {
       state = JSON.parse(raw);
-    } catch {}
+    } catch {
+      // Corrupt KV data — treat as fresh state (safe default)
+    }
   }
   
   if (state.flagged) return false; // Already flagged this window

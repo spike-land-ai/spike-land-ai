@@ -58,10 +58,9 @@ export function registerReportingTools(server: McpServer, client: GoogleAdsClien
       date_range: DATE_RANGE,
       segments: z.enum(["date", "device", "network"]).optional().describe("Segment results by date, device, or network"),
     },
-    async handler(args) {
-      const campaignId = String(args.campaign_id);
-      const dateRange = String(args.date_range);
-      const segments = args.segments as string | undefined;
+    async handler({ campaign_id, date_range, segments }) {
+      const campaignId = String(campaign_id);
+      const dateRange = String(date_range);
 
       let segmentField = "";
       if (segments === "date") segmentField = ", segments.date";
@@ -104,10 +103,8 @@ export function registerReportingTools(server: McpServer, client: GoogleAdsClien
       date_range: DATE_RANGE,
       limit: z.number().int().min(1).max(500).default(50).describe("Max results to return"),
     },
-    async handler(args) {
-      const campaignId = args.campaign_id as string | undefined;
-      const dateRange = String(args.date_range);
-      const limit = (args.limit as number | undefined) ?? 50;
+    async handler({ campaign_id: campaignId, date_range, limit = 50 }) {
+      const dateRange = String(date_range);
 
       let query = `SELECT search_term_view.search_term, metrics.impressions, metrics.clicks, metrics.cost_micros, metrics.conversions FROM search_term_view WHERE segments.date DURING ${dateRange}`;
       if (campaignId) {

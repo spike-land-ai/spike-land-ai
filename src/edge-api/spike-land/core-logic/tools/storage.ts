@@ -7,7 +7,7 @@
 import { z } from "zod";
 import type { ToolRegistryAdapter } from "../../lazy-imports/types";
 import { freeTool } from "../../lazy-imports/procedures-index.ts";
-import { textResult, jsonResult, McpError, McpErrorCode } from "../../db-mcp/tool-helpers";
+import { textResult, jsonResult, McpError, McpErrorCode } from "../lib/tool-helpers";
 import type { DrizzleDB } from "../../db/db/db-index.ts";
 
 const CONTENT_TYPE_MAP: Record<string, string> = {

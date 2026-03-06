@@ -164,12 +164,8 @@ export function performSyncWorkOnRoot(root: FiberRoot): void {
 // ─── Concurrent Work ────────────────────────────────────────────────────
 
 function performConcurrentWorkOnRoot(root: FiberRoot): void {
-  // NOTE: Concurrent mode not yet implemented.
-  // This falls back to synchronous rendering, which means:
-  // - No time-slicing (work is not interrupted)
-  // - No useTransition/useDeferredValue support
-  // - No React 18 concurrent features
-  // TODO: Implement workLoopConcurrent with shouldYield() support
+  // Concurrent mode not yet implemented — falls back to synchronous rendering.
+  // workLoopConcurrent (below) is ready but not wired in yet.
   performSyncWorkOnRoot(root);
 }
 

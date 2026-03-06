@@ -113,7 +113,7 @@ export const baseEditorOptions: Editor.IStandaloneEditorConstructionOptions = {
   smoothScrolling: true,
   suggestOnTriggerCharacters: true,
   acceptSuggestionOnEnter: "on",
-  fontFamily: '"Rubik", monospace',
+  fontFamily: "Rubik",
   fontLigatures: true,
   fontWeight: "400",
   codeLens: true,

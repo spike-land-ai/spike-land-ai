@@ -7,6 +7,7 @@
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { createZodTool, textResult } from "@spike-land-ai/mcp-server-base";
 import { DeployWorkerSchema, GenerateWranglerTomlSchema } from "../core-logic/types.js";
+import type { z } from "zod";
 import { getManifestPackage } from "../node-sys/manifest.js";
 import { runCommand } from "../node-sys/shell.js";
 import { writeFile } from "node:fs/promises";
@@ -119,12 +120,7 @@ export function registerDeployTools(server: McpServer): void {
     name: "bazdmeg_generate_wrangler_toml",
     description: "Generate wrangler.toml from packages.yaml worker section.",
     schema: GenerateWranglerTomlSchema.shape,
-    handler: async (args) => {
-      const { packageName, dryRun = true } = args as {
-        packageName: string;
-        dryRun?: boolean;
-      };
-
+    handler: async ({ packageName, dryRun = true }: z.infer<typeof GenerateWranglerTomlSchema>) => {
       const repoRoot = process.cwd();
       const pkg = await getManifestPackage(packageName, repoRoot);
 
@@ -163,16 +159,7 @@ export function registerDeployTools(server: McpServer): void {
     description:
       "Build + generate wrangler.toml + wrangler deploy. Full deploy pipeline for workers.",
     schema: DeployWorkerSchema.shape,
-    handler: async (args) => {
-      const {
-        packageName,
-        env,
-        dryRun = true,
-      } = args as {
-        packageName: string;
-        env?: string;
-        dryRun?: boolean;
-      };
+    handler: async ({ packageName, env, dryRun = true }: z.infer<typeof DeployWorkerSchema>) => {
 
       const repoRoot = process.cwd();
       const pkg = await getManifestPackage(packageName, repoRoot);

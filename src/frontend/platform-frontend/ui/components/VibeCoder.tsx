@@ -59,17 +59,17 @@ export default function App() {
         className="relative cursor-pointer select-none rounded-2xl p-px transition-all duration-300"
         style={{
           background: hovered
-            ? "var(--color-primary, #6366f1)"
-            : "var(--color-muted-foreground, #475569)",
+            ? "var(--primary-color)"
+            : "var(--muted-fg)",
           boxShadow: hovered
-            ? "0 0 40px 8px var(--color-primary, rgba(99, 102, 241, 0.45))"
-            : "0 0 0px 0px transparent",
+            ? "0 0 40px 8px var(--primary-glow)"
+            : "none",
         }}
       >
         <div className="rounded-2xl bg-card/90 backdrop-blur-xl px-10 py-8 text-center border border-border">
           <div
             className="text-5xl mb-3 transition-all duration-300 text-primary"
-            style={{ filter: hovered ? "drop-shadow(0 0 12px var(--color-primary, #6366f1))" : "none" }}
+            style={{ filter: hovered ? "drop-shadow(0 0 12px var(--primary-color))" : "none" }}
           >
             ✦
           </div>
@@ -806,10 +806,6 @@ export function VibeCoder({ initialCode = DEFAULT_CODE, appId }: VibeCoderProps)
     setPreviewWidth((w) => Math.max(MIN_PANEL_WIDTH, w - deltaX));
   }, []);
 
-  const handleCodeChange = useCallback((value: string) => {
-    setCode(value);
-  }, []);
-
   return (
     <div
       ref={containerRef}
@@ -851,7 +847,7 @@ export function VibeCoder({ initialCode = DEFAULT_CODE, appId }: VibeCoderProps)
           >
             <CodePanel
               code={code}
-              onChange={handleCodeChange}
+              onChange={setCode}
               isDarkMode={isDarkMode}
               isStreaming={isStreaming}
               className="h-full"

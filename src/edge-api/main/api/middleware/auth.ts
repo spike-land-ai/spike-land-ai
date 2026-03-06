@@ -1,12 +1,12 @@
 import type { Context, Next } from "hono";
-import type { Env } from "../../core-logic/env.js";
+import type { Env, Variables } from "../../core-logic/env.js";
 
 /**
  * Auth middleware that validates the user session via the AUTH_MCP service binding.
  * Returns 401 if no valid session exists.
  */
 export async function authMiddleware(
-  c: Context<{ Bindings: Env }>,
+  c: Context<{ Bindings: Env; Variables: Variables }>,
   next: Next,
 ): Promise<Response | void> {
   const cookie = c.req.header("cookie");
@@ -21,7 +21,7 @@ export async function authMiddleware(
     internalSecret === c.env.INTERNAL_SERVICE_SECRET &&
     requestedUserId
   ) {
-    c.set("userId" as never, requestedUserId as never);
+    c.set("userId", requestedUserId);
     return next();
   }
 
@@ -30,7 +30,7 @@ export async function authMiddleware(
   }
 
   // Validate session via AUTH_MCP service binding (sub-1ms internal call)
-  const requestId = c.get("requestId" as never) as string | undefined;
+  const requestId = c.get("requestId") as string | undefined;
   const sessionReq = new Request("https://auth-mcp.spike.land/api/auth/get-session", {
     headers: {
       ...(cookie ? { cookie } : {}),
@@ -54,7 +54,7 @@ export async function authMiddleware(
   }
 
   // Store user info for downstream handlers
-  c.set("userId" as never, session.user.id as never);
+  c.set("userId", session.user.id);
 
   return next();
 }

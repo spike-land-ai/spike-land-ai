@@ -7,6 +7,7 @@
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { createZodTool, textResult } from "@spike-land-ai/mcp-server-base";
 import { GeneratePackageJsonSchema, PublishNpmSchema } from "../core-logic/types.js";
+import type { z } from "zod";
 import { readManifest } from "../node-sys/manifest.js";
 import { runCommand } from "../node-sys/shell.js";
 import { writeFile } from "node:fs/promises";
@@ -113,11 +114,7 @@ export function registerPublishTools(server: McpServer): void {
     name: "bazdmeg_generate_package_json",
     description: "Generate a valid package.json from packages.yaml entry for npm publishing.",
     schema: GeneratePackageJsonSchema.shape,
-    handler: async (args) => {
-      const { packageName, dryRun = true } = args as {
-        packageName: string;
-        dryRun?: boolean;
-      };
+    handler: async ({ packageName, dryRun = true }: z.infer<typeof GeneratePackageJsonSchema>) => {
 
       const repoRoot = process.cwd();
       const manifest = await readManifest(repoRoot);
@@ -149,16 +146,7 @@ export function registerPublishTools(server: McpServer): void {
     name: "bazdmeg_publish_npm",
     description: "Build + generate package.json + npm publish. Full publishing pipeline.",
     schema: PublishNpmSchema.shape,
-    handler: async (args) => {
-      const {
-        packageName,
-        registry = "github",
-        dryRun = true,
-      } = args as {
-        packageName: string;
-        registry?: string;
-        dryRun?: boolean;
-      };
+    handler: async ({ packageName, registry = "github", dryRun = true }: z.infer<typeof PublishNpmSchema>) => {
 
       const repoRoot = process.cwd();
       const manifest = await readManifest(repoRoot);

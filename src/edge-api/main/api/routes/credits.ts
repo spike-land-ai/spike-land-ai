@@ -11,7 +11,7 @@
  */
 
 import { Hono } from "hono";
-import type { Env } from "../../core-logic/env.js";
+import type { Env, Variables } from "../../core-logic/env.js";
 import { getBalance, getUsedToday } from "../../core-logic/credit-service.js";
 import { resolveEffectiveTier } from "../../core-logic/tier-service.js";
 import { createLogger } from "@spike-land-ai/shared";
@@ -20,10 +20,10 @@ import { CREDIT_PACKS } from "../../core-logic/pricing.js";
 
 const log = createLogger("spike-edge");
 
-const credits = new Hono<{ Bindings: Env }>();
+const credits = new Hono<{ Bindings: Env; Variables: Variables }>();
 
 credits.get("/api/credits/balance", async (c) => {
-  const userId = c.get("userId" as never) as string | undefined;
+  const userId = c.get("userId") as string | undefined;
   if (!userId) {
     return c.json({ error: "Unauthorized" }, 401);
   }
@@ -43,7 +43,7 @@ credits.post("/api/credits/purchase", async (c) => {
     return c.json({ error: "Stripe not configured" }, 503);
   }
 
-  const userId = c.get("userId" as never) as string | undefined;
+  const userId = c.get("userId") as string | undefined;
   if (!userId) {
     return c.json({ error: "Unauthorized" }, 401);
   }

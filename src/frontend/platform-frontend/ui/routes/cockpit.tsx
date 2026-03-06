@@ -115,7 +115,7 @@ function RoadmapBoard() {
       {KANBAN_COLS.map((col) => {
         const items = MILESTONES.filter((m) => m.status === col.id);
         return (
-          <div key={col.id} className="rounded-xl border border-border bg-card p-4 space-y-3">
+          <div key={col.id} className="rounded-2xl border border-border bg-card dark:glass-card p-4 space-y-3">
             <div className="flex items-center gap-2">
               <span className={`h-2 w-2 rounded-full ${col.dotClass}`} />
               <h3 className="text-sm font-semibold text-foreground">{col.label}</h3>
@@ -221,7 +221,7 @@ function CockpitChat() {
   }
 
   return (
-    <div className="rounded-xl border border-border bg-card overflow-hidden flex flex-col" style={{ height: "480px" }}>
+    <div className="rounded-2xl border border-border bg-card dark:glass-card overflow-hidden flex flex-col" style={{ height: "480px" }}>
       <div className="flex items-center justify-between border-b border-border px-4 py-3">
         <h3 className="text-sm font-semibold text-foreground">AI Chat</h3>
         <button
@@ -317,7 +317,7 @@ function ExperimentCard({ exp }: { exp: DashboardExperiment }) {
   const runtimeDays = Math.round((Date.now() - exp.createdAt) / 86400000);
 
   return (
-    <div className="rounded-xl border border-border bg-card overflow-hidden">
+    <div className="rounded-2xl border border-border bg-card dark:glass-card overflow-hidden">
       <button
         onClick={() => setExpanded(!expanded)}
         className="w-full flex items-center justify-between p-4 text-left hover:bg-muted/50 transition-colors"
@@ -419,7 +419,7 @@ function ExperimentsDashboard() {
 
   return (
     <div className="space-y-4">
-      <div className="rounded-xl border border-border bg-card p-4 flex items-center justify-between">
+      <div className="rounded-2xl border border-border bg-card dark:glass-card p-4 flex items-center justify-between">
         <div>
           <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">24h Experiment Revenue</p>
           <p className="text-2xl font-bold text-foreground">${data.revenue24h.toFixed(2)}</p>
@@ -474,7 +474,7 @@ function DevHealth() {
   return (
     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
       {panels.map((p) => (
-        <div key={p.label} className="rounded-xl border border-border bg-card p-4">
+        <div key={p.label} className="rounded-2xl border border-border bg-card dark:glass-card p-4">
           <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-2">{p.label}</p>
           <div className="flex items-center gap-2">
             <span className={`h-2 w-2 rounded-full ${p.color}`} />
@@ -525,7 +525,7 @@ function MetricsDashboard() {
     <div className="space-y-4">
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {metrics.map((m) => (
-          <div key={m.label} className="rounded-xl border border-border bg-card p-4">
+          <div key={m.label} className="rounded-2xl border border-border bg-card dark:glass-card p-4">
             <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-1">{m.label}</p>
             <p className="text-2xl font-bold text-foreground">{m.value}</p>
           </div>
@@ -533,7 +533,7 @@ function MetricsDashboard() {
       </div>
 
       {data && data.recentSignups.length > 0 && (
-        <div className="rounded-xl border border-border bg-card p-4">
+        <div className="rounded-2xl border border-border bg-card dark:glass-card p-4">
           <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-3">Recent Signups</p>
           <div className="space-y-2">
             {data.recentSignups.map((u) => (
@@ -549,7 +549,7 @@ function MetricsDashboard() {
       )}
 
       {data && data.recentServicePurchases.length > 0 && (
-        <div className="rounded-xl border border-border bg-card p-4">
+        <div className="rounded-2xl border border-border bg-card dark:glass-card p-4">
           <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-3">Service Purchases</p>
           <div className="space-y-2">
             {data.recentServicePurchases.map((p, i) => (

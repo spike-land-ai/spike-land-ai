@@ -1,4 +1,4 @@
-import { getAtaCache, setAtaCache } from "../core-logic/@/lib/idb-cache";
+import { getAtaCache, setAtaCache } from "../core-logic/lib/idb-cache";
 import { QueuedFetch } from "../http-client/queued-fetch";
 import { tryCatch } from "./try-catch";
 import { setupTypeAcquisition } from "@typescript/ata";

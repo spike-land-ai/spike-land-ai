@@ -136,9 +136,10 @@ class PlaywrightPageWrapper implements BrowserPage {
         return rebuildTree(result.nodes);
       }
     } catch (err) {
-      console.error("Failed to get accessibility tree via CDP:", err);
+      throw new Error(
+        `Failed to get accessibility tree via CDP: ${err instanceof Error ? err.message : String(err)}`,
+      );
     }
-    return null;
   }
 
   /** Access underlying Playwright page for event listeners */

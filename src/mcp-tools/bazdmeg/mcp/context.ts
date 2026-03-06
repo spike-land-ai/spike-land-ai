@@ -54,11 +54,7 @@ export function registerContextTools(server: McpServer): void {
     name: "bazdmeg_report_context_gap",
     description: "Report what context was missing — feeds the improvement loop",
     schema: ReportContextGapSchema.shape,
-    handler: async (args) => {
-      const { missingContext, whatWasNeeded } = args as {
-        missingContext: string;
-        whatWasNeeded: string;
-      };
+    handler: async ({ missingContext, whatWasNeeded }) => {
       const workspace = getWorkspace();
 
       await logContextGap(workspace?.packageName ?? null, missingContext, whatWasNeeded);

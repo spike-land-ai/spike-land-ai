@@ -20,7 +20,7 @@ function getCategoryIcon(category: string): string {
 }
 
 export function McpPage() {
-  const { data, isLoading } = useMcpTools();
+  const { data, isLoading, isError } = useMcpTools();
 
   const categories = useMemo(() => {
     const tools = data?.tools ?? [];
@@ -118,9 +118,13 @@ export function McpPage() {
             {Array.from({ length: 8 }).map((_, i) => (
               <div
                 key={i}
-                className="h-24 animate-pulse rounded-xl border border-border bg-muted"
+                className="h-24 animate-pulse rounded-2xl border border-border bg-muted"
               />
             ))}
+          </div>
+        ) : isError ? (
+          <div className="rounded-2xl border border-dashed border-border p-10 text-center text-muted-foreground">
+            Unable to load categories. <Link to="/tools" className="text-primary hover:underline">Browse tools directly</Link>.
           </div>
         ) : categories.length > 0 ? (
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -128,11 +132,11 @@ export function McpPage() {
               <Link
                 key={category}
                 to="/tools"
-                className="group flex items-center gap-4 rounded-xl border border-border bg-card p-5 shadow-sm transition hover:shadow-md hover:bg-muted/50"
+                className="group flex items-center gap-4 rounded-2xl border border-border bg-card dark:glass-card p-5 shadow-sm transition hover:shadow-md hover:scale-[1.01] hover:border-primary/30"
               >
                 <span className="text-2xl">{getCategoryIcon(category)}</span>
                 <div>
-                  <p className="font-medium text-foreground group-hover:text-primary">
+                  <p className="font-medium text-foreground group-hover:text-primary transition-colors">
                     {category}
                   </p>
                   <p className="text-xs text-muted-foreground">
@@ -143,7 +147,7 @@ export function McpPage() {
             ))}
           </div>
         ) : (
-          <div className="rounded-xl border border-dashed border-border p-10 text-center text-muted-foreground">
+          <div className="rounded-2xl border border-dashed border-border p-10 text-center text-muted-foreground">
             Unable to load categories. <Link to="/tools" className="text-primary hover:underline">Browse tools directly</Link>.
           </div>
         )}
@@ -154,12 +158,12 @@ export function McpPage() {
         <h2 className="text-2xl font-bold text-foreground">How to Connect</h2>
         <div className="grid gap-6 lg:grid-cols-3">
           {/* Device Flow */}
-          <div className="rounded-xl border border-border bg-card p-6 shadow-sm space-y-4">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-lg font-bold text-primary">
+          <div className="rounded-2xl border border-border bg-card dark:glass-card p-6 shadow-sm space-y-4">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-lg font-bold text-primary">
               1
             </div>
             <h3 className="font-semibold text-foreground">Device Flow Auth</h3>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm text-muted-foreground leading-relaxed">
               Open your MCP client, point it at{" "}
               <code className="rounded bg-muted px-1.5 py-0.5 text-xs font-mono text-foreground">
                 https://spike.land/mcp
@@ -168,43 +172,43 @@ export function McpPage() {
             </p>
             <Link
               to="/mcp/authorize"
-              className="inline-block text-sm font-medium text-primary hover:underline"
+              className="inline-block text-sm font-medium text-primary hover:underline transition-colors"
             >
               Authorize a device →
             </Link>
           </div>
 
           {/* API Keys */}
-          <div className="rounded-xl border border-border bg-card p-6 shadow-sm space-y-4">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-lg font-bold text-primary">
+          <div className="rounded-2xl border border-border bg-card dark:glass-card p-6 shadow-sm space-y-4">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-lg font-bold text-primary">
               2
             </div>
             <h3 className="font-semibold text-foreground">API Keys</h3>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm text-muted-foreground leading-relaxed">
               Generate a long-lived API key in your settings and pass it as a
               Bearer token — ideal for server-to-server integrations.
             </p>
             <Link
               to="/settings"
-              className="inline-block text-sm font-medium text-primary hover:underline"
+              className="inline-block text-sm font-medium text-primary hover:underline transition-colors"
             >
               Manage API keys →
             </Link>
           </div>
 
           {/* SDK */}
-          <div className="rounded-xl border border-border bg-card p-6 shadow-sm space-y-4">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-lg font-bold text-primary">
+          <div className="rounded-2xl border border-border bg-card dark:glass-card p-6 shadow-sm space-y-4">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-lg font-bold text-primary">
               3
             </div>
             <h3 className="font-semibold text-foreground">SDK Integration</h3>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm text-muted-foreground leading-relaxed">
               Use the MCP TypeScript SDK or any compatible client library.
               Full documentation covers all transports and auth flows.
             </p>
             <Link
               to="/docs"
-              className="inline-block text-sm font-medium text-primary hover:underline"
+              className="inline-block text-sm font-medium text-primary hover:underline transition-colors"
             >
               Read the docs →
             </Link>

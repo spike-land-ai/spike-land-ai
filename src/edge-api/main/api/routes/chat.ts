@@ -1,9 +1,9 @@
 import { Hono } from "hono";
-import type { Env } from "../../core-logic/env.js";
+import type { Env, Variables } from "../../core-logic/env.js";
 import { getChatSystemPrompt } from "../../core-logic/chat-system-prompt.js";
 import { BROWSER_TOOLS } from "../../core-logic/chat-browser-tools.js";
 
-const chat = new Hono<{ Bindings: Env }>();
+const chat = new Hono<{ Bindings: Env; Variables: Variables }>();
 
 chat.post("/api/chat", async (c) => {
   const body = await c.req.json<{ message?: string; history?: Array<{ role: string; content: string }> }>();
@@ -12,7 +12,7 @@ chat.post("/api/chat", async (c) => {
   }
 
   const history = Array.isArray(body.history) ? body.history : [];
-  const requestId = c.get("requestId" as never) as string;
+  const requestId = c.get("requestId");
 
   // Fetch MCP tools from MCP_SERVICE
   let mcpTools: Array<{ name: string; description: string; input_schema: unknown }> = [];
@@ -202,8 +202,8 @@ chat.post("/api/chat", async (c) => {
                             result = `Error: ${rpcData.error.message}`;
                           }
                         }
-                      } catch (e) {
-                        result = `Tool error: ${e instanceof Error ? e.message : "unknown"}`;
+                      } catch (error) {
+                        result = `Tool error: ${error instanceof Error ? error.message : "unknown"}`;
                       }
 
                       await sendEvent({ type: "tool_call_end", name: currentToolName, result });

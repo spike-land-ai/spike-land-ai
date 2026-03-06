@@ -1,9 +1,9 @@
 import { createMiddleware } from "hono/factory";
 import { getUserElo } from "../../core-logic/elo-service.js";
-import type { Env } from "../../core-logic/env.js";
+import type { Env, Variables } from "../../core-logic/env.js";
 
-export const eloThrottleMiddleware = createMiddleware<{ Bindings: Env }>(async (c, next) => {
-  const userId = c.get("userId" as never) as string;
+export const eloThrottleMiddleware = createMiddleware<{ Bindings: Env; Variables: Variables }>(async (c, next) => {
+  const userId = c.get("userId") as string | undefined;
   if (!userId) {
     return next();
   }

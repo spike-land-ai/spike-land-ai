@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import { cors } from "hono/cors";
-import type { Env } from "../core-logic/env.js";
+import type { Env, Variables } from "../core-logic/env.js";
 import { createLogger } from "@spike-land-ai/shared";
 import { RateLimiter } from "../edge/rate-limiter.js";
 import { authMiddleware } from "./middleware/auth.js";
@@ -38,7 +38,7 @@ import { handleScheduled } from "../lazy-imports/scheduled.js";
 
 const log = createLogger("spike-edge");
 
-const app = new Hono<{ Bindings: Env }>();
+const app = new Hono<{ Bindings: Env; Variables: Variables }>();
 
 // Request ID middleware (must run before everything else)
 app.use("*", requestIdMiddleware);
@@ -168,7 +168,7 @@ app.onError((err, c) => {
     const metadata = JSON.stringify({
       method: c.req.method,
       path: c.req.path,
-      requestId: (c.get("requestId" as never) as string | undefined) ?? c.req.header("x-request-id") ?? null,
+      requestId: (c.get("requestId") as string | undefined) ?? c.req.header("x-request-id") ?? null,
     });
     const clientId = c.req.header("cf-connecting-ip") ?? null;
     const logWork = c.env.DB.prepare(
@@ -207,7 +207,7 @@ app.route("/", cachePurge);
 // MCP tools listing proxy (public, no auth required)
 app.get("/mcp/tools", async (c) => {
   const url = new URL("https://mcp.spike.land/tools");
-  const requestId = c.get("requestId" as never) as string;
+  const requestId = c.get("requestId");
   const response = await c.env.MCP_SERVICE.fetch(new Request(url.toString(), {
     headers: { "X-Request-Id": requestId },
   }));
@@ -220,7 +220,7 @@ app.get("/mcp/tools", async (c) => {
 
 // Store tools endpoint — groups MCP registry tools by category for the store UI
 app.get("/api/store/tools", async (c) => {
-  const requestId = c.get("requestId" as never) as string;
+  const requestId = c.get("requestId");
   const response = await c.env.MCP_SERVICE.fetch(
     new Request("https://mcp.spike.land/tools", {
       headers: { "X-Request-Id": requestId },
@@ -269,7 +269,7 @@ async function mcpProxy(c: import("hono").Context<{ Bindings: Env }>) {
   url.protocol = "https:";
 
   const newRequest = new Request(url.toString(), c.req.raw);
-  newRequest.headers.set("X-Request-Id", c.get("requestId" as never) as string);
+  newRequest.headers.set("X-Request-Id", c.get("requestId"));
   const response = await c.env.MCP_SERVICE.fetch(newRequest);
   return new Response(response.body, {
     status: response.status,
@@ -315,13 +315,13 @@ app.post("/oauth/device/approve", authMiddleware, async (c) => {
   url.protocol = "https:";
 
   const body = await c.req.json<{ user_code: string }>();
-  const userId = c.get("userId" as never) as string;
+  const userId = c.get("userId");
   const newRequest = new Request(url.toString(), {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
       "X-Internal-Secret": c.env.MCP_INTERNAL_SECRET,
-      "X-Request-Id": c.get("requestId" as never) as string,
+      "X-Request-Id": c.get("requestId"),
     },
     body: JSON.stringify({ user_code: body.user_code, user_id: userId }),
   });
@@ -345,7 +345,7 @@ app.all("/api/auth/*", async (c) => {
   const newRequest = new Request(url.toString(), c.req.raw);
   newRequest.headers.set("X-Forwarded-Host", "spike.land");
   newRequest.headers.set("X-Forwarded-Proto", "https");
-  newRequest.headers.set("X-Request-Id", c.get("requestId" as never) as string);
+  newRequest.headers.set("X-Request-Id", c.get("requestId"));
 
   const response = await c.env.AUTH_MCP.fetch(newRequest);
   // Strip CORS headers from upstream — spike-edge's own CORS middleware handles them

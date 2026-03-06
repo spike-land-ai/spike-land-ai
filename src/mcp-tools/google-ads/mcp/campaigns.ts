@@ -52,9 +52,7 @@ export function registerCampaignTools(server: McpServer, client: GoogleAdsClient
       status: z.enum(["ENABLED", "PAUSED", "REMOVED"]).optional().describe("Filter by campaign status"),
       limit: z.number().int().min(1).max(1000).optional().describe("Max campaigns to return"),
     },
-    async handler(args) {
-      const status = args.status as string | undefined;
-      const limit = args.limit as number | undefined;
+    async handler({ status, limit }) {
       let query = `SELECT campaign.id, campaign.name, campaign.status, campaign.advertising_channel_type, campaign_budget.amount_micros, metrics.impressions, metrics.clicks, metrics.cost_micros FROM campaign`;
       if (status) {
         query += ` WHERE campaign.status = '${status}'`;
@@ -104,12 +102,8 @@ export function registerCampaignTools(server: McpServer, client: GoogleAdsClient
       channel_type: z.enum(["SEARCH", "DISPLAY", "SHOPPING", "VIDEO"]).describe("Advertising channel type"),
       status: z.enum(["ENABLED", "PAUSED"]).default("PAUSED").describe("Initial campaign status"),
     },
-    async handler(args) {
-      const name = String(args.name);
-      const budgetAmount = args.budget_amount as number;
-      const biddingStrategy = String(args.bidding_strategy);
-      const channelType = String(args.channel_type);
-      const status = String(args.status ?? "PAUSED");
+    async handler({ name, budget_amount: budgetAmount, bidding_strategy: biddingStrategy, channel_type: channelType, status }) {
+      const resolvedStatus = String(status ?? "PAUSED");
 
       const operations = [
         {
@@ -125,9 +119,9 @@ export function registerCampaignTools(server: McpServer, client: GoogleAdsClient
           campaignOperation: {
             create: {
               name,
-              status,
+              status: resolvedStatus,
               advertisingChannelType: channelType,
-              [`${camelCase(biddingStrategy)}`]: {},
+              [`${camelCase(String(biddingStrategy))}`]: {},
             },
           },
         },
@@ -149,10 +143,8 @@ export function registerCampaignTools(server: McpServer, client: GoogleAdsClient
       status: z.enum(["ENABLED", "PAUSED"]).optional().describe("New campaign status"),
       budget_amount: z.number().positive().optional().describe("New daily budget in currency units"),
     },
-    async handler(args) {
-      const campaignId = String(args.campaign_id);
-      const status = args.status as string | undefined;
-      const budgetAmount = args.budget_amount as number | undefined;
+    async handler({ campaign_id, status, budget_amount: budgetAmount }) {
+      const campaignId = String(campaign_id);
 
       const operations: unknown[] = [];
 
@@ -208,8 +200,8 @@ export function registerCampaignTools(server: McpServer, client: GoogleAdsClient
     schema: {
       campaign_id: z.string().describe("Campaign ID to list ad groups for"),
     },
-    async handler(args) {
-      const campaignId = String(args.campaign_id);
+    async handler({ campaign_id }) {
+      const campaignId = String(campaign_id);
       const query = `SELECT ad_group.id, ad_group.name, ad_group.status, metrics.impressions, metrics.clicks FROM ad_group WHERE campaign.id = ${campaignId} ORDER BY ad_group.name`;
 
       const result = await tryCatch(client.search(query));

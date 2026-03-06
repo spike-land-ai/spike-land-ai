@@ -76,7 +76,7 @@ export function WelcomeModal({ userName }: WelcomeModalProps) {
 
   const trapRef = useFocusTrap(open, dismiss);
 
-  function toggleInterest(interest: string) {
+  const toggleInterest = useCallback((interest: string) => {
     setSelected((prev) => {
       const next = new Set(prev);
       if (next.has(interest)) {
@@ -86,7 +86,7 @@ export function WelcomeModal({ userName }: WelcomeModalProps) {
       }
       return next;
     });
-  }
+  }, []);
 
   const suggestedTools = Array.from(selected)
     .flatMap((i) => SUGGESTED_TOOLS[i] ?? [])
@@ -103,7 +103,7 @@ export function WelcomeModal({ userName }: WelcomeModalProps) {
       aria-modal="true"
       aria-label="Welcome to spike.land"
     >
-      <div className="w-full max-w-lg rounded-3xl bg-card border border-border shadow-2xl overflow-hidden animate-in zoom-in-95 slide-in-from-bottom-4 duration-300">
+      <div className="w-full max-w-lg rounded-3xl bg-card dark:glass-card border border-border shadow-2xl overflow-hidden animate-in zoom-in-95 slide-in-from-bottom-4 duration-300">
         {/* Header */}
         <div className="border-b border-border/50 px-6 py-5 bg-muted/30">
           <div className="flex items-center justify-between">
@@ -113,7 +113,7 @@ export function WelcomeModal({ userName }: WelcomeModalProps) {
                   key={s}
                   className={cn(
                     "h-1.5 w-12 rounded-full transition-all duration-500",
-                    s <= step ? "bg-primary shadow-[0_0_8px_rgba(var(--primary),0.4)]" : "bg-muted"
+                    s <= step ? "bg-primary shadow-[0_0_8px_var(--primary-glow)]" : "bg-muted"
                   )}
                   aria-current={s === step ? "step" : undefined}
                 />

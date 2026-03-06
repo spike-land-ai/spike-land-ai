@@ -1,11 +1,11 @@
 import { Hono } from "hono";
-import type { Env } from "../../core-logic/env.js";
+import type { Env, Variables } from "../../core-logic/env.js";
 import { getClientId, sendGA4Events } from "../../lazy-imports/ga4.js";
 import { createLogger } from "@spike-land-ai/shared";
 
 const log = createLogger("spike-edge");
 
-const proxy = new Hono<{ Bindings: Env }>();
+const proxy = new Hono<{ Bindings: Env; Variables: Variables }>();
 
 interface ProxyRequestBody {
   url: string;
@@ -138,7 +138,7 @@ proxy.post("/proxy/ai", async (c) => {
   }
 
   // Try BYOK key first, fall back to platform key
-  const userId = c.get("userId" as never) as string | undefined;
+  const userId = c.get("userId") as string | undefined;
   let apiKey: string | null = null;
   let usingByok = false;
 

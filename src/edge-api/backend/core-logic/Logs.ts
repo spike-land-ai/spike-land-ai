@@ -49,20 +49,3 @@ export class KVLogger {
     }
   }
 }
-
-// // Example usage
-// async function exampleUsage() {
-//   const logger = new KVLogger('myapp');
-
-//   // Logging examples
-//   await logger.log('Application started', 'info');
-//   await logger.log('Warning: Low memory', 'warn');
-//   await logger.log('Error: Database connection failed', 'error');
-
-//   // Retrieving logs for a specific date
-//   const today = new Date().toISOString().split('T')[0];
-//   const logs = await logger.getLogs(today);
-//   console.warn('Today\'s logs:', logs);
-// }
-
-// exampleUsage();

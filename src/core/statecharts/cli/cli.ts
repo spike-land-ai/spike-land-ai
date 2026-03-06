@@ -16,7 +16,7 @@ const rl = createInterface({
   terminal: false,
 });
 
-console.error("State Machine MCP-like CLI started. Send JSON commands.");
+process.stderr.write("State Machine MCP-like CLI started. Send JSON commands.\n");
 
 rl.on("line", (line) => {
   try {

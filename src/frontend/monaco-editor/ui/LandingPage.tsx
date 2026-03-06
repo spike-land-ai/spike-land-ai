@@ -7,7 +7,7 @@ import { McpShowcaseSection } from "../animation-ui/McpShowcaseSection";
 import { PersonalizedWelcome } from "./@/components/landing/PersonalizedWelcome";
 import { ThreePillarsSection } from "../animation-ui/ThreePillarsSection";
 import { ScrollToTopButton } from "./@/components/ui/scroll-to-top";
-import { fallbackShowcaseApps } from "../core-logic/@/components/landing/gallery-fallback-data";
+import { fallbackShowcaseApps } from "../core-logic/components/landing/gallery-fallback-data";
 
 export default function Home() {
   const [showcaseApps] = useState(fallbackShowcaseApps);

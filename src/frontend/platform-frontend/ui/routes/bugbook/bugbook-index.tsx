@@ -28,7 +28,7 @@ function BugCard({ bug }: { bug: Bug }) {
     <Link
       to="/bugbook/$bugId"
       params={{ bugId: bug.id }}
-      className="group block rounded-xl border border-border bg-card p-5 shadow-sm transition hover:shadow-md hover:bg-muted/50"
+      className="group block rounded-2xl border border-border bg-card dark:glass-card p-5 shadow-sm transition hover:shadow-md hover:bg-muted/50"
     >
       <div className="flex items-start justify-between gap-2">
         <h3 className="font-semibold leading-tight text-foreground group-hover:text-primary">{bug.title}</h3>
@@ -148,7 +148,7 @@ export function BugbookIndexPage() {
       )}
 
       {isError && (
-        <div className="rounded-xl border border-destructive/30 bg-destructive/10 p-6 text-center text-destructive">
+        <div className="rounded-2xl border border-destructive/30 bg-destructive/10 p-6 text-center text-destructive">
           Failed to load bugs. Try refreshing.
         </div>
       )}

@@ -18,11 +18,7 @@ export function registerBuildTools(server: McpServer): void {
     description:
       "Run esbuild bundling for a package. Reads packages.yaml to determine build profile.",
     schema: BuildSchema.shape,
-    handler: async (args) => {
-      const { packageName, kind: kindOverride } = args as {
-        packageName: string;
-        kind?: string;
-      };
+    handler: async ({ packageName, kind: kindOverride }) => {
 
       const repoRoot = process.cwd();
       const pkgDir = `${repoRoot}/src/${packageName}`;
@@ -73,8 +69,7 @@ export function registerBuildTools(server: McpServer): void {
     description:
       "Run tsc --noEmit with per-package filtering. Omit packageName to typecheck all packages.",
     schema: TypecheckSchema.shape,
-    handler: async (args) => {
-      const { packageName } = args as { packageName?: string };
+    handler: async ({ packageName }) => {
       const repoRoot = process.cwd();
 
       if (!packageName) {

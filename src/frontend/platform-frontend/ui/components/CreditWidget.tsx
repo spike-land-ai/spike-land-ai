@@ -11,15 +11,15 @@ interface CreditBalance {
 }
 
 function getBarColor(pct: number): string {
-  if (pct > 50) return "bg-green-500";
-  if (pct > 20) return "bg-yellow-500";
-  return "bg-red-500";
+  if (pct > 50) return "bg-success";
+  if (pct > 20) return "bg-warning";
+  return "bg-destructive";
 }
 
 function getTextColor(pct: number): string {
-  if (pct > 50) return "text-green-600 dark:text-green-400";
-  if (pct > 20) return "text-yellow-600 dark:text-yellow-400";
-  return "text-red-600 dark:text-red-400";
+  if (pct > 50) return "text-success-foreground dark:text-success";
+  if (pct > 20) return "text-warning-foreground dark:text-warning";
+  return "text-destructive-foreground dark:text-destructive";
 }
 
 function getResetHours(): number {
@@ -47,7 +47,7 @@ export function CreditWidget() {
 
   if (loading) {
     return (
-      <div className="rounded-xl border border-border bg-card p-6 shadow-sm animate-pulse">
+      <div className="rounded-2xl border border-border bg-card p-6 shadow-sm animate-pulse">
         <div className="mb-4 flex items-center justify-between">
           <div className="h-4 w-24 rounded bg-muted" />
           <div className="h-5 w-12 rounded-full bg-muted" />
@@ -65,7 +65,7 @@ export function CreditWidget() {
 
   if (error || !data) {
     return (
-      <div className="rounded-xl border border-destructive/20 bg-destructive/5 p-6 shadow-sm">
+      <div className="rounded-2xl border border-destructive/20 bg-destructive/5 p-6 shadow-sm">
         <div className="flex items-center gap-2 text-destructive mb-2">
           <AlertTriangle className="size-4" />
           <h3 className="text-sm font-semibold uppercase tracking-wide">
@@ -83,18 +83,18 @@ export function CreditWidget() {
   const isUnlimited = data.dailyLimit === 0;
   const usedPct = isUnlimited ? 0 : Math.min(100, (data.usedToday / data.dailyLimit) * 100);
   const remainingPct = 100 - usedPct;
-  const barColor = isUnlimited ? "bg-green-500" : getBarColor(remainingPct);
-  const textColor = isUnlimited ? "text-green-600 dark:text-green-400" : getTextColor(remainingPct);
+  const barColor = isUnlimited ? "bg-success" : getBarColor(remainingPct);
+  const textColor = isUnlimited ? "text-success-foreground dark:text-success" : getTextColor(remainingPct);
   const resetHours = getResetHours();
 
   return (
-    <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
+    <div className="rounded-2xl border border-border bg-card dark:glass-card p-6 shadow-sm">
       <div className="mb-4 flex items-center justify-between">
         <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground flex items-center gap-2">
           <Zap className="size-3.5 fill-current" />
           Credit Balance
         </h3>
-        <span className="rounded-full bg-muted px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-muted-foreground border border-border/50">
+        <span className="rounded-full bg-muted dark:bg-white/5 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-muted-foreground border border-border/50">
           {data.tier}
         </span>
       </div>

@@ -296,7 +296,7 @@ export const open = async (
   _mode?: Mode,
 ): Promise<FileHandle> => {
   const doOpen = async () => {
-    const { getDirectoryHandleAndFileName } = await import("../core-logic/@/lib/memfs/utils"); // Keep import inside if it's only used here
+    const { getDirectoryHandleAndFileName } = await import("../core-logic/lib/memfs/utils"); // Keep import inside if it's only used here
     const { dirHandle, fileName } = await getDirectoryHandleAndFileName(path);
     if (!fileName) throw new Error("Invalid file path for open");
 

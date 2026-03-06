@@ -1,9 +1,16 @@
 export interface GatewayTransport {
-  request<T = Record<string, unknown>>(
+  request<T = unknown>(
     method: string,
     params?: unknown,
     opts?: { expectFinal?: boolean },
   ): Promise<T>;
+}
+
+/** JSON Schema shape used as MCP input schemas */
+export interface JsonSchemaObject {
+  type: "object";
+  properties: Record<string, Record<string, unknown>>;
+  required?: string[];
 }
 
 export interface ToolLike {
@@ -23,7 +30,7 @@ export interface ToolLike {
 export type McpToolDef = {
   name: string;
   description: string;
-  inputSchema: Record<string, unknown>;
+  inputSchema: JsonSchemaObject;
 };
 
 export type McpContentItem =

@@ -65,8 +65,8 @@ export function parseInputFromUrl(urlString: string): InputDefaults {
     });
 
     return { ...INPUT_DEFAULTS, ...params };
-  } catch (e) {
-    console.error("Error parsing URL params:", e);
+  } catch (error) {
+    console.error("Error parsing URL params:", error);
     return INPUT_DEFAULTS;
   }
 

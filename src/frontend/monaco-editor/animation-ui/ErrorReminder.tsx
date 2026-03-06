@@ -4,7 +4,7 @@ import { Button } from "../lazy-imports/button";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/@/components/ui/card";
 import { ScrollArea } from "../ui/@/components/ui/scroll-area";
 import { AlertCircle, X } from "../ui/@/external/lucide-react";
-import { ContextManager } from "../core-logic/@/lib/context-manager";
+import { ContextManager } from "../core-logic/lib/context-manager";
 import { cn } from "../lazy-imports/utils";
 import { AnimatePresence, motion } from "framer-motion";
 import React, { useState } from "react";

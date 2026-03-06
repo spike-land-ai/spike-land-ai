@@ -1,5 +1,5 @@
 import type Env from "../env";
-import type { PostRequestBody } from "../../lazy-imports/aiRoutes";
+import type { PostRequestBody } from "../../lazy-imports/types";
 
 export class StorageService {
   constructor(private env: Env) {}
@@ -12,8 +12,8 @@ export class StorageService {
         const body = JSON.parse(await bodyObject.text()) as PostRequestBody;
         return body;
       }
-    } catch (e) {
-      console.error(`Failed to load request body from R2 (${bodyKey}):`, e);
+    } catch (error) {
+      console.error(`Failed to load request body from R2 (${bodyKey}):`, error);
     }
     return null;
   }
@@ -22,9 +22,9 @@ export class StorageService {
     const bodyKey = `request_body_${codeSpace}`;
     try {
       await this.env.R2.put(bodyKey, JSON.stringify(body));
-    } catch (e) {
-      console.error(`Failed to save request body to R2 (${bodyKey}):`, e);
-      throw e;
+    } catch (error) {
+      console.error(`Failed to save request body to R2 (${bodyKey}):`, error);
+      throw error;
     }
   }
 }

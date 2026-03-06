@@ -2,6 +2,7 @@ import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { CallToolRequestSchema, ListToolsRequestSchema } from "@modelcontextprotocol/sdk/types.js";
 import type {
+  JsonSchemaObject,
   McpBridge,
   McpBridgeOptions,
   McpCallResult,
@@ -56,7 +57,7 @@ export function createMcpBridge(opts: McpBridgeOptions): McpBridge {
         },
       },
       required: ["message"],
-    },
+    } satisfies JsonSchemaObject,
     sessionKey: defaultSessionKey,
   });
 
@@ -71,7 +72,7 @@ export function createMcpBridge(opts: McpBridgeOptions): McpBridge {
         severity: { type: "string", enum: ["low", "medium", "high", "critical"] },
       },
       required: ["title", "description"],
-    },
+    } satisfies JsonSchemaObject,
     sessionKey: defaultSessionKey,
   });
 
@@ -103,7 +104,7 @@ export function createMcpBridge(opts: McpBridgeOptions): McpBridge {
         toolRegistry.set(tool.name, {
           name: tool.name,
           description: tool.description ?? "",
-          inputSchema: tool.parameters ?? { type: "object", properties: {} },
+          inputSchema: (tool.parameters as JsonSchemaObject | undefined) ?? { type: "object", properties: {} },
           sessionKey,
         });
       }

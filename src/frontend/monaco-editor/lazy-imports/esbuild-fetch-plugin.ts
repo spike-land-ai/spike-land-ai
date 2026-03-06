@@ -1,5 +1,5 @@
 import type { Loader, Plugin } from "@spike-land-ai/esbuild-wasm"; // Imported Loader
-import { DEPS_PARAM, EXTERNAL_DEPENDENCIES, importMap } from "../core-logic/@/lib/importmap-utils.ts";
+import { DEPS_PARAM, EXTERNAL_DEPENDENCIES, importMap } from "../core-logic/lib/importmap-utils.ts";
 import { tryCatch } from "./try-catch.ts";
 
 const urlCache = new Map<string, string>();

@@ -1,6 +1,6 @@
-import { swVersion } from "../core-logic/@/lib/sw-version";
+import { swVersion } from "../core-logic/lib/sw-version";
 import { tryCatch } from "../lazy-imports/try-catch";
-import type { IServiceWorkerManager } from "../core-logic/@/services/types";
+import type { IServiceWorkerManager } from "../core-logic/services/types";
 import type { Workbox } from "workbox-window";
 
 /**
@@ -13,19 +13,13 @@ declare global {
 }
 
 export const setupServiceWorker = async (): Promise<ServiceWorkerRegistration | null> => {
-  console.warn("Setting up service worker...");
-
   // Skip if service workers aren't supported
   if (!("serviceWorker" in navigator)) {
-    console.warn("Service worker not supported in this browser");
     return null;
   }
 
   // Skip on localhost for development unless explicitly enabled
   if (location.hostname === "localhost" && !localStorage.getItem("enable_sw_dev")) {
-    console.warn(
-      "Service worker disabled on localhost (enable with localStorage.enable_sw_dev = true)",
-    );
     return null;
   }
 
@@ -40,13 +34,7 @@ export const setupServiceWorker = async (): Promise<ServiceWorkerRegistration | 
         ),
       );
 
-      if (serverVersionResult.error) {
-        console.warn(
-          "Failed to fetch server SW version, proceeding with registration:",
-          serverVersionResult.error,
-        );
-      } else if (oldSwVersion === swVersion && serverVersionResult.data === swVersion) {
-        console.warn("Service worker is already registered and up-to-date");
+      if (!serverVersionResult.error && oldSwVersion === swVersion && serverVersionResult.data === swVersion) {
         return oldRegistration;
       }
       await oldRegistration.unregister();
@@ -58,13 +46,11 @@ export const setupServiceWorker = async (): Promise<ServiceWorkerRegistration | 
 
     const registrationResult = await tryCatch(wb.register());
     if (registrationResult.error) {
-      console.error("Service worker registration failed:", registrationResult.error);
       return null;
     }
     localStorage.setItem("swVersion", swVersion);
 
     if (registrationResult.data) {
-      console.warn("Service worker registered successfully");
       window.__WB_INSTANCE = wb;
       return registrationResult.data;
     }
@@ -74,7 +60,6 @@ export const setupServiceWorker = async (): Promise<ServiceWorkerRegistration | 
   const { data: registration, error } = await tryCatch(setupPromise());
 
   if (error) {
-    console.error("Error setting up service worker:", error);
     return null;
   }
   return registration;
@@ -87,30 +72,14 @@ function configureServiceWorkerEvents(wb: Workbox): void {
   // Handle installation events
   wb.addEventListener("installed", (event) => {
     if (event.isUpdate) {
-      console.warn("Service worker has been updated");
-
-      // Prompt user to update
       if (confirm("New version available! Reload to update?")) {
         window.location.reload();
       }
-    } else {
-      console.warn("Service worker installed for the first time");
     }
-  });
-
-  // Handle controlling events
-  wb.addEventListener("controlling", () => {
-    console.warn("Service worker is now controlling the page");
   });
 
   // Handle messages from service worker
   wb.addEventListener("message", (event) => {
-    console.warn("Message from service worker:", event.data);
-
-    if (event.data?.type === "CACHE_UPDATED") {
-      console.warn("Cache has been updated:", event.data.message);
-    }
-
     if (event.data === "reload") {
       window.location.reload();
     }
@@ -120,31 +89,12 @@ function configureServiceWorkerEvents(wb: Workbox): void {
 // Setup global service worker message listeners
 if (navigator.serviceWorker) {
   navigator.serviceWorker.addEventListener("message", (event) => {
-    console.warn("Service worker message received:", event.data);
-
     if (event.data === "reload") {
       window.location.reload();
     }
 
-    // Process structured messages
-    if (event.data?.type) {
-      switch (event.data.type) {
-        case "CACHE_UPDATED":
-          console.warn("Cache has been updated:", event.data.message);
-          break;
-
-        case "OFFLINE_MODE":
-          console.warn("App is in offline mode");
-          window.dispatchEvent(new CustomEvent("sw-offline-mode"));
-          break;
-
-        case "ERROR":
-          console.error("Service worker error:", event.data.message);
-          break;
-
-        default:
-          console.warn("Unknown message type from service worker:", event.data);
-      }
+    if (event.data?.type === "OFFLINE_MODE") {
+      window.dispatchEvent(new CustomEvent("sw-offline-mode"));
     }
   });
 }
@@ -165,7 +115,6 @@ export class ServiceWorkerManager implements IServiceWorkerManager {
     }
     const { error } = await tryCatch(setupServiceWorker());
     if (error) {
-      console.error("Error setting up service worker:", { error });
       throw error;
     }
     return undefined;

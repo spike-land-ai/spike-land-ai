@@ -52,4 +52,4 @@ registerFeedbackTool(server, { serviceName: "hackernews-mcp", toolName: "hackern
 const transport = new StdioServerTransport();
 await server.connect(transport);
 
-console.error("HackerNews MCP Server running on stdio.");
+process.stderr.write("HackerNews MCP Server running on stdio.\n");

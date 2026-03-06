@@ -9,7 +9,7 @@
 import { z } from "zod";
 import type { ToolRegistry } from "../../lazy-imports/registry";
 import { freeTool, textResult } from "../../lazy-imports/procedures-index.ts";
-import { safeToolCall } from "../../db-mcp/tool-helpers";
+import { safeToolCall } from "../lib/tool-helpers";
 import type { DrizzleDB } from "../../db/db/db-index.ts";
 
 // ─── Constants ──────────────────────────────────────────────────────────────

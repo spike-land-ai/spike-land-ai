@@ -594,16 +594,16 @@ interface EloEvent {
   createdAt: string;
 }
 
+function getTier(score: number): { label: string; color: string } {
+  if (score >= 1500) return { label: "Elite", color: "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400" };
+  if (score >= 1000) return { label: "Pro", color: "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400" };
+  return { label: "Free", color: "bg-muted text-muted-foreground" };
+}
+
 function AccessTab() {
   const eloScore = 850;
   const eloHistory: EloEvent[] = [];
   const bugBountyEligible = eloScore >= 1000;
-
-  function getTier(score: number): { label: string; color: string } {
-    if (score >= 1500) return { label: "Elite", color: "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400" };
-    if (score >= 1000) return { label: "Pro", color: "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400" };
-    return { label: "Free", color: "bg-muted text-muted-foreground" };
-  }
 
   const tier = getTier(eloScore);
 
@@ -725,7 +725,7 @@ export function SettingsPage() {
       </div>
 
       {/* Tab content */}
-      <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
+      <div className="rounded-2xl border border-border bg-card dark:glass-card p-6 shadow-sm">
         {activeTab === "profile" && <ProfileTab />}
         {activeTab === "whatsapp" && <WhatsAppTab />}
         {activeTab === "keys" && <ApiKeysTab />}

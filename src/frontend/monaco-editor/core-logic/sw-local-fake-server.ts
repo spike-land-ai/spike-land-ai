@@ -1,7 +1,7 @@
-import { getCodeSpace } from "./@/hooks/use-code-space.ts";
-import { importMap, importMapReplace } from "./@/lib/importmap-utils";
-import { routes } from "./@/lib/routes";
-import { SessionSynchronizer } from "./@/services/SessionSynchronizer";
+import { getCodeSpace } from "./hooks/use-code-space.ts";
+import { importMap, importMapReplace } from "./lib/importmap-utils";
+import { routes } from "./lib/routes";
+import { SessionSynchronizer } from "./services/SessionSynchronizer";
 import type {} from "./def";
 import { tryCatch } from "../lazy-imports/try-catch";
 import HTML from "./index.html";
@@ -9,7 +9,7 @@ import HTML from "./index.html";
 // Removed invalid HTML import: import HTML from "./index.html";
 
 import type { ICodeSession } from "../ui/@/lib/interfaces";
-import { sanitizeSession, sessionToJSON } from "./@/lib/make-sess";
+import { sanitizeSession, sessionToJSON } from "./lib/make-sess";
 
 const cSessions: Record<string, SessionSynchronizer> = {};
 

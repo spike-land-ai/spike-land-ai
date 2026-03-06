@@ -7,8 +7,8 @@ import { type MotionValue, useScroll } from "framer-motion";
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { type Material, MeshStandardMaterial, SphereGeometry, Vector3 } from "three";
 import { ErrorBoundary } from "../ui/@/components/errors/error-boundary";
-import { hasWebGLSupport } from "../core-logic/@/lib/webgl-support";
-import { detectSlowDevice } from "../core-logic/@/lib/device";
+import { hasWebGLSupport } from "../core-logic/lib/webgl-support";
+import { detectSlowDevice } from "../core-logic/lib/device";
 
 const COLORS = [
   "#FF0000", // Bright Red

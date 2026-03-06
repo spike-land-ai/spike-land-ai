@@ -7,15 +7,15 @@
  */
 
 import type { MiddlewareHandler } from "hono";
-import type { Env } from "../../core-logic/env.js";
+import type { Env, Variables } from "../../core-logic/env.js";
 import { getBalance, deductCredit } from "../../core-logic/credit-service.js";
 import { resolveEffectiveTier } from "../../core-logic/tier-service.js";
 import { createLogger } from "@spike-land-ai/shared";
 
 const log = createLogger("spike-edge");
 
-export const creditMeterMiddleware: MiddlewareHandler<{ Bindings: Env }> = async (c, next) => {
-  const userId = c.get("userId" as never) as string | undefined;
+export const creditMeterMiddleware: MiddlewareHandler<{ Bindings: Env; Variables: Variables }> = async (c, next) => {
+  const userId = c.get("userId") as string | undefined;
 
   // No userId — auth middleware should have already rejected, but be defensive
   if (!userId) {
@@ -48,7 +48,7 @@ export const creditMeterMiddleware: MiddlewareHandler<{ Bindings: Env }> = async
 
   // Deduct only on success (2xx)
   if (c.res.status >= 200 && c.res.status < 300) {
-    const requestId = (c.get("requestId" as never) as string | undefined) ?? crypto.randomUUID();
+    const requestId = (c.get("requestId") as string | undefined) ?? crypto.randomUUID();
     try {
       await deductCredit(c.env.DB, userId, required, "AI proxy call", requestId);
     } catch {

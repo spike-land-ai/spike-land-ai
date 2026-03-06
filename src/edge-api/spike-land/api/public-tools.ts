@@ -6,7 +6,7 @@
  */
 import { Hono } from "hono";
 import type { Env } from "../core-logic/env";
-import type { AuthVariables } from "../db-api/middleware";
+import type { AuthVariables } from "./middleware";
 import { ToolRegistry } from "../lazy-imports/registry";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { registerAllTools } from "../core-logic/mcp/manifest";

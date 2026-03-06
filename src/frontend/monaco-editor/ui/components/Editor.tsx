@@ -1,8 +1,8 @@
 import type { ICode, ICodeSession } from "../@/lib/interfaces";
 import { md5 } from "../../crypto-data-structures/md5";
 import { tryCatch } from "../../lazy-imports/try-catch";
-import { wait } from "../../core-logic/@/lib/wait";
-import { initializeMonaco } from "../../core-logic/@/services/editorUtils";
+import { wait } from "../../core-logic/lib/wait";
+import { initializeMonaco } from "../../core-logic/services/editorUtils";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useEditorState } from "../hooks/use-editor-state";
 import { useErrorHandling } from "../hooks/useErrorHandling";

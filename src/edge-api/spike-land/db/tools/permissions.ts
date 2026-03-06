@@ -11,7 +11,7 @@ import { z } from "zod";
 import { and, eq } from "drizzle-orm";
 import type { ToolRegistry } from "../../lazy-imports/registry";
 import { workspaceTool } from "../../lazy-imports/procedures-index.ts";
-import { textResult } from "../../db-mcp/tool-helpers";
+import { textResult } from "../../core-logic/lib/tool-helpers";
 import type { DrizzleDB } from "../db/db-index.ts";
 import { claudeCodeAgents, permissionRequests } from "../db/schema";
 

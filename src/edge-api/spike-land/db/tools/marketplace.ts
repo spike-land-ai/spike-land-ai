@@ -10,7 +10,7 @@ import { z } from "zod";
 import { and, desc, eq, sql, sum } from "drizzle-orm";
 import type { ToolRegistryAdapter } from "../../lazy-imports/types";
 import { freeTool } from "../../lazy-imports/procedures-index.ts";
-import { textResult } from "../../db-mcp/tool-helpers";
+import { textResult } from "../../core-logic/lib/tool-helpers";
 import type { DrizzleDB } from "../db/db-index.ts";
 import { registeredTools, toolPurchases, users } from "../db/schema";
 

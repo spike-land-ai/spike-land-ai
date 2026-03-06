@@ -3,7 +3,7 @@ import { useDarkMode } from "../ui/@/hooks/use-dark-mode";
 import { useDictation } from "../ui/@/hooks/use-dictation";
 import type { ImageData } from "../ui/@/lib/interfaces";
 import { md5 } from "../crypto-data-structures/md5";
-import { processImage } from "../core-logic/@/lib/process-image";
+import { processImage } from "../core-logic/lib/process-image";
 import { AnimatePresence, motion } from "framer-motion";
 import { CircleMinus } from "lucide-react";
 import React, { useEffect, useRef, useState } from "react";

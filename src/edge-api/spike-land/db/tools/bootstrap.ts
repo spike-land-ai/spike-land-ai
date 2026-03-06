@@ -13,7 +13,7 @@ import { z } from "zod";
 import { and, eq, sql } from "drizzle-orm";
 import type { ToolRegistryAdapter } from "../../lazy-imports/types";
 import { freeTool } from "../../lazy-imports/procedures-index.ts";
-import { apiRequest, SPIKE_LAND_BASE_URL, textResult } from "../../db-mcp/tool-helpers";
+import { apiRequest, SPIKE_LAND_BASE_URL, textResult } from "../../core-logic/lib/tool-helpers";
 import type { DrizzleDB } from "../db/db-index.ts";
 import { registeredTools, vaultSecrets, workspaceMembers, workspaces } from "../db/schema";
 

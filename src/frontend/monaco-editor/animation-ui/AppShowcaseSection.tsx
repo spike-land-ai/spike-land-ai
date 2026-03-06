@@ -4,7 +4,7 @@ import { AppCard } from "../ui/@/components/create/app-card";
 import { Button } from "../lazy-imports/button";
 import { Link } from "../lazy-imports/link";
 import { Marquee } from "../ui/@/components/ui/marquee";
-import type { ShowcaseApp } from "../core-logic/@/lib/landing/showcase-feed";
+import type { ShowcaseApp } from "../core-logic/lib/landing/showcase-feed";
 import { ArrowRight, Blocks } from "lucide-react";
 import { motion } from "framer-motion";
 

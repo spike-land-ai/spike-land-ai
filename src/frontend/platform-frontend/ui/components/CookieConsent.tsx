@@ -30,7 +30,7 @@ export function CookieConsent() {
       role="region"
       aria-label="Cookie consent"
     >
-      <div className="bg-card dark:bg-white/5 border border-border dark:border-white/10 shadow-lg dark:shadow-[0_-8px_30px_rgb(0,0,0,0.4)] dark:backdrop-blur-[16px] rounded-2xl dark:rounded-[24px] p-5 md:p-6 max-w-4xl mx-auto flex flex-col md:flex-row items-start md:items-center gap-6">
+      <div className="bg-card dark:glass-card border border-border shadow-lg rounded-2xl p-5 md:p-6 max-w-4xl mx-auto flex flex-col md:flex-row items-start md:items-center gap-6">
         <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-primary/10 text-primary">
           <Cookie className="h-6 w-6" />
         </div>

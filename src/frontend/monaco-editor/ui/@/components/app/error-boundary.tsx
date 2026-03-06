@@ -1,4 +1,4 @@
-import { ContextManager } from "../../../../core-logic/@/lib/context-manager";
+import { ContextManager } from "../../../../core-logic/lib/context-manager";
 import React from "react";
 
 interface ErrorBoundaryState {

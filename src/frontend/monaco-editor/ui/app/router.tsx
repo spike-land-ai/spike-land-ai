@@ -1,7 +1,7 @@
 import { Wrapper } from "../@/components/app/wrapper";
-import { getCodeSpace } from "../../core-logic/@/hooks/use-code-space";
+import { getCodeSpace } from "../../core-logic/hooks/use-code-space";
 import type { ICode } from "../@/lib/interfaces";
-import { routes } from "../../core-logic/@/lib/routes";
+import { routes } from "../../core-logic/lib/routes";
 import {
   createRootRoute,
   createRoute,

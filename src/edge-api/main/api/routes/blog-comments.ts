@@ -1,9 +1,9 @@
 import { Hono } from "hono";
-import type { Env } from "../../core-logic/env.js";
+import type { Env, Variables } from "../../core-logic/env.js";
 import { authMiddleware } from "../middleware/auth.js";
 import { recordEloEvent } from "../../core-logic/elo-service.js";
 
-const blogComments = new Hono<{ Bindings: Env }>();
+const blogComments = new Hono<{ Bindings: Env; Variables: Variables }>();
 
 const DOWNVOTE_THRESHOLD = -10; // Net score threshold for ELO penalty
 
@@ -23,7 +23,7 @@ blogComments.get("/blog/:slug/comments", async (c) => {
 /** POST /blog/:slug/comments — add a comment to an article. */
 blogComments.post("/blog/:slug/comments", authMiddleware, async (c) => {
   const slug = c.req.param("slug");
-  const userId = c.get("userId" as never) as string;
+  const userId = c.get("userId");
 
   const body = await c.req.json<{
     content: string;
@@ -70,7 +70,7 @@ blogComments.post("/blog/:slug/comments", authMiddleware, async (c) => {
 /** POST /blog/comments/:commentId/vote — upvote or downvote a comment. */
 blogComments.post("/blog/comments/:commentId/vote", authMiddleware, async (c) => {
   const commentId = c.req.param("commentId");
-  const userId = c.get("userId" as never) as string;
+  const userId = c.get("userId");
 
   const body = await c.req.json<{ vote: number }>();
   if (body.vote !== 1 && body.vote !== -1) {
@@ -166,7 +166,7 @@ blogComments.post("/blog/comments/:commentId/vote", authMiddleware, async (c) =>
 /** DELETE /blog/comments/:commentId — delete own comment. */
 blogComments.delete("/blog/comments/:commentId", authMiddleware, async (c) => {
   const commentId = c.req.param("commentId");
-  const userId = c.get("userId" as never) as string;
+  const userId = c.get("userId");
 
   const comment = await c.env.DB.prepare(
     "SELECT user_id FROM blog_comments WHERE id = ?",

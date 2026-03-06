@@ -64,11 +64,8 @@ export function registerKeywordTools(server: McpServer, client: GoogleAdsClient)
       date_range: DATE_RANGE,
       limit: z.number().int().min(1).max(500).default(50).describe("Max results to return"),
     },
-    async handler(args) {
-      const campaignId = args.campaign_id as string | undefined;
-      const adGroupId = args.ad_group_id as string | undefined;
-      const dateRange = String(args.date_range);
-      const limit = (args.limit as number | undefined) ?? 50;
+    async handler({ campaign_id: campaignId, ad_group_id: adGroupId, date_range, limit = 50 }) {
+      const dateRange = String(date_range);
 
       const conditions = [`segments.date DURING ${dateRange}`];
       if (campaignId) conditions.push(`campaign.id = ${campaignId}`);
@@ -104,9 +101,8 @@ export function registerKeywordTools(server: McpServer, client: GoogleAdsClient)
       campaign_id: z.string().optional().describe("Filter by campaign ID"),
       date_range: DATE_RANGE,
     },
-    async handler(args) {
-      const campaignId = args.campaign_id as string | undefined;
-      const dateRange = String(args.date_range);
+    async handler({ campaign_id: campaignId, date_range }) {
+      const dateRange = String(date_range);
 
       const campaignFilter = campaignId ? ` AND campaign.id = ${campaignId}` : "";
 

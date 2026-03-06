@@ -3,15 +3,15 @@ import { CacheProvider } from "@emotion/react";
 
 import { createRoot, type Root } from "react-dom/client";
 
-import { AIBuildingOverlay } from "../../../core-logic/@/components/app/ai-building-overlay";
+import { AIBuildingOverlay } from "../../../core-logic/components/app/ai-building-overlay";
 import ErrorBoundary from "../components/app/error-boundary";
 
-import { getCodeSpace } from "../../../core-logic/@/hooks/use-code-space";
+import { getCodeSpace } from "../../../core-logic/hooks/use-code-space";
 import useWindowSize from "../hooks/use-window-size";
-import { importMapReplace } from "../../../core-logic/@/lib/importmap-utils";
+import { importMapReplace } from "../../../core-logic/lib/importmap-utils";
 import type { FlexibleComponentType, IRenderApp, RenderedApp } from "./interfaces";
 import { md5 } from "../../../crypto-data-structures/md5";
-import { transpile } from "../../../concurrency-messaging/shared";
+import { transpile } from "../../../concurrency/shared";
 import { tryCatch } from "../../../lazy-imports/try-catch";
 
 import React from "react";

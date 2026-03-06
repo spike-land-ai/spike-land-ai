@@ -1,6 +1,6 @@
 import { createGoogleGenerativeAI } from "@ai-sdk/google";
 import { jsonSchema as aiJsonSchema, streamText, tool } from "ai";
-import type { ModelMessage, Tool } from "ai";
+import type { ModelMessage, StepResult, Tool, ToolSet } from "ai";
 import type { Code } from "../lazy-imports/chatRoom";
 import type Env from "../core-logic/env";
 import { hashClientId, sendGA4Events } from "../core-logic/lib/ga4";
@@ -11,7 +11,7 @@ import { createSystemPrompt } from "../core-logic/lib/prompts";
 import { validateToolsArray } from "../core-logic/lib/tool-adapter";
 import type { McpTool } from "../core-logic/mcp/mcp-index.ts";
 import { StorageService } from "../core-logic/services/storageService";
-import type { ErrorResponse, PostRequestBody } from "../lazy-imports/aiRoutes";
+import type { ErrorResponse, PostRequestBody } from "../lazy-imports/types";
 import { DEFAULT_CORS_HEADERS } from "../core-logic/utils";
 
 /**
@@ -151,10 +151,10 @@ export class PostHandler {
           : {
               tools: processedTools,
               toolChoice: "auto" as const,
-              onStepFinish: async (stepResult: { toolResults?: unknown[] }) => {
+              onStepFinish: async (stepResult: StepResult<ToolSet>) => {
                 if (stepResult.toolResults && stepResult.toolResults.length > 0) {
                   try {
-                    const toolMessages = stepResult.toolResults.map((result: unknown) => ({
+                    const toolMessages = stepResult.toolResults.map((result) => ({
                       ["role"]: "assistant" as const,
                       ["content"]: JSON.stringify(result),
                     }));

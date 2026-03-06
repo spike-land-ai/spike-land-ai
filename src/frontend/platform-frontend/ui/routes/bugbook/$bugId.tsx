@@ -51,7 +51,7 @@ export function BugbookDetailPage() {
       </div>
 
       {/* Header */}
-      <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
+      <div className="rounded-2xl border border-border bg-card dark:glass-card p-6 shadow-sm">
         <div className="flex items-start justify-between gap-4">
           <div>
             <h1 className="text-xl font-bold text-foreground">{bug.title}</h1>
@@ -103,7 +103,7 @@ export function BugbookDetailPage() {
 
       {/* ELO History */}
       {eloHistory.length > 0 && (
-        <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
+        <div className="rounded-2xl border border-border bg-card dark:glass-card p-6 shadow-sm">
           <h2 className="mb-4 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
             ELO History
           </h2>
@@ -127,7 +127,7 @@ export function BugbookDetailPage() {
       )}
 
       {/* Reports */}
-      <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
+      <div className="rounded-2xl border border-border bg-card dark:glass-card p-6 shadow-sm">
         <h2 className="mb-4 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
           Reports ({reports.length})
         </h2>

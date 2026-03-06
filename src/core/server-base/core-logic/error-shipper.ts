@@ -47,8 +47,8 @@ export function createErrorShipper(options: ErrorShipperOptions = {}): ErrorShip
         },
         body: JSON.stringify({ errors: entries }),
       });
-    } catch (err) {
-      console.error("[mcp-server-base] Failed to ship errors:", err);
+    } catch {
+      // Silently discard: error shipping is best-effort and must not throw
     }
   };
 

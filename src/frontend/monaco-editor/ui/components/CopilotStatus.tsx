@@ -1,5 +1,5 @@
-import { copilotService } from "../../core-logic/@/services/CopilotService";
-import type { CopilotStatus as CopilotStatusType } from "../../core-logic/@/services/types";
+import { copilotService } from "../../core-logic/services/CopilotService";
+import type { CopilotStatus as CopilotStatusType } from "../../core-logic/services/types";
 import React, { useEffect, useState } from "react";
 
 export const CopilotStatus: React.FC = () => {

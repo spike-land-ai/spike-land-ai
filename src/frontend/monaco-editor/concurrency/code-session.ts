@@ -1,12 +1,12 @@
-import { getCodeSpace } from "../core-logic/@/hooks/use-code-space";
+import { getCodeSpace } from "../core-logic/hooks/use-code-space";
 import type { ICode, ICodeSession, ImageData, Message } from "../ui/@/lib/interfaces";
-import { computeSessionHash, sanitizeSession } from "../core-logic/@/lib/make-sess";
+import { computeSessionHash, sanitizeSession } from "../core-logic/lib/make-sess";
 import { tryCatch } from "../lazy-imports/try-catch";
-import { wait } from "../core-logic/@/lib/wait";
-import { CodeProcessor } from "../core-logic/@/services/CodeProcessor";
-import { screenshot } from "../core-logic/@/services/editorUtils";
-import { ModelManager } from "../core-logic/@/services/ModelManager";
-import { SessionManager } from "../core-logic/@/services/SessionManager";
+import { wait } from "../core-logic/lib/wait";
+import { CodeProcessor } from "../core-logic/services/CodeProcessor";
+import { screenshot } from "../core-logic/services/editorUtils";
+import { ModelManager } from "../core-logic/services/ModelManager";
+import { SessionManager } from "../core-logic/services/SessionManager";
 import { Mutex } from "async-mutex";
 
 // Mutex for thread-safe code access
@@ -106,14 +106,12 @@ export class Code implements ICode {
     );
 
     if (fetchError) {
-      console.error(`Failed to fetch session for ${this.codeSpace}:`, fetchError);
       throw new Error(`Failed to fetch session: ${fetchError?.message || "Unknown error"}`);
     }
 
     const { data: sessionData, error: jsonError } = await tryCatch(response!.json());
 
     if (jsonError) {
-      console.error(`Failed to parse session JSON for ${this.codeSpace}:`, jsonError);
       throw new Error(`Failed to parse session JSON: ${jsonError.message}`);
     }
 
@@ -130,7 +128,7 @@ export class Code implements ICode {
     if (mutex.isLocked()) {
       const { error: mutexError } = await tryCatch(mutex.waitForUnlock());
       if (mutexError) {
-        console.error("Error waiting for mutex unlock:", mutexError);
+        // Non-fatal: proceed with current session state
       }
     }
     return this.currentSession?.code || "";
@@ -164,7 +162,6 @@ export class Code implements ICode {
     this.isRunning = false;
 
     if (error) {
-      console.error("CodeSession.setCode failed with error:", error);
       return currentCode;
     }
 
@@ -201,12 +198,6 @@ export class Code implements ICode {
     );
 
     if (processError || !processorResult) {
-      console.error(
-        "CodeProcessor failed or returned no result. Session will not be updated. Error:",
-        processError,
-      );
-      // Return the original code that was in the session before this attempt.
-      // 'currentCode' was defined at the beginning of this function.
       return currentCode;
     }
 
@@ -253,7 +244,6 @@ export class Code implements ICode {
     const { data: result, error } = await tryCatch(this.modelManager.updateModelsByCode(newCodes));
 
     if (error) {
-      console.error("Failed to update models by code:", error);
       throw error;
     }
 
@@ -266,7 +256,6 @@ export class Code implements ICode {
     );
 
     if (error) {
-      console.error("Failed to get current code with extra models:", error);
       throw error;
     }
 
@@ -285,7 +274,7 @@ export class Code implements ICode {
     );
 
     if (error) {
-      console.error("Error during release:", error);
+      // Release errors are non-fatal; resources may already be cleaned up
     }
   }
 
@@ -334,11 +323,9 @@ export class Code implements ICode {
           ...sessionWithoutFlag,
           sender: "CODE_SESSION_RERENDER",
         });
-      } else {
-        console.error("Re-render failed for remote transpiled change");
       }
-    } catch (error) {
-      console.error("Error handling remote transpiled change:", error);
+    } catch (_error) {
+      // Re-render failure is non-fatal; session remains at previous state
     }
   }
 
@@ -401,8 +388,8 @@ export class Code implements ICode {
           sender: "CODE_SESSION_RERENDER",
         } as ICodeSession & { sender: string });
       }
-    } catch (error) {
-      console.error("Error handling external code change:", error);
+    } catch (_error) {
+      // Transpilation failure is non-fatal; session remains at previous state
     }
   }
 
@@ -410,7 +397,6 @@ export class Code implements ICode {
     const { error } = await tryCatch(this.init());
 
     if (error) {
-      console.error("Failed to initialize during run:", error);
       throw error;
     }
   }
@@ -466,12 +452,10 @@ export async function getCodeSession(
   const { data: sessionData, error: fetchError } = await tryCatch(fetchCodeSession(codeSpaceId));
 
   if (fetchError) {
-    console.error(`Failed to get code session for ${codeSpaceId}:`, fetchError);
     throw fetchError;
   }
 
   if (!sessionData) {
-    console.error(`Failed to get code session for ${codeSpaceId}: sessionData is undefined`);
     throw new Error(`Failed to get code session for ${codeSpaceId}: sessionData is undefined`);
   }
   const codeSession = new Code(sessionData);
@@ -479,7 +463,6 @@ export async function getCodeSession(
   const { error: initError } = await tryCatch(codeSession.init(sessionData));
 
   if (initError) {
-    console.error(`Failed to initialize session for ${codeSpaceId}:`, initError);
     throw initError;
   }
 

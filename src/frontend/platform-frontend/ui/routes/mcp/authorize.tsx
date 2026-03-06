@@ -47,8 +47,8 @@ function AuthorizeForm() {
   if (status === "success") {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
-        <div className="w-full max-w-sm space-y-4 rounded-xl border border-border bg-card p-8 text-center shadow-sm">
-          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-green-100 text-3xl text-green-600">
+        <div className="w-full max-w-sm space-y-4 rounded-2xl border border-border bg-card dark:glass-card p-8 text-center shadow-sm">
+          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-success/10 text-3xl text-success">
             &#10003;
           </div>
           <h1 className="text-xl font-bold text-foreground">Device Authorized</h1>
@@ -62,9 +62,9 @@ function AuthorizeForm() {
 
   return (
     <div className="flex min-h-[60vh] items-center justify-center">
-      <div className="w-full max-w-sm space-y-6 rounded-xl border border-border bg-card p-8 shadow-sm">
+      <div className="w-full max-w-sm space-y-6 rounded-2xl border border-border bg-card dark:glass-card p-8 shadow-sm">
         <div className="text-center">
-          <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-primary text-xl font-bold text-primary-foreground">
+          <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-primary text-xl font-bold text-primary-foreground shadow-lg shadow-primary/20">
             S
           </div>
           <h1 className="text-xl font-bold text-foreground">Authorize Device</h1>

@@ -1,6 +1,6 @@
 "use client";
 
-import { TOTAL_TOOL_COUNT } from "../core-logic/@/components/mcp/mcp-tool-registry";
+import { TOTAL_TOOL_COUNT } from "../core-logic/components/mcp/mcp-tool-registry";
 import { Button } from "../lazy-imports/button";
 import { Link } from "../lazy-imports/link";
 import { ChevronDown, Rocket, Sparkles, Terminal } from "lucide-react";

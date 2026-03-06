@@ -279,8 +279,8 @@ export function wrapServerWithLogging(
         if (onLog) {
           onLog(entry);
         } else {
-          console.error(
-            `[mcp-analytics] ${serverName}/${toolName} ${outcome} ${durationMs}ms`,
+          process.stderr.write(
+            `[mcp-analytics] ${serverName}/${toolName} ${outcome} ${durationMs}ms\n`,
           );
         }
       }
@@ -331,13 +331,22 @@ export async function startMcpServer(server: McpServer): Promise<void> {
 
 // ─── Zod Tool Wrapper ─────────────────────────────────────────────────────────
 
+import { z } from "zod";
+
+/**
+ * Infer the validated argument type from a Zod raw shape.
+ * This allows handler functions to receive fully-typed arguments instead of
+ * `Record<string, unknown>`.
+ */
+export type InferZodArgs<TSchema extends ZodRawShapeCompat> = z.infer<z.ZodObject<TSchema>>;
+
 /**
  * Options accepted by `createZodTool`.
  *
  * The `schema` is a plain Zod shape object (i.e. `{ key: z.string(), ... }`).
- * The `handler` receives the already-validated arguments and must return
- * a `CallToolResult`.  Any thrown value is caught and converted to an error
- * result automatically.
+ * The `handler` receives already-validated, fully-typed arguments and must
+ * return a `CallToolResult`. Any thrown value is caught and converted to an
+ * error result automatically.
  *
  * @template TSchema - Zod raw shape type, constrained to `ZodRawShapeCompat`
  */
@@ -355,11 +364,11 @@ export interface ZodToolOptions<TSchema extends ZodRawShapeCompat = ZodRawShapeC
    */
   schema: TSchema;
   /**
-   * Tool handler. Receives the validated arguments as a plain object.
+   * Tool handler. Receives the validated, typed arguments inferred from `schema`.
    * Return a `CallToolResult` or throw an `McpError` / any `Error`.
    * Uncaught errors are automatically converted to error results via `formatError`.
    */
-  handler: (args: Record<string, unknown>) => Promise<CallToolResult> | CallToolResult;
+  handler: (args: InferZodArgs<TSchema>) => Promise<CallToolResult> | CallToolResult;
 }
 
 /**
@@ -389,9 +398,9 @@ export function createZodTool<TSchema extends ZodRawShapeCompat = ZodRawShapeCom
 
   // server.tool() uses complex conditional types (ToolCallback<TSchema>) that
   // cannot be directly satisfied by our simplified handler signature. At runtime
-  // the callback receives a plain object for args; the two-step cast through
-  // unknown is safe and semantically correct.
-  const wrappedHandler = async (args: Record<string, unknown>) => {
+  // the callback receives a plain object for args whose shape matches the inferred
+  // Zod type; the two-step cast through unknown is safe and semantically correct.
+  const wrappedHandler = async (args: InferZodArgs<TSchema>) => {
     try {
       return await handler(args);
     } catch (err: unknown) {

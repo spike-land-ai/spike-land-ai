@@ -303,9 +303,9 @@ const transport = new StdioServerTransport();
 server
   .connect(transport)
   .then(() => {
-    console.log("Image Studio MCP Server running on stdio.");
+    process.stderr.write("Image Studio MCP Server running on stdio.\n");
   })
   .catch((err: unknown) => {
-    console.error("Fatal error:", err);
+    process.stderr.write(`Fatal error: ${err instanceof Error ? err.message : String(err)}\n`);
     process.exit(1);
   });

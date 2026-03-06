@@ -1,13 +1,13 @@
 import { copy } from "esbuild-plugin-copy";
 import { readdir, readFile, stat, writeFile } from "fs/promises"; // Assuming these are Node.js fs/promises
 import { getCommonBuildOptions } from "./esbuild-build-config.ts";
-import { environment } from "../core-logic/@/lib/esbuild-make-env.ts";
+import { environment } from "../core-logic/lib/esbuild-make-env.ts";
 import { build } from "./esbuild-operations.ts";
 import { createHash } from "crypto";
 import { tryCatch } from "./try-catch.ts"; // Added import
 export type Environment = "development" | "production";
 import path from "path";
-import { importMapReplace } from "../core-logic/@/lib/importmap-utils.ts";
+import { importMapReplace } from "../core-logic/lib/importmap-utils.ts";
 // import path from "path";
 
 const isProduction = environment === "production";

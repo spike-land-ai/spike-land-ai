@@ -7,6 +7,7 @@
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { createZodTool, textResult } from "@spike-land-ai/mcp-server-base";
 import { SyncMirrorSchema } from "../core-logic/types.js";
+import type { z } from "zod";
 import { getManifestPackage } from "../node-sys/manifest.js";
 import { runCommand } from "../node-sys/shell.js";
 
@@ -16,11 +17,7 @@ export function registerMirrorTools(server: McpServer): void {
     name: "bazdmeg_sync_mirror",
     description: "Sync a package to its mirror GitHub repo. Reads mirror field from packages.yaml.",
     schema: SyncMirrorSchema.shape,
-    handler: async (args) => {
-      const { packageName, dryRun = true } = args as {
-        packageName: string;
-        dryRun?: boolean;
-      };
+    handler: async ({ packageName, dryRun = true }: z.infer<typeof SyncMirrorSchema>) => {
 
       const repoRoot = process.cwd();
       const pkg = await getManifestPackage(packageName, repoRoot);

@@ -17,8 +17,8 @@ export function QaStudioPage() {
     try {
       const result = await mcp.callTool("web_navigate", { url });
       setNarrationText(result.content[0]?.text || "");
-    } catch (e) {
-      console.error(e);
+    } catch (error) {
+      console.error(error);
     }
   };
 
@@ -26,8 +26,8 @@ export function QaStudioPage() {
     try {
       const result = await mcp.callTool("web_read", {});
       setNarrationText(result.content[0]?.text || "");
-    } catch (e) {
-      console.error(e);
+    } catch (error) {
+      console.error(error);
     }
   };
 
@@ -38,8 +38,8 @@ export function QaStudioPage() {
       if (imgContent?.data) {
         setScreenshotData(imgContent.data);
       }
-    } catch (e) {
-      console.error(e);
+    } catch (error) {
+      console.error(error);
     }
   };
 
@@ -47,8 +47,8 @@ export function QaStudioPage() {
     try {
       const result = await mcp.callTool("web_click", { ref });
       setNarrationText(result.content[0]?.text || "");
-    } catch (e) {
-      console.error(e);
+    } catch (error) {
+      console.error(error);
     }
   };
 
@@ -62,8 +62,8 @@ export function QaStudioPage() {
           setFormsData({ text: result.content[0].text });
         }
       }
-    } catch (e) {
-      console.error(e);
+    } catch (error) {
+      console.error(error);
     }
   };
 
@@ -77,8 +77,8 @@ export function QaStudioPage() {
           setTabsData({ text: result.content[0].text });
         }
       }
-    } catch (e) {
-      console.error(e);
+    } catch (error) {
+      console.error(error);
     }
   };
 

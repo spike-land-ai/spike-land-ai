@@ -322,10 +322,6 @@ export function getCurrentPriorityLevel(): PriorityLevel {
 
 export function forceFrameRate(fps: number): void {
   if (fps < 0 || fps > 125) {
-    console.error(
-      "forceFrameRate takes a positive int between 0 and 125, " +
-        "forcing frame rates higher than 125 fps is not supported",
-    );
     return;
   }
   if (fps > 0) {

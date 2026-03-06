@@ -50,8 +50,7 @@ export function startHttpServer(server: McpServer, port: number, host: string) {
 
     try {
       await transport.handlePostMessage(req, res);
-    } catch (error) {
-      console.error("Error handling message:", error);
+    } catch {
       if (!res.headersSent) {
         res.status(500).send("Error processing message");
       }
@@ -70,7 +69,5 @@ export function startHttpServer(server: McpServer, port: number, host: string) {
     res.status(200).send("Session cleaned up");
   });
 
-  app.listen(port, host, () => {
-    console.log(`QA Studio MCP Server listening on http://${host}:${port}/mcp`);
-  });
+  app.listen(port, host);
 }

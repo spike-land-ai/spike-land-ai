@@ -1,6 +1,6 @@
 "use client";
 
-import { MCP_CATEGORIES } from "../core-logic/@/components/mcp/mcp-tool-registry";
+import { MCP_CATEGORIES } from "../core-logic/components/mcp/mcp-tool-registry";
 import { Button } from "../lazy-imports/button";
 import { Link } from "../lazy-imports/link";
 import { ArrowRight, Check, Copy, Terminal } from "lucide-react";

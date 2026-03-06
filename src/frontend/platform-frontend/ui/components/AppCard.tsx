@@ -33,7 +33,7 @@ export function AppCard({
   createdAt,
   toolCount,
 }: AppCardProps) {
-  const config = CATEGORY_CONFIG[category] ?? CATEGORY_CONFIG.other;
+  const config = CATEGORY_CONFIG[category];
   const Icon = config.icon;
 
   return (
@@ -41,7 +41,7 @@ export function AppCard({
       to="/apps/$appId"
       params={{ appId: id }}
       search={{ tab: "Overview" }}
-      className="group block relative rounded-2xl border border-border dark:border-white/10 bg-card dark:bg-white/5 dark:backdrop-blur-lg p-5 shadow-sm dark:shadow-[0_10px_40px_rgba(0,0,0,0.4)] transition-all duration-300 hover:shadow-md dark:hover:shadow-[0_10px_40px_rgba(20,184,166,0.08)] hover:scale-[1.01] hover:border-primary/30"
+      className="group block relative rounded-2xl border border-border bg-card dark:glass-card p-5 shadow-sm transition-all duration-300 hover:shadow-md hover:scale-[1.01] hover:border-primary/30 hover:shadow-primary/10"
     >
       <div className="flex items-start justify-between gap-3">
         <div className="flex flex-col gap-1 min-w-0">

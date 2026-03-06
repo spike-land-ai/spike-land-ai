@@ -39,13 +39,7 @@ export function registerRealtimeTool(
         .describe("Optional dimension filter"),
       limit: z.number().int().min(1).max(100000).default(1000).describe("Max rows to return"),
     },
-    handler: async (args) => {
-      const { dimensions, metrics, dimension_filter, limit } = args as {
-        dimensions?: string[];
-        metrics: string[];
-        dimension_filter?: unknown;
-        limit: number;
-      };
+    handler: async ({ dimensions, metrics, dimension_filter, limit }) => {
 
       const headers = await auth.authHeaders();
       const body: Record<string, unknown> = {

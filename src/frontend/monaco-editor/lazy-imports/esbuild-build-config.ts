@@ -1,7 +1,7 @@
 import type { BuildOptions } from "esbuild";
 
-import type { Environment } from "../core-logic/@/lib/esbuild-make-env.ts";
-import { makeEnv } from "../core-logic/@/lib/esbuild-make-env.ts";
+import type { Environment } from "../core-logic/lib/esbuild-make-env.ts";
+import { makeEnv } from "../core-logic/lib/esbuild-make-env.ts";
 
 import { fetchPlugin } from "./esbuild-fetch-plugin.ts";
 

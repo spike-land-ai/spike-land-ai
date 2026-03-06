@@ -7,12 +7,12 @@
  */
 
 import { Hono } from "hono";
-import type { Env } from "../../core-logic/env.js";
+import type { Env, Variables } from "../../core-logic/env.js";
 import { createLogger } from "@spike-land-ai/shared";
 
 const log = createLogger("spike-edge");
 
-const billing = new Hono<{ Bindings: Env }>();
+const billing = new Hono<{ Bindings: Env; Variables: Variables }>();
 
 interface SubscriptionRow {
   plan: string;
@@ -23,7 +23,7 @@ interface SubscriptionRow {
 }
 
 billing.get("/api/billing/status", async (c) => {
-  const userId = c.get("userId" as never) as string | undefined;
+  const userId = c.get("userId") as string | undefined;
   if (!userId) {
     return c.json({ error: "Unauthorized" }, 401);
   }
@@ -58,7 +58,7 @@ billing.post("/api/billing/cancel", async (c) => {
     return c.json({ error: "Stripe not configured" }, 503);
   }
 
-  const userId = c.get("userId" as never) as string | undefined;
+  const userId = c.get("userId") as string | undefined;
   if (!userId) {
     return c.json({ error: "Unauthorized" }, 401);
   }

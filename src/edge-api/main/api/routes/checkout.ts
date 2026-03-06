@@ -6,14 +6,14 @@
  */
 
 import { Hono } from "hono";
-import type { Env } from "../../core-logic/env.js";
+import type { Env, Variables } from "../../core-logic/env.js";
 import { createLogger } from "@spike-land-ai/shared";
 import { stripePost, stripeGet } from "../../core-logic/stripe-client.js";
 import { VALID_LOOKUP_KEYS, SERVICE_PRODUCTS } from "../../core-logic/pricing.js";
 
 const log = createLogger("spike-edge");
 
-const checkout = new Hono<{ Bindings: Env }>();
+const checkout = new Hono<{ Bindings: Env; Variables: Variables }>();
 
 checkout.post("/api/checkout", async (c) => {
   const stripeKey = c.env.STRIPE_SECRET_KEY;
@@ -22,7 +22,7 @@ checkout.post("/api/checkout", async (c) => {
   }
 
   // userId is set by auth middleware via c.set("userId", ...)
-  const userId = c.get("userId" as never) as string | undefined;
+  const userId = c.get("userId") as string | undefined;
   if (!userId) {
     return c.json({ error: "Unauthorized" }, 401);
   }
@@ -147,7 +147,7 @@ checkout.post("/api/checkout/service", async (c) => {
   };
 
   // Attach userId if authenticated, otherwise allow guest checkout
-  const userId = c.get("userId" as never) as string | undefined;
+  const userId = c.get("userId") as string | undefined;
   if (userId) {
     sessionParams.client_reference_id = userId;
     sessionParams["metadata[userId]"] = userId;

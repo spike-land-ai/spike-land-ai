@@ -19,8 +19,7 @@ export function registerWorkspaceTools(server: McpServer): void {
     description:
       "Declare active workspace, compute allowed paths from deps, write config, serve context bundle",
     schema: EnterWorkspaceSchema.shape,
-    handler: async (args) => {
-      const { packageName } = args as { packageName: string };
+    handler: async ({ packageName }) => {
       const monorepoRoot = process.cwd();
 
       // Resolve dependencies and allowed paths

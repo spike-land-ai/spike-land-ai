@@ -36,7 +36,7 @@ export { tryCatch, type Result as TryCatchResult } from "./try-catch.js";
 export { fnv1a } from "./hash.js";
 
 // Statistical Sampling
-export { randn, sampleGamma, sampleBeta } from "./stats.js";
+export { sampleBeta } from "./stats.js";
 
 // ELO Rating
 export {

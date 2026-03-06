@@ -47,8 +47,7 @@ export function registerMetadataTools(
         .optional()
         .describe('Optional filter string, e.g. "parent:accounts/123456"'),
     },
-    handler: async (args) => {
-      const { filter } = args as { filter?: string };
+    handler: async ({ filter }) => {
       const headers = await auth.authHeaders();
 
       const params = new URLSearchParams();

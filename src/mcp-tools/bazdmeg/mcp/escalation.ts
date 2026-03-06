@@ -9,6 +9,7 @@ import { createZodTool, textResult } from "@spike-land-ai/mcp-server-base";
 import { writeFile } from "node:fs/promises";
 import { SignalStuckSchema } from "../core-logic/types.js";
 import type { StuckSignal } from "../core-logic/types.js";
+import type { z } from "zod";
 import { getWorkspace } from "../node-sys/workspace-state.js";
 import { logStuckSignal } from "../node-sys/telemetry.js";
 
@@ -19,12 +20,7 @@ export function registerEscalationTools(server: McpServer): void {
     description:
       "Declare that you are stuck — writes signal file and logs to telemetry for overseeing agent",
     schema: SignalStuckSchema.shape,
-    handler: async (args) => {
-      const { reason, attemptedAction, suggestedContext } = args as {
-        reason: string;
-        attemptedAction: string;
-        suggestedContext?: string;
-      };
+    handler: async ({ reason, attemptedAction, suggestedContext }: z.infer<typeof SignalStuckSchema>) => {
 
       const workspace = getWorkspace();
       const timestamp = new Date().toISOString();

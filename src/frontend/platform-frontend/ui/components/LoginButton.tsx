@@ -42,7 +42,7 @@ export function LoginButton() {
       <Button
         onClick={() => login()}
         className={cn(
-          "rounded-xl px-5 font-bold shadow-lg tracking-widest text-[0.9rem]",
+          "rounded-2xl px-5 font-bold shadow-lg tracking-widest text-[0.9rem]",
           "shadow-primary/20",
         )}
       >
@@ -63,7 +63,7 @@ export function LoginButton() {
       <button
         onClick={() => setMenuOpen(!menuOpen)}
         className={cn(
-          "flex items-center gap-2 rounded-xl p-1 sm:pr-3 transition-all duration-200 border",
+          "flex items-center gap-2 rounded-2xl p-1 sm:pr-3 transition-all duration-200 border",
           // Light mode
           menuOpen ? "bg-muted border-border" : "border-transparent hover:bg-muted",
           // Dark mode: glass trigger
@@ -78,9 +78,9 @@ export function LoginButton() {
       >
         <div className="relative">
           {user.picture ? (
-            <img src={user.picture} alt="" className="h-8 w-8 rounded-lg object-cover shadow-sm" />
+            <img src={user.picture} alt="" className="h-8 w-8 rounded-xl object-cover shadow-sm" />
           ) : (
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-[10px] font-black text-primary-foreground shadow-inner">
+            <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-primary text-[10px] font-black text-primary-foreground shadow-inner">
               {initials}
             </div>
           )}
@@ -91,7 +91,7 @@ export function LoginButton() {
             {user.name ?? user.preferred_username ?? "User"}
           </span>
           <span className="text-[10px] font-medium text-muted-foreground">
-            {"Pro Member"}
+            Pro Member
           </span>
         </div>
         <ChevronDown className={cn("hidden sm:block size-3.5 text-muted-foreground transition-transform duration-200", menuOpen && "rotate-180")} />
@@ -105,7 +105,7 @@ export function LoginButton() {
             // Light mode
             "border border-border bg-card",
             // Dark mode: glass panel
-            "dark:bg-white/5 dark:border-white/20 dark:backdrop-blur-md dark:shadow-black/40",
+            "dark:glass-card dark:backdrop-blur-md",
           )}
         >
           <div className="px-3 py-3 mb-1 border-b border-border/50 dark:border-white/10">

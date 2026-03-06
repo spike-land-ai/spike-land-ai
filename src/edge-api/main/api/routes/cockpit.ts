@@ -7,9 +7,9 @@
  */
 
 import { Hono } from "hono";
-import type { Env } from "../../core-logic/env.js";
+import type { Env, Variables } from "../../core-logic/env.js";
 
-const cockpit = new Hono<{ Bindings: Env }>();
+const cockpit = new Hono<{ Bindings: Env; Variables: Variables }>();
 
 const ADMIN_EMAIL = "zoltan.erdos@spike.land";
 
@@ -43,7 +43,7 @@ interface ServicePurchaseRow {
 }
 
 cockpit.get("/api/cockpit/metrics", async (c) => {
-  const userId = c.get("userId" as never) as string | undefined;
+  const userId = c.get("userId") as string | undefined;
   if (!userId) {
     return c.json({ error: "Unauthorized" }, 401);
   }

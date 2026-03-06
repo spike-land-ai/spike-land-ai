@@ -8,6 +8,7 @@
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { createZodTool, textResult } from "@spike-land-ai/mcp-server-base";
 import { AutoShipSchema } from "../core-logic/types.js";
+import type { z } from "zod";
 import { getWorkspace } from "../node-sys/workspace-state.js";
 import { countChanges, getBuiltinRules, getChangedFiles, runGates } from "../core-logic/engine.js";
 import { hasScript, runCommand } from "../node-sys/shell.js";
@@ -47,18 +48,7 @@ export function registerShipTools(server: McpServer): void {
     description:
       "Auto-ship: lint → typecheck → test → quality gates → commit → push. Fail-fast on first failure.",
     schema: AutoShipSchema.shape,
-    handler: async (args) => {
-      const {
-        commitMessage,
-        packageName: explicitPkg,
-        push = true,
-        dryRun = false,
-      } = args as {
-        commitMessage?: string;
-        packageName?: string;
-        push?: boolean;
-        dryRun?: boolean;
-      };
+    handler: async ({ commitMessage, packageName: explicitPkg, push = true, dryRun = false }: z.infer<typeof AutoShipSchema>) => {
 
       const workspace = getWorkspace();
       const pkgName = explicitPkg ?? workspace?.packageName;

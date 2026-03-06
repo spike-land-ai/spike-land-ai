@@ -68,7 +68,7 @@ export class RenderService {
 
       this.cleanup();
 
-      const { renderApp } = await import("../core-logic/@/external/render-app");
+      const { renderApp } = await import("../core-logic/external/render-app");
       this.rendered = await renderApp({
         transpiled,
         codeSpace: this.codeSpace,

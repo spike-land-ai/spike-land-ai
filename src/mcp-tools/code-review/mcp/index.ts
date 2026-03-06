@@ -283,8 +283,8 @@ export async function startServer(): Promise<void> {
 
   const token = process.env.GITHUB_TOKEN;
   if (!token) {
-    console.error(
-      "GITHUB_TOKEN environment variable is required. Set it to a GitHub PAT or App installation token.",
+    process.stderr.write(
+      "GITHUB_TOKEN environment variable is required. Set it to a GitHub PAT or App installation token.\n",
     );
     process.exit(1);
   }

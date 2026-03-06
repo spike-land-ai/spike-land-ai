@@ -1,5 +1,5 @@
 import { Hono } from "hono";
-import type { Env } from "../../core-logic/env.js";
+import type { Env, Variables } from "../../core-logic/env.js";
 import { authMiddleware } from "../middleware/auth.js";
 import { calculateBugEloChange } from "../../lazy-imports/elo.js";
 import { ensureUserElo, getUserElo, recordEloEvent, type EloEventType } from "../../core-logic/elo-service.js";
@@ -16,7 +16,7 @@ import {
   buildRandomCompetitor,
 } from "../../core-logic/bugbook-queries.js";
 
-const bugbook = new Hono<{ Bindings: Env }>();
+const bugbook = new Hono<{ Bindings: Env; Variables: Variables }>();
 
 // ── Public Endpoints ──
 
@@ -101,7 +101,7 @@ bugbook.get("/bugbook/:id", async (c) => {
 
 /** POST /bugbook/report — submit a bug report. */
 bugbook.post("/bugbook/report", authMiddleware, eloThrottleMiddleware, async (c) => {
-  const userId = c.get("userId" as never) as string;
+  const userId = c.get("userId");
 
   const body = await c.req.json<{
     title: string;
@@ -203,7 +203,7 @@ bugbook.post("/bugbook/report", authMiddleware, eloThrottleMiddleware, async (c)
 
 /** POST /bugbook/:id/confirm — confirm an existing bug. */
 bugbook.post("/bugbook/:id/confirm", authMiddleware, eloThrottleMiddleware, async (c) => {
-  const userId = c.get("userId" as never) as string;
+  const userId = c.get("userId");
   const bugId = c.req.param("id");
 
   const bug = await c.env.DB.prepare("SELECT * FROM bugs WHERE id = ?").bind(bugId).first();
@@ -256,7 +256,7 @@ bugbook.patch("/bugbook/:id/fix", authMiddleware, async (c) => {
 
 /** GET /bugbook/my-reports — user's own reports. */
 bugbook.get("/bugbook/my-reports", authMiddleware, async (c) => {
-  const userId = c.get("userId" as never) as string;
+  const userId = c.get("userId");
   const limit = Math.min(parseInt(c.req.query("limit") ?? "50", 10), 200);
 
   const [reports, userElo] = await Promise.all([

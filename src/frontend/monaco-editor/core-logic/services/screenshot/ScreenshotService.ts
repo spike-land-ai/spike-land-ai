@@ -1,5 +1,5 @@
 import type { IframeMessage, ImageData } from "../../../ui/@/lib/interfaces";
-import { processImage } from "../../@/lib/process-image";
+import { processImage } from "../../lib/process-image";
 import { tryCatch } from "../../../lazy-imports/try-catch";
 
 export class ScreenshotService {

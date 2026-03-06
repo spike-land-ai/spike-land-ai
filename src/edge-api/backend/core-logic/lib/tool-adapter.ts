@@ -1,4 +1,4 @@
-import type { JsonSchemaObject, ToolDefinition } from "../../lazy-imports/aiRoutes";
+import type { JsonSchemaObject, ToolDefinition } from "../../lazy-imports/types";
 
 /**
  * Type for tool validation - checks if a tool has valid input schema format

@@ -9,6 +9,6 @@
 import { startServer } from "../mcp/index.js";
 
 startServer().catch((err: unknown) => {
-  console.error("Failed to start Spike Review server:", err);
+  process.stderr.write(`Failed to start Spike Review server: ${err instanceof Error ? err.message : String(err)}\n`);
   process.exit(1);
 });

@@ -352,8 +352,9 @@ export class Code implements DurableObject {
           if (response.ok) {
             transpiled = await response.text();
           }
-        } catch (e) {
-          console.error("[Files] Transpilation failed for entry point:", e);
+        } catch (error) {
+          // Transpilation failure is non-fatal: session updates with empty transpiled
+          console.error("[Files] Transpilation failed for entry point:", error);
         }
       }
 
@@ -475,16 +476,18 @@ export class Code implements DurableObject {
         try {
           const htmlObject = await this.env.R2.get(r2HtmlKey);
           if (htmlObject) html = await htmlObject.text();
-        } catch (e) {
-          console.error(`Failed to load html from R2 (${r2HtmlKey}):`, e);
+        } catch (error) {
+          // R2 read failure is non-fatal: session loads with empty html
+          console.error(`Failed to load html from R2 (${r2HtmlKey}):`, error);
         }
 
         let css = "";
         try {
           const cssObject = await this.env.R2.get(r2CssKey);
           if (cssObject) css = await cssObject.text();
-        } catch (e) {
-          console.error(`Failed to load css from R2 (${r2CssKey}):`, e);
+        } catch (error) {
+          // R2 read failure is non-fatal: session loads with empty css
+          console.error(`Failed to load css from R2 (${r2CssKey}):`, error);
         }
 
         loadedSession = {
@@ -679,9 +682,9 @@ export class Code implements DurableObject {
     if (codeChanged || transpiledChanged) {
       try {
         await this._saveVersion(newSession);
-      } catch (e) {
-        console.error(`[updateAndBroadcastSession] Failed to save version:`, e);
-        // Don't fail the update if versioning fails
+      } catch (error) {
+        // Non-fatal: versioning failure must not block the session update
+        console.error(`[updateAndBroadcastSession] Failed to save version:`, error);
       }
     }
 
@@ -719,8 +722,9 @@ export class Code implements DurableObject {
       try {
         const origin = this.origin || "https://spike.land";
         await this.initializeSession(new URL(`${origin}/?room=default`));
-      } catch (e) {
-        console.error("Failed to initialize session on wake:", e);
+      } catch (error) {
+        // Non-fatal: hibernation recovery falls back to stored state
+        console.error("Failed to initialize session on wake:", error);
       }
     }
     this.wsHandler.handleMessage(ws, message);

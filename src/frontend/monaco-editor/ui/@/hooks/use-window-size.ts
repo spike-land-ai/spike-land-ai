@@ -1,4 +1,4 @@
-import { throttle } from "../../../core-logic/@/lib/throttle";
+import { throttle } from "../../../core-logic/lib/throttle";
 import { useEffect, useMemo, useState } from "react";
 
 function useWindowSize(delay = 250) {

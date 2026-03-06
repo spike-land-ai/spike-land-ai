@@ -1,5 +1,5 @@
 import { md5 } from "../crypto-data-structures/md5";
-import { routes } from "../core-logic/@/lib/routes";
+import { routes } from "../core-logic/lib/routes";
 import { lookup } from "mime-types";
 
 // Simplified getContentType function

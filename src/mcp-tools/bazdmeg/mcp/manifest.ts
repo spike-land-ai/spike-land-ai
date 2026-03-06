@@ -7,6 +7,7 @@
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { createZodTool, textResult } from "@spike-land-ai/mcp-server-base";
 import { ManifestQuerySchema, ManifestValidateSchema } from "../core-logic/types.js";
+import type { z } from "zod";
 import { readManifest } from "../node-sys/manifest.js";
 
 export function registerManifestTools(server: McpServer): void {
@@ -16,12 +17,7 @@ export function registerManifestTools(server: McpServer): void {
     description:
       "Query packages.yaml for package info. Filter by name, kind, or extract specific fields.",
     schema: ManifestQuerySchema.shape,
-    handler: async (args) => {
-      const { packageName, kind, field } = args as {
-        packageName?: string;
-        kind?: string;
-        field?: string;
-      };
+    handler: async ({ packageName, kind, field }: z.infer<typeof ManifestQuerySchema>) => {
 
       const repoRoot = process.cwd();
       const manifest = await readManifest(repoRoot);

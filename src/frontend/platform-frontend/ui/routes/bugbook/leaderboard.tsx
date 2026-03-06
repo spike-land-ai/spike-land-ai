@@ -7,6 +7,13 @@ const tierColor: Record<string, string> = {
   business: "bg-warning text-warning-foreground",
 };
 
+const severityColor: Record<string, string> = {
+  low: "bg-muted text-foreground",
+  medium: "bg-warning text-warning-foreground",
+  high: "bg-warning text-warning-foreground",
+  critical: "bg-destructive text-destructive-foreground",
+};
+
 export function BugbookLeaderboardPage() {
   const { data, isLoading, isError } = useBugbookLeaderboard();
 
@@ -40,7 +47,7 @@ export function BugbookLeaderboardPage() {
       <h1 className="text-2xl font-bold text-foreground">Leaderboard</h1>
 
       {/* Top Bugs */}
-      <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
+      <div className="rounded-2xl border border-border bg-card dark:glass-card p-6 shadow-sm">
         <h2 className="mb-4 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
           Top Bugs by ELO
         </h2>
@@ -70,12 +77,7 @@ export function BugbookLeaderboardPage() {
                     </td>
                     <td className="py-2 pr-4 text-muted-foreground">{bug.category}</td>
                     <td className="py-2 pr-4">
-                      <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${
-                        bug.severity === "critical" ? "bg-destructive text-destructive-foreground" :
-                        bug.severity === "high" ? "bg-warning text-warning-foreground" :
-                        bug.severity === "medium" ? "bg-warning text-warning-foreground" :
-                        "bg-muted text-foreground"
-                      }`}>
+                      <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${severityColor[bug.severity] ?? "bg-muted text-foreground"}`}>
                         {bug.severity}
                       </span>
                     </td>
@@ -90,7 +92,7 @@ export function BugbookLeaderboardPage() {
       </div>
 
       {/* Top Reporters */}
-      <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
+      <div className="rounded-2xl border border-border bg-card dark:glass-card p-6 shadow-sm">
         <h2 className="mb-4 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
           Top Bug Reporters
         </h2>

@@ -194,8 +194,8 @@ function createToolFromExport(
         };
       } finally {
         const durationMs = Date.now() - start;
-        console.error(
-          `[mcp-analytics] mcp-image-studio/${toolName} ${outcome} ${durationMs}ms`,
+        process.stderr.write(
+          `[mcp-analytics] mcp-image-studio/${toolName} ${outcome} ${durationMs}ms\n`,
         );
       }
     },

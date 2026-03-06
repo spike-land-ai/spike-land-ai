@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { apiUrl } from "../../core-logic/api";
+import { cn } from "../../styling/cn";
 
 interface StoreTool {
   name: string;
@@ -38,7 +39,10 @@ function ToolCard({ tool, featured = false }: { tool: StoreTool; featured?: bool
 
   return (
     <div
-      className={`rounded-2xl border border-border dark:border-white/10 bg-card dark:bg-white/5 dark:backdrop-blur-lg p-5 shadow-sm dark:shadow-[0_10px_40px_rgba(0,0,0,0.4)] transition-all duration-300 hover:shadow-md dark:hover:shadow-[0_10px_40px_rgba(20,184,166,0.08)] hover:scale-[1.01] hover:border-primary/30  ${featured ? "ring-1 ring-primary/20 " : ""}`}
+      className={cn(
+        "rounded-2xl border border-border bg-card dark:glass-card p-5 shadow-sm transition-all duration-300 hover:shadow-md hover:scale-[1.01] hover:border-primary/30 hover:shadow-primary/10",
+        featured && "ring-1 ring-primary/20"
+      )}
     >
       <div className="flex items-start justify-between gap-2">
         <div className="flex items-center gap-2">
@@ -76,14 +80,11 @@ export function StorePage() {
         if (!res.ok) throw new Error(`Failed to load store (${res.status})`);
         return res.json() as Promise<StoreData>;
       })
-      .then((d) => {
-        setData(d);
-        setLoading(false);
-      })
+      .then((d) => setData(d))
       .catch((err: unknown) => {
         setError(err instanceof Error ? err.message : "Unknown error");
-        setLoading(false);
-      });
+      })
+      .finally(() => setLoading(false));
   }, []);
 
   const filteredData = useMemo(() => {
@@ -110,7 +111,7 @@ export function StorePage() {
         <h1 className="text-2xl font-bold text-foreground">Tool Store</h1>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="h-32 rounded-2xl border border-border dark:border-white/10 bg-muted dark:bg-white/5 dark:backdrop-blur-lg animate-pulse" />
+            <div key={i} className="h-32 rounded-2xl border border-border bg-muted dark:glass-card animate-pulse" />
           ))}
         </div>
       </div>
@@ -121,7 +122,7 @@ export function StorePage() {
     return (
       <div className="space-y-6 p-6 max-w-7xl mx-auto">
         <h1 className="text-2xl font-bold text-foreground">Tool Store</h1>
-        <div className="rounded-2xl border border-border dark:border-white/10 bg-card dark:bg-white/5 dark:backdrop-blur-lg shadow-sm dark:shadow-[0_10px_40px_rgba(0,0,0,0.4)] p-8 text-center space-y-4">
+        <div className="rounded-2xl border border-border bg-card dark:glass-card shadow-sm p-8 text-center space-y-4">
           <p className="text-muted-foreground">
             We couldn't load the tool store right now. This might be a temporary issue.
           </p>
@@ -140,7 +141,7 @@ export function StorePage() {
 
   return (
     <div className="space-y-8 p-6 max-w-7xl mx-auto">
-      <div className="rounded-2xl border border-border dark:border-white/10 bg-card dark:bg-white/5 dark:backdrop-blur-lg shadow-sm dark:shadow-[0_10px_40px_rgba(0,0,0,0.4)] p-6 flex items-center justify-between gap-4">
+      <div className="rounded-2xl border border-border bg-card dark:glass-card shadow-sm p-6 flex items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-foreground">App Store</h1>
           <p className="text-sm text-muted-foreground mt-1">Discover, install, rate, and review AI applications.</p>
@@ -154,7 +155,7 @@ export function StorePage() {
         aria-label="Search tools"
         value={search}
         onChange={(e) => setSearch(e.target.value)}
-        className="w-full rounded-xl border border-border dark:border-white/10 bg-card dark:bg-white/5 dark:backdrop-blur-lg px-4 py-3 text-foreground shadow-sm dark:shadow-[0_10px_40px_rgba(0,0,0,0.2)] focus:border-primary/40 focus:outline-none focus:ring-1 focus:ring-primary/30 placeholder:text-muted-foreground/50 transition-colors"
+        className="w-full rounded-2xl border border-border bg-card dark:glass-card px-4 py-3 text-foreground shadow-sm focus:border-primary/40 focus:outline-none focus:ring-1 focus:ring-primary/30 placeholder:text-muted-foreground/50 transition-colors"
       />
 
       {filteredData.featured.length > 0 && (
@@ -184,7 +185,7 @@ export function StorePage() {
       ))}
 
       {filteredData.featured.length === 0 && filteredData.categories.length === 0 && (
-        <div className="rounded-2xl border border-dashed border-border dark:border-white/10 bg-card dark:bg-white/5 dark:backdrop-blur-lg p-12 text-center text-muted-foreground">
+        <div className="rounded-2xl border border-dashed border-border bg-card dark:glass-card p-12 text-center text-muted-foreground">
           No tools found matching your search.
         </div>
       )}

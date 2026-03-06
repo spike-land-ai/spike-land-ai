@@ -279,7 +279,7 @@ export const ManifestQuerySchema = z.object({
   field: z.string().optional().describe("Return only this field from matching packages"),
 });
 
-export const ManifestValidateSchema = z.object({});
+export const ManifestValidateSchema = z.object({}).strict();
 
 // ── Dep Graph Schema ────────────────────────────────────────────────────────
 

@@ -43,7 +43,7 @@ function MetricCard({
   color?: string;
 }) {
   return (
-    <div className="rounded-xl border border-border bg-card p-5 shadow-sm">
+    <div className="rounded-2xl border border-border bg-card dark:glass-card p-5 shadow-sm">
       <p className="text-sm text-muted-foreground">{label}</p>
       <p className={`mt-1 text-2xl font-bold ${color ?? "text-foreground"}`}>{value}</p>
       {subtitle && <p className="mt-1 text-xs text-muted-foreground">{subtitle}</p>}
@@ -226,7 +226,7 @@ function ReplaySlider({
   if (events.length === 0) return null;
 
   return (
-    <div className="rounded-xl border border-border bg-card p-5 shadow-sm">
+    <div className="rounded-2xl border border-border bg-card dark:glass-card p-5 shadow-sm">
       <div className="mb-3 flex items-center justify-between">
         <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
           Workspace Replay
@@ -347,7 +347,6 @@ export function BazdmegDashboardPage() {
   const [replayTimestamp, setReplayTimestamp] = useState<number | null>(null);
   const cutoff = Date.now() - timeRangeToMs(timeRange);
 
-  // TODO: wire up to edge API
   const allEvents: PlatformEvent[] = useMemo(() => [], []);
 
   const handleReplayChange = useCallback((ts: number) => setReplayTimestamp(ts), []);
@@ -484,7 +483,7 @@ export function BazdmegDashboardPage() {
 
       <div className="grid gap-6 lg:grid-cols-2">
         {/* Gate Results */}
-        <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
+        <div className="rounded-2xl border border-border bg-card dark:glass-card p-6 shadow-sm">
           <h3 className="mb-4 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
             Latest Gate Results
           </h3>
@@ -511,7 +510,7 @@ export function BazdmegDashboardPage() {
         </div>
 
         {/* Stuck Signals */}
-        <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
+        <div className="rounded-2xl border border-border bg-card dark:glass-card p-6 shadow-sm">
           <h3 className="mb-4 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
             Stuck Signals
           </h3>
@@ -546,7 +545,7 @@ export function BazdmegDashboardPage() {
       </div>
 
       {/* Event Log */}
-      <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
+      <div className="rounded-2xl border border-border bg-card dark:glass-card p-6 shadow-sm">
         <div className="mb-4 flex items-center justify-between">
           <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">Event Log</h3>
           <select

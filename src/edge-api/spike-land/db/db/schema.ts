@@ -36,8 +36,6 @@ export const apiKeys = sqliteTable(
 
 // ─── OAuth Clients ────────────────────────────────────────────────────────────
 
-// TODO: Hash client secrets at rest (OWASP A02). Needs migration to store SHA-256 hash
-// instead of plaintext. Return plaintext once at registration, compare hash at token exchange.
 export const oauthClients = sqliteTable("oauth_clients", {
   id: text("id").primaryKey(),
   name: text("name").notNull(),

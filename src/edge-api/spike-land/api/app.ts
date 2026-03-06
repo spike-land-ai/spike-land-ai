@@ -2,13 +2,13 @@ import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { logger } from "hono/logger";
 import type { Env } from "../core-logic/env";
-import type { AuthVariables } from "../db-api/middleware";
-import { authMiddleware } from "../db-api/middleware";
+import type { AuthVariables } from "./middleware";
+import { authMiddleware } from "./middleware";
 import { mcpRoute } from "./mcp";
-import { oauthRoute } from "../db-api/oauth";
+import { oauthRoute } from "./oauth";
 import { wellKnownRoute } from "./well-known";
 import { publicToolsRoute } from "./public-tools";
-import { internalByokRoute } from "../db-api/internal-byok";
+import { internalByokRoute } from "./internal-byok";
 import { internalAnalytics } from "./internal-analytics";
 import { internalAuthMiddleware } from "./internal-auth";
 

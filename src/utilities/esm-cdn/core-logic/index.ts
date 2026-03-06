@@ -59,7 +59,7 @@ export default {
       });
     }
 
-    const cache = (caches as any).default;
+    const cache = (caches as unknown as { default: Cache }).default;
     // Cache key ignores Origin so we store one copy per URL
     const cacheKey = new Request(url.toString());
     let response = await cache.match(cacheKey);

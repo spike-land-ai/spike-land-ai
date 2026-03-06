@@ -1,10 +1,10 @@
-import { getCodeSpace } from "./@/hooks/use-code-space";
+import { getCodeSpace } from "./hooks/use-code-space";
 import { getCodeSession } from "../concurrency/code-session";
 import type { ICode } from "../ui/@/lib/interfaces";
 // import { init } from "@/lib/tw-dev-setup";
 import { tryCatch } from "../lazy-imports/try-catch";
-import { main } from "./@/lib/ws";
-import { SessionSynchronizer } from "./@/services/SessionSynchronizer";
+import { main } from "./lib/ws";
+import { SessionSynchronizer } from "./services/SessionSynchronizer";
 
 // Centralized type definitions
 export interface AppContext {
@@ -24,8 +24,8 @@ export interface AppComponentProps {
  */
 export const initializeAppEnvironment = async (): Promise<void> => {
   const [{ enhancedFetch }, { useArchive, useSpeedy }] = await Promise.all([
-    import("./@/lib/enhanced-fetch"),
-    import("./@/lib/use-archive"),
+    import("./lib/enhanced-fetch"),
+    import("./lib/use-archive"),
   ]);
 
   // Make utilities available globally for debugging and development

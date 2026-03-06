@@ -7,7 +7,7 @@
 
 import { createProcedure, middleware } from "@spike-land-ai/shared/tool-builder";
 import type { DrizzleDB } from "../db/db/db-index.ts";
-import { jsonResult, textResult } from "../db-mcp/tool-helpers";
+import { jsonResult, textResult } from "../core-logic/lib/tool-helpers";
 
 // ─── Middleware: userId injection ───
 

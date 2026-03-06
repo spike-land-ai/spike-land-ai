@@ -1,5 +1,5 @@
-import { getWasmModule, setWasmModule } from "../core-logic/@/lib/idb-cache";
-import { importMap } from "../core-logic/@/lib/importmap-utils";
+import { getWasmModule, setWasmModule } from "../core-logic/lib/idb-cache";
+import { importMap } from "../core-logic/lib/importmap-utils";
 import { tryCatch } from "../lazy-imports/try-catch";
 import { Mutex } from "async-mutex";
 import type { BuildOptions } from "@spike-land-ai/esbuild-wasm";
@@ -7,7 +7,7 @@ import { build as esmBuild, initialize, transform } from "@spike-land-ai/esbuild
 import type * as esbuild from "@spike-land-ai/esbuild-wasm";
 import { wasmFile } from "../lazy-imports/esbuildWASM";
 import { fetchPlugin } from "../lazy-imports/esbuild-fetch-plugin";
-import { makeEnv } from "../core-logic/@/lib/esbuild-make-env";
+import { makeEnv } from "../core-logic/lib/esbuild-make-env";
 
 export { wasmFile };
 

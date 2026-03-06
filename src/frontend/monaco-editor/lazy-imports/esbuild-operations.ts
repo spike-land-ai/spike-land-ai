@@ -1,6 +1,6 @@
 import * as esbuild from "esbuild";
 import { buildOptions } from "./esbuild-build-config.ts";
-import { makeEnv } from "../core-logic/@/lib/esbuild-make-env.ts";
+import { makeEnv } from "../core-logic/lib/esbuild-make-env.ts";
 
 export const stop = () => esbuild.stop();
 export const build = (opts: esbuild.BuildOptions) =>

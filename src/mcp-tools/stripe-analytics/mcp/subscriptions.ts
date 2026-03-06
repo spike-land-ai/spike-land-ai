@@ -81,9 +81,9 @@ export function registerSubscriptionTools(server: McpServer, client: StripeClien
       start_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Must be YYYY-MM-DD").describe("Start date in YYYY-MM-DD format"),
       end_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Must be YYYY-MM-DD").describe("End date in YYYY-MM-DD format"),
     },
-    async handler(args) {
-      const startUnix = Math.floor(new Date(String(args.start_date)).getTime() / 1000);
-      const endUnix = Math.floor(new Date(String(args.end_date)).getTime() / 1000);
+    async handler({ start_date, end_date }) {
+      const startUnix = Math.floor(new Date(start_date).getTime() / 1000);
+      const endUnix = Math.floor(new Date(end_date).getTime() / 1000);
 
       if (isNaN(startUnix) || isNaN(endUnix)) {
         return errorResult("INVALID_INPUT", "Invalid date format. Use YYYY-MM-DD.");
@@ -127,7 +127,7 @@ export function registerSubscriptionTools(server: McpServer, client: StripeClien
       const totalBase = canceled.length + activeCount;
 
       return jsonResult({
-        period: { start_date: String(args.start_date), end_date: String(args.end_date) },
+        period: { start_date, end_date },
         churn_count: canceled.length,
         churn_rate: totalBase > 0 ? canceled.length / totalBase : 0,
         active_count: activeCount,

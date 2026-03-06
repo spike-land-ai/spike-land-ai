@@ -10,9 +10,9 @@
  */
 
 import { Hono } from "hono";
-import type { Env } from "../../core-logic/env.js";
+import type { Env, Variables } from "../../core-logic/env.js";
 
-const apiKeys = new Hono<{ Bindings: Env }>();
+const apiKeys = new Hono<{ Bindings: Env; Variables: Variables }>();
 
 interface ApiKeyRow {
   id: string;
@@ -28,7 +28,7 @@ function maskKey(key: string): string {
 }
 
 apiKeys.get("/api/keys", async (c) => {
-  const userId = c.get("userId" as never) as string | undefined;
+  const userId = c.get("userId") as string | undefined;
   if (!userId) {
     return c.json({ error: "Unauthorized" }, 401);
   }
@@ -51,7 +51,7 @@ apiKeys.get("/api/keys", async (c) => {
 });
 
 apiKeys.post("/api/keys", async (c) => {
-  const userId = c.get("userId" as never) as string | undefined;
+  const userId = c.get("userId") as string | undefined;
   if (!userId) {
     return c.json({ error: "Unauthorized" }, 401);
   }
@@ -81,7 +81,7 @@ apiKeys.post("/api/keys", async (c) => {
 });
 
 apiKeys.delete("/api/keys/:id", async (c) => {
-  const userId = c.get("userId" as never) as string | undefined;
+  const userId = c.get("userId") as string | undefined;
   if (!userId) {
     return c.json({ error: "Unauthorized" }, 401);
   }
@@ -127,7 +127,7 @@ const PROVIDER_TEST_URLS: Record<string, { url: string; method: string; headers:
 };
 
 apiKeys.post("/api/keys/:id/test", async (c) => {
-  const userId = c.get("userId" as never) as string | undefined;
+  const userId = c.get("userId") as string | undefined;
   if (!userId) {
     return c.json({ error: "Unauthorized" }, 401);
   }

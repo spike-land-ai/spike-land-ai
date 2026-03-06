@@ -1,4 +1,4 @@
-import type { ContextManager } from "../../core-logic/@/lib/context-manager";
+import type { ContextManager } from "../../core-logic/lib/context-manager";
 import { useEffect } from "react";
 import type { ErrorType } from "../../core-logic/components/ErrorMessages";
 

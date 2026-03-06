@@ -55,9 +55,9 @@ const handleGetRequest = async (codeSpace: string, origin: string) => {
         "Content-Type": "application/json",
       },
     });
-  } catch (e) {
-    const error = e instanceof Error ? e : new Error(String(e));
-    return new Response(error.message, { status: 500 });
+  } catch (error) {
+    const err = error instanceof Error ? error : new Error(String(error));
+    return new Response(err.message, { status: 500 });
   }
 };
 
@@ -97,9 +97,9 @@ const handlePostRequest = async (request: Request, ctx?: ExecutionContext) => {
     } catch { /* waitUntil not available outside worker context */ }
 
     return response;
-  } catch (e) {
-    const error = e instanceof Error ? e : new Error(String(e));
-    return new Response(error.message || "Unknown error", { status: 500 });
+  } catch (error) {
+    const err = error instanceof Error ? error : new Error(String(error));
+    return new Response(err.message || "Unknown error", { status: 500 });
   }
 };
 

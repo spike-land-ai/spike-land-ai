@@ -27,7 +27,7 @@ function MetricCard({
   subtitle?: string;
 }) {
   return (
-    <div className="rounded-xl border border-border bg-card p-5 shadow-sm">
+    <div className="rounded-2xl border border-border bg-card p-5 shadow-sm">
       <p className="text-sm text-muted-foreground">{label}</p>
       <p className="mt-1 text-2xl font-bold text-foreground">{value}</p>
       {subtitle && <p className="mt-1 text-xs text-muted-foreground">{subtitle}</p>}
@@ -131,12 +131,12 @@ export function AnalyticsPage() {
 
       <div className="grid gap-6 lg:grid-cols-2">
         {/* Tool Usage */}
-        <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
+        <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
           <h3 className="mb-4 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
             Top Tools by Usage
           </h3>
           {!summary?.toolUsage.length ? (
-            <div className="flex h-48 items-center justify-center rounded-lg border-2 border-dashed border-border text-muted-foreground">
+            <div className="flex h-48 items-center justify-center rounded-2xl border-2 border-dashed border-border text-muted-foreground">
               {loading ? "Loading..." : "No tool usage data yet"}
             </div>
           ) : (
@@ -144,7 +144,7 @@ export function AnalyticsPage() {
               {summary.toolUsage.slice(0, 10).map((tool) => (
                 <div
                   key={tool.tool_name}
-                  className="flex items-center justify-between rounded-lg bg-muted px-3 py-2"
+                  className="flex items-center justify-between rounded-2xl bg-muted px-3 py-2"
                 >
                   <span className="text-sm font-medium text-foreground">{tool.tool_name}</span>
                   <div className="flex items-center gap-2">
@@ -166,12 +166,12 @@ export function AnalyticsPage() {
         </div>
 
         {/* Recent Activity */}
-        <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
+        <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
           <h3 className="mb-4 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
             Recent Activity
           </h3>
           {recentEvents.length === 0 ? (
-            <div className="flex h-48 items-center justify-center rounded-lg border-2 border-dashed border-border text-muted-foreground">
+            <div className="flex h-48 items-center justify-center rounded-2xl border-2 border-dashed border-border text-muted-foreground">
               {loading ? "Loading..." : "No recent events"}
             </div>
           ) : (
@@ -179,7 +179,7 @@ export function AnalyticsPage() {
               {recentEvents.map((event) => (
                 <div
                   key={event.id}
-                  className="flex items-center justify-between rounded px-2 py-1.5 hover:bg-muted"
+                  className="flex items-center justify-between rounded-lg px-2 py-1.5 hover:bg-muted"
                 >
                   <div className="flex items-center gap-2">
                     <span className="inline-block rounded bg-muted px-1.5 py-0.5 text-xs font-medium text-muted-foreground">
@@ -199,7 +199,7 @@ export function AnalyticsPage() {
 
       {/* Events by Type */}
       {summary?.eventsByType && summary.eventsByType.length > 0 && (
-        <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
+        <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
           <h3 className="mb-4 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
             Events by Type
           </h3>

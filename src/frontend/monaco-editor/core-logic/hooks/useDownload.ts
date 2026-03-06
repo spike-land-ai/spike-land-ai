@@ -1,5 +1,5 @@
 import { tryCatch } from "../../lazy-imports/try-catch";
-import { getSpeedy2 } from "../@/lib/use-archive";
+import { getSpeedy2 } from "../lib/use-archive";
 
 const download = async (codeSpace: string, onlyReturn: boolean): Promise<string | void> => {
   const downloadProcess = async (): Promise<string | void> => {

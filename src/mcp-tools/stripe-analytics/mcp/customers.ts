@@ -12,10 +12,10 @@ export function registerCustomerTools(server: McpServer, client: StripeClient): 
       customer_id: z.string().optional().describe("Specific customer ID (optional)"),
       limit: z.number().int().min(1).max(100).default(20).describe("Number of top customers to return"),
     },
-    async handler(args) {
-      if (args.customer_id) {
+    async handler({ customer_id, limit = 20 }) {
+      if (customer_id) {
         const result = await tryCatch(
-          client.getAll<Charge>("charges", { customer: String(args.customer_id) }),
+          client.getAll<Charge>("charges", { customer: customer_id }),
         );
 
         if (!result.ok) {
@@ -29,7 +29,7 @@ export function registerCustomerTools(server: McpServer, client: StripeClient): 
         const latestCharge = charges[0];
 
         return jsonResult({
-          customer_id: String(args.customer_id),
+          customer_id,
           total_spend: totalSpend,
           charge_count: charges.length,
           average_charge: charges.length > 0 ? totalSpend / charges.length : 0,
@@ -43,7 +43,6 @@ export function registerCustomerTools(server: McpServer, client: StripeClient): 
       }
 
       // Top customers by spend
-      const limit = Number(args.limit ?? 20);
       const result = await tryCatch(
         client.getAll<Charge>("charges", {}),
       );

@@ -1,4 +1,4 @@
-import type { McpToolDef, ToolLike } from "./types.js";
+import type { JsonSchemaObject, McpToolDef, ToolLike } from "./types.js";
 
 /**
  * Convert a ToolLike (TypeBox schema) to MCP JSON Schema format.
@@ -7,11 +7,7 @@ import type { McpToolDef, ToolLike } from "./types.js";
  */
 export function convertToolToMcp(tool: ToolLike): McpToolDef {
   const schema = tool.parameters;
-  const jsonSchema: {
-    type: "object";
-    properties: Record<string, unknown>;
-    required: string[];
-  } = {
+  const jsonSchema: JsonSchemaObject = {
     type: "object",
     properties: {},
     required: [],

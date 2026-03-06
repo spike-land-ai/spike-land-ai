@@ -8,7 +8,7 @@
 import { Hono } from "hono";
 import { WebStandardStreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/webStandardStreamableHttp.js";
 import type { Env } from "../core-logic/env";
-import type { AuthVariables } from "../db-api/middleware";
+import type { AuthVariables } from "./middleware";
 import { createMcpServer } from "../core-logic/mcp/server";
 import { loadEnabledCategories } from "../core-logic/kv/categories";
 import { checkRateLimit } from "../core-logic/kv/rate-limit";

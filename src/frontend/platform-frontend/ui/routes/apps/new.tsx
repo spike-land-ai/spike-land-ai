@@ -15,7 +15,7 @@ export function AppsNewPage() {
         <h1 className="text-2xl font-bold text-foreground">Create App</h1>
       </div>
 
-      <div className="rounded-xl border border-border bg-card p-8 text-center space-y-6">
+      <div className="rounded-2xl border border-border bg-card dark:glass-card p-8 text-center space-y-6">
         <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
           <span className="text-2xl" role="img" aria-label="Rocket">🚀</span>
         </div>

@@ -1,5 +1,5 @@
 import { Hono } from "hono";
-import type { Env } from "../../core-logic/env.js";
+import type { Env, Variables } from "../../core-logic/env.js";
 import { resolveEffectiveTier } from "../../core-logic/tier-service.js";
 import { createLogger } from "@spike-land-ai/shared";
 
@@ -8,7 +8,7 @@ import { recordEloEvent } from "../../core-logic/elo-service.js";
 import { parseCommand, dispatchCommand } from "../../core-logic/whatsapp-commands.js";
 import type { Tier } from "../../core-logic/whatsapp-commands.js";
 
-const whatsapp = new Hono<{ Bindings: Env }>();
+const whatsapp = new Hono<{ Bindings: Env; Variables: Variables }>();
 
 // --- Helpers ---
 
@@ -111,7 +111,7 @@ async function sendWhatsAppReply(
 // --- Linking API (requires authMiddleware applied in index.ts) ---
 
 whatsapp.post("/whatsapp/link/initiate", async (c) => {
-  const userId = c.get("userId" as never) as string;
+  const userId = c.get("userId");
   const code = generateOtp();
   const now = Date.now();
   const expiresAt = now + 10 * 60 * 1000; // 10 minutes
@@ -141,7 +141,7 @@ whatsapp.post("/whatsapp/link/initiate", async (c) => {
 });
 
 whatsapp.post("/whatsapp/link/verify", async (c) => {
-  const userId = c.get("userId" as never) as string;
+  const userId = c.get("userId");
   const body = await c.req.json<{ code: string }>();
 
   if (!body.code || typeof body.code !== "string") {
@@ -177,7 +177,7 @@ whatsapp.post("/whatsapp/link/verify", async (c) => {
 });
 
 whatsapp.delete("/whatsapp/link", async (c) => {
-  const userId = c.get("userId" as never) as string;
+  const userId = c.get("userId");
 
   await c.env.DB.prepare("DELETE FROM whatsapp_links WHERE user_id = ?")
     .bind(userId)
@@ -187,7 +187,7 @@ whatsapp.delete("/whatsapp/link", async (c) => {
 });
 
 whatsapp.get("/whatsapp/link/status", async (c) => {
-  const userId = c.get("userId" as never) as string;
+  const userId = c.get("userId");
 
   const link = await c.env.DB.prepare(
     "SELECT phone_hash, verified_at, created_at FROM whatsapp_links WHERE user_id = ?",
@@ -247,8 +247,23 @@ whatsapp.post("/whatsapp/webhook", async (c) => {
   }
 
   // Extract message from Meta's nested structure
-  const entry = (body as Record<string, unknown[]>).entry as
-    Array<{ changes: Array<{ value: { messages?: Array<{ from: string; text?: { body: string }; id: string; type: string }>; statuses?: unknown[] } }> }> | undefined;
+  interface MetaWebhookMessage {
+    from: string;
+    text?: { body: string };
+    id: string;
+    type: string;
+  }
+  interface MetaWebhookValue {
+    messages?: MetaWebhookMessage[];
+    statuses?: Record<string, unknown>[];
+  }
+  interface MetaWebhookEntry {
+    changes: Array<{ value: MetaWebhookValue }>;
+  }
+  interface MetaWebhookPayload {
+    entry?: MetaWebhookEntry[];
+  }
+  const { entry } = body as MetaWebhookPayload;
   const value = entry?.[0]?.changes?.[0]?.value;
 
   // Status webhooks (no messages) — acknowledge immediately

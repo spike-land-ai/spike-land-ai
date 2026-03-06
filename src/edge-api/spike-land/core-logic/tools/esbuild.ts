@@ -9,7 +9,7 @@
 import { z } from "zod";
 import type { ToolRegistryAdapter } from "../../lazy-imports/types";
 import { freeTool } from "../../lazy-imports/procedures-index.ts";
-import { apiRequest, jsonResult, safeToolCall, textResult } from "../../db-mcp/tool-helpers";
+import { apiRequest, jsonResult, safeToolCall, textResult } from "../lib/tool-helpers";
 import type { DrizzleDB } from "../../db/db/db-index.ts";
 
 const LOADER_ENUM = ["tsx", "ts", "jsx", "js"] as const;
