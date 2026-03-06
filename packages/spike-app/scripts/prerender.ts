@@ -143,16 +143,16 @@ async function startMockApiServer(): Promise<http.Server> {
 async function startServer(): Promise<{ url: string; close: () => void }> {
   return new Promise((resolve, reject) => {
     console.log("Starting preview server...");
-    const server = exec("vite preview --port 4173", { cwd: ROOT_DIR });
+    const server = exec("yarn vite preview --port 4173", { cwd: ROOT_DIR });
 
     let isReady = false;
 
     server.stdout?.on("data", (data) => {
       const output = data.toString();
-      if (output.includes("http://localhost:4173")) {
+      if (output.includes("localhost:4173")) {
         isReady = true;
         resolve({
-          url: "http://localhost:4173",
+          url: "https://localhost:4173",
           close: () => server.kill(),
         });
       }

@@ -5,9 +5,9 @@ cd "$(dirname "$0")"
 
 R2_BUCKET="spike-app-assets"
 VERSION_URL="https://spike.land/version"
-WRANGLER="npx wrangler"
-VITE="npx vite"
-TSX="npx tsx"
+WRANGLER="yarn wrangler"
+VITE="yarn vite"
+TSX="yarn tsx"
 
 # ── 1. Current HEAD info ──
 HEAD_SHA="$(git rev-parse HEAD)"
@@ -51,9 +51,9 @@ fi
 if [ "$NEED_BUILD" = true ]; then
   echo "Building spike-app..."
   $VITE build
-  
+
   echo "Prerendering static HTML for SEO..."
-  $TSX scripts/prerender.ts
+  $TSX scripts/prerender.ts || echo "⚠ Prerender failed (non-fatal), deploying without prerendered HTML"
 
   echo "$TREE_HASH" > "$CACHE_DIR/app.treehash"
 else
@@ -155,8 +155,8 @@ done < <(find dist -type f -print0)
 
 echo "Uploading ${#FILES_TO_UPLOAD[@]} files (skipped $(( $(find dist -type f | wc -l) - ${#FILES_TO_UPLOAD[@]} )) cached)..."
 
-# Upload in parallel (16 concurrent)
-printf '%s\0' "${FILES_TO_UPLOAD[@]}" | xargs -0 -P 16 -I {} bash -c 'upload_file "$@"' _ {}
+# Upload in parallel (4 concurrent to avoid R2 rate limits)
+printf '%s\0' "${FILES_TO_UPLOAD[@]}" | xargs -0 -P 4 -I {} bash -c 'upload_file "$@"' _ {}
 
 # Update uploaded keys cache
 printf '%s\n' "${NEW_KEYS[@]}" >> "$UPLOADED_KEYS_FILE"
@@ -175,7 +175,7 @@ fi
 
 if [ "$BLOG_HASH" != "$CACHED_BLOG_HASH" ] || [ -z "$BLOG_HASH" ]; then
   echo "Seeding blog content to D1 + R2..."
-  (cd ../.. && npx tsx scripts/seed-blog.ts --remote)
+  (cd ../.. && yarn tsx scripts/seed-blog.ts --remote) || echo "⚠ Blog seed failed (non-fatal)"
   if [ -n "$BLOG_HASH" ]; then
     echo "$BLOG_HASH" > "$CACHE_DIR/blog.treehash"
   fi
