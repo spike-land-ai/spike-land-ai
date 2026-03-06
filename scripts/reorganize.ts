@@ -13,9 +13,11 @@ import {
   nameOverrides,
   excludeGlobs,
   getDependencyGroupName,
+  kindToCategory,
+  deduplicateDepGroup,
 } from "./reorganize-config.js";
 
-interface FileNode {
+export interface FileNode {
   absPath: string;
   relPath: string; // relative to src/
   packageName: string;
@@ -24,7 +26,7 @@ interface FileNode {
   resolvedDeps?: Set<string>; // inherited
 }
 
-interface MovePlan {
+export interface MovePlan {
   fileNode: FileNode;
   targetDir: string;
   targetFileName: string;
@@ -118,32 +120,33 @@ async function discoverFiles(project: Project): Promise<FileNode[]> {
 
 // ─── PHASE 3: GROUPING ────────────────────────────────────────────────
 
-function resolveZeroImportFiles(nodes: FileNode[]) {
-  const reverseMap = new Map<string, FileNode[]>();
-  const nodesByAbsNoExt = new Map<string, FileNode>();
+// Build a lookup map from absolute path (with/without extension) to FileNode
+export function buildNodeLookup(nodes: FileNode[]): Map<string, FileNode> {
+  const lookup = new Map<string, FileNode>();
   for (const n of nodes) {
+    lookup.set(n.absPath, n);
     const noExt = n.absPath.replace(/\.(tsx|ts|js|jsx)$/, "");
-    nodesByAbsNoExt.set(noExt, n);
+    lookup.set(noExt, n);
     if (noExt.endsWith("/index")) {
-      nodesByAbsNoExt.set(noExt.slice(0, -6), n);
+      lookup.set(noExt.slice(0, -6), n);
     }
   }
+  return lookup;
+}
 
-  for (const n of nodes) {
-    for (const rel of n.relativeImports) {
-      const relNoExt = rel.replace(/\.(tsx|ts|js|jsx)$/, "");
-      let target = nodesByAbsNoExt.get(relNoExt);
-      if (!target) target = nodesByAbsNoExt.get(relNoExt + "/index");
-      if (target) {
-        let arr = reverseMap.get(target.absPath);
-        if (!arr) {
-          arr = [];
-          reverseMap.set(target.absPath, arr);
-        }
-        arr.push(n);
-      }
-    }
-  }
+function resolveImportTarget(
+  importPath: string,
+  lookup: Map<string, FileNode>,
+): FileNode | undefined {
+  const noExt = importPath.replace(/\.(tsx|ts|js|jsx)$/, "");
+  return lookup.get(importPath) || lookup.get(noExt) || lookup.get(noExt + "/index");
+}
+
+// FIXED: Propagate deps from importees to importers (forward direction).
+// If A imports B, then A transitively depends on B's deps.
+// Previously this was inverted — importers' deps were pushed to importees.
+export function propagateDeps(nodes: FileNode[]) {
+  const lookup = buildNodeLookup(nodes);
 
   for (const n of nodes) {
     n.resolvedDeps = new Set(n.externalDeps);
@@ -155,11 +158,13 @@ function resolveZeroImportFiles(nodes: FileNode[]) {
     changed = false;
     rounds++;
     for (const n of nodes) {
-      const importers = reverseMap.get(n.absPath) || [];
       const sizeBefore = n.resolvedDeps!.size;
-      for (const imp of importers) {
-        for (const dep of imp.resolvedDeps!) {
-          n.resolvedDeps!.add(dep);
+      for (const importPath of n.relativeImports) {
+        const target = resolveImportTarget(importPath, lookup);
+        if (target?.resolvedDeps) {
+          for (const dep of target.resolvedDeps) {
+            n.resolvedDeps!.add(dep);
+          }
         }
       }
       if (n.resolvedDeps!.size > sizeBefore) changed = true;
@@ -167,7 +172,63 @@ function resolveZeroImportFiles(nodes: FileNode[]) {
   }
 }
 
-function resolveAppName(packageName: string): string {
+// Compute a single category per package (not per file).
+// Priority: packages.yaml kind → dominant file-level category → fallback
+export function computePackageCategories(
+  nodes: FileNode[],
+  packagesYaml: Record<string, { kind?: string }>,
+): Map<string, string> {
+  const result = new Map<string, string>();
+
+  const byPackage = new Map<string, FileNode[]>();
+  for (const n of nodes) {
+    let arr = byPackage.get(n.packageName);
+    if (!arr) {
+      arr = [];
+      byPackage.set(n.packageName, arr);
+    }
+    arr.push(n);
+  }
+
+  for (const [pkgName, pkgNodes] of byPackage) {
+    const pkgKind = packagesYaml[pkgName]?.kind;
+
+    // 1. Try packages.yaml kind → category mapping
+    if (pkgKind && kindToCategory[pkgKind]) {
+      result.set(pkgName, kindToCategory[pkgKind]);
+      continue;
+    }
+
+    // 2. Compute dominant category from file-level rules
+    const categoryCounts = new Map<string, number>();
+    for (const n of pkgNodes) {
+      let fileCategory = fallbackCategory;
+      for (const rule of categoryRules) {
+        if (rule.predicate(n.resolvedDeps!, n.externalDeps, pkgKind)) {
+          fileCategory = rule.category;
+          break;
+        }
+      }
+      categoryCounts.set(fileCategory, (categoryCounts.get(fileCategory) || 0) + 1);
+    }
+
+    // Pick most common non-fallback category
+    let bestCategory = fallbackCategory;
+    let bestCount = 0;
+    for (const [cat, count] of categoryCounts) {
+      if (cat !== fallbackCategory && count > bestCount) {
+        bestCategory = cat;
+        bestCount = count;
+      }
+    }
+
+    result.set(pkgName, bestCategory);
+  }
+
+  return result;
+}
+
+export function resolveAppName(packageName: string): string {
   if (nameOverrides[packageName]) return nameOverrides[packageName];
   let name = packageName;
   if (name.endsWith("-mcp")) name = name.replace("-mcp", "");
