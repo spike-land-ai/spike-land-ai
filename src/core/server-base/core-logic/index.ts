@@ -331,7 +331,7 @@ export async function startMcpServer(server: McpServer): Promise<void> {
 
 // ─── Zod Tool Wrapper ─────────────────────────────────────────────────────────
 
-import { z } from "zod";
+import type { z } from "zod";
 
 /**
  * Infer the validated argument type from a Zod raw shape.

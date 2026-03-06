@@ -149,7 +149,7 @@ services:
   mcp-image-studio:
     <<: *node-service
     working_dir: /app
-    command: sh -c "corepack enable && npx tsx docker/lib/mcp-http-bridge.ts src/mcp-tools/mcp-image-studio/mcp/cli-server.ts 3100"
+    command: sh -c "corepack enable && npx tsx docker/lib/mcp-http-bridge.ts src/mcp-tools/image-studio/mcp/cli-server.ts 3100"
     environment:
       <<: *common-env
     expose:
@@ -194,7 +194,7 @@ services:
   spike-review:
     <<: *node-service
     working_dir: /app
-    command: sh -c "corepack enable && npx tsx docker/lib/mcp-http-bridge.ts src/mcp-tools/spike-review/mcp/index.ts 3103"
+    command: sh -c "corepack enable && npx tsx docker/lib/mcp-http-bridge.ts src/mcp-tools/code-review/mcp/index.ts 3103"
     environment:
       <<: *common-env
     expose:
@@ -209,7 +209,7 @@ services:
   openclaw-mcp:
     <<: *node-service
     working_dir: /app
-    command: sh -c "corepack enable && npx tsx docker/lib/mcp-http-bridge.ts src/mcp-tools/openclaw/mcp/index.ts 3104"
+    command: sh -c "corepack enable && npx tsx docker/lib/mcp-http-bridge.ts src/mcp-tools/openclaw/mcp/cli.ts 3104"
     environment:
       <<: *common-env
     expose:
@@ -266,20 +266,17 @@ services:
     depends_on:
       - caddy
 
-  spike-cli:
-    <<: *node-service
-    working_dir: /app
-    command: sh -c "corepack enable && npx tsx src/cli/spike-cli/cli.ts serve --port 3005 --host 0.0.0.0"
-    environment:
-      <<: *common-env
-    expose:
-      - "3005"
-    labels:
-      spike.subdomain: cli
-      spike.port: "3005"
-      spike.type: aggregator
-    depends_on:
-      - caddy
+  # spike-cli: MCP aggregator — needs custom HTTP adapter (TODO)
+  # spike-cli:
+  #   <<: *node-service
+  #   working_dir: /app
+  #   command: sh -c "corepack enable && npx tsx src/cli/spike-cli/core-logic/cli.ts agent --port 3005"
+  #   expose: ["3005"]
+  #   labels:
+  #     spike.subdomain: cli
+  #     spike.port: "3005"
+  #     spike.type: aggregator
+  #   depends_on: [caddy]
 
   docker-compose-mcp:
     <<: *node-service

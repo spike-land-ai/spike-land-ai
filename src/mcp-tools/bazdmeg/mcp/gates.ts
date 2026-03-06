@@ -4,7 +4,7 @@
  * MCP tools for running, checking, and listing quality gates.
  */
 
-import { z } from "zod";
+import type { z } from "zod";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { createZodTool, jsonResult, textResult } from "@spike-land-ai/mcp-server-base";
 import { CheckGateSchema, RunGatesSchema } from "../core-logic/types.js";

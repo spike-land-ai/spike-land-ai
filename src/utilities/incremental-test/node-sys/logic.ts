@@ -101,7 +101,7 @@ function parseCoverage(stdout: string): number {
       // The table has: File | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s
       // Index 4 is % Lines
       if (parts.length >= 5) {
-        const linesPercent = parts[4]?.trim() ?? "";
+        const linesPercent = parts[4].trim();
         const percent = parseFloat(linesPercent);
         if (!isNaN(percent)) {
           return percent;

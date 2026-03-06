@@ -56,7 +56,7 @@ export default tseslint.config(
   },
   // TypeScript files (non-React)
   {
-    files: ["src/**/*.ts"],
+    files: ["src/**/*.ts", ".tests/**/*.ts"],
     languageOptions: {
       parser: tseslint.parser,
       parserOptions: {
@@ -71,7 +71,7 @@ export default tseslint.config(
   },
   // React/TSX files
   {
-    files: ["src/**/*.tsx"],
+    files: ["src/**/*.tsx", ".tests/**/*.tsx"],
     languageOptions: {
       parser: tseslint.parser,
       parserOptions: {

@@ -58,6 +58,7 @@ export interface ToolExample {
   name: string;
   input: Record<string, unknown>;
   description: string;
+  expected_output?: string | undefined;
 }
 
 export interface ToolMeta {

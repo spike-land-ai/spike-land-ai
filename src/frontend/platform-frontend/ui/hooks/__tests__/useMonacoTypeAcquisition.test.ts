@@ -1,6 +1,6 @@
 // @vitest-environment happy-dom
 import { renderHook, act, waitFor } from "@testing-library/react";
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { describe, it, expect, vi, beforeEach } from "vitest";
 
 // Track delegate callbacks so tests can invoke them manually
 let capturedDelegate: Record<string, (...args: unknown[]) => void> = {};

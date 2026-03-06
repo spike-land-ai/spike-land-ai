@@ -60,6 +60,9 @@ function resolveZodProperty(zodField: unknown): { prop: JsonSchemaProperty; opti
 export const publicToolsRoute = new Hono<{ Bindings: Env; Variables: AuthVariables }>();
 
 publicToolsRoute.get("/", async (c) => {
+  const stabilityFilter = c.req.query("stability");
+  const categoryFilter = c.req.query("category");
+
   const db = createDb(c.env.DB);
   const mcpServer = new McpServer(
     { name: "spike-land-mcp", version: "1.0.0" },
@@ -72,7 +75,16 @@ publicToolsRoute.get("/", async (c) => {
     vaultSecret: c.env.VAULT_SECRET,
   });
 
-  const tools = registry.getToolDefinitions().map((t) => {
+  let definitions = registry.getToolDefinitions();
+
+  if (stabilityFilter) {
+    definitions = definitions.filter((t) => t.stability === stabilityFilter);
+  }
+  if (categoryFilter) {
+    definitions = definitions.filter((t) => t.category === categoryFilter);
+  }
+
+  const tools = definitions.map((t) => {
     if (!t.inputSchema) {
       return {
         name: t.name, description: t.description, category: t.category,

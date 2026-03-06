@@ -1,6 +1,6 @@
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
-import { z } from "zod";
+import type { z } from "zod";
 import { CallToolRequestSchema, ListToolsRequestSchema } from "@modelcontextprotocol/sdk/types.js";
 import { registerImageStudioTools } from "../lazy-imports/register.js";
 import type { ImageStudioDeps, ImageStudioToolRegistry, ToolDefinition } from "./types.js";

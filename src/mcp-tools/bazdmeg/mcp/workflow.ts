@@ -4,7 +4,7 @@
  * MCP tools for checkpoint operations: session bootstrap, planning interview (MCQ), pre-PR check.
  */
 
-import { z } from "zod";
+import type { z } from "zod";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { createZodTool, textResult } from "@spike-land-ai/mcp-server-base";
 import { PlanningInterviewSchema, PrePRCheckSchema, SessionBootstrapSchema } from "../core-logic/types.js";
