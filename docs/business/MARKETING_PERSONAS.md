@@ -1,494 +1,1146 @@
-# Marketing Personas - Spike Land Platform
+# Marketing Personas — Spike Land Platform
 
-> **Last Updated**: February 2026 **Product**: Spike Land (managed deployment
-> platform with MCP registry) **Primary Channels**: GitHub, Twitter/X, LinkedIn,
-> Hacker News, Discord
+> **Last Updated**: March 2026
+> **Product**: Spike Land — MCP-first AI development platform on Cloudflare edge
+> **Primary Channels**: GitHub, npm, Hacker News, LinkedIn, Twitter/X, Discord
+> **Personas**: 16 (Year 1), scaling to 32 (Year 2) and 64 (Year 3)
+> **Related**: [BUSINESS_PLAN.md](./BUSINESS_PLAN.md) Section 5
 
 ---
 
 ## Strategic Context
 
-**Current Focus**: Managed deployment platform with MCP registry, multi-channel
-AI assistant (spike-cli, web chat, WhatsApp, Telegram)
+Spike Land is a managed MCP registry and AI development platform. The core
+audience is developers and AI agent builders who discover the platform through
+npm (`spike-cli`), GitHub, MCP registry listings, and developer communities.
 
-This document defines the target personas for the platform, focusing on
-developers and AI builders. Historical personas (social media managers, content
-creators) are retained where they overlap with the current positioning but the
-primary audience is now developers.
+This document defines 16 target personas across 4 segments. Each persona
+includes demographics, pain points, activation triggers, platform tools used,
+pricing tier, unit economics, messaging, and content strategy.
 
----
-
-## Primary Target Personas
-
-These 4 personas represent the core addressable market for the Spike Land
-platform and spike-cli. All marketing, product development, and sales efforts
-should prioritize these segments.
+**Year 1 priority**: Focus acquisition on the 4 highest-LTV personas (D3, D1,
+D4, D2) and the 4 lowest-CAC personas (A1, A4, C4, A2). The remaining 8
+personas receive baseline measurement only.
 
 ---
 
-### 1. The Solo Content Creator
+## Segment A: Builders (Developer-First)
+
+Developers who discover spike.land through npm, GitHub, MCP registries, or
+developer communities. They evaluate tools by API quality, developer experience,
+and extensibility. This is the primary early-adoption segment.
+
+---
+
+### A1: AI Agent Developer
 
 **Demographics**
 
-| Attribute | Value                                |
-| --------- | ------------------------------------ |
-| Age       | 25-35                                |
-| Gender    | Mixed (55% Female)                   |
-| Income    | £25-50k                              |
-| Location  | UK/Global (Remote-first)             |
-| Platforms | Instagram, TikTok, YouTube, LinkedIn |
+| Attribute | Value |
+|-----------|-------|
+| Age | 25-40 |
+| Gender | 75% Male |
+| Income | £50-120k |
+| Location | Global (Remote-first) |
+| Platforms | GitHub, npm, Discord, Hacker News, Twitter/X |
 
 **Professional Profile**
 
-- Manages 3-5 social media accounts across multiple platforms
-- Posts 5-10 times per week per account
-- Earns revenue through brand partnerships, sponsorships, affiliate marketing
-- Works solo or with 1-2 freelance collaborators
-- Active in creator communities (Discord, Slack groups)
-
-**Psychographics**
-
-- Highly motivated, entrepreneurial mindset
-- Values efficiency and automation to maximize output
-- Constantly seeking tools to reduce manual work
-- Sensitive to pricing (bootstrapped business)
-- Active early adopter of creator tools
+- Builds AI agents using MCP; works with Claude, GPT, or custom agent frameworks
+- Comfortable with CLIs, APIs, and the MCP protocol
+- Evaluates tools by developer experience, documentation, and composability
+- Discovers tools through npm weekly downloads, GitHub trending, and MCP
+  registries
+- Active in AI/ML Discord servers and open-source communities
 
 **Pain Points**
 
-- **Time Management**: Spending 4-6 hours/day on social media tasks
-- **Platform Juggling**: Switching between 5+ apps daily
-- **Inconsistent Posting**: Missing optimal posting times
-- **Response Burnout**: Can't keep up with DMs/comments across platforms
-- **Analytics Overload**: Data scattered across platform-specific dashboards
-- **Brand Voice Drift**: Tone varies when rushed or tired
+- Fragmented MCP servers — must build, host, and authenticate each one
+  separately
+- Connection management overhead when running multiple MCP servers
+- No managed registry that handles auth, rate limiting, and billing
+- Vendor lock-in with proprietary APIs and breaking changes
 
-**Triggers**
+**Activation Trigger**
 
-- Missing a brand partnership deadline due to overwhelm
-- Losing followers from slow response times
-- Competitor creator launching with better consistency
-- Seasonal content campaigns (Q4, summer, back-to-school)
+Adding spike.land as an MCP server to Claude Code in one terminal command:
 
-**Primary Hook**
+```
+claude mcp add spike-land --transport http https://spike.land/mcp
+```
 
-> "3 hours back in your day. Every day."
+**Platform Tools Used**
 
-**Value Proposition**
+spike-cli, MCP API, code editor, image studio, chess engine, QA studio
 
-- **Unified Inbox**: All mentions, DMs, comments in one place
-- **AI Draft Generation**: Speed up content creation by 70%
-- **Smart Scheduling**: Post at optimal times automatically
-- **Brand Voice Consistency**: Train AI on your existing content style
+**Unit Economics**
 
-**Pricing Sensitivity**
+| Metric | Value |
+|--------|-------|
+| Target Tier | FREE → API PRO ($49/mo) |
+| CAC | £10-30 |
+| LTV | £588-1,764 |
+| LTV:CAC | 19.6-58.8x |
+| Payback | < 1 month |
 
-- **Budget**: £50-100/month for tools
-- **Target Tier**: PRO ($29/month) - perfect fit
-- **Upgrade Trigger**: When managing 5+ accounts or hiring first team member
+**Messaging**
+
+- **Hero**: "80+ MCP tools. One `claude mcp add`. Done."
+- **Pain amplification**: "Stop building auth, rate limiting, and billing for
+  every MCP server."
+- **Differentiator**: "The only managed MCP registry — hosted, metered, billed."
 
 **Ad Copy Variations**
 
-- "I got 3 hours back every day. Here's how."
-- "Managing 5 accounts solo? Stop switching tabs."
-- "The AI that sounds like you—because it learned from you."
-- "Never miss a DM again. Even while you sleep."
+- "Your AI agent can now use 80+ tools. One line to connect."
+- "Building an AI agent? Skip the plumbing. `npx spike --help`"
+- "80+ MCP tools for developers. Open source CLI. Managed registry."
+- "The MCP registry that runs the tools — not just lists them."
 
-**Content Ideas**
+**Content Strategy**
 
-- "Day in the life" comparison: before/after Spike Land
-- Tutorial: "How I schedule 50 posts in 30 minutes"
-- Case study: "Doubled engagement with half the time investment"
-- Behind-the-scenes: "My social media tech stack"
+- Show HN: "spike.land — 80+ MCP tools in Claude with one line"
+- Tutorial: "Build a Claude-powered agent with spike-cli in 10 minutes"
+- GitHub README with quickstart, tool catalog, and asciinema recording
+- Blog: "Why managed MCP is the future of AI agent infrastructure"
 
 ---
 
-### 2. The Small Business Marketing Manager
+### A2: Indie Hacker / Solo Founder
 
 **Demographics**
 
-| Attribute | Value                                    |
-| --------- | ---------------------------------------- |
-| Age       | 28-45                                    |
-| Gender    | 60% Female                               |
-| Income    | £35-65k                                  |
-| Location  | UK (Urban/Suburban)                      |
-| Platforms | LinkedIn, Facebook, Instagram, Twitter/X |
+| Attribute | Value |
+|-----------|-------|
+| Age | 22-38 |
+| Gender | 65% Male |
+| Income | £20-80k (variable, bootstrapped) |
+| Location | Global (Remote-first) |
+| Platforms | Twitter/X, Indie Hackers, Product Hunt, Hacker News |
 
 **Professional Profile**
 
-- Solo or 1-2 person marketing team at 10-50 person company
-- Manages brand social presence across 3-5 platforms
-- Reports to CEO/CMO on social media performance
-- Responsible for brand reputation, customer engagement, and lead generation
-- Juggles social media with other marketing responsibilities (email, content,
-  events)
-
-**Psychographics**
-
-- Results-driven, needs to prove ROI to leadership
-- Values professionalism and brand consistency
-- Risk-averse (fears public PR mistakes)
-- Time-constrained (social is 30-50% of job, not 100%)
-- Collaborative (works with sales, support, product teams)
+- Solo SaaS builder; ships fast, budget-conscious
+- Earns revenue through micro-SaaS, info products, or consulting
+- Values tools that reduce time-to-launch
+- Active early adopter, shares tool discoveries on Twitter/X
 
 **Pain Points**
 
-- **Multi-Tasking Chaos**: Social is just one of many responsibilities
-- **Brand Risk**: One off-brand post can damage reputation
-- **Budget Justification**: Needs clear ROI data to defend marketing spend
-- **Crisis Management**: Can't monitor mentions 24/7
-- **Team Coordination**: Sales/support need visibility into social conversations
-- **Reporting Overhead**: Spending hours compiling monthly reports
+- Too many tools to stitch together for deployment + AI + monitoring
+- Limited engineering time — needs maximum leverage from each tool
+- Budget-sensitive — cannot justify $100+/mo tooling on unvalidated ideas
+- No integrated "build and deploy" workflow for AI-powered apps
 
-**Triggers**
+**Activation Trigger**
 
-- Negative viral mention or PR crisis
-- CEO asking for social media ROI metrics
-- Competitor launching aggressive social campaign
-- Quarterly budget planning season
-- Hiring freeze forcing automation needs
+Seeing a "build and deploy an app in 5 minutes" tutorial using spike-cli or vibe
+coding
 
-**Primary Hook**
+**Platform Tools Used**
 
-> "Sleep soundly. We'll catch what matters."
+Vibe coding, managed deployments, image studio, QA automation, templates
 
-**Value Proposition**
+**Unit Economics**
 
-- **Anomaly Detection (Pulse)**: Catch PR crises before they explode
-- **Brand Guardrails (Brand Brain)**: Enforce tone, avoid compliance risks
-- **Competitive Intelligence (Scout)**: Track competitors without manual
-  monitoring
-- **ROI Dashboard**: Exportable reports for leadership
-- **Team Collaboration**: Share inbox access with sales/support
+| Metric | Value |
+|--------|-------|
+| Target Tier | PRO ($29/mo) |
+| CAC | £30-60 |
+| LTV | £348-1,044 |
+| LTV:CAC | 5.8-17.4x |
+| Payback | 1-2 months |
 
-**Pricing Sensitivity**
+**Messaging**
 
-- **Budget**: £200-500/month for social tools
-- **Target Tier**: BUSINESS ($99/month) - room for team members
-- **Upgrade Trigger**: First PR scare or need for 3+ team member seats
+- **Hero**: "Build, deploy, and manage your SaaS with one platform."
+- **Pain amplification**: "Stop paying for 8 tools. Start shipping."
+- **Differentiator**: "AI-first deployment with 80+ tools at $29/mo."
 
 **Ad Copy Variations**
 
-- "We caught a PR crisis at 2 AM. You slept through it."
-- "Your CEO wants ROI? Here's the dashboard."
-- "Brand voice guardrails. Because one bad tweet costs more than $99."
-- "What if you could add 10 hours to your week?"
+- "I replaced 5 SaaS tools with one platform. Here's how."
+- "Solo founder? Build your entire stack with spike-cli."
+- "From idea to deployed app in 5 minutes. No team needed."
+- "The $29/mo platform that replaced my $200/mo tool stack."
 
-**Content Ideas**
+**Content Strategy**
 
-- Case study: "How we prevented a viral PR disaster"
-- Webinar: "Social media ROI for marketing teams"
-- White paper: "The real cost of manual social media management"
-- Testimonial video: Marketing manager explaining time savings
+- Product Hunt launch: "Spike Land — Build and deploy apps with AI"
+- Twitter/X thread: "How I ship SaaS products with spike-cli (tool breakdown)"
+- Blog: "The solo founder's stack in 2026"
+- YouTube: "Build a SaaS MVP in 30 minutes with vibe coding"
 
 ---
 
-### 3. The Freelance Social Media Manager
+### A3: DevOps / Platform Engineer
 
 **Demographics**
 
-| Attribute | Value                                                                  |
-| --------- | ---------------------------------------------------------------------- |
-| Age       | 25-40                                                                  |
-| Gender    | 70% Female                                                             |
-| Income    | £30-80k (variable, freelance)                                          |
-| Location  | UK/Global (Remote)                                                     |
-| Platforms | All major platforms (Instagram, LinkedIn, Facebook, Twitter/X, TikTok) |
+| Attribute | Value |
+|-----------|-------|
+| Age | 28-45 |
+| Gender | 80% Male |
+| Income | £55-110k |
+| Location | UK/US/EU |
+| Platforms | GitHub, LinkedIn, DevOps Slack, conferences |
 
 **Professional Profile**
 
-- Manages 3-8 client accounts simultaneously
-- Charges £500-2,000/month per client
-- Solo operator or small 2-3 person agency
-- Provides content creation, scheduling, community management, reporting
-- Constantly seeking new clients while retaining existing ones
-
-**Psychographics**
-
-- Entrepreneurial, profit-margin conscious
-- Values scalability (more clients without more hours)
-- Competitive (many freelancers in market)
-- Service-oriented (client satisfaction is everything)
-- Tool-savvy (uses 5-10 SaaS tools daily)
+- Evaluates and manages team developer tools
+- Needs audit logs, permissions, SSO, and compliance features
+- Responsible for developer productivity and tool standardisation
+- Reports on tool ROI and security posture to leadership
 
 **Pain Points**
 
-- **Client Juggling**: Context-switching between brand voices all day
-- **Scaling Ceiling**: Can't take on more clients without burning out
-- **Client Churn**: Clients leave when overwhelmed or dissatisfied
-- **Reporting Time Sink**: Each client needs monthly reports
-- **Billing Complexity**: Tracking time per client for invoicing
-- **Competitive Pressure**: Agencies offering lower prices
+- Tool sprawl across engineering teams — no audit trail for AI tool usage
+- Permission management and access control for shared AI resources
+- Compliance requirements (SOC2, GDPR) for AI tool adoption
+- Manual onboarding for each new team member across multiple tools
 
-**Triggers**
+**Activation Trigger**
 
-- Turning down new clients due to capacity
-- Client threatens to leave due to slow response times
-- Competitor offering AI-powered services
-- End-of-year client contract renewals
-- Onboarding 3rd or 4th simultaneous client
+Team member recommends spike-cli; evaluates for org-wide rollout based on admin
+features and security posture
 
-**Primary Hook**
+**Platform Tools Used**
 
-> "Manage 8 clients like you're managing 2."
+Admin tools, audit logs, team workspaces, API access, QA studio, deployment
+management
 
-**Value Proposition**
+**Unit Economics**
 
-- **Multi-Workspace Management**: Separate workspace per client
-- **AI Drafts with Client Voice**: Train Brand Brain per client
-- **White-Label Reporting**: Client-ready analytics exports
-- **Scalable Workflow**: Add clients without proportional time increase
-- **Agency Pricing**: Volume discount for 3+ workspaces
+| Metric | Value |
+|--------|-------|
+| Target Tier | BUSINESS ($99/mo) |
+| CAC | £100-200 |
+| LTV | £1,188-3,564 |
+| LTV:CAC | 5.9-17.8x |
+| Payback | 1-2 months |
 
-**Pricing Sensitivity**
+**Messaging**
 
-- **Budget**: £100-300/month for tools (passes cost to clients)
-- **Target Tier**: PRO ($29/month) × 3-5 workspaces = $87-145/month
-- **Upgrade Trigger**: When managing 5+ clients or needing team members
+- **Hero**: "One platform, full audit trail, every AI tool your team needs."
+- **Pain amplification**: "Your team uses 6 AI tools. You have visibility into
+  zero of them."
+- **Differentiator**: "Managed MCP with team permissions, audit logs, and SSO."
+
+**Content Strategy**
+
+- LinkedIn post: "How we standardised AI tool access for 20 engineers"
+- Blog: "The DevOps case for managed MCP registries"
+- Webinar: "AI tool governance for engineering teams"
+
+---
+
+### A4: Open-Source MCP Tool Author
+
+**Demographics**
+
+| Attribute | Value |
+|-----------|-------|
+| Age | 22-40 |
+| Gender | 80% Male |
+| Income | £30-100k |
+| Location | Global |
+| Platforms | GitHub, npm, MCP registries (Smithery, Glama, LobeHub) |
+
+**Professional Profile**
+
+- Maintains one or more open-source MCP tools
+- Frustrated by inability to monetise without building billing infrastructure
+- Values developer-friendly platforms that handle ops burden
+- Active in the MCP ecosystem and open-source communities
+
+**Pain Points**
+
+- No monetisation path for open-source MCP tools
+- Must build and maintain hosting, auth, rate limiting, and billing to charge
+- Limited analytics on tool usage and adoption
+- Competing with free alternatives makes it hard to justify paid tiers
+
+**Activation Trigger**
+
+Cold outreach from founder offering 70/30 marketplace revenue share with
+featured listing
+
+**Platform Tools Used**
+
+Marketplace publisher dashboard, tool submission workflow, analytics, revenue
+reporting
+
+**Unit Economics**
+
+| Metric | Value |
+|--------|-------|
+| Target Tier | Marketplace Publisher (70/30 rev share) |
+| CAC | £0-20 |
+| LTV | £240-1,200 |
+| LTV:CAC | 12.0-60.0x |
+| Payback | < 1 month |
+
+**Messaging**
+
+- **Hero**: "Monetise your MCP tools. We handle billing, auth, and hosting."
+- **Pain amplification**: "You built a great tool. You shouldn't have to build
+  Stripe integration too."
+- **Differentiator**: "70% revenue share. Featured listing. Zero ops."
+
+**Content Strategy**
+
+- Direct email: "Your [tool_name] + spike.land marketplace"
+- Blog: "How to monetise your open-source MCP tool in 15 minutes"
+- GitHub issue/discussion on popular MCP tool repos
+
+---
+
+## Segment B: Operators (Business-First)
+
+Business users and team leads who need AI-powered tools to solve operational
+problems. They evaluate platforms on ROI, team features, and support quality
+rather than API documentation.
+
+---
+
+### B1: Startup CTO
+
+**Demographics**
+
+| Attribute | Value |
+|-----------|-------|
+| Age | 28-45 |
+| Gender | 70% Male |
+| Income | £60-130k |
+| Location | UK/US/EU startup hubs |
+| Platforms | LinkedIn, Hacker News, CTO Slack communities, conferences |
+
+**Professional Profile**
+
+- Technical leader at 5-30 person startup
+- Wears multiple hats: architecture, hiring, code review, QA
+- Budget-conscious but willing to pay for productivity gains
+- Evaluates tools by team impact, not personal preference
+
+**Pain Points**
+
+- Engineering bandwidth bottleneck — too few engineers, too many features to
+  build
+- Manual code review consuming senior engineer time
+- QA and testing is the first thing cut when deadlines approach
+- No integrated tool for code review + QA + deployment in a single pipeline
+
+**Activation Trigger**
+
+Seeing spike-cli automate code review and QA in a CI pipeline, saving 10+
+engineering hours per week
+
+**Platform Tools Used**
+
+Code review tools, QA studio, deployment automation, team workspaces, API access
+
+**Unit Economics**
+
+| Metric | Value |
+|--------|-------|
+| Target Tier | BUSINESS ($99/mo) |
+| CAC | £80-180 |
+| LTV | £1,188-3,564 |
+| LTV:CAC | 6.6-19.8x |
+| Payback | 1-2 months |
+
+**Messaging**
+
+- **Hero**: "Give your team 10 hours back every week."
+- **Pain amplification**: "Your 3-person eng team doesn't have time for code
+  review AND QA AND shipping."
+- **Differentiator**: "AI-powered code review + QA + deployment in one platform."
+
+**Content Strategy**
+
+- Case study: "How a 5-person startup automated code review with spike-cli"
+- LinkedIn: "The startup CTO's AI tool stack for 2026"
+- Webinar: "Scaling engineering quality without scaling the team"
+
+---
+
+### B2: Non-Technical SMB Owner
+
+**Demographics**
+
+| Attribute | Value |
+|-----------|-------|
+| Age | 30-55 |
+| Gender | 50/50 |
+| Income | £30-80k |
+| Location | UK (primarily) |
+| Platforms | Google search, Facebook groups, LinkedIn, word of mouth |
+
+**Professional Profile**
+
+- Runs a small business (1-10 employees)
+- Cannot code and finds hiring developers expensive and risky
+- Needs a web presence, custom tools, or internal apps
+- Evaluates solutions by outcome ("build me an app"), not technology
+
+**Pain Points**
+
+- Cannot build software without hiring expensive developers
+- Agencies charge £5,000-50,000 for simple web apps
+- Existing no-code tools are limiting and lock data in
+- Needs professional image creation without design skills
+
+**Activation Trigger**
+
+Discovering the App Builder service (£1,997 one-time) or seeing vibe coding
+create a working app from a description
+
+**Platform Tools Used**
+
+App Builder service, image studio, dashboard, templates, basic reporting
+
+**Unit Economics**
+
+| Metric | Value |
+|--------|-------|
+| Target Tier | PRO ($29/mo) + App Builder (£1,997 one-time) |
+| CAC | £60-120 |
+| LTV | £348-2,345 |
+| LTV:CAC | 5.8-19.5x |
+| Payback | Immediate (App Builder) / 2-4 months (subscription) |
+
+**Messaging**
+
+- **Hero**: "Get a custom app for your business. No coding required."
+- **Pain amplification**: "Agencies charge £10,000+. We charge £1,997."
+- **Differentiator**: "AI-built, professionally deployed, with ongoing platform
+  access."
+
+**Content Strategy**
+
+- Google Ads: "Custom business app — £1,997, no coding"
+- Facebook group posts: testimonial from SMB owner
+- Blog: "How a bakery got a custom ordering app for under £2,000"
+
+---
+
+### B3: QA / Testing Lead
+
+**Demographics**
+
+| Attribute | Value |
+|-----------|-------|
+| Age | 28-42 |
+| Gender | 60% Male |
+| Income | £45-85k |
+| Location | UK/US/EU |
+| Platforms | LinkedIn, QA communities, testing conferences, dev blogs |
+
+**Professional Profile**
+
+- Responsible for test coverage, accessibility compliance, and browser testing
+- Reports on quality metrics to engineering leadership
+- Under pressure to increase coverage without increasing headcount
+- Evaluates automation tools by coverage breadth and setup effort
+
+**Pain Points**
+
+- Manual testing is the bottleneck before every release
+- WCAG accessibility compliance requires specialist knowledge and time
+- Cross-browser testing is tedious and error-prone
+- Existing automation tools require significant setup and maintenance
+
+**Activation Trigger**
+
+Discovering QA Studio's automated WCAG audits and browser test generation from
+natural language descriptions
+
+**Platform Tools Used**
+
+QA Studio (browser automation, WCAG audits, test runner), coverage reporting,
+CI integration
+
+**Unit Economics**
+
+| Metric | Value |
+|--------|-------|
+| Target Tier | BUSINESS ($99/mo) |
+| CAC | £80-150 |
+| LTV | £1,188-2,376 |
+| LTV:CAC | 7.9-15.8x |
+| Payback | 1-2 months |
+
+**Messaging**
+
+- **Hero**: "Automated accessibility audits and browser testing in one tool."
+- **Pain amplification**: "WCAG compliance takes 40 hours per release. Automate
+  it."
+- **Differentiator**: "Natural language test descriptions → automated browser
+  tests."
+
+**Content Strategy**
+
+- Blog: "Automating WCAG audits with MCP tools"
+- Conference talk: "AI-powered QA for small teams"
+- LinkedIn: "We cut QA time by 60% with automated browser testing"
+
+---
+
+### B4: Data-Driven Marketing Manager
+
+**Demographics**
+
+| Attribute | Value |
+|-----------|-------|
+| Age | 26-42 |
+| Gender | 55% Female |
+| Income | £35-65k |
+| Location | UK/US |
+| Platforms | LinkedIn, marketing Slack communities, Google search |
+
+**Professional Profile**
+
+- Solo or small marketing team at a 10-50 person company
+- Needs analytics dashboards, campaign images, and content at scale
+- Reports on ROI to leadership; needs data-driven justification
+- Juggles social media, content, email, and analytics across multiple tools
+
+**Pain Points**
+
+- Analytics scattered across 5+ platform dashboards
+- Manual image creation for campaigns (Canva, Photoshop, Figma)
+- No AI-powered content pipeline for blog posts, social media, newsletters
+- Reporting overhead — hours spent compiling monthly reports
+
+**Activation Trigger**
+
+Seeing the image studio + analytics dashboard combination automate campaign
+image creation and reporting
+
+**Platform Tools Used**
+
+Image studio, analytics MCP tools, content generation, dashboard, reporting
+
+**Unit Economics**
+
+| Metric | Value |
+|--------|-------|
+| Target Tier | PRO ($29/mo) → BUSINESS ($99/mo) |
+| CAC | £60-150 |
+| LTV | £348-2,376 |
+| LTV:CAC | 5.8-15.8x |
+| Payback | 1-3 months |
+
+**Messaging**
+
+- **Hero**: "Campaign images, analytics, and content in one AI platform."
+- **Pain amplification**: "You spend 60% of your time on busywork. Stop."
+- **Differentiator**: "AI image generation + analytics + content — not just
+  scheduling."
+
+**Content Strategy**
+
+- LinkedIn: "How I automated campaign image creation with AI"
+- Blog: "The marketing manager's AI tool stack for 2026"
+- Webinar: "AI-powered marketing for small teams"
+
+---
+
+## Segment C: Creators (Content-First)
+
+Individuals who use the platform for content creation, education, or creative
+projects. Lower ARPU but high virality — each creator produces content that
+drives organic awareness for the platform.
+
+---
+
+### C1: Technical Blogger
+
+**Demographics**
+
+| Attribute | Value |
+|-----------|-------|
+| Age | 24-40 |
+| Gender | 65% Male |
+| Income | £30-70k |
+| Location | Global |
+| Platforms | Dev.to, Hashnode, Medium, Twitter/X, personal blogs |
+
+**Professional Profile**
+
+- Writes developer tutorials and technical deep-dives
+- Monetises through sponsorships, consulting leads, or employer branding
+- Needs interactive code embeds and high-quality illustrations
+- Publishes 2-4 posts per month
+
+**Pain Points**
+
+- Manual screenshot creation for code examples
+- No interactive code embeds that readers can edit and run
+- Image editing tools (Figma, Canva) are overkill for blog illustrations
+- Code formatting and syntax highlighting inconsistencies across platforms
+
+**Activation Trigger**
+
+Discovering embeddable code sandboxes and image studio for blog illustrations
+
+**Platform Tools Used**
+
+Code editor embeds, image studio, blog tools, sandbox environments
+
+**Unit Economics**
+
+| Metric | Value |
+|--------|-------|
+| Target Tier | PRO ($29/mo) |
+| CAC | £30-60 |
+| LTV | £348-696 |
+| LTV:CAC | 5.8-11.6x |
+| Payback | 1-2 months |
+
+**Messaging**
+
+- **Hero**: "Interactive code embeds + AI illustrations for your blog."
+- **Differentiator**: "Your readers can edit and run the code in your blog post."
+
+**Content Strategy**
+
+- Dev.to: "How I add interactive code sandboxes to my blog posts"
+- Twitter/X: Thread showing before/after blog post quality
+- Partnership: Featured on Hashnode's tool recommendations
+
+---
+
+### C2: Educator / Course Creator
+
+**Demographics**
+
+| Attribute | Value |
+|-----------|-------|
+| Age | 28-50 |
+| Gender | 55% Male |
+| Income | £35-80k |
+| Location | Global |
+| Platforms | Udemy, YouTube, LinkedIn Learning, education conferences |
+
+**Professional Profile**
+
+- Creates coding courses or teaches programming at institutions
+- Needs interactive sandboxes where students can practice
+- Values tools that reduce grading and feedback overhead
+- Publishes courses on 1-3 platforms
+
+**Pain Points**
+
+- No scalable interactive coding environment for students
+- Manual grading of coding assignments
+- Engagement tracking across course modules is limited
+- Per-seat licensing for educational tools is expensive
+
+**Activation Trigger**
+
+Seeing LearnIt quizzes + code sandboxes integrated for student use, with
+progress tracking
+
+**Platform Tools Used**
+
+LearnIt tools, code sandboxes, badges, student workspaces, progress tracking
+
+**Unit Economics**
+
+| Metric | Value |
+|--------|-------|
+| Target Tier | PRO ($29/mo) |
+| CAC | £40-80 |
+| LTV | £348-1,044 |
+| LTV:CAC | 4.4-13.1x |
+| Payback | 1-3 months |
+
+**Messaging**
+
+- **Hero**: "Interactive coding courses with built-in quizzes and sandboxes."
+- **Differentiator**: "Students write and run code inside your course. No setup."
+
+**Content Strategy**
+
+- YouTube: "How I built an interactive coding course with spike.land"
+- Education conference: Demo of LearnIt + sandbox integration
+- Partnership: Bootcamp pilot programme
+
+---
+
+### C3: Visual Designer
+
+**Demographics**
+
+| Attribute | Value |
+|-----------|-------|
+| Age | 22-38 |
+| Gender | 55% Female |
+| Income | £25-60k |
+| Location | Global |
+| Platforms | Dribbble, Behance, Instagram, Twitter/X, design communities |
+
+**Professional Profile**
+
+- Creates visual content for clients, personal brand, or products
+- Needs AI-powered image generation, enhancement, and export pipelines
+- Evaluates tools by output quality and workflow efficiency
+- Budget-sensitive — prefers tools under £50/month
+
+**Pain Points**
+
+- Expensive design tools (Adobe CC £50+/mo, Figma £15+/mo)
+- No integrated AI pipeline: generate → enhance → export
+- Manual image processing for different formats and sizes
+- Switching between 3+ tools for a single image workflow
+
+**Activation Trigger**
+
+Discovering the image studio pipeline: AI generation → enhancement → album
+organisation → export
+
+**Platform Tools Used**
+
+Image studio (generate, enhance, album, export), templates, batch processing
+
+**Unit Economics**
+
+| Metric | Value |
+|--------|-------|
+| Target Tier | PRO ($29/mo) + credit overages |
+| CAC | £40-80 |
+| LTV | £348-870 |
+| LTV:CAC | 4.4-10.9x |
+| Payback | 1-2 months |
+
+**Messaging**
+
+- **Hero**: "Generate, enhance, and export images in one AI pipeline."
+- **Differentiator**: "Complete image workflow at $29/mo — not $50+/mo."
+
+**Content Strategy**
+
+- Instagram: Before/after image enhancement showcase
+- Dribbble: "Made with spike.land" project showcase
+- Blog: "My AI image workflow: from prompt to final export"
+
+---
+
+### C4: Chess / Game Enthusiast
+
+**Demographics**
+
+| Attribute | Value |
+|-----------|-------|
+| Age | 18-50 |
+| Gender | 70% Male |
+| Income | £15-60k |
+| Location | Global |
+| Platforms | Chess forums, Reddit (r/chess), Discord, YouTube |
+
+**Professional Profile**
+
+- Plays chess recreationally or competitively online
+- Interested in ELO ratings, game analysis, and tournament play
+- Active in online chess communities
+- May be a developer who discovers chess tools while exploring the platform
+
+**Pain Points**
+
+- Limited AI-powered game analysis on existing platforms
+- No MCP-native chess experience (play via Claude or agent)
+- Existing platforms (Chess.com, Lichess) don't integrate with AI assistants
+- Want unique chess experience combining AI analysis with play
+
+**Activation Trigger**
+
+Discovering the Chess Arena with AI opponents, ELO system, time controls, and
+game replay — playable through Claude or spike-cli
+
+**Platform Tools Used**
+
+Chess Arena (21 MCP tools), ELO ratings, time controls, game replay, profile
+
+**Unit Economics**
+
+| Metric | Value |
+|--------|-------|
+| Target Tier | FREE → PRO ($29/mo) |
+| CAC | £5-20 |
+| LTV | £87-348 |
+| LTV:CAC | 4.4-17.4x |
+| Payback | 1-2 months |
+
+**Messaging**
+
+- **Hero**: "Play chess with AI — via Claude, your terminal, or the web."
+- **Differentiator**: "The only chess engine you can play through MCP."
+
+**Content Strategy**
+
+- Reddit: "I built a chess engine you can play through Claude" (r/chess,
+  r/AnthropicAI)
+- YouTube: "Playing chess through Claude Code — MCP Chess Arena"
+- Discord: Chess community engagement, weekly tournaments
+
+---
+
+## Segment D: Scalers (Agency/Team)
+
+Teams and organisations deploying the platform across multiple clients or
+projects. Highest ARPU and longest retention, but highest CAC and longest sales
+cycle.
+
+---
+
+### D1: AI Consultancy / Agency
+
+**Demographics**
+
+| Attribute | Value |
+|-----------|-------|
+| Age | 30-50 (principals) |
+| Gender | 65% Male |
+| Income | £60-150k |
+| Location | UK/US/EU |
+| Platforms | LinkedIn, industry events, client referrals, partnerships |
+
+**Professional Profile**
+
+- 5-50 person agency building AI solutions for enterprise clients
+- Manages multiple client projects simultaneously
+- Needs workspace isolation, per-client billing, and team management
+- Evaluates platforms on scalability, API quality, and support SLA
+
+**Pain Points**
+
+- Per-client tool setup is repetitive and time-consuming
+- Billing complexity across multiple clients and tool providers
+- No workspace isolation — client data mixing is a compliance risk
+- Need white-label or co-branded reporting for client deliverables
+
+**Activation Trigger**
+
+Seeing multi-workspace management with per-client isolation, API SCALE access,
+and consolidated billing
+
+**Platform Tools Used**
+
+Multi-workspace, API SCALE, client deployments, team management, audit logs,
+reporting
+
+**Unit Economics**
+
+| Metric | Value |
+|--------|-------|
+| Target Tier | BUSINESS ($99/mo) + API SCALE ($149/mo) |
+| CAC | £150-300 |
+| LTV | £5,940-17,820 |
+| LTV:CAC | 19.8-59.4x |
+| Payback | 1-2 months |
+
+**Messaging**
+
+- **Hero**: "One platform for all your AI client projects. Isolated. Metered.
+  Billed."
+- **Differentiator**: "Multi-workspace with per-client API access and billing."
+
+**Content Strategy**
+
+- LinkedIn: Direct outreach to AI agency principals
+- Case study: "How an AI agency manages 15 clients on one platform"
+- Partnership: Referral programme with revenue share
+
+---
+
+### D2: Freelance Developer (Multi-Client)
+
+**Demographics**
+
+| Attribute | Value |
+|-----------|-------|
+| Age | 25-40 |
+| Gender | 70% Male |
+| Income | £30-80k (variable, freelance) |
+| Location | Global (Remote) |
+| Platforms | LinkedIn, Upwork, freelancer communities, word of mouth |
+
+**Professional Profile**
+
+- Manages 3-8 client projects simultaneously
+- Solo operator or small 2-3 person team
+- Charges clients for tool costs as part of project fees
+- Values tools that scale linearly with client count
+
+**Pain Points**
+
+- Context-switching between client codebases and tool configurations
+- Tool costs scale linearly with clients — eats into margins
+- Client reporting is manual and time-consuming
+- Need separate workspaces to prevent data mixing
+
+**Activation Trigger**
+
+Discovering multi-workspace pricing that scales with client count, and the
+ability to pass tool costs through to clients
+
+**Platform Tools Used**
+
+Multiple workspaces, code editor, deployments, client reporting, spike-cli
+
+**Unit Economics**
+
+| Metric | Value |
+|--------|-------|
+| Target Tier | PRO x3-5 workspaces ($87-145/mo) |
+| CAC | £40-80 |
+| LTV | £1,044-4,350 |
+| LTV:CAC | 13.1-54.4x |
+| Payback | 1-2 months |
+
+**Messaging**
+
+- **Hero**: "Manage 8 clients like you're managing 2."
+- **Differentiator**: "Multi-workspace management built for freelancers."
 
 **Ad Copy Variations**
 
 - "I 3x'd my client roster without hiring anyone."
-- "The secret to managing 8 brands without losing your mind."
 - "Freelancers: Stop trading hours for money."
 - "Your clients think you have a team. It's just you + Spike."
 
-**Content Ideas**
+**Content Strategy**
 
-- Tutorial: "How I onboard new clients in 15 minutes"
-- Income breakdown: "How I went from 3 to 8 clients in 6 months"
-- Case study: "White-label reporting that impressed my clients"
-- LinkedIn post: "The #1 tool every freelance SMM needs"
+- LinkedIn: "How I onboard new clients in 15 minutes with spike-cli"
+- Blog: "The freelance developer's guide to managing 8 clients"
+- Community: Freelancer Slack/Discord engagement
 
 ---
 
-### 4. The Developer / AI Agent Builder
+### D3: Enterprise Innovation Lead
 
 **Demographics**
 
-| Attribute | Value                                   |
-| --------- | --------------------------------------- |
-| Age       | 22-40                                   |
-| Gender    | 75% Male                                |
-| Income    | £40-120k                                |
-| Location  | Global (Remote-first)                   |
-| Platforms | GitHub, Twitter/X, Discord, Hacker News |
+| Attribute | Value |
+|-----------|-------|
+| Age | 35-55 |
+| Gender | 60% Male |
+| Income | £80-150k |
+| Location | UK/US/EU enterprise centres |
+| Platforms | Gartner, Forrester, enterprise sales, LinkedIn, CTO summits |
 
 **Professional Profile**
 
-- Builds AI agents, automations, and integrations for clients or internal teams
-- Comfortable with CLIs, APIs, and the MCP protocol
-- Evaluates tools based on developer experience, documentation, and
-  extensibility
-- May manage social media programmatically for clients or as part of larger
-  automation pipelines
-- Active in open-source communities and AI/ML Discord servers
-
-**Psychographics**
-
-- Values composability, open standards, and scriptable interfaces
-- Prefers CLI over GUI for repeatable workflows
-- Early adopter of MCP ecosystem tools
-- Contributes to and consumes open-source packages
-- Judges products by API quality, not marketing copy
+- Evaluates AI platforms for enterprise-wide adoption
+- Needs SSO, RBAC, SLA, audit logs, and dedicated support
+- Reports to CTO/CIO; must justify vendor selection to procurement
+- Long sales cycle (3-6 months) with multiple stakeholders
 
 **Pain Points**
 
-- **No CLI access to social tools**: Existing platforms (Buffer, Hootsuite)
-  offer only GUIs or limited REST APIs
-- **Agent integration friction**: Building social media agents requires scraping
-  or unofficial APIs
-- **Fragmented tooling**: Must stitch together multiple APIs for a complete
-  social workflow
-- **No MCP-native social tools**: The MCP ecosystem lacks a social media
-  management provider
-- **Vendor lock-in**: Proprietary APIs with breaking changes and restrictive
-  rate limits
+- Security requirements (SSO, audit trail) that most AI tools don't meet
+- Vendor risk assessment for AI tool providers
+- Compliance requirements (SOC2, GDPR, ISO 27001)
+- Integration with existing enterprise tools (Jira, Slack, CI/CD)
 
-**Triggers**
+**Activation Trigger**
 
-- Client requests an AI agent that manages social media
-- Discovering spike-cli on npm or an MCP registry listing
-- Needing to automate social media reporting across multiple accounts
-- Hackathon or side project requiring social media integration
-- Frustration with rate-limited or poorly documented social APIs
+Enterprise features (SSO, RBAC, SLA, dedicated support) becoming available,
+combined with a successful pilot by an internal team
 
-**Primary Hook**
+**Platform Tools Used**
 
-> "455+ MCP tools. One `npm install` away."
+Full platform with enterprise security, custom integrations, SLA, dedicated
+support
 
-**Value Proposition**
+**Unit Economics**
 
-- **spike-cli**: Open-source MCP multiplexer CLI -- install from npm,
-  authenticate, start calling tools
-- **Same 455+ tools as web dashboard**: Full parity between GUI and CLI
-- **Scriptable workflows**: Chain tools in shell scripts, CI pipelines, or agent
-  loops
-- **MCP standard**: Works with Claude, GPT, or any MCP-compatible agent
-  framework
-- **Ecosystem contribution**: Build custom tools, submit PRs, extend the
-  platform
+| Metric | Value |
+|--------|-------|
+| Target Tier | ENTERPRISE (£500+/mo, custom pricing) |
+| CAC | £500-2,000 |
+| LTV | £12,000-36,000 |
+| LTV:CAC | 6.0-18.0x |
+| Payback | 2-4 months |
 
-**Pricing Sensitivity**
+**Messaging**
 
-- **Budget**: $0 for CLI (open-source), willing to pay $29-99/mo for API access
-  and higher rate limits
-- **Target Tier**: FREE (spike-cli) to API PRO add-on ($49/mo)
-- **Upgrade Trigger**: Hitting rate limits or needing write access for
-  production agents
+- **Hero**: "Enterprise AI platform with SSO, audit logs, and SLA."
+- **Differentiator**: "MCP-native AI tools with enterprise-grade security."
 
-**Ad Copy Variations**
+**Content Strategy**
 
-- "Your AI agent can now manage social media. `npx spike --help`"
-- "455+ MCP tools for developers. Open source. One CLI."
-- "Buffer has a dashboard. We have a REPL."
-- "Build a social media agent in 10 minutes with spike-cli."
-
-**Content Ideas**
-
-- Tutorial: "Build a Claude-powered social media agent with spike-cli"
-- GitHub README with quickstart and tool catalog
-- Hacker News Show HN: "spike-cli -- MCP multiplexer for social media
-  automation"
-- Dev.to post: "Why MCP is the future of social media tooling"
-- YouTube: Live-coding a social media automation pipeline in spike-cli
+- Direct sales: Custom demo and pilot programme
+- White paper: "Enterprise AI tool governance with managed MCP"
+- Conference: CTO summit presentations and booth
 
 ---
 
-## Campaign Strategy
+### D4: Education Institution / Bootcamp
 
-### Platform Targeting
+**Demographics**
 
-| Persona                   | Primary Platform | Secondary Platform     | Ad Format                    |
-| ------------------------- | ---------------- | ---------------------- | ---------------------------- |
-| Solo Content Creator      | Instagram        | TikTok                 | Story ads, Reels ads         |
-| Small Business Manager    | LinkedIn         | Facebook               | Sponsored posts, InMail      |
-| Freelance SMM             | LinkedIn         | Twitter/X              | Sponsored posts, Video ads   |
-| Developer / Agent Builder | GitHub / npm     | Twitter/X, Hacker News | README, Show HN, npm listing |
+| Attribute | Value |
+|-----------|-------|
+| Age | 35-55 (programme directors) |
+| Gender | 50/50 |
+| Income | Institution budget |
+| Location | UK/US/EU |
+| Platforms | Education conferences, partnership outreach, LinkedIn |
 
-### Budget Allocation (Initial Launch)
+**Professional Profile**
 
-| Persona                   | Budget % | Expected CAC | Lifetime Value (LTV)    | Payback Period |
-| ------------------------- | -------- | ------------ | ----------------------- | -------------- |
-| Solo Content Creator      | 30%      | £40-80       | £348-1,044 (12-36 mo)   | 1-3 months     |
-| Small Business Manager    | 35%      | £100-200     | £1,188-3,564 (12-36 mo) | 1-2 months     |
-| Freelance SMM             | 20%      | £60-120      | £522-1,566 (18-54 mo)   | 2-4 months     |
-| Developer / Agent Builder | 15%      | £10-30       | £588-1,764 (12-36 mo)   | 1-2 months     |
+- Coding bootcamp or university CS programme director
+- Manages 50-500 students per cohort
+- Needs scalable coding sandbox, progress tracking, and grading tools
+- Evaluates by per-student cost, setup effort, and student experience
 
-**Assumptions:**
+**Pain Points**
 
-- Solo Creator: $29/mo PRO tier, 12-36 month retention
-- Small Business: $99/mo BUSINESS tier, 12-36 month retention
-- Freelancer: 3 workspaces × $29/mo, 18-54 month retention
+- No scalable interactive coding environment for entire cohorts
+- Per-seat licensing for IDE tools is prohibitively expensive
+- Manual grading and progress tracking across large student groups
+- Students need sandboxed environments that prevent interference
 
-### Funnel Stages
+**Activation Trigger**
 
-**Awareness**: Social ads, content marketing, influencer partnerships
-**Consideration**: Free tier signup, 14-day PRO trial, feature comparison
-landing pages **Decision**: Upgrade prompts on limit hit, sales demo for
-BUSINESS tier **Retention**: Onboarding emails, feature adoption tracking,
-success stories
+Volume pricing for student workspaces with LearnIt integration and progress
+tracking dashboard
 
----
+**Platform Tools Used**
 
-## UTM Tracking by Persona
+Student workspaces, LearnIt quizzes, code sandboxes, badges, progress tracking,
+admin dashboard
 
-```
-Solo Creator:
-?utm_source=instagram&utm_medium=paid&utm_campaign=creator&utm_content=time-saver
+**Unit Economics**
 
-Small Business:
-?utm_source=linkedin&utm_medium=paid&utm_campaign=smb&utm_content=roi-dashboard
+| Metric | Value |
+|--------|-------|
+| Target Tier | BUSINESS ($99/mo) → ENTERPRISE (volume pricing) |
+| CAC | £200-500 |
+| LTV | £3,564-11,880 |
+| LTV:CAC | 7.1-23.8x |
+| Payback | 2-5 months |
 
-Freelancer:
-?utm_source=linkedin&utm_medium=paid&utm_campaign=freelance&utm_content=scale
-```
+**Messaging**
 
----
+- **Hero**: "Interactive coding sandboxes for your entire cohort. Volume
+  pricing."
+- **Differentiator**: "50 students, one dashboard. Quizzes, sandboxes, progress
+  tracking."
 
-## A/B Testing Themes
+**Content Strategy**
 
-Test these value propositions across all personas:
-
-1. **Time Savings**: "3 hours back every day"
-2. **Risk Mitigation**: "Catch crises before they go viral"
-3. **Revenue Growth**: "Manage 2x the clients without burning out"
-4. **AI Differentiation**: "The AI that sounds like you"
-5. **Professional Credibility**: "Enterprise-grade social media management"
+- Education conference: Demo of student sandbox + progress tracking
+- Partnership: Pilot programme with 2-3 bootcamps
+- Case study: "How a coding bootcamp deployed 200 student sandboxes"
 
 ---
 
-## Persona Evolution (Future Phases)
+## Platform Targeting Summary
 
-**Phase 2 Expansion (Q2 2026)**:
+| Persona | Primary Channel | Secondary Channel | Acquisition Method |
+|---------|-----------------|-------------------|--------------------|
+| A1: AI Agent Dev | GitHub / npm | Hacker News, Discord | PLG (spike-cli) |
+| A2: Indie Hacker | Twitter/X | Product Hunt, HN | Content, community |
+| A3: DevOps Engineer | LinkedIn | GitHub, Slack | Content, events |
+| A4: OSS MCP Author | GitHub | npm registries | Direct outreach |
+| B1: Startup CTO | LinkedIn | Hacker News, Slack | Content, events |
+| B2: Non-Tech SMB | Google Search | Facebook groups | Google Ads, referrals |
+| B3: QA Lead | LinkedIn | QA communities | Content, conferences |
+| B4: Marketing Mgr | LinkedIn | Google Search | Content, Google Ads |
+| C1: Tech Blogger | Dev.to / Hashnode | Twitter/X | Content, community |
+| C2: Educator | YouTube | Education conf. | Partnerships |
+| C3: Visual Designer | Dribbble / Instagram | Twitter/X | Community, social |
+| C4: Chess Enthusiast | Reddit | Discord, YouTube | Organic, viral |
+| D1: AI Agency | LinkedIn | Industry events | Direct sales |
+| D2: Freelance Dev | LinkedIn | Upwork, communities | Content, referrals |
+| D3: Enterprise Lead | Direct sales | Gartner, conferences | Enterprise sales |
+| D4: Education Inst. | Conferences | LinkedIn | Partnerships |
 
-- Agency owner (10-50 employees)
-- Enterprise social media director
-- Creator economy manager (MCN/talent management)
-- spike-cli power users converting to web dashboard (developer-to-prosumer
-  funnel)
+---
 
-**Phase 3 Niche Verticals (Q3 2026)**:
+## Budget Allocation by Persona (Y1)
 
-- E-commerce brand manager (Shopify/WooCommerce focus)
-- SaaS growth marketer (B2B tech companies)
-- Non-profit communications director
+| Persona | Budget % | Expected CAC | LTV (mid) | LTV:CAC |
+|---------|---------|-------------|-----------|---------|
+| A1: AI Agent Dev | 12% | £20 | £1,176 | 58.8x |
+| A2: Indie Hacker | 8% | £45 | £696 | 15.5x |
+| A3: DevOps Engineer | 6% | £150 | £2,376 | 15.8x |
+| A4: OSS MCP Author | 3% | £10 | £720 | 72.0x |
+| B1: Startup CTO | 8% | £130 | £2,376 | 18.3x |
+| B2: Non-Tech SMB | 7% | £90 | £1,347 | 15.0x |
+| B3: QA Lead | 5% | £115 | £1,782 | 15.5x |
+| B4: Marketing Mgr | 5% | £105 | £1,362 | 13.0x |
+| C1: Tech Blogger | 4% | £45 | £522 | 11.6x |
+| C2: Educator | 4% | £60 | £696 | 11.6x |
+| C3: Visual Designer | 3% | £60 | £609 | 10.2x |
+| C4: Chess Enthusiast | 2% | £13 | £218 | 16.8x |
+| D1: AI Agency | 10% | £225 | £11,880 | 52.8x |
+| D2: Freelance Dev | 5% | £60 | £2,697 | 44.9x |
+| D3: Enterprise Lead | 12% | £1,250 | £24,000 | 19.2x |
+| D4: Education Inst. | 6% | £350 | £7,722 | 22.1x |
+
+---
+
+## Persona Scaling Strategy
+
+### Year 1: 16 Personas — Establish Baselines
+
+Operate with these 16 personas. Track monthly: signups, activation rate,
+free-to-paid conversion, churn, and LTV:CAC per persona. Kill or merge bottom
+2 per quarter.
+
+### Year 2: 32 Personas — Behavioural Splitting
+
+Split each Y1 persona into 2 sub-personas based on observed data. Splitting
+dimensions: industry vertical, company size, use-case depth, geography.
+
+**Gating**: Minimum 10 users, statistically significant difference (p < 0.05) in
+activation/ARPU/churn vs parent persona. If a persona cannot justify a split, it
+remains consolidated.
+
+### Year 3: 64 Personas — Geographic & Vertical Deepening
+
+Split again via geographic expansion, vertical specialisation, and usage pattern
+segmentation. Same gating criteria as Year 2.
+
+See [BUSINESS_PLAN.md](./BUSINESS_PLAN.md) Section 8 for full scaling
+methodology.
 
 ---
 
 ## Competitive Positioning
 
-| Competitor        | Positioning vs. Spike Land                             | CLI/Agent Access?   |
-| ----------------- | ------------------------------------------------------ | ------------------- |
-| **Hootsuite**     | "Modern AI vs. legacy tool"                            | No                  |
-| **Buffer**        | "Smart automation vs. manual scheduling"               | No                  |
-| **Sprout Social** | "Affordable pro tool vs. enterprise pricing"           | No                  |
-| **Later**         | "Full command center vs. scheduling-only"              | No                  |
-| **Spike Land**    | The only platform with MCP registry + multi-channel AI | **Yes (spike-cli)** |
+| Competitor | Positioning vs. Spike Land | MCP Registry? | CLI Access? |
+|------------|---------------------------|---------------|-------------|
+| **Vercel** | Deployment only, no MCP tools | No | Yes |
+| **Cursor** | AI editor only, no deployment or registry | No | No |
+| **Replit** | Cloud IDE, no managed MCP, no marketplace | No | No |
+| **Smithery** | MCP directory only — lists tools, doesn't host them | Directory | No |
+| **Glama** | MCP directory only — no hosting, billing, or auth | Directory | No |
+| **spike.land** | **Managed MCP registry + deployment + marketplace** | **80+ hosted** | **spike-cli** |
+
+**Single-sentence positioning**: "The only MCP registry where 80+ tools work in
+Claude, in your terminal, and soon in WhatsApp — without stitching anything
+together."
 
 ---
 
-## Key Messaging by Persona
+## Success Metrics by Segment
 
-### Solo Content Creator
-
-- **Hero Message**: "Focus on creating. We'll handle the rest."
-- **Pain Point Amplification**: "Stop spending 60% of your time on busywork."
-- **Differentiation**: "AI that learns your voice, not generic templates."
-
-### Small Business Marketing Manager
-
-- **Hero Message**: "Enterprise-grade social management at SMB pricing."
-- **Pain Point Amplification**: "What's the cost of a PR crisis at 2 AM?"
-- **Differentiation**: "Anomaly detection and brand guardrails others don't
-  offer."
-
-### Freelance Social Media Manager
-
-- **Hero Message**: "Scale your freelance business without hiring."
-- **Pain Point Amplification**: "Turning down clients = turning down money."
-- **Differentiation**: "Multi-workspace management built for agencies."
-
-### Developer / AI Agent Builder
-
-- **Hero Message**: "455+ MCP tools. `npm install`. Done."
-- **Pain Point Amplification**: "Your agents can't manage social media because
-  no one built the CLI."
-- **Differentiation**: "Open-source MCP multiplexer. No competitor has a CLI."
+| Metric | Builders (A) | Operators (B) | Creators (C) | Scalers (D) |
+|--------|-------------|---------------|--------------|-------------|
+| Trial-to-Paid Conversion | 10-15% | 20-30% | 8-12% | 30-40% |
+| Month 1 Churn | < 12% | < 8% | < 15% | < 5% |
+| 6-Month Retention | 60-70% | 70-80% | 55-65% | 80-90% |
+| NPS Score | 50-60 | 45-55 | 40-50 | 55-65 |
+| Activation Rate (24h) | 50-60% | 40-50% | 35-45% | 55-65% |
 
 ---
 
-## Success Metrics by Persona
-
-| Metric                       | Solo Creator | Small Business | Freelancer | Developer/Agent Builder |
-| ---------------------------- | ------------ | -------------- | ---------- | ----------------------- |
-| **Trial-to-Paid Conversion** | 20-30%       | 30-40%         | 25-35%     | 10-20%                  |
-| **Month 1 Churn**            | <15%         | <10%           | <12%       | <20%                    |
-| **6-Month Retention**        | 60-70%       | 70-80%         | 65-75%     | 55-65%                  |
-| **NPS Score**                | 40-50        | 50-60          | 45-55      | 50-60                   |
-
----
-
-_Document created: January 2026_ _Next review: April 2026_ _Owner: Marketing
-Team_
+*Document Version: 2.0 (complete rewrite — expanded from 4 to 16 personas)*
+*Last Updated: March 2026*
+*Next Review: When paying customers exceed 50, or June 2026*
+*Owner: Founder / first growth hire*

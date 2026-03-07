@@ -1,6 +1,7 @@
 {
   "private": true,
   "name": "spike-land-ai",
+  "license": "MIT",
   "packageManager": "yarn@4.13.0",
   "workspaces": [
     "packages/*",
