@@ -132,7 +132,7 @@ export function ToolsIndexPage() {
                 <span className="inline-block rounded-full bg-muted px-3 py-0.5 text-xs text-muted-foreground">
                   {tool.category}
                 </span>
-                <span className="text-xs text-muted-foreground group-hover:text-primary">Run →</span>
+                <span className="text-xs text-muted-foreground group-hover:text-primary">Run <span aria-hidden="true">→</span></span>
               </div>
             </Link>
           ))}

@@ -38,8 +38,9 @@ export function CookieConsent() {
         <div className="flex-1 space-y-1">
           <h3 className="text-sm font-bold text-foreground">We use cookies</h3>
           <p className="text-xs text-muted-foreground leading-relaxed max-w-2xl">
-            We use essential cookies to make our platform work and analytics cookies to understand how you use it. 
-            By clicking "Accept All", you agree to our use of all cookies.{" "}
+            We use essential cookies to make our platform work, analytics cookies to understand how you use it,
+            and advertising cookies to measure campaign effectiveness.
+            By clicking &ldquo;Accept All&rdquo;, you agree to our use of all cookies.{" "}
             <Link
               to="/privacy"
               className="font-semibold text-primary hover:underline underline-offset-4"

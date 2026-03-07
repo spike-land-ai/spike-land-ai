@@ -25,6 +25,7 @@ export default {
           status: "ok",
           service: "spike-review",
           version: "0.1.0",
+          timestamp: new Date().toISOString(),
         }),
         { headers: { "content-type": "application/json" } },
       );

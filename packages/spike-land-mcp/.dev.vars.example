@@ -1,0 +1,14 @@
+# Copy this file to .dev.vars and fill in real values
+# Required for local development with `wrangler dev`
+
+MCP_JWT_SECRET=
+MCP_INTERNAL_SECRET=
+ANTHROPIC_API_KEY=
+OPENAI_API_KEY=
+GEMINI_API_KEY=
+ELEVENLABS_API_KEY=
+VAULT_SECRET=
+GA_MEASUREMENT_ID=
+GA_API_SECRET=
+APP_ENV=
+SPIKE_LAND_URL=

@@ -1,1 +1,1 @@
-export * from "../../src/core/block-website/index.ts";
+export * from "../../src/core/block-website/index";

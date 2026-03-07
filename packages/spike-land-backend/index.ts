@@ -1,1 +1,1 @@
-export * from "../../src/edge-api/backend/edge/chat.ts";
+export * from "../../src/edge-api/backend/edge/chat";

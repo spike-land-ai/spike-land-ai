@@ -104,7 +104,7 @@ export function AiChatWidget({ open, onToggle }: AiChatWidgetProps) {
             <div className="flex flex-col">
               <span
                 className={cn(
-                  "text-[10px] font-black uppercase tracking-widest",
+                  "text-xs font-black uppercase tracking-widest",
                   isDarkMode ? "text-primary-light/60" : "text-muted-foreground",
                 )}
               >
@@ -280,7 +280,7 @@ export function AiChatWidget({ open, onToggle }: AiChatWidgetProps) {
             />
             <button
               onClick={handleSend}
-              disabled={!input.trim() || isStreaming}
+              disabled={!input.trim() || isStreaming || !isAuthenticated}
               className={cn(
                 "p-3 rounded-xl transition-all active:scale-90 disabled:opacity-20 disabled:grayscale",
                 "bg-primary text-primary-foreground hover:bg-primary-light glow-primary disabled:shadow-none",

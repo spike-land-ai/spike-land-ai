@@ -32,7 +32,7 @@ migrations_dir = "db/migrations"
 
 [vars]
 GA_MEASUREMENT_ID = "G-9WNEM9ZHE7"
-CACHE_VERSION = "v4"
+CACHE_VERSION = "v5"
 
 [[services]]
 binding = "AUTH_MCP"

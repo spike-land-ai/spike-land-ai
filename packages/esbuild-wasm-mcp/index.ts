@@ -1,1 +1,1 @@
-export * from "../../src/mcp-tools/esbuild-wasm/mcp/index.ts";
+export * from "../../src/mcp-tools/esbuild-wasm/mcp/index";

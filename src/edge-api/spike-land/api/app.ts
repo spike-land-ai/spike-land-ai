@@ -27,7 +27,7 @@ export function createApp(): Hono<{ Bindings: Env; Variables: AuthVariables }> {
   );
   app.use("*", logger());
 
-  app.get("/health", (c) => c.json({ ok: true, service: "spike-land-mcp" }));
+  app.get("/health", (c) => c.json({ status: "ok", service: "spike-land-mcp", timestamp: new Date().toISOString() }));
 
   // Internal routes (protected by x-internal-secret header)
   app.use("/internal/*", internalAuthMiddleware);

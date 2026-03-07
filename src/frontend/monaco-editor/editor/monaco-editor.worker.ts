@@ -6,19 +6,18 @@ const MonacoEnvironment = {
   baseUrl,
 
   getWorkerUrl: (_moduleId: string, label: string) => {
+    let path = `${baseUrl}/editor/editor.worker.js`;
     if (label === "typescript" || label === "javascript") {
-      return `${baseUrl}/language/typescript/ts.worker.js`;
+      path = `${baseUrl}/language/typescript/ts.worker.js`;
+    } else if (label === "json") {
+      path = `${baseUrl}/language/json/json.worker.js`;
+    } else if (label === "css" || label === "scss" || label === "less") {
+      path = `${baseUrl}/language/css/css.worker.js`;
+    } else if (label === "html" || label === "handlebars" || label === "razor") {
+      path = `${baseUrl}/language/html/html.worker.js`;
     }
-    if (label === "json") {
-      return `${baseUrl}/language/json/json.worker.js`;
-    }
-    if (label === "css" || label === "scss" || label === "less") {
-      return `${baseUrl}/language/css/css.worker.js`;
-    }
-    if (label === "html" || label === "handlebars" || label === "razor") {
-      return `${baseUrl}/language/html/html.worker.js`;
-    }
-    return `${baseUrl}/editor/editor.worker.js`;
+    const blob = new Blob([`importScripts('${path}');`], { type: 'application/javascript' });
+    return URL.createObjectURL(blob);
   },
 };
 

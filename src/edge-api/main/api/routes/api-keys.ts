@@ -56,16 +56,16 @@ apiKeys.post("/api/keys", async (c) => {
     return c.json({ error: "Unauthorized" }, 401);
   }
 
-  let body: { provider?: string; encryptedKey?: string };
+  let body: { provider?: string; apiKey?: string };
   try {
-    body = (await c.req.json()) as { provider?: string; encryptedKey?: string };
+    body = (await c.req.json()) as { provider?: string; apiKey?: string };
   } catch {
     return c.json({ error: "Invalid JSON body" }, 400);
   }
 
-  const { provider, encryptedKey } = body;
-  if (!provider || !encryptedKey) {
-    return c.json({ error: "provider and encryptedKey are required" }, 400);
+  const { provider, apiKey } = body;
+  if (!provider || !apiKey) {
+    return c.json({ error: "provider and apiKey are required" }, 400);
   }
 
   const id = crypto.randomUUID();
@@ -74,7 +74,7 @@ apiKeys.post("/api/keys", async (c) => {
     `INSERT INTO user_api_key_vault (id, user_id, provider, encrypted_key, created_at)
      VALUES (?, ?, ?, ?, datetime('now'))`,
   )
-    .bind(id, userId, provider, encryptedKey)
+    .bind(id, userId, provider, apiKey)
     .run();
 
   return c.json({ id, provider, createdAt: new Date().toISOString() }, 201);

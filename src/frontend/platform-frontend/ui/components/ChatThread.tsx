@@ -1,4 +1,4 @@
-import { type KeyboardEvent, useEffect, useRef, useState, useCallback } from "react";
+import { type KeyboardEvent, useEffect, useRef, useState, useCallback, memo } from "react";
 import { Button } from "../shared/ui/button";
 import { Send, Copy, Check, User, Bot, Loader2 } from "lucide-react";
 import { cn } from "../../styling/cn";
@@ -17,7 +17,7 @@ interface ChatThreadProps {
   isLoading?: boolean;
 }
 
-function MessageItem({ msg }: { msg: Message }) {
+const MessageItem = memo(function MessageItem({ msg }: { msg: Message }) {
   const [copied, setCopied] = useState(false);
 
   const handleCopy = useCallback(() => {
@@ -73,7 +73,7 @@ function MessageItem({ msg }: { msg: Message }) {
       </div>
     </div>
   );
-}
+});
 
 export function ChatThread({ messages, onSendMessage, isLoading }: ChatThreadProps) {
   const [input, setInput] = useState("");

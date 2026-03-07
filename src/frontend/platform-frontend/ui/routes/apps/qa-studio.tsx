@@ -84,12 +84,25 @@ export function QaStudioPage() {
 
   return (
     <div className="flex flex-col h-full w-full overflow-hidden bg-background">
-      <ConnectionPanel 
-        url={mcp.url} 
-        connected={mcp.connected} 
-        onConnect={mcp.connect} 
-        onDisconnect={mcp.disconnect} 
-      />
+      <div className="flex items-center justify-between px-4 py-3 border-b border-border bg-card">
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center border border-primary/20">
+            <div className="w-4 h-4 bg-primary rounded-sm" />
+          </div>
+          <div>
+            <h1 className="text-sm font-semibold text-foreground">QA Studio</h1>
+            <p className="text-xs text-muted-foreground">Browser Automation Control</p>
+          </div>
+        </div>
+        <div className="flex items-center gap-3">
+          <ConnectionPanel
+            url={mcp.url}
+            connected={mcp.connected}
+            onConnect={mcp.connect}
+            onDisconnect={mcp.disconnect}
+          />
+        </div>
+      </div>
       
       {mcp.connected && (
         <div className="flex flex-col flex-1 overflow-hidden">
@@ -103,7 +116,7 @@ export function QaStudioPage() {
           />
           
           <div className="flex flex-1 overflow-hidden">
-            <div className="flex-1 min-w-[50%]">
+            <div className="w-1/2 min-w-[400px] border-r border-border overflow-hidden flex flex-col">
               <NarrationPanel 
                 text={narrationText} 
                 onRefClick={handleRefClick} 
@@ -111,7 +124,7 @@ export function QaStudioPage() {
               />
             </div>
             
-            <div className="w-[40%] min-w-[300px]">
+            <div className="w-1/2 min-w-[400px] overflow-hidden flex flex-col">
               <SidePanel
                 {...(screenshotData !== undefined && { screenshotData })}
                 tabsData={tabsData}
@@ -126,25 +139,33 @@ export function QaStudioPage() {
 
       {!mcp.connected && (
         <div className="flex-1 flex items-center justify-center text-muted-foreground p-8 text-center flex-col gap-4">
-          <div className="text-2xl font-semibold text-foreground">QA Studio</div>
-          <div className="max-w-md">Connect to a local QA Studio MCP server to begin visually controlling browser automation without writing code.</div>
-          <div className="bg-muted/50 p-6 rounded-lg text-left border border-border mt-4 w-full max-w-lg shadow-sm">
-            <div className="font-semibold mb-3 text-foreground flex items-center gap-2">
-              <span className="bg-primary/20 text-primary w-6 h-6 rounded-full flex items-center justify-center text-sm">1</span>
-              Open your terminal
+          <div className="bg-muted/30 p-8 rounded-2xl border border-border mt-4 w-full max-w-2xl shadow-sm flex flex-col items-center">
+            <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center border border-primary/20 mb-6">
+              <div className="w-8 h-8 bg-primary rounded-lg" />
             </div>
-            <div className="font-semibold mb-3 text-foreground flex items-center gap-2">
-              <span className="bg-primary/20 text-primary w-6 h-6 rounded-full flex items-center justify-center text-sm">2</span>
-              Run the server
+            <div className="text-2xl font-bold text-foreground mb-2">Connect to QA Studio</div>
+            <div className="text-base text-muted-foreground mb-8 max-w-md text-center">
+              Control browser automation visually without writing any code. Connect to a local MCP server to begin.
             </div>
-            <div className="pl-8 mb-6">
-              <code className="bg-background border border-border px-3 py-2 rounded text-primary block shadow-inner font-mono text-sm">
-                npx @spike-land-ai/qa-studio --http --visible
-              </code>
-            </div>
-            <div className="font-semibold mb-3 text-foreground flex items-center gap-2">
-              <span className="bg-primary/20 text-primary w-6 h-6 rounded-full flex items-center justify-center text-sm">3</span>
-              Click Connect above
+
+            <div className="w-full text-left space-y-6">
+              <div className="flex items-start gap-4">
+                <div className="bg-primary/10 text-primary w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold shrink-0 mt-0.5 border border-primary/20">1</div>
+                <div>
+                  <div className="font-semibold text-foreground mb-2">Start the local server</div>
+                  <div className="bg-background border border-border p-3 rounded-lg shadow-inner">
+                    <code className="font-mono text-sm text-primary">npx @spike-land-ai/qa-studio --http --visible</code>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-4">
+                <div className="bg-primary/10 text-primary w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold shrink-0 mt-0.5 border border-primary/20">2</div>
+                <div>
+                  <div className="font-semibold text-foreground mb-1">Connect from the header</div>
+                  <div className="text-sm text-muted-foreground">Click the Connect button in the top right corner of this page.</div>
+                </div>
+              </div>
             </div>
           </div>
         </div>

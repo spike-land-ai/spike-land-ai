@@ -19,12 +19,14 @@ export function useMonacoTypeAcquisition({
   const initialMountRef = useRef(true);
 
   useEffect(() => {
-    if (!monaco) return;
+    // Support either monaco.typescript (our local package) or monaco.languages.typescript
+    const typescript = monaco?.typescript || monaco?.languages?.typescript;
+    if (!monaco || !typescript) return;
 
     let isActive = true;
 
     // Configure diagnostics so Monaco shows meaningful errors, not noise
-    monaco.languages.typescript.typescriptDefaults.setDiagnosticsOptions({
+    typescript.typescriptDefaults.setDiagnosticsOptions({
       noSemanticValidation: false,
       noSyntaxValidation: false,
       noSuggestionDiagnostics: true,
@@ -60,7 +62,7 @@ export function useMonacoTypeAcquisition({
               libsRef.current.set(filePath, fileContent);
               // Apply each type file to Monaco immediately so IntelliSense works
               // progressively instead of waiting for the entire batch to finish.
-              monaco!.languages.typescript.typescriptDefaults.addExtraLib(fileContent, filePath);
+              typescript.typescriptDefaults.addExtraLib(fileContent, filePath);
             },
             started: () => {
               if (!isActive) return;
@@ -78,7 +80,7 @@ export function useMonacoTypeAcquisition({
                 ([filePath, content]) => ({ filePath, content }),
               );
               if (extraLibs.length > 0) {
-                monaco!.languages.typescript.typescriptDefaults.setExtraLibs(extraLibs);
+                typescript.typescriptDefaults.setExtraLibs(extraLibs);
               }
 
               setTypesReady(true);

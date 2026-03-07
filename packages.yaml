@@ -75,17 +75,8 @@ packages:
     kind: library
     version: 1.0.0
     description: Shared base utilities for MCP servers
-    entry: index.ts
+    entry: core-logic/index.ts
     deps: []
-    publish:
-      registries: [github, npm]
-
-  esbuild-wasm:
-    kind: library
-    version: 0.27.4
-    description: Cross-platform WebAssembly binary for esbuild
-    entry: lib/main.js
-    type: commonjs
     publish:
       registries: [github, npm]
 
@@ -162,7 +153,7 @@ packages:
     description: MCP server wrapping esbuild-wasm
     entry: index.ts
     bin: index.js
-    deps: [esbuild-wasm, mcp-server-base]
+    deps: [mcp-server-base]
     publish:
       registries: [github, npm]
 
@@ -228,7 +219,7 @@ packages:
     kind: cli
     version: 1.0.0
     description: Docker-based dev workflow tool
-    entry: cli.ts
+    entry: core-logic/cli.ts
     bin: cli.js
     binName: vibe-dev
     publish:
@@ -374,8 +365,8 @@ packages:
     kind: browser
     version: 1.0.0
     description: Monaco Editor-based code editor with live preview
-    entry: modules.ts
-    deps: [esbuild-wasm, esbuild-wasm-mcp]
+    entry: core-logic/modules.ts
+    deps: [esbuild-wasm-mcp]
     publish:
       registries: [github]
     worker:

@@ -26,6 +26,8 @@ const app = new Hono<{ Bindings: Env }>();
 
 app.get("/version", (c) => c.json({ sha: __BUILD_SHA__, built: __BUILD_TIME__ }));
 
+app.get("/health", (c) => c.json({ status: "ok", service: "image-studio-mcp", timestamp: new Date().toISOString() }));
+
 app.use(
   "*",
   cors({

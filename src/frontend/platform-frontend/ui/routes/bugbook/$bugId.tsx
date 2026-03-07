@@ -31,7 +31,7 @@ export function BugbookDetailPage() {
   if (isError || !data?.bug) {
     return (
       <div className="space-y-4">
-        <Link to="/bugbook" className="text-primary hover:underline">&larr; Back to Bugbook</Link>
+        <Link to="/bugbook" className="text-primary hover:underline"><span aria-hidden="true">&larr;</span> Back to Bugbook</Link>
         <div className="rounded-xl border border-destructive/30 bg-destructive/10 p-6 text-center text-destructive">
           Bug not found.
         </div>

@@ -2,7 +2,7 @@ import { renderApp } from "../ui/@/lib/render-app";
 import { tryCatch } from "../lazy-imports/try-catch";
 import { App } from "./App";
 import { router } from "../ui/app/router";
-import "./index.css";
+import "../index.css";
 import { getCodeSpace } from "./hooks/use-code-space";
 import { initializeWebSocket, shouldInitWebSocket } from "./app-loader";
 

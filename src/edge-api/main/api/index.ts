@@ -26,7 +26,9 @@ import { credits } from "./routes/credits.js";
 import { creditMeterMiddleware } from "./middleware/credit-meter.js";
 import { requestIdMiddleware } from "./middleware/request-id.js";
 import { support } from "./routes/support.js";
+import { pricingApi } from "./routes/pricing-api.js";
 import { experiments } from "./routes/experiments.js";
+import { fixer } from "./routes/fixer.js";
 import { cachePurge } from "./routes/cache-purge.js";
 import { chat } from "./routes/chat.js";
 import { spa } from "./routes/spa.js";
@@ -140,8 +142,9 @@ app.delete("/r2/*", authMiddleware);
 // Auth middleware for WhatsApp linking API (not webhook — that uses HMAC)
 app.use("/whatsapp/link/*", authMiddleware);
 
-// Auth middleware for checkout
+// Auth middleware for checkout (covers /api/checkout and /api/checkout/*)
 app.use("/api/checkout", authMiddleware);
+app.use("/api/checkout/*", authMiddleware);
 
 // Auth middleware for credits routes
 app.use("/api/credits/*", authMiddleware);
@@ -186,6 +189,7 @@ app.onError((err, c) => {
 });
 
 // Mount routes (order matters — specific routes before SPA catch-all)
+app.route("/", pricingApi);
 app.route("/", health);
 app.route("/", r2);
 app.route("/", proxy);
@@ -207,6 +211,7 @@ app.route("/", cockpit);
 app.route("/", credits);
 app.route("/", support);
 app.route("/", experiments);
+app.route("/", fixer);
 app.route("/", chat);
 app.route("/", cachePurge);
 
@@ -268,7 +273,7 @@ app.get("/api/store/tools", async (c) => {
 // --- MCP Gateway ---
 
 // Helper: proxy request to MCP service binding
-async function mcpProxy(c: import("hono").Context<{ Bindings: Env }>) {
+async function mcpProxy(c: import("hono").Context<{ Bindings: Env; Variables: Variables }>) {
   const url = new URL(c.req.url);
   url.hostname = "mcp.spike.land";
   url.port = "";

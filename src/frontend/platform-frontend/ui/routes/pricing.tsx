@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { useAuth } from "../hooks/useAuth";
+import { useAnalytics } from "../hooks/useAnalytics";
+import { usePricing } from "../hooks/usePricing";
 import { apiFetch } from "../../core-logic/api";
 
 interface PricingFeature {
@@ -20,80 +22,82 @@ interface PricingPlan {
   highlighted: boolean;
 }
 
-const PLANS: PricingPlan[] = [
-  {
-    name: "Free",
-    monthlyPrice: "$0",
-    annualPrice: "$0",
-    annualTotal: "$0/yr",
-    description: "Get started with AI-powered development tools.",
-    features: [
-      { text: "50 AI requests/day" },
-      { text: "10 MCP (Model Context Protocol) tools" },
-      { text: "Community support" },
-      { text: "Basic dashboard" },
-    ],
-    cta: "Get Started Free",
-    ctaHref: "/tools",
-    highlighted: false,
-  },
-  {
-    name: "Pro",
-    monthlyPrice: "$29",
-    annualPrice: "$23",
-    annualTotal: "$276/yr",
-    period: "/mo",
-    description: "Unlock professional tools and higher limits.",
-    features: [
-      { text: "500 AI requests/day" },
-      { text: "All 80+ MCP tools" },
-      { text: "Priority support" },
-      { text: "API key vault — Bring Your Own Keys (BYOK)" },
-      { text: "Advanced analytics" },
-    ],
-    cta: "Upgrade to Pro",
-    tier: "pro",
-    highlighted: true,
-  },
-  {
-    name: "Business",
-    monthlyPrice: "$99",
-    annualPrice: "$79",
-    annualTotal: "$948/yr",
-    period: "/mo",
-    description: "Unlimited access and dedicated support for teams.",
-    features: [
-      { text: "Unlimited AI requests" },
-      { text: "All 80+ MCP tools" },
-      { text: "Dedicated support" },
-      { text: "Team management" },
-      { text: "Custom integrations" },
-      { text: "Marketplace revenue share" },
-    ],
-    cta: "Upgrade to Business",
-    tier: "business",
-    highlighted: false,
-  },
-  {
-    name: "Enterprise",
-    monthlyPrice: "Custom",
-    annualPrice: "Custom",
-    annualTotal: "",
-    description: "SSO, RBAC, and dedicated support for large teams.",
-    features: [
-      { text: "Everything in Business" },
-      { text: "SSO / SAML authentication" },
-      { text: "Custom RBAC & permissions" },
-      { text: "SLA guarantee (99.9%)" },
-      { text: "Dedicated support engineer" },
-      { text: "Audit logs & compliance" },
-      { text: "Custom integrations" },
-    ],
-    cta: "Contact Sales",
-    ctaHref: "mailto:enterprise@spike.land",
-    highlighted: false,
-  },
-];
+function makePlans(pricing: import("../hooks/usePricing").PricingData): PricingPlan[] {
+  return [
+    {
+      name: "Free",
+      monthlyPrice: "$0",
+      annualPrice: "$0",
+      annualTotal: "$0/yr",
+      description: "Get started with AI-powered development tools.",
+      features: [
+        { text: "50 AI requests/day" },
+        { text: "10 MCP (Model Context Protocol) tools" },
+        { text: "Community support" },
+        { text: "Basic dashboard" },
+      ],
+      cta: "Get Started Free",
+      ctaHref: "/tools",
+      highlighted: false,
+    },
+    {
+      name: "Pro",
+      monthlyPrice: pricing.pro.monthly,
+      annualPrice: pricing.pro.annual,
+      annualTotal: pricing.pro.annualTotal,
+      period: "/mo",
+      description: "Unlock professional tools and higher limits.",
+      features: [
+        { text: "500 AI requests/day" },
+        { text: "All 80+ MCP tools" },
+        { text: "Priority support" },
+        { text: "API key vault — Bring Your Own Keys (BYOK)" },
+        { text: "Advanced analytics" },
+      ],
+      cta: "Upgrade to Pro",
+      tier: "pro",
+      highlighted: true,
+    },
+    {
+      name: "Business",
+      monthlyPrice: pricing.business.monthly,
+      annualPrice: pricing.business.annual,
+      annualTotal: pricing.business.annualTotal,
+      period: "/mo",
+      description: "Unlimited access and dedicated support for teams.",
+      features: [
+        { text: "Unlimited AI requests" },
+        { text: "All 80+ MCP tools" },
+        { text: "Dedicated support" },
+        { text: "Team management" },
+        { text: "Custom integrations" },
+        { text: "Marketplace revenue share" },
+      ],
+      cta: "Upgrade to Business",
+      tier: "business",
+      highlighted: false,
+    },
+    {
+      name: "Enterprise",
+      monthlyPrice: "Custom",
+      annualPrice: "Custom",
+      annualTotal: "",
+      description: "SSO, RBAC, and dedicated support for large teams.",
+      features: [
+        { text: "Everything in Business" },
+        { text: "SSO / SAML authentication" },
+        { text: "Custom RBAC & permissions" },
+        { text: "SLA guarantee (99.9%)" },
+        { text: "Dedicated support engineer" },
+        { text: "Audit logs & compliance" },
+        { text: "Custom integrations" },
+      ],
+      cta: "Contact Sales",
+      ctaHref: "mailto:enterprise@spike.land",
+      highlighted: false,
+    },
+  ];
+}
 
 const FAQ_ITEMS = [
   {
@@ -143,11 +147,17 @@ const FAQ_ITEMS = [
   },
 ];
 
-async function handleCheckout(tier: "pro" | "business", annual: boolean, isAuthenticated: boolean) {
+async function handleCheckout(
+  tier: "pro" | "business",
+  annual: boolean,
+  isAuthenticated: boolean,
+  trackEvent: (event: string, data?: Record<string, unknown>) => void,
+) {
   if (!isAuthenticated) {
     window.location.href = "/login";
     return;
   }
+  trackEvent("checkout_started", { tier, billing: annual ? "annual" : "monthly" });
   const lookupKey = annual ? `${tier}_annual` : `${tier}_monthly`;
   const res = await apiFetch("/checkout", {
     method: "POST",
@@ -163,7 +173,7 @@ async function handleCheckout(tier: "pro" | "business", annual: boolean, isAuthe
   window.location.href = data.url;
 }
 
-function PlanCard({ plan, annual, isAuthenticated }: { plan: PricingPlan; annual: boolean; isAuthenticated: boolean }) {
+function PlanCard({ plan, annual, isAuthenticated, trackEvent }: { plan: PricingPlan; annual: boolean; isAuthenticated: boolean; trackEvent: (event: string, data?: Record<string, unknown>) => void }) {
   const isFree = plan.name === "Free";
   const displayPrice = annual ? plan.annualPrice : plan.monthlyPrice;
   const planId = `plan-${plan.name.toLowerCase()}`;
@@ -228,13 +238,17 @@ function PlanCard({ plan, annual, isAuthenticated }: { plan: PricingPlan; annual
       {plan.tier ? (
         <button
           type="button"
-          onClick={() => handleCheckout(plan.tier!, annual, isAuthenticated)}
+          onClick={() => handleCheckout(plan.tier!, annual, isAuthenticated, trackEvent)}
           className={buttonClass}
         >
           {!isAuthenticated && plan.tier ? "Get Started" : plan.cta}
         </button>
       ) : (
-        <a href={plan.ctaHref} className={buttonClass}>
+        <a
+          href={plan.ctaHref}
+          onClick={() => trackEvent("cta_clicked", { plan: plan.name, tier: plan.tier ?? "free" })}
+          className={buttonClass}
+        >
           {plan.cta}
         </a>
       )}
@@ -244,6 +258,7 @@ function PlanCard({ plan, annual, isAuthenticated }: { plan: PricingPlan; annual
 
 function FaqItem({ question, answer }: { question: string; answer: string }) {
   const [open, setOpen] = useState(false);
+  const panelId = `faq-${question.slice(0, 20).replace(/\W+/g, "-").toLowerCase()}`;
 
   return (
     <div className="border-b border-border py-4">
@@ -252,6 +267,7 @@ function FaqItem({ question, answer }: { question: string; answer: string }) {
         onClick={() => setOpen(!open)}
         className="flex w-full items-start justify-between text-left gap-4"
         aria-expanded={open}
+        aria-controls={panelId}
       >
         <span className="text-sm font-semibold text-foreground">{question}</span>
         <svg
@@ -265,7 +281,7 @@ function FaqItem({ question, answer }: { question: string; answer: string }) {
         </svg>
       </button>
       {open && (
-        <p className="mt-3 text-sm text-muted-foreground leading-relaxed">{answer}</p>
+        <p id={panelId} className="mt-3 text-sm text-muted-foreground leading-relaxed">{answer}</p>
       )}
     </div>
   );
@@ -274,6 +290,9 @@ function FaqItem({ question, answer }: { question: string; answer: string }) {
 export function PricingPage() {
   const [annual, setAnnual] = useState(false);
   const { isAuthenticated } = useAuth();
+  const { trackEvent } = useAnalytics();
+  const { pricing } = usePricing();
+  const PLANS = makePlans(pricing);
 
   return (
     <div className="mx-auto max-w-5xl space-y-12 px-4 py-10">
@@ -282,17 +301,25 @@ export function PricingPage() {
         <p className="text-muted-foreground max-w-xl mx-auto">
           Choose the plan that fits your workflow. From free to enterprise-grade.
         </p>
+        <div className="inline-flex items-center gap-2 rounded-full border border-green-500/30 bg-green-50 px-4 py-1.5 text-sm font-medium text-green-700 dark:bg-green-900/20 dark:text-green-400">
+          Launch pricing: £1/mo with code <span className="font-mono font-bold">LAUNCH97</span> — 14-day free trial included
+        </div>
 
         {/* Billing toggle */}
         <div
           role="radiogroup"
           aria-label="Billing frequency"
           className="mt-6 inline-flex items-center gap-3 rounded-full border border-border bg-muted p-1"
+          onKeyDown={(e) => {
+            if (e.key === "ArrowLeft" || e.key === "ArrowUp") { e.preventDefault(); setAnnual(false); }
+            if (e.key === "ArrowRight" || e.key === "ArrowDown") { e.preventDefault(); setAnnual(true); }
+          }}
         >
           <button
             type="button"
             role="radio"
             aria-checked={!annual}
+            tabIndex={!annual ? 0 : -1}
             onClick={() => setAnnual(false)}
             className={`rounded-full px-4 py-1.5 text-sm font-medium transition ${
               !annual ? "bg-background text-foreground shadow-sm" : "text-muted-foreground"
@@ -304,6 +331,7 @@ export function PricingPage() {
             type="button"
             role="radio"
             aria-checked={annual}
+            tabIndex={annual ? 0 : -1}
             onClick={() => setAnnual(true)}
             className={`rounded-full px-4 py-1.5 text-sm font-medium transition ${
               annual ? "bg-background text-foreground shadow-sm" : "text-muted-foreground"
@@ -319,7 +347,7 @@ export function PricingPage() {
 
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
         {PLANS.map((plan) => (
-          <PlanCard key={plan.name} plan={plan} annual={annual} isAuthenticated={isAuthenticated} />
+          <PlanCard key={plan.name} plan={plan} annual={annual} isAuthenticated={isAuthenticated} trackEvent={trackEvent} />
         ))}
       </div>
 
@@ -331,7 +359,11 @@ export function PricingPage() {
       </p>
 
       <p className="text-center text-sm text-muted-foreground">
-        Pricing and limits are subject to change. Prices in USD. VAT may apply.
+        Pricing and limits are subject to change.{" "}
+        {pricing.billedInUsd
+          ? `Prices shown in ${pricing.currency}. Billed in USD.`
+          : "Prices in USD."}{" "}
+        VAT may apply.
         <br />
         Students and educators: <a href="mailto:education@spike.land" className="text-primary underline hover:text-primary/80">Contact us for academic pricing</a>.
       </p>

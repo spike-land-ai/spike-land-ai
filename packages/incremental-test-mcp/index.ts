@@ -1,1 +1,1 @@
-export * from "../../src/utilities/incremental-test/core-logic/index.ts";
+export * from "../../src/utilities/incremental-test/core-logic/index";

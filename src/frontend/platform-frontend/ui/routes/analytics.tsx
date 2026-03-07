@@ -45,10 +45,12 @@ function TimeRangeSelector({
 }) {
   const ranges: TimeRange[] = ["24h", "7d", "30d"];
   return (
-    <div className="flex gap-1 rounded-lg border border-border bg-muted p-1">
+    <div role="group" aria-label="Time range" className="flex gap-1 rounded-lg border border-border bg-muted p-1">
       {ranges.map((range) => (
         <button
           key={range}
+          type="button"
+          aria-pressed={value === range}
           onClick={() => onChange(range)}
           className={`rounded-md px-3 py-1 text-sm font-medium transition-colors ${
             value === range
@@ -63,7 +65,7 @@ function TimeRangeSelector({
   );
 }
 
-const API_BASE = "/analytics";
+const API_BASE = "/api/analytics";
 
 export function AnalyticsPage() {
   const [timeRange, setTimeRange] = useState<TimeRange>("24h");

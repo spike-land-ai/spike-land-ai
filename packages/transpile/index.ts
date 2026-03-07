@@ -1,1 +1,1 @@
-export * from "../../src/edge-api/transpile/lazy-imports/index.ts";
+export * from "../../src/edge-api/transpile/lazy-imports/index";

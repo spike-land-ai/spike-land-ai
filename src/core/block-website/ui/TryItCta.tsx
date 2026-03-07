@@ -24,17 +24,17 @@ export function TryItCta() {
         <h2 className="text-2xl font-bold tracking-tight text-foreground mb-6">
           Ready to try?
         </h2>
-        
+
         <div className="max-w-2xl mx-auto mb-6">
-          <div className="rounded-xl overflow-hidden border border-[#334155] shadow-lg bg-[#0f172a] p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="rounded-xl overflow-hidden border border-border/50 shadow-lg bg-obsidian-950 p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="font-mono text-sm overflow-x-auto w-full text-left flex gap-2">
-              <span className="text-cyan-400 shrink-0">$</span>
-              <span className="text-slate-200 break-all">{command}</span>
+              <span className="text-primary shrink-0">$</span>
+              <span className="text-foreground break-all">{command}</span>
             </div>
             <button
               onClick={handleCopy}
               aria-label="Copy command to clipboard"
-              className="shrink-0 flex items-center justify-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 text-slate-200 rounded-md transition-colors text-sm font-medium w-full sm:w-auto"
+              className="shrink-0 flex items-center justify-center gap-2 px-4 py-2 bg-foreground/10 hover:bg-foreground/20 text-foreground rounded-md transition-colors text-sm font-medium w-full sm:w-auto"
             >
               {copied ? (
                 <>
@@ -52,7 +52,7 @@ export function TryItCta() {
         </div>
 
         <Link href="/tools" className="inline-flex items-center justify-center text-sm font-medium text-muted-foreground hover:text-foreground transition-colors group">
-          Or browse tools first 
+          Or browse tools first
           <span className="ml-1 group-hover:translate-x-1 transition-transform" aria-hidden="true">&rarr;</span>
         </Link>
       </div>

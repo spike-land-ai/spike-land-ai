@@ -1,0 +1,8 @@
+# Copy this file to .dev.vars and fill in real values
+# Required for local development with `wrangler dev`
+
+GEMINI_API_KEY=
+CF_AIG_TOKEN=
+DEMO_TOKEN=
+ANTHROPIC_API_KEY=
+AUTH_SERVICE_URL=

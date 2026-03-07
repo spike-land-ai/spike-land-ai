@@ -1,1 +1,1 @@
-export * from "../../src/mcp-tools/hackernews/mcp/index.ts";
+export * from "../../src/mcp-tools/hackernews/mcp/index";

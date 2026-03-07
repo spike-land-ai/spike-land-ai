@@ -1,6 +1,6 @@
 name = "qa-studio"
 main = "../../src/core/browser-automation/api-edge/worker-entry.ts"
-compatibility_date = "2025-01-01"
+compatibility_date = "2025-07-12"
 compatibility_flags = ["nodejs_compat"]
 
 [browser]

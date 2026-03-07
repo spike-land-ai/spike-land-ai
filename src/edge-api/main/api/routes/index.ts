@@ -12,6 +12,7 @@ export * from "./credits";
 export * from "./docs-api";
 export * from "./errors";
 export * from "./experiments";
+export * from "./fixer";
 export * from "./github-stars";
 export * from "./health";
 export * from "./live";

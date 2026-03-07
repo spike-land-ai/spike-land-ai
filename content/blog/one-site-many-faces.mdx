@@ -7,6 +7,7 @@ author: "Zoltan Erdos"
 category: "Engineering"
 tags: ["personalization", "a-b-testing", "onboarding", "product"]
 featured: true
+draft: true
 primer: "Same URL. 16 different experiences. One cookie."
 heroImage: "/blog/one-site-many-faces/hero.png"
 ---
@@ -36,12 +37,26 @@ This is not a thought experiment. It is running in production right now, and you
 
 ---
 
+## The First Adaptive Moment
+
+Before you ever see the quiz, spike.land makes its first adaptive decision on the landing page itself.
+
+Two buttons. "I'm a developer" and "I'm exploring." One binary choice that transforms the entire experience instantly.
+
+Click "I'm a developer" and the page shifts. A circular dark-mode transition ripples outward from the button. The hero heading's font weight animates from 400 to 700 — the text literally gets bolder as the interface acknowledges who you are. Letter spacing tightens. The "I'm exploring" button morphs into "Vibe Code Online Now," linking directly to our AI-powered code editor. A "Vibe" link slides into the navigation bar. The ThemeSwitcher appears — because developers want control over their environment.
+
+Click again to toggle it off. Light mode returns, the Vibe link disappears, the ThemeSwitcher hides, and "I'm exploring" comes back. It is a feature flag stored in `localStorage`, not a permanent commitment.
+
+This is the simplest personalization — one binary decision transforms the entire experience. Theme, typography, navigation, and available features all change instantly. It happens before the full 4-question onboarding quiz, because the very first thing spike.land wants to know is: do you write code?
+
+---
+
 ## The 4-Question Decision Tree
 
 The magic starts with four questions. Not a 47-field form that makes you question your life choices. Four binary questions that branch into a tree of 16 leaves.
 
 **Question 1: Do you write code?**
-This single question splits the entire user base into two worlds. Developers go left. Everyone else goes right.
+This single question splits the entire user base into two worlds. Developers go left. Everyone else goes right. And if you clicked "I'm a developer" on the landing page, you already answered it — the quiz remembers.
 
 **Question 2** depends on your first answer. Developers get asked what they build (apps vs. infrastructure). Non-developers get asked about their goals (business vs. personal).
 
@@ -167,6 +182,8 @@ This is the real power of persona-based personalization. It is not just about ma
 ## The Meta Reveal
 
 Here is the part where we break the fourth wall.
+
+If you clicked "I'm a developer" when you arrived at spike.land, you already saw personalization in action — before you even reached this article. The dark mode transition, the font weight shift, the navigation reshuffling — that was the system adapting to you in real time.
 
 You are reading one of 16 versions of this article right now. Not in the sense that the text changed — the prose is the same for everyone. But the poll question you saw above? Personalized. The landing preview? Personalized. The app recommendations on the sidebar? Personalized.
 

@@ -6,11 +6,11 @@
     },
     "google-analytics-mcp": {
       "command": "npx",
-      "args": ["tsx", "./src/google-analytics-mcp/index.ts"]
+      "args": ["tsx", "./src/mcp-tools/google-analytics/mcp/index.ts"]
     },
     "stripe-analytics-mcp": {
       "command": "npx",
-      "args": ["tsx", "./src/stripe-analytics-mcp/index.ts"]
+      "args": ["tsx", "./src/mcp-tools/stripe-analytics/mcp/index.ts"]
     }
   }
 }

@@ -1,8 +1,20 @@
 import type { ModelMessage } from "ai";
-import type { MessageContentPart } from "./aiRoutes";
-import { isMessageContentPart } from "./aiRoutes";
 import { VALID_ROLES } from "../core-logic/lib/message-validation";
 import type { ValidRole } from "../core-logic/lib/message-validation";
+
+interface MessageContentPart {
+  type: string;
+  text?: string;
+  image_url?: {
+    url: string;
+  };
+}
+
+function isMessageContentPart(value: unknown): value is MessageContentPart {
+  if (value === null || typeof value !== "object") return false;
+  const obj = value as Record<string, unknown>;
+  return typeof obj.type === "string";
+}
 
 interface MessagePart {
   type: string;

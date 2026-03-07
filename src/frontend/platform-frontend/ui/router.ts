@@ -4,6 +4,7 @@ import {
   createRoute,
   createRouter,
   redirect,
+  Outlet,
 } from "@tanstack/react-router";
 import { RootLayout } from "./routes/__root";
 import { NotFoundPage } from "./routes/not-found";
@@ -18,11 +19,12 @@ function withSuspense(load: () => Promise<{ [key: string]: React.ComponentType }
       {
         fallback: createElement(
           "div",
-          { className: "flex items-center justify-center py-20" },
+          { role: "status", "aria-label": "Loading", className: "flex items-center justify-center py-20" },
           createElement("div", {
-            className:
-              "h-8 w-8 animate-spin rounded-full border-4 border-border border-t-primary",
-          })
+            className: "h-8 w-8 animate-spin rounded-full border-4 border-border border-t-primary",
+            "aria-hidden": "true",
+          }),
+          createElement("span", { className: "sr-only" }, "Loading...")
         ),
       },
       createElement(LazyComponent)
@@ -198,6 +200,7 @@ const bugbookMyReportsRoute = createRoute({
 const dashboardRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/dashboard",
+  component: Outlet,
 });
 
 const dashboardIndexRoute = createRoute({
@@ -240,6 +243,7 @@ const learnBadgeRoute = createRoute({
 const messagesRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/messages",
+  component: Outlet,
 });
 
 const messagesIndexRoute = createRoute({
@@ -317,6 +321,12 @@ const whatWeDoRoute = createRoute({
   component: withSuspense(() => import("./routes/what-we-do"), "WhatWeDoPage"),
 });
 
+const buildRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/build",
+  component: withSuspense(() => import("./routes/build"), "BuildPage"),
+});
+
 // Build route tree
 const routeTree = rootRoute.addChildren([
   indexRoute,
@@ -324,6 +334,7 @@ const routeTree = rootRoute.addChildren([
   vibeCodeRoute,
   bazdmegRedirectRoute,
   whatWeDoRoute,
+  buildRoute,
   aboutRoute,
   analyticsRoute,
   callbackRoute,

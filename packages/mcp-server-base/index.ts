@@ -1,1 +1,1 @@
-export * from "../../src/core/server-base/core-logic/index.ts";
+export * from "../../src/core/server-base/core-logic/index";

@@ -19,7 +19,7 @@ const isProduction = environment === "production";
  * For example, `createEntryPoints("workers")` would find all script files in `src/@/workers`.
  * This helps in automating the build process for different modules or sections of the application.
  */
-const createEntryPoints = async (dir: string): Promise<string[]> => {
+const createEntryPoints = async (dir: string, basePath: string = "ui/@"): Promise<string[]> => {
   const result: string[] = [];
 
   async function processDirectory(currentDir: string, basePath: string): Promise<void> {
@@ -48,7 +48,7 @@ const createEntryPoints = async (dir: string): Promise<string[]> => {
     }
   }
 
-  const { error } = await tryCatch(processDirectory(dir, "src/@"));
+  const { error } = await tryCatch(processDirectory(dir, basePath));
   if (error) {
     console.error(`Error creating entry points for directory ${dir}:`, error);
     return []; // Return empty if top-level processing fails
@@ -57,7 +57,7 @@ const createEntryPoints = async (dir: string): Promise<string[]> => {
 };
 
 export async function buildMainScripts(): Promise<void> {
-  const workerFiles = await createEntryPoints("workers");
+  const workerFiles = await createEntryPoints("workers", "core-logic");
 
   // This function builds the main application scripts found in `src/@/workers`.
   // It produces two types of output for these worker files:
@@ -148,7 +148,7 @@ export async function buildMainScripts(): Promise<void> {
 export const buildWasm = async (): Promise<void> => {
   await build({
     ...getCommonBuildOptions(environment),
-    entryPoints: ["src/esbuildWASM.ts"],
+    entryPoints: ["lazy-imports/esbuildWASM.ts"],
     format: "esm",
     outdir: "dist",
     minify: true,
@@ -158,7 +158,7 @@ export const buildWasm = async (): Promise<void> => {
 export async function buildServiceWorker(): Promise<void> {
   await build({
     ...getCommonBuildOptions("production"),
-    entryPoints: ["src/sw.ts"],
+    entryPoints: ["core-logic/sw.ts"],
     format: "iife",
     outExtension: { ".js": ".js" },
     minifySyntax: false,
@@ -172,7 +172,7 @@ export async function buildServiceWorker(): Promise<void> {
 
   await build({
     ...getCommonBuildOptions("production"),
-    entryPoints: ["src/sw-deps.ts"],
+    entryPoints: ["core-logic/sw-deps.ts"],
     format: "iife",
     outExtension: { ".js": ".js" },
     minifySyntax: true,
@@ -184,7 +184,7 @@ export async function buildServiceWorker(): Promise<void> {
   });
 }
 
-const createAliases = async (dir: string): Promise<Record<string, string>> => {
+const createAliases = async (dir: string, basePath: string = "ui/@"): Promise<Record<string, string>> => {
   const result: Record<string, string> = {};
 
   // This function recursively scans directories (e.g., "components/ui", "lib")
@@ -229,7 +229,7 @@ const createAliases = async (dir: string): Promise<Record<string, string>> => {
     }
   }
 
-  const { error } = await tryCatch(processDirectory(dir, "src/@"));
+  const { error } = await tryCatch(processDirectory(dir, basePath));
   if (error) {
     console.error(`Error creating aliases for directory ${dir}:`, error);
     return {}; // Return empty if top-level processing fails
@@ -247,12 +247,12 @@ let _extraAliases: Record<string, string> | null = null;
 async function getStandaloneEntryPoints(): Promise<string[]> {
   if (_standaloneEntryPoints) return _standaloneEntryPoints;
   const [ui, app, lib, external, hooks, services] = await Promise.all([
-    createEntryPoints("components/ui"),
-    createEntryPoints("components/app"),
-    createEntryPoints("lib"),
-    createEntryPoints("external"),
-    createEntryPoints("hooks"),
-    createEntryPoints("services"),
+    createEntryPoints("components/ui", "ui/@"),
+    createEntryPoints("components/app", "ui/@"),
+    createEntryPoints("lib", "ui/@"),
+    createEntryPoints("external", "ui/@"),
+    createEntryPoints("hooks", "ui/@"),
+    createEntryPoints("services", "core-logic"),
   ]);
   _standaloneEntryPoints = [...ui, ...lib, ...external, ...app, ...hooks, ...services];
   return _standaloneEntryPoints;
@@ -261,12 +261,12 @@ async function getStandaloneEntryPoints(): Promise<string[]> {
 async function getExtraAliases(): Promise<Record<string, string>> {
   if (_extraAliases) return _extraAliases;
   const [ui, app, lib, external, hooks, services] = await Promise.all([
-    createAliases("components/ui"),
-    createAliases("components/app"),
-    createAliases("lib"),
-    createAliases("external"),
-    createAliases("hooks"),
-    createAliases("services"),
+    createAliases("components/ui", "ui/@"),
+    createAliases("components/app", "ui/@"),
+    createAliases("lib", "ui/@"),
+    createAliases("external", "ui/@"),
+    createAliases("hooks", "ui/@"),
+    createAliases("services", "core-logic"),
   ]);
   _extraAliases = { ...ui, ...app, ...lib, ...external, ...hooks, ...services };
   return _extraAliases;
@@ -293,7 +293,7 @@ export async function buildMainBundle(wasmFile: string): Promise<void> {
     legalComments: "none",
     platform: "node",
     plugins: [],
-    entryPoints: ["src/cf-esbuild.mjs", "src/modules.ts"],
+    entryPoints: ["cf-esbuild.mjs", "core-logic/modules.ts"],
     alias: {
       ...buildOptions.alias,
       "@src/swVersion": "/swVersion.mjs",
@@ -340,7 +340,7 @@ export async function buildMainBundle(wasmFile: string): Promise<void> {
     target: "es2024",
     external: [], // Override common externals
     alias: {}, // Override common aliases
-    outdir: "./dist/@/", // Output to a subdirectory for these standalone modules
+    outdir: "dist/@/", // Output to a subdirectory for these standalone modules
     platform: "browser",
     plugins: [
       ...buildOptions.plugins, // Keep common plugins like fetchPlugin
@@ -348,24 +348,24 @@ export async function buildMainBundle(wasmFile: string): Promise<void> {
         resolveFrom: "cwd",
         assets: [
           {
-            from: ["./src/assets/*"],
-            to: ["./dist/assets"],
+            from: ["assets/*"],
+            to: ["dist/assets"],
           },
           {
-            from: "./src/assets/manifest.webmanifest",
-            to: "./dist",
+            from: "assets/manifest.webmanifest",
+            to: "dist/manifest.webmanifest",
           },
           {
-            from: "./src/index.html",
-            to: "./dist",
+            from: "index.html",
+            to: "dist/index.html",
           },
           {
-            from: "./src/assets/favicons/favicon.ico",
-            to: "./dist",
+            from: "assets/favicons/favicon.ico",
+            to: "dist/favicon.ico",
           },
           {
-            from: "./src/assets/favicons/chunk-chunk-fe2f7da4f9ccc2.png",
-            to: "./dist/assets/favicons/chunk-chunk-fe2f7da4f9ccc2.png",
+            from: "assets/favicons/chunk-chunk-fe2f7da4f9ccc2.png",
+            to: "dist/assets/favicons/chunk-chunk-fe2f7da4f9ccc2.png",
           },
         ],
       }),
@@ -405,17 +405,17 @@ export async function buildMainBundle(wasmFile: string): Promise<void> {
     platform: "browser",
     plugins: [...buildOptions.plugins],
     entryPoints: [
-      "src/emotion.ts",
-      "src/emotionStyled.ts",
-      "src/reactMod.ts",
-      "src/recharts.ts",
-      "src/framerMotion.ts",
-      "src/reactDom.ts",
-      "src/start.ts",
-      "src/reactDomServer.ts",
-      "src/reactDomClient.ts",
-      "src/jsx.ts",
-      "src/emotionJsxRuntime.ts",
+      "ui/emotion.ts",
+      "ui/emotionStyled.ts",
+      "ui/reactMod.ts",
+      "lazy-imports/recharts.ts",
+      "animation/framerMotion.ts",
+      "ui/reactDom.ts",
+      "core-logic/start.ts",
+      "ui/reactDomServer.ts",
+      "ui/reactDomClient.ts",
+      "ui/jsx.ts",
+      "ui/emotionJsxRuntime.ts",
     ],
     alias: {
       ...buildOptions.alias,
@@ -480,7 +480,7 @@ export async function buildMainBundle(wasmFile: string): Promise<void> {
     }
   }
 
-  runImportMapReplaceOnAllFilesRecursive("./dist/@");
+  runImportMapReplaceOnAllFilesRecursive("dist/@");
 }
 
 const PRECACHE_EXTENSIONS = new Set([".js", ".mjs", ".css", ".wasm"]);

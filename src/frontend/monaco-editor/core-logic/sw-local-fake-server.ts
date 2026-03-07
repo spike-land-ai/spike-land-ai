@@ -2,11 +2,8 @@ import { getCodeSpace } from "./hooks/use-code-space.ts";
 import { importMap, importMapReplace } from "./lib/importmap-utils";
 import { routes } from "./lib/routes";
 import { SessionSynchronizer } from "./services/SessionSynchronizer";
-import type {} from "./def";
 import { tryCatch } from "../lazy-imports/try-catch";
-import HTML from "./index.html";
-
-// Removed invalid HTML import: import HTML from "./index.html";
+import HTML from "../index.html";
 
 import type { ICodeSession } from "../ui/@/lib/interfaces";
 import { sanitizeSession, sessionToJSON } from "./lib/make-sess";
@@ -186,15 +183,9 @@ function createHtmlResponseHeaders(): Headers {
 }
 
 async function handleHtmlResponse(session: ICodeSession) {
-  // Fetch index.html content
-  // const htmlResponse = await fetch("/index.html");
-  // if (!htmlResponse.ok) {
-  //   return new Response("Failed to fetch base HTML", { status: 500 });
-  // }
   const baseHtml = HTML;
 
   const { codeSpace, html, css } = session;
-  // Use fetched baseHtml instead of the imported variable
   const respText = baseHtml
     .replace("// IMPORTMAP", JSON.stringify(importMap))
     .replaceAll("${codeSpace}", codeSpace)

@@ -49,7 +49,8 @@ export function startHttpServer(server: McpServer, port: number, host: string) {
     }
 
     try {
-      await transport.handlePostMessage(req, res);
+      // Pass req.body as parsedBody since express.json() already consumed the stream
+      await transport.handlePostMessage(req, res, req.body as Record<string, unknown>);
     } catch {
       if (!res.headersSent) {
         res.status(500).send("Error processing message");

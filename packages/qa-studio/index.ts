@@ -1,1 +1,1 @@
-export * from "../../src/core/browser-automation/core-logic/index.ts";
+export * from "../../src/core/browser-automation/core-logic/index";

@@ -97,7 +97,7 @@ export function useDictation(defaultValue = "", options: UseDictationOptions = {
 
     if (sendError) {
       console.error("Error sending audio data:", sendError);
-      setError(`An error occurred: ${(sendError as Error).message}`);
+      setError(`An error occurred: ${sendError instanceof Error ? sendError.message : String(sendError)}`);
       return;
     }
 
@@ -115,7 +115,7 @@ export function useDictation(defaultValue = "", options: UseDictationOptions = {
 
     if (textError) {
       console.error("Error reading API response text:", textError);
-      setError(`An error occurred while reading response: ${(textError as Error).message}`);
+      setError(`An error occurred while reading response: ${textError instanceof Error ? textError.message : String(textError)}`);
       return;
     }
     if (text === null || text === undefined) {

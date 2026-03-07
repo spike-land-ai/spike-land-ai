@@ -14,7 +14,6 @@
     "deploy:force": "FORCE_DEPLOY=1 bash deploy.sh"
   },
   "dependencies": {
-    "@monaco-editor/react": "^4.7.0",
     "@radix-ui/react-slot": "^1.2.3",
     "@spike-land-ai/block-website": "workspace:*",
     "@tanstack/react-query": "^5.90.21",
@@ -27,6 +26,7 @@
     "clsx": "^2.1.1",
     "framer-motion": "^12.35.0",
     "lucide-react": "^0.577.0",
+    "monaco-editor": "workspace:*",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
     "tailwind-merge": "^3.5.0",

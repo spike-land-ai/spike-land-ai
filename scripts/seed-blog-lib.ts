@@ -13,6 +13,7 @@ export interface BlogPost {
   category: string;
   tags: string[];
   featured: boolean;
+  draft: boolean;
   heroImage: string | null;
   content: string;
 }
@@ -35,7 +36,7 @@ export function parseMdxContent(
 ): BlogPost | null {
   const { data, content } = matter(rawContent);
 
-  if (data.draft) return null;
+  const isDraft = Boolean(data.draft);
 
   let heroImage: string | null = data.heroImage || null;
   let body = content.trim();
@@ -69,6 +70,7 @@ export function parseMdxContent(
     category: data.category || "",
     tags: data.tags || [],
     featured: data.featured || false,
+    draft: isDraft,
     heroImage,
     content: body,
   };
@@ -91,8 +93,8 @@ export function generateSQL(posts: BlogPost[]): string {
 
   for (const post of posts) {
     statements.push(
-      `INSERT OR REPLACE INTO blog_posts (slug, title, description, primer, date, author, category, tags, featured, hero_image, content, updated_at)
-VALUES ('${escapeSQL(post.slug)}', '${escapeSQL(post.title)}', '${escapeSQL(post.description)}', '${escapeSQL(post.primer)}', '${escapeSQL(post.date)}', '${escapeSQL(post.author)}', '${escapeSQL(post.category)}', '${escapeSQL(JSON.stringify(post.tags))}', ${post.featured ? 1 : 0}, ${post.heroImage ? `'${escapeSQL(post.heroImage)}'` : "NULL"}, '${escapeSQL(post.content)}', unixepoch());`,
+      `INSERT OR REPLACE INTO blog_posts (slug, title, description, primer, date, author, category, tags, featured, draft, hero_image, content, updated_at)
+VALUES ('${escapeSQL(post.slug)}', '${escapeSQL(post.title)}', '${escapeSQL(post.description)}', '${escapeSQL(post.primer)}', '${escapeSQL(post.date)}', '${escapeSQL(post.author)}', '${escapeSQL(post.category)}', '${escapeSQL(JSON.stringify(post.tags))}', ${post.featured ? 1 : 0}, ${post.draft ? 1 : 0}, ${post.heroImage ? `'${escapeSQL(post.heroImage)}'` : "NULL"}, '${escapeSQL(post.content)}', unixepoch());`,
     );
   }
 

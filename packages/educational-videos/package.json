@@ -5,11 +5,12 @@
   "type": "module",
   "main": "./index.ts",
   "scripts": {
-    "build": "remotion bundle index.ts dist/bundle.js",
-    "start": "remotion preview index.ts",
-    "render": "remotion render index.ts out/video.mp4"
+    "build": "npx remotion bundle index.ts dist/bundle.js",
+    "start": "npx remotion preview index.ts",
+    "render": "npx remotion render index.ts out/video.mp4"
   },
   "dependencies": {
+    "@remotion/cli": "^4.0.0",
     "@remotion/transitions": "^4.0.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",

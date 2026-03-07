@@ -52,7 +52,7 @@ export const PLAN_DEFINITIONS: PlanDefinition[] = [
   {
     name: "Pro",
     tier: "pro",
-    price: 19,
+    price: 29,
     features: [
       "Unlimited apps",
       "500 vault secrets",
@@ -64,7 +64,7 @@ export const PLAN_DEFINITIONS: PlanDefinition[] = [
   {
     name: "Business",
     tier: "business",
-    price: 49,
+    price: 99,
     features: [
       "Everything in Pro",
       "Team workspaces with RBAC",

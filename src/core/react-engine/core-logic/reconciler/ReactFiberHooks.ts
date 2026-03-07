@@ -482,7 +482,7 @@ function mountEffectImpl(
   deps: Array<unknown> | void | null,
 ): void {
   const hook = mountWorkInProgressHook();
-  const nextDeps = deps === undefined ? null : deps;
+  const nextDeps = (deps === undefined ? null : deps) as Array<unknown> | null;
   currentlyRenderingFiber.flags |= fiberFlags;
   hook.memoizedState = pushSimpleEffect(
     HookHasEffect | hookFlags,
@@ -499,7 +499,7 @@ function updateEffectImpl(
   deps: Array<unknown> | void | null,
 ): void {
   const hook = updateWorkInProgressHook();
-  const nextDeps = deps === undefined ? null : deps;
+  const nextDeps = (deps === undefined ? null : deps) as Array<unknown> | null;
   const effect: Effect = hook.memoizedState as Effect;
   const inst = createEffectInstance();
   inst.destroy = effect.destroy as unknown as void | (() => void);
@@ -604,14 +604,14 @@ function updateImperativeHandle<T>(
 
 function mountCallback<T>(callback: T, deps: Array<unknown> | void | null): T {
   const hook = mountWorkInProgressHook();
-  const nextDeps = deps === undefined ? null : deps;
+  const nextDeps = (deps === undefined ? null : deps) as Array<unknown> | null;
   hook.memoizedState = [callback, nextDeps];
   return callback;
 }
 
 function updateCallback<T>(callback: T, deps: Array<unknown> | void | null): T {
   const hook = updateWorkInProgressHook();
-  const nextDeps = deps === undefined ? null : deps;
+  const nextDeps = (deps === undefined ? null : deps) as Array<unknown> | null;
   const prevState = hook.memoizedState as [T, Array<unknown> | null];
   if (nextDeps !== null) {
     const prevDeps: Array<unknown> | null = prevState[1];
@@ -625,7 +625,7 @@ function updateCallback<T>(callback: T, deps: Array<unknown> | void | null): T {
 
 function mountMemo<T>(nextCreate: () => T, deps: Array<unknown> | void | null): T {
   const hook = mountWorkInProgressHook();
-  const nextDeps = deps === undefined ? null : deps;
+  const nextDeps = (deps === undefined ? null : deps) as Array<unknown> | null;
   const nextValue = nextCreate();
   hook.memoizedState = [nextValue, nextDeps];
   return nextValue;
@@ -633,7 +633,7 @@ function mountMemo<T>(nextCreate: () => T, deps: Array<unknown> | void | null): 
 
 function updateMemo<T>(nextCreate: () => T, deps: Array<unknown> | void | null): T {
   const hook = updateWorkInProgressHook();
-  const nextDeps = deps === undefined ? null : deps;
+  const nextDeps = (deps === undefined ? null : deps) as Array<unknown> | null;
   const prevState = hook.memoizedState as [T, Array<unknown> | null];
   if (nextDeps !== null) {
     const prevDeps: Array<unknown> | null = prevState[1];

@@ -15,6 +15,7 @@ interface BlogPostRow {
   category: string;
   tags: string;
   featured: number;
+  draft: number;
   hero_image: string | null;
   content: string;
   created_at: number;
@@ -39,6 +40,7 @@ function rowToPost(row: BlogPostRow, includeContent = false) {
     category: row.category,
     tags,
     featured: Boolean(row.featured),
+    draft: Boolean(row.draft),
     heroImage: row.hero_image,
   };
   if (includeContent) {
@@ -47,32 +49,39 @@ function rowToPost(row: BlogPostRow, includeContent = false) {
   return post;
 }
 
+function isLocalDev(c: { req: { header: (name: string) => string | undefined } }): boolean {
+  const origin = c.req.header("origin") ?? "";
+  const referer = c.req.header("referer") ?? "";
+  return origin.includes("local.spike.land") || referer.includes("local.spike.land");
+}
+
+// /api/blog/posts is a common alias — redirect before :slug catches "posts"
+blog.get("/api/blog/posts", (c) => c.redirect("/api/blog", 301));
+
 blog.get("/api/blog", async (c) => {
+  const showDrafts = isLocalDev(c);
+  const draftFilter = showDrafts ? "" : " WHERE draft = 0";
+
   let cached: Response | null = null;
   try {
-    cached = await withEdgeCache(
-      c.req.raw,
-      safeCtx(c),
-      async () => {
-        const result = await c.env.DB.prepare(
-          `SELECT slug, title, description, primer, date, author, category, tags, featured, hero_image
-         FROM blog_posts ORDER BY date DESC`,
-        ).all<BlogPostRow>();
+    cached = await withEdgeCache(c.req.raw, safeCtx(c), async () => {
+      const result = await c.env.DB.prepare(
+        `SELECT slug, title, description, primer, date, author, category, tags, featured, draft, hero_image
+         FROM blog_posts${draftFilter} ORDER BY date DESC`,
+      ).all<BlogPostRow>();
 
         if (!result.results?.length) return null;
 
-        const posts = result.results.map((row) => rowToPost(row));
-        return new Response(JSON.stringify(posts), {
-          headers: { "Content-Type": "application/json" },
-        });
-      },
-      { ttl: 300, swr: 3600 },
-    );
+      const posts = result.results.map((row) => rowToPost(row));
+      return new Response(JSON.stringify(posts), {
+        headers: { "Content-Type": "application/json" },
+      });
+    }, { ttl: showDrafts ? 0 : 300, swr: showDrafts ? 0 : 3600 });
   } catch {
     // Cache API unavailable — fall back to direct D1
     const result = await c.env.DB.prepare(
-      `SELECT slug, title, description, primer, date, author, category, tags, featured, hero_image
-       FROM blog_posts ORDER BY date DESC`,
+      `SELECT slug, title, description, primer, date, author, category, tags, featured, draft, hero_image
+       FROM blog_posts${draftFilter} ORDER BY date DESC`,
     ).all<BlogPostRow>();
 
     if (result.results?.length) {
@@ -105,30 +114,27 @@ blog.get("/api/blog", async (c) => {
 
 blog.get("/api/blog/:slug", async (c) => {
   const slug = c.req.param("slug");
+  const showDrafts = isLocalDev(c);
+  const draftFilter = showDrafts ? "" : " AND draft = 0";
 
   let cached: Response | null = null;
   try {
-    cached = await withEdgeCache(
-      c.req.raw,
-      safeCtx(c),
-      async () => {
-        const row = await c.env.DB.prepare(`SELECT * FROM blog_posts WHERE slug = ?`)
-          .bind(slug)
-          .first<BlogPostRow>();
+    cached = await withEdgeCache(c.req.raw, safeCtx(c), async () => {
+      const row = await c.env.DB.prepare(
+        `SELECT * FROM blog_posts WHERE slug = ?${draftFilter}`,
+      ).bind(slug).first<BlogPostRow>();
 
         if (!row) return null;
 
-        return new Response(JSON.stringify(rowToPost(row, true)), {
-          headers: { "Content-Type": "application/json" },
-        });
-      },
-      { ttl: 300, swr: 3600 },
-    );
+      return new Response(JSON.stringify(rowToPost(row, true)), {
+        headers: { "Content-Type": "application/json" },
+      });
+    }, { ttl: showDrafts ? 0 : 300, swr: showDrafts ? 0 : 3600 });
   } catch {
     // Cache API unavailable — fall back to direct D1
-    const row = await c.env.DB.prepare(`SELECT * FROM blog_posts WHERE slug = ?`)
-      .bind(slug)
-      .first<BlogPostRow>();
+    const row = await c.env.DB.prepare(
+      `SELECT * FROM blog_posts WHERE slug = ?${draftFilter}`,
+    ).bind(slug).first<BlogPostRow>();
 
     if (row) {
       cached = new Response(JSON.stringify(rowToPost(row, true)), {

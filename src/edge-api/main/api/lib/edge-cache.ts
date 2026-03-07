@@ -72,6 +72,7 @@ export async function withEdgeCache(
       headers: new Headers(response.headers),
     });
     toCache.headers.set("Cache-Control", cc);
+    toCache.headers.set("Vary", "Accept-Encoding");
 
     try {
       ctx?.waitUntil(cache.put(cacheReq, toCache));
@@ -80,5 +81,6 @@ export async function withEdgeCache(
 
   // Set cache headers on the live response
   response.headers.set("Cache-Control", cc);
+  response.headers.set("Vary", "Accept-Encoding");
   return response;
 }

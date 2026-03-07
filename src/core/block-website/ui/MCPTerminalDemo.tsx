@@ -76,10 +76,10 @@ function highlight(raw: string): React.ReactNode[] {
       if ((m = KEY.exec(rest))) {
         nodes.push(
           m[1],
-          <span key={`k${li}${i++}`} className="text-cyan-400">
+          <span key={`k${li}${i++}`} className="text-primary">
             {m[2]}
           </span>,
-          <span key={`p${li}${i++}`} className="text-slate-400">
+          <span key={`p${li}${i++}`} className="text-muted-foreground">
             {m[3]}
           </span>,
         );
@@ -106,7 +106,7 @@ function highlight(raw: string): React.ReactNode[] {
         );
       } else if ((m = PUNC.exec(rest))) {
         nodes.push(
-          <span key={`br${li}${i++}`} className="text-slate-400">
+          <span key={`br${li}${i++}`} className="text-muted-foreground">
             {m[1]}
           </span>,
         );
@@ -201,9 +201,9 @@ export function MCPTerminalDemo() {
               type="button"
               onClick={() => resetTab(i)}
               className={[
-                "px-4 py-2 text-xs tracking-wide transition-colors border-b-2 focus:outline-none focus:ring-2 focus:ring-cyan-500",
+                "px-4 py-2 text-xs tracking-wide transition-colors border-b-2 focus:outline-none focus:ring-2 focus:ring-primary",
                 i === activeTab
-                  ? "text-cyan-400 border-cyan-400 bg-card"
+                  ? "text-primary border-primary bg-card"
                   : "text-muted-foreground border-transparent hover:text-foreground hover:bg-muted/30",
               ].join(" ")}
             >
@@ -216,12 +216,12 @@ export function MCPTerminalDemo() {
         <div className="p-5 min-h-72 flex flex-col gap-5">
           {/* Request */}
           <div>
-            <div className="text-[10px] text-slate-500 mb-1 uppercase tracking-widest">Request</div>
-            <div className="text-slate-300 whitespace-pre leading-relaxed">
+            <div className="text-[10px] text-muted-foreground mb-1 uppercase tracking-widest">Request</div>
+            <div className="text-foreground whitespace-pre leading-relaxed">
               {highlight(typed)}
               {playing && !paused && (
                 <span
-                  className="inline-block w-0.5 h-[1em] bg-cyan-400 align-text-bottom animate-pulse"
+                  className="inline-block w-0.5 h-[1em] bg-primary align-text-bottom animate-pulse"
                   aria-hidden="true"
                 />
               )}
@@ -237,10 +237,10 @@ export function MCPTerminalDemo() {
               transition: "opacity 0.4s ease, transform 0.4s ease",
             }}
           >
-            <div className="text-[10px] text-slate-500 mb-1 uppercase tracking-widest">
+            <div className="text-[10px] text-muted-foreground mb-1 uppercase tracking-widest">
               Response
             </div>
-            <div className="text-slate-300 whitespace-pre leading-relaxed">
+            <div className="text-foreground whitespace-pre leading-relaxed">
               {highlight(tab.response)}
             </div>
           </div>
@@ -251,7 +251,7 @@ export function MCPTerminalDemo() {
               type="button"
               onClick={startAnimation}
               aria-label={isDone ? "Replay animation" : "Play animation"}
-              className="px-4 py-1.5 rounded-full bg-muted/50 border border-border text-[10px] font-bold text-muted-foreground uppercase tracking-widest hover:text-cyan-400 hover:border-cyan-600 transition-colors focus:outline-none focus:ring-2 focus:ring-cyan-500"
+              className="px-4 py-1.5 rounded-full bg-muted/50 border border-border text-[10px] font-bold text-muted-foreground uppercase tracking-widest hover:text-primary hover:border-primary transition-colors focus:outline-none focus:ring-2 focus:ring-primary"
             >
               {isDone ? "Replay" : "Play"}
             </button>

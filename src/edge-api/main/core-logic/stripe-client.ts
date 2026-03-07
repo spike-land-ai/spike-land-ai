@@ -11,13 +11,18 @@ export async function stripePost(
   key: string,
   path: string,
   body: Record<string, string>,
+  idempotencyKey?: string,
 ): Promise<StripeResponse> {
+  const headers: Record<string, string> = {
+    Authorization: `Bearer ${key}`,
+    "Content-Type": "application/x-www-form-urlencoded",
+  };
+  if (idempotencyKey) {
+    headers["Idempotency-Key"] = idempotencyKey;
+  }
   const res = await fetch(`https://api.stripe.com${path}`, {
     method: "POST",
-    headers: {
-      Authorization: `Bearer ${key}`,
-      "Content-Type": "application/x-www-form-urlencoded",
-    },
+    headers,
     body: new URLSearchParams(body).toString(),
   });
   const data = (await res.json()) as Record<string, unknown>;

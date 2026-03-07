@@ -8,8 +8,8 @@ import { asAlbumHandle, asImageId, asJobId, asPipelineId } from "./types.js";
 import { createErrorShipper } from "@spike-land-ai/mcp-server-base";
 
 const shipper = createErrorShipper();
-process.on('uncaughtException', (err) => shipper.shipError({ service_name: "mcp-image-studio", message: err.message, stack_trace: err.stack, severity: "high" }));
-process.on('unhandledRejection', (err: unknown) => shipper.shipError({ service_name: "mcp-image-studio", message: (err as Error)?.message || String(err), stack_trace: (err as Error)?.stack, severity: "high" }));
+process.on('uncaughtException', (err: Error) => shipper.shipError({ service_name: "mcp-image-studio", message: err.message, stack_trace: err.stack, severity: "high" }));
+process.on('unhandledRejection', (err: unknown) => shipper.shipError({ service_name: "mcp-image-studio", message: err instanceof Error ? err.message : String(err), stack_trace: err instanceof Error ? err.stack : undefined, severity: "high" }));
 
 // --- 1. Mock the Dependencies so the tools can run without a real DB ---
 
@@ -18,7 +18,7 @@ function createMockDeps(): ImageStudioDeps {
     id: asImageId("mock-image-id"),
     userId: "test-user",
     name: "test-image.jpg",
-    description: null,
+    description: null as string | null,
     originalUrl: "https://example.com/image.jpg",
     originalR2Key: "image.jpg",
     originalFormat: "jpeg",
@@ -28,7 +28,7 @@ function createMockDeps(): ImageStudioDeps {
     isPublic: false,
     viewCount: 0,
     tags: [] as string[],
-    shareToken: null,
+    shareToken: null as string | null,
     createdAt: new Date(),
     updatedAt: new Date(),
   };
@@ -253,7 +253,7 @@ tools.push({
     },
     required: ["title", "description"],
   },
-  handler: async (args: unknown): Promise<{ content: { type: string; text: string }[]; isError?: boolean }> => {
+  handler: async (args: unknown): Promise<{ content: { type: "text"; text: string }[]; isError?: boolean }> => {
     const input = args as Record<string, unknown>;
     try {
       const response = await fetch("https://spike.land/api/bugbook/report", {

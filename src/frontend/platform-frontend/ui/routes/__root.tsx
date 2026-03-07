@@ -1,9 +1,10 @@
 import { Link, Outlet, useRouterState } from "@tanstack/react-router";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useAnalytics } from "../hooks/useAnalytics";
 import { useDarkMode } from "../hooks/useDarkMode";
 import { useAuth } from "../hooks/useAuth";
 import { useFocusTrap } from "../hooks/useFocusTrap";
+import { useDevMode } from "@spike-land-ai/block-website/core";
 import { LoginButton } from "../components/LoginButton";
 import { AppFooter } from "../components/AppFooter";
 import { CookieConsent } from "../components/CookieConsent";
@@ -11,6 +12,7 @@ import { MessageCircle } from "lucide-react";
 import { AiChatWidget } from "../components/AiChatWidget";
 import { ThemeSwitcher } from "../components/ThemeSwitcher";
 import { apiUrl } from "../../core-logic/api";
+import { initGoogleAds } from "../../core-logic/google-ads";
 
 const DEFAULT_TITLE = "spike.land - MCP-First AI Development Platform";
 const DEFAULT_DESCRIPTION =
@@ -28,8 +30,8 @@ const ROUTE_META: Record<string, { title: string; description: string; ogImage?:
     description: "Browse 80+ MCP tools on spike.land. Find tools for code review, image generation, data analysis, and more.",
   },
   "/apps": {
-    title: "MCP Tools - spike.land",
-    description: "Browse and interact with Model Context Protocol tools on spike.land. Connect AI agents to real-world data and actions.",
+    title: "Apps - spike.land",
+    description: "Browse and interact with AI-powered applications on spike.land. Connect AI agents to real-world data and actions.",
   },
   "/store": {
     title: "App Store - spike.land",
@@ -155,8 +157,7 @@ function injectJsonLd(id: string, content: string) {
   el.textContent = content;
 }
 
-const ALL_NAV_LINKS = [
-  { to: "/vibe-code", label: "Vibe", localOnly: true },
+const BASE_NAV_LINKS = [
   { to: "/tools", label: "Tools" },
   { to: "/store", label: "Store" },
   { to: "/pricing", label: "Pricing" },
@@ -165,13 +166,18 @@ const ALL_NAV_LINKS = [
   { to: "/about", label: "About" },
 ] as const;
 
-const isLocalDev = typeof window !== "undefined" && window.location.hostname === "local.spike.land";
-const NAV_LINKS = ALL_NAV_LINKS.filter((link) => !("localOnly" in link && link.localOnly) || isLocalDev);
+const VIBE_NAV_LINK = { to: "/vibe-code", label: "Vibe" } as const;
 
 export function RootLayout() {
   useAnalytics();
   const { theme, setTheme } = useDarkMode();
   useAuth();
+  const { isDeveloper } = useDevMode();
+
+  const navLinks = useMemo(() =>
+    isDeveloper ? [VIBE_NAV_LINK, ...BASE_NAV_LINKS] : [...BASE_NAV_LINKS],
+    [isDeveloper],
+  );
 
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [searchToast, setSearchToast] = useState(false);
@@ -195,6 +201,7 @@ export function RootLayout() {
   useEffect(() => {
     injectJsonLd("jsonld-organization", ORGANIZATION_JSON_LD);
     injectJsonLd("jsonld-webapp", WEB_APP_JSON_LD);
+    initGoogleAds();
 
     if (!document.querySelector('link[type="application/rss+xml"]')) {
       const rssLink = document.createElement("link");
@@ -282,8 +289,8 @@ export function RootLayout() {
           <div className="flex flex-1 items-center justify-between">
             <div className="flex items-center gap-8">
               <Link to="/" className="text-xl font-bold">spike.land</Link>
-              <nav className="hidden md:flex items-center gap-6" aria-label="Main navigation">
-                {NAV_LINKS.map(({ to, label }) => (
+              <nav className="hidden lg:flex items-center gap-6" aria-label="Main navigation">
+                {navLinks.map(({ to, label }) => (
                   <Link
                     key={to}
                     to={to}
@@ -297,7 +304,7 @@ export function RootLayout() {
               </nav>
               <button
                 type="button"
-                className="hidden md:flex items-center gap-2 px-3 py-1.5 text-sm text-muted-foreground bg-muted/50 dark:bg-white/5 border border-border rounded-md hover:bg-muted hover:text-foreground transition-all duration-200 active:scale-[0.98]"
+                className="hidden lg:flex items-center gap-2 px-3 py-1.5 text-sm text-muted-foreground bg-muted/50 dark:bg-white/5 border border-border rounded-md hover:bg-muted hover:text-foreground transition-all duration-200 active:scale-[0.98]"
                 aria-label="Search site"
                 onClick={() => {
                   setSearchToast(true);
@@ -312,11 +319,11 @@ export function RootLayout() {
               </button>
             </div>
             <div className="flex items-center gap-3">
-              <ThemeSwitcher theme={theme} setTheme={setTheme} />
+              {isDeveloper && <ThemeSwitcher theme={theme} setTheme={setTheme} />}
               {showGlobalChat && (
                 <button
                   onClick={() => setChatOpen((v) => !v)}
-                  className="rounded-lg p-1.5 transition-all duration-200 text-muted-foreground hover:text-foreground hover:bg-muted dark:hover:bg-white/10"
+                  className="rounded-lg p-2.5 transition-all duration-200 text-muted-foreground hover:text-foreground hover:bg-muted dark:hover:bg-white/10"
                   aria-label={chatOpen ? "Close chat" : "Open chat"}
                 >
                   <MessageCircle className="size-4" />
@@ -326,7 +333,7 @@ export function RootLayout() {
               {/* Mobile hamburger */}
               <button
                 type="button"
-                className="md:hidden flex items-center justify-center rounded-md p-2 text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+                className="lg:hidden flex items-center justify-center rounded-md p-3 text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
                 aria-label={mobileNavOpen ? "Close navigation menu" : "Open navigation menu"}
                 aria-expanded={mobileNavOpen}
                 aria-controls="mobile-nav"
@@ -351,13 +358,13 @@ export function RootLayout() {
           <div
             ref={mobileNavRef}
             id="mobile-nav"
-            className="md:hidden fixed inset-0 z-40 bg-background/95 backdrop-blur-xl flex flex-col pt-20 px-6 gap-4"
+            className="lg:hidden fixed inset-0 z-40 bg-background/95 backdrop-blur-xl flex flex-col pt-20 px-6 gap-4"
             role="dialog"
             aria-modal="true"
             aria-label="Mobile navigation"
           >
             <nav aria-label="Mobile navigation links">
-              {NAV_LINKS.map(({ to, label }) => (
+              {navLinks.map(({ to, label }) => (
                 <Link
                   key={to}
                   to={to}

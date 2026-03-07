@@ -98,7 +98,7 @@ export function PrivacyPage() {
 
       <section className="space-y-3">
         <h2 className="text-xl font-semibold">5. Cookies</h2>
-        <p className="leading-relaxed text-foreground">We use two categories of cookies:</p>
+        <p className="leading-relaxed text-foreground">We use three categories of cookies:</p>
         <ul className="list-inside list-disc space-y-2 text-foreground ml-4">
           <li>
             <strong>Essential cookies</strong> — required for authentication and session management
@@ -108,9 +108,15 @@ export function PrivacyPage() {
             <strong>Analytics cookies</strong> — anonymised, first-party usage tracking to improve
             the Platform (you can opt out via Settings)
           </li>
+          <li>
+            <strong>Advertising cookies</strong> — Google Ads conversion tracking to measure the
+            effectiveness of our advertising campaigns (only loaded with your consent via
+            &ldquo;Accept All&rdquo;)
+          </li>
         </ul>
         <p className="leading-relaxed text-foreground">
-          We do not use third-party advertising cookies or share cookie data with ad networks.
+          Advertising cookies are only set when you explicitly accept all cookies. You can withdraw
+          consent at any time via Settings.
         </p>
       </section>
 
@@ -152,6 +158,13 @@ export function PrivacyPage() {
                 <td className="py-2 pr-4">Authentication</td>
                 <td className="py-2">
                   <a href="https://policies.google.com/privacy" className="text-primary underline hover:text-primary/80" target="_blank" rel="noopener noreferrer">policies.google.com/privacy</a>
+                </td>
+              </tr>
+              <tr>
+                <td className="py-2 pr-4">Google Ads</td>
+                <td className="py-2 pr-4">Advertising conversion tracking</td>
+                <td className="py-2">
+                  <a href="https://policies.google.com/technologies/ads" className="text-primary underline hover:text-primary/80" target="_blank" rel="noopener noreferrer">Google Ads Privacy</a>
                 </td>
               </tr>
             </tbody>

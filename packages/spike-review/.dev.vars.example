@@ -1,0 +1,6 @@
+# Copy this file to .dev.vars and fill in real values
+# Required for local development with `wrangler dev`
+
+GITHUB_TOKEN=
+GITHUB_WEBHOOK_SECRET=
+CLAUDE_CODE_OAUTH_TOKEN=

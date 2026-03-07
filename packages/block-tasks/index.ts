@@ -1,1 +1,1 @@
-export * from "../../src/core/block-tasks/lazy-imports/index.ts";
+export * from "../../src/core/block-tasks/lazy-imports/index";

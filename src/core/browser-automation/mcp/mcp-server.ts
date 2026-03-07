@@ -48,5 +48,5 @@ process.on("SIGTERM", () => {
 if (isHttp) {
   startHttpServer(server, port, host);
 } else {
-  await startMcpServer(server);
+  startMcpServer(server).catch(console.error);
 }

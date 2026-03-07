@@ -1,7 +1,8 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, memo } from "react";
 import { ChevronDown, ChevronRight, Wrench, AlertCircle, Copy, Check } from "lucide-react";
 import { useDarkMode } from "../hooks/useDarkMode";
 import { cn } from "../../styling/cn";
+import { sanitizeUrl } from "../../core-logic/lib/security";
 import type { ChatMessage as ChatMessageType } from "../hooks/useChat";
 
 interface AiChatMessageProps {
@@ -387,7 +388,7 @@ function MessageContent({
                 return (
                   <a
                     key={i}
-                    href={linkMatch[2]}
+                    href={sanitizeUrl(linkMatch[2])}
                     target="_blank"
                     rel="noopener noreferrer"
                     className={cn(
@@ -426,7 +427,10 @@ function MessageContent({
 // Main export
 // ---------------------------------------------------------------------------
 
-export function AiChatMessage({ message, isStreaming }: AiChatMessageProps) {
+export const AiChatMessage = memo(function AiChatMessage({
+  message,
+  isStreaming,
+}: AiChatMessageProps) {
   const { isDarkMode } = useDarkMode();
   const isUser = message.role === "user";
   const isEmpty =
@@ -501,4 +505,4 @@ export function AiChatMessage({ message, isStreaming }: AiChatMessageProps) {
       </div>
     </div>
   );
-}
+});

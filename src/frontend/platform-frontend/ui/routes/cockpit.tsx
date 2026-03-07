@@ -596,7 +596,11 @@ export function CockpitPage() {
     );
   }
 
-  if (!user || user.email !== FOUNDER_EMAIL) {
+  if (!user) {
+    return <Navigate to="/login" />;
+  }
+
+  if (user.email !== FOUNDER_EMAIL) {
     return <Navigate to="/" />;
   }
 

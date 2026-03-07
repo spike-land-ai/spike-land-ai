@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { apiUrl } from "../../core-logic/api";
+import { usePricing } from "../hooks/usePricing";
 import { Button } from "../shared/ui/button";
 import { Zap, Coins, Trophy, CreditCard, Sparkles, Check } from "lucide-react";
 import { cn } from "../../styling/cn";
@@ -8,16 +9,11 @@ interface CreditPack {
   id: string;
   label: string;
   price: number;
+  formattedPrice: string;
   credits: number;
   highlighted: boolean;
   icon: typeof Zap;
 }
-
-const PACKS: CreditPack[] = [
-  { id: "starter", label: "Starter", price: 5, credits: 500, highlighted: false, icon: Coins },
-  { id: "popular", label: "Popular", price: 20, credits: 2500, highlighted: true, icon: Zap },
-  { id: "power", label: "Power", price: 50, credits: 7500, highlighted: false, icon: Trophy },
-];
 
 async function purchaseCredits(credits: number): Promise<void> {
   const res = await fetch(apiUrl("/credits/purchase"), {
@@ -85,8 +81,7 @@ function PackCard({ pack }: { pack: CreditPack }) {
       </div>
 
       <div className="flex items-baseline gap-1 mb-1">
-        <span className="text-4xl font-black tracking-tighter text-foreground">${pack.price}</span>
-        <span className="text-sm font-bold text-muted-foreground/60 tracking-tight uppercase">USD</span>
+        <span className="text-4xl font-black tracking-tighter text-foreground">{pack.formattedPrice}</span>
       </div>
       <p className="text-xs font-bold text-muted-foreground/40 mb-6 uppercase tracking-wider">
         ${perCredit} per credit
@@ -136,6 +131,14 @@ function PackCard({ pack }: { pack: CreditPack }) {
 }
 
 export function BuyCredits() {
+  const { pricing } = usePricing();
+
+  const PACKS: CreditPack[] = [
+    { id: "starter", label: "Starter", price: 5, formattedPrice: pricing.credits.starter, credits: 500, highlighted: false, icon: Coins },
+    { id: "popular", label: "Popular", price: 20, formattedPrice: pricing.credits.popular, credits: 2500, highlighted: true, icon: Zap },
+    { id: "power", label: "Power", price: 50, formattedPrice: pricing.credits.power, credits: 7500, highlighted: false, icon: Trophy },
+  ];
+
   return (
     <section aria-labelledby="buy-credits-heading" className="py-12">
       <div className="max-w-xl mb-12">
@@ -155,6 +158,12 @@ export function BuyCredits() {
           <PackCard key={pack.id} pack={pack} />
         ))}
       </div>
+
+      {pricing.billedInUsd && (
+        <p className="mt-6 text-center text-xs text-muted-foreground">
+          Prices shown in {pricing.currency}. Billed in USD.
+        </p>
+      )}
     </section>
   );
 }

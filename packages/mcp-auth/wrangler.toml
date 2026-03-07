@@ -1,6 +1,6 @@
 name = "mcp-auth"
 main = "../../src/edge-api/auth/db/index.ts"
-compatibility_date = "2025-02-28"
+compatibility_date = "2025-07-12"
 compatibility_flags = ["nodejs_compat"]
 
 route = { pattern = "auth-mcp.spike.land", custom_domain = true }

@@ -7,7 +7,7 @@ import { createErrorShipper } from "@spike-land-ai/mcp-server-base";
 
 const shipper = createErrorShipper();
 process.on('uncaughtException', (err) => shipper.shipError({ service_name: "openclaw-mcp", message: err.message, stack_trace: err.stack, severity: "high" }));
-process.on('unhandledRejection', (err: unknown) => shipper.shipError({ service_name: "openclaw-mcp", message: (err as Error)?.message || String(err), stack_trace: (err as Error)?.stack, severity: "high" }));
+process.on('unhandledRejection', (err: unknown) => shipper.shipError({ service_name: "openclaw-mcp", message: err instanceof Error ? err.message : String(err), stack_trace: err instanceof Error ? err.stack : undefined, severity: "high" }));
 
 type CliPayload = { text?: string };
 

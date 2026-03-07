@@ -59,17 +59,17 @@ export default function App() {
         className="relative cursor-pointer select-none rounded-2xl p-px transition-all duration-300"
         style={{
           background: hovered
-            ? "var(--primary-color)"
-            : "var(--muted-fg)",
+            ? "hsl(var(--primary))"
+            : "hsl(var(--muted-foreground) / 0.3)",
           boxShadow: hovered
-            ? "0 0 40px 8px var(--primary-glow)"
+            ? "0 0 40px 8px hsl(var(--primary) / 0.4)"
             : "none",
         }}
       >
         <div className="rounded-2xl bg-card/90 backdrop-blur-xl px-10 py-8 text-center border border-border">
           <div
             className="text-5xl mb-3 transition-all duration-300 text-primary"
-            style={{ filter: hovered ? "drop-shadow(0 0 12px var(--primary-color))" : "none" }}
+            style={{ filter: hovered ? "drop-shadow(0 0 12px hsl(var(--primary) / 0.8))" : "none" }}
           >
             ✦
           </div>
@@ -100,6 +100,11 @@ function ResizeDivider({ onDrag, isDarkMode }: DividerProps) {
   const onMouseDown = useCallback((e: React.MouseEvent) => {
     dragging.current = true;
     lastX.current = e.clientX;
+    // Prevent iframes from swallowing mouse up/move events
+    const iframes = document.querySelectorAll("iframe");
+    iframes.forEach((iframe) => {
+      iframe.style.pointerEvents = "none";
+    });
     e.preventDefault();
   }, []);
 
@@ -111,7 +116,14 @@ function ResizeDivider({ onDrag, isDarkMode }: DividerProps) {
       onDrag(delta);
     };
     const onMouseUp = () => {
-      dragging.current = false;
+      if (dragging.current) {
+        dragging.current = false;
+        // Restore iframe pointer events
+        const iframes = document.querySelectorAll("iframe");
+        iframes.forEach((iframe) => {
+          iframe.style.pointerEvents = "";
+        });
+      }
     };
     window.addEventListener("mousemove", onMouseMove);
     window.addEventListener("mouseup", onMouseUp);
@@ -428,9 +440,10 @@ interface CodePanelProps {
   isDarkMode: boolean;
   isStreaming?: boolean;
   className?: string;
+  fileName?: string;
 }
 
-function CodePanel({ code, onChange, isDarkMode, isStreaming = false, className }: CodePanelProps) {
+function CodePanel({ code, onChange, isDarkMode, isStreaming = false, className, fileName }: CodePanelProps) {
   return (
     <div
       className={cn(
@@ -500,7 +513,7 @@ function CodePanel({ code, onChange, isDarkMode, isStreaming = false, className 
             </div>
           }
         >
-          <CodeEditor value={code} onChange={onChange} />
+          <CodeEditor value={code} onChange={onChange} fileName={fileName || "App.tsx"} />
         </Suspense>
       </div>
     </div>
@@ -601,7 +614,7 @@ function PreviewPanel({ appId, code, isDarkMode, className }: PreviewPanelProps)
           <iframe
             title="Live preview"
             srcDoc={html}
-            sandbox="allow-scripts allow-same-origin"
+            sandbox="allow-scripts"
             className="w-full h-full border-0"
           />
         ) : code.trim() ? (
@@ -696,8 +709,8 @@ function MobileTabBar({ active, onChange, isDarkMode }: MobileTabBarProps) {
               isActive
                 ? "text-primary border-b-2 border-primary"
                 : isDarkMode
-                ? "text-gray-500 active:text-gray-300"
-                : "text-muted-foreground active:text-foreground",
+                  ? "text-gray-500 active:text-gray-300"
+                  : "text-muted-foreground active:text-foreground",
             )}
           >
             <Icon className="w-5 h-5" />
@@ -831,7 +844,7 @@ export function VibeCoder({ initialCode = DEFAULT_CODE, appId }: VibeCoderProps)
         {/* ---- CODE PANEL (left, flex-1) ---- */}
         <div
           id="vibecoder-panel-code"
-          role="tabpanel"
+          role="region"
           aria-label="Code editor panel"
           className={cn(
             "flex-1 overflow-hidden min-w-0",
@@ -851,6 +864,7 @@ export function VibeCoder({ initialCode = DEFAULT_CODE, appId }: VibeCoderProps)
               isDarkMode={isDarkMode}
               isStreaming={isStreaming}
               className="h-full"
+              fileName="App.tsx"
             />
           </div>
         </div>
@@ -861,7 +875,7 @@ export function VibeCoder({ initialCode = DEFAULT_CODE, appId }: VibeCoderProps)
             <ResizeDivider onDrag={handlePreviewDrag} isDarkMode={isDarkMode} />
             <div
               id="vibecoder-panel-preview"
-              role="tabpanel"
+              role="region"
               aria-label="Live preview panel"
               style={{ width: previewWidth, minWidth: MIN_PANEL_WIDTH }}
               className={cn(
@@ -894,7 +908,7 @@ export function VibeCoder({ initialCode = DEFAULT_CODE, appId }: VibeCoderProps)
             <ResizeDivider onDrag={handleChatDrag} isDarkMode={isDarkMode} />
             <div
               id="vibecoder-panel-chat"
-              role="tabpanel"
+              role="region"
               aria-label="Chat panel"
               style={{ width: chatWidth, minWidth: MIN_PANEL_WIDTH }}
               className={cn(

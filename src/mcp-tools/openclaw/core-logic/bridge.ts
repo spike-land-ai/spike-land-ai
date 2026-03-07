@@ -104,7 +104,7 @@ export function createMcpBridge(opts: McpBridgeOptions): McpBridge {
         toolRegistry.set(tool.name, {
           name: tool.name,
           description: tool.description ?? "",
-          inputSchema: (tool.parameters as JsonSchemaObject | undefined) ?? { type: "object", properties: {} },
+          inputSchema: (tool.parameters as unknown as JsonSchemaObject | undefined) ?? { type: "object", properties: {} },
           sessionKey,
         });
       }
@@ -215,7 +215,7 @@ export function createMcpBridge(opts: McpBridgeOptions): McpBridge {
           return { content: [{ type: "text", text: JSON.stringify(data, null, 2) }] };
         } catch (err: unknown) {
           outcome = "error";
-          return { content: [{ type: "text", text: `Error: ${(err as Error).message}` }], isError: true };
+          return { content: [{ type: "text", text: `Error: ${err instanceof Error ? err.message : String(err)}` }], isError: true };
         }
       }
       const entry = toolRegistry.get(name);

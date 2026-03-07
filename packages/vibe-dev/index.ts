@@ -1,1 +1,1 @@
-export * from "../../src/cli/docker-dev/core-logic/cli.ts";
+export * from "../../src/cli/docker-dev/core-logic/cli";

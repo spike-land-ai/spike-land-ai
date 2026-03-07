@@ -1,5 +1,36 @@
 import type { ICodeSession } from "@spike-land-ai/code";
 
+// ─── API types ───────────────────────────────────────────────────────────────
+
+export interface ErrorResponse {
+  error: string;
+  details?: string;
+}
+
+export interface PostRequestBody {
+  messages: unknown[];
+  tools?: unknown[];
+  codeSpace?: string;
+  model?: string;
+  system?: string;
+}
+
+export interface JsonSchemaObject {
+  type: "object";
+  properties?: Record<string, unknown>;
+  required?: string[];
+  additionalProperties?: boolean;
+}
+
+export interface ToolDefinition {
+  name?: string;
+  description?: string;
+  input_schema?: JsonSchemaObject;
+  custom?: {
+    input_schema?: JsonSchemaObject;
+  };
+}
+
 // Re-export SDK types used across the MCP module
 export type {
   CallToolResult,

@@ -32,13 +32,12 @@
     "noEmit": true,
     "paths": {
       "@/*": [
-        "./src/frontend/monaco-/*"
+        "./src/frontend/monaco-editor/*"
       ],
       "@/generated/prisma": [
         "./src/core/chess/core-logic/prisma.ts"
       ],
-      "@spike-land-ai/shared": [
-        "./src/core/shared-utils/core-logic/index.ts"
+      "@spike-land-ai/shared": [        "./src/core/shared-utils/core-logic/index.ts"
       ],
       "@spike-land-ai/shared/*": [
         "./src/core/shared-utils/core-logic/*"
@@ -158,23 +157,24 @@
         "./src/edge-api/image-studio-worker/api-mcp/index.ts"
       ],
       "monaco-editor": [
-        "./packages/monaco-editor/src/index.ts"
+        "./src/monaco-editor/src/index.ts"
       ],
       "monaco-editor/*": [
-        "./packages/monaco-editor/*"
+        "./src/monaco-editor/*"
       ]
     }
   },
   "include": [
     "src/**/*.ts",
-    "src/**/*.tsx"
+    "src/**/*.tsx",
+    "src/**/*.d.ts"
   ],
   "exclude": [
     "node_modules",
     "dist",
     "coverage",
     "packages/*/dist",
-    "packages/monaco-editor",
+    "src/monaco-editor",
     "**/*.test.ts",
     "**/*.test.tsx",
     "**/*.spec.ts",

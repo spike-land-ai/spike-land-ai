@@ -1,1 +1,1 @@
-export * from "../../src/core/chess/core-logic/index.ts";
+export * from "../../src/core/chess/core-logic/index";

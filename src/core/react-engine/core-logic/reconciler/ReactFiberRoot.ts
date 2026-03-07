@@ -1,4 +1,4 @@
-import type { Fiber, FiberRoot } from "./ReactFiberTypes.js";
+import type { ClassUpdateQueue, Fiber, FiberRoot } from "./ReactFiberTypes.js";
 import type { HostConfig } from "../host-config/HostConfigInterface.js";
 import { createHostRootFiber } from "./ReactFiber.js";
 import { createLaneMap, NoLane, NoLanes } from "./ReactFiberLane.js";
@@ -37,7 +37,7 @@ export function createFiberRoot(containerInfo: unknown, hostConfig: HostConfig):
   uninitializedFiber.stateNode = root;
 
   // Initialize the update queue for the root fiber
-  const queue = {
+  const queue: ClassUpdateQueue = {
     baseState: uninitializedFiber.memoizedState,
     firstBaseUpdate: null,
     lastBaseUpdate: null,

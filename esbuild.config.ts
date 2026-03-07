@@ -17,7 +17,7 @@ import YAML from "yaml";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
-type PackageKind = "library" | "mcp-server" | "worker" | "cli" | "browser" | "config" | "block";
+type PackageKind = "library" | "mcp-server" | "worker" | "cli" | "browser" | "config" | "block" | "video";
 
 interface BuildProfile {
   platform: esbuild.Platform;
@@ -125,6 +125,7 @@ const kindToCategory: Record<PackageKind, string> = {
 };
 
 const nameOverrides: Record<string, string> = {
+  "mcp-server-base": "server-base",
   "spike-app": "platform-frontend",
   "spike-edge": "main",
   "spike-land-backend": "backend",
@@ -137,6 +138,17 @@ const nameOverrides: Record<string, string> = {
   "state-machine": "statecharts",
   "vibe-dev": "docker-dev",
   "spike-review": "code-review",
+  "bazdmeg-mcp": "bazdmeg",
+  "google-analytics-mcp": "google-analytics",
+  "google-ads-mcp": "google-ads",
+  "stripe-analytics-mcp": "stripe-analytics",
+  "docker-compose-mcp": "docker-compose",
+  "esbuild-wasm-mcp": "esbuild-wasm",
+  "hackernews-mcp": "hackernews",
+  "mcp-image-studio": "image-studio",
+  "openclaw-mcp": "openclaw",
+  "spike-land-mcp": "spike-land",
+  "mcp-auth": "auth",
 };
 
 /**
@@ -359,6 +371,11 @@ async function main(): Promise<void> {
     if (!pkg) {
       console.error(`Package "${name}" not found in manifest`);
       process.exit(1);
+    }
+
+    // Workers are compiled by wrangler, browser apps by Vite, video by Remotion — skip
+    if (["worker", "browser", "video"].includes(pkg.kind) && args.includes("--all")) {
+      continue;
     }
 
     await buildPackage({

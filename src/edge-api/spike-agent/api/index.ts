@@ -79,11 +79,11 @@ export class CodeReviewAgent extends Agent<Env, ReviewState> {
       const completedReviews = this.state.reviews.map((r) =>
         r.id === reviewId
           ? {
-              ...r,
-              status: "completed" as const,
-              result: results.join("\n"),
-              completedAt: new Date().toISOString(),
-            }
+            ...r,
+            status: "completed" as const,
+            result: results.join("\n"),
+            completedAt: new Date().toISOString(),
+          }
           : r,
       );
       this.setState({ ...this.state, reviews: completedReviews });
@@ -91,11 +91,11 @@ export class CodeReviewAgent extends Agent<Env, ReviewState> {
       const failedReviews = this.state.reviews.map((r) =>
         r.id === reviewId
           ? {
-              ...r,
-              status: "failed" as const,
-              result: err instanceof Error ? err.message : "Unknown error",
-              completedAt: new Date().toISOString(),
-            }
+            ...r,
+            status: "failed" as const,
+            result: err instanceof Error ? err.message : "Unknown error",
+            completedAt: new Date().toISOString(),
+          }
           : r,
       );
       this.setState({ ...this.state, reviews: failedReviews });
@@ -109,7 +109,7 @@ app.all("/agents/*", async (c) => {
   return (await routeAgentRequest(c.req.raw, c.env)) ?? new Response("Not Found", { status: 404 });
 });
 
-app.get("/health", (c) => c.json({ status: "ok", service: "spike-agent" }));
+app.get("/health", (c) => c.json({ status: "ok", service: "spike-agent", timestamp: new Date().toISOString() }));
 
 export default {
   fetch: app.fetch,

@@ -336,7 +336,7 @@ export function LivePreview({
             key={key}
             src={src}
             title={`Preview — ${appId}`}
-            sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
+            sandbox="allow-scripts allow-forms allow-popups"
             className="h-full w-full border-0"
             onLoad={() => setLoading(false)}
             onError={() => {

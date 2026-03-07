@@ -5,7 +5,8 @@ const sw = self as unknown as ServiceWorkerGlobalScope & typeof globalThis;
 const CACHE_NAME_PREFIX = "spike-land-cache-v";
 let CACHE_NAME = "spike-land-cache-v3";
 
-const PRECACHE_ASSETS = ["/", "/index.html"];
+// Navigation requests must always hit the network to pick up new deployments
+const PRECACHE_ASSETS: string[] = [];
 
 const CACHED_ORIGINS = [
   "unpkg.com",

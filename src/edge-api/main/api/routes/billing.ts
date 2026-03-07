@@ -2,11 +2,12 @@
  * Billing Endpoints
  *
  * GET /api/billing/status — query subscription status for authenticated user.
- * POST /api/billing/cancel — create Stripe billing portal session.
+ * POST /api/billing/portal — create Stripe billing portal session.
+ * POST /api/billing/cancel — alias for /portal (backwards compat).
  * Requires auth.
  */
 
-import { Hono } from "hono";
+import { Hono, type Context } from "hono";
 import type { Env, Variables } from "../../core-logic/env.js";
 import { createLogger } from "@spike-land-ai/shared";
 
@@ -52,7 +53,7 @@ billing.get("/api/billing/status", async (c) => {
   });
 });
 
-billing.post("/api/billing/cancel", async (c) => {
+async function handleBillingPortal(c: Context<{ Bindings: Env; Variables: Variables }>) {
   const stripeKey = c.env.STRIPE_SECRET_KEY;
   if (!stripeKey) {
     return c.json({ error: "Stripe not configured" }, 503);
@@ -97,6 +98,9 @@ billing.post("/api/billing/cancel", async (c) => {
   }
 
   return c.json({ url });
-});
+}
+
+billing.post("/api/billing/portal", handleBillingPortal);
+billing.post("/api/billing/cancel", handleBillingPortal);
 
 export { billing };

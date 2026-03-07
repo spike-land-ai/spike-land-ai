@@ -14,42 +14,7 @@ env:
   NODE_VERSION: "24"
 
 jobs:
-  detect-affected:
-    runs-on: ubuntu-latest
-    outputs:
-      packages: ${{ steps.affected.outputs.packages }}
-      all_changed: ${{ steps.affected.outputs.all_changed }}
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Detect affected packages
-        id: affected
-        run: |
-          if [ "${{ github.event_name }}" = "push" ]; then
-            BASE="${{ github.event.before }}"
-          else
-            BASE="${{ github.event.pull_request.base.sha }}"
-          fi
-
-          # Get changed files (source in src/, config in packages/)
-          CHANGED=$(git diff --name-only "$BASE" HEAD -- src/ packages/ || echo "")
-
-          # Extract package names from both src/ and packages/ paths
-          PACKAGES=$(echo "$CHANGED" | grep -E '^(src|packages)/' | sed 's|^src/||;s|^packages/||' | cut -d/ -f1 | sort -u | jq -R . | jq -cs .)
-
-          echo "packages=$PACKAGES" >> "$GITHUB_OUTPUT"
-
-          # Check if root config changed (affects all)
-          if echo "$CHANGED" | grep -qE '^(tsconfig\.json|esbuild\.config\.ts|packages\.yaml|eslint\.config\.mjs)'; then
-            echo "all_changed=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "all_changed=false" >> "$GITHUB_OUTPUT"
-          fi
-
   typecheck:
-    needs: detect-affected
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -57,12 +22,17 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: yarn
+
+      - uses: actions/cache@v4
+        with:
+          path: .tsbuildinfo
+          key: tsbuildinfo-${{ runner.os }}-${{ hashFiles('tsconfig.json', 'src/**/*.ts', 'src/**/*.tsx') }}
+          restore-keys: tsbuildinfo-${{ runner.os }}-
 
       - run: yarn install
       - run: yarn typecheck
 
   lint:
-    needs: detect-affected
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -71,11 +41,16 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
           cache: yarn
 
+      - uses: actions/cache@v4
+        with:
+          path: .eslintcache
+          key: eslintcache-${{ runner.os }}-${{ hashFiles('eslint.config.mjs') }}-${{ github.sha }}
+          restore-keys: eslintcache-${{ runner.os }}-${{ hashFiles('eslint.config.mjs') }}-
+
       - run: yarn install
       - run: yarn lint
 
   test:
-    needs: detect-affected
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -213,7 +188,8 @@ jobs:
           echo "--- Wave 2: spike-land-backend, spike-edge (parallel) ---"
           (cd packages/spike-land-backend && npm run deploy) &
           PID_BACKEND=$!
-          (cd packages/spike-edge && npm run deploy) &
+          SHORT_SHA=$(git rev-parse --short HEAD)
+          (cd packages/spike-edge && npx wrangler deploy --minify --var CACHE_VERSION:"$SHORT_SHA") &
           PID_EDGE=$!
 
           wait $PID_BACKEND || { echo "FATAL: spike-land-backend deploy failed"; exit 1; }
@@ -221,6 +197,9 @@ jobs:
           echo "Wave 2 complete."
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+
+      - name: Build spike-app SPA
+        run: cd packages/spike-app && npm run build
 
       - name: Deploy spike-app SPA
         run: bash packages/spike-app/deploy.sh
@@ -233,13 +212,17 @@ jobs:
           sleep 5
           echo "Running smoke tests (failures are blocking)..."
 
-          # Retry function: 3 attempts with 10s between
           smoke_check() {
             local url="$1" label="$2"
             for i in 1 2 3; do
-              if curl -sf --max-time 15 "$url" > /dev/null 2>&1; then
-                echo "  ✓ $label"
-                return 0
+              RES=$(curl -sf --max-time 15 "$url" || echo "")
+              if [ -n "$RES" ]; then
+                if echo "$RES" | jq -e '.status == "ok" or .ok == true' > /dev/null; then
+                  SVC=$(echo "$RES" | jq -r '.service // "unknown"')
+                  TS=$(echo "$RES" | jq -r '.timestamp // "none"')
+                  echo "  ✓ $label (service: $SVC, timestamp: $TS)"
+                  return 0
+                fi
               fi
               [ "$i" -lt 3 ] && sleep 10
             done
@@ -247,13 +230,42 @@ jobs:
             return 1
           }
 
-          smoke_check "https://edge.spike.land/health" "spike-edge healthy"
-          smoke_check "https://js.spike.land/health" "transpile healthy"
-          smoke_check "https://mcp.spike.land/health" "spike-land-mcp healthy"
-          smoke_check "https://auth-mcp.spike.land/health" "mcp-auth healthy"
-          smoke_check "https://image-studio-mcp.spike.land/health" "image-studio-mcp healthy"
-          smoke_check "https://spike.land/" "SPA serving"
+          FAIL_COUNT=0
+          smoke_check "https://edge.spike.land/health" "spike-edge healthy" || ((FAIL_COUNT++))
+          smoke_check "https://js.spike.land/health" "transpile healthy" || ((FAIL_COUNT++))
+          smoke_check "https://mcp.spike.land/health" "spike-land-mcp healthy" || ((FAIL_COUNT++))
+          smoke_check "https://auth-mcp.spike.land/health" "mcp-auth healthy" || ((FAIL_COUNT++))
+          smoke_check "https://image-studio-mcp.spike.land/health" "image-studio-mcp healthy" || ((FAIL_COUNT++))
+          
+          # SPA test check
+          for i in 1 2 3; do
+            if curl -sf --max-time 15 "https://spike.land/" > /dev/null 2>&1; then
+              echo "  ✓ SPA serving"
+              break
+            fi
+            if [ "$i" -eq 3 ]; then
+              echo "  ✗ SPA serving FAILED after 3 attempts"
+              ((FAIL_COUNT++))
+            fi
+            sleep 10
+          done
+
+          if [ $FAIL_COUNT -gt 0 ]; then
+            echo "$FAIL_COUNT smoke tests failed."
+            exit 1
+          fi
           echo "All smoke tests passed."
+
+      - name: Verify deployed version
+        run: |
+          sleep 5
+          DEPLOYED_SHA=$(curl -sf https://spike.land/api/version | jq -r '.sha // ""' 2>/dev/null || echo "")
+          HEAD_SHA=$(git rev-parse HEAD)
+          if [ "$DEPLOYED_SHA" != "$HEAD_SHA" ]; then
+            echo "WARNING: Deployed SHA ($DEPLOYED_SHA) does not match HEAD ($HEAD_SHA)"
+          else
+            echo "Verified: deployed SHA matches HEAD ($HEAD_SHA)"
+          fi
 
       - name: Rollback on failure
         if: failure()

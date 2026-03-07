@@ -66,16 +66,19 @@ checkout.post("/api/checkout", async (c) => {
   const priceId = prices[0]!.id;
 
   // Create checkout session
+  const idempotencyKey = `${userId}-checkout-${tier}-${Math.floor(Date.now() / 60000)}`;
   const sessionRes = await stripePost(stripeKey, "/v1/checkout/sessions", {
     mode: "subscription",
     "line_items[0][price]": priceId,
     "line_items[0][quantity]": "1",
+    allow_promotion_codes: "true",
+    "subscription_data[trial_period_days]": "14",
     success_url: "https://spike.land/settings?tab=billing&success=1",
     cancel_url: "https://spike.land/pricing",
     client_reference_id: userId,
     "metadata[userId]": userId,
     "metadata[tier]": tier,
-  });
+  }, idempotencyKey);
 
   if (!sessionRes.ok) {
     log.error("Failed to create checkout session", { data: String(sessionRes.data) });

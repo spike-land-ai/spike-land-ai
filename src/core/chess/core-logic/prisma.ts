@@ -21,3 +21,24 @@ export type ChessGameStatus =
   | "DRAW"
   | "RESIGNED"
   | "EXPIRED";
+
+// ---- Stub implementation ----
+// Throws at runtime making misconfiguration explicit rather than silently
+// returning empty data.
+
+const notConfigured = (model: string, method: string) => (): never => {
+  throw new Error(
+    `prisma.${model}.${method}() called but no PrismaClient is configured. ` +
+      "Inject a real client via the host application.",
+  );
+};
+
+const makeStub = (model: string) => new Proxy({}, {
+  get: (_, method) => notConfigured(model, String(method))
+});
+
+const prismaStub: any = new Proxy({}, {
+  get: (_, model) => makeStub(String(model))
+});
+
+export default prismaStub;

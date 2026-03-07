@@ -191,15 +191,6 @@ export const useSpeedy = async (codeSpace: string) => {
     text: string;
   }>;
 
-  //   if (indexCss.length > 0 ) {
-  //   const assets = indexCss.filter((f) => f.path.includes("/assets/"));
-  //  assets.forEach(async (f) => {
-  //     const assetU8Array = f.contents;
-  //     const base64TTF = btoa(String.fromCharCode(...assetU8Array));
-  //     const path = f.path.split("api/my-cms").pop();
-  //     css= css.split(path).join(`data:font/ttf;base64,${base64TTF}`);
-  //   });}
-
   const getMimeType = (extension: string) => {
     const mimeTypes: Record<string, string> = {
       woff: "font/woff",

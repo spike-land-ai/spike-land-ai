@@ -344,7 +344,7 @@ across multiple multiple server instances. TODO: Implement Redis Pub/Sub.
   src={app.codespaceUrl} // https://testing.spike.land/live/{id}/
   className="h-[400%] w-[400%]"
   style={{ transform: "scale(0.25)", transformOrigin: "0 0" }}
-  sandbox="allow-scripts allow-same-origin"
+  sandbox="allow-scripts"
 />;
 ```
 

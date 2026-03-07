@@ -61,6 +61,7 @@ export function QuizCard({
               key={idx}
               onClick={() => !disabled && onSelect(questionIndex, idx)}
               disabled={disabled}
+              aria-label={`Question ${questionIndex + 1}, ${String.fromCharCode(65 + idx)}: ${option}`}
               className={`flex w-full items-center gap-3 rounded-lg border-2 px-4 py-3 text-left text-sm transition-colors ${borderColor} ${bgColor} ${textColor} ${
                 disabled ? "cursor-not-allowed opacity-60" : "cursor-pointer"
               }`}

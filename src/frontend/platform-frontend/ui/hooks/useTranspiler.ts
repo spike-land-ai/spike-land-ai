@@ -6,7 +6,7 @@ interface TranspileResult {
   isTranspiling: boolean;
 }
 
-const TRANSPILE_ENDPOINT = "https://js.spike.land";
+const TRANSPILE_ENDPOINT = import.meta.env.DEV ? "/transpile" : "https://js.spike.land";
 
 /**
  * Post-process transpiled code so it can run in an inline module script.
@@ -68,7 +68,7 @@ function buildPreviewHtml(transpiledCode: string): string {
     }
   }
   </script>
-  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: system-ui, -apple-system, sans-serif; }

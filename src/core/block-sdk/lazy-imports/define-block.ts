@@ -164,14 +164,14 @@ export function defineBlock<
     // We create procedures with a no-op storage to introspect names
     const dummyStorage: StorageAdapter = {
       kv: {
-        /* v8 ignore next */ get: async () => null,
-        /* v8 ignore next */ put: async () => {},
-        /* v8 ignore next */ delete: async () => false,
-        /* v8 ignore next */ list: async () => [],
+        /* v8 ignore next */ get: async (): Promise<null> => null,
+        /* v8 ignore next */ put: async (): Promise<void> => {},
+        /* v8 ignore next */ delete: async (): Promise<boolean> => false,
+        /* v8 ignore next */ list: async (): Promise<[]> => [],
       },
       sql: {
-        /* v8 ignore next */ execute: async () => ({ rows: [], rowsAffected: 0 }),
-        /* v8 ignore next */ batch: async () => [],
+        /* v8 ignore next */ execute: async (): Promise<{ rows: []; rowsAffected: 0 }> => ({ rows: [], rowsAffected: 0 }),
+        /* v8 ignore next */ batch: async (): Promise<[]> => [],
       },
     };
     const procs = createProcedures(dummyStorage, "__introspect__");

@@ -14,7 +14,7 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import type { ToolCallback } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
-import type { ZodRawShapeCompat } from "@modelcontextprotocol/sdk/server/zod-compat.js";
+import type { ZodRawShapeCompat, ShapeOutput } from "@modelcontextprotocol/sdk/server/zod-compat.js";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -331,14 +331,12 @@ export async function startMcpServer(server: McpServer): Promise<void> {
 
 // ─── Zod Tool Wrapper ─────────────────────────────────────────────────────────
 
-import type { z } from "zod";
-
 /**
  * Infer the validated argument type from a Zod raw shape.
  * This allows handler functions to receive fully-typed arguments instead of
  * `Record<string, unknown>`.
  */
-export type InferZodArgs<TSchema extends ZodRawShapeCompat> = z.infer<z.ZodObject<TSchema>>;
+export type InferZodArgs<TSchema extends ZodRawShapeCompat> = ShapeOutput<TSchema>;
 
 /**
  * Options accepted by `createZodTool`.

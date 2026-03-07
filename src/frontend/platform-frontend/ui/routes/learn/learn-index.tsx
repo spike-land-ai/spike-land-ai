@@ -88,8 +88,13 @@ export function LearnIndexPage() {
       </div>
 
       {/* Input mode tabs */}
-      <div className="flex gap-1 rounded-lg border border-border bg-muted p-1">
+      <div role="tablist" aria-label="Content input mode" className="flex gap-1 rounded-lg border border-border bg-muted p-1">
         <button
+          role="tab"
+          aria-selected={inputMode === "url"}
+          aria-controls="learn-panel-url"
+          id="learn-tab-url"
+          tabIndex={inputMode === "url" ? 0 : -1}
           onClick={() => setInputMode("url")}
           className={`flex-1 rounded-md px-4 py-2 text-sm font-medium transition-colors ${
             inputMode === "url"
@@ -100,6 +105,11 @@ export function LearnIndexPage() {
           URL
         </button>
         <button
+          role="tab"
+          aria-selected={inputMode === "text"}
+          aria-controls="learn-panel-text"
+          id="learn-tab-text"
+          tabIndex={inputMode === "text" ? 0 : -1}
           onClick={() => setInputMode("text")}
           className={`flex-1 rounded-md px-4 py-2 text-sm font-medium transition-colors ${
             inputMode === "text"
@@ -114,9 +124,10 @@ export function LearnIndexPage() {
       {/* Content input */}
       <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
         {inputMode === "url" ? (
-          <div>
-            <label className="mb-2 block text-sm font-medium text-foreground">Content URL</label>
+          <div id="learn-panel-url" role="tabpanel" aria-labelledby="learn-tab-url">
+            <label htmlFor="learn-content-url" className="mb-2 block text-sm font-medium text-foreground">Content URL</label>
             <input
+              id="learn-content-url"
               type="url"
               value={contentUrl}
               onChange={(e) => setContentUrl(e.target.value)}
@@ -125,9 +136,10 @@ export function LearnIndexPage() {
             />
           </div>
         ) : (
-          <div>
-            <label className="mb-2 block text-sm font-medium text-foreground">Content Text</label>
+          <div id="learn-panel-text" role="tabpanel" aria-labelledby="learn-tab-text">
+            <label htmlFor="learn-content-text" className="mb-2 block text-sm font-medium text-foreground">Content Text</label>
             <textarea
+              id="learn-content-text"
               value={contentText}
               onChange={(e) => setContentText(e.target.value)}
               placeholder="Paste the article or content you want to learn from..."

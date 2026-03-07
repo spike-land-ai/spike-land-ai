@@ -1,1 +1,1 @@
-export * from "../../src/mcp-tools/bazdmeg/mcp/index.ts";
+export * from "../../src/mcp-tools/bazdmeg/mcp/index";

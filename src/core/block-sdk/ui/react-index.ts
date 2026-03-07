@@ -74,7 +74,7 @@ export function createBlockClient<
       if (!tool || typeof tool !== "object" || !("handler" in tool)) {
         throw new Error(`Unknown procedure: ${String(name)}`);
       }
-      const builtTool = tool as BuiltTool;
+      const builtTool = tool as unknown as BuiltTool;
       return builtTool.handler(input, { storage, userId: options.userId });
     },
 

@@ -1,5 +1,5 @@
 import { useAuth } from "../hooks/useAuth";
-import { Navigate, useLocation } from "@tanstack/react-router";
+import { Navigate } from "@tanstack/react-router";
 import type { ReactNode } from "react";
 import { Loader2 } from "lucide-react";
 
@@ -10,7 +10,7 @@ interface AuthGuardProps {
 
 export function AuthGuard({ children, fallback }: AuthGuardProps) {
   const { isAuthenticated, isLoading } = useAuth();
-  const location = useLocation();
+  const returnUrl = window.location.pathname + window.location.search;
 
   if (isLoading) {
     return (
@@ -30,7 +30,7 @@ export function AuthGuard({ children, fallback }: AuthGuardProps) {
     if (fallback) {
       return <>{fallback}</>;
     }
-    return <Navigate to="/login" search={{ returnUrl: location.pathname }} />;
+    return <Navigate to="/login" search={{ returnUrl }} />;
   }
 
   return (

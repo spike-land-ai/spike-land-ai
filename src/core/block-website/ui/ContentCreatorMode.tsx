@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, lazy, Suspense } from "react";
+import { useState, useEffect, useCallback, useRef, Suspense } from "react";
 import Markdown from "react-markdown";
 import rehypeRaw from "rehype-raw";
 import remarkGfm from "remark-gfm";
@@ -7,15 +7,49 @@ import { Button } from "../lazy-imports/button";
 import { cn } from "@spike-land-ai/shared";
 import { apiUrl } from "../core-logic/api";
 
-// Lazy-load Monaco if available; falls back to textarea
-type LazyMod = { default: React.ComponentType<Record<string, unknown>> };
-const FallbackEditor: React.FC<Record<string, unknown>> = () => null;
-const MonacoEditor = lazy(
-  (): Promise<LazyMod> =>
-    (import("@monaco-editor/react") as Promise<LazyMod>).catch(
-      (): LazyMod => ({ default: FallbackEditor }),
-    ),
-);
+function MonacoEditorWrapper({ value, onChange }: { value: string, onChange: (v: string) => void }) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const editorRef = useRef<{ getValue(): string; dispose(): void; onDidChangeModelContent(cb: () => void): void } | null>(null);
+  const onChangeRef = useRef(onChange);
+  const valueRef = useRef(value);
+  onChangeRef.current = onChange;
+  valueRef.current = value;
+
+  useEffect(() => {
+    if (!containerRef.current) return;
+    let isMounted = true;
+
+    import("monaco-editor").then((monaco) => {
+      if (!isMounted) return;
+      editorRef.current = monaco.editor.create(containerRef.current!, {
+        value: valueRef.current,
+        language: "markdown",
+        theme: "vs-dark",
+        minimap: { enabled: false },
+        wordWrap: "on",
+        fontSize: 13,
+        lineNumbers: "on",
+        scrollBeyondLastLine: false,
+        automaticLayout: true,
+      });
+
+      editorRef.current.onDidChangeModelContent(() => {
+        onChangeRef.current(editorRef.current!.getValue());
+      });
+    }).catch((err: unknown) => {
+      console.error("Failed to load monaco-editor", err);
+    });
+
+    return () => {
+      isMounted = false;
+      if (editorRef.current) {
+        editorRef.current.dispose();
+      }
+    };
+  }, []);
+
+  return <div ref={containerRef} className="w-full h-full" />;
+}
 
 function isDevMode(): boolean {
   if (typeof window === "undefined") return false;
@@ -42,7 +76,6 @@ export function ContentCreatorMode({
   const [content, setContent] = useState(initialContent);
   const [submitting, setSubmitting] = useState(false);
   const [toast, setToast] = useState<ToastState>(null);
-  const [monacoFailed, setMonacoFailed] = useState(false);
 
   const showToast = useCallback((message: string, type: "success" | "error") => {
     setToast({ message, type });
@@ -131,32 +164,19 @@ export function ContentCreatorMode({
               MDX Source
             </span>
           </div>
-          <div className="flex-1 overflow-hidden">
-            {!monacoFailed ? (
-              <Suspense
-                fallback={
-                  <textarea
-                    className="w-full h-full resize-none bg-background font-mono text-sm p-4 focus:outline-none"
-                    value={content}
-                    onChange={(e) => setContent(e.target.value)}
-                    spellCheck={false}
-                  />
-                }
-              >
-                <MonacoEditorWrapper
+          <div className="flex-1 overflow-hidden relative">
+            <Suspense
+              fallback={
+                <textarea
+                  className="w-full h-full resize-none bg-background font-mono text-sm p-4 focus:outline-none absolute inset-0"
                   value={content}
-                  onChange={setContent}
-                  onError={() => setMonacoFailed(true)}
+                  onChange={(e) => setContent(e.target.value)}
+                  spellCheck={false}
                 />
-              </Suspense>
-            ) : (
-              <textarea
-                className="w-full h-full resize-none bg-background font-mono text-sm p-4 focus:outline-none"
-                value={content}
-                onChange={(e) => setContent(e.target.value)}
-                spellCheck={false}
-              />
-            )}
+              }
+            >
+              <MonacoEditorWrapper value={content} onChange={setContent} />
+            </Suspense>
           </div>
         </div>
 
@@ -186,40 +206,6 @@ export function ContentCreatorMode({
         </div>
       </div>
     </div>
-  );
-}
-
-interface MonacoEditorWrapperProps {
-  value: string;
-  onChange: (value: string) => void;
-  onError: () => void;
-}
-
-function MonacoEditorWrapper({ value, onChange, onError }: MonacoEditorWrapperProps) {
-  return (
-    <Suspense fallback={null}>
-      <MonacoEditorInner value={value} onChange={onChange} onError={onError} />
-    </Suspense>
-  );
-}
-
-function MonacoEditorInner({ value, onChange }: MonacoEditorWrapperProps) {
-  return (
-    <MonacoEditor
-      height="100%"
-      language="markdown"
-      value={value}
-      onChange={(v: string | undefined) => onChange(v ?? "")}
-      theme="vs-dark"
-      options={{
-        minimap: { enabled: false },
-        wordWrap: "on",
-        fontSize: 13,
-        lineNumbers: "on",
-        scrollBeyondLastLine: false,
-        automaticLayout: true,
-      }}
-    />
   );
 }
 

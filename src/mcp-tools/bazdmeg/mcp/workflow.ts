@@ -464,7 +464,7 @@ export function registerWorkflowTools(server: McpServer): void {
 
         for (let i = 0; i < 3; i++) {
           const q = round.questions[i]!;
-          const givenAnswer = answers[i]!;
+          const givenAnswer = answers[i] as number;
           const isCorrect = givenAnswer === q.correctIndex;
           const conceptState = session.conceptStates[q.conceptIndex]!;
           const conceptName = session.concepts[q.conceptIndex]!.name;
@@ -648,7 +648,7 @@ export function registerWorkflowTools(server: McpServer): void {
         deletions,
         prTitle,
         prBody,
-        claudeMdRules: [],
+        claudeMdRules: [] as string[],
         allowedPaths: workspace?.allowedPaths,
       };
 

@@ -9,4 +9,5 @@ export * from "./useFocusTrap";
 export * from "./useMonacoTypeAcquisition";
 export * from "./useQaStudioMcp";
 export * from "./useTranspiler";
+export * from "./usePricing";
 export * from "./useVibeCode";

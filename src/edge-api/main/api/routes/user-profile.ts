@@ -1,7 +1,8 @@
 /**
  * User Profile Endpoint
  *
- * POST /api/user/profile — update user name/email in users table.
+ * POST /api/user/profile — update user display name.
+ * Email changes are blocked to prevent privilege escalation (email is auth-provider-owned).
  * Requires auth.
  */
 
@@ -23,29 +24,23 @@ userProfile.post("/api/user/profile", async (c) => {
     return c.json({ error: "Invalid JSON body" }, 400);
   }
 
-  const { name, email } = body;
-  if (!name && !email) {
-    return c.json({ error: "At least one of name or email is required" }, 400);
+  // Email changes are not permitted via this endpoint — email is owned by the
+  // auth provider (Better Auth/OAuth) and requires a verified change flow.
+  // Allowing unverified email changes would allow privilege escalation to admin
+  // roles that rely on email-based access checks (e.g. cockpit metrics).
+  if (body.email !== undefined) {
+    return c.json({ error: "Email cannot be changed via this endpoint" }, 400);
   }
 
-  const fields: string[] = [];
-  const values: string[] = [];
-
-  if (name) {
-    fields.push("name = ?");
-    values.push(name);
+  const { name } = body;
+  if (!name) {
+    return c.json({ error: "name is required" }, 400);
   }
-  if (email) {
-    fields.push("email = ?");
-    values.push(email);
-  }
-
-  values.push(userId);
 
   await c.env.DB.prepare(
-    `UPDATE users SET ${fields.join(", ")} WHERE id = ?`,
+    `UPDATE users SET name = ? WHERE id = ?`,
   )
-    .bind(...values)
+    .bind(name, userId)
     .run();
 
   return c.json({ success: true });

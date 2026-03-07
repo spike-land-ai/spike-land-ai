@@ -33,8 +33,8 @@ export function AppsNewPage() {
             Thanks! We'll notify you when app creation is ready.
           </div>
         ) : (
-          <form 
-            onSubmit={(e) => { e.preventDefault(); setSubmitted(true); }}
+          <form
+            onSubmit={(e) => { e.preventDefault(); if (e.currentTarget.checkValidity()) setSubmitted(true); }}
             className="flex flex-col sm:flex-row gap-3 max-w-sm mx-auto"
           >
             <input
@@ -43,6 +43,7 @@ export function AppsNewPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
+              maxLength={254}
               className="flex-1 rounded-lg border border-border bg-background px-4 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
             />
             <button

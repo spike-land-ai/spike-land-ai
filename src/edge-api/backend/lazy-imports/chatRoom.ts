@@ -57,7 +57,6 @@ export class Code implements DurableObject {
   private static readonly MAX_LOG_ENTRIES = 50;
   private xLog: (sess: ICodeSession) => Promise<void>;
 
-  // private historyManager: CodeHistoryManager;
   public getSession() {
     const session = this.session;
     return sanitizeSession(Object.freeze(session)) as ICodeSession;

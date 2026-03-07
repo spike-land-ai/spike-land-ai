@@ -35,12 +35,12 @@ export function TryItNow() {
       <div className="max-w-4xl mx-auto px-4 sm:px-6">
         <div className="bg-card rounded-2xl border border-border overflow-hidden shadow-xl">
           <div className="p-6 sm:p-8 border-b border-border relative">
-            <div className="absolute top-0 right-0 p-4 opacity-10 pointer-events-none">
-              <svg className="w-24 h-24" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 4.238 9.617 9.634 10.828.576.106.788-.25.788-.556 0-.273-.01-1.185-.015-2.171-4.037.876-4.889-1.731-4.889-1.731-.66-1.676-1.61-2.122-1.61-2.122-1.318-.9.1-.882.1-.882 1.457.102 2.224 1.496 2.224 1.496 1.296 2.218 3.39 1.577 4.216 1.206.13-.938.533-1.577.976-1.94-3.221-.366-6.608-1.61-6.608-7.17 0-1.583.565-2.877 1.492-3.892-.15-.366-.647-1.84.142-3.838 0 0 1.217-.422 3.992 1.486 1.157-.322 2.397-.483 3.633-.488 1.235.005 2.476.166 3.635.488 2.772-1.908 3.987-1.486 3.987-1.486.791 1.998.294 3.472.144 3.838.929 1.015 1.49 2.309 1.49 3.892 0 5.574-3.393 6.801-6.624 7.16.524.452.991 1.344.991 2.709 0 1.957-.014 3.532-.014 4.012 0 .31.209.669.799.554 5.393-1.213 9.629-5.526 9.629-10.828 0-6.627-5.373-12-12-12z"/></svg>
+            <div className="absolute top-4 right-4 pointer-events-none select-none text-muted-foreground/10 dark:text-muted-foreground/20">
+              <svg className="w-32 h-32 md:w-48 md:h-48 transform translate-x-4 -translate-y-4" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 4.238 9.617 9.634 10.828.576.106.788-.25.788-.556 0-.273-.01-1.185-.015-2.171-4.037.876-4.889-1.731-4.889-1.731-.66-1.676-1.61-2.122-1.61-2.122-1.318-.9.1-.882.1-.882 1.457.102 2.224 1.496 2.224 1.496 1.296 2.218 3.39 1.577 4.216 1.206.13-.938.533-1.577.976-1.94-3.221-.366-6.608-1.61-6.608-7.17 0-1.583.565-2.877 1.492-3.892-.15-.366-.647-1.84.142-3.838 0 0 1.217-.422 3.992 1.486 1.157-.322 2.397-.483 3.633-.488 1.235.005 2.476.166 3.635.488 2.772-1.908 3.987-1.486 3.987-1.486.791 1.998.294 3.472.144 3.838.929 1.015 1.49 2.309 1.49 3.892 0 5.574-3.393 6.801-6.624 7.16.524.452.991 1.344.991 2.709 0 1.957-.014 3.532-.014 4.012 0 .31.209.669.799.554 5.393-1.213 9.629-5.526 9.629-10.828 0-6.627-5.373-12-12-12z"/></svg>
             </div>
             
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-cyan-500/10 text-cyan-600 text-xs font-semibold tracking-wide uppercase mb-4">
-              <span className="w-1.5 h-1.5 rounded-full bg-cyan-500 animate-pulse"></span>
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-semibold tracking-wide uppercase mb-4">
+              <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse shadow-[0_0_8px_var(--primary-glow)]"></span>
               {TOTAL_TOOL_COUNT}+ MCP Tools · Instant Access
             </div>
             
@@ -49,14 +49,14 @@ export function TryItNow() {
               Connect your AI to the entire platform instantly. Zero config, no npm install required.
             </p>
 
-            <div className="rounded-xl overflow-hidden border border-[#334155] shadow-2xl bg-[#0f172a]">
-              <div className="flex overflow-x-auto border-b border-[#334155] bg-[#0f172a]">
+            <div className="rounded-xl overflow-hidden border border-border/50 shadow-2xl bg-obsidian-950">
+              <div className="flex overflow-x-auto border-b border-border/50 bg-obsidian-900/50">
                 <button
                   onClick={() => setActiveTab("claude-code")}
                   className={`px-4 py-3 text-sm font-medium whitespace-nowrap transition-colors border-b-2 ${
                     activeTab === "claude-code"
-                      ? "border-cyan-400 text-cyan-400 bg-white/5"
-                      : "border-transparent text-slate-400 hover:text-slate-200 hover:bg-white/5"
+                      ? "border-primary text-primary bg-primary/5"
+                      : "border-transparent text-muted-foreground hover:text-foreground hover:bg-foreground/5"
                   }`}
                 >
                   Claude Code
@@ -65,8 +65,8 @@ export function TryItNow() {
                   onClick={() => setActiveTab("cursor")}
                   className={`px-4 py-3 text-sm font-medium whitespace-nowrap transition-colors border-b-2 ${
                     activeTab === "cursor"
-                      ? "border-cyan-400 text-cyan-400 bg-white/5"
-                      : "border-transparent text-slate-400 hover:text-slate-200 hover:bg-white/5"
+                      ? "border-primary text-primary bg-primary/5"
+                      : "border-transparent text-muted-foreground hover:text-foreground hover:bg-foreground/5"
                   }`}
                 >
                   Cursor
@@ -75,8 +75,8 @@ export function TryItNow() {
                   onClick={() => setActiveTab("vscode")}
                   className={`px-4 py-3 text-sm font-medium whitespace-nowrap transition-colors border-b-2 ${
                     activeTab === "vscode"
-                      ? "border-cyan-400 text-cyan-400 bg-white/5"
-                      : "border-transparent text-slate-400 hover:text-slate-200 hover:bg-white/5"
+                      ? "border-primary text-primary bg-primary/5"
+                      : "border-transparent text-muted-foreground hover:text-foreground hover:bg-foreground/5"
                   }`}
                 >
                   VS Code
@@ -87,30 +87,30 @@ export function TryItNow() {
                 <div className="font-mono text-sm overflow-x-auto w-full">
                   {activeTab === "claude-code" && (
                     <div className="flex gap-2">
-                      <span className="text-cyan-400 shrink-0">$</span>
-                      <span className="text-slate-200 break-all">claude mcp add spike-land --transport http https://spike.land/mcp</span>
+                      <span className="text-primary shrink-0">$</span>
+                      <span className="text-foreground break-all">claude mcp add spike-land --transport http https://spike.land/mcp</span>
                     </div>
                   )}
                   {activeTab === "cursor" && (
                     <div className="flex flex-col gap-1">
-                      <span className="text-slate-400 text-xs mb-1">Add to Cursor Settings → MCP</span>
-                      <span className="text-slate-200 break-all">{getCommand()}</span>
+                      <span className="text-muted-foreground text-xs mb-1">Add to Cursor Settings → MCP</span>
+                      <span className="text-foreground break-all">{getCommand()}</span>
                     </div>
                   )}
                   {activeTab === "vscode" && (
                     <div className="flex flex-col gap-1">
-                      <span className="text-slate-400 text-xs mb-1">Add to .vscode/mcp.json</span>
-                      <span className="text-slate-200 break-all">{getCommand()}</span>
+                      <span className="text-muted-foreground text-xs mb-1">Add to .vscode/mcp.json</span>
+                      <span className="text-foreground break-all">{getCommand()}</span>
                     </div>
                   )}
                 </div>
                 <button
                   onClick={handleCopy}
-                  className="shrink-0 flex items-center justify-center gap-2 px-3 py-2 bg-white/10 hover:bg-white/20 text-slate-200 rounded-md transition-colors text-sm font-medium w-full sm:w-auto"
+                  className="shrink-0 flex items-center justify-center gap-2 px-3 py-2 bg-foreground/10 hover:bg-foreground/20 text-foreground rounded-md transition-colors text-sm font-medium w-full sm:w-auto"
                 >
                   {copied ? (
                     <>
-                      <svg className="w-4 h-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>
+                      <svg className="w-4 h-4 text-success" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>
                       Copied!
                     </>
                   ) : (

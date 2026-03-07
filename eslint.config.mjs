@@ -49,6 +49,8 @@ export default tseslint.config(
       ".wrangler/**",
       "packages/**",
       "src/esbuild-wasm/**",
+      "src/monaco-editor/**",
+      "src/core/chess/core-logic/prisma.ts",
       "**/*.d.ts",
       ".yarn/**",
       "**/routeTree.gen.ts",

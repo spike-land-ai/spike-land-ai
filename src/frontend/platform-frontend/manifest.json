@@ -2,8 +2,6 @@
   "name": "platform-frontend",
   "category": "frontend",
   "dependencies": [
-    "@monaco-editor/loader",
-    "@monaco-editor/react",
     "@radix-ui/react-slot",
     "@spike-land-ai/block-website",
     "@spike-land-ai/shared",

@@ -39,7 +39,7 @@ export function registerGatesTools(server: McpServer): void {
         deletions,
         prTitle: prTitle ?? "",
         prBody: prBody ?? null,
-        claudeMdRules: [],
+        claudeMdRules: [] as string[],
         allowedPaths: workspace?.allowedPaths,
       };
 
@@ -84,8 +84,8 @@ export function registerGatesTools(server: McpServer): void {
         additions,
         deletions,
         prTitle: "",
-        prBody: null,
-        claudeMdRules: [],
+        prBody: null as string | null,
+        claudeMdRules: [] as string[],
         allowedPaths: workspace?.allowedPaths,
       };
 

@@ -7,9 +7,7 @@
     "declaration": true,
     "declarationMap": true,
     "paths": {
-      "@/*": [
-        "../../src/core/chess/*"
-      ]
+      "@/*": ["../../src/core/chess/*"]
     }
   },
   "include": [

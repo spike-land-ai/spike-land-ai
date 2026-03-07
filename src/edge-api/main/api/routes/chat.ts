@@ -12,7 +12,7 @@ chat.post("/api/chat", async (c) => {
   }
 
   const history = Array.isArray(body.history) ? body.history : [];
-  const requestId = c.get("requestId");
+  const requestId = (c.get("requestId") as string | undefined) ?? crypto.randomUUID();
 
   // Fetch MCP tools from MCP_SERVICE
   let mcpTools: Array<{ name: string; description: string; input_schema: unknown }> = [];

@@ -10,7 +10,7 @@ const getCorsHeaders = (requestUrl?: string) => {
   let allowOrigin = "https://spike.land";
   if (requestUrl) {
     const origin = new URL(requestUrl).origin;
-    if (origin.endsWith(".spike.land") || origin.startsWith("http://localhost:")) {
+    if (origin.endsWith(".spike.land") || origin.startsWith("http://localhost:") || origin.startsWith("https://localhost:") || origin.startsWith("http://127.0.0.1:") || origin.startsWith("https://127.0.0.1:")) {
       allowOrigin = origin;
     }
   }

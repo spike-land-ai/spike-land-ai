@@ -59,6 +59,11 @@ function FeaturedCard({ post, LinkComp }: { post: BlogMeta; LinkComp: React.Comp
       <CardImage post={post} className="lg:w-3/5 lg:h-full aspect-[16/9] lg:aspect-auto" />
       <div className="p-8 lg:p-12 lg:w-2/5 flex flex-col justify-center bg-card">
         <div className="flex flex-wrap items-center gap-4 text-[10px] font-black uppercase tracking-[0.2em] mb-6">
+          {post.draft && (
+            <span className="bg-amber-500/10 text-amber-600 dark:text-amber-400 px-3 py-1 rounded-full border border-amber-500/20">
+              Draft
+            </span>
+          )}
           {post.category && (
             <span className="bg-primary/10 text-primary px-3 py-1 rounded-full border border-primary/10">
               {post.category}
@@ -105,6 +110,12 @@ function BlogCard({ post, LinkComp }: { post: BlogMeta; LinkComp: React.Componen
       <CardImage post={post} className="aspect-[16/10]" />
       <div className="p-6 sm:p-8 flex flex-col flex-1">
         <div className="flex items-center gap-3 text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-4">
+          {post.draft && (
+            <>
+              <span className="text-amber-600 dark:text-amber-400">Draft</span>
+              <span className="opacity-30">&middot;</span>
+            </>
+          )}
           <Tag className="size-3" />
           <span>{post.category || "General"}</span>
           <span className="opacity-30">&middot;</span>

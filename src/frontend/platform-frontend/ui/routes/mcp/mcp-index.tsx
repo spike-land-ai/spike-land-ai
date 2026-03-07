@@ -109,7 +109,7 @@ export function McpPage() {
             to="/tools"
             className="text-sm font-medium text-primary hover:underline"
           >
-            View all →
+            View all <span aria-hidden="true">→</span>
           </Link>
         </div>
 
@@ -134,7 +134,7 @@ export function McpPage() {
                 to="/tools"
                 className="group flex items-center gap-4 rounded-2xl border border-border bg-card dark:glass-card p-5 shadow-sm transition hover:shadow-md hover:scale-[1.01] hover:border-primary/30"
               >
-                <span className="text-2xl">{getCategoryIcon(category)}</span>
+                <span className="text-2xl" aria-hidden="true">{getCategoryIcon(category)}</span>
                 <div>
                   <p className="font-medium text-foreground group-hover:text-primary transition-colors">
                     {category}
@@ -174,7 +174,7 @@ export function McpPage() {
               to="/mcp/authorize"
               className="inline-block text-sm font-medium text-primary hover:underline transition-colors"
             >
-              Authorize a device →
+              Authorize a device <span aria-hidden="true">→</span>
             </Link>
           </div>
 
@@ -192,7 +192,7 @@ export function McpPage() {
               to="/settings"
               className="inline-block text-sm font-medium text-primary hover:underline transition-colors"
             >
-              Manage API keys →
+              Manage API keys <span aria-hidden="true">→</span>
             </Link>
           </div>
 
@@ -210,7 +210,7 @@ export function McpPage() {
               to="/docs"
               className="inline-block text-sm font-medium text-primary hover:underline transition-colors"
             >
-              Read the docs →
+              Read the docs <span aria-hidden="true">→</span>
             </Link>
           </div>
         </div>

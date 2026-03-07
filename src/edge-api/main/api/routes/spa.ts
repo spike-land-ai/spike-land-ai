@@ -68,6 +68,18 @@ spa.get("/*", async (c) => {
       return c.json({ error: "Not Found", path }, 404);
     }
 
+    // Known SPA route prefixes — any path NOT matching these is a soft 404
+    const knownSpaRoutes = [
+      "/", "/about", "/analytics", "/apps", "/blog", "/bugbook",
+      "/build", "/callback", "/cockpit", "/dashboard", "/docs",
+      "/learn", "/login", "/messages", "/mcp", "/pricing",
+      "/privacy", "/settings", "/store", "/terms", "/tools",
+      "/version", "/vibe-code", "/what-we-do", "/bazdmeg",
+    ];
+    const isKnownRoute = knownSpaRoutes.some(r =>
+      r === "/" ? path === "/" : path === r || path.startsWith(r + "/")
+    );
+
     // 3. Last fallback: the SPA generic index.html shell
     if (!fallback) {
       fallback = await c.env.SPA_ASSETS.get("index.html");
@@ -216,9 +228,10 @@ spa.get("/*", async (c) => {
     }
 
     const response = new Response(html, {
+      status: isKnownRoute ? 200 : 404,
       headers: {
         "content-type": "text/html; charset=utf-8",
-        "cache-control": "no-cache",
+        "cache-control": "private, no-cache, no-store, must-revalidate",
       },
     });
 

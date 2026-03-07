@@ -10,7 +10,7 @@ export type {
 } from "../ui/@/lib/interfaces.ts";
 export { tryCatch } from "../lazy-imports/try-catch.ts";
 
-import HTML from "./index.html";
+import HTML from "../index.html";
 export { HTML };
 
 export { serveWithCache } from "../file-types/serve-with-cache.ts";

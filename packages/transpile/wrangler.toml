@@ -3,7 +3,7 @@ name = "esbuild"
 # Wrangler automatically reads CLOUDFLARE_ACCOUNT_ID from environment
 # See docs/SECRETS_SETUP.md for configuration instructions
 # account_id = "your-account-id-here"
-compatibility_date = "2024-12-01"
+compatibility_date = "2025-07-12"
 compatibility_flags = ["nodejs_compat"]
 main = "index.ts"
 

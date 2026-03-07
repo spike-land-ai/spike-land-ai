@@ -1,0 +1,12 @@
+# Copy this file to .dev.vars and fill in real values
+# Required for local development with `wrangler dev`
+
+BETTER_AUTH_SECRET=
+MCP_INTERNAL_SECRET=
+APP_URL=
+GOOGLE_CLIENT_ID=
+GOOGLE_CLIENT_SECRET=
+GITHUB_CLIENT_ID=
+GITHUB_CLIENT_SECRET=
+APPLE_CLIENT_ID=
+APPLE_CLIENT_SECRET=

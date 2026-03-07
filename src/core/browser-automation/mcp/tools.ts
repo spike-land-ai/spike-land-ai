@@ -296,16 +296,19 @@ export function registerWebTools(server: McpServer): void {
       const tab = getActiveTab();
       if (!tab) return errorResult("NO_PAGE", "No active browser tab. Use web_navigate first.");
 
-      const base64 = await tab.page.screenshot({
+      const buffer = await tab.page.screenshot({
         fullPage: fullPage ?? false,
-        encoding: "base64",
         type: "png",
       });
+
+      const data = Buffer.isBuffer(buffer)
+        ? buffer.toString("base64")
+        : String(buffer);
 
       return {
         content: [{
           type: "image" as const,
-          data: String(base64),
+          data,
           mimeType: "image/png",
         }],
       } as unknown as ReturnType<typeof textResult>;

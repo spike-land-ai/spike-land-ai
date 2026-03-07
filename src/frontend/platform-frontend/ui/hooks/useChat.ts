@@ -50,8 +50,12 @@ export function useChat(): UseChatReturn {
   const abortRef = useRef<AbortController | null>(null);
   const pendingBrowserRef = useRef<Map<string, (result: unknown) => void>>(new Map());
 
+  // Debounce localStorage persistence to avoid excessive I/O during streaming
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(messages));
+    const timeoutId = setTimeout(() => {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(messages));
+    }, 1000);
+    return () => clearTimeout(timeoutId);
   }, [messages]);
 
   const submitBrowserResult = useCallback((requestId: string, result: unknown) => {

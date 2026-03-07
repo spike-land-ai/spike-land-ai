@@ -1,1 +1,1 @@
-export * from "../../src/mcp-tools/openclaw/core-logic/index.ts";
+export * from "../../src/mcp-tools/openclaw/core-logic/index";

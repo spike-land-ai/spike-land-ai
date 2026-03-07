@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Plug, Unplug } from "lucide-react";
 
 interface Props {
   url: string;
@@ -11,43 +12,40 @@ export function ConnectionPanel({ url, connected, onConnect, onDisconnect }: Pro
   const [inputUrl, setInputUrl] = useState(url);
 
   return (
-    <div className="flex items-center gap-4 p-4 border-b border-border bg-card dark:glass-card backdrop-blur-sm">
-      <div className="flex items-center gap-2.5 px-3 py-1.5 rounded-full bg-muted/50 border border-border/50">
-        <div className={`w-2.5 h-2.5 rounded-full transition-all duration-500 ${connected ? 'bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)] ring-2 ring-green-500/20' : 'bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.6)] ring-2 ring-red-500/20'}`} />
-        <span className="text-xs font-semibold tracking-wide uppercase">{connected ? 'Connected' : 'Disconnected'}</span>
+    <div className="flex items-center gap-3">
+      <div className="flex items-center gap-2 px-2.5 py-1.5 rounded-md bg-muted/50 border border-border">
+        <div className={`w-2 h-2 rounded-full transition-all duration-500 ${connected ? 'bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)]' : 'bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.6)]'}`} />
+        <span className="text-[11px] font-semibold tracking-wide uppercase text-muted-foreground">{connected ? 'Connected' : 'Disconnected'}</span>
       </div>
-      <div className="flex-1 flex items-center">
+
+      <div className="flex items-center gap-1.5 bg-background border border-border rounded-md px-2 py-1 focus-within:ring-2 focus-within:ring-primary/20 transition-all">
         <input
           type="text"
           value={inputUrl}
           onChange={(e) => setInputUrl(e.target.value)}
-          className="w-full px-4 py-2 text-sm border rounded-lg bg-background/50 border-border focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all placeholder:text-muted-foreground/40"
+          className="w-[200px] text-xs bg-transparent outline-none placeholder:text-muted-foreground/50"
           placeholder="http://localhost:3100/mcp"
           disabled={connected}
         />
       </div>
-      <div className="flex items-center gap-3">
-        {connected ? (
-          <button 
-            onClick={onDisconnect} 
-            className="px-5 py-2 text-sm font-medium bg-destructive text-destructive-foreground rounded-lg hover:bg-destructive/90 active:scale-[0.98] transition-all shadow-sm"
-          >
-            Disconnect
-          </button>
-        ) : (
-          <button 
-            onClick={() => onConnect(inputUrl)} 
-            className="px-5 py-2 text-sm font-medium bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 active:scale-[0.98] transition-all shadow-sm shadow-primary/20"
-          >
-            Connect
-          </button>
-        )}
-        {!connected && (
-          <div className="hidden lg:block text-[11px] text-muted-foreground leading-tight">
-            Run <code className="bg-muted px-1.5 py-0.5 rounded-md font-mono text-primary">npx @spike-land-ai/qa-studio --http</code><br/>locally to connect.
-          </div>
-        )}
-      </div>
+
+      {connected ? (
+        <button
+          onClick={onDisconnect}
+          className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-destructive/10 text-destructive border border-destructive/20 rounded-md hover:bg-destructive/20 active:scale-[0.98] transition-all"
+        >
+          <Unplug className="w-3.5 h-3.5" />
+          Disconnect
+        </button>
+      ) : (
+        <button
+          onClick={() => onConnect(inputUrl)}
+          className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-primary text-primary-foreground rounded-md hover:bg-primary/90 active:scale-[0.98] transition-all shadow-sm"
+        >
+          <Plug className="w-3.5 h-3.5" />
+          Connect
+        </button>
+      )}
     </div>
   );
 }

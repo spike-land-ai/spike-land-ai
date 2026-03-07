@@ -69,16 +69,6 @@ export function parseInputFromUrl(urlString: string): InputDefaults {
     console.error("Error parsing URL params:", error);
     return INPUT_DEFAULTS;
   }
-
-  // return Object.entries(INPUT_DEFAULTS).reduce((acc, [key, defaultValue]) => {
-  //   const value = urlParams.get(key);
-  //   if (value !== null) {
-  //     Object.assign(acc, {
-  //       [key]: value
-  //     });
-  //   }
-  //   return acc;
-  // }, { ...INPUT_DEFAULTS });
 }
 
 /**

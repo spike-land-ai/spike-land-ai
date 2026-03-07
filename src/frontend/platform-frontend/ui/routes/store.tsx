@@ -107,7 +107,7 @@ export function StorePage() {
 
   if (loading) {
     return (
-      <div className="space-y-6 p-6 max-w-7xl mx-auto">
+      <div className="space-y-6 p-4 sm:p-6 max-w-7xl mx-auto">
         <h1 className="text-2xl font-bold text-foreground">Tool Store</h1>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {Array.from({ length: 6 }).map((_, i) => (
@@ -120,7 +120,7 @@ export function StorePage() {
 
   if (error) {
     return (
-      <div className="space-y-6 p-6 max-w-7xl mx-auto">
+      <div className="space-y-6 p-4 sm:p-6 max-w-7xl mx-auto">
         <h1 className="text-2xl font-bold text-foreground">Tool Store</h1>
         <div className="rounded-2xl border border-border bg-card dark:glass-card shadow-sm p-8 text-center space-y-4">
           <p className="text-muted-foreground">
@@ -140,7 +140,7 @@ export function StorePage() {
   if (!filteredData) return null;
 
   return (
-    <div className="space-y-8 p-6 max-w-7xl mx-auto">
+    <div className="space-y-8 p-4 sm:p-6 max-w-7xl mx-auto">
       <div className="rounded-2xl border border-border bg-card dark:glass-card shadow-sm p-6 flex items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-foreground">App Store</h1>

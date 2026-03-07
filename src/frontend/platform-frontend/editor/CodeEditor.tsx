@@ -1,42 +1,158 @@
-import { lazy, Suspense, useState, useCallback, useMemo } from "react";
-import type { OnMount, BeforeMount } from "@monaco-editor/react";
-import loader from "@monaco-editor/loader";
+import { Suspense, useState, useCallback, useMemo, useRef, useEffect } from "react";
 import { Copy, Check, FileCode } from "lucide-react";
 import { cn } from "../styling/cn";
 import { useDarkMode } from "../ui/hooks/useDarkMode";
 import { useMonacoTypeAcquisition } from "../ui/hooks/useMonacoTypeAcquisition";
 import { MonacoCover } from "./monaco-cover/MonacoCover";
 
-// Configure Monaco loader to use esm.spike.land instead of cdn.jsdelivr.net (CSP-safe).
-loader.config({
-  paths: {
-    vs: "https://esm.spike.land/monaco-editor@0.55.1/min/vs",
-  },
-});
+import EditorWorker from "../../../monaco-editor/src/deprecated/editor/editor.worker?worker";
+import TsWorker from "../../../monaco-editor/src/languages/features/typescript/ts.worker?worker";
+import JsonWorker from "../../../monaco-editor/src/languages/features/json/json.worker?worker";
+import CssWorker from "../../../monaco-editor/src/languages/features/css/css.worker?worker";
+import HtmlWorker from "../../../monaco-editor/src/languages/features/html/html.worker?worker";
 
-// Configure Monaco web workers to load from esm.spike.land (CSP-safe).
 if (typeof globalThis !== "undefined") {
   (globalThis as Record<string, unknown>).MonacoEnvironment = {
-    getWorkerUrl(_moduleId: string, label: string) {
-      const base = "https://esm.spike.land/monaco-editor@0.55.1/min/vs";
-      if (label === "typescript" || label === "javascript") return `${base}/language/typescript/ts.worker.js`;
-      if (label === "json") return `${base}/language/json/json.worker.js`;
-      if (label === "css" || label === "scss" || label === "less") return `${base}/language/css/css.worker.js`;
-      if (label === "html" || label === "handlebars" || label === "razor") return `${base}/language/html/html.worker.js`;
-      return `${base}/editor/editor.worker.js`;
+    getWorker(_moduleId: string, label: string) {
+      if (label === "typescript" || label === "javascript") return new TsWorker();
+      if (label === "json") return new JsonWorker();
+      if (label === "css" || label === "scss" || label === "less") return new CssWorker();
+      if (label === "html" || label === "handlebars" || label === "razor") return new HtmlWorker();
+      return new EditorWorker();
     },
   };
 }
 
-// Lazy-load the heavy Monaco bundle so it doesn't block initial page load.
-const Editor = lazy(() => import("@monaco-editor/react"));
+interface LocalMonacoEditorProps {
+  value: string;
+  language?: string;
+  theme?: string;
+  fileName?: string;
+  onChange?: (value: string) => void;
+  options?: Record<string, unknown>;
+  onMount?: (editor: MonacoEditorInstance, monaco: MonacoModule) => void;
+  beforeMount?: (monaco: MonacoModule) => void;
+}
+
+interface MonacoEditorInstance {
+  getValue(): string;
+  setValue(value: string): void;
+  dispose(): void;
+  focus(): void;
+  getModel(): { uri: { path: string } } | null;
+  onDidChangeModelContent(cb: () => void): void;
+  updateOptions(options: Record<string, unknown>): void;
+}
+
+interface MonacoModule {
+  editor: {
+    create(element: HTMLElement, options: Record<string, unknown>): MonacoEditorInstance;
+    createModel(value: string, language?: string, uri?: unknown): unknown;
+    getModel(uri: unknown): { setValue(value: string): void } | null;
+    setModelLanguage(model: unknown, language: string): void;
+    setTheme(theme: string): void;
+  };
+  Uri: { parse(uri: string): unknown };
+  languages?: { typescript?: MonacoTypescript };
+  typescript?: MonacoTypescript;
+}
+
+interface MonacoTypescript {
+  typescriptDefaults?: {
+    setCompilerOptions(options: Record<string, unknown>): void;
+    setDiagnosticsOptions(options: Record<string, unknown>): void;
+    setEagerModelSync(value: boolean): void;
+  };
+}
+
+function LocalMonacoEditor({
+  value,
+  language,
+  theme,
+  fileName,
+  onChange,
+  options,
+  onMount,
+  beforeMount,
+}: LocalMonacoEditorProps) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const editorRef = useRef<MonacoEditorInstance | null>(null);
+  const propsRef = useRef({ value, language, theme, fileName, onChange, options, onMount, beforeMount });
+  propsRef.current = { value, language, theme, fileName, onChange, options, onMount, beforeMount };
+
+  useEffect(() => {
+    if (!containerRef.current) return;
+    let isMounted = true;
+    const props = propsRef.current;
+
+    import("monaco-editor").then((monaco: MonacoModule) => {
+      if (!isMounted) return;
+
+      if (props.beforeMount) {
+        props.beforeMount(monaco);
+      }
+
+      const uri = monaco.Uri.parse(`file:///${props.fileName || 'file.tsx'}`);
+      let model = monaco.editor.getModel(uri);
+      if (!model) {
+        model = monaco.editor.createModel(props.value, props.language, uri);
+      } else {
+        model.setValue(props.value);
+        monaco.editor.setModelLanguage(model, props.language || 'typescript');
+      }
+
+      editorRef.current = monaco.editor.create(containerRef.current!, {
+        model,
+        theme: props.theme,
+        ...props.options,
+      });
+
+      if (props.onMount) {
+        props.onMount(editorRef.current, monaco);
+      }
+
+      editorRef.current.onDidChangeModelContent(() => {
+        propsRef.current.onChange?.(editorRef.current!.getValue());
+      });
+    }).catch((err: unknown) => {
+      console.error("Failed to load monaco-editor", err);
+    });
+
+    return () => {
+      isMounted = false;
+      if (editorRef.current) {
+        editorRef.current.dispose();
+      }
+    };
+  }, []); // Run once on mount
+
+  useEffect(() => {
+    if (editorRef.current && editorRef.current.getValue() !== value) {
+      editorRef.current.setValue(value);
+    }
+  }, [value]);
+
+  useEffect(() => {
+    if (editorRef.current) {
+      import("monaco-editor").then((monaco) => {
+         monaco.editor.setTheme(theme);
+         const model = editorRef.current.getModel();
+         if (model) {
+           monaco.editor.setModelLanguage(model, language);
+         }
+      });
+    }
+  }, [theme, language]);
+
+  return <div ref={containerRef} className="w-full h-full" />;
+}
 
 /** Map file extensions to Monaco language identifiers. */
 const EXTENSION_LANGUAGE_MAP: Record<string, string> = {
   ts: "typescript",
-  tsx: "typescriptreact",
+  tsx: "typescript",
   js: "javascript",
-  jsx: "javascriptreact",
+  jsx: "javascript",
   css: "css",
   scss: "scss",
   less: "less",
@@ -130,15 +246,19 @@ export function CodeEditor({
     }
   }, [value]);
 
-  const handleBeforeMount = useCallback<BeforeMount>((monaco) => {
-    const tsDefaults = monaco.languages.typescript.typescriptDefaults;
+  const handleBeforeMount = useCallback((monaco: MonacoModule) => {
+    // Local monaco package exports typescript directly on the root object
+    const typescript = monaco?.typescript || monaco?.languages?.typescript;
+    if (!typescript) return;
+
+    const tsDefaults = typescript.typescriptDefaults;
+    if (!tsDefaults) return;
 
     tsDefaults.setCompilerOptions({
-      target: monaco.languages.typescript.ScriptTarget.Latest,
-      module: monaco.languages.typescript.ModuleKind.ESNext,
-      moduleResolution: monaco.languages.typescript.ModuleResolutionKind.NodeJs,
-      jsx: monaco.languages.typescript.JsxEmit.ReactJSX,
-      jsxImportSource: "react",
+      target: 9, // ScriptTarget.ES2022
+      module: 99, // ModuleKind.ESNext
+      moduleResolution: 2, // ModuleResolutionKind.NodeJs
+      jsx: 2, // JsxEmit.React
       allowNonTsExtensions: true,
       allowSyntheticDefaultImports: true,
       esModuleInterop: true,
@@ -162,7 +282,7 @@ export function CodeEditor({
   }, []);
 
   // Focus the editor as soon as it mounts so users can type immediately.
-  const handleMount = useCallback<OnMount>((editor, monaco) => {
+  const handleMount = useCallback((editor: MonacoEditorInstance, monaco: MonacoModule) => {
     editor.focus();
     setMonacoInstance(monaco);
   }, []);
@@ -255,11 +375,12 @@ export function CodeEditor({
           />
         ) : (
           <Suspense fallback={<LoadingSpinner />}>
-            <Editor
+            <LocalMonacoEditor
               height="100%"
               language={resolvedLanguage}
               theme={monacoTheme}
               value={value}
+              fileName={fileName}
               onChange={handleChange}
               beforeMount={handleBeforeMount}
               onMount={handleMount}

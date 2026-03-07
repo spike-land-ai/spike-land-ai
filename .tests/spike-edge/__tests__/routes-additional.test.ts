@@ -320,7 +320,7 @@ describe("user-profile route", () => {
     expect(body.error).toBe("Invalid JSON body");
   });
 
-  it("returns 400 when neither name nor email provided", async () => {
+  it("returns 400 when name is not provided", async () => {
     const base = makeApp(userProfile as unknown as Hono);
     const app = new Hono<{ Bindings: Env }>();
     app.use("*", async (c, next) => { c.set("userId" as never, "user1" as never); await next(); });
@@ -334,7 +334,7 @@ describe("user-profile route", () => {
     }, env);
     expect(res.status).toBe(400);
     const body = await res.json<{ error: string }>();
-    expect(body.error).toContain("At least one");
+    expect(body.error).toContain("name is required");
   });
 
   it("updates name successfully", async () => {
@@ -354,7 +354,7 @@ describe("user-profile route", () => {
     expect(body.success).toBe(true);
   });
 
-  it("updates email successfully", async () => {
+  it("returns 400 when only email provided (email changes blocked)", async () => {
     const base = makeApp(userProfile as unknown as Hono);
     const app = new Hono<{ Bindings: Env }>();
     app.use("*", async (c, next) => { c.set("userId" as never, "user1" as never); await next(); });
@@ -366,10 +366,12 @@ describe("user-profile route", () => {
       body: JSON.stringify({ email: "alice@example.com" }),
       headers: { "Content-Type": "application/json" },
     }, env);
-    expect(res.status).toBe(200);
+    expect(res.status).toBe(400);
+    const body = await res.json<{ error: string }>();
+    expect(body.error).toContain("Email cannot be changed");
   });
 
-  it("updates both name and email", async () => {
+  it("returns 400 when email provided alongside name (email changes blocked)", async () => {
     const base = makeApp(userProfile as unknown as Hono);
     const app = new Hono<{ Bindings: Env }>();
     app.use("*", async (c, next) => { c.set("userId" as never, "user1" as never); await next(); });
@@ -381,7 +383,9 @@ describe("user-profile route", () => {
       body: JSON.stringify({ name: "Bob", email: "bob@example.com" }),
       headers: { "Content-Type": "application/json" },
     }, env);
-    expect(res.status).toBe(200);
+    expect(res.status).toBe(400);
+    const body = await res.json<{ error: string }>();
+    expect(body.error).toContain("Email cannot be changed");
   });
 });
 
@@ -577,7 +581,7 @@ describe("api-keys route", () => {
     const env = createMockEnv();
     const res = await app.request("/api/keys", {
       method: "POST",
-      body: JSON.stringify({ provider: "openai", encryptedKey: "sk-newkey" }),
+      body: JSON.stringify({ provider: "openai", apiKey: "sk-newkey" }),
       headers: { "Content-Type": "application/json" },
     }, env);
     expect(res.status).toBe(201);

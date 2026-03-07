@@ -46,9 +46,12 @@ export function useAuth() {
       // Default to github if no provider specified
       provider = "github";
     }
+    // Validate returnUrl is a relative path to prevent open-redirect (CWE-601)
+    const returnParam = new URLSearchParams(window.location.search).get("returnUrl");
+    const callbackURL = returnParam && returnParam.startsWith("/") ? returnParam : "/";
     return authClient.signIn.social({
       provider: provider as "github" | "google",
-      callbackURL: "/",
+      callbackURL,
     });
   }, []);
 

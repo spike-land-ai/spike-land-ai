@@ -8,6 +8,7 @@ export interface BlogPost {
   category: string;
   tags: string[];
   featured: boolean;
+  draft?: boolean;
   heroImage: string | null;
   content: string;
 }

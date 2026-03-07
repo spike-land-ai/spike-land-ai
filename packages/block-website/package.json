@@ -30,6 +30,7 @@
     "@spike-land-ai/shared": "workspace:*",
     "framer-motion": "^12.35.0",
     "lucide-react": "^0.577.0",
+    "monaco-editor": "workspace:*",
     "react-markdown": "^10.1.0",
     "rehype-raw": "^7.0.0",
     "remark-gfm": "^4.0.1",

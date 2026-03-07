@@ -23,7 +23,7 @@ export async function sendChallenge(
   if (senderId === receiverId) {
     throw new Error("Cannot challenge yourself");
   }
-  const prisma = (await import("./prisma-chess-engine")).default;
+  const prisma = (await import("@/generated/prisma")).default;
   return prisma.chessChallenge.create({
     data: {
       senderId,
@@ -39,7 +39,7 @@ export async function acceptChallenge(
   challengeId: string,
   playerId: string,
 ): Promise<{ challenge: ChessChallenge; gameId: string }> {
-  const prisma = (await import("./prisma-chess-engine")).default;
+  const prisma = (await import("@/generated/prisma")).default;
   const challenge = await prisma.chessChallenge.findUnique({
     where: { id: challengeId },
   });
@@ -101,7 +101,7 @@ export async function declineChallenge(
   challengeId: string,
   playerId: string,
 ): Promise<ChessChallenge> {
-  const prisma = (await import("./prisma-chess-engine")).default;
+  const prisma = (await import("@/generated/prisma")).default;
   const challenge = await prisma.chessChallenge.findUnique({
     where: { id: challengeId },
   });
@@ -123,7 +123,7 @@ export async function cancelChallenge(
   challengeId: string,
   playerId: string,
 ): Promise<ChessChallenge> {
-  const prisma = (await import("./prisma-chess-engine")).default;
+  const prisma = (await import("@/generated/prisma")).default;
   const challenge = await prisma.chessChallenge.findUnique({
     where: { id: challengeId },
   });
@@ -142,7 +142,7 @@ export async function cancelChallenge(
 }
 
 export async function listChallenges(playerId: string, status?: string): Promise<ChessChallenge[]> {
-  const prisma = (await import("./prisma-chess-engine")).default;
+  const prisma = (await import("@/generated/prisma")).default;
 
   const where: Record<string, unknown> = {
     OR: [{ senderId: playerId }, { receiverId: playerId }],
@@ -170,7 +170,7 @@ export async function listChallenges(playerId: string, status?: string): Promise
 }
 
 export async function expireStaleChallenges(): Promise<number> {
-  const prisma = (await import("./prisma-chess-engine")).default;
+  const prisma = (await import("@/generated/prisma")).default;
   const result = await prisma.chessChallenge.updateMany({
     where: {
       status: "PENDING",

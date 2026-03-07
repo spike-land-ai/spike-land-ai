@@ -53,6 +53,6 @@ rl.on("line", (line) => {
 
     process.stdout.write(JSON.stringify({ id, result }) + "\n");
   } catch (err) {
-    process.stdout.write(JSON.stringify({ error: (err as Error).message }) + "\n");
+    process.stdout.write(JSON.stringify({ error: err instanceof Error ? err.message : String(err) }) + "\n");
   }
 });

@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
-const API = "/bugbook";
+const API = "/api/bugbook";
 
 export interface Bug {
   id: string;
@@ -172,7 +172,7 @@ export function useBlogComments(slug: string) {
   return useQuery({
     queryKey: ["blog-comments", slug],
     queryFn: async () => {
-      const res = await fetch(`/blog/${slug}/comments`);
+      const res = await fetch(`/api/blog/${slug}/comments`);
       if (!res.ok) throw new Error("Failed to fetch comments");
       return res.json() as Promise<Array<{
         id: string;
@@ -203,7 +203,7 @@ export function usePostComment() {
       position_selector?: string;
       parent_id?: string;
     }) => {
-      const res = await fetch(`/blog/${data.slug}/comments`, {
+      const res = await fetch(`/api/blog/${data.slug}/comments`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
@@ -221,7 +221,7 @@ export function useVoteComment() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (data: { commentId: string; vote: 1 | -1 }) => {
-      const res = await fetch(`/blog/comments/${data.commentId}/vote`, {
+      const res = await fetch(`/api/blog/comments/${data.commentId}/vote`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ vote: data.vote }),

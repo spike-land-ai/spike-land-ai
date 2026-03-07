@@ -1,5 +1,6 @@
 import { Link, useParams } from "@tanstack/react-router";
 import { useState } from "react";
+import { useAuth } from "../../hooks/useAuth";
 
 
 const placeholderMessages = [
@@ -25,6 +26,7 @@ const placeholderMessages = [
 
 export function MessageThreadPage() {
   const { userId } = useParams({ strict: false });
+  const { isAuthenticated } = useAuth();
   const [input, setInput] = useState("");
 
   return (
@@ -64,10 +66,15 @@ export function MessageThreadPage() {
           type="text"
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          placeholder="Type a message..."
-          className="flex-1 rounded-lg border border-border bg-background px-4 py-2 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+          placeholder={isAuthenticated ? "Type a message..." : "Sign in to send messages..."}
+          disabled={!isAuthenticated}
+          aria-label="Message input"
+          className="flex-1 rounded-lg border border-border bg-background px-4 py-2 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring disabled:opacity-60 disabled:cursor-not-allowed"
         />
-        <button className="rounded-lg bg-primary px-4 py-2 text-sm text-primary-foreground hover:bg-primary/90 transition-colors">
+        <button
+          disabled={!isAuthenticated || !input.trim()}
+          className="rounded-lg bg-primary px-4 py-2 text-sm text-primary-foreground hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        >
           Send
         </button>
       </div>
