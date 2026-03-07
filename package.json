@@ -70,6 +70,7 @@
     "eslint-plugin-boundaries": "^5.4.0",
     "eslint-plugin-react": "7.37.5",
     "eslint-plugin-react-hooks": "7.0.1",
+    "fake-indexeddb": "^6.2.5",
     "ts-morph": "^27.0.2",
     "tsx": "^4.21.0",
     "typescript": "5.9.3",
