@@ -61,7 +61,7 @@ While the company is pre-revenue and still completing commercialization work, th
 Developers building with AI face two compounding problems:
 
 1. **Fragmented tooling** — The average developer uses 8+ SaaS tools daily (deployment, monitoring, QA, etc.). Each requires separate authentication, billing, and integration work.
-2. **No managed MCP registry** — The Model Context Protocol (Anthropic, 2024) is emerging as a standard for AI-tool interaction. However, developers currently have limited options for a managed MCP platform that combines hosted tools, authentication, rate limiting, and billing in one offering. Developers currently must build, host, and secure their own MCP servers.
+2. **No managed MCP registry** — The Model Context Protocol (Anthropic, 2024) is emerging as a standard for AI-tool interaction. Developers currently have limited options for a managed MCP platform that combines hosted tools, authentication, rate limiting, and billing in one offering, so many teams still end up building, hosting, and securing their own MCP servers.
 
 ### 4.2 Solution
 
@@ -140,7 +140,7 @@ As a developer-first tool, acquisition relies heavily on Product-Led Growth (PLG
 
 The company believes its current combination of hosted MCP tooling, CLI access, and edge-native infrastructure is differentiated from existing point solutions and directories. The market remains underserved by managed MCP platforms that combine hosted tools, authentication, rate limiting, and billing in one offering.
 
-Anthropic's March 2026 launch of Claude Marketplace and OpenAI's expanding app ecosystem, including the ChatGPT app directory update on 18 December 2025, validate the broader thesis that AI tool and application marketplaces are becoming an established category. However, these offerings remain distinct from Spike Land's position: Anthropic is targeting enterprise procurement of partner-built Claude applications, while OpenAI's ecosystem is model-specific. Spike Land is focused on granular, programmatic, model-agnostic MCP tool access for developers and small teams.
+OpenAI’s December 18, 2025 app directory update validates the broader trend toward AI tool and application marketplaces. Spike Land remains differentiated by focusing on model-agnostic, granular MCP tool access for developers and small teams rather than model-specific app ecosystems.
 
 | Competitor | Core Focus | Managed MCP Hosting? | CLI Access? | Tool Marketplace? |
 |------------|-------------|------|------|--------------|
@@ -194,25 +194,27 @@ To demonstrate the path from SEIS-funded strategic burn to eventual profitabilit
 | **Revenue** | £42,832 | £150,000 | £400,000 |
 | **COGS** (18%) | £7,710 | £27,000 | £72,000 |
 | **Gross Profit** | £35,122 | £123,000 | £328,000 |
-| **OpEx** | £95,000 | £113,000 | £178,000 |
-| **EBIT / Net Income** | **-£59,878** | **£10,000** | **£150,000** |
+| **OpEx** | £95,000 | £143,000 | £218,000 |
+| **EBIT / Net Income** | **-£59,878** | **-£20,000** | **£110,000** |
+
+*\*Note on Year 3 Revenue: Year 3 revenue growth reflects the combined effect of continued subscription growth, the launch of the marketplace revenue-share model, and the introduction of API SCALE tier adoption.*
 
 ### 10.4 Year-End Balance Sheet & Cash Summary
 
 | Item | Year 1 | Year 2 (Forecast) | Year 3 (Forecast) |
 |------|--------|-------------------|-------------------|
-| **Cash at Bank** | £190,123 | £200,123 | £330,123 |
+| **Cash at Bank** | £190,123 | £170,123 | £260,123 |
 | Other Assets | £3,000 | £10,000 | £28,000 |
-| **Total Assets** | **£193,123** | **£210,123** | **£358,123** |
+| **Total Assets** | **£193,123** | **£180,123** | **£288,123** |
 | | | | |
 | Liabilities* | £3,000 | £10,000 | £8,000 |
-| **Net Assets** | **£190,123** | **£200,123** | **£350,123** |
+| **Net Assets** | **£190,123** | **£170,123** | **£280,123** |
 | | | | |
 | **Equity** | | | |
 | Share Capital | £1 | £1 | £1 |
 | Share Premium | £250,000 | £250,000 | £250,000 |
-| Retained Earnings | -£59,878 | -£49,878 | £100,122 |
-| **Total Equity** | **£190,123** | **£200,123** | **£350,123** |
+| Retained Earnings | -£59,878 | -£79,878 | £30,122 |
+| **Total Equity** | **£190,123** | **£170,123** | **£280,123** |
 
 *\*Note: Liabilities consist primarily of accrued expenses and short-term trade creditors. Share Premium figure represents the forecast position post-SEIS raise.*
 
@@ -246,11 +248,11 @@ The company is structured to satisfy the HMRC Risk-to-Capital condition:
 
 ## 13. Risk Factors
 
-1. **Market Risk (MCP Adoption):** The Model Context Protocol may not achieve widespread industry adoption. *Mitigation:* MCP is backed by major ecosystem participants, and platform tools can also be exposed through standard API channels rather than relying exclusively on one protocol surface.*
-2. **Competition Risk (Developer Platforms):** Established platforms such as Vercel, Replit, or hosted MCP providers could add overlapping managed-tool functionality. *Mitigation:* Spike Land is targeting a narrow initial wedge, using CLI-led developer distribution and tool-level workflows rather than generic hosting positioning.*
-3. **Platform Marketplace Risk (Model Providers):** Major model providers are beginning to launch proprietary app marketplaces, including Anthropic's March 2026 Claude Marketplace and OpenAI's expanding app ecosystem. *Mitigation:* Spike Land is model-agnostic, focused on granular tool access rather than full SaaS procurement, and oriented toward developers and small teams rather than enterprise committed-spend budgets.*
-4. **Concentration Risk (AI Providers):** Core user workflows depend heavily on Anthropic/OpenAI/Google APIs. Pricing or policy changes by these providers could affect margins or product behavior. *Mitigation:* The platform architecture is model-agnostic, allowing developers to route requests to alternative open-source or proprietary LLMs.*
-5. **Execution Risk:** A single founder creates a key-person dependency. *Mitigation:* AI-assisted development enables the founder to ship quickly and operate efficiently at the current stage, while the raise provides capital to reduce single-founder execution risk through targeted hiring (Growth Lead and CS support in Y1 H2).*
+1. **Market Risk (MCP Adoption):** The Model Context Protocol may not achieve widespread industry adoption. *Mitigation:* MCP is backed by major ecosystem participants, and platform tools can also be exposed through standard API channels rather than relying exclusively on one protocol surface.
+2. **Competition Risk (Developer Platforms):** Established platforms such as Vercel, Replit, or hosted MCP providers could add overlapping managed-tool functionality. *Mitigation:* Spike Land is targeting a narrow initial wedge, using CLI-led developer distribution and tool-level workflows rather than generic hosting positioning.
+3. **Platform Marketplace Risk (Model Providers):** Major model providers are beginning to launch proprietary app marketplaces, including Anthropic's March 2026 Claude Marketplace and OpenAI's expanding app ecosystem. *Mitigation:* Spike Land is model-agnostic, focused on granular tool access rather than full SaaS procurement, and oriented toward developers and small teams rather than enterprise committed-spend budgets.
+4. **Concentration Risk (AI Providers):** Core user workflows depend heavily on Anthropic/OpenAI/Google APIs. Pricing or policy changes by these providers could affect margins or product behavior. *Mitigation:* The platform architecture is model-agnostic, allowing developers to route requests to alternative open-source or proprietary LLMs.
+5. **Execution Risk:** A single founder creates a key-person dependency. *Mitigation:* AI-assisted development enables the founder to ship quickly and operate efficiently at the current stage, while the raise provides capital to reduce single-founder execution risk through targeted hiring (Growth Lead and CS support in Y1 H2).
 
 ---
 
@@ -266,5 +268,5 @@ Rather than engineering speculative exit scenarios at this pre-revenue stage, th
 6. **ARR Target:** Reach a baseline of £105k+ ARR to establish strong momentum for a potential Series A or secondary EIS round.
 
 ---
-*Document Version: 2.2 (SEIS Advance Assurance Edition)*
+*Document Version: 2.3 (SEIS Advance Assurance Edition)*
 *Prepared: March 2026*
