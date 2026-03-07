@@ -6,7 +6,7 @@ function createTrustedTypesPolicy<Options extends TrustedTypePolicyOptions>(
 ):
 	| undefined
 	| Pick<
-			TrustedTypePolicy<Options>,
+			TrustedTypePolicy,
 			'name' | Extract<keyof Options, keyof TrustedTypePolicyOptions>
 	  > {
 	interface IMonacoEnvironment {
@@ -16,7 +16,7 @@ function createTrustedTypesPolicy<Options extends TrustedTypePolicyOptions>(
 		):
 			| undefined
 			| Pick<
-					TrustedTypePolicy<Options>,
+					TrustedTypePolicy,
 					'name' | Extract<keyof Options, keyof TrustedTypePolicyOptions>
 			  >;
 	}

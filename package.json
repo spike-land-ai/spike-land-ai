@@ -35,8 +35,8 @@
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.27.1",
-    "@remotion/cli": "^4.0.100",
-    "@remotion/transitions": "^4.0.100",
+    "@remotion/cli": "^4.0.434",
+    "@remotion/transitions": "^4.0.434",
     "@spike-land-ai/mcp-server-base": "workspace:*",
     "@spike-land-ai/shared": "workspace:*",
     "@tanstack/react-query": "^5.90.21",
@@ -50,7 +50,7 @@
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
     "react-markdown": "^10.1.0",
-    "remotion": "^4.0.100",
+    "remotion": "^4.0.434",
     "tailwind-merge": "^3.5.0",
     "yaml": "^2.8.2",
     "zod": "4.3.6"
@@ -63,7 +63,7 @@
     "@types/node": "25.3.5",
     "@vitest/coverage-v8": "4.0.18",
     "esbuild": "^0.27.3",
-    "eslint": "10.0.2",
+    "eslint": "10.0.3",
     "eslint-plugin-boundaries": "^5.4.0",
     "eslint-plugin-react": "7.37.5",
     "eslint-plugin-react-hooks": "7.0.1",
