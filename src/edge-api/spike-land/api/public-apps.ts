@@ -35,8 +35,8 @@ publicAppsRoute.get("/:slug", async (c) => {
   let tools = [];
   let graph = {};
   
-  try { tools = JSON.parse(row.tools as string); } catch { /* ignore */ }
-  try { graph = JSON.parse(row.graph as string); } catch { /* ignore */ }
+  try { tools = JSON.parse(row.tools as string); } catch (e) { console.error(`Failed to parse 'tools' for app ${slug}`, e); }
+  try { graph = JSON.parse(row.graph as string); } catch (e) { console.error(`Failed to parse 'graph' for app ${slug}`, e); }
 
   const app = {
     slug: row.slug,
