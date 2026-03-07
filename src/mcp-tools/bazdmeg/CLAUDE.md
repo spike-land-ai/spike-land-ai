@@ -40,7 +40,7 @@ npm start             # Run the MCP server (stdio)
     └── fixtures.ts         # Fake monorepo builder for tests
 ```
 
-## MCP Tools (14)
+## MCP Tools (24)
 
 **Workspace**: `bazdmeg_enter_workspace`, `bazdmeg_workspace_status`,
 `bazdmeg_exit_workspace` **Context**: `bazdmeg_get_context`,
@@ -49,6 +49,11 @@ npm start             # Run the MCP server (stdio)
 `bazdmeg_session_bootstrap`, `bazdmeg_planning_interview`,
 `bazdmeg_pre_pr_check` **Ship**: `bazdmeg_auto_ship` — lint → typecheck → test →
 gates → commit → push (fail-fast) **Escalation**: `bazdmeg_signal_stuck`
+**Fixer**: `bazdmeg_fixer_start`, `bazdmeg_fixer_assign_personas`,
+`bazdmeg_fixer_report_finding`, `bazdmeg_fixer_quiz`,
+`bazdmeg_fixer_validate`, `bazdmeg_fixer_status`,
+`bazdmeg_fixer_advance`, `bazdmeg_fixer_report`,
+`bazdmeg_fixer_cancel`, `bazdmeg_fixer_my_assignment`
 
 ## Code Quality Rules
 

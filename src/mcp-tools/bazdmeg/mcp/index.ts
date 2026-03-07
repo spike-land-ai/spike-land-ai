@@ -3,6 +3,7 @@ export * from "./context";
 export * from "./deploy";
 export * from "./deps";
 export * from "./escalation";
+export * from "./fixer";
 export * from "./gates";
 export * from "./manifest";
 export * from "./mirror";

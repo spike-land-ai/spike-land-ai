@@ -28,6 +28,7 @@ import { requestIdMiddleware } from "./middleware/request-id.js";
 import { support } from "./routes/support.js";
 import { pricingApi } from "./routes/pricing-api.js";
 import { experiments } from "./routes/experiments.js";
+import { fixer } from "./routes/fixer.js";
 import { cachePurge } from "./routes/cache-purge.js";
 import { chat } from "./routes/chat.js";
 import { spa } from "./routes/spa.js";
@@ -210,6 +211,7 @@ app.route("/", cockpit);
 app.route("/", credits);
 app.route("/", support);
 app.route("/", experiments);
+app.route("/", fixer);
 app.route("/", chat);
 app.route("/", cachePurge);
 

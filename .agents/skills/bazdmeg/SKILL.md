@@ -1,6 +1,6 @@
 ---
 name: bazdmeg
-description: "BAZDMEG Method workflow checkpoint system for AI-assisted development. Enforce quality gates at three phases: pre-code, post-code, and pre-PR. Use when: (1) starting a new feature or bug fix, (2) finishing AI-generated code before review, (3) preparing a pull request, (4) running a planning interview, (5) auditing automation readiness, (6) preventing AI slop, (7) session bootstrap, (8) source rank, (9) domain gates, (10) bugbook. Triggers: 'bazdmeg', 'pre-code checklist', 'post-code checklist', 'pre-PR checklist', 'planning interview', 'quality gates', 'session bootstrap', 'source rank', 'domain gates', 'bugbook'."
+description: "BAZDMEG Method workflow checkpoint system for AI-assisted development. Enforce quality gates at three phases: pre-code, post-code, and pre-PR. Use when: (1) starting a new feature or bug fix, (2) finishing AI-generated code before review, (3) preparing a pull request, (4) running a planning interview, (5) auditing automation readiness, (6) preventing AI slop, (7) session bootstrap, (8) source rank, (9) domain gates, (10) bugbook, (11) orchestrating 8-agent QA. Triggers: 'bazdmeg', 'bazdmeg fixer', 'pre-code checklist', 'post-code checklist', 'pre-PR checklist', 'planning interview', 'quality gates', 'session bootstrap', 'source rank', 'domain gates', 'bugbook'."
 ---
 
 # The BAZDMEG Method
@@ -230,9 +230,40 @@ recurrence and lose it through irrelevance.
 | Fix prevents recurrence | +0.1 per prevention | ACTIVE — confidence grows             |
 | Irrelevant 5+ sessions  | -0.1 decay          | Decaying → DEPRECATED below 0.3       |
 
-Every ACTIVE entry requires a regression test matched to scope: unit test for
-single-function bugs, E2E test for cross-component bugs, agent-based test for
-usability bugs.
+Every ACTIVE entry requires a regression test matched to scope: unit test for single-function bugs, E2E test for cross-component bugs, agent-based test for usability bugs.
 
-See [references/04-testing.md](references/04-testing.md) for the full Bugbook
-entry format and Three Lies integration.
+See [references/04-testing.md](references/04-testing.md) for the full Bugbook entry format and Three Lies integration.
+
+---
+
+## The `/bazdmeg fixer` Command
+
+The `/bazdmeg fixer` command creates a structured 8-agent team that runs 16 user personas against both MCP tools and the website, logs bugs to the ELO-rated bugbook, and validates fixes with independent agents before merging.
+
+### Team Structure (8 Agents)
+
+| # | Role | Personas |
+|---|------|----------|
+| 1 | MCP Explorer A | 1–4 (Alex, Priya, Marcus, Sofia) |
+| 2 | MCP Explorer B | 5–8 (Yuki, Ahmed, Emma, Carlos) |
+| 3 | Website Explorer A | 9–12 (Lisa, David, Anya, Tom) |
+| 4 | Website Explorer B | 13–16 (Mei-Lin, James, Rachel, Oleg) |
+| 5 | QA Expert A | Bug Reproduction & Triage |
+| 6 | QA Expert B | Bug Reproduction & Triage |
+| 7 | Log Monitor A | Error Log Correlation |
+| 8 | Log Monitor B | Bugbook ELO Monitoring |
+
+### Staged Workflow
+
+1. **Stage 1: Setup Verification**: Verify Docker setup, live reload, and HTTPS access. (Quiz checkpoint: 2/3 min)
+2. **Stage 2: Parallel Exploration**: 8 agents run concurrently, executing 16 personas. Findings logged to Bugbook via MCP. (Quiz checkpoint per agent)
+3. **Stage 3: Bug Triage**: QA Experts reproduce candidates. Confirmed bugs move to ACTIVE. Log Monitors correlate errors. (Quiz checkpoint)
+4. **Stage 4: Fix Cycle**: Agents create fixes. Requires 2 independent validators to pass (no regressions + original scenario fixed). Max 3 iterations. Validated fixes use `bazdmeg_auto_ship`. (Quiz checkpoint)
+5. **Stage 5: Regression Pass**: Re-run all 16 scenarios vs Stage 2 baseline. Generate final report.
+
+### Validation Protocol
+
+A fix cannot be shipped until **two independent agents** record a "PASS" verdict using `bazdmeg_fixer_validate`. They must independently verify that:
+1. The original bug reproduction scenario no longer triggers the bug.
+2. No new regressions were introduced in surrounding functionality.
+
