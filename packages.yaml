@@ -365,8 +365,8 @@ packages:
     kind: browser
     version: 1.0.0
     description: Monaco Editor-based code editor with live preview
-    entry: modules.ts
-    deps: [esbuild-wasm, esbuild-wasm-mcp]
+    entry: core-logic/modules.ts
+    deps: [esbuild-wasm-mcp]
     publish:
       registries: [github]
     worker:

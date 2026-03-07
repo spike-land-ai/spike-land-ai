@@ -17,7 +17,7 @@ import YAML from "yaml";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
-type PackageKind = "library" | "mcp-server" | "worker" | "cli" | "browser" | "config" | "block";
+type PackageKind = "library" | "mcp-server" | "worker" | "cli" | "browser" | "config" | "block" | "video";
 
 interface BuildProfile {
   platform: esbuild.Platform;
@@ -371,6 +371,11 @@ async function main(): Promise<void> {
     if (!pkg) {
       console.error(`Package "${name}" not found in manifest`);
       process.exit(1);
+    }
+
+    // Workers are compiled by wrangler, browser apps by Vite, video by Remotion — skip
+    if (["worker", "browser", "video"].includes(pkg.kind) && args.includes("--all")) {
+      continue;
     }
 
     await buildPackage({
