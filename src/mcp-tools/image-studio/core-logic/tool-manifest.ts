@@ -60,7 +60,11 @@ export const TOOL_MANIFEST: ToolManifestEntry[] = Object.keys(
   functionName: toolNameToFunctionName(toolName),
 }));
 
+const toolManifestMap = new Map<string, ToolManifestEntry>(
+  TOOL_MANIFEST.map((entry) => [entry.toolName, entry]),
+);
+
 /** Lookup a manifest entry by tool name */
 export function getManifestEntry(toolName: string): ToolManifestEntry | undefined {
-  return TOOL_MANIFEST.find((e) => e.toolName === toolName);
+  return toolManifestMap.get(toolName);
 }
