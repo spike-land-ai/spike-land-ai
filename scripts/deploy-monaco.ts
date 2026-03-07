@@ -85,13 +85,18 @@ async function main() {
     fs.mkdirSync(CACHE_DIR, { recursive: true });
   }
 
+  const oldHashPromise = fs.promises
+    .readFile(CACHE_FILE, "utf-8")
+    .then((content) => content.trim())
+    .catch((err: any) => {
+      if (err.code === "ENOENT") return "";
+      throw err;
+    });
+
   const { finalHash } = await bundleMonaco();
   console.log(`Generated monaco-editor bundle hash: ${finalHash}`);
 
-  let oldHash = "";
-  if (fs.existsSync(CACHE_FILE)) {
-    oldHash = fs.readFileSync(CACHE_FILE, "utf-8").trim();
-  }
+  const oldHash = await oldHashPromise;
 
   const R2_BUCKET = "spike-app-assets";
   const BUCKET_PREFIX = `monaco/${finalHash}`;
