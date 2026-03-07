@@ -111,13 +111,13 @@ export function ToolsCategoryPage() {
           <div className="border-b border-border bg-muted px-4 py-3">
             <h2 className="text-sm font-semibold text-foreground">Execution Result</h2>
           </div>
-          <div className="flex-1 bg-foreground p-4 text-sm text-success-foreground overflow-x-auto font-mono">
+          <div className="flex-1 bg-muted dark:bg-[#0f172a] p-4 text-sm text-foreground dark:text-slate-200 overflow-x-auto font-mono">
             {!result && !executeTool.isPending && (
               <span className="text-muted-foreground">Waiting for execution...</span>
             )}
 
             {executeTool.isPending && (
-              <span className="text-cyan-400 animate-pulse">Running tool...</span>
+              <span className="text-primary dark:text-cyan-400 animate-pulse">Running tool...</span>
             )}
 
             {result?.success && (
