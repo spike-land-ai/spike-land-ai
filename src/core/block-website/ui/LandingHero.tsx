@@ -201,7 +201,7 @@ export function LandingHero() {
             role="group"
             aria-label="Primary actions"
           >
-        {/* Dev mode toggle */}
+            {/* Dev mode toggle */}
             <motion.button
               layout
               ref={devButtonRef}
@@ -219,7 +219,11 @@ export function LandingHero() {
               I&apos;m a developer
             </motion.button>
 
-            <motion.div layout className="relative w-full sm:w-auto" style={{ minHeight: "3.5rem" }}>
+            <motion.div
+              layout
+              className="relative w-full sm:w-auto"
+              style={{ minHeight: "3.5rem" }}
+            >
               <AnimatePresence mode="wait">
                 {!showVibeButton ? (
                   <motion.div
@@ -358,7 +362,9 @@ export function LandingHero() {
                     {modeLabel.text}
                   </p>
                   <p className="mt-3 text-lg font-bold text-foreground">
-                    {isDeveloper ? "Enabled for builder workflows" : "Toggle for deeper product surface"}
+                    {isDeveloper
+                      ? "Enabled for builder workflows"
+                      : "Toggle for deeper product surface"}
                   </p>
                   <p className="mt-2 text-sm text-muted-foreground">
                     {modeBody.text}

@@ -9,7 +9,6 @@ You can control the user's browser with these tools:
 - browser_fill — Fill an input field with a value
 - browser_screenshot — Take a screenshot of the current viewport
 - browser_read_text — Read text content from an element (defaults to body)
-- browser_evaluate — Evaluate JavaScript in the browser
 - browser_scroll — Scroll to an element or position
 - browser_get_elements — Get interactive elements matching a selector
 

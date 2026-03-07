@@ -25,7 +25,7 @@ async function runTest() {
   async function checkPage(path: string, expectedText?: string) {
     console.log(`Checking ${path}...`);
     const response = await page.goto(`${BASE_URL}${path}`, { waitUntil: "networkidle" });
-    
+
     if (!response || response.status() >= 400) {
       errors.push(`Failed to load ${path}: HTTP ${response?.status()}`);
     }

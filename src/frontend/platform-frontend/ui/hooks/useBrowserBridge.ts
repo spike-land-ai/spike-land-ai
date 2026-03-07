@@ -88,16 +88,6 @@ export function useBrowserBridge({ messages, onResult, router }: BrowserBridgeOp
           return { success: true, text };
         }
 
-        case "browser_evaluate": {
-          try {
-            const fn = new Function(`return (${args.script as string})`);
-            const result = fn();
-            return { success: true, result: String(result).slice(0, 1000) };
-          } catch (err) {
-            return { success: false, error: err instanceof Error ? err.message : "Eval failed" };
-          }
-        }
-
         case "browser_scroll": {
           if (args.selector) {
             const el = document.querySelector(args.selector as string);

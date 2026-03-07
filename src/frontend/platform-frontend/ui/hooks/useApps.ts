@@ -10,6 +10,12 @@ export interface McpAppSummary {
   sort_order: number;
 }
 
+interface ToolEntry {
+  name: string;
+  description?: string;
+  category?: string;
+}
+
 export interface McpAppDetail extends McpAppSummary {
   status: string;
   tools: string[];
@@ -38,7 +44,7 @@ export function useApps() {
         allTools.push(...data.tools);
       }
       
-      return allTools.map((t: any, i: number) => ({
+      return allTools.map((t: ToolEntry, i: number) => ({
         slug: t.name,
         name: t.name,
         description: t.description || "",
@@ -62,15 +68,15 @@ export function useApp(slug: string) {
       let foundTool = null;
       if (data.categories) {
         for (const cat of data.categories) {
-          const t = cat.tools?.find((x: any) => x.name === slug);
+          const t = cat.tools?.find((x: ToolEntry) => x.name === slug);
           if (t) foundTool = t;
         }
       }
       if (!foundTool && data.featured) {
-        foundTool = data.featured.find((x: any) => x.name === slug);
+        foundTool = data.featured.find((x: ToolEntry) => x.name === slug);
       }
       if (!foundTool && data.tools) {
-        foundTool = data.tools.find((x: any) => x.name === slug);
+        foundTool = data.tools.find((x: ToolEntry) => x.name === slug);
       }
       
       if (!foundTool) throw new Error("Tool not found");
