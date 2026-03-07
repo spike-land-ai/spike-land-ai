@@ -96,6 +96,18 @@ async function main() {
   const manifest = loadManifest();
   const { defaults, packages } = manifest;
 
+  // Override root .npmrc to set correct scope registry for this target.
+  // Without this, setup-node's registry-url or the checked-in .npmrc
+  // redirects all @spike-land-ai requests to GitHub Packages, even when
+  // targeting npmjs.org.
+  const registryUrl =
+    targetRegistry === "npm" ? "https://registry.npmjs.org" : "https://npm.pkg.github.com";
+  const tokenEnv = targetRegistry === "npm" ? "NPM_TOKEN" : "NODE_AUTH_TOKEN";
+  writeFileSync(
+    join(ROOT, ".npmrc"),
+    `${defaults.scope}:registry=${registryUrl}\n//${new URL(registryUrl).host}/:_authToken=\${${tokenEnv}}\n`,
+  );
+
   const toPublish = [];
 
   for (const [name, pkg] of Object.entries(packages)) {
@@ -132,15 +144,11 @@ async function main() {
     const packageJson = generatePackageJson(name, pkg, defaults);
     writeFileSync(join(pkgDist, "package.json"), JSON.stringify(packageJson, null, 2));
 
-    // Write local .npmrc so auth works regardless of setup-node registry-url
-    const registryUrl =
-      targetRegistry === "npm" ? "https://registry.npmjs.org" : "https://npm.pkg.github.com";
-    const tokenEnv = targetRegistry === "npm" ? "NPM_TOKEN" : "NODE_AUTH_TOKEN";
-    const token = process.env[tokenEnv];
-    if (token) {
+    // Write per-package .npmrc with scope registry override and auth
+    if (process.env[tokenEnv]) {
       writeFileSync(
         join(pkgDist, ".npmrc"),
-        `//${new URL(registryUrl).host}/:_authToken=\${${tokenEnv}}\n`,
+        `${defaults.scope}:registry=${registryUrl}\n//${new URL(registryUrl).host}/:_authToken=\${${tokenEnv}}\n`,
       );
     }
 
