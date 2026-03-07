@@ -122,6 +122,13 @@ export default {
     const originParam = params.get("origin");
     const origin = originParam === "testing" ? "https://testing.spike.land" : "https://spike.land";
 
+    if (request.method === "OPTIONS") {
+      return new Response(null, {
+        status: 204,
+        headers: getCorsHeaders(request.url),
+      });
+    }
+
     if (request.method === "GET") {
       return handleGetRequest(codeSpace, origin);
     }

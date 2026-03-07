@@ -181,7 +181,7 @@ export interface CodeEditorProps {
   value: string;
   onChange: (value: string) => void;
   language?: string;
-  theme?: "vs-dark" | "light";
+  theme?: "vs-dark" | "vs";
   readOnly?: boolean;
   height?: string;
   fileName?: string;
@@ -215,7 +215,7 @@ export function CodeEditor({
   });
 
   // Derive Monaco theme: explicit prop overrides auto-detection.
-  const monacoTheme = theme ?? (isDarkMode ? "vs-dark" : "light");
+  const monacoTheme = theme ?? (isDarkMode ? "vs-dark" : "vs");
 
   // Auto-detect language from fileName extension; fall back to the prop.
   const resolvedLanguage = useMemo(

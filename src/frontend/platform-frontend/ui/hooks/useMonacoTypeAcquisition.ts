@@ -60,9 +60,6 @@ export function useMonacoTypeAcquisition({
               if (!isActive) return;
               if (libsRef.current.get(filePath) === fileContent) return;
               libsRef.current.set(filePath, fileContent);
-              // Apply each type file to Monaco immediately so IntelliSense works
-              // progressively instead of waiting for the entire batch to finish.
-              typescript.typescriptDefaults.addExtraLib(fileContent, filePath);
             },
             started: () => {
               if (!isActive) return;
@@ -77,7 +74,12 @@ export function useMonacoTypeAcquisition({
               // Sync the full set — setExtraLibs replaces everything, ensuring
               // stale entries from previous runs are cleaned up.
               const extraLibs = Array.from(libsRef.current.entries()).map(
-                ([filePath, content]) => ({ filePath, content }),
+                ([filePath, content]) => {
+                  const formattedPath = filePath.startsWith("file://") || filePath.startsWith("inmemory://") 
+                    ? filePath 
+                    : "file://" + (filePath.startsWith("/") ? filePath : "/" + filePath);
+                  return { filePath: formattedPath, content };
+                }
               );
               if (extraLibs.length > 0) {
                 typescript.typescriptDefaults.setExtraLibs(extraLibs);
@@ -87,7 +89,12 @@ export function useMonacoTypeAcquisition({
             },
           },
           fetcher: async (request: RequestInfo | URL, init?: RequestInit) => {
-            const url = typeof request === "string" ? request : request.toString();
+            const url = typeof request === "string" 
+              ? request 
+              : request instanceof URL 
+                ? request.toString() 
+                : (request as Request).url;
+                
             try {
               const cached = await getTypeCache(url);
               if (cached) {
