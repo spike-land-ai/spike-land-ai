@@ -48,6 +48,8 @@ interface MonacoModule {
   editor: {
     create(element: HTMLElement, options: Record<string, unknown>): MonacoEditorInstance;
     createModel(value: string, language?: string, uri?: unknown): unknown;
+    getModel(uri: unknown): { setValue(value: string): void } | null;
+    setModelLanguage(model: unknown, language: string): void;
     setTheme(theme: string): void;
   };
   Uri: { parse(uri: string): unknown };
@@ -91,12 +93,12 @@ function LocalMonacoEditor({
       }
 
       const uri = monaco.Uri.parse(`file:///${props.fileName || 'file.tsx'}`);
-      let model = (monaco.editor as any).getModel(uri);
+      let model = monaco.editor.getModel(uri);
       if (!model) {
         model = monaco.editor.createModel(props.value, props.language, uri);
       } else {
         model.setValue(props.value);
-        (monaco.editor as any).setModelLanguage(model, props.language || 'typescript');
+        monaco.editor.setModelLanguage(model, props.language || 'typescript');
       }
 
       editorRef.current = monaco.editor.create(containerRef.current!, {

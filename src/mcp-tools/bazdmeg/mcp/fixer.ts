@@ -1,4 +1,3 @@
-import type { z } from "zod";
 import { z as zod } from "zod";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { createZodTool, textResult } from "@spike-land-ai/mcp-server-base";
@@ -6,7 +5,6 @@ import {
   PERSONAS,
   QUIZ_BANK,
   createFixerSessionId,
-  type AgentRole,
 } from "../core-logic/personas.js";
 
 const API_BASE = process.env.EDGE_API_BASE_URL || "https://api.spike.land";
