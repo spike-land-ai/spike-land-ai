@@ -33,13 +33,14 @@ async function runTest() {
 
       if (expectedText) {
         // Wait for content to appear if it's dynamic
-        await page.waitForTimeout(1000); 
+        await page.waitForTimeout(2000); 
         const content = await page.textContent("body");
         if (!content?.includes(expectedText)) {
+          console.log(`Body content for ${path}:`);
+          console.log(content?.substring(0, 1000) + "...");
           errors.push(`Missing expected text "${expectedText}" on ${path}`);
         }
       }
-
       // Capture screenshot for debugging
       const filename = `screenshot-${path.replace(/\//g, "_") || "root"}.png`;
       await page.screenshot({ path: filename });
