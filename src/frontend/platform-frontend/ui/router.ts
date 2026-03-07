@@ -327,6 +327,22 @@ const buildRoute = createRoute({
   component: withSuspense(() => import("./routes/build"), "BuildPage"),
 });
 
+const startChecklistRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/spike-land-start-checklist",
+  beforeLoad: () => {
+    if (typeof window !== "undefined"
+      && window.location.hostname !== "local.spike.land"
+      && window.location.hostname !== "localhost") {
+      throw redirect({ to: "/" });
+    }
+  },
+  component: withSuspense(
+    () => import("./routes/spike-land-start-checklist"),
+    "SpikeLandStartChecklistPage"
+  ),
+});
+
 // Build route tree
 const routeTree = rootRoute.addChildren([
   indexRoute,
@@ -335,6 +351,7 @@ const routeTree = rootRoute.addChildren([
   bazdmegRedirectRoute,
   whatWeDoRoute,
   buildRoute,
+  startChecklistRoute,
   aboutRoute,
   analyticsRoute,
   callbackRoute,
