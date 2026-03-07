@@ -156,8 +156,8 @@ export function LandingHero() {
                   transition={{ duration: 0.4, delay: 0.05 }}
                   className="max-w-2xl text-balance text-lg leading-8 text-muted-foreground sm:text-xl"
                 >
-                  spike.land connects AI assistants to real tools through MCP, so models can
-                  browse data, run workflows, and take action inside a system built for production.
+                  spike.land connects AI assistants to real tools through MCP, so models can browse
+                  data, run workflows, and take action inside a system built for production.
                 </motion.p>
               )}
             </AnimatePresence>
@@ -169,7 +169,7 @@ export function LandingHero() {
             role="group"
             aria-label="Primary actions"
           >
-        {/* Dev mode toggle */}
+            {/* Dev mode toggle */}
             <motion.button
               layout
               ref={devButtonRef}
@@ -187,7 +187,11 @@ export function LandingHero() {
               I&apos;m a developer
             </motion.button>
 
-            <motion.div layout className="relative w-full sm:w-auto" style={{ minHeight: "3.5rem" }}>
+            <motion.div
+              layout
+              className="relative w-full sm:w-auto"
+              style={{ minHeight: "3.5rem" }}
+            >
               <AnimatePresence mode="wait">
                 {!showVibeButton ? (
                   <motion.div
@@ -309,7 +313,9 @@ export function LandingHero() {
                     Dev mode
                   </p>
                   <p className="mt-3 text-lg font-bold text-foreground">
-                    {isDeveloper ? "Enabled for builder workflows" : "Toggle for deeper product surface"}
+                    {isDeveloper
+                      ? "Enabled for builder workflows"
+                      : "Toggle for deeper product surface"}
                   </p>
                   <p className="mt-2 text-sm text-muted-foreground">
                     One page that speaks to explorers and builders without fragmenting the brand.

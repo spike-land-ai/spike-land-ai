@@ -68,17 +68,6 @@ export const BROWSER_TOOLS: AnthropicTool[] = [
     },
   },
   {
-    name: "browser_evaluate",
-    description: "Evaluate a JavaScript expression in the browser and return the result.",
-    input_schema: {
-      type: "object",
-      properties: {
-        script: { type: "string", description: "JavaScript expression to evaluate" },
-      },
-      required: ["script"],
-    },
-  },
-  {
     name: "browser_scroll",
     description: "Scroll the browser to an element or to a specific vertical position.",
     input_schema: {
