@@ -38,7 +38,7 @@
 		"glob": "^13.0.6",
 		"globals": "^17.4.0",
 		"jsonc-parser": "^3.3.1",
-		"monaco-editor-core": "0.56.0-dev-20260203",
+		"monaco-editor-core": "0.56.0-dev-20260212",
 		"tsx": "^4.21.0",
 		"typescript": "^5.9.3",
 		"vscode-css-languageservice": "6.3.10",
