@@ -41,7 +41,15 @@ export async function authMiddleware(
     },
   });
 
-  const sessionRes = await c.env.AUTH_MCP.fetch(sessionReq);
+  let sessionRes: Response;
+  try {
+    sessionRes = await c.env.AUTH_MCP.fetch(sessionReq);
+    if (sessionRes.status === 503) {
+      sessionRes = await fetch(sessionReq);
+    }
+  } catch {
+    sessionRes = await fetch(sessionReq);
+  }
 
   if (!sessionRes.ok) {
     return c.json({ error: "Invalid or expired session" }, 401);

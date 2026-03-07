@@ -4,8 +4,8 @@ import type { Env } from "../core-logic/env.js";
 const log = createLogger("spike-edge-cron");
 
 export async function handleScheduled(env: Env): Promise<void> {
-  const nowSec = Math.floor(Date.now() / 1000);
-  const fifteenMinAgo = nowSec - 15 * 60;
+  const nowMs = Date.now();
+  const fifteenMinAgo = nowMs - 15 * 60 * 1000;
 
   try {
     const result = await env.DB.prepare(
@@ -23,7 +23,7 @@ export async function handleScheduled(env: Env): Promise<void> {
         "SELECT created_at FROM error_logs WHERE message = 'ERROR_RATE_ALERT_SENT' ORDER BY created_at DESC LIMIT 1",
       ).first<{ created_at: number }>();
 
-      const oneHourAgo = nowSec - 60 * 60;
+      const oneHourAgo = nowMs - 60 * 60 * 1000;
       if (!lastAlert || lastAlert.created_at < oneHourAgo) {
         log.error("Error rate spike detected", { errorCount, threshold: 50, window: "15m" });
 

@@ -238,31 +238,36 @@ app.route("/", cachePurge);
 
 /** Track whether MCP_SERVICE binding is functional (avoids repeated failures in local dev). */
 let mcpServiceAvailable = true;
+let mcpServiceDownSince = 0;
+const SERVICE_RETRY_MS = 30_000;
 
 /**
  * Fetch from MCP_SERVICE binding with fallback to production URL.
  * In local dev, the service binding may not be available if spike-land-mcp isn't running.
- * After the first 503, skips the binding entirely to avoid repeated failures.
+ * After a 503, skips the binding for 30s before retrying.
  */
 async function fetchMcpWithFallback(
   env: Env,
   url: string,
   init?: RequestInit,
 ): Promise<Response> {
+  if (!mcpServiceAvailable && Date.now() - mcpServiceDownSince > SERVICE_RETRY_MS) {
+    mcpServiceAvailable = true;
+  }
   if (mcpServiceAvailable) {
     try {
       const response = await env.MCP_SERVICE.fetch(new Request(url, init));
-      // 503 = service binding can't find the target worker (local dev without spike-land-mcp)
       if (response.status === 503) {
         mcpServiceAvailable = false;
+        mcpServiceDownSince = Date.now();
       } else {
         return response;
       }
     } catch {
       mcpServiceAvailable = false;
+      mcpServiceDownSince = Date.now();
     }
   }
-  // Fall back to direct production fetch
   return fetch(url, init);
 }
 
@@ -433,6 +438,39 @@ app.post("/oauth/device/approve", authMiddleware, async (c) => {
 // MCP Streamable HTTP proxy — POST, GET, DELETE (all methods)
 app.all("/mcp", mcpProxy);
 
+/** Track whether AUTH_MCP binding is functional (avoids repeated failures in local dev). */
+let authServiceAvailable = true;
+let authServiceDownSince = 0;
+
+/**
+ * Fetch from AUTH_MCP binding with fallback to production URL.
+ * In local dev, the service binding may not be available if mcp-auth isn't running.
+ * After a 503, skips the binding for 30s before retrying.
+ */
+async function fetchAuthWithFallback(
+  env: Env,
+  request: Request,
+): Promise<Response> {
+  if (!authServiceAvailable && Date.now() - authServiceDownSince > SERVICE_RETRY_MS) {
+    authServiceAvailable = true;
+  }
+  if (authServiceAvailable) {
+    try {
+      const response = await env.AUTH_MCP.fetch(request);
+      if (response.status === 503) {
+        authServiceAvailable = false;
+        authServiceDownSince = Date.now();
+      } else {
+        return response;
+      }
+    } catch {
+      authServiceAvailable = false;
+      authServiceDownSince = Date.now();
+    }
+  }
+  return fetch(request);
+}
+
 // Better Auth proxy via service binding (sub-1ms internal call)
 app.all("/api/auth/*", async (c) => {
   const url = new URL(c.req.url);
@@ -445,7 +483,7 @@ app.all("/api/auth/*", async (c) => {
   newRequest.headers.set("X-Forwarded-Proto", "https");
   newRequest.headers.set("X-Request-Id", c.get("requestId"));
 
-  const response = await c.env.AUTH_MCP.fetch(newRequest);
+  const response = await fetchAuthWithFallback(c.env, newRequest);
   // Strip CORS headers from upstream — spike-edge's own CORS middleware handles them
   const headers = new Headers(response.headers);
   headers.delete("Access-Control-Allow-Origin");
