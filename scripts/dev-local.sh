@@ -37,7 +37,7 @@ fi
 
 cleanup() {
   echo "Shutting down..."
-  kill $PID_EDGE $PID_APP 2>/dev/null || true
+  kill $PID_EDGE $PID_APP $PID_SYNC 2>/dev/null || true
   wait 2>/dev/null || true
 }
 trap cleanup EXIT INT TERM
@@ -56,5 +56,10 @@ echo ""
 echo "  spike-app:  https://local.spike.land:5173"
 echo "  spike-edge: https://local.spike.land:8787"
 echo ""
+
+echo "Starting auto-sync..."
+bash "$ROOT/scripts/auto-sync.sh" &
+PID_SYNC=$!
+
 
 wait

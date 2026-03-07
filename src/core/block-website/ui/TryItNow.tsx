@@ -1,10 +1,25 @@
 import { useState, useEffect } from "react";
 import { Link } from "../lazy-imports/link";
 import { TOTAL_TOOL_COUNT } from "./LandingHero";
+import { useDevModeCopy } from "./useDevModeCopy";
 
 export function TryItNow() {
   const [activeTab, setActiveTab] = useState<"claude-code" | "cursor" | "vscode">("claude-code");
   const [copied, setCopied] = useState(false);
+  const headingCopy = useDevModeCopy(
+    "Try spike.land in one command",
+    "Patch an MCP stack from one command",
+  );
+  const bodyCopy = useDevModeCopy(
+    "Connect your AI to the entire platform instantly. Zero config, no npm install required.",
+    "Boot an edge-ready developer surface instantly. No npm package ceremony, no manual runtime setup.",
+  );
+  const footerCopy = useDevModeCopy(
+    "This installs the spike.land CLI or configures your editor. Requires Node.js 18+.",
+    "This attaches the hosted MCP endpoint and developer tooling surface. Requires Node.js 18+.",
+  );
+  const nextCopy = useDevModeCopy("What happens next:", "What the agent changes next:");
+  const browseCopy = useDevModeCopy("Browse all tools", "Browse the runtime surface");
 
   const getCommand = () => {
     switch (activeTab) {
@@ -51,11 +66,10 @@ export function TryItNow() {
             </div>
 
             <h2 className="text-3xl font-bold mb-3 text-foreground tracking-tight">
-              Try spike.land in one command
+              {headingCopy.text}
             </h2>
             <p className="text-muted-foreground text-lg mb-8 max-w-2xl">
-              Connect your AI to the entire platform instantly. Zero config, no npm install
-              required.
+              {bodyCopy.text}
             </p>
 
             <div className="rounded-xl overflow-hidden border border-border/50 shadow-2xl bg-obsidian-950">
@@ -163,12 +177,12 @@ export function TryItNow() {
             </div>
 
             <p className="mt-4 text-center text-sm text-muted-foreground">
-              This installs the spike.land CLI or configures your editor. Requires Node.js 18+.
+              {footerCopy.text}
             </p>
           </div>
 
           <div className="p-6 sm:p-8 bg-muted/30">
-            <h3 className="font-semibold text-foreground mb-4">What happens next:</h3>
+            <h3 className="font-semibold text-foreground mb-4">{nextCopy.text}</h3>
             <ol className="space-y-3 mb-8 text-muted-foreground text-sm list-decimal list-inside ml-1">
               <li>Registers spike.land as an MCP server with your AI client.</li>
               <li>First use will automatically open your browser for a quick 1-click approval.</li>
@@ -192,7 +206,7 @@ export function TryItNow() {
                 href="/tools"
                 className="inline-flex items-center gap-2 text-sm font-medium text-foreground hover:text-foreground/80 transition-colors group"
               >
-                Browse all tools
+                {browseCopy.text}
                 <span className="group-hover:translate-x-1 transition-transform" aria-hidden="true">
                   &rarr;
                 </span>

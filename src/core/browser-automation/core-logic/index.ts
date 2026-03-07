@@ -1,4 +1,5 @@
 export * from "./types.js";
+export * from "./link-checker/index.js";
 export * from "./adapter.js";
 export * from "./browser-session.js";
 export * from "./narrate.js";

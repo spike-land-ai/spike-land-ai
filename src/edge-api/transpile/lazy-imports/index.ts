@@ -18,6 +18,8 @@ const getCorsHeaders = (requestUrl?: string) => {
       origin.startsWith("http://localhost:") ||
       origin.startsWith("https://localhost:") ||
       origin.startsWith("http://127.0.0.1:") ||
+      origin.startsWith("https://local.spike.land") ||
+      origin.startsWith("https://local.spike.land:") ||
       origin.startsWith("https://127.0.0.1:")
     ) {
       allowOrigin = origin;
@@ -142,6 +144,8 @@ export default {
           requestOrigin.startsWith("http://localhost:") ||
           requestOrigin.startsWith("https://localhost:") ||
           requestOrigin.startsWith("http://127.0.0.1:") ||
+          requestOrigin.startsWith("https://local.spike.land") ||
+          requestOrigin.startsWith("https://local.spike.land:") ||
           requestOrigin.startsWith("https://127.0.0.1:"))
       ) {
         allowOrigin = requestOrigin;

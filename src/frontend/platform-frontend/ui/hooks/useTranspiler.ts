@@ -6,7 +6,7 @@ interface TranspileResult {
   isTranspiling: boolean;
 }
 
-const TRANSPILE_ENDPOINT = import.meta.env.DEV ? "/transpile" : "https://js.spike.land";
+const TRANSPILE_ENDPOINT = "https://js.spike.land";
 
 /**
  * Post-process transpiled code so it can run in an inline module script.

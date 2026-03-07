@@ -95,48 +95,53 @@ experiments.post("/api/experiments/assign", async (c) => {
     return c.json({ error: "clientId is required" }, 400);
   }
 
-  const db = c.env.DB;
-  const rows = await db
-    .prepare("SELECT * FROM experiments WHERE status = 'active'")
-    .all<ExperimentRow>();
+  try {
+    const db = c.env.DB;
+    const rows = await db
+      .prepare("SELECT * FROM experiments WHERE status = 'active'")
+      .all<ExperimentRow>();
 
-  const activeExperiments = rows.results ?? [];
-  const assignments: Record<string, { variantId: string; config: Record<string, unknown> }> = {};
+    const activeExperiments = rows.results ?? [];
+    const assignments: Record<string, { variantId: string; config: Record<string, unknown> }> = {};
 
-  for (const exp of activeExperiments) {
-    const variants: VariantDef[] = JSON.parse(exp.variants);
+    for (const exp of activeExperiments) {
+      const variants: VariantDef[] = JSON.parse(exp.variants);
 
-    // Check existing assignment
-    const existing = await db
-      .prepare(
-        "SELECT variant_id FROM experiment_assignments WHERE experiment_id = ? AND client_id = ?",
-      )
-      .bind(exp.id, clientId)
-      .first<{ variant_id: string }>();
-
-    let variantId: string;
-    if (existing) {
-      variantId = existing.variant_id;
-    } else {
-      variantId = assignVariant(clientId, exp.id, variants);
-      const id = crypto.randomUUID();
-      const now = Date.now();
-      await db
+      // Check existing assignment
+      const existing = await db
         .prepare(
-          "INSERT INTO experiment_assignments (id, experiment_id, client_id, variant_id, created_at) VALUES (?, ?, ?, ?, ?)",
+          "SELECT variant_id FROM experiment_assignments WHERE experiment_id = ? AND client_id = ?",
         )
-        .bind(id, exp.id, clientId, variantId, now)
-        .run();
+        .bind(exp.id, clientId)
+        .first<{ variant_id: string }>();
+
+      let variantId: string;
+      if (existing) {
+        variantId = existing.variant_id;
+      } else {
+        variantId = assignVariant(clientId, exp.id, variants);
+        const id = crypto.randomUUID();
+        const now = Date.now();
+        await db
+          .prepare(
+            "INSERT INTO experiment_assignments (id, experiment_id, client_id, variant_id, created_at) VALUES (?, ?, ?, ?, ?)",
+          )
+          .bind(id, exp.id, clientId, variantId, now)
+          .run();
+      }
+
+      const variant = variants.find((v) => v.id === variantId);
+      assignments[exp.id] = {
+        variantId,
+        config: variant?.config ?? {},
+      };
     }
 
-    const variant = variants.find((v) => v.id === variantId);
-    assignments[exp.id] = {
-      variantId,
-      config: variant?.config ?? {},
-    };
+    return c.json({ assignments });
+  } catch (error) {
+    console.error("Experiment assign error:", error);
+    return c.json({ assignments: {} });
   }
-
-  return c.json({ assignments });
 });
 
 // ─── POST /api/experiments/track ────────────────────────────────────────────
