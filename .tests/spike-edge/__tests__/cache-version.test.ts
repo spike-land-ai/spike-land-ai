@@ -62,7 +62,7 @@ describe("getCacheVersion", () => {
 
         // First call reads from R2
         const version1 = await getCacheVersion(r2);
-        expect(version1).toBe("initial12345");
+        expect(version1).toBe("initial123456");
         expect(r2.get).toHaveBeenCalledTimes(1);
 
         // Change mock (should not be called due to cache)
@@ -71,13 +71,13 @@ describe("getCacheVersion", () => {
         // Second call within TTL (e.g. 1 minute later) returns cached value
         vi.advanceTimersByTime(60 * 1000);
         const version2 = await getCacheVersion(r2);
-        expect(version2).toBe("initial12345");
+        expect(version2).toBe("initial123456");
         expect(r2.get).not.toHaveBeenCalled(); // No new call to R2
 
         // Third call after TTL expires (e.g. 5 minutes + 1 ms later)
         vi.advanceTimersByTime(4 * 60 * 1000 + 1); // Exact time where it expires
         const version3 = await getCacheVersion(r2);
-        expect(version3).toBe("changed12345");
+        expect(version3).toBe("changed123456");
         expect(r2.get).toHaveBeenCalledTimes(1); // Fetched again
     });
 
