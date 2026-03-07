@@ -140,7 +140,7 @@ const COMPONENT_MAP: Record<string, React.ComponentType<Record<string, unknown>>
       </div>
     );
   },
-  p: ({ node, children, ...props }: any) => (
+  p: ({ children, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
     <div className="text-lg text-muted-foreground leading-relaxed font-medium my-6" {...props}>
       {children}
     </div>

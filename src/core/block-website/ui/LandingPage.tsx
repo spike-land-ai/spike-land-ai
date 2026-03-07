@@ -4,7 +4,16 @@ import { TryItNow } from "./TryItNow";
 import { TryItCta } from "./TryItCta";
 import { BlogListView } from "./BlogList";
 import { Link } from "../lazy-imports/link";
-import { Search, Globe, Code2, ArrowRight, Zap, Layers3, Workflow, ShieldCheck } from "lucide-react";
+import {
+  Search,
+  Globe,
+  Code2,
+  ArrowRight,
+  Zap,
+  Layers3,
+  Workflow,
+  ShieldCheck,
+} from "lucide-react";
 import { cn } from "@spike-land-ai/shared";
 import { useDevModeCopy } from "./useDevModeCopy";
 

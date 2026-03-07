@@ -35,7 +35,9 @@ export function useDevMode() {
       targetMode: value,
       startedAt: Date.now(),
     };
-    window.dispatchEvent(new CustomEvent<DevModeTransitionDetail>(DEV_MODE_TRANSITION_EVENT, { detail }));
+    window.dispatchEvent(
+      new CustomEvent<DevModeTransitionDetail>(DEV_MODE_TRANSITION_EVENT, { detail }),
+    );
     localStorage.setItem(DEV_MODE_KEY, String(value));
     setIsDeveloper(value);
     window.dispatchEvent(new CustomEvent(DEV_MODE_EVENT));

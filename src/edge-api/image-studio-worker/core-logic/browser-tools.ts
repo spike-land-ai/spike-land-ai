@@ -76,17 +76,6 @@ export const BROWSER_TOOLS: BrowserToolDefinition[] = [
     },
   },
   {
-    name: "browser_evaluate",
-    description: "Execute JavaScript in the page context and return the result",
-    inputSchema: {
-      type: "object",
-      properties: {
-        script: { type: "string", description: "JavaScript code to evaluate" },
-      },
-      required: ["script"],
-    },
-  },
-  {
     name: "browser_scroll",
     description: "Scroll to an element or position",
     inputSchema: {

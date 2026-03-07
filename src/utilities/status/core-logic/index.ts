@@ -12,11 +12,19 @@ interface ServiceCheck extends ServiceConfig {
 }
 
 const SERVICES: ServiceConfig[] = [
-  { name: "Main Site", url: "https://spike-edge.spikeland.workers.dev/health", expectedStatus: [200] },
+  {
+    name: "Main Site",
+    url: "https://spike-edge.spikeland.workers.dev/health",
+    expectedStatus: [200],
+  },
   { name: "Edge API", url: "https://api.spike.land/health", expectedStatus: [200] },
   { name: "Transpile", url: "https://js.spike.land/health", expectedStatus: [200] },
   { name: "ESM CDN", url: "https://esm.spike.land/health", expectedStatus: [200] },
-  { name: "MCP Registry", url: "https://spike-land-mcp.spikeland.workers.dev/health", expectedStatus: [200] },
+  {
+    name: "MCP Registry",
+    url: "https://spike-land-mcp.spikeland.workers.dev/health",
+    expectedStatus: [200],
+  },
   { name: "Auth MCP", url: "https://auth-mcp.spike.land/health", expectedStatus: [200] },
 ];
 
