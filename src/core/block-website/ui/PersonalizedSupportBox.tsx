@@ -30,7 +30,7 @@ export function PersonalizedSupportBox() {
             href="/support"
             className={cn(
               buttonVariants({ variant: "default" }),
-              "rounded-2xl h-14 px-8 font-black uppercase tracking-widest text-xs shadow-xl shadow-primary/20 hover:scale-105 active:scale-95 transition-transform"
+              "rounded-2xl h-14 px-8 font-black uppercase tracking-widest text-xs shadow-xl shadow-primary/20 hover:scale-105 active:scale-95 transition-transform",
             )}
           >
             <Heart className="mr-2 size-4" />
@@ -41,7 +41,7 @@ export function PersonalizedSupportBox() {
             href="/about"
             className={cn(
               buttonVariants({ variant: "ghost" }),
-              "rounded-2xl h-14 px-8 font-black uppercase tracking-widest text-xs"
+              "rounded-2xl h-14 px-8 font-black uppercase tracking-widest text-xs",
             )}
           >
             Learn More

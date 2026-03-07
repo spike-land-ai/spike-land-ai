@@ -121,11 +121,11 @@ const COMPONENT_MAP: Record<string, React.ComponentType<Record<string, unknown>>
         className={cn(
           "p-6 my-10 rounded-2xl border-l-4 shadow-sm",
           isInfo &&
-          "bg-blue-500/[0.03] border-l-blue-500 border-y border-r border-blue-500/10 text-blue-900 dark:text-blue-100",
+            "bg-blue-500/[0.03] border-l-blue-500 border-y border-r border-blue-500/10 text-blue-900 dark:text-blue-100",
           isSuccess &&
-          "bg-emerald-500/[0.03] border-l-emerald-500 border-y border-r border-emerald-500/10 text-emerald-900 dark:text-emerald-100",
+            "bg-emerald-500/[0.03] border-l-emerald-500 border-y border-r border-emerald-500/10 text-emerald-900 dark:text-emerald-100",
           isWarning &&
-          "bg-amber-500/[0.03] border-l-amber-500 border-y border-r border-amber-500/10 text-amber-900 dark:text-amber-100",
+            "bg-amber-500/[0.03] border-l-amber-500 border-y border-r border-amber-500/10 text-amber-900 dark:text-amber-100",
         )}
       >
         <div className="flex gap-4">
@@ -164,9 +164,9 @@ export function BlogPostView({
 }: {
   slug: string;
   linkComponent?:
-  | React.ComponentType<{ to: string; className?: string; children: React.ReactNode }>
-  | "a"
-  | undefined;
+    | React.ComponentType<{ to: string; className?: string; children: React.ReactNode }>
+    | "a"
+    | undefined;
 }) {
   const [post, setPost] = useState<BlogPost | null>(null);
   const [loading, setLoading] = useState(true);
@@ -229,10 +229,7 @@ export function BlogPostView({
         </p>
         <a
           href="/blog"
-          className={cn(
-            buttonVariants({ variant: "default" }),
-            "rounded-2xl px-8 font-bold"
-          )}
+          className={cn(buttonVariants({ variant: "default" }), "rounded-2xl px-8 font-bold")}
         >
           <ArrowLeft className="mr-2 size-4" />
           Back to All Stories
@@ -258,16 +255,16 @@ export function BlogPostView({
 
       <article className="max-w-4xl mx-auto py-12 px-6 font-sans">
         <div className="mb-12 flex items-center justify-between">
-          <Button
-            variant="ghost"
-            className="rounded-xl text-muted-foreground font-bold hover:text-primary group"
-            asChild
+          <a
+            href="/blog"
+            className={cn(
+              buttonVariants({ variant: "ghost" }),
+              "rounded-xl text-muted-foreground font-bold hover:text-primary group",
+            )}
           >
-            <a href="/blog">
-              <ChevronLeft className="mr-1 size-4 transition-transform group-hover:-translate-x-1" />
-              Stories
-            </a>
-          </Button>
+            <ChevronLeft className="mr-1 size-4 transition-transform group-hover:-translate-x-1" />
+            Stories
+          </a>
           <div className="flex items-center gap-2">
             <Button
               variant="ghost"
@@ -436,7 +433,7 @@ function SupportWidget({ post }: { post: BlogPost }) {
           setSupporters(data.supporters);
         }
       })
-      .catch(() => { });
+      .catch(() => {});
   }, [slug]);
 
   const handleBump = useCallback(async () => {

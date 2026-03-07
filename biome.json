@@ -1,5 +1,5 @@
 {
-  "$schema": "https://biomejs.dev/schemas/2.0.0/schema.json",
+  "$schema": "https://biomejs.dev/schemas/2.4.6/schema.json",
   "vcs": {
     "enabled": true,
     "clientKind": "git",
@@ -32,13 +32,17 @@
     "enabled": false
   },
   "files": {
-    "includes": ["**/*.ts", "**/*.tsx", "**/*.js", "**/*.mjs", "**/*.json"],
-    "ignore": [
-      "src/monaco-editor/**",
-      "src/**/dist-vite/**",
-      "src/**/dist/**",
-      "node_modules/**",
-      ".yarn/**"
+    "includes": [
+      "**/*.ts",
+      "**/*.tsx",
+      "**/*.js",
+      "**/*.mjs",
+      "**/*.json",
+      "!**/src/monaco-editor/**",
+      "!**/src/**/dist-vite/**",
+      "!**/src/**/dist/**",
+      "!**/node_modules/**",
+      "!**/.yarn/**"
     ]
   }
 }
