@@ -109,4 +109,23 @@ credits.post("/api/credits/purchase", async (c) => {
   return c.json({ url: sessionUrl });
 });
 
+/** GET /internal/credits/balance/:userId — internal service binding endpoint. */
+credits.get("/internal/credits/balance/:userId", async (c) => {
+  const secret = c.req.header("x-internal-secret");
+  if (
+    !secret ||
+    !c.env.INTERNAL_SERVICE_SECRET ||
+    secret !== c.env.INTERNAL_SERVICE_SECRET
+  ) {
+    return c.json({ error: "Unauthorized" }, 401);
+  }
+  const userId = c.req.param("userId");
+  const [{ balance, dailyLimit }, tier, usedToday] = await Promise.all([
+    getBalance(c.env.DB, userId),
+    resolveEffectiveTier(c.env.DB, userId),
+    getUsedToday(c.env.DB, userId),
+  ]);
+  return c.json({ balance, dailyLimit, tier, usedToday });
+});
+
 export { credits };

@@ -122,7 +122,16 @@ export async function registerAllTools(
   db: DrizzleDB,
   env?: ToolRegistrationEnv,
 ): Promise<void> {
-  safeRegister(registerGatewayMetaTools, "registerGatewayMetaTools", registry, userId, db);
+  safeRegister(
+    registerGatewayMetaTools,
+    "registerGatewayMetaTools",
+    registry,
+    userId,
+    db,
+    env?.kv,
+    env?.spikeEdge,
+    env?.mcpInternalSecret,
+  );
   safeRegister(registerAuthTools, "registerAuthTools", registry, userId, db);
   safeRegister(registerWorkspacesTools, "registerWorkspacesTools", registry, userId, db);
   safeRegister(registerBillingTools, "registerBillingTools", registry, userId, db);

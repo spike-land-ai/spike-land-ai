@@ -15,11 +15,41 @@ import { registeredTools, users } from "../db/schema";
 import { saveEnabledCategories } from "../../core-logic/kv/categories";
 import { freeTool } from "../../lazy-imports/procedures-index.ts";
 
+interface CreditInfo {
+  balance: number;
+  dailyLimit: number;
+  tier: string;
+  usedToday: number;
+}
+
+async function fetchCreditInfo(
+  spikeEdge: Fetcher,
+  mcpInternalSecret: string,
+  userId: string,
+): Promise<CreditInfo | null> {
+  try {
+    const res = await spikeEdge.fetch(
+      `https://edge.spike.land/internal/credits/balance/${userId}`,
+      { headers: { "x-internal-secret": mcpInternalSecret } },
+    );
+    if (!res.ok) {
+      console.error("[mcp] fetchCreditInfo failed:", res.status, await res.text().catch(() => ""));
+      return null;
+    }
+    return (await res.json()) as CreditInfo;
+  } catch (err) {
+    console.error("[mcp] fetchCreditInfo error:", err);
+    return null;
+  }
+}
+
 export function registerGatewayMetaTools(
   registry: ToolRegistry,
   userId: string,
   db: DrizzleDB,
-  kv: KVNamespace,
+  kv?: KVNamespace,
+  spikeEdge?: Fetcher,
+  mcpInternalSecret?: string,
 ): void {
   const t = freeTool(userId, db);
 
@@ -85,7 +115,7 @@ export function registerGatewayMetaTools(
           const newlyEnabled = registry.enableTools(names);
 
           if (newlyEnabled.length > 0) {
-            void saveEnabledCategories(userId, registry.getEnabledCategories(), kv);
+            if (kv) void saveEnabledCategories(userId, registry.getEnabledCategories(), kv);
           }
 
           let text = `**Found ${semanticResults.length} tool(s) matching "${query}" (semantic):**\n\n`;
@@ -150,7 +180,8 @@ export function registerGatewayMetaTools(
             )
             .orderBy(desc(registeredTools.installCount))
             .limit(limit);
-        } catch {
+        } catch (err) {
+          console.error("[mcp] search_tools marketplace query error:", err);
           // DB query failure should not break platform tool search
         }
 
@@ -172,7 +203,7 @@ export function registerGatewayMetaTools(
           const newlyEnabled = registry.enableTools(names);
 
           if (newlyEnabled.length > 0) {
-            void saveEnabledCategories(userId, registry.getEnabledCategories(), kv);
+            if (kv) void saveEnabledCategories(userId, registry.getEnabledCategories(), kv);
           }
 
           text += `**Found ${results.length} platform tool(s) matching "${query}"${stability ? ` (${stability})` : ""}:**\n\n`;
@@ -317,7 +348,7 @@ export function registerGatewayMetaTools(
         }
 
         // Persist enabled categories to KV (fire & forget)
-        void saveEnabledCategories(userId, registry.getEnabledCategories(), kv);
+        if (kv) void saveEnabledCategories(userId, registry.getEnabledCategories(), kv);
 
         let text = `**Activated ${enabled.length} tool(s) in "${category}":**\n\n`;
         for (const name of enabled) text += `- ${name}\n`;
@@ -340,17 +371,42 @@ export function registerGatewayMetaTools(
         },
       ])
       .handler(async () => {
+        const creditInfo =
+          spikeEdge && mcpInternalSecret
+            ? await fetchCreditInfo(spikeEdge, mcpInternalSecret, userId)
+            : null;
+
+        if (!creditInfo) {
+          return {
+            content: [
+              {
+                type: "text",
+                text:
+                  `**AI Credit Balance**\n\n` +
+                  `**Amount:** N/A (edge mode)\n` +
+                  `**Currency:** credits\n` +
+                  `**Approximate USD:** N/A\n\n` +
+                  `Balance details are available at https://spike.land/settings?tab=billing\n` +
+                  `Use \`billing_status\` to check your subscription tier.`,
+              },
+            ],
+          };
+        }
+
+        const usd = (creditInfo.balance * 0.01).toFixed(2);
+        const remaining = creditInfo.dailyLimit - creditInfo.usedToday;
         return {
           content: [
             {
               type: "text",
               text:
                 `**AI Credit Balance**\n\n` +
-                `**Amount:** N/A (edge mode)\n` +
-                `**Currency:** credits\n` +
-                `**Approximate USD:** N/A\n\n` +
-                `Balance details are available at https://spike.land/settings?tab=billing\n` +
-                `Use \`billing_status\` to check your subscription tier.`,
+                `**Balance:** ${creditInfo.balance} credits (~$${usd} USD)\n` +
+                `**Tier:** ${creditInfo.tier}\n` +
+                `**Daily Limit:** ${creditInfo.dailyLimit}\n` +
+                `**Used Today:** ${creditInfo.usedToday}\n` +
+                `**Remaining Today:** ${remaining}\n\n` +
+                `Manage billing at https://spike.land/settings?tab=billing`,
             },
           ],
         };
@@ -379,9 +435,39 @@ export function registerGatewayMetaTools(
         const totalTools = registry.getToolCount();
         const enabledTools = registry.getEnabledCount();
 
-        let text = `**spike.land Platform Status**\n\n`;
-        text += `**Total Tools:** ${totalTools}\n`;
-        text += `**Active Tools:** ${enabledTools}\n`;
+        // Fetch user name and credit info in parallel
+        const [userRow, creditInfo] = await Promise.all([
+          db
+            .select({ name: users.name })
+            .from(users)
+            .where(eq(users.id, userId))
+            .limit(1)
+            .then((rows) => rows[0] ?? null)
+            .catch((err): null => {
+              console.error("[mcp] get_status user lookup error:", err);
+              return null;
+            }),
+          spikeEdge && mcpInternalSecret
+            ? fetchCreditInfo(spikeEdge, mcpInternalSecret, userId)
+            : null,
+        ]);
+
+        const name = userRow?.name;
+        let text = name
+          ? `**Welcome back, ${name}!**`
+          : `**Welcome to spike.land!**`;
+
+        if (creditInfo) {
+          text += ` You're on the **${creditInfo.tier}** tier.\n\n`;
+          text += `**Credits:** ${creditInfo.balance} available | ${creditInfo.usedToday}/${creditInfo.dailyLimit} used today\n\n`;
+          if (creditInfo.tier === "free" && creditInfo.balance < 10) {
+            text += `> Low credits! Consider upgrading at https://spike.land/settings?tab=billing\n\n`;
+          }
+        } else {
+          text += `\n\n`;
+        }
+
+        text += `**Platform:** ${totalTools} tools | ${enabledTools} active | ${categories.length} categories\n`;
         const stabilityBreakdown = registry.getStabilityBreakdown();
         if (Object.keys(stabilityBreakdown).length > 0) {
           text += `**Stability:** `;
@@ -390,7 +476,7 @@ export function registerGatewayMetaTools(
             .join(", ");
           text += `\n`;
         }
-        text += `**Categories:** ${categories.length}\n\n`;
+        text += `\n`;
 
         const activeCategories = categories.filter((c) => c.enabledCount > 0);
         const inactiveCategories = categories.filter(
@@ -422,6 +508,12 @@ export function registerGatewayMetaTools(
         text += `- **Generate images →** enable "image" category\n`;
         text += `- **AI chat →** enable "ai-gateway" category\n`;
         text += `- **Manage secrets →** enable "vault" category\n`;
+
+        if (creditInfo && (creditInfo.tier === "pro" || creditInfo.tier === "business")) {
+          text += `- **Code review →** enable "codegen" category\n`;
+          text += `- **Advanced AI →** enable "ai-gateway" category for multi-model access\n`;
+        }
+
         return { content: [{ type: "text", text }] };
       }),
   );
@@ -492,7 +584,7 @@ export function registerGatewayMetaTools(
         }
         
         registry.enableByStability(stability);
-        void saveEnabledCategories(userId, registry.getEnabledCategories(), kv);
+        if (kv) void saveEnabledCategories(userId, registry.getEnabledCategories(), kv);
         
         let text = `**Found and activated ${matching.length} tool(s) with stability: ${stability}**\n\n`;
         
