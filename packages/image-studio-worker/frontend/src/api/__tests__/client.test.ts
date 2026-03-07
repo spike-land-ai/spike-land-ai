@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { deleteGalleryImage } from "../client";
+import { deleteGalleryImage, callTool } from "../client";
 
 describe("client", () => {
   beforeEach(() => {
@@ -32,11 +32,8 @@ describe("client", () => {
     });
 
     it("should include gemini key and image model in headers if present in storage", async () => {
-      vi.spyOn(sessionStorage, "getItem").mockImplementation((key) => {
+      vi.spyOn(Storage.prototype, "getItem").mockImplementation((key) => {
         if (key === "gemini_api_key") return "test-gemini-key";
-        return null;
-      });
-      vi.spyOn(localStorage, "getItem").mockImplementation((key) => {
         if (key === "pref_image_model") return "test-image-model";
         return null;
       });
@@ -69,6 +66,61 @@ describe("client", () => {
       vi.stubGlobal("fetch", mockFetch);
 
       await expect(deleteGalleryImage("test-image-id")).rejects.toThrow("API error 404: Not Found");
+    });
+  });
+
+  describe("callTool", () => {
+    it("should call fetch with the correct payload to /api/tool", async () => {
+      const mockResult = { result: { content: [{ type: "text", text: "Success" }] } };
+      const mockFetch = vi.fn().mockResolvedValue({
+        ok: true,
+        json: () => Promise.resolve(mockResult),
+      });
+      vi.stubGlobal("fetch", mockFetch);
+
+      const result = await callTool("myTool", { arg1: "value1" });
+
+      expect(mockFetch).toHaveBeenCalledWith("/api/tool", {
+        method: "POST",
+        body: JSON.stringify({ name: "myTool", arguments: { arg1: "value1" } }),
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer demo",
+        },
+      });
+      expect(result).toEqual(mockResult.result);
+    });
+
+    it("should default arguments to an empty object if not provided", async () => {
+      const mockResult = { result: { content: [] } };
+      const mockFetch = vi.fn().mockResolvedValue({
+        ok: true,
+        json: () => Promise.resolve(mockResult),
+      });
+      vi.stubGlobal("fetch", mockFetch);
+
+      const result = await callTool("myTool");
+
+      expect(mockFetch).toHaveBeenCalledWith("/api/tool", {
+        method: "POST",
+        body: JSON.stringify({ name: "myTool", arguments: {} }),
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer demo",
+        },
+      });
+      expect(result).toEqual(mockResult.result);
+    });
+
+    it("should throw an error if the response is not ok", async () => {
+      const mockFetch = vi.fn().mockResolvedValue({
+        ok: false,
+        status: 500,
+        text: () => Promise.resolve("Internal Server Error"),
+      });
+      vi.stubGlobal("fetch", mockFetch);
+
+      await expect(callTool("myTool")).rejects.toThrow("API error 500: Internal Server Error");
     });
   });
 });
