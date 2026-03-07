@@ -115,13 +115,12 @@ blog.get("/api/blog", async (c) => {
 blog.get("/api/blog/:slug", async (c) => {
   const slug = c.req.param("slug");
   const showDrafts = isLocalDev(c);
-  const draftFilter = showDrafts ? "" : " AND draft = 0";
 
   let cached: Response | null = null;
   try {
     cached = await withEdgeCache(c.req.raw, safeCtx(c), async () => {
       const row = await c.env.DB.prepare(
-        `SELECT * FROM blog_posts WHERE slug = ?${draftFilter}`,
+        `SELECT * FROM blog_posts WHERE slug = ?`,
       ).bind(slug).first<BlogPostRow>();
 
         if (!row) return null;
@@ -133,7 +132,7 @@ blog.get("/api/blog/:slug", async (c) => {
   } catch {
     // Cache API unavailable — fall back to direct D1
     const row = await c.env.DB.prepare(
-      `SELECT * FROM blog_posts WHERE slug = ?${draftFilter}`,
+      `SELECT * FROM blog_posts WHERE slug = ?`,
     ).bind(slug).first<BlogPostRow>();
 
     if (row) {
