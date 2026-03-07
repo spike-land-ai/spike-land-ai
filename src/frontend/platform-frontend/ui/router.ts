@@ -270,10 +270,10 @@ const toolsIndexRoute = createRoute({
   component: withSuspense(() => import("./routes/tools/tools-index.tsx"), "ToolsIndexPage"),
 });
 
-const toolsCategoryRoute = createRoute({
+const appSessionRoute = createRoute({
   getParentRoute: () => toolsRoute,
-  path: "$toolName",
-  component: withSuspense(() => import("./routes/tools/$toolName"), "ToolsCategoryPage"),
+  path: "$appSlug",
+  component: withSuspense(() => import("./routes/tools/$appSlug"), "AppSessionPage"),
 });
 
 // MCP routes
@@ -374,7 +374,7 @@ const routeTree = rootRoute.addChildren([
   dashboardRoute.addChildren([dashboardIndexRoute, bazdmegDashboardRoute]),
   learnRoute.addChildren([learnIndexRoute, learnSessionRoute, learnBadgeRoute]),
   messagesRoute.addChildren([messagesIndexRoute, messageThreadRoute]),
-  toolsRoute.addChildren([toolsIndexRoute, toolsCategoryRoute]),
+  toolsRoute.addChildren([toolsIndexRoute, appSessionRoute]),
   mcpRoute.addChildren([mcpIndexRoute, mcpAuthorizeRoute]),
 ]);
 

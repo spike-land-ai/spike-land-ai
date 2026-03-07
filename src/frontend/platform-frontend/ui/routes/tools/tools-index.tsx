@@ -1,46 +1,14 @@
-import { useState, useMemo } from "react";
 import { Link } from "@tanstack/react-router";
-import { useMcpTools } from "../../src/hooks/useMcp";
+import { useApps } from "../../hooks/useApps";
+import { Sparkles } from "lucide-react";
 
 export function ToolsIndexPage() {
-  const { data, isLoading, isError, error } = useMcpTools();
-  const [search, setSearch] = useState("");
-  const [activeCategory, setActiveCategory] = useState("All");
-
-  const categorizedTools = useMemo(() => {
-    const toolsArray = data?.tools;
-    if (!toolsArray || !Array.isArray(toolsArray)) return [];
-
-    return toolsArray.map((tool) => ({
-      ...tool,
-      category: tool.category || "General",
-      name: tool.name || "Unknown Tool",
-      description: tool.description || "",
-    }));
-  }, [data]);
-
-  const categories = useMemo(
-    () => ["All", ...Array.from(new Set(categorizedTools.map((t) => t.category))).sort()],
-    [categorizedTools],
-  );
-
-  const filtered = useMemo(
-    () =>
-      categorizedTools.filter((tool) => {
-        const q = search.toLowerCase();
-        const matchesSearch =
-          tool.name.toLowerCase().includes(q) ||
-          tool.description.toLowerCase().includes(q);
-        const matchesCategory = activeCategory === "All" || tool.category === activeCategory;
-        return matchesSearch && matchesCategory;
-      }),
-    [categorizedTools, search, activeCategory],
-  );
+  const { data: apps, isLoading, isError, error } = useApps();
 
   if (isLoading) {
     return (
       <div className="flex h-64 items-center justify-center">
-        <div role="status" aria-live="polite" className="text-muted-foreground animate-pulse">Loading tools...</div>
+        <div role="status" aria-live="polite" className="text-muted-foreground animate-pulse">Loading apps...</div>
       </div>
     );
   }
@@ -49,11 +17,11 @@ export function ToolsIndexPage() {
     return (
       <div className="space-y-6">
         <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-bold text-foreground">Tool Registry</h1>
+          <h1 className="text-2xl font-bold text-foreground">MCP Apps</h1>
         </div>
         <div className="rounded-xl border border-border bg-card p-8 text-center space-y-4">
           <p className="text-muted-foreground">
-            Unable to load tools. Please try again later.
+            Unable to load apps. Please try again later.
           </p>
           <p className="text-sm text-muted-foreground">
             {error instanceof Error ? error.message : "An unexpected error occurred."}
@@ -73,66 +41,50 @@ export function ToolsIndexPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-foreground">Tools Registry</h1>
-          <p className="text-sm text-muted-foreground mt-1">Explore developer tools, MCP schemas, and endpoints.</p>
+          <h1 className="text-2xl font-bold text-foreground">MCP Apps</h1>
+          <p className="text-sm text-muted-foreground mt-1">Interactive stateful workflows powered by MCP tools.</p>
         </div>
-        <span className="inline-flex items-center rounded-md bg-success/10 px-2 py-1 text-xs font-medium text-success-foreground ring-1 ring-inset ring-success/20">
-          {categorizedTools.length} Live Tools
+        <span className="inline-flex items-center gap-1 rounded-md bg-primary/10 px-2.5 py-1 text-xs font-medium text-primary ring-1 ring-inset ring-primary/20">
+          <Sparkles className="w-3.5 h-3.5" />
+          {apps?.length || 0} Apps
         </span>
       </div>
 
-      <input
-        type="text"
-        placeholder="Search tools by name or description..."
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
-        aria-label="Search tools"
-        className="w-full rounded-lg border border-border bg-background px-4 py-2 text-foreground focus:border-ring focus:outline-none focus:ring-1 focus:ring-ring placeholder:text-muted-foreground"
-      />
-
-      <div className="flex flex-wrap gap-2">
-        {categories.map((cat) => (
-          <button
-            key={cat}
-            onClick={() => setActiveCategory(cat)}
-            aria-pressed={activeCategory === cat}
-            className={`rounded-full px-4 py-1.5 text-sm font-medium transition ${
-              activeCategory === cat
-                ? "bg-primary text-primary-foreground"
-                : "bg-muted text-foreground hover:bg-muted/80"
-            }`}
-          >
-            {cat}
-          </button>
-        ))}
-      </div>
-
-      {filtered.length === 0 ? (
+      {!apps || apps.length === 0 ? (
         <div className="rounded-xl border border-border border-dashed p-12 text-center text-muted-foreground">
-          No tools found matching your criteria.
+          No apps available at the moment.
         </div>
       ) : (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {filtered.map((tool) => (
+        <div className="grid gap-6 sm:grid-cols-2">
+          {apps.map((app) => (
             <Link
-              key={tool.name}
-              to="/tools/$toolName"
+              key={app.slug}
+              to="/tools/$appSlug"
               params={{
-                toolName: tool.name,
+                appSlug: app.slug,
               }}
-              className="group rounded-2xl border border-border bg-card dark:glass-card p-5 shadow-sm transition hover:shadow-md hover:scale-[1.01] hover:border-primary/30"
+              className="group flex flex-col rounded-2xl border border-border bg-card p-6 shadow-sm transition-all hover:shadow-md hover:scale-[1.01] hover:border-primary/40"
             >
-              <h3 className="font-mono text-sm font-semibold text-info-foreground group-hover:text-primary transition-colors">
-                {tool.name}
-              </h3>
-              <p className="mt-2 text-sm text-muted-foreground line-clamp-2" title={tool.description}>
-                {tool.description}
+              <div className="flex items-center gap-4 mb-4">
+                <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-muted/50 text-2xl group-hover:scale-110 transition-transform">
+                  {app.emoji || "🔧"}
+                </div>
+                <div>
+                  <h3 className="font-bold text-lg text-foreground group-hover:text-primary transition-colors">
+                    {app.name}
+                  </h3>
+                  <p className="text-xs font-medium text-muted-foreground">
+                    {app.tool_count} {app.tool_count === 1 ? "tool" : "tools"}
+                  </p>
+                </div>
+              </div>
+              
+              <p className="text-sm text-muted-foreground leading-relaxed flex-1">
+                {app.description}
               </p>
-              <div className="mt-4 flex items-center justify-between">
-                <span className="inline-block rounded-full bg-muted px-3 py-0.5 text-xs text-muted-foreground">
-                  {tool.category}
-                </span>
-                <span className="text-xs text-muted-foreground group-hover:text-primary">Run <span aria-hidden="true">→</span></span>
+              
+              <div className="mt-6 flex items-center justify-end text-sm font-semibold text-primary/80 group-hover:text-primary">
+                Launch App <span aria-hidden="true" className="ml-1 group-hover:translate-x-1 transition-transform">→</span>
               </div>
             </Link>
           ))}

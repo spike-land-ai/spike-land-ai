@@ -8,6 +8,7 @@ import { mcpRoute } from "./mcp";
 import { oauthRoute } from "./oauth";
 import { wellKnownRoute } from "./well-known";
 import { publicToolsRoute } from "./public-tools";
+import { publicAppsRoute } from "./public-apps";
 import { internalByokRoute } from "./internal-byok";
 import { internalAnalytics } from "./internal-analytics";
 import { internalAuthMiddleware } from "./internal-auth";
@@ -38,6 +39,7 @@ export function createApp(): Hono<{ Bindings: Env; Variables: AuthVariables }> {
   app.route("/.well-known", wellKnownRoute);
   app.route("/oauth", oauthRoute);
   app.route("/tools", publicToolsRoute);
+  app.route("/apps", publicAppsRoute);
 
   // Authenticated MCP route
   app.use("/mcp/*", authMiddleware);
