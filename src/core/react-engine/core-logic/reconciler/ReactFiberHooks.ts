@@ -488,7 +488,7 @@ function mountEffectImpl(
     HookHasEffect | hookFlags,
     createEffectInstance(),
     create,
-    nextDeps,
+    nextDeps as Array<unknown> | null,
   );
 }
 
@@ -508,15 +508,15 @@ function updateEffectImpl(
     if (nextDeps !== null) {
       const prevEffect: Effect = currentHook.memoizedState as Effect;
       const prevDeps = prevEffect.deps;
-      if (areHookInputsEqual(nextDeps, prevDeps)) {
-        hook.memoizedState = pushSimpleEffect(hookFlags, inst, create, nextDeps);
+      if (areHookInputsEqual(nextDeps as Array<unknown>, prevDeps)) {
+        hook.memoizedState = pushSimpleEffect(hookFlags, inst, create, nextDeps as Array<unknown> | null);
         return;
       }
     }
   }
 
   currentlyRenderingFiber.flags |= fiberFlags;
-  hook.memoizedState = pushSimpleEffect(HookHasEffect | hookFlags, inst, create, nextDeps);
+  hook.memoizedState = pushSimpleEffect(HookHasEffect | hookFlags, inst, create, nextDeps as Array<unknown> | null);
 }
 
 function mountEffect(create: () => (() => void) | void, deps?: Array<unknown> | null): void {
@@ -582,7 +582,7 @@ function mountImperativeHandle<T>(
     UpdateEffect | LayoutStaticEffect,
     HookLayout,
     (imperativeHandleEffect<T>).bind(null, create, ref) as unknown as () => (() => void) | void,
-    effectDeps,
+    effectDeps as Array<unknown> | null,
   );
 }
 
@@ -596,7 +596,7 @@ function updateImperativeHandle<T>(
     UpdateEffect,
     HookLayout,
     (imperativeHandleEffect<T>).bind(null, create, ref) as unknown as () => (() => void) | void,
-    effectDeps,
+    effectDeps as Array<unknown> | null,
   );
 }
 
@@ -615,7 +615,7 @@ function updateCallback<T>(callback: T, deps: Array<unknown> | void | null): T {
   const prevState = hook.memoizedState as [T, Array<unknown> | null];
   if (nextDeps !== null) {
     const prevDeps: Array<unknown> | null = prevState[1];
-    if (areHookInputsEqual(nextDeps, prevDeps)) {
+    if (areHookInputsEqual(nextDeps as Array<unknown>, prevDeps)) {
       return prevState[0];
     }
   }
@@ -637,7 +637,7 @@ function updateMemo<T>(nextCreate: () => T, deps: Array<unknown> | void | null):
   const prevState = hook.memoizedState as [T, Array<unknown> | null];
   if (nextDeps !== null) {
     const prevDeps: Array<unknown> | null = prevState[1];
-    if (areHookInputsEqual(nextDeps, prevDeps)) {
+    if (areHookInputsEqual(nextDeps as Array<unknown>, prevDeps)) {
       return prevState[0];
     }
   }
