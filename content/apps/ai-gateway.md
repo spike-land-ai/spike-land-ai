@@ -20,7 +20,7 @@ graph:
       provider: "from:ai_list_providers.provider_id"
     outputs:
       model_id: "string"
-    always_available: true
+    always_available: false
   ai_chat:
     inputs:
       provider: "from:ai_list_providers.provider_id"
