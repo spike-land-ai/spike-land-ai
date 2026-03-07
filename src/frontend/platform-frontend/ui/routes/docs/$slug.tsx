@@ -1,6 +1,7 @@
 import { Link, useParams } from "@tanstack/react-router";
 import { apiUrl } from "../../../core-logic/api";
 import { useEffect, useState } from "react";
+import { sanitizeUrl, escapeHtml } from "../../../core-logic/lib/security";
 
 const SITE_URL = "https://spike.land";
 
@@ -89,10 +90,9 @@ export function DocPage() {
       if (line.trim() === "") return <br key={i} />;
       // Handle links in markdown [text](url)
       const withLinks = line.replace(/\[([^\]]+)\]\(([^)]+)\)/g, (_match, text, url) => {
-        // Sanitize URL to prevent XSS
-        const isSafe = url.startsWith("http://") || url.startsWith("https://") || url.startsWith("/") || url.startsWith("mailto:");
-        const safeUrl = isSafe ? url : "about:blank";
-        return `<a href="${safeUrl}" class="text-primary underline hover:text-primary/80" target="_blank" rel="noopener noreferrer">${text}</a>`;
+        const safeUrl = sanitizeUrl(url);
+        const safeText = escapeHtml(text);
+        return `<a href="${safeUrl}" class="text-primary underline hover:text-primary/80" target="_blank" rel="noopener noreferrer">${safeText}</a>`;
       });
       return <p key={i} className="text-foreground leading-relaxed mb-2" dangerouslySetInnerHTML={{ __html: withLinks }} />;
     });
