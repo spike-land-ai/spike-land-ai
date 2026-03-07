@@ -88,9 +88,13 @@ export async function validateAnchor(
     link,
     status: "broken",
     reason: `Anchor "#${anchor}" not found in file headings`,
-    suggestion: headings.length > 0
-      ? `Available anchors: ${headings.slice(0, 5).map((h) => `#${h}`).join(", ")}`
-      : undefined,
+    suggestion:
+      headings.length > 0
+        ? `Available anchors: ${headings
+            .slice(0, 5)
+            .map((h) => `#${h}`)
+            .join(", ")}`
+        : undefined,
     durationMs: Date.now() - start,
   };
 }
@@ -156,12 +160,7 @@ export async function suggestCorrectPath(
   const targetName = basename(brokenPath);
 
   // Search in sibling directories and common doc locations
-  const searchDirs = [
-    sourceDir,
-    dirname(sourceDir),
-    rootDir,
-    join(rootDir, "docs"),
-  ];
+  const searchDirs = [sourceDir, dirname(sourceDir), rootDir, join(rootDir, "docs")];
 
   for (const dir of searchDirs) {
     try {

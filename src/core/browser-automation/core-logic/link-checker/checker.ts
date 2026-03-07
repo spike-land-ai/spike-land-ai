@@ -1,17 +1,8 @@
 import { readdir, readFile, stat } from "node:fs/promises";
 import { join, relative, resolve } from "node:path";
-import type {
-  CheckerOptions,
-  FileReport,
-  LinkValidationResult,
-  ScanReport,
-} from "./types.js";
+import type { CheckerOptions, FileReport, LinkValidationResult, ScanReport } from "./types.js";
 import { extractLinks } from "./markdown-parser.js";
-import {
-  validateRelativeLink,
-  validateAnchor,
-  validateFileWithAnchor,
-} from "./file-validator.js";
+import { validateRelativeLink, validateAnchor, validateFileWithAnchor } from "./file-validator.js";
 import { createUrlValidator } from "./url-validator.js";
 import { parseGitHubUrl, parseShieldsBadge, validateGitHubUrl } from "./github-validator.js";
 
@@ -137,14 +128,24 @@ export async function checkLinks(options: CheckerOptions): Promise<ScanReport> {
             result = await validateGitHubUrl(link, badgeParsed, { token: githubToken, timeout });
             urlCache.set(link.target, result);
           } else {
-            result = { link, status: "warning", reason: "Could not parse shields.io badge URL", durationMs: 0 };
+            result = {
+              link,
+              status: "warning",
+              reason: "Could not parse shields.io badge URL",
+              durationMs: 0,
+            };
           }
           break;
         }
 
         case "external_url": {
           if (!checkExternal) {
-            result = { link, status: "skipped", reason: "External URL checking disabled", durationMs: 0 };
+            result = {
+              link,
+              status: "skipped",
+              reason: "External URL checking disabled",
+              durationMs: 0,
+            };
             break;
           }
           const cached = urlCache.get(link.target);
@@ -158,16 +159,31 @@ export async function checkLinks(options: CheckerOptions): Promise<ScanReport> {
         }
 
         default:
-          result = { link, status: "error", reason: `Unknown category: ${link.category}`, durationMs: 0 };
+          result = {
+            link,
+            status: "error",
+            reason: `Unknown category: ${link.category}`,
+            durationMs: 0,
+          };
       }
 
       // Sort result into report buckets
       switch (result.status) {
-        case "ok": report.ok.push(result); break;
-        case "broken": report.broken.push(result); break;
-        case "warning": report.warnings.push(result); break;
-        case "skipped": report.skipped.push(result); break;
-        case "error": report.errors.push(result); break;
+        case "ok":
+          report.ok.push(result);
+          break;
+        case "broken":
+          report.broken.push(result);
+          break;
+        case "warning":
+          report.warnings.push(result);
+          break;
+        case "skipped":
+          report.skipped.push(result);
+          break;
+        case "error":
+          report.errors.push(result);
+          break;
       }
     }
 
@@ -214,15 +230,17 @@ export async function checkSingleFile(
     rootDir,
     files: [filePath],
   });
-  return report.files[0] ?? {
-    filePath,
-    totalLinks: 0,
-    broken: [],
-    warnings: [],
-    ok: [],
-    skipped: [],
-    errors: [],
-  };
+  return (
+    report.files[0] ?? {
+      filePath,
+      totalLinks: 0,
+      broken: [],
+      warnings: [],
+      ok: [],
+      skipped: [],
+      errors: [],
+    }
+  );
 }
 
 export function formatReport(report: ScanReport): string {

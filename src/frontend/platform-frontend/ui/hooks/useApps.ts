@@ -24,7 +24,7 @@ export function useApps() {
       const res = await fetch(apiUrl("/store/tools"));
       if (!res.ok) throw new Error("Failed to fetch tools");
       const data = await res.json();
-      
+
       const allTools = [];
       if (data.categories) {
         for (const cat of data.categories) {
@@ -37,7 +37,7 @@ export function useApps() {
       } else if (data.tools) {
         allTools.push(...data.tools);
       }
-      
+
       return allTools.map((t: any, i: number) => ({
         slug: t.name,
         name: t.name,
@@ -45,7 +45,7 @@ export function useApps() {
         emoji: "🔧",
         tool_count: 1,
         sort_order: i,
-        category: t.category || "general"
+        category: t.category || "general",
       }));
     },
   });
@@ -58,7 +58,7 @@ export function useApp(slug: string) {
       const res = await fetch(apiUrl("/store/tools"));
       if (!res.ok) throw new Error("Failed to fetch tools");
       const data = await res.json();
-      
+
       let foundTool = null;
       if (data.categories) {
         for (const cat of data.categories) {
@@ -72,7 +72,7 @@ export function useApp(slug: string) {
       if (!foundTool && data.tools) {
         foundTool = data.tools.find((x: any) => x.name === slug);
       }
-      
+
       if (!foundTool) throw new Error("Tool not found");
 
       return {
@@ -85,7 +85,7 @@ export function useApp(slug: string) {
         status: "live",
         tools: [foundTool.name],
         graph: {},
-        markdown: `# ${foundTool.name}\n\n${foundTool.description || ""}`
+        markdown: `# ${foundTool.name}\n\n${foundTool.description || ""}`,
       };
     },
     enabled: !!slug,

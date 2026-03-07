@@ -24,7 +24,9 @@ export function TryItCta() {
   return (
     <section className="py-20 sm:py-24 bg-background border-t border-border">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 text-center">
-        <h2 className="text-2xl font-bold tracking-tight text-foreground mb-6">{headingCopy.text}</h2>
+        <h2 className="text-2xl font-bold tracking-tight text-foreground mb-6">
+          {headingCopy.text}
+        </h2>
 
         <div className="max-w-2xl mx-auto mb-6">
           <div className="rounded-xl overflow-hidden border border-border/50 shadow-lg bg-obsidian-950 p-4 flex flex-col sm:flex-row items-center justify-between gap-4">

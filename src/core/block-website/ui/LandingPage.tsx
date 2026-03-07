@@ -4,7 +4,16 @@ import { TryItNow } from "./TryItNow";
 import { TryItCta } from "./TryItCta";
 import { BlogListView } from "./BlogList";
 import { Link } from "../lazy-imports/link";
-import { Search, Globe, Code2, ArrowRight, Zap, Layers3, Workflow, ShieldCheck } from "lucide-react";
+import {
+  Search,
+  Globe,
+  Code2,
+  ArrowRight,
+  Zap,
+  Layers3,
+  Workflow,
+  ShieldCheck,
+} from "lucide-react";
 import { cn } from "@spike-land-ai/shared";
 import { useDevModeCopy } from "./useDevModeCopy";
 
@@ -243,9 +252,7 @@ export function LandingPage() {
                 >
                   {updatesHeading.text}
                 </h2>
-                <p className="text-lg text-muted-foreground font-medium">
-                  {updatesBody.text}
-                </p>
+                <p className="text-lg text-muted-foreground font-medium">{updatesBody.text}</p>
               </div>
               <Link
                 href="/blog"

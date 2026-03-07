@@ -1,8 +1,10 @@
 import type { ExtractedLink, LinkValidationResult, ParsedGitHubUrl } from "./types.js";
 
-const GITHUB_URL_RE = /github\.com\/([^/]+)\/([^/]+?)(?:\.git)?(?:\/(blob|tree)\/([^/]+)\/(.+))?(?:[?#].*)?$/;
+const GITHUB_URL_RE =
+  /github\.com\/([^/]+)\/([^/]+?)(?:\.git)?(?:\/(blob|tree)\/([^/]+)\/(.+))?(?:[?#].*)?$/;
 const RAW_GH_RE = /raw\.githubusercontent\.com\/([^/]+)\/([^/]+)\/([^/]+)\/(.+)$/;
-const SHIELDS_WORKFLOW_RE = /img\.shields\.io\/github\/actions\/workflow\/status\/([^/]+)\/([^/]+)\/([^?]+)/;
+const SHIELDS_WORKFLOW_RE =
+  /img\.shields\.io\/github\/actions\/workflow\/status\/([^/]+)\/([^/]+)\/([^?]+)/;
 
 export function parseGitHubUrl(url: string): ParsedGitHubUrl | null {
   // Try raw.githubusercontent.com first
@@ -81,15 +83,18 @@ export async function validateGitHubUrl(
   const { token, timeout = 10_000 } = options;
 
   // Resolve token from options or environment
-  const authToken = token
-    ?? (typeof process !== "undefined" ? process.env["GITHUB_TOKEN"] ?? process.env["GH_TOKEN"] : undefined);
+  const authToken =
+    token ??
+    (typeof process !== "undefined"
+      ? (process.env.GITHUB_TOKEN ?? process.env.GH_TOKEN)
+      : undefined);
 
   const headers: Record<string, string> = {
     Accept: "application/vnd.github.v3+json",
     "User-Agent": "spike-land-ai-link-checker/1.0",
   };
   if (authToken) {
-    headers["Authorization"] = `Bearer ${authToken}`;
+    headers.Authorization = `Bearer ${authToken}`;
   }
 
   await rateLimiter.checkAndWait();

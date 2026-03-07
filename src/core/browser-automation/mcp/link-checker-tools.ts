@@ -13,10 +13,16 @@ export function registerLinkCheckerTools(server: McpServer): void {
     schema: {
       root_dir: z.string().describe("Root directory to scan"),
       file_pattern: z.string().optional().describe("Glob pattern for files (default: **/*.md)"),
-      files: z.array(z.string()).optional().describe("Specific files to check (overrides file_pattern)"),
+      files: z
+        .array(z.string())
+        .optional()
+        .describe("Specific files to check (overrides file_pattern)"),
       check_external: z.boolean().optional().describe("Check external HTTP URLs (default: false)"),
       check_github: z.boolean().optional().describe("Validate GitHub URLs via API (default: true)"),
-      skip_code_blocks: z.boolean().optional().describe("Skip links in code blocks (default: true)"),
+      skip_code_blocks: z
+        .boolean()
+        .optional()
+        .describe("Skip links in code blocks (default: true)"),
       github_token: z.string().optional().describe("GitHub token for API auth"),
       concurrency: z.number().optional().describe("Max concurrent HTTP requests (default: 5)"),
       timeout: z.number().optional().describe("HTTP timeout in ms (default: 10000)"),
@@ -74,7 +80,9 @@ export function registerLinkCheckerTools(server: McpServer): void {
       const lines: string[] = [];
       lines.push(`# Link Check: ${fileReport.filePath}`);
       lines.push(`Total links: ${fileReport.totalLinks}`);
-      lines.push(`OK: ${fileReport.ok.length} | Broken: ${fileReport.broken.length} | Warnings: ${fileReport.warnings.length} | Errors: ${fileReport.errors.length} | Skipped: ${fileReport.skipped.length}`);
+      lines.push(
+        `OK: ${fileReport.ok.length} | Broken: ${fileReport.broken.length} | Warnings: ${fileReport.warnings.length} | Errors: ${fileReport.errors.length} | Skipped: ${fileReport.skipped.length}`,
+      );
 
       if (fileReport.broken.length > 0) {
         lines.push("\n## Broken Links");

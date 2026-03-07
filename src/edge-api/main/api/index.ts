@@ -246,11 +246,7 @@ const SERVICE_RETRY_MS = 30_000;
  * In local dev, the service binding may not be available if spike-land-mcp isn't running.
  * After a 503, skips the binding for 30s before retrying.
  */
-async function fetchMcpWithFallback(
-  env: Env,
-  url: string,
-  init?: RequestInit,
-): Promise<Response> {
+async function fetchMcpWithFallback(env: Env, url: string, init?: RequestInit): Promise<Response> {
   if (!mcpServiceAvailable && Date.now() - mcpServiceDownSince > SERVICE_RETRY_MS) {
     mcpServiceAvailable = true;
   }
@@ -447,10 +443,7 @@ let authServiceDownSince = 0;
  * In local dev, the service binding may not be available if mcp-auth isn't running.
  * After a 503, skips the binding for 30s before retrying.
  */
-async function fetchAuthWithFallback(
-  env: Env,
-  request: Request,
-): Promise<Response> {
+async function fetchAuthWithFallback(env: Env, request: Request): Promise<Response> {
   if (!authServiceAvailable && Date.now() - authServiceDownSince > SERVICE_RETRY_MS) {
     authServiceAvailable = true;
   }

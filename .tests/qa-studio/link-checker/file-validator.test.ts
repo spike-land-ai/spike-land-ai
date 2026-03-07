@@ -148,22 +148,14 @@ describe("suggestCorrectPath", () => {
     mockReaddir.mockImplementation(async (_dir: string, _opts?: unknown) => {
       return ["sub/TARGET.md"];
     });
-    const suggestion = await suggestCorrectPath(
-      "../TARGET.md",
-      "/project/docs",
-      "/project",
-    );
+    const suggestion = await suggestCorrectPath("../TARGET.md", "/project/docs", "/project");
     // Should find the file somewhere and suggest a path
     expect(suggestion).toBeDefined();
   });
 
   it("returns undefined when no match found", async () => {
     mockReaddir.mockResolvedValue([]);
-    const suggestion = await suggestCorrectPath(
-      "nonexistent-file.md",
-      "/project/docs",
-      "/project",
-    );
+    const suggestion = await suggestCorrectPath("nonexistent-file.md", "/project/docs", "/project");
     expect(suggestion).toBeUndefined();
   });
 });

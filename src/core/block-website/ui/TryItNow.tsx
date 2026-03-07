@@ -68,9 +68,7 @@ export function TryItNow() {
             <h2 className="text-3xl font-bold mb-3 text-foreground tracking-tight">
               {headingCopy.text}
             </h2>
-            <p className="text-muted-foreground text-lg mb-8 max-w-2xl">
-              {bodyCopy.text}
-            </p>
+            <p className="text-muted-foreground text-lg mb-8 max-w-2xl">{bodyCopy.text}</p>
 
             <div className="rounded-xl overflow-hidden border border-border/50 shadow-2xl bg-obsidian-950">
               <div className="flex overflow-x-auto border-b border-border/50 bg-obsidian-900/50">
@@ -176,9 +174,7 @@ export function TryItNow() {
               </div>
             </div>
 
-            <p className="mt-4 text-center text-sm text-muted-foreground">
-              {footerCopy.text}
-            </p>
+            <p className="mt-4 text-center text-sm text-muted-foreground">{footerCopy.text}</p>
           </div>
 
           <div className="p-6 sm:p-8 bg-muted/30">

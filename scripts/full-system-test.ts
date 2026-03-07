@@ -25,7 +25,7 @@ async function runTest() {
   async function checkPage(path: string, expectedText?: string) {
     console.log(`Checking ${path}...`);
     const response = await page.goto(`${BASE_URL}${path}`, { waitUntil: "networkidle" });
-    
+
     if (!response || response.status() >= 400) {
       errors.push(`Failed to load ${path}: HTTP ${response?.status()}`);
     }
@@ -68,13 +68,12 @@ async function runTest() {
     // We might not be developer by default, but we can try to find ThemeSwitcher
     const themeSwitcher = await page.$('button[aria-label*="theme"]');
     if (themeSwitcher) {
-       console.log("Testing theme switcher...");
-       await themeSwitcher.click();
-       // Check if html has dark class
-       const isDark = await page.evaluate(() => document.documentElement.classList.contains("dark"));
-       console.log(`Theme is dark: ${isDark}`);
+      console.log("Testing theme switcher...");
+      await themeSwitcher.click();
+      // Check if html has dark class
+      const isDark = await page.evaluate(() => document.documentElement.classList.contains("dark"));
+      console.log(`Theme is dark: ${isDark}`);
     }
-
   } catch (err) {
     errors.push(`Test execution failed: ${(err as Error).message}`);
   } finally {
@@ -83,9 +82,9 @@ async function runTest() {
 
   if (errors.length > 0 || consoleErrors.length > 0) {
     console.error("\n--- TEST FAILURES ---");
-    errors.forEach(e => console.error(e));
+    errors.forEach((e) => console.error(e));
     console.error("\n--- CONSOLE ERRORS ---");
-    consoleErrors.forEach(e => console.error(e));
+    consoleErrors.forEach((e) => console.error(e));
     process.exit(1);
   } else {
     console.log("\nFull system test passed successfully!");

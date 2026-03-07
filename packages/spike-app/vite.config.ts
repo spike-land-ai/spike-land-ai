@@ -100,17 +100,17 @@ export default defineConfig(() => ({
     },
     ...(hasLocalCerts
       ? {
-        host: "0.0.0.0",
-        port: 5173,
-        hmr: {
-          host: "local.spike.land",
-          protocol: "wss",
-        },
-        https: {
-          key: readFileSync(keyFile),
-          cert: readFileSync(certFile),
-        },
-      }
+          host: "0.0.0.0",
+          port: 5173,
+          hmr: {
+            host: "local.spike.land",
+            protocol: "wss",
+          },
+          https: {
+            key: readFileSync(keyFile),
+            cert: readFileSync(certFile),
+          },
+        }
       : {}),
     proxy: {
       "/api": {

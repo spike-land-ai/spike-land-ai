@@ -104,7 +104,12 @@ describe("validateGitHubUrl", () => {
       headers: new Headers({ "X-RateLimit-Remaining": "50" }),
     });
 
-    const parsed = { org: "org", repo: "repo", type: "repo" as const, url: "https://github.com/org/repo" };
+    const parsed = {
+      org: "org",
+      repo: "repo",
+      type: "repo" as const,
+      url: "https://github.com/org/repo",
+    };
     const result = await validateGitHubUrl(makeLink(parsed.url), parsed, {});
     expect(result.status).toBe("ok");
   });
@@ -116,7 +121,12 @@ describe("validateGitHubUrl", () => {
       headers: new Headers({ "X-RateLimit-Remaining": "50" }),
     });
 
-    const parsed = { org: "org", repo: "missing", type: "repo" as const, url: "https://github.com/org/missing" };
+    const parsed = {
+      org: "org",
+      repo: "missing",
+      type: "repo" as const,
+      url: "https://github.com/org/missing",
+    };
     const result = await validateGitHubUrl(makeLink(parsed.url), parsed, {});
     expect(result.status).toBe("broken");
     expect(result.httpStatus).toBe(404);
@@ -129,7 +139,12 @@ describe("validateGitHubUrl", () => {
       headers: new Headers({ "X-RateLimit-Remaining": "0" }),
     });
 
-    const parsed = { org: "org", repo: "private", type: "repo" as const, url: "https://github.com/org/private" };
+    const parsed = {
+      org: "org",
+      repo: "private",
+      type: "repo" as const,
+      url: "https://github.com/org/private",
+    };
     const result = await validateGitHubUrl(makeLink(parsed.url), parsed, {});
     expect(result.status).toBe("warning");
   });
@@ -156,7 +171,12 @@ describe("validateGitHubUrl", () => {
   it("handles network errors gracefully", async () => {
     globalThis.fetch = vi.fn().mockRejectedValue(new Error("Network failure"));
 
-    const parsed = { org: "org", repo: "repo", type: "repo" as const, url: "https://github.com/org/repo" };
+    const parsed = {
+      org: "org",
+      repo: "repo",
+      type: "repo" as const,
+      url: "https://github.com/org/repo",
+    };
     const result = await validateGitHubUrl(makeLink(parsed.url), parsed, {});
     expect(result.status).toBe("error");
     expect(result.reason).toContain("Network failure");

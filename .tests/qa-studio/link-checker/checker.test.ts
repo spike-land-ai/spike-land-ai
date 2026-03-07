@@ -12,7 +12,11 @@ vi.mock("node:fs/promises", () => ({
   access: (...args: unknown[]) => mockAccess(...args),
 }));
 
-import { checkLinks, checkSingleFile, formatReport } from "../../../src/core/browser-automation/core-logic/link-checker/checker.js";
+import {
+  checkLinks,
+  checkSingleFile,
+  formatReport,
+} from "../../../src/core/browser-automation/core-logic/link-checker/checker.js";
 import type { ScanReport } from "../../../src/core/browser-automation/core-logic/link-checker/types.js";
 
 describe("checkLinks", () => {

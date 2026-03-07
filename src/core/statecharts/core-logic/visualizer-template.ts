@@ -518,11 +518,10 @@ function executeActions(actions, context) {
 function processEvent(definition, state, eventName) {
   const { currentStates, context, history, transitionLog } = state;
 
-  const candidateTransitions = definition.transitions.filter(t =>
-    t.event === eventName && currentStates.includes(t.source)
-  );
-
-  const matchingTransition = candidateTransitions.find(t => {
+  const matchingTransition = definition.transitions.find(t => {
+    if (t.event !== eventName || !currentStates.includes(t.source)) {
+      return false;
+    }
     if (!t.guard) return true;
     return evaluateGuard(t.guard.expression, context);
   });

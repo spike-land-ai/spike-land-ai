@@ -67,7 +67,8 @@ describe("createUrlValidator", () => {
   });
 
   it("falls back to GET on 405", async () => {
-    const mockFetch = vi.fn()
+    const mockFetch = vi
+      .fn()
       .mockResolvedValueOnce({
         ok: false,
         status: 405,

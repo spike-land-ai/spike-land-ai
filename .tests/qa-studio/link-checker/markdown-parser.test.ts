@@ -36,11 +36,15 @@ describe("categorizeLink", () => {
   });
 
   it("classifies raw GitHub links", () => {
-    expect(categorizeLink("https://raw.githubusercontent.com/org/repo/main/logo.svg")).toBe("github_raw");
+    expect(categorizeLink("https://raw.githubusercontent.com/org/repo/main/logo.svg")).toBe(
+      "github_raw",
+    );
   });
 
   it("classifies shields.io badges", () => {
-    expect(categorizeLink("https://img.shields.io/github/actions/workflow/status/org/repo/ci.yml")).toBe("github_badge");
+    expect(
+      categorizeLink("https://img.shields.io/github/actions/workflow/status/org/repo/ci.yml"),
+    ).toBe("github_badge");
   });
 
   it("classifies external URLs", () => {

@@ -53,7 +53,11 @@ describe("eventBus", () => {
     eventBus.on("image:uploaded", handler1);
     eventBus.on("image:uploaded", handler2);
 
-    eventBus.emit("image:uploaded", { imageId: "img1", url: "http://example.com/img1.jpg", name: "img1.jpg" });
+    eventBus.emit("image:uploaded", {
+      imageId: "img1",
+      url: "http://example.com/img1.jpg",
+      name: "img1.jpg",
+    });
 
     expect(handler1).toHaveBeenCalledTimes(1);
     expect(handler2).toHaveBeenCalledTimes(1);
@@ -72,7 +76,11 @@ describe("eventBus", () => {
     eventBus.on("image:generated", successfulHandler);
 
     expect(() => {
-      eventBus.emit("image:generated", { imageId: "gen1", url: "http://example.com/gen1.jpg", prompt: "A dog" });
+      eventBus.emit("image:generated", {
+        imageId: "gen1",
+        url: "http://example.com/gen1.jpg",
+        prompt: "A dog",
+      });
     }).not.toThrow();
 
     expect(failingHandler).toHaveBeenCalledTimes(1);
@@ -81,7 +89,7 @@ describe("eventBus", () => {
     // Verify console.error was called with the correct message and error object
     expect(consoleErrorSpy).toHaveBeenCalledWith(
       "[EventBus] Error in handler for image:generated:",
-      expect.any(Error)
+      expect.any(Error),
     );
   });
 

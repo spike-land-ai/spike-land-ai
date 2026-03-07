@@ -39,13 +39,17 @@ export function useDevModeCopy(defaultText: string, developerText: string) {
 
       if (progress < 0.45) {
         const visible = fromText.slice(0, keepCount);
-        const noise = scrambleString(Math.max(0, Math.min(6, fromText.length - keepCount)), typedCount + keepCount);
+        const noise = scrambleString(
+          Math.max(0, Math.min(6, fromText.length - keepCount)),
+          typedCount + keepCount,
+        );
         setDisplayText(`${visible}${noise}`);
       } else {
         const visible = targetText.slice(0, typedCount);
-        const noise = typedCount < targetText.length
-          ? scrambleString(Math.min(4, targetText.length - typedCount), keepCount + typedCount)
-          : "";
+        const noise =
+          typedCount < targetText.length
+            ? scrambleString(Math.min(4, targetText.length - typedCount), keepCount + typedCount)
+            : "";
         setDisplayText(`${visible}${noise}`);
       }
 

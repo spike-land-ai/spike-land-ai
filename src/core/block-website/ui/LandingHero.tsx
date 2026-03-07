@@ -201,7 +201,7 @@ export function LandingHero() {
             role="group"
             aria-label="Primary actions"
           >
-        {/* Dev mode toggle */}
+            {/* Dev mode toggle */}
             <motion.button
               layout
               ref={devButtonRef}
@@ -219,7 +219,11 @@ export function LandingHero() {
               I&apos;m a developer
             </motion.button>
 
-            <motion.div layout className="relative w-full sm:w-auto" style={{ minHeight: "3.5rem" }}>
+            <motion.div
+              layout
+              className="relative w-full sm:w-auto"
+              style={{ minHeight: "3.5rem" }}
+            >
               <AnimatePresence mode="wait">
                 {!showVibeButton ? (
                   <motion.div
@@ -276,7 +280,9 @@ export function LandingHero() {
                   <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-75" />
                   <span className="relative inline-flex h-2 w-2 rounded-full bg-primary" />
                 </span>
-                {targetMode ? "Agent rewriting builder surface" : "Agent restoring explorer surface"}
+                {targetMode
+                  ? "Agent rewriting builder surface"
+                  : "Agent restoring explorer surface"}
               </motion.div>
             )}
           </AnimatePresence>
@@ -348,9 +354,7 @@ export function LandingHero() {
                   <p className="mt-3 text-4xl font-black tracking-tight text-foreground">
                     {isDeveloper ? "Edge+" : `${TOTAL_TOOL_COUNT}+`}
                   </p>
-                  <p className="mt-2 text-sm text-muted-foreground">
-                    {inventoryBody.text}
-                  </p>
+                  <p className="mt-2 text-sm text-muted-foreground">{inventoryBody.text}</p>
                 </div>
 
                 <div className="rounded-[1.5rem] border border-border/50 bg-muted/40 p-4">
@@ -358,11 +362,11 @@ export function LandingHero() {
                     {modeLabel.text}
                   </p>
                   <p className="mt-3 text-lg font-bold text-foreground">
-                    {isDeveloper ? "Enabled for builder workflows" : "Toggle for deeper product surface"}
+                    {isDeveloper
+                      ? "Enabled for builder workflows"
+                      : "Toggle for deeper product surface"}
                   </p>
-                  <p className="mt-2 text-sm text-muted-foreground">
-                    {modeBody.text}
-                  </p>
+                  <p className="mt-2 text-sm text-muted-foreground">{modeBody.text}</p>
                 </div>
               </div>
             </div>
