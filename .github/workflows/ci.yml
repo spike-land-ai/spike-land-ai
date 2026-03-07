@@ -142,11 +142,22 @@ jobs:
       - name: Validate D1 migrations
         run: bash .github/scripts/validate-migrations.sh
 
+      - name: Validate Cloudflare token
+        run: |
+          if [ -z "$CLOUDFLARE_API_TOKEN" ]; then
+            echo "::error::CLOUDFLARE_API_TOKEN secret is empty or not set"
+            exit 1
+          fi
+          echo "Cloudflare token is set (length: ${#CLOUDFLARE_API_TOKEN})"
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+
       # D6: Run D1 migrations BEFORE deploying workers
       - name: Apply D1 migrations
         run: |
           echo "Applying D1 migrations..."
-          cd packages/spike-land-mcp && npx wrangler d1 migrations apply spike-land-mcp --remote && cd ../..
+          cd packages/spike-land-mcp
+          npx wrangler d1 migrations apply spike-land-mcp --remote
           echo "D1 migrations applied."
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
