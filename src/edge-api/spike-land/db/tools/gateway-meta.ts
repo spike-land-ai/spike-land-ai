@@ -32,9 +32,13 @@ async function fetchCreditInfo(
       `https://edge.spike.land/internal/credits/balance/${userId}`,
       { headers: { "x-internal-secret": mcpInternalSecret } },
     );
-    if (!res.ok) return null;
+    if (!res.ok) {
+      console.error("[mcp] fetchCreditInfo failed:", res.status, await res.text().catch(() => ""));
+      return null;
+    }
     return (await res.json()) as CreditInfo;
-  } catch {
+  } catch (err) {
+    console.error("[mcp] fetchCreditInfo error:", err);
     return null;
   }
 }
@@ -176,7 +180,8 @@ export function registerGatewayMetaTools(
             )
             .orderBy(desc(registeredTools.installCount))
             .limit(limit);
-        } catch {
+        } catch (err) {
+          console.error("[mcp] search_tools marketplace query error:", err);
           // DB query failure should not break platform tool search
         }
 
@@ -366,11 +371,12 @@ export function registerGatewayMetaTools(
         },
       ])
       .handler(async () => {
-        const credits = spikeEdge && mcpInternalSecret
-          ? await fetchCreditInfo(spikeEdge, mcpInternalSecret, userId)
-          : null;
+        const creditInfo =
+          spikeEdge && mcpInternalSecret
+            ? await fetchCreditInfo(spikeEdge, mcpInternalSecret, userId)
+            : null;
 
-        if (!credits) {
+        if (!creditInfo) {
           return {
             content: [
               {
@@ -387,18 +393,18 @@ export function registerGatewayMetaTools(
           };
         }
 
-        const usd = (credits.balance * 0.01).toFixed(2);
-        const remaining = credits.dailyLimit - credits.usedToday;
+        const usd = (creditInfo.balance * 0.01).toFixed(2);
+        const remaining = creditInfo.dailyLimit - creditInfo.usedToday;
         return {
           content: [
             {
               type: "text",
               text:
                 `**AI Credit Balance**\n\n` +
-                `**Balance:** ${credits.balance} credits (~$${usd} USD)\n` +
-                `**Tier:** ${credits.tier}\n` +
-                `**Daily Limit:** ${credits.dailyLimit}\n` +
-                `**Used Today:** ${credits.usedToday}\n` +
+                `**Balance:** ${creditInfo.balance} credits (~$${usd} USD)\n` +
+                `**Tier:** ${creditInfo.tier}\n` +
+                `**Daily Limit:** ${creditInfo.dailyLimit}\n` +
+                `**Used Today:** ${creditInfo.usedToday}\n` +
                 `**Remaining Today:** ${remaining}\n\n` +
                 `Manage billing at https://spike.land/settings?tab=billing`,
             },
@@ -430,10 +436,17 @@ export function registerGatewayMetaTools(
         const enabledTools = registry.getEnabledCount();
 
         // Fetch user name and credit info in parallel
-        const [userRow, credits] = await Promise.all([
-          db.select({ name: users.name }).from(users).where(eq(users.id, userId)).limit(1)
+        const [userRow, creditInfo] = await Promise.all([
+          db
+            .select({ name: users.name })
+            .from(users)
+            .where(eq(users.id, userId))
+            .limit(1)
             .then((rows) => rows[0] ?? null)
-            .catch((): null => null),
+            .catch((err): null => {
+              console.error("[mcp] get_status user lookup error:", err);
+              return null;
+            }),
           spikeEdge && mcpInternalSecret
             ? fetchCreditInfo(spikeEdge, mcpInternalSecret, userId)
             : null,
@@ -444,10 +457,10 @@ export function registerGatewayMetaTools(
           ? `**Welcome back, ${name}!**`
           : `**Welcome to spike.land!**`;
 
-        if (credits) {
-          text += ` You're on the **${credits.tier}** tier.\n\n`;
-          text += `**Credits:** ${credits.balance} available | ${credits.usedToday}/${credits.dailyLimit} used today\n\n`;
-          if (credits.tier === "free" && credits.balance < 10) {
+        if (creditInfo) {
+          text += ` You're on the **${creditInfo.tier}** tier.\n\n`;
+          text += `**Credits:** ${creditInfo.balance} available | ${creditInfo.usedToday}/${creditInfo.dailyLimit} used today\n\n`;
+          if (creditInfo.tier === "free" && creditInfo.balance < 10) {
             text += `> Low credits! Consider upgrading at https://spike.land/settings?tab=billing\n\n`;
           }
         } else {
@@ -496,7 +509,7 @@ export function registerGatewayMetaTools(
         text += `- **AI chat →** enable "ai-gateway" category\n`;
         text += `- **Manage secrets →** enable "vault" category\n`;
 
-        if (credits && (credits.tier === "pro" || credits.tier === "business")) {
+        if (creditInfo && (creditInfo.tier === "pro" || creditInfo.tier === "business")) {
           text += `- **Code review →** enable "codegen" category\n`;
           text += `- **Advanced AI →** enable "ai-gateway" category for multi-model access\n`;
         }

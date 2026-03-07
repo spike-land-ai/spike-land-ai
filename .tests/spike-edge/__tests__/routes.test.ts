@@ -808,7 +808,7 @@ describe("spa route", () => {
     const res = await app.request("/dashboard/settings", {}, env);
     expect(res.status).toBe(200);
     expect(res.headers.get("content-type")).toContain("text/html");
-    expect(res.headers.get("cache-control")).toBe("no-cache");
+    expect(res.headers.get("cache-control")).toBe("private, no-cache, no-store, must-revalidate");
   });
 
   it("serves static asset with correct cache headers", async () => {
