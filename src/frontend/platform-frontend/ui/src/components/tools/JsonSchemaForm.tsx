@@ -1,4 +1,4 @@
-import { type FormEvent, useState, useEffect, useCallback } from "react";
+import { type FormEvent, useState, useEffect, useCallback, useRef } from "react";
 import { apiUrl } from "../../../../core-logic/api";
 
 interface JsonSchemaProperty {
@@ -20,9 +20,10 @@ interface JsonSchemaFormProps {
   onChange: (data: Record<string, unknown>) => void;
   onSubmit: () => void;
   isPending?: boolean;
+  initialData?: Record<string, unknown>;
 }
 
-export function JsonSchemaForm({ schema, onChange, onSubmit, isPending }: JsonSchemaFormProps) {
+export function JsonSchemaForm({ schema, onChange, onSubmit, isPending, initialData }: JsonSchemaFormProps) {
   const [formData, setFormData] = useState<Record<string, unknown>>({});
   const [urlOptions, setUrlOptions] = useState<{ url: string, label: string }[]>([]);
 

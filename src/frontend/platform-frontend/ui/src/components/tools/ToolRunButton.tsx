@@ -86,7 +86,7 @@ export function ToolRunButton({
       {expanded && isAvailable && (
         <div className="p-4 border-t border-border bg-background">
           <JsonSchemaForm
-            schema={toolSchema as unknown as any}
+            schema={toolSchema as unknown as { type: "object"; properties?: Record<string, unknown> }}
             onChange={setFormData}
             onSubmit={() => handleSubmit(formData)}
             isPending={isPending}
