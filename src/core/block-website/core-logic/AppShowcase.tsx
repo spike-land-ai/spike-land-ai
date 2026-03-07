@@ -1,4 +1,5 @@
 import { Link } from "../lazy-imports/link";
+import { useDevModeCopy } from "../ui/useDevModeCopy";
 
 const categories = [
   {
@@ -39,6 +40,16 @@ const categories = [
 ];
 
 export function AppShowcase() {
+  const headingCopy = useDevModeCopy(
+    "Ready-to-run apps for every workflow",
+    "Composable surfaces for every developer workflow",
+  );
+  const bodyCopy = useDevModeCopy(
+    "Whether you are building software, growing a brand, or creating art, spike.land has the apps you need, powered by AI.",
+    "From browser automation to media generation and orchestration, spike.land exposes deployable capabilities instead of disconnected demos.",
+  );
+  const browseCopy = useDevModeCopy("Browse all tools", "Inspect all capabilities");
+
   return (
     <section aria-labelledby="showcase-heading" className="py-20 sm:py-24 border-t border-border">
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
@@ -47,12 +58,9 @@ export function AppShowcase() {
             id="showcase-heading"
             className="text-3xl sm:text-4xl font-bold tracking-tight text-foreground mb-4"
           >
-            Ready-to-run apps for every workflow
+            {headingCopy.text}
           </h2>
-          <p className="text-lg text-muted-foreground">
-            Whether you are building software, growing a brand, or creating art, spike.land has the
-            apps you need, powered by AI.
-          </p>
+          <p className="text-lg text-muted-foreground">{bodyCopy.text}</p>
         </header>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {categories.map((category) => (
@@ -93,7 +101,7 @@ export function AppShowcase() {
             href="/tools"
             className="inline-flex items-center justify-center px-6 py-3 border border-border/50 bg-background text-foreground text-sm font-medium rounded-xl hover:bg-muted/30 hover:border-border hover:shadow-sm hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98] transition-all duration-200"
           >
-            Browse all tools &rarr;
+            {browseCopy.text} &rarr;
           </Link>
         </div>
       </div>

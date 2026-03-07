@@ -11,6 +11,7 @@ import { createMcpServer, startMcpServer } from "@spike-land-ai/mcp-server-base"
 
 import { setBrowserConfig, cleanup } from "../core-logic/browser-session.js";
 import { registerWebTools } from "./tools.js";
+import { registerLinkCheckerTools } from "./link-checker-tools.js";
 import { startHttpServer } from "../lazy-imports/http-server.js";
 
 const args = process.argv.slice(2);
@@ -33,6 +34,7 @@ const server = createMcpServer({
 });
 
 registerWebTools(server);
+registerLinkCheckerTools(server);
 
 process.on("SIGINT", () => {
   void cleanup().then(() => process.exit(0));

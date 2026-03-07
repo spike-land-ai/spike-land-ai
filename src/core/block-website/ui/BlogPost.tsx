@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, lazy, Suspense } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import Markdown from "react-markdown";
 import rehypeRaw from "rehype-raw";
 import remarkGfm from "remark-gfm";
@@ -139,6 +140,11 @@ const COMPONENT_MAP: Record<string, React.ComponentType<Record<string, unknown>>
       </div>
     );
   },
+  p: ({ _node, children, ...props }: { _node?: unknown; children?: React.ReactNode; [key: string]: unknown }) => (
+    <div className="text-lg text-muted-foreground leading-relaxed font-medium my-6" {...props}>
+      {children}
+    </div>
+  ),
   img: ({ src, alt, ...rest }: React.ImgHTMLAttributes<HTMLImageElement>) => (
     <div className="my-12">
       <img
@@ -172,6 +178,7 @@ export function BlogPostView({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [scrollProgress, setScrollProgress] = useState(0);
+  const [isHeroExpanded, setIsHeroExpanded] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -277,17 +284,41 @@ export function BlogPostView({
         </div>
 
         {post.heroImage && (
-          <div className="mb-16 rounded-[3rem] overflow-hidden shadow-2xl ring-1 ring-border/5">
-            <img
-              src={post.heroImage}
-              alt={post.title}
-              width={1200}
-              height={514}
-              loading="eager"
-              decoding="async"
-              className="w-full aspect-[21/9] object-cover"
-            />
-          </div>
+          <>
+            <motion.div
+              layoutId={`hero-image-${slug}`}
+              className="mb-16 rounded-[3rem] overflow-hidden shadow-2xl ring-1 ring-border/5 cursor-zoom-in"
+              onClick={() => setIsHeroExpanded(true)}
+            >
+              <motion.img
+                src={post.heroImage}
+                alt={post.title}
+                width={1200}
+                height={514}
+                loading="eager"
+                decoding="async"
+                className="w-full aspect-[21/9] object-cover"
+              />
+            </motion.div>
+            <AnimatePresence>
+              {isHeroExpanded && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="fixed inset-0 z-[200] flex items-center justify-center bg-background/80 backdrop-blur-xl cursor-zoom-out p-4 sm:p-8"
+                  onClick={() => setIsHeroExpanded(false)}
+                >
+                  <motion.img
+                    layoutId={`hero-image-${slug}`}
+                    src={post.heroImage}
+                    alt={post.title}
+                    className="max-w-full max-h-full rounded-2xl shadow-2xl object-contain"
+                  />
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </>
         )}
 
         <header className="mb-16 max-w-3xl mx-auto space-y-8">

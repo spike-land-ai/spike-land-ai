@@ -8,7 +8,8 @@
  */
 import { readdir, readFile, writeFile, unlink, stat } from "node:fs/promises";
 import { join, resolve, extname } from "node:path";
-import { execSync } from "node:child_process";
+import { exec } from "node:child_process";
+import { promisify } from "node:util";
 import { fileURLToPath } from "node:url";
 import { type BlogPost, parseMdxContent, sortByDateDesc, generateSQL } from "./seed-blog-lib.js";
 
@@ -21,6 +22,8 @@ const DB_NAME = "spike-edge-analytics";
 const R2_BUCKET = "spike-app-assets";
 
 const isRemote = process.argv.includes("--remote");
+
+const execAsync = promisify(exec);
 
 async function parseMdxFiles(): Promise<BlogPost[]> {
   const entries = await readdir(BLOG_DIR, { withFileTypes: true });
@@ -47,7 +50,9 @@ async function seedD1(posts: BlogPost[]): Promise<void> {
     const remoteFlag = isRemote ? "--remote" : "--local";
     const cmd = `npx wrangler d1 execute ${DB_NAME} --file="${tmpFile}" ${remoteFlag}`;
     console.log(`Executing: ${cmd}`);
-    execSync(cmd, { cwd: SPIKE_EDGE_DIR, stdio: "inherit" });
+    const { stdout, stderr } = await execAsync(cmd, { cwd: SPIKE_EDGE_DIR });
+    if (stdout) console.log(stdout);
+    if (stderr) console.error(stderr);
     console.log(`Seeded ${posts.length} blog posts to D1 (${isRemote ? "remote" : "local"}).`);
   } finally {
     await unlink(tmpFile).catch(() => {});
@@ -96,10 +101,12 @@ async function uploadImages(): Promise<void> {
       const contentType = contentTypeMap[ext] || "application/octet-stream";
 
       console.log(`Uploading ${r2Key} (${contentType})...`);
-      execSync(
+      const { stdout, stderr } = await execAsync(
         `npx wrangler r2 object put "${R2_BUCKET}/${r2Key}" --file="${filePath}" --content-type="${contentType}" --remote`,
-        { cwd: SPIKE_EDGE_DIR, stdio: "inherit" },
+        { cwd: SPIKE_EDGE_DIR },
       );
+      if (stdout) console.log(stdout);
+      if (stderr) console.error(stderr);
     }
   }
 

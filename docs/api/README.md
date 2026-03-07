@@ -489,11 +489,10 @@ Token refund policy documentation:
 
 For additional context, see documentation in the parent directory:
 
-- [API_REFERENCE.md](../API_REFERENCE.md) - Detailed endpoint documentation
-- [TOKEN_SYSTEM.md](../TOKEN_SYSTEM.md) - Token economy details
-- [IMAGE_ENHANCEMENT.md](../IMAGE_ENHANCEMENT.md) - Enhancement pipeline
-- [DATABASE_SCHEMA.md](../DATABASE_SCHEMA.md) - Data models
-- [SECURITY_AUDIT_REPORT.md](../SECURITY_AUDIT_REPORT.md) - Security practices
+- [API_REFERENCE.md](./API_REFERENCE.md) - Detailed endpoint documentation
+- [TOKEN_SYSTEM.md](../develop/TOKEN_SYSTEM.md) - Token economy details
+- [DATABASE_SCHEMA.md](../archive/DATABASE_SCHEMA.md) - Data models
+- [SECURITY_AUDIT_REPORT.md](../security/SECURITY_AUDIT_REPORT.md) - Security practices
 
 ## Support
 

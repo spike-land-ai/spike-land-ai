@@ -1,9 +1,12 @@
 import { useState, useEffect } from "react";
 import { Link } from "../lazy-imports/link";
+import { useDevModeCopy } from "./useDevModeCopy";
 
 export function TryItCta() {
   const [copied, setCopied] = useState(false);
   const command = "claude mcp add spike-land --transport http https://spike.land/mcp";
+  const headingCopy = useDevModeCopy("Ready to try?", "Ready to ship?");
+  const browseCopy = useDevModeCopy("Or browse tools first", "Or inspect capabilities first");
 
   const handleCopy = () => {
     navigator.clipboard.writeText(command);
@@ -21,7 +24,7 @@ export function TryItCta() {
   return (
     <section className="py-20 sm:py-24 bg-background border-t border-border">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 text-center">
-        <h2 className="text-2xl font-bold tracking-tight text-foreground mb-6">Ready to try?</h2>
+        <h2 className="text-2xl font-bold tracking-tight text-foreground mb-6">{headingCopy.text}</h2>
 
         <div className="max-w-2xl mx-auto mb-6">
           <div className="rounded-xl overflow-hidden border border-border/50 shadow-lg bg-obsidian-950 p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
@@ -72,7 +75,7 @@ export function TryItCta() {
           href="/tools"
           className="inline-flex items-center justify-center text-sm font-medium text-muted-foreground hover:text-foreground transition-colors group"
         >
-          Or browse tools first
+          {browseCopy.text}
           <span className="ml-1 group-hover:translate-x-1 transition-transform" aria-hidden="true">
             &rarr;
           </span>

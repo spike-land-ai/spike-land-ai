@@ -1,10 +1,11 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { Link } from "../lazy-imports/link";
 import { apiUrl } from "../core-logic/api";
-import { useDevMode } from "../core-logic/dev-mode";
+import { useDevMode, useDevModeTransition } from "../core-logic/dev-mode";
 import { triggerViewTransition } from "../core-logic/view-transition";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowRight, Code2, Globe2, Sparkles, TerminalSquare } from "lucide-react";
+import { useDevModeCopy } from "./useDevModeCopy";
 
 export const TOTAL_TOOL_COUNT = 80;
 
@@ -17,8 +18,29 @@ function setThemeDirectly(theme: "light" | "dark") {
 export function LandingHero() {
   const [stars, setStars] = useState<number | null>(null);
   const { isDeveloper, setDevMode } = useDevMode();
+  const { isTransitioning, targetMode } = useDevModeTransition();
   const devButtonRef = useRef<HTMLButtonElement>(null);
   const [showVibeButton, setShowVibeButton] = useState(isDeveloper);
+  const badgeCopy = useDevModeCopy("OPEN MCP PLATFORM", "DEVELOPER MODE ACTIVE");
+  const headingCopy = useDevModeCopy(
+    "Give your AI agents a real operating surface, not just another prompt box.",
+    "Ship MCP servers with the feel of a design tool and the reach of the edge.",
+  );
+  const bodyCopy = useDevModeCopy(
+    "spike.land connects AI assistants to real tools through MCP, so models can browse data, run workflows, and take action inside a system built for production.",
+    "Deploy TypeScript tools instantly with hot reload, hosted auth, and global edge delivery. Focus on capability design while spike.land handles the runtime.",
+  );
+  const runtimeLabel = useDevModeCopy("Runtime", "Agent patch stream");
+  const inventoryLabel = useDevModeCopy("Tool inventory", "Deployment surface");
+  const inventoryBody = useDevModeCopy(
+    "Ready-to-run capabilities across coding, media, research, auth, and ops.",
+    "Tooling, auth, storage, and edge execution bundled into a single builder-facing layer.",
+  );
+  const modeLabel = useDevModeCopy("Dev mode", "Agent rewrite");
+  const modeBody = useDevModeCopy(
+    "One page that speaks to explorers and builders without fragmenting the brand.",
+    "The copy retunes itself as if an agent is actively swapping in the implementation for builders.",
+  );
 
   useEffect(() => {
     fetch(apiUrl("/github/stars"))
@@ -67,6 +89,18 @@ export function LandingHero() {
         <div className="absolute left-1/2 top-0 h-[24rem] w-[24rem] -translate-x-1/2 rounded-full bg-primary/12 blur-3xl" />
         <div className="absolute right-0 top-24 h-48 w-48 rounded-full bg-primary/8 blur-3xl" />
         <div className="absolute left-0 top-40 h-40 w-40 rounded-full bg-foreground/6 blur-3xl" />
+        {isTransitioning && (
+          <>
+            <div className="absolute inset-x-0 top-0 h-px bg-primary/60 shadow-[0_0_24px_var(--primary-glow)] animate-pulse" />
+            <div className="absolute left-0 right-0 top-0 h-24 bg-gradient-to-b from-primary/10 to-transparent animate-pulse" />
+            <motion.div
+              className="absolute left-0 right-0 h-20 bg-gradient-to-b from-primary/0 via-primary/18 to-primary/0"
+              initial={{ top: "-5%" }}
+              animate={{ top: "105%" }}
+              transition={{ duration: 2, ease: "linear" }}
+            />
+          </>
+        )}
       </div>
 
       <div className="relative mx-auto grid max-w-7xl items-center gap-12 lg:grid-cols-[1.05fr_0.95fr] lg:gap-16">
@@ -83,7 +117,7 @@ export function LandingHero() {
                   className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-4 py-1.5 text-xs font-black tracking-[0.22em] text-primary-light glow-primary"
                 >
                   <Sparkles className="size-3.5" />
-                  DEVELOPER MODE ACTIVE
+                  {badgeCopy.text}
                 </motion.div>
               ) : (
                 <motion.div
@@ -95,7 +129,7 @@ export function LandingHero() {
                   className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-card/80 px-4 py-1.5 text-xs font-black tracking-[0.22em] text-muted-foreground backdrop-blur-sm"
                 >
                   <Globe2 className="size-3.5" />
-                  OPEN MCP PLATFORM
+                  {badgeCopy.text}
                 </motion.div>
               )}
             </AnimatePresence>
@@ -114,7 +148,7 @@ export function LandingHero() {
                   className="text-fluid-h1 max-w-4xl text-balance"
                   style={{ fontVariationSettings: `"wght" 760`, letterSpacing: "-0.04em" }}
                 >
-                  Ship MCP servers with the feel of a design tool and the reach of the edge.
+                  {headingCopy.text}
                 </motion.h1>
               ) : (
                 <motion.h1
@@ -127,7 +161,7 @@ export function LandingHero() {
                   className="text-fluid-h1 max-w-4xl text-balance"
                   style={{ fontVariationSettings: `"wght" 700`, letterSpacing: "-0.04em" }}
                 >
-                  Give your AI agents a real operating surface, not just another prompt box.
+                  {headingCopy.text}
                 </motion.h1>
               )}
             </AnimatePresence>
@@ -144,8 +178,7 @@ export function LandingHero() {
                   transition={{ duration: 0.4, delay: 0.05 }}
                   className="max-w-2xl text-balance text-lg leading-8 text-muted-foreground sm:text-xl"
                 >
-                  Deploy TypeScript tools instantly with hot reload, hosted auth, and global edge
-                  delivery. Focus on capability design while spike.land handles the runtime.
+                  {bodyCopy.text}
                 </motion.p>
               ) : (
                 <motion.p
@@ -156,8 +189,7 @@ export function LandingHero() {
                   transition={{ duration: 0.4, delay: 0.05 }}
                   className="max-w-2xl text-balance text-lg leading-8 text-muted-foreground sm:text-xl"
                 >
-                  spike.land connects AI assistants to real tools through MCP, so models can
-                  browse data, run workflows, and take action inside a system built for production.
+                  {bodyCopy.text}
                 </motion.p>
               )}
             </AnimatePresence>
@@ -232,6 +264,23 @@ export function LandingHero() {
             </motion.div>
           </motion.div>
 
+          <AnimatePresence>
+            {isTransitioning && (
+              <motion.div
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -8 }}
+                className="mt-4 inline-flex items-center gap-2 rounded-full border border-primary/25 bg-primary/10 px-3 py-2 text-xs font-black uppercase tracking-[0.2em] text-primary"
+              >
+                <span className="relative flex h-2 w-2">
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-75" />
+                  <span className="relative inline-flex h-2 w-2 rounded-full bg-primary" />
+                </span>
+                {targetMode ? "Agent rewriting builder surface" : "Agent restoring explorer surface"}
+              </motion.div>
+            )}
+          </AnimatePresence>
+
           <div className="mt-10 grid gap-3 sm:grid-cols-3">
             {[
               { icon: TerminalSquare, label: "Command-first setup", value: "1 command to connect" },
@@ -273,20 +322,20 @@ export function LandingHero() {
               <div className="rounded-[1.5rem] border border-border/50 bg-background/80 p-4">
                 <div className="mb-3 flex items-center gap-2 text-xs font-black uppercase tracking-[0.18em] text-muted-foreground">
                   <span className="size-2 rounded-full bg-emerald-400" />
-                  Runtime
+                  {runtimeLabel.text}
                 </div>
                 <div className="space-y-3 font-mono text-sm text-foreground">
                   <div className="flex items-center justify-between rounded-xl bg-muted/60 px-3 py-2">
                     <span>registry.connect()</span>
-                    <span className="text-primary">ready</span>
+                    <span className="text-primary">{isDeveloper ? "patched" : "ready"}</span>
                   </div>
                   <div className="flex items-center justify-between rounded-xl bg-muted/60 px-3 py-2">
                     <span>edge.deploy()</span>
-                    <span className="text-primary">4 regions</span>
+                    <span className="text-primary">{isDeveloper ? "live build" : "4 regions"}</span>
                   </div>
                   <div className="flex items-center justify-between rounded-xl bg-muted/60 px-3 py-2">
                     <span>agent.invoke("qa-studio")</span>
-                    <span className="text-primary">live</span>
+                    <span className="text-primary">{isDeveloper ? "mutating" : "live"}</span>
                   </div>
                 </div>
               </div>
@@ -294,25 +343,25 @@ export function LandingHero() {
               <div className="grid gap-4 sm:grid-cols-2">
                 <div className="rounded-[1.5rem] border border-border/50 bg-muted/40 p-4">
                   <p className="text-xs font-black uppercase tracking-[0.18em] text-muted-foreground">
-                    Tool inventory
+                    {inventoryLabel.text}
                   </p>
                   <p className="mt-3 text-4xl font-black tracking-tight text-foreground">
-                    {TOTAL_TOOL_COUNT}+
+                    {isDeveloper ? "Edge+" : `${TOTAL_TOOL_COUNT}+`}
                   </p>
                   <p className="mt-2 text-sm text-muted-foreground">
-                    Ready-to-run capabilities across coding, media, research, auth, and ops.
+                    {inventoryBody.text}
                   </p>
                 </div>
 
                 <div className="rounded-[1.5rem] border border-border/50 bg-muted/40 p-4">
                   <p className="text-xs font-black uppercase tracking-[0.18em] text-muted-foreground">
-                    Dev mode
+                    {modeLabel.text}
                   </p>
                   <p className="mt-3 text-lg font-bold text-foreground">
                     {isDeveloper ? "Enabled for builder workflows" : "Toggle for deeper product surface"}
                   </p>
                   <p className="mt-2 text-sm text-muted-foreground">
-                    One page that speaks to explorers and builders without fragmenting the brand.
+                    {modeBody.text}
                   </p>
                 </div>
               </div>

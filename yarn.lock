@@ -4635,6 +4635,9 @@ __metadata:
     playwright: "npm:^1.58.2"
     react: "npm:^19.2.4"
     react-dom: "npm:^19.2.4"
+    react-markdown: "npm:^10.1.0"
+    rehype-raw: "npm:^7.0.0"
+    remark-gfm: "npm:^4.0.1"
     tailwind-merge: "npm:^3.5.0"
     tailwindcss: "npm:^4.2.1"
     tsx: "npm:^4.21.0"
@@ -4763,6 +4766,16 @@ __metadata:
     vitest: "npm:4.0.18"
   bin:
     state-machine-cli: ./dist/cli.js
+  languageName: unknown
+  linkType: soft
+
+"@spike-land-ai/status@workspace:packages/status":
+  version: 0.0.0-use.local
+  resolution: "@spike-land-ai/status@workspace:packages/status"
+  dependencies:
+    "@cloudflare/workers-types": "npm:4.20260307.1"
+    typescript: "npm:5.9.3"
+    wrangler: "npm:4.71.0"
   languageName: unknown
   linkType: soft
 

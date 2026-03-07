@@ -6,8 +6,29 @@ import { BlogListView } from "./BlogList";
 import { Link } from "../lazy-imports/link";
 import { Search, Globe, Code2, ArrowRight, Zap, Layers3, Workflow, ShieldCheck } from "lucide-react";
 import { cn } from "@spike-land-ai/shared";
+import { useDevModeCopy } from "./useDevModeCopy";
 
 export function LandingPage() {
+  const platformRhythmHeading = useDevModeCopy(
+    "A homepage that explains the system before it asks for trust.",
+    "The interface retunes itself as if an agent is actively rebuilding it for developers.",
+  );
+  const platformRhythmBody = useDevModeCopy(
+    "spike.land is strongest when it feels like one coherent operating layer for agentic work. This section turns the message into a simple sequence: connect, compose, deploy.",
+    "The same page pivots into implementation language in place: connect the endpoint, compose the toolchain, deploy the runtime. No route swap, no new screen.",
+  );
+  const howHeading = useDevModeCopy("How it actually works", "What the runtime is patching");
+  const howBody = useDevModeCopy(
+    "spike.land connects your AI assistant to real-world tools using the Model Context Protocol.",
+    "spike.land is swapping from explorer copy into builder copy while keeping the same MCP-backed surface live.",
+  );
+  const updatesHeading = useDevModeCopy("Latest Intelligence", "Latest implementation notes");
+  const updatesBody = useDevModeCopy(
+    "Insights from the edge of AI development.",
+    "Signals from the edge runtime, product experiments, and shipping notes.",
+  );
+  const archiveCopy = useDevModeCopy("View Archive", "Read build log");
+
   return (
     <div className="font-sans text-foreground selection:bg-primary selection:text-primary-foreground dark:selection:bg-primary/40 dark:selection:text-primary-light">
       <LandingHero />
@@ -31,12 +52,10 @@ export function LandingPage() {
                 id="platform-rhythm-heading"
                 className="mt-4 max-w-xl text-4xl font-black tracking-tight sm:text-5xl"
               >
-                A homepage that explains the system before it asks for trust.
+                {platformRhythmHeading.text}
               </h2>
               <p className="mt-5 max-w-xl text-lg leading-8 text-muted-foreground">
-                spike.land is strongest when it feels like one coherent operating layer for agentic
-                work. This section turns the message into a simple sequence: connect, compose,
-                deploy.
+                {platformRhythmBody.text}
               </p>
             </div>
 
@@ -96,14 +115,21 @@ export function LandingPage() {
                 id="features-heading"
                 className="text-4xl sm:text-6xl font-black tracking-tighter text-foreground text-balance leading-none"
               >
-                How it <span className="text-primary italic">actually</span> works
+                {howHeading.text.split("actually").length > 1 ? (
+                  <>
+                    {howHeading.text.split("actually")[0]}
+                    <span className="text-primary italic">actually</span>
+                    {howHeading.text.split("actually").slice(1).join("actually")}
+                  </>
+                ) : (
+                  howHeading.text
+                )}
               </h2>
               <p className="text-xl text-muted-foreground leading-relaxed font-medium">
-                spike.land connects your AI assistant to real-world tools using the{" "}
+                {howBody.text}{" "}
                 <span className="text-foreground font-bold underline decoration-primary/30 dark:decoration-primary/40 decoration-4 underline-offset-4">
                   Model Context Protocol
                 </span>
-                .
               </p>
             </div>
 
@@ -215,17 +241,17 @@ export function LandingPage() {
                   id="updates-heading"
                   className="text-4xl sm:text-5xl font-black tracking-tighter text-foreground"
                 >
-                  Latest Intelligence
+                  {updatesHeading.text}
                 </h2>
                 <p className="text-lg text-muted-foreground font-medium">
-                  Insights from the edge of AI development.
+                  {updatesBody.text}
                 </p>
               </div>
               <Link
                 href="/blog"
                 className="hidden sm:flex items-center gap-2 text-sm font-black uppercase tracking-widest text-primary hover:gap-4 transition-all"
               >
-                View Archive
+                {archiveCopy.text}
                 <ArrowRight size={16} aria-hidden="true" />
               </Link>
             </header>
@@ -238,7 +264,7 @@ export function LandingPage() {
                 className="flex items-center justify-center gap-2 p-4 rounded-2xl font-black uppercase tracking-widest text-xs text-foreground
                            bg-muted dark:bg-white/10 dark:border dark:border-white/10 dark:backdrop-blur-[16px]"
               >
-                View Archive
+                {archiveCopy.text}
                 <ArrowRight size={16} aria-hidden="true" />
               </Link>
             </div>

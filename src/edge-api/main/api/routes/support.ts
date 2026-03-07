@@ -78,24 +78,29 @@ support.get("/api/support/engagement/:slug", async (c) => {
 
   const db = c.env.DB;
 
-  const [fistBumps, donations] = await Promise.all([
-    db
-      .prepare("SELECT COUNT(*) as cnt FROM blog_engagement WHERE slug = ? AND type = 'fistbump'")
-      .bind(slug)
-      .first<{ cnt: number }>(),
-    db
-      .prepare(
-        "SELECT COUNT(*) as cnt FROM support_donations WHERE slug = ? AND status = 'completed'",
-      )
-      .bind(slug)
-      .first<{ cnt: number }>(),
-  ]);
+  try {
+    const [fistBumps, donations] = await Promise.all([
+      db
+        .prepare("SELECT COUNT(*) as cnt FROM blog_engagement WHERE slug = ? AND type = 'fistbump'")
+        .bind(slug)
+        .first<{ cnt: number }>(),
+      db
+        .prepare(
+          "SELECT COUNT(*) as cnt FROM support_donations WHERE slug = ? AND status = 'completed'",
+        )
+        .bind(slug)
+        .first<{ cnt: number }>(),
+    ]);
 
-  c.header("Cache-Control", "public, max-age=60, stale-while-revalidate=300");
-  return c.json({
-    fistBumps: fistBumps?.cnt ?? 0,
-    supporters: donations?.cnt ?? 0,
-  });
+    c.header("Cache-Control", "public, max-age=60, stale-while-revalidate=300");
+    return c.json({
+      fistBumps: fistBumps?.cnt ?? 0,
+      supporters: donations?.cnt ?? 0,
+    });
+  } catch (error) {
+    console.error("Support engagement error:", error);
+    return c.json({ fistBumps: 0, supporters: 0 });
+  }
 });
 
 // ─── Donate (Stripe Checkout) ───────────────────────────────────────────────
