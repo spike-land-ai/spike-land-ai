@@ -3,7 +3,9 @@ import { storage } from "../storage";
 import "fake-indexeddb/auto";
 
 // Mock global URL
-global.URL.createObjectURL = vi.fn((blob: Blob | File) => `blob:http://localhost/${Math.random().toString(36).substring(7)}`);
+global.URL.createObjectURL = vi.fn(
+  (blob: Blob | File) => `blob:http://localhost/${Math.random().toString(36).substring(7)}`,
+);
 
 // Mock OPFS File System API
 const mockWritable = {
@@ -21,10 +23,12 @@ const mockFileHandle = {
 const mockDirectoryHandle = {
   getFileHandle: vi.fn().mockResolvedValue(mockFileHandle),
   removeEntry: vi.fn().mockResolvedValue(undefined),
-  values: vi.fn().mockReturnValue((async function* () {
-    yield { name: "img_test1.png" };
-    yield { name: "img_test2.png" };
-  })()),
+  values: vi.fn().mockImplementation(() =>
+    (async function* () {
+      yield { name: "img_test1.png" };
+      yield { name: "img_test2.png" };
+    })(),
+  ),
 };
 
 Object.defineProperty(navigator, "storage", {
@@ -62,7 +66,9 @@ describe("storage service", () => {
       expect(result.blobData).toBeUndefined();
 
       expect(navigator.storage.getDirectory).toHaveBeenCalled();
-      expect(mockDirectoryHandle.getFileHandle).toHaveBeenCalledWith(`img_${result.id}.png`, { create: true });
+      expect(mockDirectoryHandle.getFileHandle).toHaveBeenCalledWith(`img_${result.id}.png`, {
+        create: true,
+      });
       expect(mockFileHandle.createWritable).toHaveBeenCalled();
       expect(mockWritable.write).toHaveBeenCalledWith(blob);
       expect(mockWritable.close).toHaveBeenCalled();
@@ -74,7 +80,9 @@ describe("storage service", () => {
     });
 
     it("should fall back to saving blob data directly in IndexedDB if OPFS fails", async () => {
-      vi.spyOn(navigator.storage, "getDirectory").mockRejectedValueOnce(new Error("OPFS not available"));
+      vi.spyOn(navigator.storage, "getDirectory").mockRejectedValueOnce(
+        new Error("OPFS not available"),
+      );
       const consoleWarnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
 
       const blob = new Blob(["dummy content"], { type: "image/png" });
@@ -91,7 +99,10 @@ describe("storage service", () => {
         url: expect.any(String),
       });
 
-      expect(consoleWarnSpy).toHaveBeenCalledWith("OPFS not available, falling back to IndexedDB blob storage", expect.any(Error));
+      expect(consoleWarnSpy).toHaveBeenCalledWith(
+        "OPFS not available, falling back to IndexedDB blob storage",
+        expect.any(Error),
+      );
 
       const images = await storage.getImagesFromLocal();
       expect(images).toHaveLength(1);
@@ -159,7 +170,11 @@ describe("storage service", () => {
   describe("deleteImageFromLocal", () => {
     it("should delete an image from both IndexedDB and OPFS", async () => {
       const blob = new Blob(["dummy"], { type: "image/png" });
-      const img = await storage.saveImageToLocal(blob, { name: "To Delete", width: 10, height: 10 });
+      const img = await storage.saveImageToLocal(blob, {
+        name: "To Delete",
+        width: 10,
+        height: 10,
+      });
 
       let images = await storage.getImagesFromLocal();
       expect(images).toHaveLength(1);
@@ -177,14 +192,21 @@ describe("storage service", () => {
 
     it("should handle deletion when OPFS file does not exist or fails", async () => {
       const blob = new Blob(["dummy"], { type: "image/png" });
-      const img = await storage.saveImageToLocal(blob, { name: "To Delete", width: 10, height: 10 });
+      const img = await storage.saveImageToLocal(blob, {
+        name: "To Delete",
+        width: 10,
+        height: 10,
+      });
 
       mockDirectoryHandle.removeEntry.mockRejectedValueOnce(new Error("File not found"));
       const consoleWarnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
 
       await storage.deleteImageFromLocal(img.id);
 
-      expect(consoleWarnSpy).toHaveBeenCalledWith(`Failed to delete OPFS file ${img.opfsPath}`, expect.any(Error));
+      expect(consoleWarnSpy).toHaveBeenCalledWith(
+        `Failed to delete OPFS file ${img.opfsPath}`,
+        expect.any(Error),
+      );
 
       const images = await storage.getImagesFromLocal();
       expect(images).toHaveLength(0); // Should still be deleted from IndexedDB
@@ -211,6 +233,286 @@ describe("storage service", () => {
 
       images = await storage.getImagesFromLocal();
       expect(images).toHaveLength(0);
+    });
+
+    it("should continue clearing IndexedDB if OPFS clearing fails", async () => {
+      const consoleWarnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+
+      const blob = new Blob(["dummy"], { type: "image/png" });
+      await storage.saveImageToLocal(blob, { name: "img1", width: 10, height: 10 });
+
+      vi.spyOn(navigator.storage, "getDirectory").mockRejectedValueOnce(
+        new Error("OPFS not available"),
+      );
+
+      await storage.clearAllLocalData();
+
+      expect(consoleWarnSpy).toHaveBeenCalledWith(
+        "Error clearing OPFS or OPFS not available",
+        expect.any(Error),
+      );
+
+      const images = await storage.getImagesFromLocal();
+      expect(images).toHaveLength(0);
+
+      consoleWarnSpy.mockRestore();
+    });
+  });
+
+  describe("getImagesFromLocal (edge cases)", () => {
+    it("should handle error when OPFS reading fails", async () => {
+      const blob = new Blob(["dummy"], { type: "image/png" });
+      const img = await storage.saveImageToLocal(blob, {
+        name: "OPFS Error",
+        width: 10,
+        height: 10,
+      });
+
+      vi.spyOn(navigator.storage, "getDirectory").mockRejectedValueOnce(
+        new Error("OPFS read error"),
+      );
+      const consoleWarnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+
+      const images = await storage.getImagesFromLocal();
+      // Even if OPFS directory fails, the image entry without OPFS URL shouldn't be loaded
+      expect(images).toHaveLength(0);
+      expect(consoleWarnSpy).toHaveBeenCalledWith(
+        "OPFS not available for reading",
+        expect.any(Error),
+      );
+
+      consoleWarnSpy.mockRestore();
+    });
+
+    it("should catch and log error for individual file load failure", async () => {
+      const blob = new Blob(["dummy"], { type: "image/png" });
+      const img = await storage.saveImageToLocal(blob, { name: "Bad File", width: 10, height: 10 });
+
+      mockDirectoryHandle.getFileHandle.mockRejectedValueOnce(new Error("File handle error"));
+      const consoleWarnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+
+      const images = await storage.getImagesFromLocal();
+
+      expect(images).toHaveLength(0);
+      expect(consoleWarnSpy).toHaveBeenCalledWith(
+        `Failed to load file for image ${img.id}`,
+        expect.any(Error),
+      );
+
+      consoleWarnSpy.mockRestore();
+    });
+  });
+
+  describe("IndexedDB error handling", () => {
+    it("should handle IndexedDB transaction errors during saveImageToLocal", async () => {
+      // We'll mock indexedDB.open to return a mock DB that throws on transaction
+      const mockTx = {
+        onerror: null as ((ev: any) => void) | null,
+        objectStore: vi.fn().mockReturnValue({
+          add: vi.fn().mockImplementation(() => {
+            const req = { onsuccess: null, onerror: null };
+            setTimeout(() => {
+              if (mockTx.onerror) {
+                mockTx.onerror({ target: { error: new Error("Add failed") } } as any);
+              }
+            }, 0);
+            return req;
+          }),
+        }),
+      };
+
+      const mockDb = {
+        transaction: vi.fn().mockReturnValue(mockTx),
+      };
+
+      const originalOpen = indexedDB.open;
+      vi.spyOn(indexedDB, "open").mockImplementation(() => {
+        const req: any = { onsuccess: null, onerror: null, result: mockDb };
+        setTimeout(() => {
+          if (req.onsuccess) req.onsuccess({ target: { result: mockDb } });
+        }, 0);
+        return req;
+      });
+
+      const blob = new Blob(["dummy content"], { type: "image/png" });
+      const metadata = { name: "test-db-error", width: 800, height: 600 };
+
+      await expect(storage.saveImageToLocal(blob, metadata)).rejects.toThrow();
+
+      // restore
+      indexedDB.open = originalOpen;
+    });
+
+    it("should handle IndexedDB transaction errors during getImagesFromLocal", async () => {
+      const mockTx = {
+        onerror: null as ((ev: any) => void) | null,
+        objectStore: vi.fn().mockReturnValue({
+          getAll: vi.fn().mockImplementation(() => {
+            const req = { onsuccess: null, onerror: null };
+            setTimeout(() => {
+              if (mockTx.onerror)
+                mockTx.onerror({ target: { error: new Error("Get all failed") } } as any);
+            }, 0);
+            return req;
+          }),
+        }),
+      };
+
+      const mockDb = {
+        transaction: vi.fn().mockReturnValue(mockTx),
+      };
+
+      const originalOpen = indexedDB.open;
+      vi.spyOn(indexedDB, "open").mockImplementation(() => {
+        const req: any = { onsuccess: null, onerror: null, result: mockDb };
+        setTimeout(() => {
+          if (req.onsuccess) req.onsuccess({ target: { result: mockDb } });
+        }, 0);
+        return req;
+      });
+
+      await expect(storage.getImagesFromLocal()).rejects.toThrow();
+
+      // restore
+      indexedDB.open = originalOpen;
+    });
+
+    it("should handle IndexedDB transaction errors during deleteImageFromLocal", async () => {
+      const mockTx = {
+        onerror: null as ((ev: any) => void) | null,
+        objectStore: vi.fn().mockReturnValue({
+          get: vi.fn().mockImplementation(() => {
+            const req = { onsuccess: null, onerror: null };
+            setTimeout(() => {
+              if (req.onerror) req.onerror({ target: { error: new Error("Get failed") } } as any);
+            }, 0);
+            return req;
+          }),
+        }),
+      };
+
+      const mockDb = {
+        transaction: vi.fn().mockReturnValue(mockTx),
+      };
+
+      const originalOpen = indexedDB.open;
+      vi.spyOn(indexedDB, "open").mockImplementation(() => {
+        const req: any = { onsuccess: null, onerror: null, result: mockDb };
+        setTimeout(() => {
+          if (req.onsuccess) req.onsuccess({ target: { result: mockDb } });
+        }, 0);
+        return req;
+      });
+
+      await expect(storage.deleteImageFromLocal("some-id")).rejects.toThrow();
+
+      // restore
+      indexedDB.open = originalOpen;
+    });
+
+    it("should handle IndexedDB open errors", async () => {
+      const originalOpen = indexedDB.open;
+      vi.spyOn(indexedDB, "open").mockImplementation(() => {
+        const req: any = { onsuccess: null, onerror: null };
+        setTimeout(() => {
+          if (req.onerror) req.onerror({ target: { error: new Error("Open failed") } } as any);
+        }, 0);
+        return req;
+      });
+
+      const blob = new Blob(["dummy content"], { type: "image/png" });
+      const metadata = { name: "test-db-error", width: 800, height: 600 };
+
+      await expect(storage.saveImageToLocal(blob, metadata)).rejects.toThrow();
+
+      // restore
+      indexedDB.open = originalOpen;
+    });
+
+    it("should handle IndexedDB transaction errors during clearAllLocalData", async () => {
+      const mockTx = {
+        onerror: null as ((ev: any) => void) | null,
+        objectStore: vi.fn().mockReturnValue({
+          clear: vi.fn().mockImplementation(() => {
+            const req = { onsuccess: null, onerror: null };
+            setTimeout(() => {
+              if (mockTx.onerror) {
+                mockTx.onerror({ target: { error: new Error("Clear failed") } } as any);
+              }
+            }, 0);
+            return req;
+          }),
+        }),
+      };
+
+      const mockDb = {
+        transaction: vi.fn().mockReturnValue(mockTx),
+      };
+
+      const originalOpen = indexedDB.open;
+      vi.spyOn(indexedDB, "open").mockImplementation(() => {
+        const req: any = { onsuccess: null, onerror: null, result: mockDb };
+        setTimeout(() => {
+          if (req.onsuccess) req.onsuccess({ target: { result: mockDb } });
+        }, 0);
+        return req;
+      });
+
+      await expect(storage.clearAllLocalData()).rejects.toThrow();
+
+      // restore
+      indexedDB.open = originalOpen;
+    });
+
+    it("should handle IndexedDB get errors during deleteImageFromLocal delete block", async () => {
+      // To test the final delete block's onerror, we mock tx for both `get` and `delete`.
+      let isGet = true;
+      const mockTx = {
+        onerror: null as ((ev: any) => void) | null,
+        objectStore: vi.fn().mockImplementation(() => {
+          if (isGet) {
+            isGet = false;
+            return {
+              get: vi.fn().mockImplementation(() => {
+                const req = { onsuccess: null, onerror: null, result: null };
+                setTimeout(() => {
+                  if (req.onsuccess) (req.onsuccess as any)({ target: { result: null } });
+                }, 0);
+                return req;
+              }),
+            };
+          } else {
+            return {
+              delete: vi.fn().mockImplementation(() => {
+                const req = { onsuccess: null, onerror: null };
+                setTimeout(() => {
+                  if (mockTx.onerror)
+                    mockTx.onerror({ target: { error: new Error("Delete failed") } } as any);
+                }, 0);
+                return req;
+              }),
+            };
+          }
+        }),
+      };
+
+      const mockDb = {
+        transaction: vi.fn().mockReturnValue(mockTx),
+      };
+
+      const originalOpen = indexedDB.open;
+      vi.spyOn(indexedDB, "open").mockImplementation(() => {
+        const req: any = { onsuccess: null, onerror: null, result: mockDb };
+        setTimeout(() => {
+          if (req.onsuccess) req.onsuccess({ target: { result: mockDb } });
+        }, 0);
+        return req;
+      });
+
+      await expect(storage.deleteImageFromLocal("some-id")).rejects.toThrow();
+
+      // restore
+      indexedDB.open = originalOpen;
     });
   });
 });
