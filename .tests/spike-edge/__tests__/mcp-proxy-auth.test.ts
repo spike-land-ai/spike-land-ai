@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
-import { buildMcpProxyHeaders } from "../../../../src/edge-api/main/api/middleware/mcp-proxy-auth.js";
-import type { Env } from "../../../../src/edge-api/main/core-logic/env.js";
+import { buildMcpProxyHeaders } from "../../../src/edge-api/main/api/middleware/mcp-proxy-auth.js";
+import type { Env } from "../../../src/edge-api/main/core-logic/env.js";
 
 function makeEnv(): Env {
   return {
