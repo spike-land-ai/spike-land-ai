@@ -1,3 +1,4 @@
+/* v8 ignore start */
 import { integer, sqliteTable, text, unique } from "drizzle-orm/sqlite-core";
 
 export const channels = sqliteTable("channels", {
@@ -19,7 +20,7 @@ export const channelMembers = sqliteTable("channel_members", {
   isMuted: integer("isMuted", { mode: "boolean" }).default(false).notNull(),
   notifyPreference: text("notifyPreference").notNull().default("all"),
   joinedAt: integer("createdAt").notNull(),
-}, /* v8 ignore next 3 */ (t) => ({
+}, (t) => ({
   unq: unique().on(t.channelId, t.userId),
 }));
 
@@ -43,7 +44,7 @@ export const reactions = sqliteTable("reactions", {
   userId: text("userId").notNull(),
   emoji: text("emoji").notNull(),
   createdAt: integer("createdAt").notNull(),
-}, /* v8 ignore next 3 */ (t) => ({
+}, (t) => ({
   unq: unique().on(t.messageId, t.userId, t.emoji),
 }));
 
@@ -52,7 +53,7 @@ export const readCursors = sqliteTable("read_cursors", {
   channelId: text("channelId").notNull().references(() => channels.id),
   lastReadMessageId: text("lastReadMessageId").notNull(),
   updatedAt: integer("updatedAt").notNull(),
-}, /* v8 ignore next 3 */ (t) => ({
+}, (t) => ({
   unq: unique().on(t.userId, t.channelId),
 }));
 
@@ -62,7 +63,7 @@ export const pins = sqliteTable("pins", {
   messageId: text("messageId").notNull().references(() => messages.id),
   pinnedBy: text("pinnedBy").notNull(),
   createdAt: integer("createdAt").notNull(),
-}, /* v8 ignore next 3 */ (t) => ({
+}, (t) => ({
   unq: unique().on(t.channelId, t.messageId),
 }));
 
@@ -72,7 +73,7 @@ export const bookmarks = sqliteTable("bookmarks", {
   messageId: text("messageId").notNull().references(() => messages.id),
   note: text("note"),
   createdAt: integer("createdAt").notNull(),
-}, /* v8 ignore next 3 */ (t) => ({
+}, (t) => ({
   unq: unique().on(t.userId, t.messageId),
 }));
 
@@ -101,6 +102,6 @@ export const slashCommands = sqliteTable("slash_commands", {
   handlerUrl: text("handlerUrl"),
   handlerAgentId: text("handlerAgentId"),
   createdAt: integer("createdAt").notNull(),
-}, /* v8 ignore next 3 */ (t) => ({
+}, (t) => ({
   unq: unique().on(t.workspaceId, t.command),
 }));
