@@ -15,6 +15,7 @@ import { blog } from "./routes/blog.js";
 import { errors } from "./routes/errors.js";
 import { bugbook } from "./routes/bugbook.js";
 import { blogComments } from "./routes/blog-comments.js";
+import { iwd } from "./routes/iwd.js";
 import { whatsapp } from "./routes/whatsapp.js";
 import { stripeWebhook } from "./routes/stripe-webhook.js";
 import { checkout } from "./routes/checkout.js";
@@ -118,8 +119,8 @@ app.use("*", async (c, next) => {
     [
       "default-src 'self'",
       "script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' blob: https://static.cloudflareinsights.com https://esm.sh https://esm.spike.land https://unpkg.com https://www.googletagmanager.com",
-      "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://esm.spike.land",
-      "img-src 'self' https://*.r2.dev https://*.r2.cloudflarestorage.com https://avatars.githubusercontent.com https://*.googleusercontent.com data: blob:",
+      "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://esm.spike.land https://unpkg.com",
+      "img-src 'self' https://*.r2.dev https://*.r2.cloudflarestorage.com https://avatars.githubusercontent.com https://*.googleusercontent.com https://*.basemaps.cartocdn.com data: blob:",
       "font-src 'self' https://fonts.gstatic.com https://esm.spike.land data:",
       "connect-src 'self' https://api.spike.land https://edge.spike.land https://auth-mcp.spike.land https://mcp.spike.land https://js.spike.land https://checkout.stripe.com wss://spike.land https://esm.sh https://esm.spike.land https://unpkg.com https://local.spike.land:5173 https://www.google-analytics.com https://www.googletagmanager.com blob: data:",
       "worker-src 'self' blob: https://esm.sh https://esm.spike.land",
@@ -235,6 +236,7 @@ app.route("/", experiments);
 app.route("/", fixer);
 app.route("/", chat);
 app.route("/", cachePurge);
+app.route("/", iwd);
 
 /** Track whether MCP_SERVICE binding is functional (avoids repeated failures in local dev). */
 let mcpServiceAvailable = true;
