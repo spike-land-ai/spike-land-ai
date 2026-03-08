@@ -143,9 +143,11 @@ mcpRoute.post("/", async (c) => {
     body: null,
   });
 
-  // Stateless transport — always JSON (no hanging SSE streams)
+  const sessionId = c.req.header("Mcp-Session-Id");
+
+  // Stateful transport — supports both SSE streaming and JSON depending on headers
   const transport = new WebStandardStreamableHTTPServerTransport({
-    enableJsonResponse: true,
+    sessionIdGenerator: () => sessionId ?? crypto.randomUUID(),
   });
 
   await mcpServer.connect(transport);
@@ -283,18 +285,45 @@ mcpRoute.post("/", async (c) => {
   }
 });
 
-mcpRoute.get("/", (c) => {
+mcpRoute.get("/", async (c) => {
   const authHeader = c.req.header("Authorization");
   if (!authHeader) {
     return c.json({ error: "Unauthorized" }, 401);
   }
-  return c.json(
-    {
-      error: "SSE server-initiated mode not supported.",
-      hint: "POST with Accept: text/event-stream for streaming.",
-    },
-    405,
-  );
+
+  const userId = c.var.userId;
+  const db = c.var.db;
+
+  const enabledCategories = await loadEnabledCategories(userId, c.env.KV);
+  const mcpServer = await createMcpServer(userId, db, {
+    enabledCategories,
+    kv: c.env.KV,
+    vaultSecret: c.env.VAULT_SECRET,
+    mcpInternalSecret: c.env.MCP_INTERNAL_SECRET,
+    spikeEdge: c.env.SPIKE_EDGE,
+    spaAssets: c.env.SPA_ASSETS,
+  });
+
+  const sessionId = c.req.header("Mcp-Session-Id");
+  const transport = new WebStandardStreamableHTTPServerTransport({
+    sessionIdGenerator: () => sessionId ?? crypto.randomUUID(),
+  });
+
+  await mcpServer.connect(transport);
+
+  const headers = new Headers(c.req.raw.headers);
+  const accept = headers.get("Accept") ?? "";
+  if (!accept.includes("text/event-stream")) {
+    headers.set("Accept", "text/event-stream");
+  }
+
+  const req = new Request(c.req.url, {
+    method: "GET",
+    headers,
+    body: null,
+  });
+
+  return transport.handleRequest(req);
 });
 
 mcpRoute.delete("/", () => Response.json({ ok: true }));
