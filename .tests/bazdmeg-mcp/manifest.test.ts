@@ -6,7 +6,7 @@
  */
 
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
+import { mkdtemp, rm, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import {
@@ -703,7 +703,7 @@ packages:
     const manifest = await readManifest(root);
     expect(manifest.packages["test-pkg"]!.deps).toBeNull();
     // Use any casting since 'other' is not in the type
-    expect((manifest.packages["test-pkg"] as any).other).toBe("value");
+    expect((manifest.packages["test-pkg"] as Record<string, unknown>).other).toBe("value");
   });
 
   it("handles irregular indentation in objects", async () => {
@@ -727,7 +727,7 @@ packages:
     cleanup = tmp.cleanup;
 
     const manifest = await readManifest(root);
-    expect((manifest.packages["test-pkg"] as any).obj.key1).toBe("val1");
+    expect(((manifest.packages["test-pkg"] as Record<string, unknown>).obj as Record<string, unknown>).key1).toBe("val1");
   });
 
   it("handles list ending with a key at same indent", async () => {
@@ -751,9 +751,9 @@ packages:
     cleanup = tmp.cleanup;
 
     const manifest = await readManifest(root);
-    expect((manifest.packages["test-pkg"] as any).list).toEqual(["item1"]);
+    expect((manifest.packages["test-pkg"] as Record<string, unknown>).list).toEqual(["item1"]);
     // 'key' is missing because the irregular indent of 'not-a-list-item' broke the object parser
-    expect((manifest.packages["test-pkg"] as any).key).toBeUndefined();
+    expect((manifest.packages["test-pkg"] as Record<string, unknown>).key).toBeUndefined();
   });
 
   it("handles empty values in inline list maps", async () => {
@@ -776,7 +776,7 @@ packages:
     cleanup = tmp.cleanup;
 
     const manifest = await readManifest(root);
-    expect((manifest.packages["test-pkg"] as any).list).toEqual([
+    expect((manifest.packages["test-pkg"] as Record<string, unknown>).list).toEqual([
       { key: null },
       { other: "value" },
     ]);
@@ -800,6 +800,6 @@ packages:
     cleanup = tmp.cleanup;
 
     const manifest = await readManifest(root);
-    expect((manifest.packages["test-pkg"] as any).max_tokens).toBe(100);
+    expect((manifest.packages["test-pkg"] as Record<string, unknown>).max_tokens).toBe(100);
   });
 });

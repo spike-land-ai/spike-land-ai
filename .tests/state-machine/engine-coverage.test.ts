@@ -34,7 +34,7 @@ describe("Engine extra coverage", () => {
 
   describe("resetMachine without initial state", () => {
     it("resets machine with no initial, sets currentStates to []", () => {
-      const machine = createMachine({
+      const _machine = createMachine({
         name: "No Initial",
         userId: "u1",
         // no initial
@@ -52,7 +52,7 @@ describe("Engine extra coverage", () => {
 
     it("resetMachine re-executes entry actions and raises events", () => {
       // Create machine with entry action that raises an event
-      const machine = createMachine({
+      const _machine = createMachine({
         name: "Entry Actions Machine",
         userId: "u1",
         initial: "start",
@@ -71,7 +71,7 @@ describe("Engine extra coverage", () => {
     });
 
     it("resetMachine handles raised events with no matching transition silently", () => {
-      const machine = createMachine({
+      const _machine = createMachine({
         name: "Raise Machine",
         userId: "u1",
         initial: "s1",
@@ -92,7 +92,7 @@ describe("Engine extra coverage", () => {
 
   describe("validateMachine edge cases", () => {
     it("validates compound state without initial child", () => {
-      const machine = createMachine({ name: "Compound No Initial", userId: "u1" });
+      const _machine = createMachine({ name: "Compound No Initial", userId: "u1" });
       const id = machine.definition.id;
 
       addState(id, {
@@ -106,7 +106,7 @@ describe("Engine extra coverage", () => {
     });
 
     it("validates compound state with non-existent initial", () => {
-      const machine = createMachine({ name: "Bad Initial", userId: "u1" });
+      const _machine = createMachine({ name: "Bad Initial", userId: "u1" });
       const id = machine.definition.id;
 
       // Manually set up a compound state with non-existent initial
@@ -126,7 +126,7 @@ describe("Engine extra coverage", () => {
     });
 
     it("validates transitions referencing non-existent source state", () => {
-      const machine = createMachine({ name: "Bad Source", userId: "u1" });
+      const _machine = createMachine({ name: "Bad Source", userId: "u1" });
       const id = machine.definition.id;
 
       addState(id, { id: "real", type: "atomic" });
@@ -146,7 +146,7 @@ describe("Engine extra coverage", () => {
     });
 
     it("validates transitions referencing non-existent target state", () => {
-      const machine = createMachine({ name: "Bad Target", userId: "u1" });
+      const _machine = createMachine({ name: "Bad Target", userId: "u1" });
       const id = machine.definition.id;
 
       addState(id, { id: "real", type: "atomic" });
@@ -165,7 +165,7 @@ describe("Engine extra coverage", () => {
     });
 
     it("validates duplicate transition IDs", () => {
-      const machine = createMachine({ name: "Dup Trans", userId: "u1" });
+      const _machine = createMachine({ name: "Dup Trans", userId: "u1" });
       const id = machine.definition.id;
 
       addState(id, { id: "a", type: "atomic" });
@@ -193,7 +193,7 @@ describe("Engine extra coverage", () => {
     });
 
     it("warns about unreachable states", () => {
-      const machine = createMachine({ name: "Unreachable", userId: "u1" });
+      const _machine = createMachine({ name: "Unreachable", userId: "u1" });
       const id = machine.definition.id;
 
       addState(id, { id: "reachable", type: "atomic" });
@@ -204,7 +204,7 @@ describe("Engine extra coverage", () => {
     });
 
     it("warns about dead-end states", () => {
-      const machine = createMachine({ name: "Dead End", userId: "u1", initial: "s1" });
+      const _machine = createMachine({ name: "Dead End", userId: "u1", initial: "s1" });
       const id = machine.definition.id;
 
       addState(id, { id: "s1", type: "atomic" });
@@ -223,7 +223,7 @@ describe("Engine extra coverage", () => {
     });
 
     it("history states are excluded from dead-end warning", () => {
-      const machine = createMachine({ name: "History Machine", userId: "u1" });
+      const _machine = createMachine({ name: "History Machine", userId: "u1" });
       const id = machine.definition.id;
 
       addState(id, { id: "hist", type: "history" });
@@ -238,7 +238,7 @@ describe("Engine extra coverage", () => {
 
   describe("removeState and removeTransition", () => {
     it("removeState removes the state", () => {
-      const machine = createMachine({ name: "Remove Test", userId: "u1" });
+      const _machine = createMachine({ name: "Remove Test", userId: "u1" });
       const id = machine.definition.id;
       addState(id, { id: "s1", type: "atomic" });
       addState(id, { id: "s2", type: "atomic" });
@@ -257,14 +257,14 @@ describe("Engine extra coverage", () => {
     });
 
     it("removeState throws for non-existent state", () => {
-      const machine = createMachine({ name: "Remove Fail", userId: "u1" });
+      const _machine = createMachine({ name: "Remove Fail", userId: "u1" });
       expect(() => removeState(machine.definition.id, "nonexistent")).toThrow(
         'State "nonexistent" not found',
       );
     });
 
     it("removeState removes from parent children array", () => {
-      const machine = createMachine({ name: "Parent Remove", userId: "u1" });
+      const _machine = createMachine({ name: "Parent Remove", userId: "u1" });
       const id = machine.definition.id;
 
       addState(id, { id: "parent", type: "compound", initial: "child" });
@@ -275,7 +275,7 @@ describe("Engine extra coverage", () => {
     });
 
     it("removeState removes from currentStates", () => {
-      const machine = createMachine({ name: "Active Remove", userId: "u1" });
+      const _machine = createMachine({ name: "Active Remove", userId: "u1" });
       const id = machine.definition.id;
 
       addState(id, { id: "active", type: "atomic" });
@@ -286,7 +286,7 @@ describe("Engine extra coverage", () => {
     });
 
     it("removeTransition removes a transition", () => {
-      const machine = createMachine({ name: "Trans Remove", userId: "u1" });
+      const _machine = createMachine({ name: "Trans Remove", userId: "u1" });
       const id = machine.definition.id;
 
       addState(id, { id: "a", type: "atomic" });
@@ -304,7 +304,7 @@ describe("Engine extra coverage", () => {
     });
 
     it("removeTransition throws for non-existent transition", () => {
-      const machine = createMachine({ name: "Trans Remove Fail", userId: "u1" });
+      const _machine = createMachine({ name: "Trans Remove Fail", userId: "u1" });
       expect(() => removeTransition(machine.definition.id, "nonexistent-tid")).toThrow(
         'Transition "nonexistent-tid" not found',
       );
@@ -313,7 +313,7 @@ describe("Engine extra coverage", () => {
 
   describe("setContext", () => {
     it("merges context values", () => {
-      const machine = createMachine({
+      const _machine = createMachine({
         name: "Context Machine",
         userId: "u1",
         context: { a: 1 },
@@ -328,7 +328,7 @@ describe("Engine extra coverage", () => {
     });
 
     it("overwrites existing context keys", () => {
-      const machine = createMachine({
+      const _machine = createMachine({
         name: "Context Overwrite",
         userId: "u1",
         context: { x: 10 },
@@ -343,7 +343,7 @@ describe("Engine extra coverage", () => {
 
   describe("exportMachine", () => {
     it("exports machine state", () => {
-      const machine = createMachine({
+      const _machine = createMachine({
         name: "Export Test",
         userId: "u1",
         context: { val: 42 },
@@ -362,7 +362,7 @@ describe("Engine extra coverage", () => {
 
   describe("getHistory", () => {
     it("returns transition log", () => {
-      const machine = createMachine({
+      const _machine = createMachine({
         name: "History Test",
         userId: "u1",
         initial: "a",
@@ -383,7 +383,7 @@ describe("Engine extra coverage", () => {
     });
 
     it("returns empty log initially", () => {
-      const machine = createMachine({ name: "Empty Log", userId: "u1" });
+      const _machine = createMachine({ name: "Empty Log", userId: "u1" });
       const log = getHistory(machine.definition.id);
       expect(log).toHaveLength(0);
     });
@@ -410,7 +410,7 @@ describe("Engine extra coverage", () => {
     });
 
     it("includes state and transition count", () => {
-      const machine = createMachine({ name: "Counted Machine", userId: "counter" });
+      const _machine = createMachine({ name: "Counted Machine", userId: "counter" });
       const id = machine.definition.id;
 
       addState(id, { id: "s1", type: "atomic" });
@@ -429,7 +429,7 @@ describe("Engine extra coverage", () => {
     });
 
     it("returns machine for known ID", () => {
-      const machine = createMachine({ name: "Known Machine", userId: "u1" });
+      const _machine = createMachine({ name: "Known Machine", userId: "u1" });
       const found = getMachine(machine.definition.id);
       expect(found.definition.name).toBe("Known Machine");
     });
@@ -437,7 +437,7 @@ describe("Engine extra coverage", () => {
 
   describe("createMachine with duplicate ID", () => {
     it("throws when creating machine with existing ID", () => {
-      const machine = createMachine({ name: "First Machine", userId: "u1", id: "fixed-id" });
+      const _machine = createMachine({ name: "First Machine", userId: "u1", id: "fixed-id" });
       expect(() => createMachine({ name: "Duplicate", userId: "u1", id: "fixed-id" })).toThrow(
         "already exists",
       );
@@ -446,7 +446,7 @@ describe("Engine extra coverage", () => {
 
   describe("sendEvent edge cases", () => {
     it("handles internal transitions (no exit/entry actions)", () => {
-      const machine = createMachine({
+      const _machine = createMachine({
         name: "Internal Trans",
         userId: "u1",
         initial: "s1",
@@ -479,7 +479,7 @@ describe("Engine extra coverage", () => {
     });
 
     it("throws when no matching transition found", () => {
-      const machine = createMachine({ name: "No Match", userId: "u1" });
+      const _machine = createMachine({ name: "No Match", userId: "u1" });
       const id = machine.definition.id;
 
       addState(id, { id: "s1", type: "atomic" });
@@ -489,7 +489,7 @@ describe("Engine extra coverage", () => {
     });
 
     it("evaluates guard expression and selects matching transition", () => {
-      const machine = createMachine({
+      const _machine = createMachine({
         name: "Guard Machine",
         userId: "u1",
         context: { level: 5 },
@@ -526,7 +526,7 @@ describe("Engine extra coverage", () => {
     });
 
     it("handles raise action that triggers another event", () => {
-      const machine = createMachine({
+      const _machine = createMachine({
         name: "Raise Machine",
         userId: "u1",
         context: { step: 0 },
@@ -564,7 +564,7 @@ describe("Engine extra coverage", () => {
     });
 
     it("handles log and custom action types (no-op)", () => {
-      const machine = createMachine({ name: "NoOp Actions", userId: "u1" });
+      const _machine = createMachine({ name: "NoOp Actions", userId: "u1" });
       const id = machine.definition.id;
 
       addState(id, { id: "s1", type: "atomic" });
@@ -588,7 +588,7 @@ describe("Engine extra coverage", () => {
     });
 
     it("handles sendEvent with payload merging into context", () => {
-      const machine = createMachine({
+      const _machine = createMachine({
         name: "Payload Machine",
         userId: "u1",
         context: { base: 10 },
@@ -619,7 +619,7 @@ describe("Engine extra coverage", () => {
 
   describe("assign action with invalid expression (catch branch)", () => {
     it("falls back to literal string value when expression evaluation throws", () => {
-      const machine = createMachine({
+      const _machine = createMachine({
         name: "Fallback Context",
         userId: "u1",
         context: { x: 0 },
@@ -676,7 +676,7 @@ describe("Engine extra coverage", () => {
       // resetMachine clears history first, so we set history AFTER resetMachine
       // by directly calling sendEvent targeting a history state.
       // Instead: set the initial to hist, and use createMachine (which doesn't clear history).
-      const machine = createMachine({ name: "History Remembered", userId: "u1" });
+      const _machine = createMachine({ name: "History Remembered", userId: "u1" });
       const id = machine.definition.id;
 
       addState(id, {
@@ -722,7 +722,7 @@ describe("Engine extra coverage", () => {
     });
 
     it("history state with no parent has empty results", () => {
-      const machine = createMachine({ name: "Orphan Hist", userId: "u1" });
+      const _machine = createMachine({ name: "Orphan Hist", userId: "u1" });
       const id = machine.definition.id;
 
       // History state with no parent and no remembered history
@@ -736,7 +736,7 @@ describe("Engine extra coverage", () => {
 
   describe("parallel states", () => {
     it("enters all children of a parallel state", () => {
-      const machine = createMachine({ name: "Parallel Test", userId: "u1", initial: "par" });
+      const _machine = createMachine({ name: "Parallel Test", userId: "u1", initial: "par" });
       const id = machine.definition.id;
 
       addState(id, { id: "par", type: "parallel", children: ["r1", "r2"] });
@@ -752,7 +752,7 @@ describe("Engine extra coverage", () => {
 
   describe("exit actions on state transitions", () => {
     it("executes exit actions when leaving a state", () => {
-      const machine = createMachine({
+      const _machine = createMachine({
         name: "Exit Actions Machine",
         userId: "u1",
         context: { exited: false },
@@ -785,7 +785,7 @@ describe("Engine extra coverage", () => {
 
   describe("createMachine with entry actions that raise events", () => {
     it("processes raised events from initial state entry actions during creation", () => {
-      const machine = createMachine({
+      const _machine = createMachine({
         name: "Auto-raise Machine",
         userId: "u1",
         initial: "init",
@@ -815,14 +815,14 @@ describe("Engine extra coverage", () => {
       // Reset triggers entry into init which raises AUTO_NEXT which transitions to next
       resetMachine(id);
       // step should be 2 if AUTO_NEXT was processed
-      const { context, activeStates } = getState(id);
+      const { context, activeStates: _activeStates } = getState(id);
       expect(context.step).toBeGreaterThanOrEqual(1);
     });
   });
 
   describe("transition with entry actions on target state", () => {
     it("executes entry actions when entering a new state with entry actions", () => {
-      const machine = createMachine({
+      const _machine = createMachine({
         name: "Entry Action Trans",
         userId: "u1",
         context: { count: 0 },
@@ -855,7 +855,7 @@ describe("Engine extra coverage", () => {
 
   describe("validateMachine with parallel states", () => {
     it("parallel state children are not flagged as unreachable", () => {
-      const machine = createMachine({ name: "Parallel Validate", userId: "u1" });
+      const _machine = createMachine({ name: "Parallel Validate", userId: "u1" });
       const id = machine.definition.id;
 
       // Add parallel state with children
@@ -876,7 +876,7 @@ describe("Engine extra coverage", () => {
 
   describe("final state done events", () => {
     it("raises done event when entering final state", () => {
-      const machine = createMachine({ name: "Final Test", userId: "u1" });
+      const _machine = createMachine({ name: "Final Test", userId: "u1" });
       const id = machine.definition.id;
 
       addState(id, { id: "parent", type: "compound", initial: "active" });

@@ -7,7 +7,13 @@ import { hashToken } from "../db/auth/token";
 import { oauthAccessTokens, users } from "../db/db/schema";
 import { and, eq, gt, isNull } from "drizzle-orm";
 
-const ANONYMOUS_TOOLS = new Set(["search_tools", "list_categories", "get_status", "get_tool_info"]);
+const ANONYMOUS_TOOLS = new Set([
+  "search_tools",
+  "list_categories",
+  "get_status",
+  "get_tool_info",
+  "billing_list_plans",
+]);
 
 export type UserRole = "user" | "admin" | "super_admin";
 
@@ -17,6 +23,36 @@ export const authMiddleware = createMiddleware<{
   Bindings: Env;
   Variables: AuthVariables;
 }>(async (c, next) => {
+  const db = createDb(c.env.DB);
+  const internalSecret = c.req.header("X-Internal-Secret");
+  const internalUserId = c.req.header("X-User-Id");
+
+  if (
+    internalSecret &&
+    c.env.MCP_INTERNAL_SECRET &&
+    internalSecret === c.env.MCP_INTERNAL_SECRET &&
+    internalUserId
+  ) {
+    let userRole: UserRole = "user";
+    try {
+      const userRow = await db
+        .select({ role: users.role })
+        .from(users)
+        .where(eq(users.id, internalUserId))
+        .limit(1);
+      if (userRow[0]?.role) {
+        userRole = userRow[0].role as UserRole;
+      }
+    } catch {
+      // Default to "user" if role lookup fails
+    }
+
+    c.set("userId", internalUserId);
+    c.set("db", db);
+    c.set("userRole", userRole);
+    return next();
+  }
+
   const reqClone = c.req.raw.clone();
   try {
     const body = (await reqClone.json()) as Record<string, unknown>;
@@ -30,7 +66,7 @@ export const authMiddleware = createMiddleware<{
       ANONYMOUS_TOOLS.has((body.params as Record<string, unknown>).name as string)
     ) {
       c.set("userId", "anonymous");
-      c.set("db", createDb(c.env.DB));
+      c.set("db", db);
       c.set("userRole", "user" as UserRole);
       return next();
     }
@@ -60,8 +96,6 @@ export const authMiddleware = createMiddleware<{
   }
 
   const token = authHeader.slice("Bearer ".length);
-  const db = createDb(c.env.DB);
-
   let userId: string | null = null;
 
   if (token.startsWith("sk_")) {

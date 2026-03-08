@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import {  describe, expect, it, vi } from "vitest";
 import { Hono } from "hono";
 import type { Env } from "../../../src/edge-api/main/core-logic/env.js";
 import { health } from "../../../src/edge-api/main/api/routes/health.js";

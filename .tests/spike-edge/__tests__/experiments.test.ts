@@ -40,7 +40,7 @@ function makeMockDB(
   } as unknown as D1Database;
 }
 
-function createMockEnv(dbOverrides = {}): Env {
+function createMockEnv(dbOverrides: Record<string, unknown> = {}): Env {
   return {
     R2: {} as R2Bucket,
     SPA_ASSETS: {} as R2Bucket,
@@ -142,20 +142,20 @@ describe("POST /api/experiments/assign", () => {
       traffic_pct: 100,
     };
     const db = {
-      prepare: vi.fn().mockImplementation((sql: string) => ({
+      prepare: vi.fn().mockImplementation((_sql: string) => ({
         bind: vi.fn().mockReturnThis(),
-        all: vi.fn().mockResolvedValue({ results: sql.includes("experiments") ? [exp] : [] }),
+        all: vi.fn().mockResolvedValue({ results: _sql.includes("experiments") ? [exp] : [] }),
         first: vi
           .fn()
           .mockResolvedValue(
-            sql.includes("experiment_assignments") ? { variant_id: "control" } : null,
+            _sql.includes("experiment_assignments") ? { variant_id: "control" } : null,
           ),
         run: vi.fn().mockResolvedValue({}),
       })),
       batch: vi.fn().mockResolvedValue([]),
     } as unknown as D1Database;
     const env = createMockEnv();
-    (env as any).DB = db;
+    (env as unknown as { DB: D1Database }).DB = db;
     const app = makeApp();
     const res = await app.request(
       "/api/experiments/assign",
@@ -181,16 +181,16 @@ describe("POST /api/experiments/assign", () => {
     };
     const runMock = vi.fn().mockResolvedValue({});
     const db = {
-      prepare: vi.fn().mockImplementation((sql: string) => ({
+      prepare: vi.fn().mockImplementation((_sql: string) => ({
         bind: vi.fn().mockReturnThis(),
-        all: vi.fn().mockResolvedValue({ results: sql.includes("experiments") ? [exp] : [] }),
-        first: vi.fn().mockResolvedValue(sql.includes("experiment_assignments") ? null : null),
+        all: vi.fn().mockResolvedValue({ results: _sql.includes("experiments") ? [exp] : [] }),
+        first: vi.fn().mockResolvedValue(_sql.includes("experiment_assignments") ? null : null),
         run: runMock,
       })),
       batch: vi.fn().mockResolvedValue([]),
     } as unknown as D1Database;
     const env = createMockEnv();
-    (env as any).DB = db;
+    (env as unknown as { DB: D1Database }).DB = db;
     const app = makeApp();
     const res = await app.request(
       "/api/experiments/assign",
@@ -268,7 +268,7 @@ describe("POST /api/experiments/track", () => {
       batch: batchMock,
     } as unknown as D1Database;
     const env = createMockEnv();
-    (env as any).DB = db;
+    (env as unknown as { DB: D1Database }).DB = db;
     const app = makeApp();
     const res = await app.request(
       "/api/experiments/track",
@@ -320,7 +320,7 @@ describe("POST /api/experiments/track", () => {
       batch: batchMock,
     } as unknown as D1Database;
     const env = createMockEnv();
-    (env as any).DB = db;
+    (env as unknown as { DB: D1Database }).DB = db;
     const app = makeApp();
     const res = await app.request(
       "/api/experiments/track",
@@ -408,7 +408,7 @@ describe("GET /api/experiments/active", () => {
       batch: vi.fn().mockResolvedValue([]),
     } as unknown as D1Database;
     const env = createMockEnv();
-    (env as any).DB = db;
+    (env as unknown as { DB: D1Database }).DB = db;
     const app = makeApp();
     const res = await app.request("/api/experiments/active", {}, env);
     expect(res.status).toBe(200);
@@ -442,18 +442,18 @@ describe("GET /api/experiments/:id/metrics", () => {
       { variant_id: "control", metric_name: "donations", metric_value: 5, sample_size: 5 },
     ];
     const db = {
-      prepare: vi.fn().mockImplementation((sql: string) => ({
+      prepare: vi.fn().mockImplementation((_sql: string) => ({
         bind: vi.fn().mockReturnThis(),
-        first: vi.fn().mockResolvedValue(sql.includes("WHERE id") ? exp : null),
+        first: vi.fn().mockResolvedValue(_sql.includes("WHERE id") ? exp : null),
         all: vi
           .fn()
-          .mockResolvedValue({ results: sql.includes("experiment_metrics") ? metricRows : [] }),
+          .mockResolvedValue({ results: _sql.includes("experiment_metrics") ? metricRows : [] }),
         run: vi.fn().mockResolvedValue({}),
       })),
       batch: vi.fn().mockResolvedValue([]),
     } as unknown as D1Database;
     const env = createMockEnv();
-    (env as any).DB = db;
+    (env as unknown as { DB: D1Database }).DB = db;
     const app = makeApp();
     const res = await app.request("/api/experiments/exp-1/metrics", {}, env);
     expect(res.status).toBe(200);
@@ -504,7 +504,7 @@ describe("POST /api/experiments/:id/evaluate", () => {
       batch: vi.fn().mockResolvedValue([]),
     } as unknown as D1Database;
     const env = createMockEnv();
-    (env as any).DB = db;
+    (env as unknown as { DB: D1Database }).DB = db;
     const app = makeApp();
     const res = await app.request(
       "/api/experiments/exp-1/evaluate",
@@ -536,7 +536,7 @@ describe("POST /api/experiments/:id/evaluate", () => {
       batch: vi.fn().mockResolvedValue([]),
     } as unknown as D1Database;
     const env = createMockEnv();
-    (env as any).DB = db;
+    (env as unknown as { DB: D1Database }).DB = db;
     const app = makeApp();
     const res = await app.request(
       "/api/experiments/exp-1/evaluate",
@@ -566,18 +566,18 @@ describe("POST /api/experiments/:id/evaluate", () => {
       { variant_id: "control", metric_name: "impressions", metric_value: 100, sample_size: 100 },
     ];
     const db = {
-      prepare: vi.fn().mockImplementation((sql: string) => ({
+      prepare: vi.fn().mockImplementation((_sql: string) => ({
         bind: vi.fn().mockReturnThis(),
         first: vi.fn().mockResolvedValue(exp),
         all: vi
           .fn()
-          .mockResolvedValue({ results: sql.includes("experiment_metrics") ? metricRows : [] }),
+          .mockResolvedValue({ results: _sql.includes("experiment_metrics") ? metricRows : [] }),
         run: vi.fn().mockResolvedValue({}),
       })),
       batch: vi.fn().mockResolvedValue([]),
     } as unknown as D1Database;
     const env = createMockEnv();
-    (env as any).DB = db;
+    (env as unknown as { DB: D1Database }).DB = db;
     const app = makeApp();
     const res = await app.request(
       "/api/experiments/exp-1/evaluate",
@@ -616,18 +616,18 @@ describe("POST /api/experiments/:id/evaluate", () => {
     ];
     const runMock = vi.fn().mockResolvedValue({});
     const db = {
-      prepare: vi.fn().mockImplementation((sql: string) => ({
+      prepare: vi.fn().mockImplementation((_sql: string) => ({
         bind: vi.fn().mockReturnThis(),
         first: vi.fn().mockResolvedValue(exp),
         all: vi
           .fn()
-          .mockResolvedValue({ results: sql.includes("experiment_metrics") ? metricRows : [] }),
+          .mockResolvedValue({ results: _sql.includes("experiment_metrics") ? metricRows : [] }),
         run: runMock,
       })),
       batch: vi.fn().mockResolvedValue([]),
     } as unknown as D1Database;
     const env = createMockEnv();
-    (env as any).DB = db;
+    (env as unknown as { DB: D1Database }).DB = db;
     const app = makeApp();
     const res = await app.request(
       "/api/experiments/exp-1/evaluate",
@@ -661,7 +661,7 @@ describe("GET /api/experiments/dashboard", () => {
       },
     ];
     const db = {
-      prepare: vi.fn().mockImplementation((sql: string) => ({
+      prepare: vi.fn().mockImplementation((_sql: string) => ({
         bind: vi.fn().mockReturnThis(),
         all: vi.fn().mockResolvedValue({ results: exps }),
         first: vi.fn().mockResolvedValue({ total: 1500 }),
@@ -670,7 +670,7 @@ describe("GET /api/experiments/dashboard", () => {
       batch: vi.fn().mockResolvedValue([]),
     } as unknown as D1Database;
     const env = createMockEnv();
-    (env as any).DB = db;
+    (env as unknown as { DB: D1Database }).DB = db;
     const app = makeApp();
     const res = await app.request("/api/experiments/dashboard", {}, env);
     expect(res.status).toBe(200);
@@ -690,7 +690,7 @@ describe("GET /api/experiments/dashboard", () => {
       batch: vi.fn().mockResolvedValue([]),
     } as unknown as D1Database;
     const env = createMockEnv();
-    (env as any).DB = db;
+    (env as unknown as { DB: D1Database }).DB = db;
     const app = makeApp();
     const res = await app.request("/api/experiments/dashboard", {}, env);
     const body = await res.json<{ revenue24h: number }>();
@@ -722,7 +722,7 @@ describe("GET /api/experiments/monitor", () => {
       batch: vi.fn().mockResolvedValue([]),
     } as unknown as D1Database;
     const env = createMockEnv();
-    (env as any).DB = db;
+    (env as unknown as { DB: D1Database }).DB = db;
     const app = makeApp();
     const res = await app.request("/api/experiments/monitor?hours=8", {}, env);
     expect(res.status).toBe(200);
@@ -734,7 +734,7 @@ describe("GET /api/experiments/monitor", () => {
     }>();
     expect(body.windowHours).toBe(8);
     // variant-a has no impressions → anomaly
-    expect(body.anomalies.some((a: any) => a.variantId === "variant-a")).toBe(true);
+    expect(body.anomalies.some((a: Record<string, unknown>) => a.variantId === "variant-a")).toBe(true);
   });
 
   it("accepts large hours value (clamps window internally)", async () => {

@@ -223,7 +223,7 @@ describe("define-tool framework", () => {
 
       const res = await tool.handler(
         { image_id: "img-1" },
-        { userId: "u1", deps: mockDeps as any },
+        { userId: "u1", deps: mockDeps as unknown as ImageStudioDeps },
       );
       expect(res.isError).toBe(true);
       expect(res.content[0].text).toContain("UNAUTHORIZED");
@@ -248,7 +248,7 @@ describe("define-tool framework", () => {
 
       const res = await tool.handler(
         { image_ids: ["img-1", "img-2"] },
-        { userId: "u1", deps: mockDeps as any },
+        { userId: "u1", deps: mockDeps as unknown as ImageStudioDeps },
       );
       expect(res.isError).toBe(true);
       expect(res.content[0].text).toContain("UNAUTHORIZED");
@@ -273,7 +273,7 @@ describe("define-tool framework", () => {
 
       const res = await tool.handler(
         { album_handle: "alb" },
-        { userId: "u1", deps: mockDeps as any },
+        { userId: "u1", deps: mockDeps as unknown as ImageStudioDeps },
       );
       expect(res.isError).toBe(true);
       expect(res.content[0].text).toContain("UNAUTHORIZED");
@@ -297,7 +297,7 @@ describe("define-tool framework", () => {
         { val: "bad" },
         {
           userId: "u1",
-          deps: {} as any,
+          deps: {} as unknown as ImageStudioDeps,
         },
       );
       expect(res.isError).toBe(true);
@@ -331,7 +331,7 @@ describe("define-tool framework", () => {
         { val: "img-1" },
         {
           userId: "u1",
-          deps: mockDeps as any,
+          deps: mockDeps as unknown as ImageStudioDeps,
         },
       );
       expect(res.isError).toBe(true);
@@ -349,7 +349,7 @@ describe("define-tool framework", () => {
         { val: "v" },
         {
           userId: "u1",
-          deps: {} as any,
+          deps: {} as unknown as ImageStudioDeps,
         },
       );
       expect(res.isError).toBeFalsy();
@@ -366,7 +366,7 @@ describe("define-tool framework", () => {
         throw new DomainError("UNKNOWN_ERROR", "A specific domain error", true);
       });
 
-      const res = await tool.handler({}, { userId: "u1", deps: {} as any });
+      const res = await tool.handler({}, { userId: "u1", deps: {} as unknown as ImageStudioDeps });
       expect(res.isError).toBe(true);
       expect(res.content[0].text).toContain("UNKNOWN_ERROR");
       expect(res.content[0].text).toContain("A specific domain error");
@@ -378,7 +378,7 @@ describe("define-tool framework", () => {
         throw new Error("Normal error");
       });
 
-      await expect(tool.handler({}, { userId: "u1", deps: {} as any })).rejects.toThrow(
+      await expect(tool.handler({}, { userId: "u1", deps: {} as unknown as ImageStudioDeps })).rejects.toThrow(
         "Normal error",
       );
     });
@@ -398,7 +398,7 @@ describe("define-tool framework", () => {
 
       const res = await tool.handler(
         { image_id: "img-1" },
-        { userId: "u1", deps: mockDeps as any },
+        { userId: "u1", deps: mockDeps as unknown as ImageStudioDeps },
       );
       expect(res.isError).toBe(true);
       expect(res.content[0].text).toContain("JOB_CREATE_FAILED");

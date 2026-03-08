@@ -1,0 +1,9 @@
+name = "spike-status"
+main = "../../src/edge-api/status/api/app.ts"
+compatibility_date = "2025-07-12"
+compatibility_flags = ["nodejs_compat"]
+workers_dev = true
+
+[[routes]]
+pattern = "status.spike.land/*"
+zone_name = "spike.land"

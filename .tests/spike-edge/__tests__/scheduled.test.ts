@@ -8,7 +8,7 @@ function createDB(overrides: {
   firstReturns?: Array<unknown>;
 }) {
   const nowSec = Math.floor(Date.now() / 1000);
-  const oneHourAgo = nowSec - 60 * 60;
+  const _oneHourAgo = nowSec - 60 * 60;
 
   let callIndex = 0;
   const responses = [

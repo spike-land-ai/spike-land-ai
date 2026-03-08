@@ -7,12 +7,12 @@ import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { createMockServer } from "../__test-utils__/mock-server.js";
 
 vi.mock("../../../src/mcp-tools/bazdmeg/node-sys/manifest.js", async (importOriginal) => {
-  const actual = (await importOriginal()) as any;
+  const actual = (await importOriginal()) as Record<string, unknown>;
   return {
     ...actual,
-    readManifest: vi.fn(actual.readManifest),
-    clearManifestCache: vi.fn(actual.clearManifestCache),
-    topologicalSort: vi.fn(actual.topologicalSort),
+    readManifest: vi.fn(actual.readManifest as (...args: unknown[]) => unknown),
+    clearManifestCache: vi.fn(actual.clearManifestCache as (...args: unknown[]) => unknown),
+    topologicalSort: vi.fn(actual.topologicalSort as (...args: unknown[]) => unknown),
   };
 });
 
@@ -376,7 +376,7 @@ describe("dep graph tools", () => {
           E: { kind: "library", version: "1.0.0", deps: [] },
           D: { kind: "library", version: "1.0.0", deps: [] },
         },
-      } as any);
+      } as Record<string, unknown>);
 
       const result = await server.call("bazdmeg_dep_graph", {
         packageName: "A",
@@ -393,7 +393,7 @@ describe("dep graph tools", () => {
         packages: {
           "no-kind": { version: "1.0.0", deps: [] },
         },
-      } as any);
+      } as Record<string, unknown>);
 
       const result = await server.call("bazdmeg_dep_graph", {
         format: "list",
@@ -412,7 +412,7 @@ describe("dep graph tools", () => {
           dep1: { kind: "library", version: "1.0.0" },
           dep2: { kind: "library", version: "1.0.0" },
         },
-      } as any);
+      } as Record<string, unknown>);
 
       const result = await server.call("bazdmeg_dep_graph", {
         packageName: "root",
@@ -430,7 +430,7 @@ describe("dep graph tools", () => {
           dep: { kind: "library", version: "1.0.0", deps: ["transitive", "transitive"] },
           transitive: { kind: "library", version: "1.0.0" },
         },
-      } as any);
+      } as Record<string, unknown>);
 
       // This should hit !seen.has(edge) being false for both direct and transitive loops
       const result = await server.call("bazdmeg_dep_graph", {

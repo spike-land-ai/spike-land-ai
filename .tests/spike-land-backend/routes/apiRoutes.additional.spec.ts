@@ -2,7 +2,7 @@
  * Additional apiRoutes tests for uncovered parseTranspileErrors branches (lines 256-268, 274)
  */
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { Code } from "../../../src/edge-api/backend/lazy-imports/chatRoom.js";
+import type { Code } from "../../../src/edge-api/backend/lazy-imports/chatRoom.js";
 import { ApiRoutes } from "../../../src/edge-api/backend/core-logic/routes/apiRoutes.js";
 
 vi.mock("../../../src/edge-api/backend/lazy-imports/chatRoom", () => ({

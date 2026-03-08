@@ -10,7 +10,6 @@ import { userProfile } from "../../../src/edge-api/main/api/routes/user-profile.
 import { billing } from "../../../src/edge-api/main/api/routes/billing.js";
 import { apiKeys } from "../../../src/edge-api/main/api/routes/api-keys.js";
 import { cockpit } from "../../../src/edge-api/main/api/routes/cockpit.js";
-import { credits } from "../../../src/edge-api/main/api/routes/credits.js";
 import { support } from "../../../src/edge-api/main/api/routes/support.js";
 import { errors } from "../../../src/edge-api/main/api/routes/errors.js";
 
@@ -67,18 +66,6 @@ function makeApp<T extends Hono>(route: T): Hono<{ Bindings: Env }> {
   const app = new Hono<{ Bindings: Env }>();
   app.route("/", route);
   return app;
-}
-
-function withUser(userId: string) {
-  return (app: Hono<{ Bindings: Env }>) => {
-    const wrapped = new Hono<{ Bindings: Env }>();
-    wrapped.use("*", async (c, next) => {
-      c.set("userId" as never, userId as never);
-      await next();
-    });
-    wrapped.route("/", app as unknown as Hono<{ Bindings: Env }>);
-    return wrapped;
-  };
 }
 
 // ─── version route ────────────────────────────────────────────────────────────

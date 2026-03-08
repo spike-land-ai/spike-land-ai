@@ -272,8 +272,8 @@ describe("blogComments — POST /blog/comments/:commentId/vote", () => {
     let callCount = 0;
     const batchMock = vi.fn().mockResolvedValue([]);
 
-    const prepareMock = vi.fn().mockImplementation((sql: string) => {
-      const localCount = 0;
+    const prepareMock = vi.fn().mockImplementation((_sql: string) => {
+      const _localCount = 0;
       return {
         bind: vi.fn().mockReturnThis(),
         first: vi.fn().mockImplementation(() => {

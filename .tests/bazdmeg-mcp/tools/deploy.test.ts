@@ -367,9 +367,9 @@ describe("deploy tools", () => {
         },
       });
 
-      let callCount = 0;
+      let _callCount = 0;
       mockRunCommand.mockImplementation(async () => {
-        callCount++;
+        _callCount++;
         return ok();
       });
       mockWriteFile.mockResolvedValue(undefined);

@@ -1,48 +1,71 @@
-import { describe, it, expect, vi } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { SpikeChatEmbed } from "../../src/core/block-website/ui/SpikeChatEmbed";
 
 vi.mock("lucide-react", () => ({
   Loader2: () => null,
+  MessageCircle: () => null,
 }));
 
+let stateCalls: Array<[string, unknown]> = [];
+let effectCleanups: Array<() => void> = [];
+
 vi.mock("react", () => ({
-  useState: (initialValue: any) => [initialValue, vi.fn()],
+  useState: (initialValue: unknown) => {
+    stateCalls.push(["useState", initialValue]);
+    return [initialValue, vi.fn()];
+  },
+  useEffect: (fn: () => (() => void) | void) => {
+    const cleanup = fn();
+    if (typeof cleanup === "function") effectCleanups.push(cleanup);
+  },
 }));
 
 describe("SpikeChatEmbed", () => {
-  it("returns JSX element with correct props", () => {
-    // Save original location
+  beforeEach(() => {
+    stateCalls = [];
+    effectCleanups = [];
+    vi.useFakeTimers();
+  });
+
+  afterEach(() => {
+    effectCleanups.forEach((c) => c());
+    effectCleanups = [];
+    vi.useRealTimers();
+  });
+
+  it("renders with loading state initially", () => {
     const originalLocation = window.location;
-    Object.defineProperty(window, 'location', {
+    Object.defineProperty(window, "location", {
       writable: true,
-      value: { hostname: 'localhost' }
+      value: { hostname: "spike.land" },
     });
 
-    const result = SpikeChatEmbed({ channelSlug: "test-chan", workspaceSlug: "test-work" });
-    
-    // We expect a React element object
+    const result = SpikeChatEmbed({ channelSlug: "test-chan", workspaceSlug: "test-work", guestAccess: true });
     expect(result).toBeDefined();
     expect(typeof result).toBe("object");
 
-    // Test production URL branch
-    Object.defineProperty(window, 'location', {
+    // Initial state should be "loading"
+    expect(stateCalls[0]).toEqual(["useState", "loading"]);
+
+    Object.defineProperty(window, "location", {
       writable: true,
-      value: { hostname: 'spike.land' }
+      value: originalLocation,
+    });
+  });
+
+  it("uses localhost URL in local dev", () => {
+    const originalLocation = window.location;
+    Object.defineProperty(window, "location", {
+      writable: true,
+      value: { hostname: "localhost" },
     });
 
-    const prodResult = SpikeChatEmbed({ channelSlug: "test-chan", workspaceSlug: "test-work", guestAccess: true });
-    expect(prodResult).toBeDefined();
+    const result = SpikeChatEmbed({ channelSlug: "test-chan", workspaceSlug: "test-work" });
+    expect(result).toBeDefined();
 
-    // Find the iframe in the prodResult children and call its onLoad
-    const iframe = (prodResult as any).props.children[1];
-    if (iframe && iframe.props && iframe.props.onLoad) {
-      iframe.props.onLoad();
-    }
-
-    // Restore location
-    Object.defineProperty(window, 'location', {
+    Object.defineProperty(window, "location", {
       writable: true,
-      value: originalLocation
+      value: originalLocation,
     });
   });
 });

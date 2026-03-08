@@ -1364,7 +1364,7 @@ import { sitemap } from "../../../src/edge-api/main/api/routes/sitemap.js";
 describe("Sitemap & Robots", () => {
   it("returns sitemap.xml with blog posts", async () => {
     const env = createMockEnv();
-    (env.DB.prepare as any).mockReturnValue({
+    (env.DB.prepare as unknown).mockReturnValue({
       all: vi.fn().mockResolvedValue({
         results: [{ slug: "test-post", date: "2024-01-01" }],
       }),
@@ -1380,7 +1380,7 @@ describe("Sitemap & Robots", () => {
 
   it("returns fallback sitemap.xml if DB fails", async () => {
     const env = createMockEnv();
-    (env.DB.prepare as any).mockImplementation(() => {
+    (env.DB.prepare as unknown).mockImplementation(() => {
       throw new Error("DB Error");
     });
     // @ts-expect-error Mock execution context
@@ -1409,7 +1409,7 @@ describe("SPA Cookie Consent", () => {
         );
       return Promise.resolve(null);
     });
-    (env.SPA_ASSETS.get as any).mockImplementation(mockR2);
+    (env.SPA_ASSETS.get as unknown).mockImplementation(mockR2);
 
     const req = new Request("https://spike.land/about");
     const res = await app.request(req, undefined, env);
@@ -1429,7 +1429,7 @@ describe("SPA Cookie Consent", () => {
         );
       return Promise.resolve(null);
     });
-    (env.SPA_ASSETS.get as any).mockImplementation(mockR2);
+    (env.SPA_ASSETS.get as unknown).mockImplementation(mockR2);
 
     const req = new Request("https://spike.land/about", {
       headers: { cookie: "cookie_consent=accepted" },
@@ -1445,14 +1445,14 @@ describe("API 404 Catch-all", () => {
   it("returns JSON 404 for unknown /api/* routes", async () => {
     const { default: appModule } = await import("../../../src/edge-api/main/index.js");
     const env = createMockEnv();
-    const res = await (appModule as any).fetch(
+    const res = await (appModule as unknown).fetch(
       new Request("https://spike.land/api/does-not-exist"),
       env,
       { waitUntil: () => {}, passThroughOnException: () => {} },
     );
     expect(res.status).toBe(404);
     expect(res.headers.get("content-type")).toContain("application/json");
-    const data = (await res.json()) as any;
+    const data = (await res.json()) as unknown;
     expect(data).toEqual({ error: "Not Found", path: "/api/does-not-exist" });
   });
 });

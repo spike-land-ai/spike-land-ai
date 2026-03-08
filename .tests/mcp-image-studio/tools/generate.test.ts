@@ -269,7 +269,7 @@ describe("generate", () => {
 
   it("should skip subject resolution if subjectFindMany is undefined", async () => {
     const ctx: ToolContext = { userId, deps };
-    deps.db.subjectFindMany = undefined as any;
+    (deps.db as unknown as Record<string, unknown>).subjectFindMany = undefined;
     mocks.generation.createAdvancedGenerationJob.mockResolvedValue({
       success: true,
       jobId: "adv-no-db-job",

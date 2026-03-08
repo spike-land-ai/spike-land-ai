@@ -233,7 +233,7 @@ describe("Code Durable Object additional coverage", () => {
   describe("_saveVersion error path (line 684)", () => {
     it("continues when _saveVersion fails during updateAndBroadcastSession", async () => {
       // Initialize with a session using mock storage
-      const initialSession = createSession({ code: "initial code" });
+      const _initialSession = createSession({ code: "initial code" });
       codeInstance.initialized = true;
 
       // Set up storage for initialization
@@ -255,7 +255,7 @@ describe("Code Durable Object additional coverage", () => {
       // Spy on largeStorage.put and make version saves fail
       const largeStorage = codeInstance["largeStorage"];
       const originalPut = largeStorage.put.bind(largeStorage);
-      let callCount = 0;
+      const _callCount = 0;
       vi.spyOn(largeStorage, "put").mockImplementation(async (key: string, value: unknown) => {
         if (key.startsWith("version_")) {
           throw new Error("Version storage failed");

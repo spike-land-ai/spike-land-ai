@@ -348,7 +348,7 @@ program
         claude.stdin?.end();
       }
 
-      claude.on("close", (code) => {
+      claude.on("close", (code: number | null) => {
         if (code !== null) {
           process.exit(code);
         } else {
@@ -356,7 +356,7 @@ program
         }
       });
 
-      claude.on("error", (err) => {
+      claude.on("error", (err: Error) => {
         console.error("Failed to spawn Claude:", err);
         process.exit(1);
       });

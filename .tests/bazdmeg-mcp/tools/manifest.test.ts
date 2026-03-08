@@ -309,7 +309,7 @@ describe("manifest tools", () => {
             worker: { name: "oops" },
           },
         },
-      } as any);
+      } as Record<string, unknown>);
 
       const result = await server.call("bazdmeg_manifest_validate", {});
       expect(result.content[0].text).toContain("has `worker` section but kind=library");
@@ -319,7 +319,7 @@ describe("manifest tools", () => {
       mockReadManifest.mockResolvedValue({
         defaults: {},
         packages: {},
-      } as any);
+      } as Record<string, unknown>);
 
       const result = await server.call("bazdmeg_manifest_validate", {});
       expect(result.content[0].text).toContain("defaults: missing `scope`平衡".replace("平衡", ""));

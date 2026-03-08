@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 import { createD1Credits } from "../../../src/edge-api/image-studio-worker/mcp/credits.ts";
-import { nanoid } from "../../../src/edge-api/image-studio-worker/deps/nanoid.ts";
+import type { Env } from "../../../src/edge-api/image-studio-worker/env.d.ts";
 
 describe("credits", () => {
   it("hasEnough returns true if remaining >= amount", async () => {
@@ -13,9 +13,9 @@ describe("credits", () => {
           first: mockFirst,
         }),
       }),
-    } as any;
+    } as unknown as D1Database;
 
-    const credits = createD1Credits({ IMAGE_DB: db } as any);
+    const credits = createD1Credits({ IMAGE_DB: db } as unknown as Env);
     const res = await credits.hasEnough("user1", 50);
     expect(res).toBe(true);
   });
@@ -30,9 +30,9 @@ describe("credits", () => {
           first: mockFirst,
         }),
       }),
-    } as any;
+    } as unknown as D1Database;
 
-    const credits = createD1Credits({ IMAGE_DB: db } as any);
+    const credits = createD1Credits({ IMAGE_DB: db } as unknown as Env);
     const res = await credits.consume({
       userId: "user1",
       amount: 10,
@@ -48,9 +48,9 @@ describe("credits", () => {
       prepare: vi.fn().mockReturnValue({
         bind: vi.fn().mockReturnValue({ run: mockRun }),
       }),
-    } as any;
+    } as unknown as D1Database;
 
-    const credits = createD1Credits({ IMAGE_DB: db } as any);
+    const credits = createD1Credits({ IMAGE_DB: db } as unknown as Env);
     const res = await credits.consume({
       userId: "user1",
       amount: 10,
@@ -66,9 +66,9 @@ describe("credits", () => {
       prepare: vi.fn().mockReturnValue({
         bind: vi.fn().mockReturnValue({ run: mockRun }),
       }),
-    } as any;
+    } as unknown as D1Database;
 
-    const credits = createD1Credits({ IMAGE_DB: db } as any);
+    const credits = createD1Credits({ IMAGE_DB: db } as unknown as Env);
     const res = await credits.refund("user1", 10);
     expect(res).toBe(true);
   });
@@ -82,9 +82,9 @@ describe("credits", () => {
           first: mockFirst,
         }),
       }),
-    } as any;
+    } as unknown as D1Database;
 
-    const credits = createD1Credits({ IMAGE_DB: db } as any);
+    const credits = createD1Credits({ IMAGE_DB: db } as unknown as Env);
     const res = await credits.getBalance("user1");
     expect(res?.remaining).toBe(42);
   });
@@ -98,31 +98,31 @@ describe("credits", () => {
           first: mockFirst,
         }),
       }),
-    } as any;
+    } as unknown as D1Database;
 
-    const credits = createD1Credits({ IMAGE_DB: db } as any);
+    const credits = createD1Credits({ IMAGE_DB: db } as unknown as Env);
     const res = await credits.getBalance("user1");
     expect(res).toBeNull();
   });
 
   it("estimate with defaults", () => {
-    const credits = createD1Credits({ IMAGE_DB: {} as any } as any);
+    const credits = createD1Credits({ IMAGE_DB: {} as unknown as D1Database } as unknown as Env);
     expect(credits.estimate("TIER_1K")).toBe(2);
   });
 
   it("calculateGenerationCost with defaults", () => {
-    const credits = createD1Credits({ IMAGE_DB: {} as any } as any);
+    const credits = createD1Credits({ IMAGE_DB: {} as unknown as D1Database } as unknown as Env);
     expect(credits.calculateGenerationCost({ tier: "TIER_2K" })).toBe(5);
-    expect(credits.calculateGenerationCost({ tier: "UNKNOWN" as any })).toBe(1);
+    expect(credits.calculateGenerationCost({ tier: "UNKNOWN" as unknown as "TIER_2K" })).toBe(1);
   });
 
   it("estimate", () => {
-    const credits = createD1Credits({ IMAGE_DB: {} as any } as any);
+    const credits = createD1Credits({ IMAGE_DB: {} as unknown as D1Database } as unknown as Env);
     expect(credits.estimate("TIER_1K", 2)).toBe(4);
   });
 
   it("calculateGenerationCost", () => {
-    const credits = createD1Credits({ IMAGE_DB: {} as any } as any);
+    const credits = createD1Credits({ IMAGE_DB: {} as unknown as D1Database } as unknown as Env);
     expect(credits.calculateGenerationCost({ tier: "TIER_2K", numImages: 3 })).toBe(15);
   });
 });

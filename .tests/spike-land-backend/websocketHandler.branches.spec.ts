@@ -407,7 +407,7 @@ describe("WebSocketHandler branch coverage", () => {
       });
       allSockets.push(ws);
 
-      const sendBefore = (ws.send as ReturnType<typeof vi.fn>).mock.calls.length;
+      const _sendBefore = (ws.send as ReturnType<typeof vi.fn>).mock.calls.length;
       await wsHandler.handleMessage(ws, JSON.stringify({ name: "bob" }));
       // Since name matches, the name update block is skipped
       // but it still gets the catch-all ack

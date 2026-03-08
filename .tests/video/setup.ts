@@ -1,3 +1,4 @@
+import React from "react";
 import { vi } from "vitest";
 
 vi.mock("remotion", () => ({
@@ -18,27 +19,23 @@ vi.mock("remotion", () => ({
     out: vi.fn((x) => x),
     in: vi.fn((x) => x),
     inOut: vi.fn((x) => x),
-    bezier: vi.fn(() => (x: any) => x),
+    bezier: vi.fn(() => (x: unknown) => x),
   },
-  AbsoluteFill: ({ children, style }: any) => {
-    const React = require("react");
+  AbsoluteFill: ({ children, style }: { children?: React.ReactNode; style?: React.CSSProperties }) => {
     return React.createElement("div", { style }, children);
   },
-  Sequence: ({ children }: any) => {
-    const React = require("react");
+  Sequence: ({ children }: { children?: React.ReactNode }) => {
     return React.createElement(React.Fragment, null, children);
   },
   Audio: () => null,
   Video: () => null,
   Img: () => null,
   Series: Object.assign(
-    ({ children }: any) => {
-      const React = require("react");
+    ({ children }: { children?: React.ReactNode }) => {
       return React.createElement(React.Fragment, null, children);
     },
     {
-      Sequence: ({ children }: any) => {
-        const React = require("react");
+      Sequence: ({ children }: { children?: React.ReactNode }) => {
         return React.createElement(React.Fragment, null, children);
       },
     },
@@ -48,13 +45,11 @@ vi.mock("remotion", () => ({
 
 vi.mock("@remotion/transitions", () => ({
   TransitionSeries: Object.assign(
-    ({ children }: any) => {
-      const React = require("react");
+    ({ children }: { children?: React.ReactNode }) => {
       return React.createElement(React.Fragment, null, children);
     },
     {
-      Sequence: ({ children }: any) => {
-        const React = require("react");
+      Sequence: ({ children }: { children?: React.ReactNode }) => {
         return React.createElement(React.Fragment, null, children);
       },
       Transition: () => null,

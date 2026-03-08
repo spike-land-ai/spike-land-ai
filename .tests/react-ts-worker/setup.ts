@@ -12,7 +12,7 @@
 
 const OriginalMessageChannel = globalThis.MessageChannel;
 
-class UnrefMessageChannel extends OriginalMessageChannel {
+class _UnrefMessageChannel extends OriginalMessageChannel {
   get port1() {
     const port = super.port1;
     // Intercept onmessage setter to unref the port

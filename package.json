@@ -72,6 +72,7 @@
     "@radix-ui/react-slot": "^1.2.4",
     "@testing-library/user-event": "^14.6.1",
     "@types/cors": "^2.8.19",
+    "@types/cross-spawn": "^6.0.6",
     "@types/express": "^5.0.6",
     "@types/mime-types": "^3.0.1",
     "@types/node": "25.3.5",

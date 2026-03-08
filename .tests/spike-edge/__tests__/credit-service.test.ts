@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import {
   getBalance,
   deductCredit,
@@ -9,7 +9,7 @@ import {
 /**
  * Build a mock D1Database that simulates the credit_balances table.
  */
-function createMockDB(
+function _createMockDB(
   options: {
     tier?: string;
     balance?: number;
@@ -27,8 +27,8 @@ function createMockDB(
   const runMock = vi.fn().mockResolvedValue({ success: true });
 
   // We need to handle multiple prepare() calls returning different values
-  const callCount = 0;
-  const firstResponses: Array<unknown> = [
+  const _callCount = 0;
+  const _firstResponses: Array<unknown> = [
     // resolveEffectiveTier: SELECT grants + SELECT sub
     null, // access_grants
     null, // subscriptions
@@ -39,28 +39,28 @@ function createMockDB(
   ];
 
   // tier-service calls DB too — mock conservatively
-  const prepareMock = vi.fn().mockImplementation((sql: string) => {
+  const prepareMock = vi.fn().mockImplementation((_sql: string) => {
     return {
       bind: vi.fn().mockReturnThis(),
       run: runMock,
       first: vi.fn().mockImplementation(() => {
-        if (sql.includes("access_grants")) {
+        if (_sql.includes("access_grants")) {
           return Promise.resolve(null);
         }
-        if (sql.includes("subscriptions")) {
+        if (_sql.includes("subscriptions")) {
           return Promise.resolve(null);
         }
-        if (sql.includes("credit_balances") && sql.includes("SELECT balance")) {
+        if (_sql.includes("credit_balances") && _sql.includes("SELECT balance")) {
           return Promise.resolve({ balance });
         }
-        if (sql.includes("credit_balances")) {
+        if (_sql.includes("credit_balances")) {
           return Promise.resolve({
             balance,
             daily_limit: dailyLimit,
             last_daily_grant: lastDailyGrant,
           });
         }
-        if (sql.includes("credit_ledger") && sql.includes("SUM")) {
+        if (_sql.includes("credit_ledger") && _sql.includes("SUM")) {
           return Promise.resolve({ used: 5 });
         }
         return Promise.resolve(null);
@@ -79,14 +79,14 @@ describe("getBalance", () => {
   it("returns current balance when daily grant already applied today", async () => {
     const today = new Date().toISOString().slice(0, 10);
     // Build a fully explicit DB so we avoid all mock complexity
-    const prepareMock = vi.fn().mockImplementation((sql: string) => ({
+    const prepareMock = vi.fn().mockImplementation((_sql: string) => ({
       bind: vi.fn().mockReturnThis(),
       run: vi.fn().mockResolvedValue({}),
       all: vi.fn().mockResolvedValue({ results: [] }),
       first: vi.fn().mockImplementation(() => {
-        if (sql.includes("access_grants")) return Promise.resolve(null);
-        if (sql.includes("subscriptions")) return Promise.resolve(null);
-        if (sql.includes("credit_balances")) {
+        if (_sql.includes("access_grants")) return Promise.resolve(null);
+        if (_sql.includes("subscriptions")) return Promise.resolve(null);
+        if (_sql.includes("credit_balances")) {
           return Promise.resolve({ balance: 30, daily_limit: 50, last_daily_grant: today });
         }
         return Promise.resolve(null);
@@ -105,13 +105,13 @@ describe("getBalance", () => {
   it("auto-grants daily credits when last grant was yesterday", async () => {
     const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
     const batchMock = vi.fn().mockResolvedValue([]);
-    const prepareMock = vi.fn().mockImplementation((sql: string) => ({
+    const prepareMock = vi.fn().mockImplementation((_sql: string) => ({
       bind: vi.fn().mockReturnThis(),
       run: vi.fn().mockResolvedValue({}),
       first: vi.fn().mockImplementation(() => {
-        if (sql.includes("access_grants")) return Promise.resolve(null);
-        if (sql.includes("subscriptions")) return Promise.resolve(null);
-        if (sql.includes("credit_balances")) {
+        if (_sql.includes("access_grants")) return Promise.resolve(null);
+        if (_sql.includes("subscriptions")) return Promise.resolve(null);
+        if (_sql.includes("credit_balances")) {
           return Promise.resolve({ balance: 0, daily_limit: 50, last_daily_grant: yesterday });
         }
         return Promise.resolve(null);
@@ -126,13 +126,13 @@ describe("getBalance", () => {
   });
 
   it("handles missing credit_balances row gracefully", async () => {
-    const prepareMock = vi.fn().mockImplementation((sql: string) => ({
+    const prepareMock = vi.fn().mockImplementation((_sql: string) => ({
       bind: vi.fn().mockReturnThis(),
       run: vi.fn().mockResolvedValue({}),
       first: vi.fn().mockImplementation(() => {
-        if (sql.includes("access_grants")) return Promise.resolve(null);
-        if (sql.includes("subscriptions")) return Promise.resolve(null);
-        if (sql.includes("credit_balances") && sql.includes("SELECT")) {
+        if (_sql.includes("access_grants")) return Promise.resolve(null);
+        if (_sql.includes("subscriptions")) return Promise.resolve(null);
+        if (_sql.includes("credit_balances") && _sql.includes("SELECT")) {
           return Promise.resolve(null); // row not found
         }
         return Promise.resolve(null);
@@ -152,14 +152,14 @@ describe("getBalance", () => {
   it("updates daily_limit when tier changes", async () => {
     const today = new Date().toISOString().slice(0, 10);
     const runMock = vi.fn().mockResolvedValue({});
-    const prepareMock = vi.fn().mockImplementation((sql: string) => ({
+    const prepareMock = vi.fn().mockImplementation((_sql: string) => ({
       bind: vi.fn().mockReturnThis(),
       run: runMock,
       first: vi.fn().mockImplementation(() => {
-        if (sql.includes("access_grants")) return Promise.resolve(null);
-        if (sql.includes("subscriptions"))
+        if (_sql.includes("access_grants")) return Promise.resolve(null);
+        if (_sql.includes("subscriptions"))
           return Promise.resolve({ plan: "pro", status: "active" });
-        if (sql.includes("credit_balances")) {
+        if (_sql.includes("credit_balances")) {
           return Promise.resolve({ balance: 100, daily_limit: 50, last_daily_grant: today }); // old limit was 50, now should be 500
         }
         return Promise.resolve(null);
@@ -181,13 +181,13 @@ describe("deductCredit", () => {
   it("deducts credits and returns new balance", async () => {
     const today = new Date().toISOString().slice(0, 10);
     const batchMock = vi.fn().mockResolvedValue([]);
-    const prepareMock = vi.fn().mockImplementation((sql: string) => ({
+    const prepareMock = vi.fn().mockImplementation((_sql: string) => ({
       bind: vi.fn().mockReturnThis(),
       run: vi.fn().mockResolvedValue({}),
       first: vi.fn().mockImplementation(() => {
-        if (sql.includes("access_grants")) return Promise.resolve(null);
-        if (sql.includes("subscriptions")) return Promise.resolve(null);
-        if (sql.includes("credit_balances")) {
+        if (_sql.includes("access_grants")) return Promise.resolve(null);
+        if (_sql.includes("subscriptions")) return Promise.resolve(null);
+        if (_sql.includes("credit_balances")) {
           return Promise.resolve({ balance: 20, daily_limit: 50, last_daily_grant: today });
         }
         return Promise.resolve(null);
@@ -203,13 +203,13 @@ describe("deductCredit", () => {
 
   it("throws when insufficient credits", async () => {
     const today = new Date().toISOString().slice(0, 10);
-    const prepareMock = vi.fn().mockImplementation((sql: string) => ({
+    const prepareMock = vi.fn().mockImplementation((_sql: string) => ({
       bind: vi.fn().mockReturnThis(),
       run: vi.fn().mockResolvedValue({}),
       first: vi.fn().mockImplementation(() => {
-        if (sql.includes("access_grants")) return Promise.resolve(null);
-        if (sql.includes("subscriptions")) return Promise.resolve(null);
-        if (sql.includes("credit_balances")) {
+        if (_sql.includes("access_grants")) return Promise.resolve(null);
+        if (_sql.includes("subscriptions")) return Promise.resolve(null);
+        if (_sql.includes("credit_balances")) {
           return Promise.resolve({ balance: 0, daily_limit: 50, last_daily_grant: today });
         }
         return Promise.resolve(null);
@@ -227,13 +227,13 @@ describe("deductCredit", () => {
   it("deducts without referenceId", async () => {
     const today = new Date().toISOString().slice(0, 10);
     const batchMock = vi.fn().mockResolvedValue([]);
-    const prepareMock = vi.fn().mockImplementation((sql: string) => ({
+    const prepareMock = vi.fn().mockImplementation((_sql: string) => ({
       bind: vi.fn().mockReturnThis(),
       run: vi.fn().mockResolvedValue({}),
       first: vi.fn().mockImplementation(() => {
-        if (sql.includes("access_grants")) return Promise.resolve(null);
-        if (sql.includes("subscriptions")) return Promise.resolve(null);
-        if (sql.includes("credit_balances")) {
+        if (_sql.includes("access_grants")) return Promise.resolve(null);
+        if (_sql.includes("subscriptions")) return Promise.resolve(null);
+        if (_sql.includes("credit_balances")) {
           return Promise.resolve({ balance: 10, daily_limit: 50, last_daily_grant: today });
         }
         return Promise.resolve(null);
@@ -251,18 +251,18 @@ describe("purchaseCredits", () => {
   it("adds credits to existing balance", async () => {
     const today = new Date().toISOString().slice(0, 10);
     const batchMock = vi.fn().mockResolvedValue([]);
-    const selectBalanceCall = false;
+    const _selectBalanceCall = false;
 
-    const prepareMock = vi.fn().mockImplementation((sql: string) => ({
+    const prepareMock = vi.fn().mockImplementation((_sql: string) => ({
       bind: vi.fn().mockReturnThis(),
       run: vi.fn().mockResolvedValue({}),
       first: vi.fn().mockImplementation(() => {
-        if (sql.includes("access_grants")) return Promise.resolve(null);
-        if (sql.includes("subscriptions")) return Promise.resolve(null);
-        if (sql.includes("credit_balances") && sql.includes("last_daily_grant")) {
+        if (_sql.includes("access_grants")) return Promise.resolve(null);
+        if (_sql.includes("subscriptions")) return Promise.resolve(null);
+        if (_sql.includes("credit_balances") && _sql.includes("last_daily_grant")) {
           return Promise.resolve({ balance: 50, daily_limit: 50, last_daily_grant: today });
         }
-        if (sql.includes("SELECT balance FROM credit_balances")) {
+        if (_sql.includes("SELECT balance FROM credit_balances")) {
           return Promise.resolve({ balance: 50 });
         }
         return Promise.resolve(null);
@@ -279,16 +279,16 @@ describe("purchaseCredits", () => {
   it("handles missing balance row (defaults to 0)", async () => {
     const today = new Date().toISOString().slice(0, 10);
     const batchMock = vi.fn().mockResolvedValue([]);
-    const prepareMock = vi.fn().mockImplementation((sql: string) => ({
+    const prepareMock = vi.fn().mockImplementation((_sql: string) => ({
       bind: vi.fn().mockReturnThis(),
       run: vi.fn().mockResolvedValue({}),
       first: vi.fn().mockImplementation(() => {
-        if (sql.includes("access_grants")) return Promise.resolve(null);
-        if (sql.includes("subscriptions")) return Promise.resolve(null);
-        if (sql.includes("credit_balances") && sql.includes("last_daily_grant")) {
+        if (_sql.includes("access_grants")) return Promise.resolve(null);
+        if (_sql.includes("subscriptions")) return Promise.resolve(null);
+        if (_sql.includes("credit_balances") && _sql.includes("last_daily_grant")) {
           return Promise.resolve({ balance: 0, daily_limit: 50, last_daily_grant: today });
         }
-        if (sql.includes("SELECT balance FROM credit_balances")) {
+        if (_sql.includes("SELECT balance FROM credit_balances")) {
           return Promise.resolve(null); // no row
         }
         return Promise.resolve(null);
@@ -304,7 +304,7 @@ describe("purchaseCredits", () => {
 
 describe("getUsedToday", () => {
   it("returns sum of usage for today", async () => {
-    const prepareMock = vi.fn().mockImplementation((sql: string) => ({
+    const prepareMock = vi.fn().mockImplementation((_sql: string) => ({
       bind: vi.fn().mockReturnThis(),
       first: vi.fn().mockResolvedValue({ used: 12 }),
     }));

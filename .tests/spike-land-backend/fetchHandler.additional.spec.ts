@@ -151,7 +151,7 @@ describe("FetchHandler additional coverage", () => {
       const request = new Request("https://example.com/live/testspace/public/file.txt", {
         method: "PUT",
         body: "file content",
-        // @ts-ignore - duplex for Node.js
+        // @ts-expect-error -- intentional error for testing - duplex for Node.js
         duplex: "half",
       });
       const response = await handleFetchApi(
@@ -249,7 +249,7 @@ describe("FetchHandler additional coverage", () => {
       const request = new Request("https://example.com/live/testspace/index.mjs", {
         method: "PUT",
         body: "module content",
-        // @ts-ignore
+        // @ts-expect-error -- intentional error for testing
         duplex: "half",
       });
       const response = await handleFetchApi(

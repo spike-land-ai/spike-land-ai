@@ -5,6 +5,7 @@ name = "esbuild"
 # account_id = "your-account-id-here"
 compatibility_date = "2025-07-12"
 compatibility_flags = ["nodejs_compat"]
+workers_dev = true
 main = "index.ts"
 routes = [{ pattern = "js.spike.land", custom_domain = true }]
 

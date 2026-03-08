@@ -3,18 +3,29 @@ import type { Env } from "../../core-logic/env.js";
 
 const cachePurge = new Hono<{ Bindings: Env }>();
 
-cachePurge.post("/api/cache/purge", async (c) => {
-  const body = await c.req.json<{ files?: string[]; purge_everything?: boolean }>();
+type CachePurgeRequest = {
+  files?: string[];
+  purge_everything?: boolean;
+};
 
-  if (!body.files && !body.purge_everything) {
-    return c.json({ error: "Provide 'files' array or 'purge_everything: true'" }, 400);
+cachePurge.post("/api/cache/purge", async (c) => {
+  let body: CachePurgeRequest = {};
+  const rawBody = await c.req.text();
+
+  if (rawBody.trim()) {
+    try {
+      body = JSON.parse(rawBody) as CachePurgeRequest;
+    } catch {
+      return c.json({ error: "Invalid JSON body" }, 400);
+    }
   }
 
   if (body.files && body.files.length > 30) {
     return c.json({ error: "Maximum 30 files per request" }, 400);
   }
 
-  const payload = body.purge_everything ? { purge_everything: true } : { files: body.files };
+  const payload =
+    body.purge_everything || !body.files?.length ? { purge_everything: true } : { files: body.files };
 
   const resp = await fetch(
     `https://api.cloudflare.com/client/v4/zones/${c.env.CF_ZONE_ID}/purge_cache`,

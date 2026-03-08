@@ -77,7 +77,7 @@ describe("checkLinks", () => {
     });
     globalThis.fetch = mockFetch;
 
-    const report = await checkLinks({
+    const _report = await checkLinks({
       rootDir: "/project",
       files: ["test.md"],
       checkGithub: true,

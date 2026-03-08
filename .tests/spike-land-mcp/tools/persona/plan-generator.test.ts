@@ -6,7 +6,7 @@ import { describe, expect, it } from "vitest";
 import {
   PERSONAS,
   getAnswersForPersona,
-  getPersonaBySlug,
+  _getPersonaBySlug,
   getPersonaFromAnswers,
   getQuestionSequence,
 } from "../../../../src/edge-api/spike-land/core-logic/lib/persona-data";
@@ -43,7 +43,7 @@ describe("Plan Generator", () => {
 
   describe("plan structure", () => {
     it("generates plan with valid step structure for each persona", () => {
-      const validTools = new Set([
+      const _validTools = new Set([
         "web_navigate",
         "web_read",
         "web_click",

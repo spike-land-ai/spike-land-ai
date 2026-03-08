@@ -250,7 +250,7 @@ describe("SPA — /blog/:slug metadata injection", () => {
       batch: vi.fn().mockResolvedValue([]),
     } as unknown as D1Database;
     const env = createMockEnv({ "index.html": htmlObj });
-    (env as any).DB = db;
+    (env as unknown).DB = db;
     const app = makeApp();
     const res = await app.request("https://spike.land/blog/my-post", {}, env);
     expect(res.status).toBe(200);
@@ -299,7 +299,7 @@ describe("SPA — /blog/:slug metadata injection", () => {
       batch: vi.fn().mockResolvedValue([]),
     } as unknown as D1Database;
     const env = createMockEnv({ "index.html": htmlObj });
-    (env as any).DB = db;
+    (env as unknown).DB = db;
     const app = makeApp();
     const res = await app.request("https://spike.land/blog/no-image", {}, env);
     const text = await res.text();
@@ -355,7 +355,7 @@ code block
       batch: vi.fn().mockResolvedValue([]),
     } as unknown as D1Database;
     const env = createMockEnv({ "index.html": htmlObj });
-    (env as any).DB = db;
+    (env as unknown).DB = db;
     const app = makeApp();
     const res = await app.request("https://spike.land/blog/rich-content", {}, env);
     expect(res.status).toBe(200);

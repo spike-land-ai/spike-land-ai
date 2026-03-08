@@ -118,7 +118,7 @@ describe("chat.ts main export", () => {
   describe("swVersion endpoints", () => {
     it("serves /swVersion.mjs", async () => {
       const request = new Request("https://example.com/swVersion.mjs");
-      const response = await main.fetch(request, mockEnv, mockCtx);
+      const _response = await main.fetch(request, mockEnv, mockCtx);
 
       expect(response.status).toBe(200);
       const text = await response.text();
@@ -128,7 +128,7 @@ describe("chat.ts main export", () => {
 
     it("serves /@/lib/swVersion.mjs", async () => {
       const request = new Request("https://example.com/@/lib/swVersion.mjs");
-      const response = await main.fetch(request, mockEnv, mockCtx);
+      const _response = await main.fetch(request, mockEnv, mockCtx);
 
       expect(response.status).toBe(200);
       expect(response.headers.get("Content-Type")).toContain("application/javascript");
@@ -136,7 +136,7 @@ describe("chat.ts main export", () => {
 
     it("serves /swVersion.json", async () => {
       const request = new Request("https://example.com/swVersion.json");
-      const response = await main.fetch(request, mockEnv, mockCtx);
+      const _response = await main.fetch(request, mockEnv, mockCtx);
 
       expect(response.status).toBe(200);
       const body = (await response.json()) as { swVersion: string };
@@ -145,7 +145,7 @@ describe("chat.ts main export", () => {
 
     it("serves /swVersion.js", async () => {
       const request = new Request("https://example.com/swVersion.js");
-      const response = await main.fetch(request, mockEnv, mockCtx);
+      const _response = await main.fetch(request, mockEnv, mockCtx);
 
       expect(response.status).toBe(200);
       expect(response.headers.get("Content-Type")).toContain("application/javascript");
@@ -153,7 +153,7 @@ describe("chat.ts main export", () => {
 
     it("serves /sw-config.json", async () => {
       const request = new Request("https://example.com/sw-config.json");
-      const response = await main.fetch(request, mockEnv, mockCtx);
+      const _response = await main.fetch(request, mockEnv, mockCtx);
 
       expect(response.status).toBe(200);
       const body = (await response.json()) as { killSwitch: boolean; version: string };
@@ -165,7 +165,7 @@ describe("chat.ts main export", () => {
   describe("ASSET_MANIFEST endpoint", () => {
     it("serves /ASSET_MANIFEST", async () => {
       const request = new Request("https://example.com/ASSET_MANIFEST");
-      const response = await main.fetch(request, mockEnv, mockCtx);
+      const _response = await main.fetch(request, mockEnv, mockCtx);
 
       expect(response.status).toBe(200);
       expect(response.headers.get("Content-Type")).toContain("application/json");
@@ -179,11 +179,11 @@ describe("chat.ts main export", () => {
       const request = new Request("https://example.com/transpile", {
         method: "POST",
         body: "const x = 1;",
-        // @ts-ignore
+        // @ts-expect-error - duplex is not in standard RequestInit yet
         duplex: "half",
       });
 
-      const response = await main.fetch(request, mockEnv, mockCtx);
+      const _response = await main.fetch(request, mockEnv, mockCtx);
 
       expect(response.status).toBe(200);
     });
@@ -203,7 +203,7 @@ describe("chat.ts main export", () => {
         headers: { "X-CodeSpace": "test-space" },
       });
 
-      const response = await main.fetch(request, mockEnv, mockCtx);
+      const _response = await main.fetch(request, mockEnv, mockCtx);
 
       expect(mockDO.fetch).toHaveBeenCalled();
     });
@@ -217,13 +217,13 @@ describe("chat.ts main export", () => {
         method: "POST",
         body: JSON.stringify({ url: "https://api.example.com/data" }),
         headers: { "Content-Type": "application/json" },
-        // @ts-ignore
+        // @ts-expect-error - duplex is not in standard RequestInit yet
         duplex: "half",
       });
 
-      const response = await main.fetch(request, mockEnv, mockCtx);
+      const _response = await main.fetch(request, mockEnv, mockCtx);
 
-      expect(mockFetch).toHaveBeenCalledWith("https://api.example.com/data", expect.any(Object));
+      expect(mockFetch).toHaveBeenCalledWith("https://api.example.com/data", expect.any(Object) as unknown);
     });
 
     it("handles /__server-fetch when fetch fails (502)", async () => {
@@ -234,11 +234,11 @@ describe("chat.ts main export", () => {
         method: "POST",
         body: JSON.stringify({ url: "https://fail.example.com" }),
         headers: { "Content-Type": "application/json" },
-        // @ts-ignore
+        // @ts-expect-error - duplex is not in standard RequestInit yet
         duplex: "half",
       });
 
-      const response = await main.fetch(request, mockEnv, mockCtx);
+      const _response = await main.fetch(request, mockEnv, mockCtx);
 
       expect(response.status).toBe(502);
       consoleError.mockRestore();
@@ -252,7 +252,7 @@ describe("chat.ts main export", () => {
       );
 
       const request = new Request("https://example.com/anthropic/v1/messages");
-      const response = await main.fetch(request, mockEnv, mockCtx);
+      const _response = await main.fetch(request, mockEnv, mockCtx);
 
       expect(handleAnthropicRequest).toHaveBeenCalled();
       expect(response.status).toBe(200);
@@ -266,7 +266,7 @@ describe("chat.ts main export", () => {
       );
 
       const request = new Request("https://example.com/openai/v1/chat");
-      const response = await main.fetch(request, mockEnv, mockCtx);
+      const _response = await main.fetch(request, mockEnv, mockCtx);
 
       expect(handleGPT4Request).toHaveBeenCalled();
     });
@@ -279,7 +279,7 @@ describe("chat.ts main export", () => {
       );
 
       const request = new Request("https://example.com/replicate/v1/predictions");
-      const response = await main.fetch(request, mockEnv, mockCtx);
+      const _response = await main.fetch(request, mockEnv, mockCtx);
 
       expect(handleReplicateRequest).toHaveBeenCalled();
     });
@@ -295,7 +295,7 @@ describe("chat.ts main export", () => {
       (mockEnv.R2.get as ReturnType<typeof vi.fn>).mockResolvedValue(mockR2Object);
 
       const request = new Request("https://example.com/my-cms/page");
-      const response = await main.fetch(request, mockEnv, mockCtx);
+      const _response = await main.fetch(request, mockEnv, mockCtx);
 
       expect(mockEnv.R2.get).toHaveBeenCalled();
     });
@@ -309,7 +309,7 @@ describe("chat.ts main export", () => {
       (mockEnv.R2.get as ReturnType<typeof vi.fn>).mockResolvedValue(mockR2Object);
 
       const request = new Request("https://example.com/live-cms/page");
-      const response = await main.fetch(request, mockEnv, mockCtx);
+      const _response = await main.fetch(request, mockEnv, mockCtx);
 
       expect(mockEnv.R2.get).toHaveBeenCalled();
     });
@@ -322,7 +322,7 @@ describe("chat.ts main export", () => {
       );
 
       const request = new Request("https://example.com/api/my-turn");
-      const response = await main.fetch(request, mockEnv, mockCtx);
+      const _response = await main.fetch(request, mockEnv, mockCtx);
 
       expect(mockFetch).toHaveBeenCalled();
     });
@@ -332,7 +332,7 @@ describe("chat.ts main export", () => {
       const consoleError = vi.spyOn(console, "error").mockImplementation(() => {});
 
       const request = new Request("https://example.com/api/my-turn");
-      const response = await main.fetch(request, mockEnv, mockCtx);
+      const _response = await main.fetch(request, mockEnv, mockCtx);
 
       expect(response.status).toBe(500);
       consoleError.mockRestore();
@@ -349,7 +349,7 @@ describe("chat.ts main export", () => {
       });
 
       const request = new Request("https://example.com/ai-logs");
-      const response = await main.fetch(request, mockEnv, mockCtx);
+      const _response = await main.fetch(request, mockEnv, mockCtx);
 
       expect(response.status).toBe(200);
     });
@@ -358,7 +358,7 @@ describe("chat.ts main export", () => {
   describe("remix endpoint", () => {
     it("returns 501 for remix requests", async () => {
       const request = new Request("https://example.com/remix/something");
-      const response = await main.fetch(request, mockEnv, mockCtx);
+      const _response = await main.fetch(request, mockEnv, mockCtx);
 
       expect(response.status).toBe(501);
     });
@@ -371,7 +371,7 @@ describe("chat.ts main export", () => {
       );
 
       const request = new Request("https://example.com/unknown-path");
-      const response = await main.fetch(request, mockEnv, mockCtx);
+      const _response = await main.fetch(request, mockEnv, mockCtx);
 
       expect(handleMainFetch).toHaveBeenCalled();
     });
@@ -383,7 +383,7 @@ describe("chat.ts main export", () => {
       mockKvServer.serve.mockResolvedValue(new Response("asset content", { status: 200 }));
 
       const request = new Request("https://example.com/some-asset.js");
-      const response = await main.fetch(request, mockEnv, mockCtx);
+      const _response = await main.fetch(request, mockEnv, mockCtx);
 
       expect(mockKvServer.serve).toHaveBeenCalled();
       expect(response.status).toBe(200);
@@ -395,7 +395,7 @@ describe("chat.ts main export", () => {
       mockKvServer.serve.mockResolvedValue(new Response("editor", { status: 200 }));
 
       const request = new Request("https://example.com/live/myspace", { method: "GET" });
-      const response = await main.fetch(request, mockEnv, mockCtx);
+      const _response = await main.fetch(request, mockEnv, mockCtx);
 
       expect(mockKvServer.serve).toHaveBeenCalled();
       mockKvServer.isAsset.mockReturnValue(false);

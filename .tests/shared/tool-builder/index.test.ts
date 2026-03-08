@@ -260,14 +260,14 @@ describe("ToolBuilder", () => {
 
 describe("middleware", () => {
   it("creates a middleware with fn property", () => {
-    const mw = middleware<{}, { userId: string }>(async ({ ctx, next }) =>
+    const mw = middleware<Record<string, unknown>, { userId: string }>(async ({ ctx, next }) =>
       next({ ...ctx, userId: "user-123" }),
     );
     expect(typeof mw.fn).toBe("function");
   });
 
   it("middleware can be used in a procedure chain", async () => {
-    const withUserId = middleware<{}, { userId: string }>(async ({ ctx, next }) =>
+    const withUserId = middleware<Record<string, unknown>, { userId: string }>(async ({ ctx, next }) =>
       next({ ...ctx, userId: "user-123" }),
     );
 
@@ -286,7 +286,7 @@ describe("middleware", () => {
   it("middleware receives input and context", async () => {
     const capturedParams: { input: unknown; ctx: unknown }[] = [];
 
-    const captureMw = middleware<{}, {}>(async ({ input, ctx, next }) => {
+    const captureMw = middleware<Record<string, unknown>, Record<string, unknown>>(async ({ input, ctx, next }) => {
       capturedParams.push({ input, ctx });
       return next(ctx);
     });
@@ -307,7 +307,7 @@ describe("middleware", () => {
   it("multiple middleware compose correctly", async () => {
     const steps: string[] = [];
 
-    const mw1 = middleware<{}, { step1: boolean }>(async ({ ctx, next }) => {
+    const mw1 = middleware<Record<string, unknown>, { step1: boolean }>(async ({ ctx, next }) => {
       steps.push("mw1-before");
       const result = await next({ ...ctx, step1: true });
       steps.push("mw1-after");
@@ -338,8 +338,8 @@ describe("middleware", () => {
     expect(steps).toEqual(["mw1-before", "mw2-before", "handler", "mw2-after", "mw1-after"]);
   });
 
-  it("middleware can short-circuit the chain", async () => {
-    const authMw = middleware<{}, { authorized: boolean }>(async () => {
+  it("middleware can be short-circuit the chain", async () => {
+    const authMw = middleware<Record<string, unknown>, { authorized: boolean }>(async () => {
       // Don't call next — return error immediately
       return {
         content: [{ type: "text", text: "Unauthorized" }],

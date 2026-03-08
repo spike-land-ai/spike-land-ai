@@ -156,7 +156,7 @@ describe("recordEloEvent", () => {
     };
 
     const batchMock = vi.fn().mockResolvedValue([]);
-    const prepareMock = vi.fn().mockImplementation((sql: string) => ({
+    const prepareMock = vi.fn().mockImplementation((_sql: string) => ({
       bind: vi.fn().mockReturnThis(),
       run: vi.fn().mockResolvedValue({}),
       first: vi.fn().mockResolvedValue(existingRow),
@@ -301,10 +301,10 @@ describe("grantBugBounty", () => {
 
     const runMock = vi.fn().mockResolvedValue({});
     const batchMock = vi.fn().mockResolvedValue([]);
-    const prepareMock = vi.fn().mockImplementation((sql: string) => ({
+    const prepareMock = vi.fn().mockImplementation((_sql: string) => ({
       bind: vi.fn().mockReturnThis(),
       run: runMock,
-      first: vi.fn().mockResolvedValue(sql.includes("user_elo") ? existingRow : null),
+      first: vi.fn().mockResolvedValue(_sql.includes("user_elo") ? existingRow : null),
       all: vi.fn().mockResolvedValue({ results: [] }),
     }));
 

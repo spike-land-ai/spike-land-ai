@@ -17,12 +17,18 @@ export const interpolate = vi.fn((frame, input, output) => {
 
 export const spring = vi.fn(() => 0);
 
-export const AbsoluteFill = ({ children, style }: any) => <div style={style}>{children}</div>;
-export const Sequence = ({ children }: any) => <>{children}</>;
+export const AbsoluteFill = ({
+  children,
+  style,
+}: { children: React.ReactNode; style?: React.CSSProperties }) => <div style={style}>{children}</div>;
+export const Sequence = ({ children }: { children: React.ReactNode }) => <>{children}</>;
 export const Audio = () => null;
 export const staticFile = (path: string) => path;
 
-export const TransitionSeries = Object.assign(({ children }: any) => <>{children}</>, {
-  Sequence: ({ children }: any) => <>{children}</>,
-  Transition: () => null,
-});
+export const TransitionSeries = Object.assign(
+  ({ children }: { children: React.ReactNode }) => <>{children}</>,
+  {
+    Sequence: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+    Transition: () => null,
+  },
+);

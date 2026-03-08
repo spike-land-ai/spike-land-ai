@@ -383,7 +383,7 @@ describe("createWorkerDOMHostConfig", () => {
 
 describe("createWorkerDOMHostConfig - worker root", () => {
   it("creates a WorkerRoot and renders", async () => {
-    const mutations: unknown[] = [];
+    const _mutations: unknown[] = [];
 
     const mockDoc: WorkerDocument = {
       createElement: (type: string) => {

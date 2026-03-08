@@ -55,7 +55,7 @@ describe("MainFetchHandler", () => {
       });
       (handleUnauthorizedRequest as Mock).mockReturnValue(mockUnauthorizedResponse);
 
-      const response = await handleMainFetch(mockYandexRequest, mockEnv, mockCtx);
+      const _response = await handleMainFetch(mockYandexRequest, mockEnv, mockCtx);
 
       expect(handleUnauthorizedRequest).toHaveBeenCalled();
       expect(response).toBe(mockUnauthorizedResponse);
@@ -77,7 +77,7 @@ describe("MainFetchHandler", () => {
       (handleErrors as Mock).mockImplementation(async (_, handler) => await handler());
       (handleFetchApi as Mock).mockResolvedValue(mockFetchApiResponse);
 
-      const response = await handleMainFetch(mockRequest, mockEnv as Env, mockCtx);
+      const _response = await handleMainFetch(mockRequest, mockEnv as Env, mockCtx);
 
       expect(handleErrors).toHaveBeenCalled();
       expect(handleFetchApi).toHaveBeenCalled();
@@ -100,7 +100,7 @@ describe("MainFetchHandler", () => {
       (handleErrors as Mock).mockImplementation(async (_, handler) => await handler());
       (handleFetchApi as Mock).mockResolvedValue(mockFetchApiResponse);
 
-      const response = await handleMainFetch(mockRequest, mockEnv as Env, mockCtx);
+      const _response = await handleMainFetch(mockRequest, mockEnv as Env, mockCtx);
 
       expect(handleFetchApi).toHaveBeenCalledWith(
         ["live", redirectTarget, "embed"],
@@ -124,7 +124,7 @@ describe("MainFetchHandler", () => {
       (handleErrors as Mock).mockImplementation(async (_, handler) => await handler());
       (handleFetchApi as Mock).mockResolvedValue(mockFetchApiResponse);
 
-      const response = await handleMainFetch(mockRequest, mockEnv as Env, mockCtx);
+      const _response = await handleMainFetch(mockRequest, mockEnv as Env, mockCtx);
 
       expect(handleFetchApi).toHaveBeenCalledWith(
         ["some", "test", "path"],
@@ -143,7 +143,7 @@ describe("MainFetchHandler", () => {
       (handleErrors as Mock).mockImplementation(async (_, handler) => await handler());
       (handleFetchApi as Mock).mockResolvedValue(mockFetchApiResponse);
 
-      const response = await handleMainFetch(mockRequest, mockEnv as Env, mockCtx);
+      const _response = await handleMainFetch(mockRequest, mockEnv as Env, mockCtx);
 
       expect(handleFetchApi).toHaveBeenCalledWith(
         ["live", "landing", "embed"],
@@ -167,7 +167,7 @@ describe("MainFetchHandler", () => {
       (handleErrors as Mock).mockImplementation(async (_, handler) => await handler());
       (handleFetchApi as Mock).mockResolvedValue(mockFetchApiResponse);
 
-      const response = await handleMainFetch(mockRequest, mockEnv as Env, mockCtx);
+      const _response = await handleMainFetch(mockRequest, mockEnv as Env, mockCtx);
 
       expect(handleErrors).toHaveBeenCalledWith(
         mockRequest,
@@ -185,7 +185,7 @@ describe("MainFetchHandler", () => {
       (handleErrors as Mock).mockImplementation(async (_, handler) => await handler());
       (handleFetchApi as Mock).mockResolvedValue(mockFetchApiResponse);
 
-      const response = await handleMainFetch(mockRequest, mockEnv as Env, mockCtx);
+      const _response = await handleMainFetch(mockRequest, mockEnv as Env, mockCtx);
 
       expect(handleFetchApi).toHaveBeenCalled();
     });

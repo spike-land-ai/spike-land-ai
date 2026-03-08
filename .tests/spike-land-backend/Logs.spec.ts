@@ -14,7 +14,7 @@ const createMockKVNamespace = () => ({
 
 describe("KVLogger", () => {
   let mockKVNamespace: ReturnType<typeof createMockKVNamespace>;
-  let mockConsoleLog: SpyInstance;
+  let _mockConsoleLog: SpyInstance;
   let mockConsoleError: SpyInstance;
   let logger: KVLogger;
 
@@ -29,7 +29,7 @@ describe("KVLogger", () => {
     mockKVNamespace = createMockKVNamespace();
 
     // Mock console methods
-    mockConsoleLog = vi.spyOn(console, "log").mockImplementation(() => {});
+    _mockConsoleLog = vi.spyOn(console, "log").mockImplementation(() => {});
     mockConsoleError = vi.spyOn(console, "error").mockImplementation(() => {});
 
     // Create logger instance

@@ -7,7 +7,7 @@ import type { Env } from "../../../src/edge-api/spike-land/core-logic/env";
 import type { AuthVariables } from "../../../src/edge-api/spike-land/api/middleware";
 import { publicToolsRoute } from "../../../src/edge-api/spike-land/api/public-tools";
 import { createMockD1, createMockKV } from "../__test-utils__/mock-env";
-import { ToolRegistry } from "../../../src/edge-api/spike-land/lazy-imports/registry";
+import type { ToolRegistry } from "../../../src/edge-api/spike-land/lazy-imports/registry";
 import { z } from "zod";
 
 // Mock registerAllTools to avoid needing full D1/env setup for all 80+ tools.

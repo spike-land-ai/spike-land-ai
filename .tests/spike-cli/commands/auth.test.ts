@@ -106,7 +106,7 @@ describe("auth command", () => {
 
     registerAuthCommand(program);
     const login = program.commands[0].commands.find((c) => c.name() === "login")!;
-    // @ts-expect-error
+    // @ts-expect-error - accessing private commander handler for testing
     await login._actionHandler([{ baseUrl: "https://test" }, []]);
 
     expect(console.error).toHaveBeenCalledWith(
@@ -131,7 +131,7 @@ describe("auth command", () => {
 
     registerAuthCommand(program);
     const login = program.commands[0].commands.find((c) => c.name() === "login")!;
-    // @ts-expect-error
+    // @ts-expect-error - accessing private commander handler for testing
     await login._actionHandler([{ baseUrl: "https://test" }, []]);
 
     expect(console.error).toHaveBeenCalledWith(expect.stringContaining("Welcome"));
@@ -146,7 +146,7 @@ describe("auth command", () => {
 
     registerAuthCommand(program);
     const status = program.commands[0].commands.find((c) => c.name() === "status")!;
-    // @ts-expect-error
+    // @ts-expect-error - accessing private commander handler for testing
     await status._actionHandler([{}, []]);
 
     expect(console.error).toHaveBeenCalledWith(expect.stringContaining("Expires at:"));

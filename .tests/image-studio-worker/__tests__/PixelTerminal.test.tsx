@@ -22,7 +22,7 @@ vi.mock("@/api/client", () => ({
 
 // Mock DynamicToolForm to avoid rendering complex nested components
 vi.mock("@/components/ui/DynamicToolForm", () => ({
-  DynamicToolForm: ({ onSubmit, toolName }: any) => (
+  DynamicToolForm: ({ onSubmit, toolName }: { onSubmit: (data: Record<string, unknown>) => void; toolName: string }) => (
     <div data-testid={`mock-form-${toolName}`}>
       <button onClick={() => onSubmit({ prompt: "test prompt" })}>Submit {toolName}</button>
     </div>
@@ -59,7 +59,7 @@ describe("PixelTerminal", () => {
       loading: false,
       error: null,
       refetch: vi.fn(),
-    } as any);
+    } as unknown as ReturnType<typeof useTools>);
   });
 
   it("renders the welcome message initially", () => {
@@ -114,7 +114,7 @@ describe("PixelTerminal", () => {
     const user = userEvent.setup();
     const mockBalRes = { content: [{ type: "text", text: '{"remaining": 100}' }] };
 
-    vi.mocked(callTool).mockResolvedValue(mockBalRes as any);
+    vi.mocked(callTool).mockResolvedValue(mockBalRes as unknown as ReturnType<typeof callTool>);
     vi.mocked(parseToolResult).mockReturnValue({ remaining: 100 });
 
     render(<PixelTerminal />);
@@ -122,11 +122,11 @@ describe("PixelTerminal", () => {
     const input = screen.getByPlaceholderText("type a command or tool name…");
 
     // Defer resolution to test loading state
-    let resolveCredits: any;
-    const creditsPromise = new Promise((resolve) => {
+    let resolveCredits: (value: unknown) => void;
+    const creditsPromise = new Promise<unknown>((resolve) => {
       resolveCredits = resolve;
     });
-    vi.mocked(callTool).mockReturnValue(creditsPromise as any);
+    vi.mocked(callTool).mockReturnValue(creditsPromise as Promise<unknown> as ReturnType<typeof callTool>);
 
     await user.type(input, "credits{Enter}");
 
@@ -203,7 +203,7 @@ describe("PixelTerminal", () => {
 
     // Simulate successful submission
     const mockResult = { success: true };
-    vi.mocked(callTool).mockResolvedValue({} as any);
+    vi.mocked(callTool).mockResolvedValue({} as unknown as ReturnType<typeof callTool>);
     vi.mocked(parseToolResult).mockReturnValue(mockResult);
 
     await user.click(screen.getByText("Submit test_gen"));
@@ -258,7 +258,7 @@ describe("PixelTerminal", () => {
       grouped: mockGrouped,
       byName: mockByName,
       loading: false,
-    } as any);
+    } as unknown as ReturnType<typeof useTools>);
 
     // Single match: 'test_edit'
     await user.type(input, "test_e");

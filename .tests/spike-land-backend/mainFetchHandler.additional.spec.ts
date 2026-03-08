@@ -1,7 +1,7 @@
 /**
  * Additional mainFetchHandler tests for uncovered branches
  */
-import { beforeEach, describe, expect, it, type Mock, vi } from "vitest";
+import { beforeEach, describe, expect, it, type  vi } from "vitest";
 import type Env from "../../src/edge-api/backend/core-logic/env.js";
 import { handleFetchApi } from "../../src/edge-api/backend/lazy-imports/fetchHandler.js";
 import { handleErrors } from "../../src/edge-api/backend/lazy-imports/handleErrors.js";

@@ -139,7 +139,7 @@ describe("PostHandler — branch coverage", () => {
 
       const handler = new PostHandler(mockCode, envWithGA);
       const request = makeRequest(makeValidBody());
-      const response = await handler.handle(request, new URL("https://example.com/messages"));
+      const _response = await handler.handle(request, new URL("https://example.com/messages"));
 
       // The GA4 error should be caught silently — request still succeeds
       expect(response.status).toBe(200);
@@ -158,7 +158,7 @@ describe("PostHandler — branch coverage", () => {
       const handler = new PostHandler(mockCode, mockEnv);
       const request = makeRequest(makeValidBody());
       const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
-      const response = await handler.handle(request, new URL("https://example.com/messages"));
+      const _response = await handler.handle(request, new URL("https://example.com/messages"));
       expect(response.status).toBe(500);
       // The outer catch returns "Failed to process message" with details: "Unknown error"
       const data = (await response.json()) as { error: string; details?: string };
@@ -179,7 +179,7 @@ describe("PostHandler — branch coverage", () => {
 
       const handler = new PostHandler(mockCode, mockEnv);
       const request = makeRequest(makeValidBody());
-      const response = await handler.handle(request, new URL("https://example.com/messages"));
+      const _response = await handler.handle(request, new URL("https://example.com/messages"));
       expect(mockResult.toTextStreamResponse).toHaveBeenCalled();
     });
   });
@@ -193,7 +193,7 @@ describe("PostHandler — branch coverage", () => {
       const handler = new PostHandler(mockCode, mockEnv);
       const request = makeRequest(makeValidBody());
       const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
-      const response = await handler.handle(request, new URL("https://example.com/messages"));
+      const _response = await handler.handle(request, new URL("https://example.com/messages"));
       expect(response.status).toBe(500);
       consoleSpy.mockRestore();
     });
@@ -210,7 +210,7 @@ describe("PostHandler — branch coverage", () => {
       const handler = new PostHandler(mockCode, mockEnv);
       const request = makeRequest(makeValidBody());
       const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
-      const response = await handler.handle(request, new URL("https://example.com/messages"));
+      const _response = await handler.handle(request, new URL("https://example.com/messages"));
       expect(response.status).toBe(500);
       consoleSpy.mockRestore();
     });
@@ -237,7 +237,7 @@ describe("PostHandler — branch coverage", () => {
 
       const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
       const request = makeRequest(makeValidBody());
-      const response = await handler.handle(request, new URL("https://example.com/messages"));
+      const _response = await handler.handle(request, new URL("https://example.com/messages"));
       expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining("invalid inputSchema.type"));
       consoleSpy.mockRestore();
     });
@@ -280,7 +280,7 @@ describe("PostHandler — branch coverage", () => {
         ...makeValidBody(),
         tools: [null, { input_schema: { type: "object" } }],
       });
-      const response = await handler.handle(request, new URL("https://example.com/messages"));
+      const _response = await handler.handle(request, new URL("https://example.com/messages"));
       expect(response).toBeDefined();
     });
   });
@@ -321,7 +321,7 @@ describe("PostHandler — branch coverage", () => {
           },
         ],
       });
-      const response = await handler.handle(request, new URL("https://example.com/messages"));
+      const _response = await handler.handle(request, new URL("https://example.com/messages"));
       expect(response).toBeDefined();
     });
   });
@@ -343,7 +343,7 @@ describe("PostHandler — branch coverage", () => {
           },
         ],
       });
-      const response = await handler.handle(request, new URL("https://example.com/messages"));
+      const _response = await handler.handle(request, new URL("https://example.com/messages"));
       expect(response).toBeDefined();
     });
   });
@@ -369,7 +369,7 @@ describe("PostHandler — branch coverage", () => {
           },
         ],
       });
-      const response = await handler.handle(request, new URL("https://example.com/messages"));
+      const _response = await handler.handle(request, new URL("https://example.com/messages"));
       expect(response).toBeDefined();
     });
   });
@@ -384,7 +384,7 @@ describe("PostHandler — branch coverage", () => {
         headers: { "Content-Type": "application/json" },
       });
       const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
-      const response = await handler.handle(request, new URL("https://example.com/messages"));
+      const _response = await handler.handle(request, new URL("https://example.com/messages"));
       // Should return 500 from outer catch
       expect(response.status).toBe(500);
       consoleSpy.mockRestore();

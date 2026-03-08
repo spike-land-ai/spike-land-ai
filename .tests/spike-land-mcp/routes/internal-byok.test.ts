@@ -73,22 +73,6 @@ async function encryptByokKey(
   return btoa(payload);
 }
 
-function buildApp(vaultSecret = "test-vault-secret") {
-  const { internalByokRoute } = require("../../../src/edge-api/spike-land/api/internal-byok") as {
-    internalByokRoute: ReturnType<typeof import("hono")["Hono"]["prototype"]["route"]>;
-  };
-  const app = new Hono<{ Bindings: Env }>();
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  app.route("/internal", internalByokRoute as any);
-
-  const env = {
-    DB: {} as D1Database,
-    VAULT_SECRET: vaultSecret,
-  } as unknown as Env;
-
-  return { app, env };
-}
-
 describe("internalByokRoute POST /byok/get", () => {
   it("returns 400 when userId is missing", async () => {
     _mockDbRows = [];

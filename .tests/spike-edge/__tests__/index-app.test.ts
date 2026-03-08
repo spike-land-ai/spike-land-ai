@@ -10,7 +10,6 @@ import type { Env } from "../../../src/edge-api/main/core-logic/env.js";
 // because importing index.ts directly would require all CF bindings
 import { Hono } from "hono";
 import { requestIdMiddleware } from "../../../src/edge-api/main/api/middleware/request-id.js";
-import { RateLimiter } from "../../../src/edge-api/main/edge/rate-limiter.js";
 
 function createMockEnv(overrides: Partial<Env> = {}): Env {
   return {
@@ -76,7 +75,7 @@ describe("requestIdMiddleware", () => {
   it("adds x-request-id header to response", async () => {
     const app = new Hono<{ Bindings: Env }>();
     app.use("*", requestIdMiddleware);
-    app.get("/test", (c) => c.json({ ok: true }));
+    app.get("/test", (_c) => _c.json({ ok: true }));
 
     const env = createMockEnv();
     const res = await app.request("/test", {}, env);
@@ -112,7 +111,7 @@ describe("CORS middleware via full app", () => {
       });
       return corsMiddleware(c, next);
     });
-    app.get("/test", (c) => c.json({ ok: true }));
+    app.get("/test", (_c) => _c.json({ ok: true }));
 
     const env = createMockEnv({ ALLOWED_ORIGINS: "" });
     const res = await app.request(
@@ -135,7 +134,7 @@ describe("CORS middleware via full app", () => {
       const corsMiddleware = cors({ origin: allowedOrigins });
       return corsMiddleware(c, next);
     });
-    app.get("/test", (c) => c.json({ ok: true }));
+    app.get("/test", (_c) => _c.json({ ok: true }));
 
     const env = createMockEnv({ ALLOWED_ORIGINS: "https://spike.land,https://dev.spike.land" });
     const res = await app.request(
@@ -171,8 +170,8 @@ describe("Security headers middleware", () => {
       }
       c.res.headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
     });
-    app.get("/test", (c) => c.json({ ok: true }));
-    app.get("/live/code1", (c) => c.json({ live: true }));
+    app.get("/test", (_c) => _c.json({ ok: true }));
+    app.get("/live/code1", (_c) => _c.json({ live: true }));
 
     const env = createMockEnv();
     const res = await app.request("/test", {}, env);
@@ -201,7 +200,7 @@ describe("Security headers middleware", () => {
       }
       c.res.headers.set("X-Content-Type-Options", "nosniff");
     });
-    app.get("/test", (c) => new Response("{}", { status: 200 }));
+    app.get("/test", (_c) => new Response("{}", { status: 200 }));
 
     const env = createMockEnv();
     const res = await app.request("/test", {}, env);
@@ -235,7 +234,7 @@ describe("Error handler in full app", () => {
 describe("Catch-all /api/* route", () => {
   it("returns 404 JSON for unmatched API routes", async () => {
     const app = new Hono<{ Bindings: Env }>();
-    app.all("/api/*", (c) => {
+    app.all("/api/*", (_c) => {
       return c.json({ error: "Not Found", path: c.req.path }, 404);
     });
 
@@ -251,7 +250,7 @@ describe("Catch-all /api/* route", () => {
 describe("OAuth well-known endpoints", () => {
   it("returns oauth-authorization-server metadata", async () => {
     const app = new Hono<{ Bindings: Env }>();
-    app.get("/.well-known/oauth-authorization-server", (c) => {
+    app.get("/.well-known/oauth-authorization-server", (_c) => {
       c.header("Cache-Control", "public, max-age=86400");
       return c.json({
         issuer: "https://spike.land",
@@ -274,7 +273,7 @@ describe("OAuth well-known endpoints", () => {
 
   it("returns oauth-protected-resource/mcp metadata", async () => {
     const app = new Hono<{ Bindings: Env }>();
-    app.get("/.well-known/oauth-protected-resource/mcp", (c) => {
+    app.get("/.well-known/oauth-protected-resource/mcp", (_c) => {
       c.header("Cache-Control", "public, max-age=86400");
       return c.json({
         resource: "https://spike.land/mcp",
@@ -295,7 +294,7 @@ describe("OAuth well-known endpoints", () => {
 describe("MCP proxy routes", () => {
   it("proxies GET /mcp/tools", async () => {
     const app = new Hono<{ Bindings: Env }>();
-    app.get("/mcp/tools", async (c) => {
+    app.get("/mcp/tools", async (_c) => {
       const url = new URL("https://mcp.spike.land/tools");
       const requestId = c.get("requestId" as never) as string;
       const response = await c.env.MCP_SERVICE.fetch(
@@ -326,7 +325,7 @@ describe("MCP proxy routes", () => {
     };
 
     const app = new Hono<{ Bindings: Env }>();
-    app.get("/api/store/tools", async (c) => {
+    app.get("/api/store/tools", async (_c) => {
       const requestId = c.get("requestId" as never) as string;
       const response = await c.env.MCP_SERVICE.fetch(
         new Request("https://mcp.spike.land/tools", {
@@ -385,13 +384,13 @@ describe("MCP proxy routes", () => {
     expect(body.total).toBe(3);
     expect(body.categories.length).toBeGreaterThan(0);
     // "other" category for tool3 (no category)
-    const otherCat = (body.categories as Array<{ name: string }>).find((c) => c.name === "other");
+    const otherCat = (body.categories as Array<{ name: string }>).find((_c) => _c.name === "other");
     expect(otherCat).toBeTruthy();
   });
 
   it("returns 502 when MCP service is unavailable for store tools", async () => {
     const app = new Hono<{ Bindings: Env }>();
-    app.get("/api/store/tools", async (c) => {
+    app.get("/api/store/tools", async (_c) => {
       const response = await c.env.MCP_SERVICE.fetch(new Request("https://mcp.spike.land/tools"));
       if (!response.ok) {
         return c.json({ error: "Failed to fetch tools" }, 502);

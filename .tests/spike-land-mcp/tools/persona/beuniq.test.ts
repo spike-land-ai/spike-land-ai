@@ -20,7 +20,7 @@ interface CapturedTool {
 
 const capturedTools: CapturedTool[] = [];
 
-function createMockRegistry() {
+function _createMockRegistry() {
   return {
     registerBuilt(built: unknown) {
       const b = built as { _name: string; _handler: CapturedTool["handler"] };

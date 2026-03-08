@@ -5,21 +5,6 @@ import { describe, expect, it } from "vitest";
 import { Hono } from "hono";
 import type { Env } from "../../../src/edge-api/spike-land/core-logic/env";
 import { internalAnalytics } from "../../../src/edge-api/spike-land/api/internal-analytics";
-import { createMockD1 } from "../__test-utils__/mock-env";
-
-function buildApp(queryResult: Record<string, unknown>[] = []) {
-  const app = new Hono<{ Bindings: Env }>();
-
-  const db = createMockD1(() => ({
-    results: queryResult,
-    success: true,
-    meta: {},
-  }));
-
-  app.route("/internal", internalAnalytics);
-
-  return { app, db };
-}
 
 function buildAppWithEnv(
   queryResult: Record<string, unknown>[] = [],
@@ -30,11 +15,11 @@ function buildAppWithEnv(
 
   // Override env for each request
   const mockDB = {
-    prepare: (sql: string) => {
-      let boundValues: unknown[] = [];
+    prepare: (_sql: string) => {
+      let _boundValues: unknown[] = [];
       const stmt = {
         bind: (...values: unknown[]) => {
-          boundValues = values;
+          _boundValues = values;
           return stmt;
         },
         all: async () => ({ results: queryResult, success: true, meta: {} }),

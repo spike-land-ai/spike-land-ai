@@ -1,4 +1,4 @@
-import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
+import { describe, expect, it, vi, _beforeEach, afterEach } from "vitest";
 import { SessionSynchronizer } from "@/services/SessionSynchronizer";
 import type { ICodeSession } from "@/lib/interfaces";
 

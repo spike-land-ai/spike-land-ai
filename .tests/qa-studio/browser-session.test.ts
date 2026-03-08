@@ -53,9 +53,9 @@ import {
   closeTab,
   getActiveTab,
   getOrCreateTab,
-  getPageSnapshot,
+  _getPageSnapshot,
   listTabs,
-  setBrowserConfig,
+  _setBrowserConfig,
 } from "../../src/core/browser-automation/core-logic/browser-session.js";
 
 // Reset all singleton state and re-configure mocks between tests

@@ -612,7 +612,7 @@ describe("workflow tools", () => {
 
     // Trigger unknown fallbacks by clearing options for Q2
     const q2 = session.currentRound.questions[1];
-    (q2 as any).options = []; // break it
+    (q2 as unknown as { options: unknown[] }).options = []; // break it
 
     const answers: [number, number, number] = [
       q1.correctIndex, // Correct for mastered concept

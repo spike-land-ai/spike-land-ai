@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it } from "vitest";
 import {
   addState,
   addTransition,
@@ -8,7 +8,6 @@ import {
   removeState,
   removeTransition,
   setContext,
-  getState,
   sendEvent,
   resetMachine,
   validateMachine,
@@ -266,7 +265,7 @@ describe("Statechart Engine Coverage", () => {
     });
 
     it("should execute exit actions on transition", () => {
-      let exitCalled = false;
+      const _exitCalled = false;
       const m = createMachine({ name: "ExitActions", userId: "u1", initial: "s1" });
       addState(m.definition.id, {
         id: "s1",
@@ -360,7 +359,7 @@ describe("Statechart Engine Coverage", () => {
     });
 
     it("should handle internal transitions without exit/entry", () => {
-      let exitCalled = false;
+      let _exitCalled = false;
       const m = createMachine({ name: "Internal", userId: "u1", initial: "s1" });
       addState(m.definition.id, {
         id: "s1",
@@ -370,7 +369,7 @@ describe("Statechart Engine Coverage", () => {
             type: "custom",
             params: {
               fn: () => {
-                exitCalled = true;
+                _exitCalled = true;
               },
             },
           },
@@ -386,7 +385,7 @@ describe("Statechart Engine Coverage", () => {
 
       resetMachine(m.definition.id);
       sendEvent(m.definition.id, "STAY");
-      expect(exitCalled).toBe(false);
+      expect(_exitCalled).toBe(false);
       expect(m.context.x).toBe(1);
     });
 

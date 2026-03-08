@@ -6,7 +6,7 @@ import { Hono } from "hono";
 import type { Env } from "../../../src/edge-api/spike-land/core-logic/env";
 import { internalAuthMiddleware } from "../../../src/edge-api/spike-land/api/internal-auth";
 
-function buildApp(internalSecret: string) {
+function buildApp(_internalSecret: string) {
   const app = new Hono<{ Bindings: Env }>();
 
   app.use("/internal/*", internalAuthMiddleware);

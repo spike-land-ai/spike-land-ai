@@ -76,7 +76,7 @@ describe("cli", () => {
 
     // Restore real parse to let the preAction hook fire
     vi.mocked(program.parse).mockRestore?.();
-    vi.spyOn(program, "parse").mockImplementation((argv, opts) => {
+    vi.spyOn(program, "parse").mockImplementation((_argv, _opts) => {
       // Manually invoke preAction by simulating what commander does:
       // walk hooks and call preAction with a command that has verbose=true
       const hooks = (program as Record<string, unknown>)._lifeCycleHooks as
@@ -116,7 +116,7 @@ describe("cli", () => {
     const store = await import("../../src/cli/spike-cli/node-sys/store");
     vi.mocked(store.loadAliases).mockResolvedValue({
       commands: { st: "status" },
-    } as any);
+    } as unknown);
 
     process.argv = ["node", "spike", "not-an-alias"];
     await main();
@@ -128,7 +128,9 @@ describe("cli", () => {
     const setVerboseSpy = vi.spyOn(logger, "setVerbose");
 
     vi.spyOn(program, "parse").mockImplementation(() => {
-      const hooks = (program as any)._lifeCycleHooks;
+      const hooks = (program as unknown as Record<string, unknown>)._lifeCycleHooks as
+        | Record<string, Array<(cmd: unknown) => void>>
+        | undefined;
       if (hooks?.["preAction"]) {
         for (const hook of hooks["preAction"]) {
           hook({ opts: () => ({ verbose: false }) });

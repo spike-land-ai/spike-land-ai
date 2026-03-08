@@ -390,7 +390,7 @@ it("uploads bytes with fallback bin extension", async () => {
     "../../src/edge-api/image-studio-worker/mcp/storage.ts"
   );
   const mockPut = vi.fn().mockResolvedValue(undefined);
-  const mockEnv = { IMAGE_R2: { put: mockPut } } as any;
+  const mockEnv = { IMAGE_R2: { put: mockPut } } as unknown as import("../../src/edge-api/image-studio-worker/env.d.ts").Env;
   const storage = createR2Storage(mockEnv, "https://cdn.example.com");
   const result = await storage.upload("user-xyz", new Uint8Array([0xff]), {
     filename: "noextension",

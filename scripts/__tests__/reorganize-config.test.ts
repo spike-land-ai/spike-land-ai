@@ -4,7 +4,6 @@ import {
   deduplicateDepGroup,
   kindToCategory,
   categoryRules,
-  fallbackCategory,
   nameOverrides,
   excludedDeps,
 } from "../reorganize-config.js";

@@ -333,7 +333,7 @@ const packages: Record<string, PkgConfig> = {
       "@spike-land-ai/code": src("edge-api/backend/__mocks__/@spike-land-ai/code.js"),
       "esbuild-wasm": path.join(root, "node_modules/esbuild-wasm"),
     },
-    reporters: process.env["COVERAGE"] ? [reporter] : ["hanging-process", reporter],
+    reporters: process.env.COVERAGE ? [reporter] : ["hanging-process", reporter],
     includeTests: [
       tests("spike-land-backend/**/*.test.ts"),
       tests("spike-land-backend/**/*.spec.ts"),
@@ -426,7 +426,7 @@ function buildProject(name: string, cfg: PkgConfig) {
   const mappedPath = packagePathMap[name] ?? name;
   const defaultIncludeTests = [tests(`${name}/**/*.test.ts`)];
   const defaultIncludeSrc = [src(`${mappedPath}/**/*.ts`)];
-  const defaultCoverageExclude = [...commonCoverageExclude, "**/index.ts"];
+  const _defaultCoverageExclude = [...commonCoverageExclude, "**/index.ts"];
 
   const coverageExclude =
     cfg.coverageExclude !== undefined && cfg.coverageExclude.length === 0

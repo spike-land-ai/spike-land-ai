@@ -273,7 +273,7 @@ describe("diagram", () => {
 
   it("should return GENERATION_FAILED when fallback createGenerationJob throws", async () => {
     const ctx: ToolContext = { userId, deps };
-    delete (deps.generation as any).createAdvancedGenerationJob;
+    delete (deps.generation as unknown as Record<string, unknown>).createAdvancedGenerationJob;
     mocks.generation.createGenerationJob.mockRejectedValue(new Error("Network fail"));
 
     const result = await diagram({ prompt: "Diagram" }, ctx);

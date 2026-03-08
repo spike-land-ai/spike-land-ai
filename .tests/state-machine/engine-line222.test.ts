@@ -10,8 +10,6 @@ import { beforeEach, describe, expect, it } from "vitest";
 import {
   clearMachines,
   createMachine,
-  getState,
-  getMachine,
   addState,
   addTransition,
   removeState,
@@ -117,7 +115,7 @@ describe("engine.ts line 222 coverage", () => {
     addState(id, { id: "p", type: "compound" });
     addState(id, { id: "c", type: "atomic", parent: "p" });
     // Adding child again should not duplicate it in parent's children
-    const parentBefore = [...machine.definition.states["p"]!.children];
+    const _parentBefore = [...machine.definition.states["p"]!.children];
 
     // Manually call addState again with same child
     machine.definition.states["c2"] = {

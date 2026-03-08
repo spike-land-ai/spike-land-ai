@@ -290,7 +290,7 @@ describe("Code Durable Object — initializeSession & fetch branches", () => {
       // Trigger through fetch which catches initializeSession errors
       const request = new Request("https://example.com/live/a-b-c/session?room=a-b-c");
       // fetch catches "Session initialization error" and continues with backup session
-      const response = await codeInstance.fetch(request);
+      const _response = await codeInstance.fetch(request);
 
       expect(consoleError).toHaveBeenCalledWith("Session initialization error:", expect.any(Error));
       // Should still return a response (from routeHandler)
@@ -403,7 +403,7 @@ describe("Code Durable Object — initializeSession & fetch branches", () => {
 
       const request = new Request("https://example.com/live/test-space/session?room=test-space");
       // Should not throw — error is caught
-      const response = await codeInstance.fetch(request);
+      const _response = await codeInstance.fetch(request);
 
       expect(response).toBeDefined();
       consoleError.mockRestore();
@@ -418,11 +418,11 @@ describe("Code Durable Object — initializeSession & fetch branches", () => {
         method: "POST",
         body: JSON.stringify(newSession),
         headers: { "Content-Type": "application/json" },
-        // @ts-ignore
+        // @ts-expect-error -- intentional error for testing
         duplex: "half",
       });
 
-      const response = await codeInstance.fetch(request);
+      const _response = await codeInstance.fetch(request);
       expect(response).toBeDefined();
     });
 
@@ -436,11 +436,11 @@ describe("Code Durable Object — initializeSession & fetch branches", () => {
         method: "POST",
         body: "not valid json",
         headers: { "Content-Type": "text/plain" },
-        // @ts-ignore
+        // @ts-expect-error -- intentional error for testing
         duplex: "half",
       });
 
-      const response = await codeInstance.fetch(request);
+      const _response = await codeInstance.fetch(request);
       expect(response.status).toBe(400);
     });
 
@@ -449,7 +449,7 @@ describe("Code Durable Object — initializeSession & fetch branches", () => {
 
       const request = new Request("https://example.com/mcp?codeSpace=test-space");
 
-      const response = await codeInstance.fetch(request);
+      const _response = await codeInstance.fetch(request);
 
       // MCP server's handleRequest is called
       expect(codeInstance["mcpServer"].handleRequest).toHaveBeenCalled();
@@ -550,7 +550,7 @@ describe("Code Durable Object — initializeSession & fetch branches", () => {
 
       // Modify codeInstance to have no session after initialization completes
       // We use a spy to verify xLog is called when session is truthy
-      const xLogSpy = vi.spyOn(codeInstance as { xLog: Function }, "xLog");
+      const xLogSpy = vi.spyOn(codeInstance as { xLog: (...args: unknown[]) => unknown }, "xLog");
       await codeInstance.initializeSession(url);
 
       // xLog should have been called (session exists)

@@ -244,7 +244,7 @@ describe("submit_review tool handler", () => {
 describe("review_pr tool handler", () => {
   it("calls reviewPR and formats the response", async () => {
     // Mock the reviewPR function to avoid GitHub API calls
-    const { reviewPR } = await import("../../src/mcp-tools/code-review/tools/review-pr.js");
+    const { reviewPR: _reviewPR } = await import("../../src/mcp-tools/code-review/tools/review-pr.js");
 
     // The review_pr handler calls reviewPR internally
     // We need to mock at the tool level - inject a mock via vi.mock

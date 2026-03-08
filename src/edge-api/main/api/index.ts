@@ -25,6 +25,7 @@ import { cockpit } from "./routes/cockpit.js";
 import { credits } from "./routes/credits.js";
 import { creditMeterMiddleware } from "./middleware/credit-meter.js";
 import { requestIdMiddleware } from "./middleware/request-id.js";
+import { buildMcpProxyHeaders } from "./middleware/mcp-proxy-auth.js";
 import { support } from "./routes/support.js";
 import { pricingApi } from "./routes/pricing-api.js";
 import { experiments } from "./routes/experiments.js";
@@ -362,10 +363,14 @@ async function mcpProxy(c: import("hono").Context<{ Bindings: Env; Variables: Va
   url.protocol = "https:";
 
   const newRequest = new Request(url.toString(), c.req.raw);
-  newRequest.headers.set("X-Request-Id", c.get("requestId"));
+  const proxyHeaders = await buildMcpProxyHeaders(c.env, c.req.raw, {
+    requestId: c.get("requestId"),
+    fetchAuth: fetchAuthWithFallback,
+  });
+  proxyHeaders.set("X-Request-Id", c.get("requestId"));
   const response = await fetchMcpWithFallback(c.env, newRequest.url, {
     method: newRequest.method,
-    headers: Object.fromEntries(newRequest.headers.entries()),
+    headers: Object.fromEntries(proxyHeaders.entries()),
     body: newRequest.method !== "GET" && newRequest.method !== "HEAD" ? newRequest.body : undefined,
     // @ts-expect-error duplex needed for streaming request bodies
     duplex: "half",

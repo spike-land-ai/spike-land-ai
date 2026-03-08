@@ -35,11 +35,11 @@ Then came the pivot to Cloudflare Workers. We moved everything to the edge. The 
 
 Costs dropped further, but more importantly, the complexity collapsed. The platform became simple again.
 
-## What Jamie and Johnny Knew
+## What Jamie and Johnny Were Right About
 
-Looking back at that interview, I realize what Jamie and Johnny intuitively understood: the universal interface isn't about how you query data. It's about how humans and agents communicate and collaborate.
+Looking back at that interview, I realize what Jamie and Johnny sensed: GraphQL wasn't the answer. They couldn't have told me what the actual universal interface was — nobody could have in 2017. AI agents and the Model Context Protocol didn't exist yet. But their skepticism was well-placed. GraphQL is a data layer. It solves querying. It doesn't solve collaboration.
 
-GraphQL is a data layer. Chat is a collaboration layer. When you add the Model Context Protocol (MCP) into the mix, you get a tool layer. 
+Nine years later, I think I finally know what the universal interface actually is. It's Chat — the way humans (and now agents) naturally communicate. When you add MCP into the mix, you get a tool layer that lets those conversations drive real actions.
 
 Together, **Chat + MCP = the actual universal interface.**
 
@@ -53,6 +53,18 @@ The architecture is built on the very primitives that made our platform simple a
 - Any app on our platform can enable this chat with a single line of configuration.
 
 Here's a live demo. We've embedded a public channel right here in the blog post. Anyone, including visitors, can post (with rate-limited guest access). Try it out and say hello.
+
+```tsx
+import { SpikeChatEmbed } from "@spike-land/core/block-website/ui/SpikeChatEmbed";
+
+
+<SpikeChatEmbed
+  channelSlug="blog-universal-interface"
+  workspaceSlug="spike-land"
+  guestAccess={true}
+  height={500}
+/>
+```
 
 <SpikeChatEmbed
   channelSlug="blog-universal-interface"

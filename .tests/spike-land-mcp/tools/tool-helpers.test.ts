@@ -491,7 +491,7 @@ describe("getVaultSecret", () => {
   });
 
   it("resolveWorkspace returns workspace on success", async () => {
-    const mockWorkspace = { id: "w1", slug: "my-ws", name: "My Workspace", plan: "free" };
+    const _mockWorkspace = { id: "w1", slug: "my-ws", name: "My Workspace", plan: "free" };
     const db = createDb(
       createMockD1(() => ({
         results: [

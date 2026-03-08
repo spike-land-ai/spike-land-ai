@@ -9,7 +9,6 @@ import {
 } from "../../../../src/core/react-engine/reconciler/ReactFiberNewContext.js";
 import { createContext } from "../../../../src/core/react-engine/react/ReactContext.js";
 import type { Fiber } from "../../../../src/core/react-engine/reconciler/ReactFiberTypes.js";
-import { createHostRootFiber } from "../../../../src/core/react-engine/reconciler/ReactFiber.js";
 import { NoLanes, SyncLane } from "../../../../src/core/react-engine/reconciler/ReactFiberLane.js";
 import { NoFlags } from "../../../../src/core/react-engine/reconciler/ReactFiberFlags.js";
 import {
@@ -106,7 +105,7 @@ describe("ReactFiberNewContext", () => {
     });
 
     it("clears previous dependencies on prepare", () => {
-      const ctx = createContext("value");
+      const _ctx = createContext("value");
       const fiber = makeTestFiber({
         dependencies: { lanes: SyncLane, firstContext: {} as never },
       });

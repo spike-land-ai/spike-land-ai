@@ -112,7 +112,7 @@ describe("anthropicHandler additional coverage", () => {
       const env = createDebugEnv(mockKV);
 
       const request = new Request("https://api.example.com/anthropic/v1/messages");
-      const response = await handleAnthropicRequest(request, env);
+      const _response = await handleAnthropicRequest(request, env);
       expect(consoleSpy).toHaveBeenCalledWith(
         expect.stringContaining("[Anthropic Proxy] API Error Response:"),
         expect.any(String),
@@ -144,7 +144,7 @@ describe("anthropicHandler additional coverage", () => {
       const env = createDebugEnv(mockKV);
       // URL without /anthropic in path
       const request = new Request("https://api.example.com/v1/messages");
-      const response = await handleAnthropicRequest(request, env);
+      const _response = await handleAnthropicRequest(request, env);
       expect(response).toBeDefined();
     });
   });
@@ -160,7 +160,7 @@ describe("anthropicHandler additional coverage", () => {
       } as unknown as Env;
 
       const request = new Request("https://api.example.com/anthropic/v1/messages");
-      const response = await handleAnthropicRequest(request, env);
+      const _response = await handleAnthropicRequest(request, env);
       // Returns CORS error response wrapping the thrown error
       expect(response.status).toBe(500);
     });

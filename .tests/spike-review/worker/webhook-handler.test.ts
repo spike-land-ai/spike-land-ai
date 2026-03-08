@@ -4,7 +4,7 @@
  * Tests HMAC verification, event filtering, and request handling.
  */
 
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, it } from "vitest";
 import {
   handleWebhook,
   isLockfileOnly,

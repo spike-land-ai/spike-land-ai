@@ -1,0 +1,13 @@
+{
+  "name": "@spike-land-ai/status",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy"
+  },
+  "devDependencies": {
+    "hono": "^4",
+    "wrangler": "^4"
+  }
+}

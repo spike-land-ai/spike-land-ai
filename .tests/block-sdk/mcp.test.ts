@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, it, _vi } from "vitest";
 import { createMemoryAdapter, defineBlock, defineTable, t } from "@spike-land-ai/block-sdk";
 import { blockToTools, registerBlockTools } from "@spike-land-ai/block-sdk/mcp";
 import type { McpToolRegistry } from "@spike-land-ai/block-sdk/mcp";

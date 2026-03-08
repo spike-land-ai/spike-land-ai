@@ -35,7 +35,7 @@ describe("main-entry", () => {
 
   it("mount with upgrade function uses upgrade", async () => {
     const upgrade = vi.fn();
-    const result = await mount({ workerUrl: "blob:fake", container, upgrade });
+    const _result = await mount({ workerUrl: "blob:fake", container, upgrade });
     expect(upgrade).toHaveBeenCalledWith(container, "blob:fake");
     document.body.removeChild(container);
   });

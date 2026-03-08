@@ -71,7 +71,7 @@ describe("computeMovePlans", () => {
       ["pkg2", "core"],
     ]);
 
-    const plans = computeMovePlans(dupNodes, categories);
+    computeMovePlans(dupNodes, categories);
 
     // Since they are in core/pkg1/core-logic and core/pkg2/core-logic,
     // they don't actually collide in the targetDir.
