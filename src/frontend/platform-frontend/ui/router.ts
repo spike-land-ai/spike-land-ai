@@ -316,13 +316,11 @@ const vibeCodeRoute = createRoute({
   component: withSuspense(() => import("../core-logic/vibe-code"), "VibeCodePage"),
 });
 
-// Backwards-compat redirect: /bazdmeg → /vibe-code
-const bazdmegRedirectRoute = createRoute({
+// BAZDMEG Method Presentation
+const bazdmegRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/bazdmeg",
-  beforeLoad: () => {
-    throw redirect({ to: "/vibe-code" });
-  },
+  component: withSuspense(() => import("../../../app/bazdmeg/page"), "BazdmegPage"),
 });
 
 const whatWeDoRoute = createRoute({
@@ -360,7 +358,7 @@ const routeTree = rootRoute.addChildren([
   indexRoute,
   cockpitRoute,
   vibeCodeRoute,
-  bazdmegRedirectRoute,
+  bazdmegRoute,
   whatWeDoRoute,
   buildRoute,
   startChecklistRoute,
