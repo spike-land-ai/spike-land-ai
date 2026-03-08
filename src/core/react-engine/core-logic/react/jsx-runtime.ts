@@ -38,4 +38,5 @@ function jsxProd(type: unknown, config: Record<string, unknown>, maybeKey?: unkn
 
 export const jsx = jsxProd;
 export const jsxs = jsxProd;
+export const jsxDEV = jsxProd;
 export const Fragment = REACT_FRAGMENT_TYPE;

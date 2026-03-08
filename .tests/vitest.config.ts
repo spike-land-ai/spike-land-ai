@@ -145,6 +145,8 @@ const packages: Record<string, PkgConfig> = {
     aliases: {
       react: src("core/react-engine/core-logic/react/index.ts"),
       "react-dom": src("core/react-engine/core-logic/react-dom/client.ts"),
+      "react/jsx-dev-runtime": src("core/react-engine/core-logic/react/jsx-runtime.ts"),
+      "react/jsx-runtime": src("core/react-engine/core-logic/react/jsx-runtime.ts"),
     },
     includeSrc: [
       src("core/block-website/core-logic/**/*.ts"),
