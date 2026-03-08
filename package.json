@@ -10,7 +10,7 @@
   "scripts": {
     "build": "yarn workspaces foreach -Apt run build",
     "build:src": "npx tsx esbuild.config.ts --all",
-    "test": "vitest run --config .tests/vitest.config.ts",
+    "test": "vitest run --config .tests/vitest.config.ts --changed HEAD~1",
     "test:src": "vitest run --config .tests/vitest.config.ts --changed HEAD~1",
     "test:staged": "vitest run --config .tests/vitest.config.ts --changed main",
     "typecheck": "tsc --noEmit --incremental",
