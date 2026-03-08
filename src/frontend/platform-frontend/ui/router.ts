@@ -286,6 +286,18 @@ const appSessionRoute = createRoute({
   component: withSuspense(() => import("./routes/tools/$appSlug"), "AppSessionPage"),
 });
 
+// Agency routes
+const agencyRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/agency",
+});
+
+const agencyPortfolioRoute = createRoute({
+  getParentRoute: () => agencyRoute,
+  path: "portfolio",
+  component: withSuspense(() => import("../../../app/agency/portfolio/page"), "PortfolioPage"),
+});
+
 // MCP routes
 const mcpRoute = createRoute({
   getParentRoute: () => rootRoute,
@@ -388,6 +400,7 @@ const routeTree = rootRoute.addChildren([
   messagesRoute.addChildren([messagesIndexRoute, messageThreadRoute]),
   toolsRoute.addChildren([toolsIndexRoute, appSessionRoute]),
   mcpRoute.addChildren([mcpIndexRoute, mcpAuthorizeRoute]),
+  agencyRoute.addChildren([agencyPortfolioRoute]),
 ]);
 
 export const router = createRouter({
