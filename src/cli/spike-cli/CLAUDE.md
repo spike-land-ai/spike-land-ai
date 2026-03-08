@@ -4,8 +4,10 @@
 
 MCP multiplexer CLI with lazy toolset loading. Aggregates multiple MCP servers,
 loads tool definitions on demand, and provides an interactive Claude chat
-interface. Node.js runtime, bundled with tsup, published as
-`@spike-land-ai/spike-cli`.
+interface. It is a first-class distribution surface for the spike.land app
+store, not just a debugging tool: the same store/search/install/runtime model
+available on the web should stay explorable from the CLI. Node.js runtime,
+bundled with tsup, published as `@spike-land-ai/spike-cli`.
 
 ## Commands
 
@@ -38,6 +40,14 @@ npm run lint         # ESLint
 
 **Key pattern**: The multiplexer discovers MCP servers from a registry, lazily
 loads their tool schemas, and presents a unified tool surface to AI clients.
+
+## App Store Notes
+
+- Favor workflows where app-store discovery and MCP runtime access feel native
+  in the CLI.
+- Keep the mental model aligned with the web docs: apps are bundles of MCP
+  tools, categories evolve, and store surfaces should remain callable from any
+  client.
 
 ## Code Quality Rules
 

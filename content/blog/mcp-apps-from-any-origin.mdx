@@ -1,0 +1,119 @@
+---
+title: "Embed spike.land MCP Tools in Your Existing Project in 5 Minutes"
+slug: "mcp-apps-from-any-origin"
+description: "You do not have to rebuild on spike.land to use spike.land. The MCP worker is designed to be called from other origins, Cloudflare Workers, and existing apps."
+date: "2026-03-08"
+author: "Zoltan Erdos"
+category: "Developer Experience"
+tags: ["mcp", "cors", "integration", "cloudflare-workers", "api", "developer-tools"]
+featured: false
+primer: "The best platform integration is the one that does not force a rewrite."
+---
+
+<Tldr>
+
+- The spike.land MCP worker is intentionally usable from other origins.
+- Public metadata is readable without auth; authenticated runtime calls work with API keys or OAuth device-flow tokens.
+- The clean default for browser integrations is `mcp.spike.land`, not the first-party proxy routes on `spike.land`.
+- You can fetch tool schemas, call tools, and embed store apps into an existing product without moving your whole app onto spike.land.
+
+</Tldr>
+
+## The Wrong Way To Think About Platforms
+
+Most platforms quietly assume you will rebuild around them.
+
+Use our UI. Use our domain. Use our SDK. Use our auth flow. Use our hosting.
+Eventually your “integration” becomes a migration project, which is another way
+of saying it never ships.
+
+That is not the model we want for spike.land.
+
+The better model is:
+
+**Use the runtime where it helps. Keep the rest of your stack.**
+
+---
+
+## What Is Actually Open
+
+The spike.land MCP worker exposes public metadata endpoints for tools and apps.
+
+That means you can:
+
+- read tool definitions
+- render UIs from live schemas
+- inspect app metadata
+- bootstrap OAuth device flow
+
+And when you are ready to execute tools, you move to the authenticated MCP
+endpoint with either an API key or a device-flow token.
+
+The important part is that this works from another origin. The platform does not
+require you to co-host the UI on spike.land.
+
+---
+
+## Why `mcp.spike.land` Matters
+
+There are really two surfaces to understand:
+
+- `spike.land` for first-party product UX
+- `mcp.spike.land` for the MCP runtime itself
+
+If you are building a browser app on another origin, call `mcp.spike.land`
+directly. That is the surface designed to expose wildcard CORS for MCP and
+public metadata.
+
+This distinction matters because “same product” and “same integration surface”
+are not the same thing.
+
+---
+
+## The 5-Minute Flow
+
+If you already have an app, the shortest path looks like this:
+
+1. fetch `https://mcp.spike.land/tools`
+2. inspect the tool you want
+3. obtain an API key or OAuth token
+4. send a JSON-RPC `tools/call` request to `https://mcp.spike.land/mcp`
+5. render the result inside your own UI
+
+That is it.
+
+No iframe platform prison. No forced rewrite. No fake “integration” that is
+really a sales funnel into a rebuild.
+
+---
+
+## Why This Changes The App Store
+
+Once the runtime is open cross-origin, the app store stops being just a store.
+
+It becomes:
+
+- a discovery layer
+- a metadata layer
+- a distribution layer
+- an execution layer
+
+An app can be listed on spike.land, embedded in another product, called by an
+agent, or wrapped inside a Cloudflare Worker that adds product-specific logic on
+top. That is a much more interesting model than “here is a directory page.”
+
+---
+
+## The Real Win
+
+The real win is not CORS.
+
+The real win is not having to choose between:
+
+- using a platform
+- keeping your existing product
+
+If spike.land is going to be a real MCP app store, it has to work as
+infrastructure, not just as a destination website.
+
+That is why we built the cross-origin path in the first place.

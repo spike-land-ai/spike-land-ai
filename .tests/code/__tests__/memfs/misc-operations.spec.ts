@@ -18,20 +18,20 @@ describe("memfs miscellaneous operations", () => {
   });
 
   describe("readFileSync", () => {
-    it("should read file synchronously from global object", () => {
+    it("should read file asynchronously from global object", async () => {
       // Mock the global object with a file
       const globalFiles = globalThis as unknown as Record<string, string>;
       globalFiles["/sync-test.txt"] = "sync content";
 
-      const content = readFileSync("/sync-test.txt");
+      const content = await readFileSync("/sync-test.txt");
       expect(content).toBe("sync content");
 
       // Clean up
       delete globalFiles["/sync-test.txt"];
     });
 
-    it("should return empty string for non-existent file", () => {
-      const content = readFileSync("/nonexistent.txt");
+    it("should return empty string for non-existent file", async () => {
+      const content = await readFileSync("/nonexistent.txt");
       expect(content).toBe("");
     });
   });

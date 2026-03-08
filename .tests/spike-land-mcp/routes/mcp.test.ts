@@ -244,7 +244,7 @@ describe("GET /mcp (mcpRoute handler)", () => {
         method: "GET",
         headers: {
           Authorization: "Bearer valid-test-token",
-          Accept: "text/event-stream"
+          Accept: "text/event-stream",
         },
       },
       env,

@@ -11,9 +11,17 @@
 
 ## 1. Executive Summary
 
-SPIKE LAND LTD is a UK-incorporated technology company building a managed MCP (Model Context Protocol) platform. The platform enables developers and AI-native teams to discover, run, and manage AI tools through one hosted system rather than stitching together separate MCP servers and services.
+SPIKE LAND LTD is a UK-incorporated technology company building an open MCP
+(Model Context Protocol) app store and managed runtime platform. The platform
+enables developers and AI-native teams to discover, run, publish, and monetize
+AI apps through one hosted system rather than stitching together separate MCP
+servers and services.
 
-The product is live in public beta at spike.land, featuring a working CLI (`spike-cli`), a web dashboard, and a managed hosted tool layer deployed on a global edge network. The company remains pre-revenue while it completes billing, onboarding, and commercialization workflows ahead of full launch.
+The product is live in public beta at spike.land, featuring a working CLI
+(`spike-cli`), a web dashboard, a public app-store surface, and a managed
+hosted tool layer deployed on a global edge network. The company remains
+pre-revenue while it completes billing, onboarding, and commercialization
+workflows ahead of full launch.
 
 The SEIS raise of up to £250,000 will be used to accelerate go-to-market, expand the hosted tool ecosystem, and fund early hiring in growth and customer success.
 
@@ -68,9 +76,18 @@ Developers building with AI face two compounding problems:
 
 Spike Land provides a unified platform to solve this:
 
-- **Managed MCP Registry** — 86 natively hosted tools (533+ total via multiplexer), with lazy-loading toolsets that reduce agent context overhead from ~47,000 tokens to ~400 tokens, plus authentication, rate limiting, and metering handled by the platform.
-- **Unified Access** — Tools can be invoked identically via the `spike-cli` or the web dashboard.
-- **Edge-Native Infrastructure** — Deployed primarily on Cloudflare infrastructure, designed for low-latency global access and highly efficient unit economics.
+- **Open MCP App Store** — developers can package MCP-native apps for
+  discovery, installation, recommendation, and future revenue share rather than
+  shipping isolated private integrations.
+- **Managed MCP Registry** — 86 natively hosted tools (533+ total via
+  multiplexer), with lazy-loading toolsets that reduce agent context overhead
+  from ~47,000 tokens to ~400 tokens, plus authentication, rate limiting, and
+  metering handled by the platform.
+- **Unified Access** — tools and apps can be invoked identically via the
+  `spike-cli`, the web dashboard, or external cross-origin integrations.
+- **Edge-Native Infrastructure** — deployed primarily on Cloudflare
+  infrastructure, designed for low-latency global access and highly efficient
+  unit economics.
 
 ---
 
@@ -94,7 +111,13 @@ Rather than targeting the entire market from day one, Spike Land is focusing on 
 
 ## 7. Revenue Model & Pricing
 
-The commercial model focuses on subscription recurring revenue (SaaS) and usage-based API add-ons. 
+The commercial model focuses on subscription recurring revenue (SaaS) and
+usage-based API add-ons.
+
+The app store adds a second structural revenue layer: marketplace distribution.
+Developers publish into the catalog, users install through the shared runtime,
+and the platform captures marketplace take rate while increasing the value of
+the core subscription and API products.
 
 ### 7.1 Current vs. Planned Revenue Streams
 
@@ -127,13 +150,18 @@ For heavy programmatic usage (e.g., AI Agent Developers running large workloads)
 
 ## 8. Go-to-Market Strategy
 
-As a developer-first tool, acquisition relies heavily on Product-Led Growth (PLG) rather than expensive paid media.
+As a developer-first tool, acquisition relies heavily on Product-Led Growth
+(PLG) rather than expensive paid media.
 
 1. **npm / CLI Distribution**: `npx @spike-land-ai/spike-cli` provides zero-install evaluation. This is the primary top-of-funnel engine.
 2. **One-Liner Activation**: Adding spike.land as an MCP server to an AI IDE (like Claude Code) takes one terminal command.
 3. **GitHub & Docs SEO**: Creating high-quality technical content, tutorials, and a strong open-source presence to capture developer search intent.
-4. **Direct Outreach**: Targeting MCP tool authors with a compelling revenue-share proposition to rapidly populate the platform's marketplace.
-5. **Community**: Leveraging Discord and developer communities (Hacker News, Indie Hackers) for organic word-of-mouth.
+4. **App Store Distribution**: Store listings, installs, public metadata, and
+   cross-origin embeddability create a second acquisition loop beyond the CLI.
+5. **Direct Outreach**: Targeting MCP tool authors with a compelling
+   revenue-share proposition to rapidly populate the platform's marketplace.
+6. **Community**: Leveraging Discord and developer communities (Hacker News,
+   Indie Hackers) for organic word-of-mouth.
 
 ---
 

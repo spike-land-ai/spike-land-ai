@@ -1,0 +1,4 @@
+services:
+  myservice:
+    image: alpine
+    command: echo hello

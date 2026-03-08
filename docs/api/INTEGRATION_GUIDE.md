@@ -578,4 +578,4 @@ describe("Image Enhancement Flow", () => {
 5. Test with development/staging environment first
 
 For support, visit [spike.land](https://spike.land) or contact
-support@spike.land
+zoltan.erdos@spike.land

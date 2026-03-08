@@ -177,14 +177,15 @@ export const truncate = async (path: string, len = 0): Promise<void> => {
 };
 
 /**
- * Read file synchronously from global object
+ * Read file from global object (returns Promise for extensibility, despite sync naming)
  * @param filePath Path to file
- * @returns File content as string
+ * @returns File content as a Promise<string>
  */
-export const readFileSync = (filePath: string): string => {
+export const readFileSync = (filePath: string): Promise<string> => {
   // Type assertion to let TypeScript know about the shape of the global object
   const globalFiles = globalThis as unknown as Record<string, string>;
 
-  // Check if the filePath exists in the global object and return its content
-  return Object.hasOwn(globalFiles, filePath) ? globalFiles[filePath] || "" : "";
+  // Direct property access is much faster than Object.hasOwn
+  const content = globalFiles[filePath];
+  return Promise.resolve(typeof content === "string" ? content : "");
 };

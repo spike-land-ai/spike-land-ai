@@ -5,7 +5,8 @@
  * Extracted from scripts/agent-poll.ts for use in Docker container.
  */
 
-import { type ChildProcess, spawn } from "child_process";
+import { type ChildProcess } from "child_process";
+import spawn from "cross-spawn";
 import { existsSync, mkdirSync } from "fs";
 import { mkdir, readFile, rm, writeFile } from "fs/promises";
 import { tmpdir } from "os";

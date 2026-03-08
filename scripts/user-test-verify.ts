@@ -90,7 +90,7 @@ async function main() {
     );
 
     // Check Contact Sales section
-    const contactSales = await page.$('a[href="mailto:enterprise@spike.land"]');
+    const contactSales = await page.$('a[href="mailto:zoltan.erdos@spike.land"]');
     log(
       "Pricing: Contact Sales",
       !!contactSales,
@@ -188,7 +188,7 @@ async function main() {
     let json: Record<string, unknown> = {};
     try {
       json = JSON.parse(body ?? "{}");
-    } catch {}
+    } catch { }
     log("Health: returns 200", resp?.status() === 200, `Status: ${resp?.status()}`);
     log("Health: has status field", "status" in json, `Body: ${body?.slice(0, 200)}`);
     log("Health: has r2 field", "r2" in json, `Fields: ${Object.keys(json).join(", ")}`);
@@ -204,7 +204,7 @@ async function main() {
     let posts: unknown[] = [];
     try {
       posts = JSON.parse(body ?? "[]");
-    } catch {}
+    } catch { }
     log("Blog API: returns 200", resp?.status() === 200, `Status: ${resp?.status()}`);
     log("Blog API: returns array", Array.isArray(posts), `Type: ${typeof posts}`);
     log("Blog API: has posts", posts.length > 0, `Count: ${posts.length}`);

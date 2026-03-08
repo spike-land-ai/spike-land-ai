@@ -3,8 +3,10 @@
 ## Overview
 
 MCP registry and platform server for spike.land, providing 80+ tools covering
-auth, storage, AI gateway, marketplace, and more. Runs as a Cloudflare Worker
-with D1 database. Private package (`@spike-land-ai/spike-land-mcp`).
+auth, storage, AI gateway, marketplace, and the open app store. Runs as a
+Cloudflare Worker with D1 database. This package is the cross-origin MCP and
+store-discovery surface behind spike.land's app-store model. Private package
+(`@spike-land-ai/spike-land-mcp`).
 
 ## Commands
 
@@ -40,6 +42,16 @@ npm run db:migrate:remote  # Apply migrations to remote D1
 ```
 
 **Key technologies**: MCP SDK, Hono, Drizzle ORM, Cloudflare Workers + D1, Zod.
+
+## App Store Notes
+
+- `api/app.ts` exposes wildcard CORS for the MCP worker so other origins can
+  read metadata and call tools directly.
+- `api/middleware.ts` keeps non-anonymous tool execution behind bearer auth.
+- `core-logic/mcp/manifest.ts` is the authoritative store/runtime registration
+  surface.
+- `core-logic/tools/store/` contains the store-search, install, ratings,
+  skills, and A/B tool families.
 
 **Dependency**: `@spike-land-ai/shared`
 

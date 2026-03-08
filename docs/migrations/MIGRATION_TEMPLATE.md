@@ -211,7 +211,7 @@ grep -r "api/v[NEW]" src/ | cut -d: -f1 | sort -u | xargs -I {} vim {}
 
 ### When to Contact Support
 
-Contact api-support@spike.land if:
+Contact zoltan.erdos@spike.land if:
 
 - Rollback doesn't resolve issues
 - Specific endpoints behave incorrectly
@@ -287,7 +287,7 @@ Contact api-support@spike.land if:
    - Stack Overflow: Tag with `spike-land` and `api`
 
 3. **Official Support**
-   - Email: api-support@spike.land
+   - Email: zoltan.erdos@spike.land
    - Response time: 24 hours (business days)
    - Include: API calls, error messages, and steps to reproduce
 
@@ -311,7 +311,7 @@ Week 4: Verify and cleanup
 Help us improve this migration guide!
 
 - Report issues: https://github.com/spike-land-ai/spike.land/issues
-- Suggest improvements: api-support@spike.land
+- Suggest improvements: zoltan.erdos@spike.land
 - Share your experience: GitHub Discussions
 
 ---

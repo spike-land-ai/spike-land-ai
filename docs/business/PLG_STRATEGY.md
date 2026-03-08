@@ -11,9 +11,13 @@
 Before prescribing tactics, these are the facts that shape this strategy:
 
 - Platform is built and live. Stripe is 75% wired. spike-cli is on npm.
+- The app store is no longer a side feature. It is the public distribution layer
+  for MCP-native apps, skills, and future marketplace revenue.
 - Zero paid customers today. Pre-revenue. Friends/family testing phase.
 - Solo founder. First hires are growth lead and customer success.
 - The core moat is real and defensible: MCP-native + multi-channel + 533+ tools. No competitor has this combination.
+- Cross-origin MCP access and offline-capable app packaging widen distribution
+  beyond the spike.land web UI.
 - The analytics infrastructure exists (D1 tables, GA4 forwarding) but the cockpit dashboard shows placeholder zeros. Blind flying until that gets wired.
 - Personas are documented but the developer / AI agent builder is the one who will actually drive early organic growth. The social media manager personas are legacy positioning from an earlier product direction. Treat them as secondary for now.
 
@@ -213,6 +217,33 @@ Specifically: add a `spike upgrade` command that opens the billing page in the b
 The tool marketplace (Phase 13) is not just a revenue stream — it is a growth flywheel. Third-party tool builders bring their own audiences. A developer who publishes a popular HackerNews MCP tool on spike.land will tweet about it, write a blog post, and drive their followers to the registry. This is exactly how the Shopify app store grew.
 
 To accelerate: identify 10-15 popular open-source MCP tools that exist in the ecosystem (hackernews-mcp, linear-mcp, github-mcp equivalents) and reach out to their authors about publishing on spike.land. Offer 70% revenue share and a featured listing in exchange for a launch tweet. The cost is zero and the upside is their audiences.
+
+---
+
+## 4.1 The App Store As The Main Growth Loop
+
+The app store is not just a monetization feature. It is the cleanest PLG loop
+in the product:
+
+`publish -> share -> install -> embed -> reuse -> publish again`
+
+Why it matters:
+
+- every store app is a reusable landing page for a real MCP surface
+- every install is a distribution signal
+- every cross-origin embed turns another product into a referral channel
+- every published skill or app expands catalog depth without founder-written
+  code
+
+The distribution advantages stack:
+
+1. **Store listing** gives the developer a home page
+2. **MCP metadata** makes the app callable by agents
+3. **Cross-origin access** lets other apps embed the same capability
+4. **Offline packaging** expands the range of use cases
+5. **Revenue share** gives authors a reason to promote what they publish
+
+That is the flywheel to lean into.
 
 ---
 

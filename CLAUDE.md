@@ -134,6 +134,22 @@ Zod validation + Vitest tests. `mcp-server-base` provides shared utilities.
 `spike-land-mcp` acts as the MCP registry aggregating 80+ tools. Additional MCP
 servers: esbuild-wasm-mcp, hackernews-mcp, mcp-image-studio, openclaw-mcp.
 
+### App Store Context
+
+spike.land is now positioned as an **open AI app store** built on top of the
+MCP runtime. Every store app is a bundle of composable MCP tools, discovery
+metadata, and install/recommendation flows.
+
+Key source paths for app-store work:
+
+- `src/edge-api/spike-land` — MCP runtime, categories, store tool families,
+  OAuth, wildcard-CORS MCP surface
+- `src/edge-api/main` — first-party edge proxy routes, experiments engine,
+  public store/tool aggregation routes
+- `src/frontend/platform-frontend` — store UI and app-facing pages
+- `src/core/block-sdk` — portable D1/IndexedDB/memory storage layer for hosted
+  and offline app variants
+
 ### Domain Packages
 
 - `chess-engine` — Chess ELO engine with game/player/challenge managers
@@ -214,6 +230,13 @@ User-facing documentation and blog posts live at the umbrella repo root:
 
 - `docs/` — architecture, guides, API docs, best practices (~140 files)
 - `content/blog/` — published MDX blog posts (18 files)
+
+App-store-specific docs live primarily under:
+
+- `docs/features/`
+- `docs/mcp/`
+- `docs/develop/`
+- `docs/security/`
 
 ## Key Conventions
 
