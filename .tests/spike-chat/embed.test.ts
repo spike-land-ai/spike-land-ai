@@ -1,11 +1,65 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import { embedRouter } from "../../src/edge-api/spike-chat/api/routes/embed";
+import * as dbIndex from "../../src/edge-api/spike-chat/db/db-index";
+
+vi.mock("../../src/edge-api/spike-chat/db/db-index", () => ({
+  createDb: vi.fn()
+}));
 
 describe("embedRouter", () => {
   it("renders embed HTML", async () => {
-    const res = await embedRouter.fetch(new Request("http://localhost/workspace-1/channel-1"));
+    // Mock the DB response
+    const mockDb = {
+      select: vi.fn().mockReturnThis(),
+      from: vi.fn().mockReturnThis(),
+      where: vi.fn().mockReturnThis(),
+      orderBy: vi.fn().mockReturnThis(),
+      limit: vi.fn().mockResolvedValue([{ id: "msg1", content: "hello", userId: "visitor-1", createdAt: 123 }])
+    };
+    // First call (channel) returns channel, second call (messages) returns messages.
+    // Actually we can just mock the whole chain
+    (dbIndex.createDb as any).mockReturnValue({
+      select: () => ({
+        from: () => ({
+          where: () => {
+            // we can return a mock that is an array for channel and has an orderBy/limit chain for messages
+            const result: any = [{ id: "chan1", workspaceId: "workspace-1", slug: "channel-1" }];
+            result.orderBy = () => ({
+              limit: () => [{ id: "msg1", content: "hello", userId: "visitor-1", createdAt: 123 }]
+            });
+            return result;
+          }
+        })
+      })
+    });
+
+    const env = { DB: {} };
+    const res = await embedRouter.fetch(new Request("http://localhost/workspace-1/channel-1"), env as any);
+    
     expect(res.status).toBe(200);
     const text = await res.text();
     expect(text).toContain("Spike Chat - channel-1");
+    expect(text).toContain("hello");
+  });
+  
+  it("renders embed HTML when channel not found", async () => {
+    (dbIndex.createDb as any).mockReturnValue({
+      select: () => ({
+        from: () => ({
+          where: () => {
+            const result: any = [];
+            return result;
+          }
+        })
+      })
+    });
+
+    const env = { DB: {} };
+    const res = await embedRouter.fetch(new Request("http://localhost/workspace-1/channel-2"), env as any);
+    
+    expect(res.status).toBe(200);
+    const text = await res.text();
+    expect(text).toContain("Spike Chat - channel-2");
+    expect(text).toContain("Welcome to #channel-2. This is the start of the channel.");
   });
 });

@@ -17,12 +17,14 @@ describe("ChannelDurableObject", () => {
     (doInstance as any).ctx = mockState;
     
     // Mock global WebSocketPair
-    global.WebSocketPair = vi.fn().mockImplementation(() => {
-      return {
-        0: { send: vi.fn(), close: vi.fn() }, // client
-        1: { send: vi.fn(), serializeAttachment: vi.fn(), deserializeAttachment: vi.fn() } // server
-      };
-    }) as any;
+    global.WebSocketPair = class {
+      0: any;
+      1: any;
+      constructor() {
+        this[0] = { send: vi.fn(), close: vi.fn() }; // client
+        this[1] = { send: vi.fn(), serializeAttachment: vi.fn(), deserializeAttachment: vi.fn() }; // server
+      }
+    } as any;
   });
 
   it("returns 404 for unknown routes", async () => {
