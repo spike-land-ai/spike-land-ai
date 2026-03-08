@@ -136,20 +136,39 @@ process_package() {
     return 1
   fi
 
-  # ── Depot CI gate ─────────────────────────────────────────────────
-  if [ "$SKIP_DEPOT" = "0" ] && command -v depot &>/dev/null; then
-    echo -e "  ${BLUE}Running depot CI...${NC}"
-    if depot ci run --workflow .depot/workflows/test.yml 2>&1 | tail -5; then
-      echo -e "  ${GREEN}Depot CI passed${NC}"
+  # ── CI gate (depot → docker fallback) ─────────────────────────────
+  if [ "$SKIP_DEPOT" = "0" ]; then
+    if command -v depot &>/dev/null; then
+      echo -e "  ${BLUE}Running depot CI...${NC}"
+      if depot ci run --workflow .depot/workflows/test.yml 2>&1 | tail -5; then
+        echo -e "  ${GREEN}Depot CI passed${NC}"
+      else
+        echo -e "  ${RED}Depot CI FAILED — unstaging${NC}"
+        git reset HEAD -- "${staged_files[@]}" >/dev/null 2>&1
+        update_queue_status "$pkg" "failed"
+        FAILED+=("$pkg")
+        return 1
+      fi
+    elif command -v docker &>/dev/null; then
+      echo -e "  ${BLUE}Running CI via Docker (depot unavailable)...${NC}"
+      if docker run --rm \
+        -v "$REPO_ROOT":/app \
+        -w /app \
+        node:24-slim \
+        sh -c "yarn install --immutable 2>/dev/null; yarn vitest run --config .tests/vitest.config.ts --changed main" 2>&1 | tail -10; then
+        echo -e "  ${GREEN}Docker CI passed${NC}"
+      else
+        echo -e "  ${RED}Docker CI FAILED — unstaging${NC}"
+        git reset HEAD -- "${staged_files[@]}" >/dev/null 2>&1
+        update_queue_status "$pkg" "failed"
+        FAILED+=("$pkg")
+        return 1
+      fi
     else
-      echo -e "  ${RED}Depot CI FAILED — unstaging${NC}"
-      git reset HEAD -- "${staged_files[@]}" >/dev/null 2>&1
-      update_queue_status "$pkg" "failed"
-      FAILED+=("$pkg")
-      return 1
+      echo -e "  ${YELLOW}Skipping CI gate (neither depot nor docker available)${NC}"
     fi
   else
-    echo -e "  ${YELLOW}Skipping depot CI (SKIP_DEPOT=1 or depot not installed)${NC}"
+    echo -e "  ${YELLOW}Skipping CI gate (SKIP_DEPOT=1)${NC}"
   fi
 
   # ── Commit ────────────────────────────────────────────────────────
