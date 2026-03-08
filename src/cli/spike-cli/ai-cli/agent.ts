@@ -60,7 +60,7 @@ export function startCompletionServer(port: number) {
         throw new Error(`Google API returned ${response.status}: ${await response.text()}`);
       }
 
-      const data = await response.json() as any;
+      const data = await response.json() as unknown as { candidates?: Array<{ content?: { parts?: Array<{ text?: string }> } }> };
       const completionText = (data.candidates?.[0]?.content?.parts?.[0]?.text || "").trim();
       
       res.json({ completion: completionText });
