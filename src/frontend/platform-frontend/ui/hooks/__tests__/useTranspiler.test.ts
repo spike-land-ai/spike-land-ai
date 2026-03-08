@@ -44,6 +44,8 @@ describe("useTranspiler", () => {
 
     expect(result.current.html).toContain("<!DOCTYPE html>");
     expect(result.current.html).toContain("createRoot");
+    expect(result.current.html).toContain("family=Rubik");
+    expect(result.current.html).toContain("@theme inline");
     expect(result.current.html).toContain("globalThis.process ??= { env: {} };");
     expect(result.current.error).toBeNull();
   });
@@ -128,5 +130,28 @@ describe("useTranspiler", () => {
         TR_ORIGIN: "http://localhost:3000",
       },
     });
+  });
+
+  it("rebuilds preview HTML for dark mode without re-fetching source", async () => {
+    fetchMock.mockResolvedValue(new Response('const App = () => "hello";export default App;', { status: 200 }));
+
+    const { result, rerender } = renderHook(
+      ({ isDark }: { isDark: boolean }) =>
+        useTranspiler('export default function App() { return "hi"; }', 10, isDark),
+      { initialProps: { isDark: false } },
+    );
+
+    await waitFor(() => {
+      expect(result.current.isTranspiling).toBe(false);
+      expect(result.current.html).toContain('data-theme="light"');
+    });
+
+    rerender({ isDark: true });
+
+    await waitFor(() => {
+      expect(result.current.html).toContain('data-theme="dark"');
+    });
+
+    expect(fetchMock).toHaveBeenCalledTimes(1);
   });
 });
