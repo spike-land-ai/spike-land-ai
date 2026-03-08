@@ -44,8 +44,9 @@ describe("useTranspiler", () => {
 
     expect(result.current.html).toContain("<!DOCTYPE html>");
     expect(result.current.html).toContain("createRoot");
-    expect(result.current.html).toContain("family=Rubik");
+    expect(result.current.html).toContain("https://js.spike.land/react@19.2.4?bundle");
     expect(result.current.html).toContain("@theme inline");
+    expect(result.current.html).not.toContain("fonts.googleapis.com");
     expect(result.current.html).toContain("globalThis.process ??= { env: {} };");
     expect(result.current.error).toBeNull();
   });

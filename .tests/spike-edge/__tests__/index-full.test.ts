@@ -523,6 +523,8 @@ describe("Security headers middleware", () => {
     expect(res.headers.get("referrer-policy")).toBe("strict-origin-when-cross-origin");
     expect(res.headers.get("strict-transport-security")).toContain("max-age=63072000");
     expect(res.headers.get("content-security-policy")).toContain("default-src 'self'");
+    expect(res.headers.get("content-security-policy")).toContain("frame-src 'self' https://edge.spike.land https://chat.spike.land");
+    expect(res.headers.get("content-security-policy")).toContain("wss://chat.spike.land");
   });
 
   it("omits X-Frame-Options for /live/* routes", async () => {
@@ -565,6 +567,44 @@ describe("Security headers middleware", () => {
     // CORS should allow the origin
     const acao = res.headers.get("access-control-allow-origin");
     expect(acao).toBeTruthy();
+  });
+
+  it("allows any https subdomain on spike.land for browser origins", async () => {
+    const env = createMockEnv({ ALLOWED_ORIGINS: "https://spike.land" });
+    const res = await appFetch(
+      new Request("https://api.spike.land/api/experiments/assign", {
+        method: "OPTIONS",
+        headers: {
+          origin: "https://notes-pwa.spike.land",
+          "access-control-request-method": "POST",
+          "access-control-request-headers": "content-type",
+        },
+      }),
+      env,
+      makeCtx() as unknown as ExecutionContext,
+    );
+
+    expect([200, 204]).toContain(res.status);
+    expect(res.headers.get("access-control-allow-origin")).toBe("https://notes-pwa.spike.land");
+  });
+
+  it("allows localhost browser origins", async () => {
+    const env = createMockEnv({ ALLOWED_ORIGINS: "https://spike.land" });
+    const res = await appFetch(
+      new Request("https://api.spike.land/api/experiments/assign", {
+        method: "OPTIONS",
+        headers: {
+          origin: "http://localhost:5173",
+          "access-control-request-method": "POST",
+          "access-control-request-headers": "content-type",
+        },
+      }),
+      env,
+      makeCtx() as unknown as ExecutionContext,
+    );
+
+    expect([200, 204]).toContain(res.status);
+    expect(res.headers.get("access-control-allow-origin")).toBe("http://localhost:5173");
   });
 });
 

@@ -1,8 +1,22 @@
 const isDev = import.meta.env.DEV;
+const chatBaseEnv = import.meta.env.VITE_CHAT_BASE_URL;
 
 export const API_BASE = isDev ? "" : "https://api.spike.land";
 export const MCP_BASE = isDev ? "" : "https://mcp.spike.land";
-export const CHAT_BASE = isDev ? "" : "https://chat.spike.land";
+
+export function resolveChatBase(dev: boolean, configuredBase?: string): string {
+  if (dev) return "";
+  return configuredBase?.trim() ?? "";
+}
+
+export function toWebSocketBase(httpBase: string): string {
+  const url = new URL(httpBase);
+  url.protocol = url.protocol === "https:" ? "wss:" : "ws:";
+  return url.toString().replace(/\/$/, "");
+}
+
+export const CHAT_BASE = resolveChatBase(isDev, chatBaseEnv);
+export const CHAT_ENABLED = isDev || CHAT_BASE.length > 0;
 
 export function apiUrl(path: string): string {
   return `${API_BASE}/api${path.startsWith("/") ? path : `/${path}`}`;
@@ -41,6 +55,7 @@ export function mcpUrl(path: string): string {
 export function chatUrl(path: string): string {
   const normalized = path.startsWith("/") ? path : `/${path}`;
   if (isDev) return `/chat${normalized}`;
+  if (!CHAT_BASE) return "";
   return `${CHAT_BASE}${normalized}`;
 }
 
@@ -51,5 +66,6 @@ export function chatWsUrl(path: string): string {
     const proto = window.location.protocol === "https:" ? "wss:" : "ws:";
     return `${proto}//${window.location.host}/chat${normalized}`;
   }
-  return `wss://chat.spike.land${normalized}`;
+  if (!CHAT_BASE) return "";
+  return `${toWebSocketBase(CHAT_BASE)}${normalized}`;
 }

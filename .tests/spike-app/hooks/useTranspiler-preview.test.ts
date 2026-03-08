@@ -14,7 +14,7 @@ beforeEach(async () => {
 });
 
 describe("useTranspiler preview shell", () => {
-  it("injects Rubik + semantic theme tokens into preview HTML", async () => {
+  it("injects first-party preview imports and semantic theme tokens into preview HTML", async () => {
     fetchMock.mockResolvedValue(
       new Response('const App = () => "hello";export default App;', { status: 200 }),
     );
@@ -28,7 +28,8 @@ describe("useTranspiler preview shell", () => {
       expect(result.current.html).toBeTruthy();
     });
 
-    expect(result.current.html).toContain("family=Rubik");
+    expect(result.current.html).toContain("https://js.spike.land/react@19.2.4?bundle");
+    expect(result.current.html).not.toContain("fonts.googleapis.com");
     expect(result.current.html).toContain("@theme inline");
     expect(result.current.html).toContain('data-theme="light"');
   });

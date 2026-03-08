@@ -39,8 +39,8 @@ resource "cloudflare_ruleset" "cache_rules" {
           default = 31536000
         }
       }
-      expression  = "(http.request.uri.path matches \"^/assets/.*\\.[0-9a-f]{8,}\\.(js|css|woff2|png|jpg|svg|webp)$\")"
-      description = "/assets/* with hashed filenames — 1 year cache"
+      expression  = "(http.request.uri.path matches \"^/assets/.*[-.][A-Za-z0-9_-]{8,}\\.(js|css|woff2|png|jpg|jpeg|svg|webp)$\")"
+      description = "/assets/* with Vite-style hashed filenames — 1 year cache"
       enabled     = true
     },
     {
@@ -58,7 +58,7 @@ resource "cloudflare_ruleset" "cache_rules" {
           default = 300
         }
       }
-      expression  = "(http.request.uri.path.extension in {\"js\" \"css\" \"woff2\"} and not http.request.uri.path matches \"\\.[0-9a-f]{8,}\\.\")"
+      expression  = "(http.request.uri.path.extension in {\"js\" \"css\" \"woff2\"} and not http.request.uri.path matches \"[-.][A-Za-z0-9_-]{8,}\\.\")"
       description = "Non-hashed *.js, *.css, *.woff2 — 1h edge / 5min browser"
       enabled     = true
     },

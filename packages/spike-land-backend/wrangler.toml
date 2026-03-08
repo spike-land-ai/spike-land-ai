@@ -27,7 +27,7 @@ bindings = [
 ]
 
 [site]
-bucket = "../../node_modules/@spike-land-ai/code/dist" # Resolved from installed package
+bucket = "../../src/frontend/monaco-editor/dist" # Source-of-truth frontend bundle kept in-repo
 
 [[r2_buckets]]
 binding = "R2"

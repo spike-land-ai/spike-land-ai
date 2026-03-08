@@ -4,6 +4,26 @@ compatibility_date = "2025-07-12"
 compatibility_flags = ["nodejs_compat"]
 workers_dev = true
 
+[[services]]
+binding = "SPIKE_EDGE"
+service = "spike-edge"
+
+[[services]]
+binding = "TRANSPILE"
+service = "esbuild"
+
+[[services]]
+binding = "MCP_REGISTRY"
+service = "spike-land-mcp"
+
+[[services]]
+binding = "AUTH_MCP"
+service = "mcp-auth"
+
+[[services]]
+binding = "IMAGE_STUDIO"
+service = "image-studio-mcp"
+
 [[routes]]
 pattern = "status.spike.land/*"
 zone_name = "spike.land"

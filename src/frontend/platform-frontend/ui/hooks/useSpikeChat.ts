@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { chatUrl, chatWsUrl } from "../../core-logic/api";
+import { CHAT_ENABLED, chatUrl, chatWsUrl } from "../../core-logic/api";
 
 export interface ChatMessage {
   id: string;
@@ -58,10 +58,14 @@ export function useSpikeChat({
 
   // Fetch message history
   useEffect(() => {
-    if (!enabled || !channelId) return;
+    if (!enabled || !channelId || !CHAT_ENABLED) {
+      setIsLoading(false);
+      return;
+    }
 
     setIsLoading(true);
-    fetch(chatUrl(`/api/v1/messages?channelId=${encodeURIComponent(channelId)}&limit=50`), {
+    const url = chatUrl(`/api/v1/messages?channelId=${encodeURIComponent(channelId)}&limit=50`);
+    fetch(url, {
       credentials: "include",
       headers: { "x-guest-access": "true" },
     })
@@ -75,12 +79,14 @@ export function useSpikeChat({
 
   // WebSocket connection with exponential backoff
   useEffect(() => {
-    if (!enabled || !channelId) return;
+    if (!enabled || !channelId || !CHAT_ENABLED) {
+      setIsConnected(false);
+      return;
+    }
 
     function connect() {
-      const ws = new WebSocket(
-        chatWsUrl(`/api/v1/channels/${encodeURIComponent(channelId)}/ws`),
-      );
+      const wsUrl = chatWsUrl(`/api/v1/channels/${encodeURIComponent(channelId)}/ws`);
+      const ws = new WebSocket(wsUrl);
 
       ws.onopen = () => {
         setIsConnected(true);
@@ -133,6 +139,7 @@ export function useSpikeChat({
 
   const sendMessage = useCallback(
     async (content: string, contentType = "text", metadata?: Record<string, unknown>) => {
+      if (!CHAT_ENABLED) return;
       await fetch(chatUrl("/api/v1/messages"), {
         method: "POST",
         credentials: "include",

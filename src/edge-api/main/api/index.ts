@@ -42,6 +42,18 @@ import { handleScheduled } from "../lazy-imports/scheduled.js";
 const log = createLogger("spike-edge");
 
 const app = new Hono<{ Bindings: Env; Variables: Variables }>();
+const SPIKE_LAND_ORIGIN_PATTERN = /^https:\/\/([a-z0-9-]+\.)*spike\.land$/i;
+const LOCAL_SPIKE_LAND_ORIGIN_PATTERN = /^https:\/\/local\.spike\.land(:\d+)?$/i;
+const LOCALHOST_ORIGIN_PATTERN = /^https?:\/\/localhost(:\d+)?$/i;
+
+function isAllowedBrowserOrigin(origin: string, configuredOrigins: string[]): boolean {
+  return (
+    configuredOrigins.includes(origin)
+    || SPIKE_LAND_ORIGIN_PATTERN.test(origin)
+    || LOCAL_SPIKE_LAND_ORIGIN_PATTERN.test(origin)
+    || LOCALHOST_ORIGIN_PATTERN.test(origin)
+  );
+}
 
 // Request ID middleware (must run before everything else)
 app.use("*", requestIdMiddleware);
@@ -66,11 +78,9 @@ app.use("*", async (c, next) => {
 
   const corsMiddleware = cors({
     origin: (requestOrigin) => {
-      if (!requestOrigin) return configuredOrigins[0];
-      if (configuredOrigins.includes(requestOrigin)) return requestOrigin;
-      // Allow any local.spike.land origin (any port)
-      if (requestOrigin.match(/^https:\/\/local\.spike\.land(:\d+)?$/)) return requestOrigin;
-      return configuredOrigins[0];
+      const fallbackOrigin = configuredOrigins[0] ?? "https://spike.land";
+      if (!requestOrigin) return fallbackOrigin;
+      return isAllowedBrowserOrigin(requestOrigin, configuredOrigins) ? requestOrigin : fallbackOrigin;
     },
     allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowHeaders: [
@@ -117,9 +127,9 @@ app.use("*", async (c, next) => {
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://esm.spike.land https://unpkg.com",
       "img-src 'self' https://*.r2.dev https://*.r2.cloudflarestorage.com https://avatars.githubusercontent.com https://*.googleusercontent.com https://*.basemaps.cartocdn.com https://image-studio-mcp.spike.land data: blob:",
       "font-src 'self' https://fonts.gstatic.com https://esm.spike.land data:",
-      "connect-src 'self' https://api.spike.land https://edge.spike.land https://auth-mcp.spike.land https://mcp.spike.land https://js.spike.land https://image-studio-mcp.spike.land https://checkout.stripe.com wss://spike.land https://esm.sh https://esm.spike.land https://unpkg.com https://local.spike.land:5173 https://www.google-analytics.com https://www.googletagmanager.com blob: data:",
+      "connect-src 'self' https://api.spike.land https://edge.spike.land https://auth-mcp.spike.land https://mcp.spike.land https://js.spike.land https://image-studio-mcp.spike.land https://chat.spike.land https://checkout.stripe.com wss://spike.land wss://chat.spike.land https://esm.sh https://esm.spike.land https://unpkg.com https://local.spike.land:5173 https://www.google-analytics.com https://www.googletagmanager.com blob: data:",
       "worker-src 'self' blob: https://esm.sh https://esm.spike.land",
-      "frame-src *",
+      "frame-src 'self' https://edge.spike.land https://chat.spike.land https://checkout.stripe.com https://js.stripe.com",
       "object-src 'none'",
       "base-uri 'self'",
       "form-action 'self'",

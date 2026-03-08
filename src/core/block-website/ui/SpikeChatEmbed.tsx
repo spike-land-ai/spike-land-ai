@@ -16,18 +16,21 @@ export function SpikeChatEmbed({
   guestAccess = false,
   height = 500,
 }: SpikeChatEmbedProps) {
-  const [status, setStatus] = useState<"loading" | "ready" | "unavailable">("loading");
-
   const isLocal = typeof window !== "undefined" && window.location.hostname.includes("localhost");
-  const baseUrl = isLocal ? "http://localhost:8787" : "https://chat.spike.land";
+  const configuredBaseUrl = import.meta.env.VITE_CHAT_BASE_URL?.trim() ?? "";
+  const baseUrl = isLocal ? "http://localhost:8787" : configuredBaseUrl;
   const embedUrl = `${baseUrl}/embed/${workspaceSlug}/${channelSlug}?guest=${guestAccess}`;
+  const [status, setStatus] = useState<"loading" | "ready" | "unavailable">(
+    baseUrl ? "loading" : "unavailable",
+  );
 
   useEffect(() => {
+    if (!baseUrl) return;
     const timer = setTimeout(() => {
       setStatus((s) => (s === "loading" ? "unavailable" : s));
     }, 8000);
     return () => clearTimeout(timer);
-  }, []);
+  }, [baseUrl]);
 
   return (
     <div

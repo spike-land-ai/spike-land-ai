@@ -272,6 +272,13 @@ const packages: Record<string, PkgConfig> = {
     coverageExclude: ["**/types.ts", "**/types-index.ts"],
   },
 
+  status: {
+    tier: 3,
+    includeTests: [src("edge-api/status/__tests__/**/*.test.ts")],
+    includeSrc: [src("edge-api/status/**/*.ts")],
+    coverageExclude: [],
+  },
+
   "spike-app": {
     tier: 3,
     env: "jsdom",

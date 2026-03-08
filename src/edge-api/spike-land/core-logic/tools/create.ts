@@ -2,9 +2,6 @@
  * /create App Generator MCP Tools (CF Workers)
  *
  * Search, classify, and manage AI-generated React apps from the /create feature.
- *
- * Most operations delegate to the spike.land API for app management
- * (slug-classifier, codespace-health) not available in this worker.
  */
 
 import { z } from "zod";
@@ -12,6 +9,185 @@ import type { ToolRegistryAdapter } from "../../lazy-imports/types";
 import { freeTool } from "../../lazy-imports/procedures-index.ts";
 import { apiRequest, SPIKE_LAND_BASE_URL, textResult } from "../lib/tool-helpers";
 import type { DrizzleDB } from "../../db/db/db-index.ts";
+
+const CATEGORY_RULES = [
+  {
+    category: "game",
+    template: "game",
+    keywords: ["game", "arcade", "puzzle", "platformer", "tetris", "chess", "multiplayer"],
+  },
+  {
+    category: "dashboard",
+    template: "dashboard",
+    keywords: ["dashboard", "analytics", "admin", "crm", "report", "metrics", "kanban"],
+  },
+  {
+    category: "website",
+    template: "landing-page",
+    keywords: ["landing", "marketing", "website", "site", "portfolio", "blog", "docs"],
+  },
+  {
+    category: "ai-agents",
+    template: "agent-workspace",
+    keywords: ["agent", "assistant", "chatbot", "copilot", "automation", "workflow"],
+  },
+  {
+    category: "productivity",
+    template: "task-app",
+    keywords: ["task", "todo", "calendar", "notes", "tracker", "planner"],
+  },
+  {
+    category: "developer",
+    template: "developer-tool",
+    keywords: ["code", "api", "developer", "editor", "json", "sql", "terminal"],
+  },
+  {
+    category: "commerce",
+    template: "storefront",
+    keywords: ["shop", "store", "ecommerce", "checkout", "catalog", "cart"],
+  },
+] as const;
+
+const STOP_WORDS = new Set([
+  "a",
+  "an",
+  "app",
+  "build",
+  "create",
+  "for",
+  "make",
+  "me",
+  "please",
+  "the",
+  "to",
+  "with",
+]);
+
+const DEFAULT_SESSION_MARKERS = [
+  "404 - for now.",
+  "But you can edit even this page",
+  "Write your code here!",
+  "const App = () =>",
+] as const;
+
+export interface CreateClassificationResult {
+  status: "heuristic";
+  slug: string;
+  category: string;
+  template: string;
+  reason: string;
+}
+
+export interface CreateSessionSnapshot {
+  code?: string;
+  html?: string;
+  css?: string;
+  transpiled?: string;
+}
+
+export interface CreateHealthAssessment {
+  healthy: boolean;
+  score: number;
+  reason: string;
+}
+
+function normalizeIdeaWords(text: string): string[] {
+  return text
+    .toLowerCase()
+    .replace(/[^a-z0-9\s-]/g, " ")
+    .split(/\s+/)
+    .map((word) => word.trim())
+    .filter((word) => word.length > 0 && !STOP_WORDS.has(word));
+}
+
+export function classifyIdeaLocally(text: string): CreateClassificationResult {
+  const words = normalizeIdeaWords(text);
+  const fallbackSlug = words.slice(0, 5).join("-") || "new-app";
+
+  const rankedRule =
+    CATEGORY_RULES.map((rule) => ({
+      ...rule,
+      score: rule.keywords.filter((keyword) => words.includes(keyword)).length,
+    }))
+      .sort((left, right) => right.score - left.score)
+      .find((rule) => rule.score > 0) || null;
+
+  if (!rankedRule) {
+    return {
+      status: "heuristic",
+      slug: fallbackSlug,
+      category: "app",
+      template: "blank-react",
+      reason: "No strong keyword match. Start from a blank React app and refine the shape in-editor.",
+    };
+  }
+
+  const matchedKeywords = rankedRule.keywords.filter((keyword) => words.includes(keyword));
+
+  return {
+    status: "heuristic",
+    slug: fallbackSlug,
+    category: rankedRule.category,
+    template: rankedRule.template,
+    reason: `Matched ${matchedKeywords.join(", ")}. Suggested template: ${rankedRule.template}.`,
+  };
+}
+
+function hasDefaultMarker(value: string): boolean {
+  return DEFAULT_SESSION_MARKERS.some((marker) => value.includes(marker));
+}
+
+export function assessCreateSessionHealth(session: CreateSessionSnapshot): CreateHealthAssessment {
+  const code = session.code?.trim() || "";
+  const html = session.html?.trim() || "";
+  const css = session.css?.trim() || "";
+  const transpiled = session.transpiled?.trim() || "";
+
+  let score = 0;
+  const signals: string[] = [];
+
+  if (code.length >= 120 && !hasDefaultMarker(code)) {
+    score += 2;
+    signals.push("non-default source");
+  } else if (code.length >= 60 && !hasDefaultMarker(code)) {
+    score += 1;
+    signals.push("edited source");
+  }
+
+  if (html.length >= 40 && html !== "<div></div>") {
+    score += 1;
+    signals.push("rendered HTML");
+  }
+
+  if (css.length >= 20) {
+    score += 1;
+    signals.push("generated CSS");
+  }
+
+  if (transpiled.length >= 120 && !hasDefaultMarker(transpiled)) {
+    score += 1;
+    signals.push("fresh transpile");
+  }
+
+  return {
+    healthy: score >= 3,
+    score,
+    reason:
+      signals.length > 0
+        ? `Detected ${signals.join(", ")}.`
+        : "Session still looks like the default scaffold or an empty render.",
+  };
+}
+
+async function fetchCodespaceSession(codespaceId: string): Promise<CreateSessionSnapshot> {
+  const response = await fetch(
+    `${SPIKE_LAND_BASE_URL}/live/${encodeURIComponent(codespaceId)}/session.json`,
+  );
+  if (!response.ok) {
+    throw new Error(`Live session lookup failed: ${response.status}`);
+  }
+  return response.json() as Promise<CreateSessionSnapshot>;
+}
 
 export function registerCreateTools(
   registry: ToolRegistryAdapter,
@@ -129,41 +305,23 @@ export function registerCreateTools(
       .tool(
         "create_classify_idea",
         "Use this for the public /create flow — classifies your idea, returns category + template suggestion, not a live app. " +
-          "Classify an app idea into a URL slug and category. " +
-          "Delegates to the spike.land classification API.",
+          "Classify an app idea into a URL slug and category using local worker heuristics.",
         {
           text: z.string().min(1).max(2000).describe("App idea text to classify."),
         },
       )
       .meta({ category: "create", tier: "free" })
       .handler(async ({ input }) => {
-        try {
-          const result = await apiRequest<{
-            status: string;
-            slug: string | null;
-            category: string | null;
-            reason?: string;
-          }>("/api/create/classify", {
-            method: "POST",
-            body: JSON.stringify({ text: input.text }),
-          });
+        const result = classifyIdeaLocally(input.text);
 
-          let output = `**Classification Result**\n\n`;
-          output += `**Status:** ${result.status}\n`;
-          output += `**Slug:** ${result.slug || "(none)"}\n`;
-          output += `**Category:** ${result.category || "(none)"}\n`;
-          if (result.reason) {
-            output += `**Reason:** ${result.reason}\n`;
-          }
+        let output = `**Classification Result**\n\n`;
+        output += `**Status:** ${result.status}\n`;
+        output += `**Slug:** ${result.slug}\n`;
+        output += `**Category:** ${result.category}\n`;
+        output += `**Template:** ${result.template}\n`;
+        output += `**Reason:** ${result.reason}\n`;
 
-          return textResult(output);
-        } catch (error) {
-          const msg = error instanceof Error ? error.message : "Unknown error";
-          return textResult(
-            `**Classification unavailable:** ${msg}\n\n` +
-              `The slug classifier requires the spike.land API. Try again later.`,
-          );
-        }
+        return textResult(output);
       }),
   );
 
@@ -179,21 +337,32 @@ export function registerCreateTools(
       .meta({ category: "create", tier: "free" })
       .handler(async ({ input }) => {
         try {
-          const result = await apiRequest<{ healthy: boolean }>(
-            `/api/create/health/${encodeURIComponent(input.codespace_id)}`,
-          );
+          const session = await fetchCodespaceSession(input.codespace_id);
+          const result = assessCreateSessionHealth(session);
 
           return textResult(
             `**Codespace Health Check**\n\n` +
               `**ID:** ${input.codespace_id}\n` +
-              `**Healthy:** ${result.healthy}`,
+              `**Healthy:** ${result.healthy}\n` +
+              `**Score:** ${result.score}\n` +
+              `**Reason:** ${result.reason}`,
           );
         } catch (error) {
-          const msg = error instanceof Error ? error.message : "Unknown error";
-          return textResult(
-            `**Health check unavailable:** ${msg}\n\n` +
-              `Health checks require the spike.land API.`,
-          );
+          try {
+            const fallback = await apiRequest<{ healthy: boolean }>(
+              `/api/create/health/${encodeURIComponent(input.codespace_id)}`,
+            );
+
+            return textResult(
+              `**Codespace Health Check**\n\n` +
+                `**ID:** ${input.codespace_id}\n` +
+                `**Healthy:** ${fallback.healthy}\n` +
+                `**Source:** legacy create health endpoint`,
+            );
+          } catch (fallbackError) {
+            const msg = fallbackError instanceof Error ? fallbackError.message : "Unknown error";
+            return textResult(`**Health check unavailable:** ${msg}`);
+          }
         }
       }),
   );

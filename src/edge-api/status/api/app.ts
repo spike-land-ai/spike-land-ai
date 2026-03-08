@@ -1,76 +1,13 @@
 import { Hono } from "hono";
 import type { Env } from "../core-logic/env.ts";
+import {
+  createStatusSnapshot,
+  DEGRADED_THRESHOLD_MS,
+  probeAll,
+  TIMEOUT_MS,
+} from "../core-logic/monitor.ts";
 
 const app = new Hono<{ Bindings: Env }>();
-
-interface ServiceProbe {
-  label: string;
-  url: string;
-}
-
-interface ProbeResult {
-  label: string;
-  url: string;
-  status: "up" | "degraded" | "down";
-  httpStatus: number | null;
-  latencyMs: number;
-  error: string | null;
-}
-
-const SERVICES: ServiceProbe[] = [
-  { label: "Main Site", url: "https://spike.land/health" },
-  { label: "Edge API", url: "https://api.spike.land/health" },
-  { label: "Transpile", url: "https://js.spike.land/health" },
-  { label: "ESM CDN", url: "https://esm.spike.land/health" },
-  { label: "MCP Registry", url: "https://mcp.spike.land/health" },
-  { label: "Auth MCP", url: "https://auth-mcp.spike.land/health" },
-  { label: "Chat", url: "https://chat.spike.land/health" },
-];
-
-const TIMEOUT_MS = 3000;
-const DEGRADED_THRESHOLD_MS = 1200;
-
-async function probeService(service: ServiceProbe): Promise<ProbeResult> {
-  const start = Date.now();
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
-
-  try {
-    const res = await fetch(service.url, { signal: controller.signal });
-    const latencyMs = Date.now() - start;
-    clearTimeout(timer);
-
-    const isOk = res.status >= 200 && res.status < 300;
-    let status: ProbeResult["status"] = "down";
-    if (isOk && latencyMs <= DEGRADED_THRESHOLD_MS) status = "up";
-    else if (isOk) status = "degraded";
-
-    return {
-      label: service.label,
-      url: service.url,
-      status,
-      httpStatus: res.status,
-      latencyMs,
-      error: isOk ? null : `HTTP ${res.status}`,
-    };
-  } catch (err) {
-    clearTimeout(timer);
-    const latencyMs = Date.now() - start;
-    const message = err instanceof Error ? err.message : "Unknown error";
-    return {
-      label: service.label,
-      url: service.url,
-      status: "down",
-      httpStatus: null,
-      latencyMs,
-      error: message.includes("abort") ? "Timeout" : message,
-    };
-  }
-}
-
-async function probeAll(): Promise<ProbeResult[]> {
-  return Promise.all(SERVICES.map(probeService));
-}
 
 // Own health
 app.get("/health", (c) =>
@@ -79,36 +16,28 @@ app.get("/health", (c) =>
 
 // JSON API
 app.get("/api/status", async (c) => {
-  const results = await probeAll();
-  const up = results.filter((r) => r.status === "up").length;
-  const degraded = results.filter((r) => r.status === "degraded").length;
-  const down = results.filter((r) => r.status === "down").length;
-
-  let overall: "operational" | "partial_degradation" | "major_outage" = "operational";
-  if (down > 0) overall = "major_outage";
-  else if (degraded > 0) overall = "partial_degradation";
+  const results = await probeAll(c.env);
+  const snapshot = createStatusSnapshot(results);
 
   return c.json({
-    overall,
+    overall: snapshot.overall,
     timestamp: new Date().toISOString(),
-    summary: { up, degraded, down, total: results.length },
-    services: results,
+    summary: snapshot.summary,
+    services: snapshot.services,
   });
 });
 
 // HTML status page
 app.get("/", async (c) => {
-  const results = await probeAll();
-  const up = results.filter((r) => r.status === "up").length;
-  const degraded = results.filter((r) => r.status === "degraded").length;
-  const down = results.filter((r) => r.status === "down").length;
+  const results = await probeAll(c.env);
+  const snapshot = createStatusSnapshot(results);
 
   let overall = "Operational";
   let overallColor = "#22c55e";
-  if (down > 0) {
+  if (snapshot.overall === "major_outage") {
     overall = "Major Outage";
     overallColor = "#ef4444";
-  } else if (degraded > 0) {
+  } else if (snapshot.overall === "partial_degradation") {
     overall = "Partial Degradation";
     overallColor = "#f59e0b";
   }
@@ -168,9 +97,9 @@ h1{font-size:1.5rem;font-weight:600;margin-bottom:.25rem}
   <p class="subtitle">spike.land status</p>
   <div class="overall" style="background:${overallColor}">${overall}</div>
   <div class="summary">
-    <span><span class="dot" style="background:#22c55e"></span> ${up} Up</span>
-    <span><span class="dot" style="background:#f59e0b"></span> ${degraded} Degraded</span>
-    <span><span class="dot" style="background:#ef4444"></span> ${down} Down</span>
+    <span><span class="dot" style="background:#22c55e"></span> ${snapshot.summary.up} Up</span>
+    <span><span class="dot" style="background:#f59e0b"></span> ${snapshot.summary.degraded} Degraded</span>
+    <span><span class="dot" style="background:#ef4444"></span> ${snapshot.summary.down} Down</span>
   </div>
   ${serviceCards}
   <div class="footer">

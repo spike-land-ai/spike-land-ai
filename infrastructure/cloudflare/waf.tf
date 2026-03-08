@@ -125,6 +125,65 @@ resource "cloudflare_ruleset" "rate_limiting" {
   ]
 }
 
+resource "cloudflare_ruleset" "public_browser_exceptions" {
+  zone_id     = var.zone_id
+  name        = "spike.land public browser exceptions"
+  description = "Allow public browser endpoints to bypass managed challenges"
+  kind        = "zone"
+  phase       = "http_request_firewall_custom"
+
+  rules = [
+    {
+      action = "skip"
+      action_parameters = {
+        phases = [
+          "http_request_sbfm",
+          "http_request_firewall_managed",
+        ]
+        products = [
+          "bic",
+          "securityLevel",
+        ]
+      }
+      expression  = "(http.host eq \"status.spike.land\")"
+      description = "Skip managed firewall challenges on the public status host"
+      enabled     = true
+    },
+    {
+      action = "skip"
+      action_parameters = {
+        phases = [
+          "http_request_sbfm",
+          "http_request_firewall_managed",
+        ]
+        products = [
+          "bic",
+          "securityLevel",
+        ]
+      }
+      expression  = "((http.host eq \"spike.land\") and (http.request.method in {\"GET\" \"HEAD\"}) and not starts_with(http.request.uri.path, \"/api/\"))"
+      description = "Skip managed firewall challenges on public spike.land page and asset requests"
+      enabled     = true
+    },
+    {
+      action = "skip"
+      action_parameters = {
+        phases = [
+          "http_request_sbfm",
+          "http_request_firewall_managed",
+        ]
+        products = [
+          "bic",
+          "securityLevel",
+        ]
+      }
+      expression = "((((http.host eq \"spike.land\") and starts_with(http.request.uri.path, \"/api/\")) or (http.host eq \"api.spike.land\")) and (any(http.request.headers[\"origin\"][*] matches \"^https://([A-Za-z0-9-]+\\\\.)*spike\\\\.land$\") or any(http.request.headers[\"origin\"][*] matches \"^https?://localhost(:[0-9]+)?$\") or ((http.host eq \"spike.land\") and http.referer matches \"^https://([A-Za-z0-9-]+\\\\.)*spike\\\\.land/\")))"
+      description = "Skip managed firewall challenges on edge API requests from spike.land, first-party pages, and localhost origins"
+      enabled     = true
+    }
+  ]
+}
+
 # Bot management — requires Bot Management add-on (Enterprise)
 # NOTE: Commented out — cf.bot_management.score requires a paid Bot Management plan.
 # If you upgrade to Enterprise or add Bot Management, uncomment and apply.

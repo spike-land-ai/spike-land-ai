@@ -7,7 +7,7 @@ interface TranspileResult {
 }
 
 const TRANSPILE_ENDPOINT = "https://js.spike.land";
-const PREVIEW_MODULE_CDN = "https://esm.sh";
+const PREVIEW_MODULE_ORIGIN = "https://js.spike.land";
 const PREVIEW_REACT_VERSION = "19.2.4";
 const PREVIEW_EMOTION_VERSION = "11.14.0";
 const PREVIEW_TAILWIND_BROWSER_URL = "https://unpkg.com/@tailwindcss/browser@4.2.1/dist/index.global.js";
@@ -106,21 +106,18 @@ function buildPreviewHtml(transpiledCode: string, isDarkMode: boolean): string {
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
   <script type="importmap">
   {
     "imports": {
-      "react": "${PREVIEW_MODULE_CDN}/react@${PREVIEW_REACT_VERSION}?bundle",
-      "react/jsx-runtime": "${PREVIEW_MODULE_CDN}/react@${PREVIEW_REACT_VERSION}/jsx-runtime?bundle",
-      "react/jsx-dev-runtime": "${PREVIEW_MODULE_CDN}/react@${PREVIEW_REACT_VERSION}/jsx-dev-runtime?bundle",
-      "react-dom": "${PREVIEW_MODULE_CDN}/react-dom@${PREVIEW_REACT_VERSION}?bundle&external=react",
-      "react-dom/client": "${PREVIEW_MODULE_CDN}/react-dom@${PREVIEW_REACT_VERSION}/client?bundle&external=react",
-      "@emotion/react/jsx-runtime": "${PREVIEW_MODULE_CDN}/@emotion/react@${PREVIEW_EMOTION_VERSION}/jsx-runtime?bundle&external=react",
-      "@emotion/react/jsx-dev-runtime": "${PREVIEW_MODULE_CDN}/@emotion/react@${PREVIEW_EMOTION_VERSION}/jsx-dev-runtime?bundle&external=react",
-      "@emotion/react": "${PREVIEW_MODULE_CDN}/@emotion/react@${PREVIEW_EMOTION_VERSION}?bundle&external=react",
-      "@emotion/styled": "${PREVIEW_MODULE_CDN}/@emotion/styled@${PREVIEW_EMOTION_VERSION}?bundle&external=react,@emotion/react"
+      "react": "${PREVIEW_MODULE_ORIGIN}/react@${PREVIEW_REACT_VERSION}?bundle",
+      "react/jsx-runtime": "${PREVIEW_MODULE_ORIGIN}/react@${PREVIEW_REACT_VERSION}/jsx-runtime?bundle",
+      "react/jsx-dev-runtime": "${PREVIEW_MODULE_ORIGIN}/react@${PREVIEW_REACT_VERSION}/jsx-dev-runtime?bundle",
+      "react-dom": "${PREVIEW_MODULE_ORIGIN}/react-dom@${PREVIEW_REACT_VERSION}?bundle&external=react",
+      "react-dom/client": "${PREVIEW_MODULE_ORIGIN}/react-dom@${PREVIEW_REACT_VERSION}/client?bundle&external=react",
+      "@emotion/react/jsx-runtime": "${PREVIEW_MODULE_ORIGIN}/@emotion/react@${PREVIEW_EMOTION_VERSION}/jsx-runtime?bundle&external=react",
+      "@emotion/react/jsx-dev-runtime": "${PREVIEW_MODULE_ORIGIN}/@emotion/react@${PREVIEW_EMOTION_VERSION}/jsx-dev-runtime?bundle&external=react",
+      "@emotion/react": "${PREVIEW_MODULE_ORIGIN}/@emotion/react@${PREVIEW_EMOTION_VERSION}?bundle&external=react",
+      "@emotion/styled": "${PREVIEW_MODULE_ORIGIN}/@emotion/styled@${PREVIEW_EMOTION_VERSION}?bundle&external=react,@emotion/react"
     }
   }
   </script>
@@ -147,9 +144,9 @@ function buildPreviewHtml(transpiledCode: string, isDarkMode: boolean): string {
   </style>
   <style>
     :root {
-      --font-sans: "Rubik", ui-sans-serif, system-ui, sans-serif;
-      --font-display: "Rubik", ui-sans-serif, system-ui, sans-serif;
-      --font-mono: "JetBrains Mono", ui-monospace, monospace;
+      --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      --font-display: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      --font-mono: ui-monospace, "SFMono-Regular", "SF Mono", Menlo, Consolas, monospace;
       --bg: ${tokens.bg};
       --fg: ${tokens.fg};
       --card-bg: ${tokens.cardBg};
