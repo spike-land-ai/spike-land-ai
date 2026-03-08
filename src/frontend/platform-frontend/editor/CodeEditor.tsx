@@ -147,10 +147,15 @@ function LocalMonacoEditor({
   useEffect(() => {
     if (editorRef.current) {
       import("monaco-editor").then((monaco) => {
-        if (theme === SPIKE_PLATFORM_MONACO_THEME) {
-          definePlatformMonacoTheme(monaco as unknown as { editor: MonacoModule["editor"] }, false);
+        const themeToApply = theme ?? "vs";
+
+        if (themeToApply === SPIKE_PLATFORM_MONACO_THEME) {
+          definePlatformMonacoTheme(
+            monaco as unknown as { editor: MonacoModule["editor"] },
+            document.documentElement.classList.contains("dark"),
+          );
         }
-        monaco.editor.setTheme(theme);
+        monaco.editor.setTheme(themeToApply);
         const model = editorRef.current.getModel();
         if (model) {
           monaco.editor.setModelLanguage(model, language);
