@@ -446,7 +446,7 @@ Found a bug or inconsistency in the API?
    - Request and response examples
    - Steps to reproduce
    - Expected vs. actual behavior
-3. **Email support** - api-support@spike.land (for sensitive issues)
+3. **Email support** - zoltan.erdos@spike.land (for sensitive issues)
 
 ---
 

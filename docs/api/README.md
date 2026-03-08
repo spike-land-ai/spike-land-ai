@@ -501,7 +501,7 @@ For additional context, see documentation in the parent directory:
 
 For questions or issues:
 
-- Email: support@spike.land
+- Email: zoltan.erdos@spike.land
 - GitHub Issues:
   [Report bug](https://github.com/spike-land-ai/spike.land/issues)
 - Documentation: [spike.land/docs](https://spike.land/docs)

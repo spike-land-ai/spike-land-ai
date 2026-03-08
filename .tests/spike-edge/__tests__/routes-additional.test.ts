@@ -165,7 +165,7 @@ describe("well-known route", () => {
     const res = await app.request("/.well-known/security.txt", {}, env);
     expect(res.status).toBe(200);
     const text = await res.text();
-    expect(text).toContain("Contact: mailto:security@spike.land");
+    expect(text).toContain("Contact: mailto:zoltan.erdos@spike.land");
     expect(text).toContain("Expires:");
     expect(text).toContain("Canonical: https://spike.land/.well-known/security.txt");
   });

@@ -1248,6 +1248,6 @@ See `/src/lib/rate-limiter.ts` for complete rate limit configuration.
 
 - Documentation: [https://spike.land/docs](https://spike.land/docs)
 - Issues: [GitHub Issues](https://github.com/spike-land-ai/spike.land/issues)
-- Email: support@spike.land
+- Email: zoltan.erdos@spike.land
 
 **Last Updated**: 2025-12-30

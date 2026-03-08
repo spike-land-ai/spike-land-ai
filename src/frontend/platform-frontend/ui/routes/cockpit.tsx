@@ -309,7 +309,7 @@ function ExperimentCard({ exp }: { exp: DashboardExperiment }) {
     fetch(apiUrl(`/experiments/${exp.id}/metrics`))
       .then((r) => r.json() as Promise<ExperimentMetrics>)
       .then(setMetrics)
-      .catch(() => {});
+      .catch(() => { });
   }, [expanded, exp.id]);
 
   const runEvaluation = async () => {
@@ -438,7 +438,7 @@ function ExperimentsDashboard() {
     fetch(apiUrl("/experiments/dashboard"))
       .then((r) => r.json() as Promise<{ experiments: DashboardExperiment[]; revenue24h: number }>)
       .then(setData)
-      .catch(() => {});
+      .catch(() => { });
   }, []);
 
   if (!data) {
@@ -484,7 +484,7 @@ function DevHealth() {
       .then((data) => {
         if (data) setErrorSummary(data);
       })
-      .catch(() => {});
+      .catch(() => { });
   }, []);
 
   const errorCount = errorSummary?.total ?? "--";
@@ -554,7 +554,7 @@ function MetricsDashboard() {
         return r.json() as Promise<CockpitMetrics>;
       })
       .then(setData)
-      .catch(() => {});
+      .catch(() => { });
   }, []);
 
   const fmt = (n: number) => n.toLocaleString();

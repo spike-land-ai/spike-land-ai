@@ -254,10 +254,10 @@ export function PrivacyPage() {
         <p className="leading-relaxed text-foreground">
           To exercise any of these rights, contact us at{" "}
           <a
-            href="mailto:privacy@spike.land"
+            href="mailto:zoltan.erdos@spike.land"
             className="text-primary underline hover:text-primary/80"
           >
-            privacy@spike.land
+            zoltan.erdos@spike.land
           </a>
           . We will respond within 30 days.
         </p>
@@ -302,10 +302,10 @@ export function PrivacyPage() {
         <p className="leading-relaxed text-foreground">
           To exercise any of these rights, contact us at{" "}
           <a
-            href="mailto:privacy@spike.land"
+            href="mailto:zoltan.erdos@spike.land"
             className="text-primary underline hover:text-primary/80"
           >
-            privacy@spike.land
+            zoltan.erdos@spike.land
           </a>
           . We will verify your identity before processing your request and respond within 45 days.
         </p>
@@ -334,10 +334,10 @@ export function PrivacyPage() {
           For privacy questions or to exercise your rights, email our Data Protection Officer (DPO)
           at{" "}
           <a
-            href="mailto:privacy@spike.land"
+            href="mailto:zoltan.erdos@spike.land"
             className="text-primary underline hover:text-primary/80"
           >
-            privacy@spike.land
+            zoltan.erdos@spike.land
           </a>{" "}
           or open an issue on our{" "}
           <a

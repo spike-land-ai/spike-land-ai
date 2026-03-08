@@ -261,7 +261,7 @@ documented. Third-party developers can submit tools.
 **Exit criteria**: Users can deploy full-stack apps from spike-cli with
 `spike deploy`.
 
-#### Phase 15: MCP Multiplexer Expansion (Q4 2026)
+#### Phase 16: MCP Multiplexer Expansion (Q4 2026)
 
 **Goal**: Scale the multiplexer ecosystem to 1,000+ community tools
 
@@ -276,7 +276,7 @@ documented. Third-party developers can submit tools.
 
 **Exit criteria**: 1,000+ tools in the registry, 100+ community-contributed tools, automated quality gates for submissions.
 
-#### Phase 16: Enterprise & Self-Extending Agents (Q1 2027)
+#### Phase 17: Enterprise & Self-Extending Agents (Q1 2027)
 
 **Goal**: Enable AI agents to discover, create, and publish tools autonomously
 

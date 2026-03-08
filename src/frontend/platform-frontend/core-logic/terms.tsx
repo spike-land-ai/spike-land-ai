@@ -148,10 +148,10 @@ export function TermsPage() {
           </a>{" "}
           or email us at{" "}
           <a
-            href="mailto:legal@spike.land"
+            href="mailto:zoltan.erdos@spike.land"
             className="text-primary underline hover:text-primary/80"
           >
-            legal@spike.land
+            zoltan.erdos@spike.land
           </a>
           .
         </p>

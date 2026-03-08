@@ -1,6 +1,6 @@
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { Hono } from "hono";
-import { blog, rowToPost, type BlogPostRow } from "../../routes/blog.js";
+import { blog, getBlogPostRow, rowToPost, type BlogPostRow } from "../../routes/blog.js";
 import type { Env } from "../../../core-logic/env.js";
 
 // ---------- helpers ----------
@@ -16,6 +16,7 @@ function makeRow(overrides: Partial<BlogPostRow> = {}): BlogPostRow {
     category: "Testing",
     tags: '["vitest","hono"]',
     featured: 0,
+    draft: 0,
     hero_image: null,
     content: "# Hello World\n\nSome content here.",
     created_at: 1709251200,
@@ -82,6 +83,11 @@ function mockR2(getResult: R2ObjectBody | null = null) {
     get: vi.fn().mockResolvedValue(getResult),
   } as unknown as R2Bucket;
 }
+
+afterEach(() => {
+  vi.restoreAllMocks();
+  vi.unstubAllGlobals();
+});
 
 // ---------- rowToPost unit tests ----------
 
@@ -230,6 +236,46 @@ describe("GET /api/blog/:slug", () => {
     expect(res.status).toBe(404);
   });
 
+  it("falls back to the canonical MDX source when D1 misses the slug", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue(
+        new Response(
+          `---
+title: "The Universal Interface Wasn't GraphQL"
+slug: "the-universal-interface-wasnt-graphql"
+description: "Fallback description"
+date: "2026-03-08"
+author: "Zoltan Erdos"
+category: "Architecture"
+tags: ["chat", "mcp"]
+featured: true
+primer: "Fallback primer"
+heroImage: "/blog/the-universal-interface-wasnt-graphql/hero.png"
+---
+
+Body from source fallback.`,
+          { status: 200, headers: { "Content-Type": "text/plain" } },
+        ),
+      ),
+    );
+
+    const db = mockDB([], null);
+    const testApp = app(db);
+
+    const res = await testApp.request("/api/blog/the-universal-interface-wasnt-graphql", undefined, {
+      DB: db,
+      SPA_ASSETS: mockR2(),
+    } as unknown as Env);
+
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as Record<string, unknown>;
+    expect(body.slug).toBe("the-universal-interface-wasnt-graphql");
+    expect(body.title).toBe("The Universal Interface Wasn't GraphQL");
+    expect(body.content).toBe("Body from source fallback.");
+    expect(body.heroImage).toBe("/blog/the-universal-interface-wasnt-graphql/hero.png");
+  });
+
   it("strips .mdx suffix from slug before querying", async () => {
     const row = makeRow({ slug: "my-post", content: "Full body content" });
     const db = mockDB([], row);
@@ -243,6 +289,44 @@ describe("GET /api/blog/:slug", () => {
     expect(res.status).toBe(200);
     const body = (await res.json()) as Record<string, unknown>;
     expect(body.slug).toBe("my-post");
+  });
+});
+
+describe("getBlogPostRow", () => {
+  it("uses the source fallback when D1 throws", async () => {
+    const db = {
+      prepare: vi.fn(() => {
+        throw new Error("d1 unavailable");
+      }),
+    } as unknown as D1Database;
+
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue(
+        new Response(
+          `---
+title: "Recovered Post"
+slug: "recovered-post"
+description: "Recovered description"
+date: "2026-03-08"
+author: "Fallback Author"
+category: "Architecture"
+tags: ["chat"]
+featured: false
+primer: "Recovered primer"
+---
+
+Recovered body.`,
+          { status: 200, headers: { "Content-Type": "text/plain" } },
+        ),
+      ),
+    );
+
+    const row = await getBlogPostRow(db, "recovered-post");
+
+    expect(row?.slug).toBe("recovered-post");
+    expect(row?.content).toBe("Recovered body.");
+    expect(row?.tags).toBe('["chat"]');
   });
 });
 
@@ -265,6 +349,8 @@ describe("GET /api/blog-images/:slug/:filename", () => {
   });
 
   it("returns 404 for missing image", async () => {
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(new Response(null, { status: 404 })));
+
     const r2 = mockR2(null);
     const testApp = app(mockDB([]));
 
@@ -323,6 +409,8 @@ describe("GET /blog/:slug/:filename (backward compat)", () => {
   });
 
   it("falls through when R2 returns null for valid image extension", async () => {
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(new Response(null, { status: 404 })));
+
     const r2 = mockR2(null);
     const testApp = app(mockDB([]));
 

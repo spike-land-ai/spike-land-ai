@@ -10,7 +10,7 @@ Only the latest code on the `main` branch is actively supported with security up
 
 Instead, use one of the following:
 
-- **Email:** security@spike.land
+- **Email:** zoltan.erdos@spike.land
 - **GitHub Security Advisory:** Open a private security advisory via the "Security" tab of this repository.
 
 ### What to Include

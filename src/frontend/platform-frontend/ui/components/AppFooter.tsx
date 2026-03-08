@@ -48,7 +48,7 @@ export function AppFooter() {
                 <Twitter className="size-5" />
               </a>
               <a
-                href="mailto:hello@spike.land"
+                href="mailto:zoltan.erdos@spike.land"
                 className="p-2 rounded-full bg-muted dark:bg-white/5 border border-border dark:border-white/10 text-muted-foreground hover:text-primary hover:border-primary/30 transition-all"
                 aria-label="Email us"
               >
