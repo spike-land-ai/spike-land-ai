@@ -21,6 +21,21 @@ describe("PresenceDurableObject", () => {
     doInstance = new PresenceDurableObject(mockState, env);
     (doInstance as any).ctx = mockState;
     
+    // Mock global Response to allow 101 status
+    const OriginalResponse = global.Response;
+    global.Response = class MockResponse {
+      status: number;
+      webSocket: any;
+      constructor(body: any, init?: any) {
+        if (init?.status === 101) {
+          this.status = 101;
+          this.webSocket = init.webSocket;
+        } else {
+          return new OriginalResponse(body, init);
+        }
+      }
+    } as any;
+    
     global.WebSocketPair = class {
       0: any;
       1: any;
