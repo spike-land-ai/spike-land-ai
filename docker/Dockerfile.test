@@ -83,26 +83,26 @@ COPY .tests/                           .tests/
 # Deps: src/core/chess/ only (self-contained, alias @/ → src/core/chess/)
 FROM config AS test-chess-engine
 COPY src/core/chess/ src/core/chess/
-RUN set -e && yarn vitest run --project=chess-engine --coverage=false
+RUN set -e && yarn vitest run --project=chess-engine --coverage=false && touch /.ok
 
 # ── test-shared ──────────────────────────────────────────────────────────────
 # Deps: src/core/shared-utils/ only
 FROM config AS test-shared
 COPY src/core/shared-utils/ src/core/shared-utils/
-RUN set -e && yarn vitest run --project=shared --coverage=false
+RUN set -e && yarn vitest run --project=shared --coverage=false && touch /.ok
 
 # ── test-mcp-server-base ─────────────────────────────────────────────────────
 # Deps: src/core/server-base/
 FROM config AS test-mcp-server-base
 COPY src/core/shared-utils/ src/core/shared-utils/
 COPY src/core/server-base/  src/core/server-base/
-RUN set -e && yarn vitest run --project=mcp-server-base --coverage=false
+RUN set -e && yarn vitest run --project=mcp-server-base --coverage=false && touch /.ok
 
 # ── test-state-machine ───────────────────────────────────────────────────────
 # Deps: src/core/statecharts/
 FROM config AS test-state-machine
 COPY src/core/statecharts/ src/core/statecharts/
-RUN set -e && yarn vitest run --project=state-machine --coverage=false
+RUN set -e && yarn vitest run --project=state-machine --coverage=false && touch /.ok
 
 # ── test-block-sdk ───────────────────────────────────────────────────────────
 # Deps: block-sdk + block-tasks (lazy-imports) + shared-utils + server-base
@@ -111,7 +111,7 @@ COPY src/core/shared-utils/  src/core/shared-utils/
 COPY src/core/server-base/   src/core/server-base/
 COPY src/core/block-tasks/   src/core/block-tasks/
 COPY src/core/block-sdk/     src/core/block-sdk/
-RUN set -e && yarn vitest run --project=block-sdk --coverage=false
+RUN set -e && yarn vitest run --project=block-sdk --coverage=false && touch /.ok
 
 # ── test-block-tasks ─────────────────────────────────────────────────────────
 FROM config AS test-block-tasks
@@ -119,13 +119,13 @@ COPY src/core/shared-utils/ src/core/shared-utils/
 COPY src/core/server-base/  src/core/server-base/
 COPY src/core/block-sdk/    src/core/block-sdk/
 COPY src/core/block-tasks/  src/core/block-tasks/
-RUN set -e && yarn vitest run --project=block-tasks --coverage=false
+RUN set -e && yarn vitest run --project=block-tasks --coverage=false && touch /.ok
 
 # ── test-react-ts-worker ─────────────────────────────────────────────────────
 # Deps: src/core/react-engine/ only (self-aliased)
 FROM config AS test-react-ts-worker
 COPY src/core/react-engine/ src/core/react-engine/
-RUN set -e && yarn vitest run --project=react-ts-worker --coverage=false
+RUN set -e && yarn vitest run --project=react-ts-worker --coverage=false && touch /.ok
 
 # ── test-spike-chat ──────────────────────────────────────────────────────────
 # Deps: src/edge-api/spike-chat/ + cloudflare-workers stub from edge-api/main
@@ -133,19 +133,19 @@ FROM config AS test-spike-chat
 COPY src/edge-api/main/core-logic/cloudflare-workers.ts \
      src/edge-api/main/core-logic/cloudflare-workers.ts
 COPY src/edge-api/spike-chat/ src/edge-api/spike-chat/
-RUN set -e && yarn vitest run --project=spike-chat --coverage=false
+RUN set -e && yarn vitest run --project=spike-chat --coverage=false && touch /.ok
 
 # ── test-spike-edge ──────────────────────────────────────────────────────────
 # Deps: src/edge-api/main/ + cloudflare-workers stub (self-referential)
 FROM config AS test-spike-edge
 COPY src/edge-api/main/ src/edge-api/main/
-RUN set -e && yarn vitest run --project=spike-edge --coverage=false
+RUN set -e && yarn vitest run --project=spike-edge --coverage=false && touch /.ok
 
 # ── test-mcp-auth ────────────────────────────────────────────────────────────
 # Deps: src/edge-api/auth/
 FROM config AS test-mcp-auth
 COPY src/edge-api/auth/ src/edge-api/auth/
-RUN set -e && yarn vitest run --project=mcp-auth --coverage=false
+RUN set -e && yarn vitest run --project=mcp-auth --coverage=false && touch /.ok
 
 # ── test-spike-land-mcp ──────────────────────────────────────────────────────
 # Deps: src/edge-api/spike-land/ + shared-utils + server-base
@@ -153,28 +153,28 @@ FROM config AS test-spike-land-mcp
 COPY src/core/shared-utils/    src/core/shared-utils/
 COPY src/core/server-base/     src/core/server-base/
 COPY src/edge-api/spike-land/  src/edge-api/spike-land/
-RUN set -e && yarn vitest run --project=spike-land-mcp --coverage=false
+RUN set -e && yarn vitest run --project=spike-land-mcp --coverage=false && touch /.ok
 
 # ── test-bazdmeg-mcp ─────────────────────────────────────────────────────────
 # Deps: src/mcp-tools/bazdmeg/ (forks pool — self-contained)
 FROM config AS test-bazdmeg-mcp
 COPY src/mcp-tools/bazdmeg/ src/mcp-tools/bazdmeg/
-RUN set -e && yarn vitest run --project=bazdmeg-mcp --coverage=false
+RUN set -e && yarn vitest run --project=bazdmeg-mcp --coverage=false && touch /.ok
 
 # ── test-hackernews-mcp ──────────────────────────────────────────────────────
 FROM config AS test-hackernews-mcp
 COPY src/mcp-tools/hackernews/ src/mcp-tools/hackernews/
-RUN set -e && yarn vitest run --project=hackernews-mcp --coverage=false
+RUN set -e && yarn vitest run --project=hackernews-mcp --coverage=false && touch /.ok
 
 # ── test-openclaw-mcp ────────────────────────────────────────────────────────
 FROM config AS test-openclaw-mcp
 COPY src/mcp-tools/openclaw/ src/mcp-tools/openclaw/
-RUN set -e && yarn vitest run --project=openclaw-mcp --coverage=false
+RUN set -e && yarn vitest run --project=openclaw-mcp --coverage=false && touch /.ok
 
 # ── test-esbuild-wasm-mcp ────────────────────────────────────────────────────
 FROM config AS test-esbuild-wasm-mcp
 COPY src/mcp-tools/esbuild-wasm/ src/mcp-tools/esbuild-wasm/
-RUN set -e && yarn vitest run --project=esbuild-wasm-mcp --coverage=false
+RUN set -e && yarn vitest run --project=esbuild-wasm-mcp --coverage=false && touch /.ok
 
 # ── test-mcp-image-studio ────────────────────────────────────────────────────
 # Uses baseAliases: shared-utils, block-sdk, block-tasks, server-base, react-engine
@@ -185,7 +185,7 @@ COPY src/core/block-sdk/          src/core/block-sdk/
 COPY src/core/block-tasks/        src/core/block-tasks/
 COPY src/core/react-engine/       src/core/react-engine/
 COPY src/mcp-tools/image-studio/  src/mcp-tools/image-studio/
-RUN set -e && yarn vitest run --project=mcp-image-studio --coverage=false
+RUN set -e && yarn vitest run --project=mcp-image-studio --coverage=false && touch /.ok
 
 # ── test-stripe-analytics-mcp ────────────────────────────────────────────────
 # Uses baseAliases (same set as mcp-image-studio)
@@ -196,52 +196,52 @@ COPY src/core/block-sdk/                 src/core/block-sdk/
 COPY src/core/block-tasks/               src/core/block-tasks/
 COPY src/core/react-engine/              src/core/react-engine/
 COPY src/mcp-tools/stripe-analytics/     src/mcp-tools/stripe-analytics/
-RUN set -e && yarn vitest run --project=stripe-analytics-mcp --coverage=false
+RUN set -e && yarn vitest run --project=stripe-analytics-mcp --coverage=false && touch /.ok
 
 # ── test-google-analytics-mcp ────────────────────────────────────────────────
 FROM config AS test-google-analytics-mcp
 COPY src/mcp-tools/google-analytics/ src/mcp-tools/google-analytics/
-RUN set -e && yarn vitest run --project=google-analytics-mcp --coverage=false
+RUN set -e && yarn vitest run --project=google-analytics-mcp --coverage=false && touch /.ok
 
 # ── test-google-ads-mcp ──────────────────────────────────────────────────────
 FROM config AS test-google-ads-mcp
 COPY src/mcp-tools/google-ads/ src/mcp-tools/google-ads/
-RUN set -e && yarn vitest run --project=google-ads-mcp --coverage=false
+RUN set -e && yarn vitest run --project=google-ads-mcp --coverage=false && touch /.ok
 
 # ── test-spike-cli ───────────────────────────────────────────────────────────
 FROM config AS test-spike-cli
 COPY src/cli/spike-cli/ src/cli/spike-cli/
-RUN set -e && yarn vitest run --project=spike-cli --coverage=false
+RUN set -e && yarn vitest run --project=spike-cli --coverage=false && touch /.ok
 
 # ── test-spike-review ────────────────────────────────────────────────────────
 FROM config AS test-spike-review
 COPY src/mcp-tools/code-review/ src/mcp-tools/code-review/
-RUN set -e && yarn vitest run --project=spike-review --coverage=false
+RUN set -e && yarn vitest run --project=spike-review --coverage=false && touch /.ok
 
 # ── test-vibe-dev ────────────────────────────────────────────────────────────
 FROM config AS test-vibe-dev
 COPY src/cli/docker-dev/ src/cli/docker-dev/
-RUN set -e && yarn vitest run --project=vibe-dev --coverage=false
+RUN set -e && yarn vitest run --project=vibe-dev --coverage=false && touch /.ok
 
 # ── test-qa-studio ───────────────────────────────────────────────────────────
 FROM config AS test-qa-studio
 COPY src/core/browser-automation/ src/core/browser-automation/
-RUN set -e && yarn vitest run --project=qa-studio --coverage=false
+RUN set -e && yarn vitest run --project=qa-studio --coverage=false && touch /.ok
 
 # ── test-whatsapp-mcp ────────────────────────────────────────────────────────
 FROM config AS test-whatsapp-mcp
 COPY src/utilities/whatsapp/ src/utilities/whatsapp/
-RUN set -e && yarn vitest run --project=whatsapp-mcp --coverage=false
+RUN set -e && yarn vitest run --project=whatsapp-mcp --coverage=false && touch /.ok
 
 # ── test-image-studio-worker ─────────────────────────────────────────────────
 FROM config AS test-image-studio-worker
 COPY src/edge-api/image-studio-worker/ src/edge-api/image-studio-worker/
-RUN set -e && yarn vitest run --project=image-studio-worker --coverage=false
+RUN set -e && yarn vitest run --project=image-studio-worker --coverage=false && touch /.ok
 
 # ── test-transpile ───────────────────────────────────────────────────────────
 FROM config AS test-transpile
 COPY src/edge-api/transpile/ src/edge-api/transpile/
-RUN set -e && yarn vitest run --project=transpile --coverage=false
+RUN set -e && yarn vitest run --project=transpile --coverage=false && touch /.ok
 
 # ─────────────────────────────────────────────────────────────────────────────
 # test-all: aggregate stage — depends on every per-package stage.
@@ -257,29 +257,29 @@ RUN set -e && yarn vitest run --project=transpile --coverage=false
 # ─────────────────────────────────────────────────────────────────────────────
 FROM scratch AS test-all
 # Pull sentinel files from every test stage so BuildKit is forced to execute them.
-COPY --from=test-chess-engine        /dev/null /chess-engine.ok
-COPY --from=test-shared              /dev/null /shared.ok
-COPY --from=test-mcp-server-base     /dev/null /mcp-server-base.ok
-COPY --from=test-state-machine       /dev/null /state-machine.ok
-COPY --from=test-block-sdk           /dev/null /block-sdk.ok
-COPY --from=test-block-tasks         /dev/null /block-tasks.ok
-COPY --from=test-react-ts-worker     /dev/null /react-ts-worker.ok
-COPY --from=test-spike-chat          /dev/null /spike-chat.ok
-COPY --from=test-spike-edge          /dev/null /spike-edge.ok
-COPY --from=test-mcp-auth            /dev/null /mcp-auth.ok
-COPY --from=test-spike-land-mcp      /dev/null /spike-land-mcp.ok
-COPY --from=test-bazdmeg-mcp         /dev/null /bazdmeg-mcp.ok
-COPY --from=test-hackernews-mcp      /dev/null /hackernews-mcp.ok
-COPY --from=test-openclaw-mcp        /dev/null /openclaw-mcp.ok
-COPY --from=test-esbuild-wasm-mcp    /dev/null /esbuild-wasm-mcp.ok
-COPY --from=test-mcp-image-studio    /dev/null /mcp-image-studio.ok
-COPY --from=test-stripe-analytics-mcp /dev/null /stripe-analytics-mcp.ok
-COPY --from=test-google-analytics-mcp /dev/null /google-analytics-mcp.ok
-COPY --from=test-google-ads-mcp      /dev/null /google-ads-mcp.ok
-COPY --from=test-spike-cli           /dev/null /spike-cli.ok
-COPY --from=test-spike-review        /dev/null /spike-review.ok
-COPY --from=test-vibe-dev            /dev/null /vibe-dev.ok
-COPY --from=test-qa-studio           /dev/null /qa-studio.ok
-COPY --from=test-whatsapp-mcp        /dev/null /whatsapp-mcp.ok
-COPY --from=test-image-studio-worker /dev/null /image-studio-worker.ok
-COPY --from=test-transpile           /dev/null /transpile.ok
+COPY --from=test-chess-engine        /.ok /chess-engine.ok
+COPY --from=test-shared              /.ok /shared.ok
+COPY --from=test-mcp-server-base     /.ok /mcp-server-base.ok
+COPY --from=test-state-machine       /.ok /state-machine.ok
+COPY --from=test-block-sdk           /.ok /block-sdk.ok
+COPY --from=test-block-tasks         /.ok /block-tasks.ok
+COPY --from=test-react-ts-worker     /.ok /react-ts-worker.ok
+COPY --from=test-spike-chat          /.ok /spike-chat.ok
+COPY --from=test-spike-edge          /.ok /spike-edge.ok
+COPY --from=test-mcp-auth            /.ok /mcp-auth.ok
+COPY --from=test-spike-land-mcp      /.ok /spike-land-mcp.ok
+COPY --from=test-bazdmeg-mcp         /.ok /bazdmeg-mcp.ok
+COPY --from=test-hackernews-mcp      /.ok /hackernews-mcp.ok
+COPY --from=test-openclaw-mcp        /.ok /openclaw-mcp.ok
+COPY --from=test-esbuild-wasm-mcp    /.ok /esbuild-wasm-mcp.ok
+COPY --from=test-mcp-image-studio    /.ok /mcp-image-studio.ok
+COPY --from=test-stripe-analytics-mcp /.ok /stripe-analytics-mcp.ok
+COPY --from=test-google-analytics-mcp /.ok /google-analytics-mcp.ok
+COPY --from=test-google-ads-mcp      /.ok /google-ads-mcp.ok
+COPY --from=test-spike-cli           /.ok /spike-cli.ok
+COPY --from=test-spike-review        /.ok /spike-review.ok
+COPY --from=test-vibe-dev            /.ok /vibe-dev.ok
+COPY --from=test-qa-studio           /.ok /qa-studio.ok
+COPY --from=test-whatsapp-mcp        /.ok /whatsapp-mcp.ok
+COPY --from=test-image-studio-worker /.ok /image-studio-worker.ok
+COPY --from=test-transpile           /.ok /transpile.ok
