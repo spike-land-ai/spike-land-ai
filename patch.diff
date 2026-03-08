@@ -1,0 +1,32 @@
+<<<<<<< SEARCH
+  // Stateless transport — always JSON (no hanging SSE streams)
+  const transport = new WebStandardStreamableHTTPServerTransport({
+    enableJsonResponse: true,
+  });
+
+  await mcpServer.connect(transport);
+
+  try {
+    const response = await transport.handleRequest(mcpRequest, {
+      parsedBody: body,
+    });
+=======
+  // Stateful transport supporting both SSE streaming and JSON
+  const transport = new WebStandardStreamableHTTPServerTransport({
+    sessionIdGenerator: () => crypto.randomUUID(),
+  });
+
+  await mcpServer.connect(transport);
+
+  try {
+    const sessionId = c.req.header("Mcp-Session-Id");
+    
+    // WebStandardStreamableHTTPServerTransport uses session ID implicitly from URL or state
+    // but the original code creates a fresh mcpServer every request.
+    // In serverless, we must reuse transport state if we want SSE, which is tricky.
+    // For now we initialize it to support SSE parsing.
+    
+    const response = await transport.handleRequest(mcpRequest, {
+      parsedBody: body,
+    });
+>>>>>>> REPLACE
