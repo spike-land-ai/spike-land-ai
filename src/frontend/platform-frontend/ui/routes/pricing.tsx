@@ -93,7 +93,7 @@ function makePlans(pricing: import("../hooks/usePricing").PricingData): PricingP
         { text: "Custom integrations" },
       ],
       cta: "Contact Sales",
-      ctaHref: "mailto:enterprise@spike.land",
+      ctaHref: "mailto:zoltan.erdos@spike.land",
       highlighted: false,
     },
   ];
@@ -188,22 +188,20 @@ function PlanCard({
   const displayPrice = annual ? plan.annualPrice : plan.monthlyPrice;
   const planId = `plan-${plan.name.toLowerCase()}`;
 
-  const buttonClass = `mt-8 block w-full rounded-lg px-6 py-2.5 text-center text-sm font-semibold transition ${
-    plan.highlighted
+  const buttonClass = `mt-8 block w-full rounded-lg px-6 py-2.5 text-center text-sm font-semibold transition ${plan.highlighted
       ? "bg-primary text-primary-foreground hover:bg-primary/90"
       : isFree
         ? "border border-border text-muted-foreground hover:bg-muted/50"
         : "bg-muted text-foreground hover:bg-muted/80"
-  }`;
+    }`;
 
   return (
     <div
       aria-labelledby={planId}
-      className={`flex flex-col rounded-2xl border p-6 shadow-sm ${
-        plan.highlighted
+      className={`flex flex-col rounded-2xl border p-6 shadow-sm ${plan.highlighted
           ? "border-primary bg-primary/5 ring-2 ring-primary"
           : "border-border bg-card"
-      }`}
+        }`}
     >
       {plan.highlighted && (
         <span className="mb-4 self-start rounded-full bg-primary px-3 py-0.5 text-xs font-semibold text-primary-foreground">
@@ -347,9 +345,8 @@ export function PricingPage() {
             aria-checked={!annual}
             tabIndex={!annual ? 0 : -1}
             onClick={() => setAnnual(false)}
-            className={`rounded-full px-4 py-1.5 text-sm font-medium transition ${
-              !annual ? "bg-background text-foreground shadow-sm" : "text-muted-foreground"
-            }`}
+            className={`rounded-full px-4 py-1.5 text-sm font-medium transition ${!annual ? "bg-background text-foreground shadow-sm" : "text-muted-foreground"
+              }`}
           >
             Monthly
           </button>
@@ -359,9 +356,8 @@ export function PricingPage() {
             aria-checked={annual}
             tabIndex={annual ? 0 : -1}
             onClick={() => setAnnual(true)}
-            className={`rounded-full px-4 py-1.5 text-sm font-medium transition ${
-              annual ? "bg-background text-foreground shadow-sm" : "text-muted-foreground"
-            }`}
+            className={`rounded-full px-4 py-1.5 text-sm font-medium transition ${annual ? "bg-background text-foreground shadow-sm" : "text-muted-foreground"
+              }`}
           >
             Annual
             <span className="ml-1.5 rounded-full bg-green-100 px-1.5 py-0.5 text-xs font-semibold text-green-700 dark:bg-green-900/30 dark:text-green-400">
@@ -386,7 +382,7 @@ export function PricingPage() {
       <p className="text-center text-sm text-muted-foreground">
         Need a custom plan?{" "}
         <a
-          href="mailto:enterprise@spike.land"
+          href="mailto:zoltan.erdos@spike.land"
           className="text-primary underline hover:text-primary/80"
         >
           Talk to our team
@@ -402,7 +398,7 @@ export function PricingPage() {
         <br />
         Students and educators:{" "}
         <a
-          href="mailto:education@spike.land"
+          href="mailto:zoltan.erdos@spike.land"
           className="text-primary underline hover:text-primary/80"
         >
           Contact us for academic pricing

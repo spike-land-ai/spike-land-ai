@@ -23,12 +23,13 @@ guide you to the right documentation based on your role.
 
 ## What's in This Directory
 
-This directory contains **9 documentation files** covering:
+This directory contains core API references plus integration guides covering:
 
 - **OpenAPI 3.0 Specification** (`openapi.yaml`) - Machine-readable API spec for
   SDK generation
 - **API Endpoint Documentation** - Detailed references for Albums and Images
 - **Integration Guides** - Code examples in TypeScript/JavaScript and cURL
+- **Cross-Origin MCP Access** - How to call spike.land MCP APIs from any origin
 - **Getting Started Guides** - Role-based navigation and quick references
 - **Policies** - Token refund policy
 
@@ -48,6 +49,7 @@ This directory contains **9 documentation files** covering:
 | ------------------------------------------ | ------------------------------------------ | --------- |
 | [ALBUM_ENDPOINTS.md](./ALBUM_ENDPOINTS.md) | Album management API reference             | 15 min    |
 | [IMAGE_ENDPOINTS.md](./IMAGE_ENDPOINTS.md) | Image upload and enhancement API reference | 15 min    |
+| [CROSS_ORIGIN_API_GUIDE.md](./CROSS_ORIGIN_API_GUIDE.md) | Browser and Worker guide for wildcard-CORS MCP access | 15 min |
 
 ### Integration Guides
 
@@ -55,6 +57,7 @@ This directory contains **9 documentation files** covering:
 | ---------------------------------------------- | -------------------------------------- | --------- |
 | [INTEGRATION_GUIDE.md](./INTEGRATION_GUIDE.md) | Code examples and integration patterns | 30 min    |
 | [CURL_EXAMPLES.md](./CURL_EXAMPLES.md)         | cURL command examples for testing      | 20 min    |
+| [CROSS_ORIGIN_API_GUIDE.md](./CROSS_ORIGIN_API_GUIDE.md) | Auth, CORS, rate limits, and base URLs for third-party apps | 15 min |
 
 ### Policies
 
@@ -498,7 +501,7 @@ For additional context, see documentation in the parent directory:
 
 For questions or issues:
 
-- Email: support@spike.land
+- Email: zoltan.erdos@spike.land
 - GitHub Issues:
   [Report bug](https://github.com/spike-land-ai/spike.land/issues)
 - Documentation: [spike.land/docs](https://spike.land/docs)

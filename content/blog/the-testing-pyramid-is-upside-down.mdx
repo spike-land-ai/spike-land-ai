@@ -1,59 +1,65 @@
 ---
 title: "The Testing Pyramid Is Upside Down"
 slug: "the-testing-pyramid-is-upside-down"
-description: "What if the worst part of your test suite — the slow, flaky E2E tests — could run at unit test speed? MCPs might be the answer nobody expected."
+description: "The worst part of your test suite — the slow, flaky E2E tests — can run at unit test speed. MCPs remove the browser from the equation."
 date: "2026-02-13"
 author: "Zoltan Erdos"
 category: "Developer Experience"
 tags: ["testing", "mcp", "unit-testing", "e2e", "architecture", "agents"]
 featured: true
-primer: "E2E tests at unit speed. MCPs made it possible."
+primer: "E2E tests at unit speed. The browser was never required."
 heroImage: "/blog/the-testing-pyramid-is-upside-down/hero.png"
 ---
 
 ![An abstract 3D visualization of a glowing glass hourglass representing the shifting testing pyramid, with unit tests at the base and E2E tests at the top, vibrant digital art, synthwave color palette](/blog/the-testing-pyramid-is-upside-down/hero.png)
 
-*Dedicated to the memory of László Merklik (1975–2018), who left us far too soon. He was in his early forties when cancer took him. As co-founder and CPO of Emarsys — later acquired by SAP — he built one of Hungary's most respected engineering cultures. He even gave a talk called "Better Quality Without Testers," which feels like a direct ancestor of the ideas in this article.*
+*Dedicated to the memory of László Merklik (1975–2018). He was forty-three when cancer took him. As co-founder and CPO of Emarsys — later acquired by SAP — he built one of Hungary's most respected engineering cultures. He gave a talk called "Better Quality Without Testers," a direct ancestor of the ideas in this article.*
 
-*László was the person who made me care about coding. Not just doing it — caring about it. He taught me that there is a special relationship between a unit test and the code it tests: when both are written properly, one specifies the other. The test tells you what the code should do. The code tells you what the test should verify. They are two views of the same truth.*
+*László was the person who made me care about coding. Not just doing it — caring about it. He taught me that there is a special relationship between a unit test and the code it tests: when both are written properly, one specifies the other. The test tells you what the code should do. The code tells you what the test should verify. Two views of the same truth.*
 
-*He was the kind of developer who made everyone around him better. The kind who would stay after the talks to help a junior fix their build. The kind who believed that writing software well was a form of respect — for your teammates, for your users, for yourself. This article is about pushing the craft forward. That was his thing too.*
+*He was the kind of developer who made everyone around him better. The kind who would stay after the talks to help a junior fix their build. The kind who believed that writing software well was a form of respect — for your teammates, for your users, for yourself.*
 
 ---
 
 ## The Conference
 
-About fifteen years ago, I went to a developer conference in Budapest. The topic was Jasmine — which ran in the browser, since Node.js itself wasn't widely adopted yet. This was before Jest had eaten the world, before testing was a given on every project. Testing was still something you had to argue for.
+About fifteen years ago, I went to a developer conference in Budapest. The topic was Jasmine — which ran in the browser, since Node.js was not widely adopted yet. This was before Jest had eaten the world, before testing was a given on every project. Testing was still something you had to argue for.
 
 The presenter was young. Nervous energy. He had clearly been converted recently — you could see it in his eyes. He walked us through how a few dozen unit tests had caught a regression that would have shipped to production. He showed how mocking worked. He showed how fast the feedback loop was. He was practically vibrating.
 
 Then someone in the audience raised their hand.
 
-"Es hogy teszteljük le az UI-t?" the person asked — *"And how do we test the UI?"*
+"Es hogy teszteljük le az UI-t?" — *"And how do we test the UI?"*
 
 The presenter paused. Then he shrugged.
 
 "Az UI-t? Azt teszteljék a hülyék!" — *"The UI? Let the idiots test that!"*
 
-A few people laughed. Most nodded. It seemed reasonable at the time. The unit tests covered the business logic. The UI was just HTML and CSS. You look at it, it either looks right or it does not. What is there to automate?
+A few people laughed. Most nodded. The unit tests covered the business logic. The UI was just HTML and CSS. You look at it, it either looks right or it does not. What is there to automate?
 
-That answer stayed with me for a long time. Not because it was wrong. Because it was almost right — and the gap between almost right and actually right would cost our industry a decade of pain.
+That answer stayed with me for a long time. Not because it was wrong. Because it was almost right — and the gap between almost right and actually right cost our industry a decade of pain.
 
 ---
 
-## What Happened Next
+## The Cypress Years
 
 We did start testing UI. Of course we did.
 
 First came Selenium. Then Protractor. Then Cypress. Then Playwright. Each one better than the last. Each one promising to finally make browser testing reliable.
 
-And they did get better. Playwright in particular is a genuinely excellent tool. But the fundamental problem never went away: you are controlling a real browser, rendering real DOM, waiting for real network requests, and hoping that the timing works out. You are testing through the thickest, most unpredictable layer of your entire stack.
+John Reilly — he interviewed me at Investec in 2017, alongside Jamie McCrindle — told me recently that they hired me for my Cypress passion. I had been evangelising it — the test runner that finally made E2E feel like a first-class citizen. The one that showed you the browser as the test ran. The one that made you believe browser automation could be pleasant.
 
-These tests became the worst part of every test suite I have ever worked on.
+They hired me for that conviction. And the conviction was real.
 
-They are slow. A fast unit test suite runs in seconds. A comprehensive E2E suite runs in minutes — sometimes tens of minutes. On CI, with parallelization and retries, you are looking at pipeline times that make developers context-switch to something else while they wait.
+But Cypress was the wrong direction. Not because the tool was bad, but because the premise was wrong. We were perfecting the art of driving a browser when we should have been removing the need for one.
 
-They are flaky. Not because the tools are bad, but because browsers are complex state machines. A test that passes locally fails on CI because the animation took 50ms longer. A test that ran fine yesterday fails today because a third-party script loaded slower. You add `waitForSelector`. You add `waitForTimeout`. You add retry logic. You are not testing your application anymore — you are testing your ability to synchronize with chaos.
+Playwright is an excellent tool. But the fundamental problem never went away: you are controlling a real browser, rendering real DOM, waiting for real network requests, and praying the timing holds. You are testing through the thickest, most unpredictable layer of your entire stack.
+
+These tests are the worst part of every test suite.
+
+They are slow. A fast unit test suite runs in seconds. A comprehensive E2E suite runs in minutes, often tens of minutes. On CI, with parallelisation and retries, you are looking at pipeline times that make developers context-switch while they wait.
+
+They are flaky. Not because the tools are bad, but because browsers are complex state machines. A test that passes locally fails on CI because the animation took 50ms longer. A test that ran fine yesterday fails today because a third-party script loaded slower. You add `waitForSelector`. You add `waitForTimeout`. You add retry logic. You are not testing your application anymore — you are testing your ability to synchronise with chaos.
 
 They are brittle. Change a CSS class? Tests break. Move a button from the left sidebar to the top nav? Tests break. Refactor a component that behaves identically but renders differently? Tests break. The tests are coupled to the implementation in exactly the way we tell junior developers not to write unit tests.
 
@@ -61,23 +67,21 @@ This is the testing pyramid. Unit tests at the base: fast, cheap, many. Integrat
 
 <PyramidReshapeDemo />
 
-Everyone knows the top of the pyramid is painful. We accepted it as the cost of doing business. You need *some* E2E tests because that is the only way to verify the full user flow. API tests are not enough — they test endpoints, not the business logic flows that string those endpoints together into something a user actually does.
-
-Or so we thought.
+Everyone knows the top of the pyramid is painful. We accepted it as the cost of doing business. You need *some* E2E tests because that is the only way to verify the full user flow. API tests alone are not enough — they test endpoints, not the business logic flows that string those endpoints together into something a user actually does.
 
 ---
 
 ## The Insight
 
-Here is the thing about E2E tests that nobody talks about clearly enough: most of them are not really testing the browser. They are testing business logic *through* the browser.
+Here is the thing about E2E tests that nobody talks about clearly enough: most of them are not testing the browser. They are testing business logic *through* the browser.
 
-Think about what a typical E2E test actually verifies. "User logs in, navigates to settings, changes their email, confirms the change, sees the updated email on the profile page." What are you really testing here? You are testing that the email change flow works. The login, the navigation, the form submission, the confirmation, the state update — that is all business logic. The browser is just the delivery mechanism.
+Think about what a typical E2E test actually verifies. "User logs in, navigates to settings, changes their email, confirms the change, sees the updated email on the profile page." What are you really testing? The email change flow. The browser is just the delivery mechanism.
 
-This is not a new observation. Alistair Cockburn's hexagonal architecture (2005) argued that applications should be equally drivable by users, programs, and test scripts. Martin Fowler named the pattern "subcutaneous testing" — testing just below the UI. Robert C. Martin's Clean Architecture insisted that business rules must be testable without any UI at all. The insight was always there. What was missing was a standardized interface that made it practical at scale.
+MCP — Model Context Protocol — is the interface that changes this. Structured input in, structured output out. An agent sends a request describing what it wants to do, your MCP server executes the action and returns the result. No browser. No DOM. No CSS selectors. No timing issues. Write your user stories as MCP tools and you have created a testable contract for your business logic.
 
-MCP — Model Context Protocol — is that interface. It is a standard for exposing your application's capabilities as structured tools. Text in, text out. An agent sends a request describing what it wants to do, your MCP server executes the action and returns the result. No browser. No DOM. No CSS selectors. No timing issues. If you write your user stories as MCP tools, you have created a testable contract for your business logic.
+Alistair Cockburn's hexagonal architecture (2005, also known as Ports and Adapters) argued that applications should be equally drivable by users, programs, and test scripts. Martin Fowler named the pattern "subcutaneous testing." Robert C. Martin's Clean Architecture insisted that business rules must be testable without any UI at all. The insight was there for twenty years. What was missing was a standardised interface that made it practical at scale. MCP is that interface.
 
-Let me show you what I mean.
+Here is what that looks like.
 
 Say you have a user story: "A user can update their email address." In the E2E world, the test looks something like this:
 
@@ -98,12 +102,12 @@ describe('Email update flow', () => {
 });
 ```
 
-This test takes 5-15 seconds to run. It depends on CSS selectors, DOM structure, animation timing, and network latency. Change the confirm dialog to a modal? Test breaks. Move the success message from a toast to an inline alert? Test breaks.
+This test takes 5–15 seconds to run. It depends on CSS selectors, DOM structure, animation timing, and network latency. Change the confirm dialog to a modal? Test breaks. Move the success message from a toast to an inline alert? Test breaks.
 
-Now here is the same business logic exposed as an MCP tool:
+Now the same business logic exposed as an MCP tool:
 
 ```typescript
-// MCP tool definition
+// MCP tool handler — simplified to show the pattern
 const updateEmailTool = {
   name: 'update_user_email',
   description: 'Update the authenticated user\'s email address',
@@ -186,7 +190,7 @@ describe('update_user_email', () => {
 });
 ```
 
-This test runs in milliseconds. It does not depend on any DOM structure. It does not care what the UI looks like. It tests the exact same business logic — the email update flow with confirmation — but at unit test speed, with unit test reliability.
+This test runs in milliseconds. It does not depend on any DOM structure. It does not care what the UI looks like. It tests the same business logic — the email update flow with confirmation — at unit test speed, with unit test reliability.
 
 You have not lost any coverage. You have lost the browser.
 
@@ -194,23 +198,23 @@ You have not lost any coverage. You have lost the browser.
 
 ## The Architecture Argument
 
-This is not just a testing trick. It is an architectural shift.
+This is not a testing trick. It is an architectural shift.
 
 When you expose your user stories as MCP tools, you create a chain:
 
 **User stories → MCP tools → Unit-testable business logic**
 
-The same spec serves three purposes simultaneously:
+The same spec serves three purposes:
 
 1. **User documentation.** The MCP tool descriptions *are* your feature documentation. "Update the authenticated user's email address" — that is the spec, written in plain language, living in the code.
 
-2. **Agent interface.** Any AI agent that connects via MCP can now execute your user stories. Your app is agent-ready not because you bolted on an AI feature, but because your business logic is accessible through a structured text interface.
+2. **Agent interface.** Any AI agent that connects via MCP can execute your user stories. Your app is agent-ready not because you bolted on an AI feature, but because your business logic is accessible through a structured text interface.
 
-3. **Test contract.** The input schema defines what the tool accepts. The handler defines the expected behavior. The response defines the expected output. That is a contract. You can test it the same way you test any function — because it *is* a function.
+3. **Test contract.** The input schema defines what the tool accepts. The handler defines the expected behaviour. The response defines the expected output. That is a contract. You test it the same way you test any function — because it *is* a function.
 
-You could get similar testability from a plain service layer — a well-structured `updateUserEmail()` function is just as testable as an MCP handler. But a service function serves one master: your application. An MCP tool serves three. The same artifact is your test contract, your agent interface, and your feature documentation. You write it once; it earns its keep three ways. That is not a testing trick. That is an architectural force multiplier.
+A plain service layer gives you one of these. MCP gives you three. The same artifact is your test contract, your agent interface, and your feature documentation. You write it once; it pays out three times. That is an architectural force multiplier.
 
-This is the key insight that took me years to see: the reason E2E tests are painful is not that browser automation is hard (though it is). It is that we were forced to go through the browser because there was no other way to exercise full user flows. The browser was the only interface that connected all the pieces.
+E2E tests are painful not because browser automation is hard. They are painful because we went through the browser when there was no other interface connecting all the pieces.
 
 MCPs give you a second interface. A text-based one with self-describing schemas that machines can discover, invoke, and verify. One that connects the same pieces but without the rendering layer, without the timing issues, without the CSS selectors.
 
@@ -220,15 +224,15 @@ MCPs give you a second interface. A text-based one with self-describing schemas 
 
 László taught me the duality: a unit test and its code, when written properly, specify each other. Two players, one truth.
 
-But I think there is a third player: the name.
+There is a third player: the name.
 
 Consider the MCP tool from earlier: `update_user_email`. That name is not just a label. It is a constraint. It tells you what the tool must do and what it must not do. It does not send notifications. It does not update the password. It updates the user's email.
 
-Good naming has always mattered. A well-named function constrains what a developer writes. But an MCP tool name constrains what a *machine* can discover, invoke, and test. An AI agent browsing your MCP server does not read your source code — it reads tool names, descriptions, and schemas. If `update_user_email` is named properly, an agent knows what to call it for without reading the implementation. The name becomes a discoverable contract.
+Good naming has always mattered. A well-named function constrains what a developer writes. But an MCP tool name constrains what a *machine* can discover, invoke, and test. An AI agent querying your MCP server does not read your source code — it reads tool names, descriptions, and schemas. If `update_user_email` is named properly, an agent knows what to call it for without reading the implementation. The name becomes a discoverable contract.
 
 <TestCodeNameVenn />
 
-Test. Code. Name. Three players, one truth. The name, the input schema, and the handler form a triangle where each vertex constrains the other two. We had the first two for decades. MCP formalized the third into something machines can reason about — and it turns out, when you give the name enough structure to be machine-readable, it becomes machine-testable too.
+Test. Code. Name. Three players, one truth. The name, the input schema, and the handler form a triangle where each vertex constrains the other two. We had the first two for decades. MCP formalised the third into something machines can reason about.
 
 ---
 
@@ -236,23 +240,23 @@ Test. Code. Name. Three players, one truth. The name, the input schema, and the 
 
 If you are staring at a flaky E2E suite right now, here is how to start.
 
-**Step 1: Find your most painful E2E tests.** You know which ones they are. The ones you re-run three times before they pass. The ones that have `// TODO: figure out why this is flaky` comments. The ones that take 30 seconds each.
+**Step 1: Find your most painful E2E tests.** You know which ones they are. The ones you re-run three times before they pass. The ones with `// TODO: figure out why this is flaky` comments. The ones that take 30 seconds each.
 
 **Step 2: Ask what business logic they actually verify.** Strip away the clicks and the waits and the selectors. What is the test really checking? "User can cancel their subscription." "Admin can ban a user." "Payment flow handles declined cards." That is the business logic.
 
 **Step 3: Expose that logic as MCP tools.** Write an MCP tool for each business flow. Define the input schema, implement the handler using your existing services, return structured results. You are not rewriting anything — you are wrapping your existing business logic in a structured interface.
 
-**Step 4: Write unit tests for the MCP tools.** Mock the dependencies. Test the happy path. Test the error cases. Test the edge cases. These tests will run in milliseconds and they will never flake.
+**Step 4: Write unit tests for the MCP tools.** Mock the dependencies. Test the happy path. Test the error cases. Test the edge cases. These tests run in milliseconds and they never flake.
 
-**Step 5: Watch your E2E suite shrink.** You will still need some E2E tests — for visual regressions, for browser-specific behavior, for integration wiring that only shows up in a real environment (CORS, auth middleware, hydration). But the number will drop dramatically. The ones you keep will be simpler and more stable because they are not carrying the weight of business logic verification anymore.
+**Step 5: Watch your E2E suite shrink.** Some E2E tests remain — visual regressions, browser-specific behaviour, integration wiring that only shows up in a real environment (CORS, auth middleware, hydration). Keep those. They are now lean and targeted. The rest disappears.
 
-You are not replacing E2E tests. You are moving the business logic out of them. What remains is a thin layer of visual smoke tests — which is all E2E tests should have been in the first place.
+You are not replacing E2E tests. You are moving the business logic out of them. What remains is a thin layer of visual smoke tests — the only job E2E tests should own.
 
 ---
 
 ## The CI Dividend
 
-Once your business logic lives in MCP tools, tightly coupled to your frontend through TypeScript, something remarkable happens to your CI pipeline.
+Once your business logic lives in MCP tools, tightly coupled to your frontend through TypeScript, your CI pipeline gets selective.
 
 Run this:
 
@@ -262,13 +266,11 @@ yarn vitest run --changed main
 
 Vitest knows which files changed since `main`. It knows which tests import those files. It runs only those tests. A change to `update_user_email` runs the email tests, not the entire suite. This takes seconds, not minutes.
 
-But the real trick is what comes next.
+That is the baseline. The compounding effect comes next.
 
-Your CI has coverage logs. It has git history. It knows which MCP tools changed, which unit tests cover them, and which E2E scenarios exercise those flows. An AI reviewer agent can read this graph and make a decision: which E2E tests actually need to run?
+Your CI has coverage logs. It has git history. It knows which MCP tools changed and which unit tests cover them. Today, `--changed` gives you deterministic file-level test selection. Tomorrow, an AI reviewer agent reads the same dependency graph and decides which E2E tests actually need to run — not by file path, but by semantic meaning.
 
-Updated the description in a test fixture file? No E2E tests needed. Changed the email validation logic in an MCP tool? Run the email-related E2E scenarios, skip the rest. Refactored a shared utility? The agent traces the dependency graph and runs exactly the affected tests — nothing more, nothing less.
-
-This is incremental review, powered by the same coupling that made your unit tests fast. The MCP tool names give the agent enough semantic context to reason about blast radius. `update_user_email` changed? The agent knows to run the email E2E tests. `list_user_notifications` unchanged? Skip those.
+`update_user_email` changed? Run the email E2E scenarios. `list_user_notifications` unchanged? Skip those. Updated a test fixture description? No E2E tests needed. The MCP tool names give the agent enough semantic context to reason about blast radius.
 
 The savings compound. On a large codebase, a typical PR touches a fraction of the business logic. Running the full E2E suite for every PR is like rebuilding the entire house because you changed a doorknob. With MCP-structured business logic and an AI reviewer, your CI runs only what matters.
 
@@ -284,26 +286,28 @@ MCPs break that constraint.
 
 If your business logic is accessible through a text interface, full user flow verification does not require a browser. It requires a function call. Function calls are fast. Therefore, full user flow tests are fast. Therefore, write as many as you want.
 
-The pyramid does not flip upside down. It reshapes. The painful top layer — the E2E layer — gets thin. The business logic that bloated it moves down to the unit test layer. Not because you found a clever way to mock the browser, but because you removed the need for the browser entirely.
+The pyramid reshapes. The painful top layer — the E2E layer — gets thin. The business logic that bloated it moves down to the unit test layer. Not because you mocked the browser more cleverly. Because you eliminated the dependency entirely.
 
-The remaining E2E tests do what they should have always done: verify that the page renders, that the integration wiring holds, that the visual design is correct. "Let the idiots test that" — except now the "idiots" are Playwright running a handful of targeted checks, not a hundred slow business logic simulations.
+The remaining E2E tests do what they should have always done: verify that the page renders, that the integration wiring holds, that the visual design is correct. "Let the idiots test that." And now they do. A handful of Playwright smoke checks, not a suite of browser-driven business logic simulations.
 
 ---
 
 ## Full Circle
 
-I still think about that conference sometimes. The young presenter, vibrating with excitement about unit tests. The person in the audience asking about UI testing. The dismissive answer.
+That conference never left me. The young presenter, vibrating with excitement about unit tests. The person in the audience asking about UI testing. The dismissive answer.
 
 "Az UI-t? Azt teszteljék a hülyék!" — *"The UI? Let the idiots test that!"*
 
 He was not wrong. He was early.
 
-The real answer to the UI testing question was never "automate the browser." The real answer was: make the business logic accessible without one. We just did not have the interface for it yet.
+And that Investec interview. John hired me for my Cypress passion. The tool that got me the job embodied the exact wrong abstraction — perfecting browser automation when we should have been escaping it. But the obsession with testing was right. Cypress was how I learned to care about the problem. MCP is what I found on the other side of it.
+
+The real answer to the UI testing question was never "automate the browser." The real answer was: make the business logic accessible without one. We did not have the interface for it yet.
 
 Now we do.
 
-László would have loved this. Not the technology itself — he was never the type to get excited about a protocol or a spec. He would have loved what it means for the craft. Less time fighting flaky tests. More time building things that matter. More time helping the junior developer after the talks.
+László would have loved this. Not the spec — what it means for the craft. Less time fighting flaky tests. More time building things that matter. More time helping the junior developer after the talks.
 
-That is what pushing the craft forward looks like. Not flashy new tools. Quieter feedback loops. Less friction between intent and verification. The boring kind of progress that makes everything else possible.
+That is what pushing the craft forward looks like. Quieter feedback loops. Less friction between intent and verification. The boring kind of progress that makes everything else possible.
 
-I think about him every time I delete a flaky test. I think he would approve.
+Every flaky test I delete — I think of him. He'd have stayed after the talk to explain it to someone. That was his thing too.

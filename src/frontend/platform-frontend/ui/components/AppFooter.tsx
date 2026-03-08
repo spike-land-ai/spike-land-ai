@@ -48,7 +48,7 @@ export function AppFooter() {
                 <Twitter className="size-5" />
               </a>
               <a
-                href="mailto:hello@spike.land"
+                href="mailto:zoltan.erdos@spike.land"
                 className="p-2 rounded-full bg-muted dark:bg-white/5 border border-border dark:border-white/10 text-muted-foreground hover:text-primary hover:border-primary/30 transition-all"
                 aria-label="Email us"
               >
@@ -173,7 +173,7 @@ export function AppFooter() {
         <div className="mt-20 pt-8 border-t border-border dark:border-white/10 flex flex-col md:flex-row justify-between items-center gap-6">
           <div className="flex flex-col items-center md:items-start gap-1">
             <p className="text-xs font-bold text-muted-foreground/60 tracking-tight">
-              &copy; {currentYear} spike.land. Built with passion on Cloudflare Workers.
+              &copy; {currentYear} SPIKE LAND LTD. Built with passion on Cloudflare Workers.
             </p>
             <p className="text-xs text-muted-foreground/40">
               Handcrafted in Europe. Global reach via Edge Computing.

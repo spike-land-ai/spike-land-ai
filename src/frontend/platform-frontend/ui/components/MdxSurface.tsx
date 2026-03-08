@@ -1,8 +1,10 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, isValidElement, type ReactNode } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeRaw from "rehype-raw";
 import { FileText, Loader2 } from "lucide-react";
+import { MdxCommandCard } from "./MdxCommandCard";
+import { isExecutableShellLanguage, resolveMcpCommandBlock } from "./mcp-command-line";
 
 interface MdxSurfaceProps {
   appSlug: string;
@@ -58,9 +60,37 @@ export function MdxSurface({ appSlug, content: initialContent, className = "" }:
                   <span className="text-xs font-mono font-bold text-primary">{name}</span>
                 </div>
                 <div className="text-sm text-muted-foreground">
-                  {(props as Record<string, React.ReactNode>).children || "Loading result..."}
+                  {(props as Record<string, ReactNode>).children || "Loading result..."}
                 </div>
               </div>
+            );
+          },
+          pre: ({ children }) => {
+            const codeBlock = getCodeBlock(children);
+            const commands =
+              codeBlock && isExecutableShellLanguage(codeBlock.language)
+                ? resolveMcpCommandBlock(codeBlock.text)
+                : null;
+
+            if (commands) {
+              return (
+                <div className="my-4 space-y-3">
+                  {commands.map((command, index) => (
+                    <MdxCommandCard
+                      key={`${command.command}-${index}`}
+                      command={command.command}
+                      toolName={command.toolName}
+                      args={command.args}
+                    />
+                  ))}
+                </div>
+              );
+            }
+
+            return (
+              <pre className="my-4 overflow-x-auto rounded-lg border border-border bg-muted/50 p-4">
+                {children}
+              </pre>
             );
           },
           // Style standard markdown elements
@@ -79,11 +109,7 @@ export function MdxSurface({ appSlug, content: initialContent, className = "" }:
           code: ({ children, className: codeClassName }) => {
             const isBlock = codeClassName?.startsWith("language-");
             if (isBlock) {
-              return (
-                <pre className="my-4 rounded-lg border border-border bg-muted/50 p-4 overflow-x-auto">
-                  <code className="text-xs font-mono text-foreground">{children}</code>
-                </pre>
-              );
+              return <code className="text-xs font-mono text-foreground">{children}</code>;
             }
             return (
               <code className="px-1.5 py-0.5 rounded bg-muted text-xs font-mono text-primary">
@@ -140,4 +166,33 @@ export function MdxSurface({ appSlug, content: initialContent, className = "" }:
       </div>
     </div>
   );
+}
+
+function getCodeBlock(children: ReactNode): { language?: string; text: string } | null {
+  const child = Array.isArray(children) ? children[0] : children;
+  if (!isValidElement(child)) return null;
+
+  const props = child.props as { className?: string; children?: ReactNode };
+  const language = props.className?.replace("language-", "");
+  const text = getNodeText(props.children).trim();
+
+  if (!text) return null;
+
+  return { language, text };
+}
+
+function getNodeText(node: ReactNode): string {
+  if (Array.isArray(node)) {
+    return node.map((item) => getNodeText(item)).join("");
+  }
+
+  if (typeof node === "string" || typeof node === "number") {
+    return String(node);
+  }
+
+  if (isValidElement(node)) {
+    return getNodeText((node.props as { children?: ReactNode }).children);
+  }
+
+  return "";
 }

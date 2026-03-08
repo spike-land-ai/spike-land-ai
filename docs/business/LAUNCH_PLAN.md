@@ -537,7 +537,7 @@ wrangler d1 execute spike-land-mcp-db --command 'SELECT count(*) FROM users;'
 ```
 User Report
     ↓
-Support Email (support@spike.land)
+Support Email (zoltan.erdos@spike.land)
     ↓
 [Triage] → P3? → Add to Backlog
     ↓

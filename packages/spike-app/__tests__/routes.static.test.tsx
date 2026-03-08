@@ -61,7 +61,7 @@ describe("Static route pages", () => {
     it("renders contact email", async () => {
       const { PrivacyPage } = await import("@/routes/privacy");
       render(<PrivacyPage />);
-      expect(screen.getAllByText("privacy@spike.land").length).toBeGreaterThan(0);
+      expect(screen.getAllByText("zoltan.erdos@spike.land").length).toBeGreaterThan(0);
     });
   });
 

@@ -10,8 +10,15 @@ Object.assign(globalThis, {
 });
 
 const getCorsHeaders = (requestOrigin?: string | null) => {
+  // Restrict the CORS origin to our app or specific subdomains for safety,
+  // falling back to the default spike.land origin if there is no match.
+  let origin = "https://spike.land";
+  if (requestOrigin && (requestOrigin.endsWith(".spike.land") || requestOrigin.startsWith("http://localhost:"))) {
+    origin = requestOrigin;
+  }
+
   return {
-    "Access-Control-Allow-Origin": requestOrigin || "*",
+    "Access-Control-Allow-Origin": origin,
     "Access-Control-Allow-Headers": "*",
     "cache-control": "no-cache",
   } as const;

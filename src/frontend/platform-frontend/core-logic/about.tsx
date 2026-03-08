@@ -44,7 +44,7 @@ export function AboutPage() {
           </p>
           <div className="flex flex-wrap gap-3">
             <a
-              href="mailto:hello@spike.land"
+              href="mailto:zoltan.erdos@spike.land"
               className="inline-flex items-center gap-2 rounded-lg border border-border px-4 py-2 text-sm font-medium text-foreground hover:bg-muted transition-colors"
             >
               Email us

@@ -88,13 +88,13 @@ export class ServiceRegistry {
     const args = ["compose"];
     switch (action) {
       case "up":
-        args.push("up", "-d", service);
+        args.push("up", "-d", "--", service);
         break;
       case "stop":
-        args.push("stop", service);
+        args.push("stop", "--", service);
         break;
       case "restart":
-        args.push("restart", service);
+        args.push("restart", "--", service);
         break;
     }
 
@@ -115,7 +115,7 @@ export class ServiceRegistry {
     if (since) {
       args.push("--since", since);
     }
-    args.push(service);
+    args.push("--", service);
 
     const { stdout } = await execFileAsync("docker", args, {
       cwd: process.env.COMPOSE_PROJECT_DIR ?? "/app",

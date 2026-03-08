@@ -254,10 +254,10 @@ export function PrivacyPage() {
         <p className="leading-relaxed text-foreground">
           To exercise any of these rights, contact us at{" "}
           <a
-            href="mailto:privacy@spike.land"
+            href="mailto:zoltan.erdos@spike.land"
             className="text-primary underline hover:text-primary/80"
           >
-            privacy@spike.land
+            zoltan.erdos@spike.land
           </a>
           . We will respond within 30 days.
         </p>
@@ -302,10 +302,10 @@ export function PrivacyPage() {
         <p className="leading-relaxed text-foreground">
           To exercise any of these rights, contact us at{" "}
           <a
-            href="mailto:privacy@spike.land"
+            href="mailto:zoltan.erdos@spike.land"
             className="text-primary underline hover:text-primary/80"
           >
-            privacy@spike.land
+            zoltan.erdos@spike.land
           </a>
           . We will verify your identity before processing your request and respond within 45 days.
         </p>
@@ -334,10 +334,10 @@ export function PrivacyPage() {
           For privacy questions or to exercise your rights, email our Data Protection Officer (DPO)
           at{" "}
           <a
-            href="mailto:privacy@spike.land"
+            href="mailto:zoltan.erdos@spike.land"
             className="text-primary underline hover:text-primary/80"
           >
-            privacy@spike.land
+            zoltan.erdos@spike.land
           </a>{" "}
           or open an issue on our{" "}
           <a
@@ -349,6 +349,25 @@ export function PrivacyPage() {
             GitHub organization
           </a>
           .
+        </p>
+      </section>
+
+      <section className="space-y-3">
+        <h2 className="text-xl font-semibold">14. Impressum & Legal Notice</h2>
+        <p className="leading-relaxed text-foreground">
+          <strong>spike.land</strong> is operated by:
+        </p>
+        <p className="leading-relaxed text-foreground">
+          SPIKE LAND LTD
+          <br />
+          Apartment 70, 42 Mighell Street
+          <br />
+          Brighton, BN2 0AU, United Kingdom
+        </p>
+        <p className="leading-relaxed text-foreground">
+          <strong>Company Registration:</strong> 16906682 (England and Wales)
+          <br />
+          <strong>Director:</strong> Zoltan Erdos
         </p>
       </section>
     </div>

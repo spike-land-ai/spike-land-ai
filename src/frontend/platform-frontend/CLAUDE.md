@@ -2,9 +2,11 @@
 
 ## Overview
 
-Vite + React 19 + TanStack Router SPA for the spike.land frontend.
-Talks to `spike-edge` (via `/api` proxy). Published as
-`@spike-land-ai/spike-app`.
+Vite + React 19 + TanStack Router SPA for the spike.land frontend. This package
+is one of the first-party clients of the open MCP app store: it renders the
+store UI, app-facing pages, and discovery/install surfaces on top of the same
+runtime other origins can call directly. Talks to `spike-edge` (via `/api`
+proxy). Published as `@spike-land-ai/spike-app`.
 
 ## Commands
 
@@ -80,6 +82,14 @@ configuration in `app.css`. Path alias `@/` maps to the package root.
 `vite.config.ts` proxies `/api/*` to `http://localhost:8787` (spike-edge). Start
 spike-edge with `npm run dev` in `src/spike-edge` before running the
 frontend for full-stack local dev.
+
+## App Store Notes
+
+- `ui/routes/store.tsx` renders the first-party store catalog.
+- The store route consumes `/api/store/tools`, which aggregates public MCP
+  metadata into a UI-friendly catalog.
+- App pages should preserve the “MCP app = composable tools + metadata” model
+  instead of drifting into screenshot-only marketing pages.
 
 ## Environment Variables
 

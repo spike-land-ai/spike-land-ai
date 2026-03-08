@@ -9,7 +9,7 @@
  *   vibe-dev claude [args]             # Run Claude Code with MCP configured
  */
 
-import { spawn } from "child_process";
+import spawn from "cross-spawn";
 import { program } from "commander";
 import { readFile, writeFile } from "fs/promises";
 import { tmpdir } from "os";
@@ -305,6 +305,12 @@ program
   .allowUnknownOption(true)
   .action(async (options, command) => {
     try {
+      // Validate codespace ID to prevent injection/path traversal
+      if (options.codespace && !/^[a-zA-Z0-9._-]+$/.test(options.codespace)) {
+        console.error("Error: Invalid codespace ID format");
+        process.exit(1);
+      }
+
       // Create temporary MCP config
       const mcpConfigPath = await createMcpConfig();
 
@@ -320,9 +326,10 @@ program
       const extraArgs = command.args || [];
       args.push(...extraArgs);
 
-      // Add prompt if provided
+      // Add prompt via stdin instead of arguments if provided to prevent breakout
+      const isInteractive = !options.prompt;
       if (options.prompt) {
-        args.push("-p", options.prompt);
+        args.push("-");
       }
 
       console.log(`🤖 Starting Claude Code...`);
@@ -330,14 +337,23 @@ program
         console.log(`   Codespace: ${options.codespace}`);
       }
 
-      // Spawn Claude interactively
+      // Spawn Claude
       const claude = spawn("claude", args, {
-        stdio: "inherit",
+        stdio: isInteractive ? "inherit" : ["pipe", "inherit", "inherit"],
         env: process.env,
       });
 
+      if (options.prompt) {
+        claude.stdin?.write(options.prompt);
+        claude.stdin?.end();
+      }
+
       claude.on("close", (code) => {
-        process.exit(code || 0);
+        if (code !== null) {
+          process.exit(code);
+        } else {
+          process.exit(0);
+        }
       });
 
       claude.on("error", (err) => {

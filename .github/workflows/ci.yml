@@ -163,6 +163,12 @@ jobs:
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
 
+      # Sync blog MDX content → D1 + R2 (runs on every push to main)
+      - name: Seed blog posts to D1 and upload images to R2
+        run: npx tsx scripts/seed-blog.ts --remote
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+
       - name: Capture pre-deploy state
         id: pre-deploy
         run: echo "timestamp=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> $GITHUB_OUTPUT

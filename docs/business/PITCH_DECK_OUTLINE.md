@@ -24,7 +24,7 @@
 **Content**:
 
 - Company: SPIKE LAND LTD
-- Product: Spike Land - Managed Deployment Platform with MCP Registry
+- Product: Spike Land - Open MCP App Store and Runtime Platform
 - Founder: Zoltan Erdos
 - Location: Brighton, UK
 - Contact: [email]
@@ -55,7 +55,7 @@ tooling
 
 ### Slide 3: Solution
 
-**Headline**: Spike Land - Build, deploy, and manage apps with your AI assistant
+**Headline**: Spike Land - Vibe code, publish, and run MCP apps anywhere
 
 **Multi-Channel Platform**:
 
@@ -67,10 +67,12 @@ tooling
 **Key Features** (brief):
 
 1. **Vibe Coding** - Build full-stack apps with AI assistance
-2. **Managed Deployments** - One-command deploy from spike-cli
-3. **MCP Registry** - 533+ tools accessible by any AI agent
-4. **Multi-Channel** - CLI, web, WhatsApp, Telegram access
-5. **App Store** - 19 first-party apps, 18 store listings, tool marketplace
+2. **Open App Store** - Publish MCP apps with installs, recommendations, and
+   future marketplace revenue share
+3. **Cross-Origin MCP** - 533+ tools accessible by any AI agent or existing app
+4. **Managed Deployments** - Deploy to Cloudflare Workers or package offline
+   browser bundles
+5. **Multi-Channel** - CLI, web, WhatsApp, Telegram access
 6. **AI Assistant (Spike)** - Your personalized AI with full platform access
 
 **Visual**: Terminal session (spike-cli) + web dashboard + mobile chat
@@ -127,8 +129,8 @@ highlight the dual-interface advantage.
 - 1,000 paid accounts @ $40 ARPU = $480K ARR
 - 10,000 paid accounts @ $40 ARPU = $4.8M ARR
 
-**Model**: 70%+ gross margin SaaS + MCP API usage fees + tool marketplace
-revenue share
+**Model**: 70%+ gross margin SaaS + MCP API usage fees + 70/30 app-store and
+tool-marketplace revenue share
 
 ---
 
@@ -179,7 +181,8 @@ GTM support."
 - Replit: No MCP registry, no messaging integration
 - Render: No AI capabilities, no tool marketplace
 
-**Spike Land**: MCP-native from day one, multi-channel, with tool marketplace
+**Spike Land**: MCP-native from day one, cross-origin, offline-capable, with
+an open app store and tool marketplace
 
 ---
 

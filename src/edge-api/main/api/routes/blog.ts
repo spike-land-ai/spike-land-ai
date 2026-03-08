@@ -4,6 +4,8 @@ import { getClientId, sendGA4Events } from "../../lazy-imports/ga4.js";
 import { safeCtx, withEdgeCache } from "../lib/edge-cache.js";
 
 const blog = new Hono<{ Bindings: Env }>();
+const GITHUB_RAW_BASE = "https://raw.githubusercontent.com/spike-land-ai/spike-land-ai/main";
+const BLOG_SLUG_RE = /^[a-z0-9-]+$/i;
 
 interface BlogPostRow {
   slug: string;
@@ -20,6 +22,98 @@ interface BlogPostRow {
   content: string;
   created_at: number;
   updated_at: number;
+}
+
+function stripQuotes(value: string): string {
+  return value.replace(/^['"]|['"]$/g, "");
+}
+
+function getFrontmatterValue(frontmatter: string, key: string): string | null {
+  const match = frontmatter.match(new RegExp(`^${key}:\\s*(.+)$`, "m"));
+  return match?.[1]?.trim() ?? null;
+}
+
+function parseTagsValue(raw: string | null): string[] {
+  if (!raw?.startsWith("[") || !raw.endsWith("]")) return [];
+
+  const inner = raw.slice(1, -1).trim();
+  if (!inner) return [];
+
+  return inner
+    .split(",")
+    .map((tag) => stripQuotes(tag.trim()))
+    .filter(Boolean);
+}
+
+function extractHeroImage(content: string, frontmatterHeroImage: string | null) {
+  let heroImage = frontmatterHeroImage;
+  let body = content.trim();
+
+  if (!heroImage) {
+    const lines = body.split("\n").slice(0, 5);
+    for (const line of lines) {
+      const match = line.match(/^!\[.*?\]\((\/blog\/[^)]+)\)$/);
+      if (match?.[1] && !line.includes("placehold.co")) {
+        heroImage = match[1];
+        body = body.replace(line + "\n", "").replace(line, "").trim();
+        break;
+      }
+    }
+    return { heroImage, body };
+  }
+
+  const escapedHero = heroImage.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  body = body.replace(new RegExp(`^!\\[.*?\\]\\(${escapedHero}\\)\\n?`, "m"), "").trim();
+  return { heroImage, body };
+}
+
+function sourceToRow(rawContent: string, requestedSlug: string): BlogPostRow | null {
+  const match = rawContent.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n?/);
+  if (!match?.[1]) return null;
+
+  const frontmatter = match[1];
+  const title = stripQuotes(getFrontmatterValue(frontmatter, "title") ?? "");
+  if (!title) return null;
+
+  const frontmatterHeroImage = stripQuotes(getFrontmatterValue(frontmatter, "heroImage") ?? "");
+  const { heroImage, body } = extractHeroImage(
+    rawContent.slice(match[0].length),
+    frontmatterHeroImage || null,
+  );
+
+  return {
+    slug: stripQuotes(getFrontmatterValue(frontmatter, "slug") ?? requestedSlug),
+    title,
+    description: stripQuotes(getFrontmatterValue(frontmatter, "description") ?? ""),
+    primer: stripQuotes(getFrontmatterValue(frontmatter, "primer") ?? ""),
+    date: stripQuotes(getFrontmatterValue(frontmatter, "date") ?? ""),
+    author: stripQuotes(getFrontmatterValue(frontmatter, "author") ?? ""),
+    category: stripQuotes(getFrontmatterValue(frontmatter, "category") ?? ""),
+    tags: JSON.stringify(parseTagsValue(getFrontmatterValue(frontmatter, "tags"))),
+    featured: getFrontmatterValue(frontmatter, "featured") === "true" ? 1 : 0,
+    draft: getFrontmatterValue(frontmatter, "draft") === "true" ? 1 : 0,
+    hero_image: heroImage,
+    content: body,
+    created_at: 0,
+    updated_at: 0,
+  };
+}
+
+async function fetchBlogPostSource(slug: string): Promise<BlogPostRow | null> {
+  if (!BLOG_SLUG_RE.test(slug)) return null;
+
+  try {
+    const response = await fetch(`${GITHUB_RAW_BASE}/content/blog/${slug}.mdx`, {
+      headers: { "User-Agent": "spike-edge/1.0" },
+      cf: { cacheTtl: 300, cacheEverything: true },
+    });
+
+    if (!response.ok) return null;
+
+    return sourceToRow(await response.text(), slug);
+  } catch {
+    return null;
+  }
 }
 
 function rowToPost(row: BlogPostRow, includeContent = false) {
@@ -128,9 +222,7 @@ blog.get("/api/blog/:slug", async (c) => {
       c.req.raw,
       safeCtx(c),
       async () => {
-        const row = await c.env.DB.prepare(`SELECT * FROM blog_posts WHERE slug = ?`)
-          .bind(slug)
-          .first<BlogPostRow>();
+        const row = await getBlogPostRow(c.env.DB, slug);
 
         if (!row) return null;
 
@@ -142,9 +234,7 @@ blog.get("/api/blog/:slug", async (c) => {
     );
   } catch {
     // Cache API unavailable — fall back to direct D1
-    const row = await c.env.DB.prepare(`SELECT * FROM blog_posts WHERE slug = ?`)
-      .bind(slug)
-      .first<BlogPostRow>();
+    const row = await getBlogPostRow(c.env.DB, slug);
 
     if (row) {
       cached = new Response(JSON.stringify(rowToPost(row, true)), {
@@ -247,7 +337,20 @@ blog.get("/blog/:slug/:filename", async (c, next) => {
 
 /** Fetch a single blog post row from D1 (no caching, for SSR injection). */
 async function getBlogPostRow(db: D1Database, slug: string): Promise<BlogPostRow | null> {
-  return db.prepare("SELECT * FROM blog_posts WHERE slug = ?").bind(slug).first<BlogPostRow>();
+  const normalizedSlug = slug.replace(/\.mdx$/i, "");
+
+  try {
+    const row = await db
+      .prepare("SELECT * FROM blog_posts WHERE slug = ?")
+      .bind(normalizedSlug)
+      .first<BlogPostRow>();
+
+    if (row) return row;
+  } catch {
+    // Fall through to the canonical MDX source when D1 is unavailable or stale.
+  }
+
+  return fetchBlogPostSource(normalizedSlug);
 }
 
 // RSS 2.0 feed endpoint

@@ -15,25 +15,25 @@ const capturedActions = vi.hoisted(
 );
 
 // Mocked modules - must be before any imports
-vi.mock("child_process", () => ({ spawn: vi.fn() }));
+vi.mock("cross-spawn", () => ({ default: vi.fn() }));
 vi.mock("fs/promises", () => ({
   readFile: vi.fn(),
   writeFile: vi.fn(),
   mkdir: vi.fn(),
 }));
-vi.mock("../../../src/cli/docker-dev/agent.js", () => ({ poll: vi.fn() }));
-vi.mock("../../../src/cli/docker-dev/api.js", () => ({
+vi.mock("../../../src/cli/docker-dev/node-sys/agent.js", () => ({ poll: vi.fn() }));
+vi.mock("../../../src/cli/docker-dev/core-logic/api.js", () => ({
   getApiConfig: vi.fn().mockReturnValue({ baseUrl: "https://api.example.com", apiKey: "key" }),
 }));
-vi.mock("../../../src/cli/docker-dev/redis.js", () => ({
+vi.mock("../../../src/cli/docker-dev/core-logic/redis.js", () => ({
   getQueueStats: vi.fn(),
   getRedisConfig: vi.fn().mockReturnValue({ url: "redis://localhost:6379", token: "token" }),
 }));
-vi.mock("../../../src/cli/docker-dev/sync.js", () => ({
+vi.mock("../../../src/cli/docker-dev/core-logic/sync.js", () => ({
   pullCode: vi.fn(),
   pushCode: vi.fn(),
 }));
-vi.mock("../../../src/cli/docker-dev/watcher.js", () => ({
+vi.mock("../../../src/cli/docker-dev/lazy-imports/watcher.js", () => ({
   downloadToLocal: vi.fn(),
   getLocalPath: vi.fn().mockReturnValue("/app/live/my-space.tsx"),
   startDevMode: vi.fn(),
@@ -70,12 +70,12 @@ vi.mock("commander", async (importOriginal) => {
 });
 
 // Import mocked modules so we can set expectations on them
-import { spawn } from "child_process";
+import spawn from "cross-spawn";
 import { mkdir, readFile, writeFile } from "fs/promises";
-import * as agentModule from "../../../src/cli/docker-dev/agent.js";
-import * as redisModule from "../../../src/cli/docker-dev/redis.js";
-import * as syncModule from "../../../src/cli/docker-dev/sync.js";
-import * as watcherModule from "../../../src/cli/docker-dev/watcher.js";
+import * as agentModule from "../../../src/cli/docker-dev/node-sys/agent.js";
+import * as redisModule from "../../../src/cli/docker-dev/core-logic/redis.js";
+import * as syncModule from "../../../src/cli/docker-dev/core-logic/sync.js";
+import * as watcherModule from "../../../src/cli/docker-dev/lazy-imports/watcher.js";
 
 // Import cli.ts - registers commands with our intercepted commander
 // program.exitOverride() makes commander throw instead of process.exit,
@@ -84,7 +84,7 @@ const originalArgv = process.argv;
 process.argv = ["node", "vibe-dev"];
 
 try {
-  await import("../../../src/cli/docker-dev/cli.js");
+  await import("../../../src/cli/docker-dev/core-logic/cli.js");
 } catch (_e) {
   // Commander throws CommanderError when displaying help (exitOverride mode)
   // This is expected - ignore it
@@ -493,7 +493,7 @@ describe("CLI claude command", () => {
     expect(spawn).toHaveBeenCalledWith(
       "claude",
       expect.arrayContaining(["--mcp-config"]),
-      expect.objectContaining({ stdio: "inherit" }),
+      expect.objectContaining({ stdio: ["pipe", "inherit", "inherit"] }),
     );
     exitSpy.mockRestore();
   });

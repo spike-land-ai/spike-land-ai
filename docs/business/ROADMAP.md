@@ -6,12 +6,12 @@
 
 ---
 
-## Vision: The Managed Deployment Platform with MCP Registry
+## Vision: The Open MCP App Store With Managed Runtime
 
-**Spike Land is a managed deployment platform where developers vibe code
-full-stack apps and deploy them instantly -- powered by Spike, your personalized
-AI assistant with 533+ tools accessible via CLI, web chat, WhatsApp, and
-Telegram.**
+**Spike Land is an open MCP app store where developers vibe code full-stack
+apps, publish them, and run them across edge-hosted, cross-origin, and offline
+surfaces -- powered by Spike, your personalized AI assistant with 533+ tools
+accessible via CLI, web chat, WhatsApp, and Telegram.**
 
 spike-cli lets you build, deploy, and manage applications from the command line.
 The web platform provides a visual dashboard. Every capability is exposed as an
@@ -24,16 +24,17 @@ Protocol.
    by any AI agent via standard protocol, accessible through spike-cli (CLI),
    web chat, WhatsApp, and Telegram. No competitor offers this breadth of access
    channels.
-2. **Managed deployment with vibe coding** - Build full-stack apps with AI
-   assistance and deploy them to managed infrastructure in one command.
+2. **Open app-store distribution with vibe coding** - Build full-stack apps
+   with AI assistance, publish them into the catalog, and distribute them as
+   callable MCP software.
 3. **UK Ltd with Stripe-first billing** - Global payments, VAT handling,
    SEIS/EIS eligible
 
-**Positioning**: Managed Deployment Platform with MCP Registry **Core Product**:
+**Positioning**: Open MCP app store with managed runtime **Core Product**:
 spike-cli (MCP multiplexer CLI), Spike web chat, WhatsApp & Telegram bots
-**Supporting Tools**: App Store (19 first-party apps), vibe coding, real-time
-code editor **Target Market**: Developers, AI agent builders, solo founders,
-small teams
+**Supporting Tools**: App Store, vibe coding, real-time code editor, offline
+bundling, Cloudflare deployment guides **Target Market**: Developers, AI agent
+builders, solo founders, small teams
 
 ---
 
@@ -196,7 +197,21 @@ Merge all credits into "Spike Credits":
 
 ### Upcoming
 
-#### Phase 12: WhatsApp & Telegram Integration (Q1-Q2 2026)
+#### Phase 12: Open App Store Expansion (Q1-Q2 2026)
+
+**Goal**: Turn the current store into the default distribution layer for
+spike.land apps and skills
+
+| Task | Priority | Status |
+| --- | --- | --- |
+| Open submissions with review gates | Critical | Planned |
+| Shared SDK v1 documentation | Critical | Planned |
+| Cross-origin MCP integration guides | High | In progress |
+| Offline browser bundle path | High | In progress |
+| Store security and sandbox docs | High | In progress |
+| Performance budgets per store surface | Medium | Planned |
+
+#### Phase 13: WhatsApp & Telegram Integration (Q1-Q2 2026)
 
 **Goal**: Multi-channel access to Spike AI assistant
 
@@ -212,7 +227,7 @@ Merge all credits into "Spike Credits":
 **Exit criteria**: Users can interact with Spike via WhatsApp and Telegram with
 the same capabilities as web chat and spike-cli.
 
-#### Phase 13: Expanded MCP Registry (Q2 2026)
+#### Phase 14: Expanded MCP Registry And Marketplace (Q2 2026)
 
 **Goal**: Package MCP server as paid API product, open tool marketplace
 
@@ -230,7 +245,7 @@ the same capabilities as web chat and spike-cli.
 **Exit criteria**: API PRO add-on purchasable, rate-limited, metered,
 documented. Third-party developers can submit tools.
 
-#### Phase 14: Managed Deployments (Q3 2026)
+#### Phase 15: Managed Deployments (Q3 2026)
 
 **Goal**: One-command deployment for vibe-coded apps
 
@@ -246,7 +261,7 @@ documented. Third-party developers can submit tools.
 **Exit criteria**: Users can deploy full-stack apps from spike-cli with
 `spike deploy`.
 
-#### Phase 15: MCP Multiplexer Expansion (Q4 2026)
+#### Phase 16: MCP Multiplexer Expansion (Q4 2026)
 
 **Goal**: Scale the multiplexer ecosystem to 1,000+ community tools
 
@@ -261,7 +276,7 @@ documented. Third-party developers can submit tools.
 
 **Exit criteria**: 1,000+ tools in the registry, 100+ community-contributed tools, automated quality gates for submissions.
 
-#### Phase 16: Enterprise & Self-Extending Agents (Q1 2027)
+#### Phase 17: Enterprise & Self-Extending Agents (Q1 2027)
 
 **Goal**: Enable AI agents to discover, create, and publish tools autonomously
 
@@ -370,8 +385,8 @@ accessible via CLI, web, WhatsApp, and Telegram.** This is the differentiator.
 
 | Tool                      | Priority | Phase    |
 | ------------------------- | -------- | -------- |
-| `deploy_app`              | Critical | Phase 14 |
-| `manage_deployment`       | Critical | Phase 14 |
+| `deploy_app`              | Critical | Phase 15 |
+| `manage_deployment`       | Critical | Phase 15 |
 | `whatsapp_send`           | High     | Phase 12 |
 | `telegram_send`           | High     | Phase 12 |
 | `marketplace_submit_tool` | High     | Phase 13 |

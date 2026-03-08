@@ -73,7 +73,7 @@ Complete!
 
 ### Official Support
 
-- **Email**: api-support@spike.land
+- **Email**: zoltan.erdos@spike.land
 - **Response time**: 24 hours (business days)
 - **Include**: API calls, error messages, reproduction steps
 

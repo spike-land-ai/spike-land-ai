@@ -1,4 +1,4 @@
-import FS from "@/lib/memfs/index";
+import FS from "@/lib/memfs/memfs-index";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { mockDirectoryHandle, mockFileSystem, mockNavigator, setupTest } from "./setup.js";
 

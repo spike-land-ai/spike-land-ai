@@ -2220,6 +2220,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@hookform/resolvers@npm:^5.2.2":
+  version: 5.2.2
+  resolution: "@hookform/resolvers@npm:5.2.2"
+  dependencies:
+    "@standard-schema/utils": "npm:^0.3.0"
+  peerDependencies:
+    react-hook-form: ^7.55.0
+  checksum: 10c0/0692cd61dcc2a70cbb27b88a37f733c39e97f555c036ba04a81bd42b0467461cfb6bafacb46c16f173672f9c8a216bd7928a2330d4e49c700d130622bf1defaf
+  languageName: node
+  linkType: hard
+
 "@humanfs/core@npm:^0.19.1":
   version: 0.19.1
   resolution: "@humanfs/core@npm:0.19.1"
@@ -4527,6 +4538,7 @@ __metadata:
     "@testing-library/dom": "npm:^10.4.1"
     "@testing-library/jest-dom": "npm:^6.9.1"
     "@testing-library/react": "npm:^16.3.2"
+    "@testing-library/user-event": "npm:^14.6.1"
     "@types/jsdom": "npm:^28"
     "@types/react": "npm:^19.2.14"
     "@types/react-dom": "npm:^19"
@@ -4867,9 +4879,11 @@ __metadata:
   resolution: "@spike-land-ai/vibe-dev@workspace:packages/vibe-dev"
   dependencies:
     "@changesets/cli": "npm:2.30.0"
+    "@types/cross-spawn": "npm:^6.0.6"
     "@types/node": "npm:25.3.5"
     chokidar: "npm:5.0.0"
     commander: "npm:14.0.3"
+    cross-spawn: "npm:^7.0.6"
     eslint: "npm:10.0.3"
     tsup: "npm:8.5.1"
     tsx: "npm:4.21.0"
@@ -5500,6 +5514,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@testing-library/user-event@npm:^14.6.1":
+  version: 14.6.1
+  resolution: "@testing-library/user-event@npm:14.6.1"
+  peerDependencies:
+    "@testing-library/dom": ">=7.21.4"
+  checksum: 10c0/75fea130a52bf320d35d46ed54f3eec77e71a56911b8b69a3fe29497b0b9947b2dc80d30f04054ad4ce7f577856ae3e5397ea7dff0ef14944d3909784c7a93fe
+  languageName: node
+  linkType: hard
+
 "@ts-morph/common@npm:~0.28.1":
   version: 0.28.1
   resolution: "@ts-morph/common@npm:0.28.1"
@@ -5612,6 +5635,15 @@ __metadata:
   dependencies:
     "@types/node": "npm:*"
   checksum: 10c0/b5dd407040db7d8aa1bd36e79e5f3f32292f6b075abc287529e9f48df1a25fda3e3799ba30b4656667ffb931d3b75690c1d6ca71e39f7337ea6dfda8581916d0
+  languageName: node
+  linkType: hard
+
+"@types/cross-spawn@npm:^6.0.6":
+  version: 6.0.6
+  resolution: "@types/cross-spawn@npm:6.0.6"
+  dependencies:
+    "@types/node": "npm:*"
+  checksum: 10c0/e3d476bb6b3a54a8934a97fe6ee4bd13e2e5eb29073929a4be76a52466602ffaea420b20774ffe8503f9fa24f3ae34817e95e7f625689fb0d1c10404f5b2889c
   languageName: node
   linkType: hard
 
@@ -14620,6 +14652,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"react-hook-form@npm:^7.71.2":
+  version: 7.71.2
+  resolution: "react-hook-form@npm:7.71.2"
+  peerDependencies:
+    react: ^16.8.0 || ^17 || ^18 || ^19
+  checksum: 10c0/bff61c229f5f2516e650325e0c450146cb8a08dc323e5e9aa0753eb937be0b66fe17f40a7b4be9aabc2b5cb770d03de07db7f4912c6c9452a86924072cc1cb46
+  languageName: node
+  linkType: hard
+
 "react-icons@npm:5.5.0":
   version: 5.5.0
   resolution: "react-icons@npm:5.5.0"
@@ -15948,6 +15989,7 @@ __metadata:
   dependencies:
     "@biomejs/biome": "npm:^2.4.6"
     "@changesets/cli": "npm:2.30.0"
+    "@hookform/resolvers": "npm:^5.2.2"
     "@modelcontextprotocol/sdk": "npm:^1.27.1"
     "@radix-ui/react-slot": "npm:^1.2.4"
     "@remotion/cli": "npm:^4.0.434"
@@ -15957,6 +15999,7 @@ __metadata:
     "@tanstack/react-query": "npm:^5.90.21"
     "@tanstack/react-router": "npm:^1.166.2"
     "@tanstack/router-cli": "npm:^1.166.2"
+    "@testing-library/user-event": "npm:^14.6.1"
     "@types/cors": "npm:^2.8.19"
     "@types/express": "npm:^5.0.6"
     "@types/mime-types": "npm:^3.0.1"
@@ -15975,6 +16018,7 @@ __metadata:
     lucide-react: "npm:^0.577.0"
     react: "npm:^19.2.4"
     react-dom: "npm:^19.2.4"
+    react-hook-form: "npm:^7.71.2"
     react-markdown: "npm:^10.1.0"
     remotion: "npm:^4.0.434"
     tailwind-merge: "npm:^3.5.0"

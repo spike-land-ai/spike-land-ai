@@ -1,240 +1,133 @@
 # Spike Land Documentation
 
-Welcome to the Spike Land documentation. This is the central index for all
-platform documentation.
+This index is the fastest way to find the platform, app store, MCP, deployment,
+security, and business docs that matter today.
 
 **Website**: [spike.land](https://spike.land)
 
 ---
 
-## Quick Navigation
+## Start Here
 
-### For Users
-
-| I want to...              | Document                                                                   |
-| ------------------------- | -------------------------------------------------------------------------- |
-| Understand the platform   | [features/FEATURES.md](./features/FEATURES.md)                             |
-| Learn about subscriptions | [features/SUBSCRIPTION_TIERS.md](./features/SUBSCRIPTION_TIERS.md)         |
-| Get credits               | [develop/TOKEN_SYSTEM.md](./develop/TOKEN_SYSTEM.md)                       |
-| Use voucher codes         | [features/VOUCHER_SYSTEM_UPDATED.md](./features/VOUCHER_SYSTEM_UPDATED.md) |
-
-### For Developers
-
-| I want to...              | Document                                                             |
-| ------------------------- | -------------------------------------------------------------------- |
-| Onboard to the monorepo   | [develop/ONBOARDING.md](./develop/ONBOARDING.md)                     |
-| Understand the edge stack | [develop/EDGE_STACK.md](./develop/EDGE_STACK.md)                     |
-| Integrate with the API    | [api/API_REFERENCE.md](./api/API_REFERENCE.md)                       |
-| View API changelog        | [api/API_CHANGELOG.md](./api/API_CHANGELOG.md)                      |
-| Set up D1 + Drizzle       | [develop/D1_QUICK_START.md](./develop/D1_QUICK_START.md)             |
-| D1 migration guide        | [develop/D1_MIGRATION_GUIDE.md](./develop/D1_MIGRATION_GUIDE.md)    |
-| Develop CF Workers locally| [develop/CF_WORKERS_DEV.md](./develop/CF_WORKERS_DEV.md)             |
-| Understand block-sdk      | [develop/BLOCK_SDK_FINDINGS.md](./develop/BLOCK_SDK_FINDINGS.md)     |
-| Understand testing        | [develop/TESTING_STRATEGY.md](./develop/TESTING_STRATEGY.md)         |
-| Automate E2E setup        | [develop/AUTOMATED_SETUP.md](./develop/AUTOMATED_SETUP.md)           |
-| Manage dependencies       | [develop/DEPENDENCY_MANAGEMENT.md](./develop/DEPENDENCY_MANAGEMENT.md) |
-| Build MCP servers         | [mcp/SERVER_DEVELOPMENT.md](./mcp/SERVER_DEVELOPMENT.md)             |
-| Use spike-cli             | `claude mcp add spike-land --transport http https://spike.land/mcp` or `npx @spike-land-ai/spike-cli shell` |
-
-### For Project Setup
-
-| I want to...               | Document                                                             |
-| -------------------------- | -------------------------------------------------------------------- |
-| Set up development         | [../README.md](../README.md)                                         |
-| Configure secrets/env vars | [develop/SECRETS_SETUP.md](./develop/SECRETS_SETUP.md)               |
-| Rotate credentials         | [develop/CREDENTIAL_ROTATION.md](./develop/CREDENTIAL_ROTATION.md)   |
-| Understand CI/CD           | [../README.md](../README.md#cicd-pipeline)                           |
-| Debug CI/CD failures       | [develop/CI_CD_DEBUGGING.md](./develop/CI_CD_DEBUGGING.md)           |
-| Review business structure  | [business/BUSINESS_STRUCTURE.md](./business/BUSINESS_STRUCTURE.md)   |
-| Review CEO decisions       | [business/CEO_DECISIONS.md](./business/CEO_DECISIONS.md)             |
+| Goal | Document |
+| --- | --- |
+| Understand the platform thesis | [PLATFORM_AND_VISION.md](./PLATFORM_AND_VISION.md) |
+| Understand the core feature set | [features/FEATURES.md](./features/FEATURES.md) |
+| Learn the app store model | [features/APP_STORE_OVERVIEW.md](./features/APP_STORE_OVERVIEW.md) |
+| Integrate MCP from another app or origin | [mcp/CROSS_ORIGIN_INTEGRATION.md](./mcp/CROSS_ORIGIN_INTEGRATION.md) |
+| See endpoint/auth details | [api/CROSS_ORIGIN_API_GUIDE.md](./api/CROSS_ORIGIN_API_GUIDE.md) |
+| Deploy an app on Cloudflare Workers | [develop/DEPLOY_APP_CLOUDFLARE.md](./develop/DEPLOY_APP_CLOUDFLARE.md) |
+| Build an offline browser bundle | [develop/OFFLINE_BUNDLE_GUIDE.md](./develop/OFFLINE_BUNDLE_GUIDE.md) |
 
 ---
 
-## Documentation Structure
+## App Store
 
-```
+| Document | What it covers |
+| --- | --- |
+| [features/APP_STORE_OVERVIEW.md](./features/APP_STORE_OVERVIEW.md) | Discovery, installs, ratings, wishlists, app lifecycle |
+| [features/SHARED_TOOL_LIBRARY.md](./features/SHARED_TOOL_LIBRARY.md) | The three-layer shared SDK and runtime model |
+| [features/AB_TESTING_BUG_DETECTION.md](./features/AB_TESTING_BUG_DETECTION.md) | Variant testing, error tracking, Bayesian promotion rules |
+| [security/APP_STORE_SECURITY.md](./security/APP_STORE_SECURITY.md) | Sandboxing, publication gates, trust model |
+| [best-practices/app-store-performance.md](./best-practices/app-store-performance.md) | Performance targets, cache policy, latency budgets |
+
+---
+
+## MCP And API Integration
+
+| Document | What it covers |
+| --- | --- |
+| [mcp/CROSS_ORIGIN_INTEGRATION.md](./mcp/CROSS_ORIGIN_INTEGRATION.md) | How to call spike.land MCP from any origin or product |
+| [api/CROSS_ORIGIN_API_GUIDE.md](./api/CROSS_ORIGIN_API_GUIDE.md) | Base URLs, auth, rate limits, example requests |
+| [mcp/DEVELOPMENT_INDEX.md](./mcp/DEVELOPMENT_INDEX.md) | MCP development map, including spike.land-specific integration paths |
+| [mcp/SERVER_DEVELOPMENT.md](./mcp/SERVER_DEVELOPMENT.md) | General MCP server authoring guide |
+| [mcp/TOOL_GUIDELINES.md](./mcp/TOOL_GUIDELINES.md) | Tool design and schema patterns |
+
+---
+
+## Build, Deploy, And Run
+
+| Document | What it covers |
+| --- | --- |
+| [develop/ONBOARDING.md](./develop/ONBOARDING.md) | Monorepo orientation and quickstart paths |
+| [develop/DEPLOY_APP_CLOUDFLARE.md](./develop/DEPLOY_APP_CLOUDFLARE.md) | Deploy shims, Wrangler workflow, store publication path |
+| [develop/OFFLINE_BUNDLE_GUIDE.md](./develop/OFFLINE_BUNDLE_GUIDE.md) | IndexedDB, local WASM assets, service worker strategy |
+| [best-practices/offline-first.md](./best-practices/offline-first.md) | Design patterns for offline-first MCP apps |
+| [develop/EDGE_STACK.md](./develop/EDGE_STACK.md) | Cloudflare service map and architecture |
+
+---
+
+## Security
+
+| Document | What it covers |
+| --- | --- |
+| [security/APP_STORE_SECURITY.md](./security/APP_STORE_SECURITY.md) | App store trust model, review gates, sandbox boundaries |
+| [security/SECURITY_INDEX.md](./security/SECURITY_INDEX.md) | Security document map |
+| [security/SECURITY_HARDENING.md](./security/SECURITY_HARDENING.md) | CSP and hardening controls |
+| [security/SPIKE_EDGE_AUDIT.md](./security/SPIKE_EDGE_AUDIT.md) | Edge security audit details |
+
+---
+
+## Business And GTM
+
+| Document | What it covers |
+| --- | --- |
+| [business/BUSINESS_PLAN.md](./business/BUSINESS_PLAN.md) | Commercial model with the app store as a core monetization layer |
+| [business/PITCH_DECK_OUTLINE.md](./business/PITCH_DECK_OUTLINE.md) | Platform flywheel and app-store investor narrative |
+| [business/ROADMAP.md](./business/ROADMAP.md) | App store, SDK, and marketplace milestones |
+| [business/PLG_STRATEGY.md](./business/PLG_STRATEGY.md) | Product-led growth through app-store distribution |
+
+---
+
+## Directory Guide
+
+```text
 docs/
-├── README.md                           # This index file
-├── develop/                            # Developer guides
-│   ├── ONBOARDING.md                   # New developer onboarding (28 packages)
-│   ├── EDGE_STACK.md                   # Cloudflare Workers architecture
-│   ├── CF_WORKERS_DEV.md               # CF Workers local development
-│   ├── D1_QUICK_START.md               # D1 + Drizzle quick start
-│   ├── D1_MIGRATION_GUIDE.md           # D1 migration guide
-│   ├── DEPLOYMENT_INVENTORY.md         # All services and deployment info
-│   ├── DEPENDENCY_MANAGEMENT.md        # Dependency management guide
-│   ├── DEPENDENCY_RESOLUTIONS.md       # Dependency resolution notes
-│   ├── CI_CD_DEBUGGING.md              # CI/CD troubleshooting guide
-│   ├── SECRETS_SETUP.md                # Secrets & environment variables
-│   ├── CREDENTIAL_ROTATION.md          # Credential rotation procedures
-│   ├── TESTING_STRATEGY.md             # Comprehensive testing guide
-│   ├── AUTOMATED_SETUP.md              # E2E authentication bypass setup
-│   ├── ERROR_LOG_AUDIT_GUIDE.md        # Error log auditing procedures
-│   ├── TOKEN_SYSTEM.md                 # Platform credit system
-│   ├── BLOCK_SDK_FINDINGS.md           # block-sdk technical assessment
-│   └── JSON_SCHEMAS.md                 # JSON schema definitions
-├── api/                                # API documentation
-│   ├── 00_START_HERE.md                # API getting started guide
-│   ├── API_REFERENCE.md                # Complete API documentation
-│   ├── API_CHANGELOG.md                # API version history
-│   ├── API_VERSIONING.md               # Versioning strategy
-│   ├── ALBUMS_BATCH_ENHANCE.md         # Album batch enhancement API
-│   ├── PUBLIC_ALBUMS_GALLERY.md        # Public albums gallery API
-│   ├── CAMPAIGN_TRACKING.md            # Campaign analytics integration
-│   ├── openapi.yaml                    # OpenAPI specification
-│   └── ...                             # Additional API docs
-├── mcp/                                # MCP ecosystem
-│   ├── TOOL_GUIDELINES.md              # MCP tool design guidelines
-│   ├── SERVER_DEVELOPMENT.md           # MCP server development guide
-│   ├── DEVELOPMENT_INDEX.md            # MCP development index
-│   ├── QUICK_REFERENCE.md              # MCP quick reference
-│   ├── TOOL_SYSTEM_ANALYSIS.md         # MCP tool system analysis
-│   └── SPIKE_CLI_LANDSCAPE.md          # spike-cli competitive landscape
-├── best-practices/                     # Development best practices
-│   ├── typescript.md                   # TypeScript guidelines
-│   ├── react-patterns.md               # React best practices
-│   ├── cloudflare-services.md          # Cloudflare Workers patterns
-│   └── ...                             # Additional best practices
-├── security/                           # Security documentation
-│   ├── SECURITY_AUDIT_REPORT.md        # Security audit
-│   ├── SECURITY_HARDENING.md           # Security hardening (CSP)
-│   ├── SECURITY_INDEX.md               # Security documentation index
-│   ├── SECURITY_QUICK_REFERENCE.md     # Security quick reference
-│   └── SPIKE_EDGE_AUDIT.md             # spike-edge security audit
-├── business/                           # Business documentation
-│   ├── BUSINESS_STRUCTURE.md           # Company information
-│   ├── CEO_DECISIONS.md                # Strategic decisions
-│   ├── ROADMAP.md                      # Future development plans
-│   ├── LAUNCH_CHECKLIST.md             # Pre-launch checklist
-│   └── ...                             # Additional business docs
-├── operations/                         # Operations & metrics
-│   ├── GROWTH_METRICS.md               # Analytics & growth measurement
-│   └── TECH_DEBT.md                    # Tech debt registry
-├── features/                           # Feature documentation
-├── database/                           # Database documentation
-├── migrations/                         # API migration guides
-├── testing/                            # Testing documentation
-└── archive/                            # Historical documentation
+├── README.md
+├── PLATFORM_AND_VISION.md
+├── features/
+│   ├── FEATURES.md
+│   ├── APP_STORE_OVERVIEW.md
+│   ├── SHARED_TOOL_LIBRARY.md
+│   └── AB_TESTING_BUG_DETECTION.md
+├── mcp/
+│   ├── CROSS_ORIGIN_INTEGRATION.md
+│   ├── DEVELOPMENT_INDEX.md
+│   ├── SERVER_DEVELOPMENT.md
+│   └── TOOL_GUIDELINES.md
+├── api/
+│   ├── CROSS_ORIGIN_API_GUIDE.md
+│   ├── API_REFERENCE.md
+│   └── 00_START_HERE.md
+├── develop/
+│   ├── ONBOARDING.md
+│   ├── DEPLOY_APP_CLOUDFLARE.md
+│   ├── OFFLINE_BUNDLE_GUIDE.md
+│   └── EDGE_STACK.md
+├── security/
+│   ├── APP_STORE_SECURITY.md
+│   └── SECURITY_INDEX.md
+├── business/
+│   ├── BUSINESS_PLAN.md
+│   ├── PITCH_DECK_OUTLINE.md
+│   ├── ROADMAP.md
+│   └── PLG_STRATEGY.md
+└── best-practices/
+    ├── app-store-performance.md
+    └── offline-first.md
 ```
 
 ---
 
-## Core Documentation
+## Source-Of-Truth Notes
 
-### Platform
+- Source code lives under `src/**`.
+- Deployable and publishable shims live under `packages/*`.
+- The app store runtime is primarily implemented in:
+  - `src/edge-api/spike-land`
+  - `src/edge-api/main`
+  - `src/frontend/platform-frontend`
+  - `src/core/block-sdk`
 
-| Document                                                           | Description                                       |
-| ------------------------------------------------------------------ | ------------------------------------------------- |
-| [features/FEATURES.md](./features/FEATURES.md)                     | Platform vision, MCP-first strategy, feature list |
-| [business/ZOLTAN_ERDOS.md](./business/ZOLTAN_ERDOS.md)             | Founder profile, background, and vision           |
-| [business/BUSINESS_STRUCTURE.md](./business/BUSINESS_STRUCTURE.md) | Company information and legal structure           |
-| [business/CEO_DECISIONS.md](./business/CEO_DECISIONS.md)           | Strategic decisions and technology choices        |
-| [business/ROADMAP.md](./business/ROADMAP.md)                       | Future development plans                          |
-
-### Architecture
-
-| Document                                                                   | Description                                   |
-| -------------------------------------------------------------------------- | --------------------------------------------- |
-| [develop/EDGE_STACK.md](./develop/EDGE_STACK.md)                           | Cloudflare Workers — service map & bindings   |
-| [develop/BLOCK_SDK_FINDINGS.md](./develop/BLOCK_SDK_FINDINGS.md)           | block-sdk honest technical assessment         |
-| [api/API_REFERENCE.md](./api/API_REFERENCE.md)                             | Complete API documentation with examples      |
-| [develop/DEPLOYMENT_INVENTORY.md](./develop/DEPLOYMENT_INVENTORY.md)       | All services, D1 databases, R2 buckets        |
-
-### API & Integration
-
-| Document                                                     | Description                                   |
-| ------------------------------------------------------------ | --------------------------------------------- |
-| [api/API_CHANGELOG.md](./api/API_CHANGELOG.md)               | API version history and breaking changes      |
-| [api/API_VERSIONING.md](./api/API_VERSIONING.md)             | Versioning strategy and deprecation policies  |
-| [api/](./api/)                                               | OpenAPI specifications and integration guides |
-| [api/00_START_HERE.md](./api/00_START_HERE.md)               | API getting started guide                     |
-
-### Platform Credits
-
-| Document                                                                   | Description                                |
-| -------------------------------------------------------------------------- | ------------------------------------------ |
-| [develop/TOKEN_SYSTEM.md](./develop/TOKEN_SYSTEM.md)                       | Credit acquisition, pricing, subscriptions |
-| [features/VOUCHER_SYSTEM_UPDATED.md](./features/VOUCHER_SYSTEM_UPDATED.md) | Voucher codes and redemption               |
-
-### Testing & CI/CD
-
-| Document                                                                 | Description                          |
-| ------------------------------------------------------------------------ | ------------------------------------ |
-| [develop/TESTING_STRATEGY.md](./develop/TESTING_STRATEGY.md)             | Comprehensive testing infrastructure |
-| [develop/AUTOMATED_SETUP.md](./develop/AUTOMATED_SETUP.md)               | E2E authentication bypass setup      |
-| [develop/CI_CD_DEBUGGING.md](./develop/CI_CD_DEBUGGING.md)               | CI/CD troubleshooting guide          |
-| [testing/](./testing/)                                                   | Testing documentation                |
-
-### Security & Operations
-
-| Document                                                                 | Description                            |
-| ------------------------------------------------------------------------ | -------------------------------------- |
-| [develop/SECRETS_SETUP.md](./develop/SECRETS_SETUP.md)                   | Secrets & environment variables (SSOT) |
-| [develop/CREDENTIAL_ROTATION.md](./develop/CREDENTIAL_ROTATION.md)       | Credential rotation procedures         |
-| [security/SECURITY_AUDIT_REPORT.md](./security/SECURITY_AUDIT_REPORT.md) | Security practices and audit           |
-| [security/SECURITY_HARDENING.md](./security/SECURITY_HARDENING.md)       | Security hardening measures (CSP)      |
-| [security/SPIKE_EDGE_AUDIT.md](./security/SPIKE_EDGE_AUDIT.md)           | spike-edge security audit              |
-| [develop/ERROR_LOG_AUDIT_GUIDE.md](./develop/ERROR_LOG_AUDIT_GUIDE.md)   | Error log auditing procedures          |
-| [operations/GROWTH_METRICS.md](./operations/GROWTH_METRICS.md)           | Analytics & growth measurement         |
-| [operations/TECH_DEBT.md](./operations/TECH_DEBT.md)                     | Tech debt registry                     |
-
-### Development Tools & Utilities
-
-| Document                                                                     | Description                         |
-| ---------------------------------------------------------------------------- | ----------------------------------- |
-| [develop/DEPENDENCY_MANAGEMENT.md](./develop/DEPENDENCY_MANAGEMENT.md)       | Adding, removing, auditing packages |
-
----
-
-## Best Practices
-
-See [best-practices/](./best-practices/) for development guidelines.
-
-### Core Development
-
-| Document                                                          | Description               |
-| ----------------------------------------------------------------- | ------------------------- |
-| [best-practices/typescript.md](./best-practices/typescript.md)     | TypeScript guidelines     |
-| [best-practices/react-patterns.md](./best-practices/react-patterns.md) | React best practices |
-| [best-practices/testing-strategies.md](./best-practices/testing-strategies.md) | Testing approaches |
-| [best-practices/cloudflare-services.md](./best-practices/cloudflare-services.md) | CF Workers patterns |
-
-### MCP Development
-
-| Document                                                   | Description                  |
-| ---------------------------------------------------------- | ---------------------------- |
-| [mcp/SERVER_DEVELOPMENT.md](./mcp/SERVER_DEVELOPMENT.md)   | MCP server development guide |
-| [mcp/DEVELOPMENT_INDEX.md](./mcp/DEVELOPMENT_INDEX.md)     | MCP development index        |
-| [mcp/QUICK_REFERENCE.md](./mcp/QUICK_REFERENCE.md)         | MCP quick reference guide    |
-| [mcp/TOOL_GUIDELINES.md](./mcp/TOOL_GUIDELINES.md)         | MCP tool design guidelines   |
-
----
-
-## API Migration Guides
-
-See [migrations/](./migrations/) for API version migration guides.
-
----
-
-## Archive
-
-Historical documentation is stored in [archive/](./archive/). This includes
-outdated AWS, Prisma, PostgreSQL, and Next.js-specific docs that were superseded
-by the Cloudflare Workers migration (March 2026).
-
-See [archive/README.md](./archive/README.md) for detailed archive inventory.
-
----
-
-## Contributing to Documentation
-
-1. **Single source of truth**: Don't duplicate content across files
-2. **Link, don't copy**: Reference other docs instead of copying
-3. **Keep files focused**: One topic per document
-4. **Update the index**: Add new docs to this README
-5. **Archive old docs**: Move outdated content to `archive/`
-6. **Follow structure**: Place docs in appropriate subdirectories
-
----
-
-**Last Updated**: 2026-03-05
+If you are editing behavior, prefer those source directories. If you are
+editing Worker deployment settings, follow the matching `packages/*` shim.
