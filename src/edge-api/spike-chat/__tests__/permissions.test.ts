@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from "vitest";
 import { checkWorkspaceMembership, checkChannelAccess } from "../core-logic/permissions";
-import { Env } from "../core-logic/env";
+import type { Env } from "../core-logic/env";
 
 describe("permissions", () => {
   it("checkWorkspaceMembership returns true for visitors", async () => {

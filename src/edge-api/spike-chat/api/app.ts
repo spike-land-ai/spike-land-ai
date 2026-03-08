@@ -1,5 +1,5 @@
 import { Hono } from "hono";
-import { Env } from "../core-logic/env";
+import type { Env } from "../core-logic/env";
 import { ChannelDurableObject } from "../edge/channel-do";
 import { PresenceDurableObject } from "../edge/presence-do";
 import { embedRouter } from "./routes/embed";
@@ -14,7 +14,8 @@ import { presenceRouter } from "./routes/presence";
 import { dmRouter } from "./routes/dm";
 import { webhooksRouter } from "./routes/webhooks";
 import { websocketRouter } from "./routes/websocket";
-import { authMiddleware, Variables } from "./middleware";
+import type { Variables } from "./middleware";
+import { authMiddleware } from "./middleware";
 
 const app = new Hono<{ Bindings: Env; Variables: Variables }>();
 

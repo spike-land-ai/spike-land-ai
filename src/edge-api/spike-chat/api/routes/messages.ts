@@ -1,9 +1,9 @@
 import { Hono } from "hono";
-import { Env } from "../../core-logic/env";
-import { Variables } from "../middleware";
+import type { Env } from "../../core-logic/env";
+import type { Variables } from "../middleware";
 import { createDb } from "../../db/db-index";
 import { messages } from "../../db/schema";
-import { eq, desc, asc } from "drizzle-orm";
+import { eq, desc } from "drizzle-orm";
 import { generateId } from "../../core-logic/id-gen";
 
 export const messagesRouter = new Hono<{ Bindings: Env; Variables: Variables }>();

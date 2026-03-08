@@ -1,4 +1,4 @@
-import { Env } from "./env";
+import type { Env } from "./env";
 
 export async function checkWorkspaceMembership(
   env: Env,
@@ -36,9 +36,9 @@ export async function checkWorkspaceMembership(
  * Currently returns true (open access) — acceptable for MVP.
  */
 export async function checkChannelAccess(
-  env: Env,
-  userId: string,
-  channelId: string,
+  _env: Env,
+  _userId: string,
+  _channelId: string,
 ): Promise<boolean> {
   return true;
 }

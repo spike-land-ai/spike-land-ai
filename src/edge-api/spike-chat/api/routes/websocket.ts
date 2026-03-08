@@ -1,6 +1,6 @@
 import { Hono } from "hono";
-import { Env } from "../../core-logic/env";
-import { Variables } from "../middleware";
+import type { Env } from "../../core-logic/env";
+import type { Variables } from "../middleware";
 
 export const websocketRouter = new Hono<{ Bindings: Env; Variables: Variables }>();
 

@@ -9,21 +9,12 @@ vi.mock("../db/db-index", () => ({
 describe("embedRouter", () => {
   it("renders embed HTML", async () => {
     // Mock the DB response
-    const mockDb = {
-      select: vi.fn().mockReturnThis(),
-      from: vi.fn().mockReturnThis(),
-      where: vi.fn().mockReturnThis(),
-      orderBy: vi.fn().mockReturnThis(),
-      limit: vi.fn().mockResolvedValue([{ id: "msg1", content: "hello", userId: "visitor-1", createdAt: 123 }])
-    };
-    // First call (channel) returns channel, second call (messages) returns messages.
-    // Actually we can just mock the whole chain
-    (dbIndex.createDb as any).mockReturnValue({
+    (dbIndex.createDb as ReturnType<typeof vi.fn>).mockReturnValue({
       select: () => ({
         from: () => ({
           where: () => {
             // we can return a mock that is an array for channel and has an orderBy/limit chain for messages
-            const result: any = [{ id: "chan1", workspaceId: "workspace-1", slug: "channel-1" }];
+            const result: Array<Record<string, unknown>> & { orderBy?: unknown } = [{ id: "chan1", workspaceId: "workspace-1", slug: "channel-1" }];
             result.orderBy = () => ({
               limit: () => [
                 { id: "msg1", content: "hello", userId: "visitor-1", createdAt: 123 },
@@ -37,7 +28,7 @@ describe("embedRouter", () => {
     });
 
     const env = { DB: {} };
-    const res = await embedRouter.fetch(new Request("http://localhost/workspace-1/channel-1"), env as any);
+    const res = await embedRouter.fetch(new Request("http://localhost/workspace-1/channel-1"), env as unknown as Record<string, unknown>);
 
     expect(res.status).toBe(200);
     const text = await res.text();
@@ -46,11 +37,11 @@ describe("embedRouter", () => {
   });
 
   it("renders embed HTML when channel not found", async () => {
-    (dbIndex.createDb as any).mockReturnValue({
+    (dbIndex.createDb as ReturnType<typeof vi.fn>).mockReturnValue({
       select: () => ({
         from: () => ({
           where: () => {
-            const result: any = [];
+            const result: Array<Record<string, unknown>> = [];
             return result;
           }
         })
@@ -58,7 +49,7 @@ describe("embedRouter", () => {
     });
 
     const env = { DB: {} };
-    const res = await embedRouter.fetch(new Request("http://localhost/workspace-1/channel-2"), env as any);
+    const res = await embedRouter.fetch(new Request("http://localhost/workspace-1/channel-2"), env as unknown as Record<string, unknown>);
 
     expect(res.status).toBe(200);
     const text = await res.text();

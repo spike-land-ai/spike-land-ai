@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from "vitest";
 import { authMiddleware } from "../api/middleware";
-import { Context } from "hono";
+import type { Context } from "hono";
 
 describe("authMiddleware", () => {
   it("returns 401 if no auth header or cookie", async () => {
@@ -13,7 +13,7 @@ describe("authMiddleware", () => {
     } as unknown as Context;
     const next = vi.fn();
 
-    await authMiddleware(c as any, next);
+    await authMiddleware(c, next);
     expect(c.json).toHaveBeenCalledWith({ error: "Authentication required" }, 401);
   });
 
@@ -27,7 +27,7 @@ describe("authMiddleware", () => {
     } as unknown as Context;
     const next = vi.fn();
 
-    await authMiddleware(c as any, next);
+    await authMiddleware(c, next);
     expect(c.set).toHaveBeenCalledWith("isGuest", true);
     expect(c.set).toHaveBeenCalledWith("userId", expect.stringMatching(/^visitor-/));
     expect(next).toHaveBeenCalled();
@@ -49,7 +49,7 @@ describe("authMiddleware", () => {
     } as unknown as Context;
     const next = vi.fn();
 
-    await authMiddleware(c as any, next);
+    await authMiddleware(c, next);
     expect(mockFetch).toHaveBeenCalled();
     expect(c.set).toHaveBeenCalledWith("userId", "user-1");
     expect(c.set).toHaveBeenCalledWith("isGuest", false);
@@ -72,7 +72,7 @@ describe("authMiddleware", () => {
     } as unknown as Context;
     const next = vi.fn();
 
-    await authMiddleware(c as any, next);
+    await authMiddleware(c, next);
     expect(mockFetch).toHaveBeenCalled();
     expect(c.set).toHaveBeenCalledWith("userId", "user-1");
   });
@@ -93,7 +93,7 @@ describe("authMiddleware", () => {
     } as unknown as Context;
     const next = vi.fn();
 
-    await authMiddleware(c as any, next);
+    await authMiddleware(c, next);
     expect(c.json).toHaveBeenCalledWith({ error: "Invalid or expired session" }, 401);
   });
 
@@ -114,7 +114,7 @@ describe("authMiddleware", () => {
     } as unknown as Context;
     const next = vi.fn();
 
-    await authMiddleware(c as any, next);
+    await authMiddleware(c, next);
     expect(c.json).toHaveBeenCalledWith({ error: "Invalid or expired session" }, 401);
   });
 
@@ -122,7 +122,7 @@ describe("authMiddleware", () => {
     global.fetch = vi.fn().mockResolvedValue({
       ok: true,
       json: () => Promise.resolve({ session: {}, user: { id: "user-2" } }),
-    }) as any;
+    }) as unknown as typeof fetch;
 
     const mockFetch = vi.fn().mockRejectedValue(new Error("Binding missing"));
     const c = {
@@ -136,7 +136,7 @@ describe("authMiddleware", () => {
     } as unknown as Context;
     const next = vi.fn();
 
-    await authMiddleware(c as any, next);
+    await authMiddleware(c, next);
     expect(global.fetch).toHaveBeenCalled();
     expect(c.set).toHaveBeenCalledWith("userId", "user-2");
     expect(next).toHaveBeenCalled();
@@ -146,7 +146,7 @@ describe("authMiddleware", () => {
     global.fetch = vi.fn().mockResolvedValue({
       ok: true,
       json: () => Promise.resolve({ session: {}, user: { id: "user-2" } }),
-    }) as any;
+    }) as unknown as typeof fetch;
 
     const mockFetch = vi.fn().mockResolvedValue({
         status: 503
@@ -162,7 +162,7 @@ describe("authMiddleware", () => {
     } as unknown as Context;
     const next = vi.fn();
 
-    await authMiddleware(c as any, next);
+    await authMiddleware(c, next);
     expect(global.fetch).toHaveBeenCalled();
     expect(c.set).toHaveBeenCalledWith("userId", "user-2");
     expect(next).toHaveBeenCalled();

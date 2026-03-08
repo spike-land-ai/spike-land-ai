@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import { html } from "hono/html";
-import { Env } from "../../core-logic/env";
+import type { Env } from "../../core-logic/env";
 import { createDb } from "../../db/db-index";
 import { channels, messages } from "../../db/schema";
 import { eq, and, desc } from "drizzle-orm";
@@ -19,7 +19,7 @@ embedRouter.get("/:workspace/:channel", async (c) => {
     .from(channels)
     .where(and(eq(channels.workspaceId, workspaceId), eq(channels.slug, channelSlug)));
     
-  let initialMessages: any[] = [];
+  let initialMessages: { id: string; content: string; userId: string; createdAt: number | null }[] = [];
   let channelId = "unknown";
   
   if (channel) {

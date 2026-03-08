@@ -1,6 +1,6 @@
 import { DurableObject } from "cloudflare:workers";
-import { Env } from "../core-logic/env";
-import { WsAttachment } from "../core-logic/types";
+import type { Env } from "../core-logic/env";
+import type { WsAttachment } from "../core-logic/types";
 
 // Messages sent from Client -> Server
 type ClientMessage =
@@ -62,7 +62,7 @@ export class ChannelDurableObject extends DurableObject {
       if (ws !== excludeWs) {
         try {
           ws.send(message);
-        } catch (e) {
+        } catch (_e) {
           // ignore
         }
       }
@@ -86,11 +86,11 @@ export class ChannelDurableObject extends DurableObject {
           this.typingUsers.add(attachment.userId);
           // Clear any existing timeout
           const existing = this.typingTimeouts.get(attachment.userId);
-          if (existing) clearTimeout(existing as any);
-          
+          if (existing) clearTimeout(existing);
+
           this.typingTimeouts.set(
             attachment.userId,
-            setTimeout(() => this.clearTyping(attachment.userId), 5000) as any
+            setTimeout(() => this.clearTyping(attachment.userId), 5000) as unknown as number
           );
           
           this.broadcast(JSON.stringify({ type: "typing", users: Array.from(this.typingUsers) }));
@@ -110,14 +110,14 @@ export class ChannelDurableObject extends DurableObject {
     this.broadcast(JSON.stringify({ type: "typing", users: Array.from(this.typingUsers) }));
   }
 
-  override async webSocketClose(ws: WebSocket, code: number, reason: string, wasClean: boolean) {
+  override async webSocketClose(ws: WebSocket, _code: number, _reason: string, _wasClean: boolean) {
     const attachment = ws.deserializeAttachment() as WsAttachment | null;
     if (attachment) {
       this.clearTyping(attachment.userId);
     }
   }
 
-  override async webSocketError(ws: WebSocket, error: unknown) {
+  override async webSocketError(ws: WebSocket, _error: unknown) {
     const attachment = ws.deserializeAttachment() as WsAttachment | null;
     if (attachment) {
       this.clearTyping(attachment.userId);

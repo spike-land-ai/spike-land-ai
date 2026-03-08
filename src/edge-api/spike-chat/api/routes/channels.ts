@@ -1,9 +1,9 @@
 import { Hono } from "hono";
-import { Env } from "../../core-logic/env";
-import { Variables } from "../middleware";
+import type { Env } from "../../core-logic/env";
+import type { Variables } from "../middleware";
 import { createDb } from "../../db/db-index";
 import { channels, channelMembers } from "../../db/schema";
-import { eq, and } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import { generateId } from "../../core-logic/id-gen";
 
 export const channelsRouter = new Hono<{ Bindings: Env; Variables: Variables }>();
@@ -73,7 +73,7 @@ channelsRouter.post("/:id/join", async (c) => {
       role: "member",
       joinedAt: Date.now(),
     });
-  } catch (e) {
+  } catch (_e) {
     // ignore duplicate
   }
   

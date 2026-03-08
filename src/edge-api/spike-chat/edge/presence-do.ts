@@ -1,5 +1,5 @@
 import { DurableObject } from "cloudflare:workers";
-import { Env } from "../core-logic/env";
+import type { Env } from "../core-logic/env";
 
 interface PresenceData {
   status: "online" | "away" | "dnd" | "offline";
@@ -62,7 +62,7 @@ export class PresenceDurableObject extends DurableObject {
     for (const ws of sockets) {
       try {
         ws.send(message);
-      } catch (e) {
+      } catch (_e) {
         // ignore
       }
     }
@@ -129,7 +129,7 @@ export class PresenceDurableObject extends DurableObject {
 
   override async alarm() {
     const now = Date.now();
-    let changed = false;
+    let _changed = false;
 
     // Check timeouts
     for (const [userId, data] of this.presence.entries()) {
@@ -141,7 +141,7 @@ export class PresenceDurableObject extends DurableObject {
           status: "offline",
           lastSeen: data.lastSeen
         }));
-        changed = true;
+        _changed = true;
       }
     }
 
