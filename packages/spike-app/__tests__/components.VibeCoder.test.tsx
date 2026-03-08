@@ -3,6 +3,12 @@ import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { VibeCoder } from "@/ui/components/VibeCoder";
 import React from "react";
 
+// Import hooks for mocking
+import { useChat } from "@/ui/hooks/useChat";
+import { useAuth } from "@/ui/hooks/useAuth";
+import { useTranspiler } from "@/ui/hooks/useTranspiler";
+import { useDarkMode } from "@/ui/hooks/useDarkMode";
+
 // Mock hooks
 vi.mock("@/ui/hooks/useChat", () => ({
   useChat: vi.fn(() => ({
@@ -54,7 +60,7 @@ vi.mock("@/editor/CodeEditor", () => ({
   ),
 }));
 
-// Mock icons
+// Mock icons - explicitly include all used icons to avoid "No export defined" errors
 vi.mock("lucide-react", () => ({
   Send: () => <div data-testid="send-icon" />,
   Code2: () => <div data-testid="code-icon" />,
@@ -68,28 +74,48 @@ vi.mock("lucide-react", () => ({
   GripVertical: () => <div data-testid="grip-icon" />,
   Loader2: () => <div data-testid="loader-icon" />,
   MonitorPlay: () => <div data-testid="monitor-play-icon" />,
+  Check: () => <div data-testid="check-icon" />,
+  Copy: () => <div data-testid="copy-icon" />,
 }));
 
-// Mock sub-components
-vi.mock("./AiChatMessage", () => ({
+// Mock sub-components using their absolute alias path
+vi.mock("@/ui/components/AiChatMessage", () => ({
   AiChatMessage: ({ message }: any) => (
     <div data-testid={`msg-${message.id}`}>{message.content}</div>
   ),
 }));
 
-vi.mock("./LivePreview", () => ({
+vi.mock("@/ui/components/LivePreview", () => ({
   LivePreview: ({ appId }: any) => <div data-testid="live-preview">{appId}</div>,
 }));
-
-// Helper to get mocked hooks
-const getMockedHook = async (name: string) => {
-  const hooks = await import(`@/ui/hooks/${name}`);
-  return hooks[name] as any;
-};
 
 describe("VibeCoder", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    
+    // Default mock implementations
+    vi.mocked(useChat).mockReturnValue({
+      messages: [],
+      sendMessage: vi.fn(),
+      isStreaming: false,
+      error: null,
+      clearError: vi.fn(),
+      clearMessages: vi.fn(),
+      submitBrowserResult: vi.fn(),
+    } as any);
+
+    vi.mocked(useAuth).mockReturnValue({
+      isAuthenticated: true,
+      login: vi.fn(),
+    } as any);
+
+    vi.mocked(useTranspiler).mockReturnValue({
+      html: "<div>Preview Content</div>",
+      error: null,
+      isTranspiling: false,
+    } as any);
+
+    vi.mocked(useDarkMode).mockReturnValue({ isDarkMode: false } as any);
   });
 
   it("renders with default code", async () => {
@@ -97,9 +123,8 @@ describe("VibeCoder", () => {
     await waitFor(() => {
       expect(screen.getByTestId("mock-code-editor")).toBeInTheDocument();
     });
-    expect(screen.getByTestId("mock-code-editor")).toHaveValue(
-      expect.stringContaining("export default function App()")
-    );
+    const editor = screen.getByTestId("mock-code-editor") as HTMLTextAreaElement;
+    expect(editor.value).toContain("export default function App()");
   });
 
   it("switches mobile panels", async () => {
@@ -141,18 +166,17 @@ describe("VibeCoder", () => {
     
     const editor = screen.getByTestId("mock-code-editor");
     fireEvent.change(editor, { target: { value: "new code content" } });
-    expect(editor).toHaveValue("new code content");
+    expect((editor as HTMLTextAreaElement).value).toBe("new code content");
   });
 
   it("sends a message through chat", async () => {
     const mockSendMessage = vi.fn();
-    const useChat = await getMockedHook("useChat");
-    useChat.mockReturnValue({
+    vi.mocked(useChat).mockReturnValue({
       messages: [],
       sendMessage: mockSendMessage,
       isStreaming: false,
       isAuthenticated: true,
-    });
+    } as any);
 
     render(<VibeCoder />);
     
@@ -167,8 +191,6 @@ describe("VibeCoder", () => {
   });
 
   it("applies code from AI assistant message", async () => {
-    const useChat = await getMockedHook("useChat");
-    
     const mockUseChat = {
       messages: [
         {
@@ -181,23 +203,22 @@ describe("VibeCoder", () => {
       isStreaming: false,
       isAuthenticated: true,
     };
-    useChat.mockReturnValue(mockUseChat);
+    vi.mocked(useChat).mockReturnValue(mockUseChat as any);
 
     render(<VibeCoder />);
     
     await waitFor(() => {
-      const editor = screen.getByTestId("mock-code-editor");
+      const editor = screen.getByTestId("mock-code-editor") as HTMLTextAreaElement;
       expect(editor.value).toContain("Blue App");
     });
   });
 
   it("shows transpilation error in preview panel", async () => {
-    const useTranspiler = await getMockedHook("useTranspiler");
-    useTranspiler.mockReturnValue({
+    vi.mocked(useTranspiler).mockReturnValue({
       html: null,
       error: "Syntax Error: Unexpected token",
       isTranspiling: false,
-    });
+    } as any);
 
     render(<VibeCoder />);
     
@@ -206,13 +227,12 @@ describe("VibeCoder", () => {
   });
 
   it("shows generating indicator when AI is streaming", async () => {
-    const useChat = await getMockedHook("useChat");
-    useChat.mockReturnValue({
+    vi.mocked(useChat).mockReturnValue({
       messages: [],
       sendMessage: vi.fn(),
       isStreaming: true,
       isAuthenticated: true,
-    });
+    } as any);
 
     render(<VibeCoder />);
     
@@ -220,12 +240,11 @@ describe("VibeCoder", () => {
   });
 
   it("shows updating indicator when transpiling", async () => {
-    const useTranspiler = await getMockedHook("useTranspiler");
-    useTranspiler.mockReturnValue({
+    vi.mocked(useTranspiler).mockReturnValue({
       html: "<div>Old</div>",
       error: null,
       isTranspiling: true,
-    });
+    } as any);
 
     render(<VibeCoder />);
     
@@ -234,14 +253,13 @@ describe("VibeCoder", () => {
 
   it("clears messages when trash button is clicked", async () => {
     const mockClearMessages = vi.fn();
-    const useChat = await getMockedHook("useChat");
-    useChat.mockReturnValue({
+    vi.mocked(useChat).mockReturnValue({
       messages: [{ id: "1", role: "user", content: "hi" }],
       sendMessage: vi.fn(),
       clearMessages: mockClearMessages,
       isStreaming: false,
       isAuthenticated: true,
-    });
+    } as any);
 
     render(<VibeCoder />);
     
@@ -253,11 +271,10 @@ describe("VibeCoder", () => {
 
   it("shows auth warning when not authenticated and trying to send", async () => {
     const mockLogin = vi.fn();
-    const useAuth = await getMockedHook("useAuth");
-    useAuth.mockReturnValue({
+    vi.mocked(useAuth).mockReturnValue({
       isAuthenticated: false,
       login: mockLogin,
-    });
+    } as any);
 
     render(<VibeCoder />);
     
