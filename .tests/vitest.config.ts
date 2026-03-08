@@ -416,6 +416,7 @@ function buildProject(name: string, cfg: PkgConfig) {
     name,
     include: cfg.includeTests ?? defaultIncludeTests,
     reporters: cfg.reporters ?? [reporter],
+    passWithNoTests: true,
     coverage: {
       provider: cfg.provider ?? "v8",
       ...(cfg.coverageReporter ? { reporter: cfg.coverageReporter } : {}),
@@ -445,6 +446,7 @@ const projects = Object.entries(packages).map(([name, cfg]) => buildProject(name
 export default defineConfig({
   resolve: { alias: baseAliases },
   test: {
+    passWithNoTests: true,
     reporters: [reporter],
     coverage: {
       exclude: [
