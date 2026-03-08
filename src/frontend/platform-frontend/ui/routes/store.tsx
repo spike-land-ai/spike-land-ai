@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { apiUrl } from "../../core-logic/api";
+import { appSlugFromToolName } from "../hooks/useApps";
 import { cn } from "../../styling/cn";
 
 interface StoreTool {
@@ -175,8 +176,8 @@ export function StorePage() {
             {filteredData.featured.map((tool) => (
               <Link
                 key={tool.name}
-                to="/tools/$toolName"
-                params={{ toolName: tool.name }}
+                to="/apps/$appSlug"
+                params={{ appSlug: appSlugFromToolName(tool.name) }}
                 className="group block"
               >
                 <ToolCard tool={tool} featured />
@@ -193,8 +194,8 @@ export function StorePage() {
             {cat.tools.map((tool) => (
               <Link
                 key={tool.name}
-                to="/tools/$toolName"
-                params={{ toolName: tool.name }}
+                to="/apps/$appSlug"
+                params={{ appSlug: appSlugFromToolName(tool.name) }}
                 className="group block"
               >
                 <ToolCard tool={tool} />

@@ -7,7 +7,7 @@ async function fetchTools(): Promise<string> {
   return new Promise((resolve, reject) => {
     // Retesting against local environment
     https
-      .get("https://local.spike.land:5173/mcp/tools", { rejectUnauthorized: false }, (res) => {
+      .get("https://local.spike.land:5173/mcp/tools", (res) => {
         if (res.statusCode !== 200) {
           reject(new Error(`Failed to fetch tools: ${res.statusCode}`));
           return;

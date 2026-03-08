@@ -144,7 +144,6 @@ export function AppProductPage({ appId }: AppProductPageProps) {
               asChild
               className="rounded-2xl h-14 px-8 text-lg font-bold"
             >
-              <Link to="/apps/qa-studio">
               <Link to="/packages/qa-studio/ui">
                 <Layout className="mr-2 h-5 w-5" />
                 Launch UI

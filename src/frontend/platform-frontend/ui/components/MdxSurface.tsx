@@ -49,7 +49,7 @@ export function MdxSurface({ appSlug, content: initialContent, className = "" }:
         rehypePlugins={[rehypeRaw]}
         components={{
           // Custom component for embedded tool results
-          toolresult: ({ node, ...props }: { node?: unknown; [key: string]: unknown }) => {
+          toolresult: ({ node: _node, ...props }: { node?: unknown; [key: string]: unknown }) => {
             const name = (props as Record<string, string>).name || "unknown";
             return (
               <div className="my-4 rounded-lg border border-border bg-muted/30 p-4">

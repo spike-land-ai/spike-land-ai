@@ -289,7 +289,7 @@ export function BuildPage() {
     if (atlasSections.length === 0) return null;
     return atlasSections.find((section) => section.category === search.category) ?? atlasSections[0];
   }, [atlasSections, search.category]);
-  const visibleApps = activeCategorySection?.apps ?? [];
+  const visibleApps = useMemo(() => activeCategorySection?.apps ?? [], [activeCategorySection]);
 
   const selectedSurface: SurfaceId = SURFACES.some((surface) => surface.id === search.surface)
     ? (search.surface as SurfaceId)
@@ -601,7 +601,7 @@ export function BuildPage() {
                   app atlas
                 </p>
                 <h2 className="mt-2 text-2xl font-black tracking-tight text-foreground">
-                  Browse real apps by category, then choose the surface.
+                  Browse categories first, then choose the app surface.
                 </h2>
               </div>
               <div className="text-right">
@@ -609,42 +609,69 @@ export function BuildPage() {
                   {registryStatus}
                 </p>
                 <p className="mt-1 text-sm font-semibold text-foreground">
-                  {atlasApps.length} apps across {atlasSections.length} categories
+                  {atlasSections.length} categories, {atlasApps.length} apps
                 </p>
               </div>
             </div>
 
-            <div className="mt-5 max-h-[42rem] space-y-5 overflow-y-auto pr-1">
-              {atlasSections.map((section) => (
-                <div key={section.category}>
-                  <div className="mb-3 flex items-center justify-between gap-3">
-                    <div className="flex items-center gap-3">
-                      <span
-                        className="rounded-full px-3 py-1 text-[11px] font-black uppercase tracking-[0.22em]"
-                        style={{
-                          background: "color-mix(in srgb, var(--primary-color) 9%, transparent)",
-                          color: "var(--primary-color)",
-                        }}
-                      >
+            <div className="mt-5 grid gap-3 sm:grid-cols-2">
+              {atlasSections.map((section) => {
+                const isActive = activeCategorySection?.category === section.category;
+
+                return (
+                  <button
+                    key={section.category}
+                    type="button"
+                    onClick={() => selectCategory(section.category)}
+                    className="rounded-[24px] border p-4 text-left transition-all duration-200 hover:-translate-y-0.5"
+                    style={{
+                      borderColor: isActive
+                        ? "color-mix(in srgb, var(--primary-color) 45%, transparent)"
+                        : "color-mix(in srgb, var(--border-color) 80%, transparent)",
+                      background: isActive
+                        ? "linear-gradient(180deg, color-mix(in srgb, var(--primary-color) 8%, var(--card-bg)), color-mix(in srgb, var(--card-bg) 92%, transparent))"
+                        : "linear-gradient(180deg, color-mix(in srgb, var(--card-bg) 96%, transparent), color-mix(in srgb, var(--muted-bg) 58%, transparent))",
+                    }}
+                  >
+                    <div className="flex items-center justify-between gap-3">
+                      <p className="text-sm font-black tracking-tight text-foreground">
                         {section.category}
+                      </p>
+                      <span className="text-[11px] font-bold uppercase tracking-[0.18em] text-muted-foreground">
+                        {section.apps.length} app{section.apps.length === 1 ? "" : "s"}
                       </span>
                     </div>
-                    <span className="text-[11px] font-bold uppercase tracking-[0.18em] text-muted-foreground">
-                      {section.apps.length} app{section.apps.length === 1 ? "" : "s"}
-                    </span>
-                  </div>
-                  <div className="grid gap-3">
-                    {section.apps.map((app) => (
-                      <AppAtlasCard
-                        key={app.slug}
-                        app={app}
-                        selected={activeApp?.slug === app.slug}
-                        onSelect={() => selectApp(app.slug)}
-                      />
-                    ))}
-                  </div>
-                </div>
-              ))}
+                  </button>
+                );
+              })}
+            </div>
+
+            <div className="mt-6">
+              <div className="mb-3 flex items-center justify-between gap-3">
+                <span
+                  className="rounded-full px-3 py-1 text-[11px] font-black uppercase tracking-[0.22em]"
+                  style={{
+                    background: "color-mix(in srgb, var(--primary-color) 9%, transparent)",
+                    color: "var(--primary-color)",
+                  }}
+                >
+                  {activeCategorySection?.category ?? "Category"}
+                </span>
+                <span className="text-[11px] font-bold uppercase tracking-[0.18em] text-muted-foreground">
+                  {visibleApps.length} visible
+                </span>
+              </div>
+
+              <div className="max-h-[28rem] space-y-3 overflow-y-auto pr-1">
+                {visibleApps.map((app) => (
+                  <AppAtlasCard
+                    key={app.slug}
+                    app={app}
+                    selected={activeApp?.slug === app.slug}
+                    onSelect={() => selectApp(app.slug)}
+                  />
+                ))}
+              </div>
             </div>
           </div>
 
@@ -718,7 +745,7 @@ export function BuildPage() {
                       <p className="text-[11px] font-black uppercase tracking-[0.18em] text-muted-foreground">
                         route
                       </p>
-                      <p className="mt-2 text-sm font-black text-foreground">/tools/{activeApp.slug}</p>
+                      <p className="mt-2 text-sm font-black text-foreground">/apps/{activeApp.slug}</p>
                     </div>
                   </div>
                 </div>
@@ -821,7 +848,7 @@ export function BuildPage() {
                         variant={selectedSurface === "chat" ? "default" : "outline"}
                       >
                         <Link
-                          to="/tools/$appSlug"
+                          to="/apps/$appSlug"
                           params={{ appSlug: activeApp.slug }}
                           search={{ surface: "chat" }}
                         >
@@ -834,7 +861,7 @@ export function BuildPage() {
                         variant={selectedSurface === "terminal" ? "default" : "outline"}
                       >
                         <Link
-                          to="/tools/$appSlug"
+                          to="/apps/$appSlug"
                           params={{ appSlug: activeApp.slug }}
                           search={{ surface: "terminal" }}
                         >
@@ -847,7 +874,7 @@ export function BuildPage() {
                         className="h-11 rounded-2xl px-5 text-sm font-bold"
                       >
                         <Link
-                          to="/tools/$appSlug"
+                          to="/apps/$appSlug"
                           params={{ appSlug: activeApp.slug }}
                           search={{ surface: "mdx" }}
                         >
@@ -860,7 +887,7 @@ export function BuildPage() {
                         className="h-11 rounded-2xl px-5 text-sm font-bold"
                       >
                         <Link
-                          to="/apps/$appId"
+                          to="/packages/$appId"
                           params={{ appId: activeApp.slug }}
                           search={{ tab: "Terminal" }}
                         >

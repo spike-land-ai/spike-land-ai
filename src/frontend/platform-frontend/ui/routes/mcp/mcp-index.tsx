@@ -127,7 +127,6 @@ export function McpPage() {
             {categories.map(([category, count]) => (
               <Link
                 key={category}
-                to="/tools"
                 to="/apps"
                 className="group flex items-center gap-4 rounded-2xl border border-border bg-card dark:glass-card p-5 shadow-sm transition hover:shadow-md hover:scale-[1.01] hover:border-primary/30"
               >
