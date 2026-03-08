@@ -3,7 +3,6 @@ import { Sidebar, type Workspace } from "./components/layout/Sidebar";
 import { MainContent } from "./components/layout/MainContent";
 import { useCredits } from "./hooks/useCredits";
 import { useAuth } from "./contexts/AuthContext";
-import { ChatWidget } from "./components/ui/ChatWidget";
 import {
   Activity,
   Cpu,
@@ -331,7 +330,7 @@ export function App() {
             </p>
           </footer>
 
-          <ChatWidget />
+
         </div>
       </DragDropProvider>
     );
@@ -436,7 +435,7 @@ export function App() {
           </div>
         </div>
 
-        <ChatWidget />
+
       </div>
     </DragDropProvider>
   );

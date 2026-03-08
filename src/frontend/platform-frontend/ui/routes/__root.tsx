@@ -8,8 +8,6 @@ import { useDevMode } from "@spike-land-ai/block-website/core";
 import { LoginButton } from "../components/LoginButton";
 import { AppFooter } from "../components/AppFooter";
 import { CookieConsent } from "../components/CookieConsent";
-import { MessageCircle } from "lucide-react";
-import { AiChatWidget } from "../components/AiChatWidget";
 import { ThemeSwitcher } from "../components/ThemeSwitcher";
 import { apiUrl } from "../../core-logic/api";
 import { initGoogleAds } from "../../core-logic/google-ads";
@@ -95,9 +93,9 @@ const ROUTE_META: Record<string, { title: string; description: string; ogImage?:
     description: "Configure your spike.land account, billing, API keys, and preferences.",
   },
   "/build": {
-    title: "AI App Builder — We Build Your App in 48 Hours | spike.land",
+    title: "vibe-code - Chat-Native MCP App Builder | spike.land",
     description:
-      "Get a working 3-screen MVP built in 48 hours for £1,997. MCP-first development with AI agents. Source code included.",
+      "See how vibe-code turns every MCP app into a chat-native product surface with spike-chat, terminal execution, MDX app views, and MCP server editing.",
   },
   "/login": {
     title: "Sign In - spike.land",
@@ -107,11 +105,6 @@ const ROUTE_META: Record<string, { title: string; description: string; ogImage?:
   "/version": {
     title: "Version - spike.land",
     description: "View build version, deployed assets, and download links for spike.land.",
-  },
-  "/vibe-code": {
-    title: "Vibe Coder - spike.land",
-    description:
-      "Vibe code with AI agents. Chat, edit code in Monaco editor, and see live preview - all in one place.",
   },
   "/what-we-do": {
     title: "What We Do - spike.land | MCP-First AI Platform",
@@ -185,35 +178,24 @@ const BASE_NAV_LINKS = [
   { to: "/about", label: "About" },
 ] as const;
 
-const VIBE_NAV_LINK = { to: "/vibe-code", label: "Vibe" } as const;
-
 export function RootLayout() {
   useAnalytics();
   const { theme, setTheme } = useDarkMode();
   useAuth();
   const { isDeveloper } = useDevMode();
 
-  const navLinks = useMemo(
-    () => (isDeveloper ? [VIBE_NAV_LINK, ...BASE_NAV_LINKS] : [...BASE_NAV_LINKS]),
-    [isDeveloper],
-  );
+  const navLinks = useMemo(() => [...BASE_NAV_LINKS], []);
 
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [searchToast, setSearchToast] = useState(false);
-  const [chatOpen, setChatOpen] = useState(false);
   const closeMobileNav = useCallback(() => setMobileNavOpen(false), []);
   const mobileNavRef = useFocusTrap(mobileNavOpen, closeMobileNav);
   const location = useRouterState({ select: (s) => s.location });
   const { pathname, searchStr } = location;
 
-  // Pages with their own integrated chat panel — hide global chat sidebar
-  const hasPageChat = pathname === "/vibe-code";
-  const showGlobalChat = !hasPageChat;
-
-  // Close mobile nav and chat sidebar on route change
+  // Close mobile nav on route change
   useEffect(() => {
     setMobileNavOpen(false);
-    if (pathname === "/vibe-code") setChatOpen(false);
   }, [pathname]);
 
   // Inject JSON-LD structured data and RSS link once on mount
@@ -353,15 +335,6 @@ export function RootLayout() {
             </div>
             <div className="flex items-center gap-3">
               {isDeveloper && <ThemeSwitcher theme={theme} setTheme={setTheme} />}
-              {showGlobalChat && (
-                <button
-                  onClick={() => setChatOpen((v) => !v)}
-                  className="rounded-lg p-2.5 transition-all duration-200 text-muted-foreground hover:text-foreground hover:bg-muted dark:hover:bg-white/10"
-                  aria-label={chatOpen ? "Close chat" : "Open chat"}
-                >
-                  <MessageCircle className="size-4" />
-                </button>
-              )}
               <LoginButton />
               {/* Mobile hamburger */}
               <button
@@ -450,7 +423,6 @@ export function RootLayout() {
 
         <AppFooter />
         <CookieConsent />
-        {showGlobalChat && <AiChatWidget open={chatOpen} onToggle={() => setChatOpen((v) => !v)} />}
         {searchToast && (
           <div
             role="status"

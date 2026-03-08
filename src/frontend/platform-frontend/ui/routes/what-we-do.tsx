@@ -504,16 +504,6 @@ export function WhatWeDoPage() {
             <Zap className="h-4 w-4" aria-hidden="true" />
             Explore All Tools
           </a>
-          <a
-            href="/vibe-code"
-            className={cn(
-              "inline-flex items-center gap-2 rounded-xl border border-border bg-card/60 px-7 py-3 text-sm font-semibold text-foreground",
-              "hover:bg-muted hover:border-primary/40 active:scale-[0.97] transition-all duration-200 backdrop-blur-sm",
-            )}
-          >
-            <Sparkles className="h-4 w-4 text-primary" aria-hidden="true" />
-            Try VibeCoder
-          </a>
         </div>
 
         {/* Scroll hint */}
@@ -688,7 +678,7 @@ export function WhatWeDoPage() {
             ?
           </h2>
           <p className="relative mt-4 text-muted-foreground max-w-lg mx-auto">
-            Browse every tool in the registry, or jump straight into VibeCoder and start building
+            Browse every tool in the registry and start building
             AI-assisted apps in seconds.
           </p>
 
@@ -704,16 +694,6 @@ export function WhatWeDoPage() {
               <Layers className="h-4 w-4" aria-hidden="true" />
               Browse All Tools
               <ArrowRight className="h-4 w-4" aria-hidden="true" />
-            </a>
-            <a
-              href="/vibe-code"
-              className={cn(
-                "inline-flex items-center gap-2 rounded-xl border border-border bg-background px-8 py-3.5 text-sm font-semibold text-foreground",
-                "hover:bg-muted hover:border-primary/40 active:scale-[0.97] transition-all duration-200",
-              )}
-            >
-              <Sparkles className="h-4 w-4 text-primary" aria-hidden="true" />
-              Try VibeCoder Free
             </a>
           </div>
 

@@ -1,12 +1,13 @@
-import { PERSONAS } from "../src/code/@/lib/onboarding/personas.js";
+import { PERSONAS } from "../src/mcp-tools/bazdmeg/core-logic/personas.js";
 import { spawnClaude } from "./bazdmeg/agent.js";
 import * as fs from "node:fs";
 import * as https from "node:https";
 
 async function fetchTools(): Promise<string> {
   return new Promise((resolve, reject) => {
+    // Retesting against local environment
     https
-      .get("https://mcp.spike.land/tools", (res) => {
+      .get("https://local.spike.land:5173/mcp/tools", { rejectUnauthorized: false }, (res) => {
         if (res.statusCode !== 200) {
           reject(new Error(`Failed to fetch tools: ${res.statusCode}`));
           return;
@@ -20,11 +21,11 @@ async function fetchTools(): Promise<string> {
 }
 
 async function main() {
-  console.log("🚀 Starting Multi-Agent MCP User Test for spike.land...");
+  console.log("🚀 Starting TARGETED Multi-Agent MCP User Retest for local.spike.land...");
 
   let toolsList = "";
   try {
-    console.log("  [API] Fetching tools from https://mcp.spike.land/tools...");
+    console.log("  [API] Fetching tools from https://local.spike.land:5173/mcp/tools...");
     const rawData = await fetchTools();
     const data = JSON.parse(rawData);
 
@@ -40,52 +41,59 @@ async function main() {
       .join("\n");
     console.log(`  [API] Successfully fetched ${data.tools.length} tools.`);
   } catch (err) {
-    console.error("❌ Failed to fetch tools:", err);
+    console.error("❌ Failed to fetch tools from local. Verify local server is running.");
     process.exit(1);
   }
 
   const results: string[] = [];
   const findings: any[] = [];
 
-  for (const persona of PERSONAS) {
-    console.log(`  [Agent] Running test for persona: ${persona.name} (${persona.slug})...`);
+  const personaList = Object.values(PERSONAS);
+
+  for (const persona of personaList) {
+    console.log(`  [Agent] TARGETED retest for persona: ${persona.name} (${persona.archetype})...`);
 
     const prompt = {
-      id: `mcp-test-${persona.slug}`,
-      role: "mcp-user-tester",
+      id: `mcp-retest-${persona.id}`,
+      role: "mcp-user-tester-targeted",
       render: (ctx: any) => `
-You are a real user visiting spike.land, but instead of using a graphical interface, you are interacting with it exclusively through its MCP (Model Context Protocol) capabilities.
+You are a real user conducting a TARGETED retest of spike.land's MCP capabilities on a LOCAL environment.
 YOUR PERSONA:
 - Name: ${persona.name}
-- Description: ${persona.description}
-- Goal: ${persona.heroText}
-- Recommended Apps: ${persona.recommendedAppSlugs.join(", ")}
+- Archetype: ${persona.archetype}
+- Experience Level: ${persona.level}
+- Primary Focus: ${persona.focus}
 
 CONTEXT:
-You have discovered the spike.land MCP server. The following is the list of MCP tools it provides to agents like you:
+We previously identified several issues in production. Your task is to verify if these issues persist in the local environment by attempting to "reason through" a call or simulating the execution logic.
 
 --- START TOOLS LIST ---
 ${ctx.toolsList}
 --- END TOOLS LIST ---
 
 TASK:
-1. Analyze your reaction to this set of tools based on your persona. Does it address your needs? Does it feel powerful or overwhelming?
-2. How proactively would you explore this MCP server? What specific tools would you want to try first and why?
-3. List any issues, concerns, missing functionality, or points of confusion you have in a flat bulleted list.
+1. Identify the 3 most critical "distinct issues" from the previous report (e.g., schema lies, missing tools, misleading descriptions) that relate to your persona.
+2. For each issue, perform a "targeted test": explain what you would call, with what parameters, and what you expect to see vs. what the schema actually says.
+3. Determine if the issue is "CONFIRMED" (still present in local schema), "FIXED" (schema/docs updated), or "BEHAVIORAL" (requires a live call to verify, which you should simulate based on the tool's description).
 
 Output your response in this exact format:
 
-# Persona: ${persona.name}
-## Reaction
-<your qualitative reaction>
+# Persona: ${persona.name} (Targeted Retest)
+## Targeted Findings
 
-## Proactivity
-<how you would explore and what you would use next>
+### Issue 1: <Name of Issue>
+- **Targeted Test**: <how you would test it>
+- **Result**: <CONFIRMED | FIXED | BEHAVIORAL>
+- **Detail**: <technical details from the local schema>
 
-## Issues & Concerns
-- <issue 1>
-- <issue 2>
+### Issue 2: <Name of Issue>
 ...
+
+### Issue 3: <Name of Issue>
+...
+
+## Summary of Local delta
+<Any changes noticed between prod and local schema>
 `,
     };
 
@@ -93,43 +101,47 @@ Output your response in this exact format:
       const output = spawnClaude(prompt as any, { toolsList } as any);
       results.push(output);
 
-      const issuesMatch = output.match(/## Issues & Concerns\n([\s\S]+)/);
-      if (issuesMatch) {
+      const findingsMatch = output.match(/## Targeted Findings\n([\s\S]+)/);
+      if (findingsMatch) {
         findings.push({
           persona: persona.name,
-          issues: issuesMatch[1]
-            .trim()
-            .split("\n")
-            .map((line) => line.replace(/^- /, "").trim())
-            .filter((line) => line.length > 0 && !line.startsWith("#")),
+          report: findingsMatch[1].trim()
         });
       }
     } catch (err) {
-      console.error(`❌ Failed to run test for ${persona.name}:`, err);
+      console.error(`❌ Failed to run targeted test for ${persona.name}:`, err);
     }
   }
 
-  console.log("📊 Generating MCP_USER_TEST_FINDINGS.md...");
+  console.log("📊 Updating MCP_USER_TEST_FINDINGS.md with Targeted Retest results...");
 
-  let summary = `# spike.land MCP User Test Findings Summary\n\n`;
-  summary += `Tested with 16 diverse AI agent personas on ${new Date().toLocaleDateString()}.\n\n`;
+  let summary = `# spike.land MCP TARGETED User Test Findings (Local vs Prod)\n\n`;
+  summary += `Tested with 16 diverse AI agent personas against https://local.spike.land:5173/ on ${new Date().toLocaleDateString()}.\n\n`;
 
   summary += `## Overview\n`;
-  summary += `The agents explored the capabilities of spike.land via its public MCP tools endpoint and provided feedback based on their specific professional and personal backgrounds.\n\n`;
+  summary += `This report focuses on verifying previously reported issues against the local development environment.\n\n`;
 
-  summary += `## Aggregate Issues & Concerns\n`;
-  const allIssues = new Set<string>();
-  findings.forEach((f) => f.issues.forEach((i: string) => allIssues.add(`**${f.persona}**: ${i}`)));
-
-  allIssues.forEach((issue) => {
-    summary += `- ${issue}\n`;
+  summary += `## Retest Result Summary\n`;
+  results.forEach(r => {
+    const lines = r.split('\n');
+    const personaLine = lines.find(l => l.startsWith('# Persona:'));
+    if (personaLine) {
+        summary += `### ${personaLine.replace('# ', '')}\n`;
+        const sections = r.split('### Issue');
+        sections.slice(1).forEach(s => {
+            const title = s.split('\n')[0].trim();
+            const result = s.match(/- \*\*Result\*\*: (.*)/)?.[1] || "UNKNOWN";
+            summary += `- **Issue ${title}**: ${result}\n`;
+        });
+        summary += '\n';
+    }
   });
 
-  summary += `\n## Individual Persona Reports\n\n`;
+  summary += `\n## Detailed Targeted Reports\n\n`;
   summary += results.join("\n\n---\n\n");
 
   fs.writeFileSync("MCP_USER_TEST_FINDINGS.md", summary);
-  console.log("✅ Done! Findings saved to MCP_USER_TEST_FINDINGS.md");
+  console.log("✅ Done! Findings updated in MCP_USER_TEST_FINDINGS.md");
 }
 
 main().catch((err) => {

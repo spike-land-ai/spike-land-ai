@@ -322,12 +322,6 @@ const cockpitRoute = createRoute({
   component: withSuspense(() => import("./routes/cockpit"), "CockpitPage"),
 });
 
-const vibeCodeRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: "/vibe-code",
-  component: withSuspense(() => import("../core-logic/vibe-code"), "VibeCodePage"),
-});
-
 // BAZDMEG Method Presentation
 const bazdmegRoute = createRoute({
   getParentRoute: () => rootRoute,
@@ -369,7 +363,6 @@ const startChecklistRoute = createRoute({
 const routeTree = rootRoute.addChildren([
   indexRoute,
   cockpitRoute,
-  vibeCodeRoute,
   bazdmegRoute,
   whatWeDoRoute,
   buildRoute,

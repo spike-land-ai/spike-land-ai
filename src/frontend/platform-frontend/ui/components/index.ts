@@ -1,5 +1,3 @@
-export * from "./AiChatMessage";
-export * from "./AiChatWidget";
 export * from "./AppCard";
 export * from "./AppFooter";
 export * from "./AppProductPage";
@@ -15,6 +13,5 @@ export * from "./StatusBadge";
 export * from "./ThemeSwitcher";
 export * from "./Toast";
 export * from "./VersionHistory";
-export * from "./VibeCoder";
 export * from "./WelcomeModal";
 export * from "./qa-studio";

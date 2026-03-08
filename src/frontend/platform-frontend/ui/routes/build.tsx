@@ -1,357 +1,852 @@
-import { useState } from "react";
-import { useAuth } from "../hooks/useAuth";
-import { apiUrl } from "../../core-logic/api";
+import { Link } from "@tanstack/react-router";
+import { useEffect, useMemo, useState } from "react";
+import {
+  ArrowRight,
+  Blocks,
+  Bot,
+  Braces,
+  Cpu,
+  FileCode2,
+  FileText,
+  MessageSquare,
+  Radio,
+  Sparkles,
+  Terminal,
+  Users,
+  Waves,
+  Zap,
+  type LucideIcon,
+} from "lucide-react";
+import { Button } from "../shared/ui/button";
+import { useApps, type McpAppSummary } from "../hooks/useApps";
 
-const DELIVERABLES = [
+type SurfaceId = "chat" | "terminal" | "mdx" | "server";
+
+interface ProductSurface {
+  id: SurfaceId;
+  label: string;
+  eyebrow: string;
+  title: string;
+  description: string;
+  points: string[];
+  commands: string[];
+  Icon: LucideIcon;
+}
+
+const FALLBACK_APPS: McpAppSummary[] = [
   {
-    title: "3-screen working MVP",
-    description: "A functional app with up to 3 core screens tailored to your brief.",
+    slug: "qa-studio",
+    name: "QA Studio",
+    description: "Browser automation loops with screenshots, narration, and MCP execution.",
+    emoji: "🧪",
+    tool_count: 10,
+    sort_order: 0,
   },
   {
-    title: "MCP-powered backend",
-    description: "API integrations and data layer built using our MCP tool ecosystem.",
+    slug: "chess-engine",
+    name: "Chess Engine",
+    description: "Stateful gameplay, ratings, and challenge flows over MCP tools.",
+    emoji: "♟️",
+    tool_count: 5,
+    sort_order: 1,
   },
   {
-    title: "Deployed to production",
-    description: "Live on Cloudflare's global edge network — fast everywhere.",
+    slug: "bugbook",
+    name: "Bugbook",
+    description: "Signal-ranked bug reporting and triage coordination.",
+    emoji: "🐞",
+    tool_count: 4,
+    sort_order: 2,
   },
   {
-    title: "Source code ownership",
-    description: "Full ownership of everything we build. No lock-in.",
-  },
-  {
-    title: "Basic documentation",
-    description: "README and inline docs so you can hand it to any developer.",
-  },
-  {
-    title: "14-day bug fix warranty",
-    description: "We fix any bugs in the delivered scope, no questions asked.",
+    slug: "learn-verify",
+    name: "Learn & Verify",
+    description: "Turn documents into adaptive quiz and badge flows.",
+    emoji: "📚",
+    tool_count: 6,
+    sort_order: 3,
   },
 ];
 
-const STEPS = [
+const SURFACES: ProductSurface[] = [
   {
-    number: "01",
-    title: "Brief",
+    id: "chat",
+    label: "Spike Chat",
+    eyebrow: "Every app gets a channel",
+    title: "Chat is the runtime, not a sidebar.",
     description:
-      "You describe what you need in a 30-minute call. We ask the right questions and confirm scope before we start.",
+      "Each MCP app owns a persistent channel where users, teammates, bots, and system events all speak in one history.",
+    points: [
+      "Multi-user state instead of local ephemeral chat.",
+      "Bot replies, human comments, and app_updated events share one thread.",
+      "The same channel works for design discussion, code review, and execution logs.",
+    ],
+    commands: [
+      "chat.join('app-qa-studio')",
+      "chat.post('Turn this flow into a markdown-driven test guide')",
+      "event.on('app_updated', refreshPreview)",
+    ],
+    Icon: MessageSquare,
   },
   {
-    number: "02",
-    title: "Build",
+    id: "terminal",
+    label: "Terminal Mode",
+    eyebrow: "Run any app as commands",
+    title: "Browse the atlas, then execute tools in a terminal.",
     description:
-      "Our AI agents and MCP tools get to work. We build in parallel — frontend, backend, and integrations simultaneously.",
+      "The same app can be opened as an operator surface where users run tools directly, inspect output, and keep the transcript tied to the app channel.",
+    points: [
+      "Command-first access to the MCP tool surface.",
+      "Useful for debugging, ops work, and agent-assisted execution.",
+      "Outputs remain attached to the same app conversation.",
+    ],
+    commands: [
+      "app.open('qa-studio', { surface: 'terminal' })",
+      "tool.run('web_navigate', { url: '/pricing' })",
+      "tool.run('web_screenshot', { name: 'pricing-flow' })",
+    ],
+    Icon: Terminal,
   },
   {
-    number: "03",
-    title: "Ship",
+    id: "mdx",
+    label: "MDX Apps",
+    eyebrow: "Docs become runnable product",
+    title: "An app can also ship as a markdown-native interface.",
     description:
-      "Your app is deployed, documented, and handed over with source code. You own everything.",
+      "MDX should be a first-class app surface so teams can mix explanation, controls, embeds, and live MCP actions in one shareable artifact.",
+    points: [
+      "Good for onboarding, runbooks, and demo-ready explainers.",
+      "Lets one app feel like docs, command center, and walkthrough at once.",
+      "Pairs naturally with preview embeds and structured params.",
+    ],
+    commands: [
+      "app.open('qa-studio', { surface: 'mdx' })",
+      "mdx.embed('tool-result', { tool: 'web_read' })",
+      "mdx.render('runbook', { channelId: 'app-qa-studio' })",
+    ],
+    Icon: FileText,
+  },
+  {
+    id: "server",
+    label: "MCP Server",
+    eyebrow: "Vibe code the tool itself",
+    title: "The app shell can also edit the MCP server behind it.",
+    description:
+      "Vibe-code should not stop at the frontend. Users should be able to modify the underlying MCP server package, tests, and tool wiring from the same product loop.",
+    points: [
+      "Frontend and MCP package evolve in the same conversation.",
+      "Generated code should prefer spike.land packages and internal tools first.",
+      "The product page becomes a launch point for implementation, not just browsing.",
+    ],
+    commands: [
+      "workspace.open('src/mcp-tools/qa-studio')",
+      "agent.plan('add a screenshot diff tool using spike.land utilities')",
+      "tool.run('test', { package: '@spike-land-ai/qa-studio' })",
+    ],
+    Icon: Cpu,
   },
 ];
 
-const FAQ_ITEMS = [
+const CHANNEL_EVENTS = [
   {
-    question: "What technologies do you use?",
-    answer:
-      "We use React + TypeScript for the frontend, Cloudflare Workers (Hono) for the backend, and our MCP tool registry for integrations. Everything runs on Cloudflare's global edge — no servers to manage.",
+    speaker: "you",
+    badge: "user",
+    message: "Turn QA Studio into a markdown-driven acceptance-test app.",
   },
   {
-    question: "How does the 48-hour timeline actually work?",
-    answer:
-      "The clock starts after your brief call. AI agents build concurrently — frontend, backend, and deployment happen in parallel, not sequentially. Most apps are ready to review within 36 hours, with the remaining time for revisions and handover.",
+    speaker: "bot-vibe-agent",
+    badge: "agent",
+    message: "Drafting MDX surface and wiring browser tools from the spike.land registry.",
   },
   {
-    question: "What if I need changes after delivery?",
-    answer:
-      "The 14-day warranty covers bugs in the delivered scope. For new features or screens beyond the original brief, we'll quote you a fixed price — same process, no surprises.",
+    speaker: "system",
+    badge: "event",
+    message: "app_updated -> preview refreshed -> version 12",
   },
   {
-    question: "Do I own the source code?",
-    answer:
-      "Yes. Full source code is yours from day one. No proprietary runtimes, no vendor lock-in. You can take it to any developer or hosting provider.",
-  },
-  {
-    question: "What about hosting costs?",
-    answer:
-      "We deploy to Cloudflare Workers, which has a generous free tier. Most MVPs run at zero cost until significant scale. We'll set up the account under your name so you control billing.",
-  },
-  {
-    question: "What if 3 screens isn't enough?",
-    answer:
-      "The fixed price covers a 3-screen MVP — the smallest useful version of your idea. If you need more screens upfront, we'll scope it out and give you a custom quote before starting.",
+    speaker: "teammate",
+    badge: "human",
+    message: "Keep screenshots in-channel so the whole review stays attached to the app.",
   },
 ];
 
-function FaqItem({ question, answer }: { question: string; answer: string }) {
-  const [open, setOpen] = useState(false);
+const PRODUCT_RULES = [
+  "Prefer spike.land MCP tools and @spike-land-ai packages over ad hoc external glue.",
+  "Keep chat, terminal, MDX, and server editing tied to the same app identity.",
+  "Treat bot output as durable app history, not transient token streams.",
+];
 
+const VALUE_POINTS = [
+  {
+    title: "Slack-shaped, app-native",
+    body: "Every app gets a dedicated conversation instead of a disconnected support widget.",
+    Icon: Users,
+  },
+  {
+    title: "Hot reload from events",
+    body: "Structured app_updated events turn chat activity directly into refreshed product state.",
+    Icon: Radio,
+  },
+  {
+    title: "One loop for all surfaces",
+    body: "Browse an app, open terminal mode, publish an MDX shell, then patch the MCP server.",
+    Icon: Waves,
+  },
+];
+
+function AppAtlasCard({
+  app,
+  selected,
+  onSelect,
+}: {
+  app: McpAppSummary;
+  selected: boolean;
+  onSelect: () => void;
+}) {
   return (
-    <div className="border-b border-border py-4">
-      <button
-        type="button"
-        onClick={() => setOpen(!open)}
-        className="flex w-full items-start justify-between text-left gap-4"
-        aria-expanded={open}
-      >
-        <span className="text-sm font-semibold text-foreground">{question}</span>
-        <svg
-          className={`mt-0.5 h-4 w-4 shrink-0 text-muted-foreground transition-transform ${open ? "rotate-180" : ""}`}
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-          aria-hidden="true"
+    <button
+      type="button"
+      onClick={onSelect}
+      className="w-full rounded-[24px] border p-4 text-left transition-all duration-200 hover:-translate-y-0.5"
+      style={{
+        borderColor: selected
+          ? "color-mix(in srgb, var(--chat-accent) 55%, transparent)"
+          : "color-mix(in srgb, var(--border-color) 82%, transparent)",
+        background: selected
+          ? "linear-gradient(180deg, color-mix(in srgb, var(--chat-accent) 10%, var(--card-bg)), color-mix(in srgb, var(--card-bg) 90%, transparent))"
+          : "linear-gradient(180deg, color-mix(in srgb, var(--card-bg) 94%, transparent), color-mix(in srgb, var(--muted-bg) 54%, transparent))",
+        boxShadow: selected
+          ? "0 20px 55px color-mix(in srgb, var(--chat-accent) 12%, transparent)"
+          : "0 18px 44px color-mix(in srgb, var(--fg) 7%, transparent)",
+      }}
+    >
+      <div className="flex items-center gap-3">
+        <div
+          className="flex size-11 items-center justify-center rounded-2xl text-xl"
+          style={{
+            background: "color-mix(in srgb, var(--chat-accent) 10%, transparent)",
+          }}
         >
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-        </svg>
-      </button>
-      {open && <p className="mt-3 text-sm text-muted-foreground leading-relaxed">{answer}</p>}
-    </div>
-  );
-}
-
-async function handleServiceCheckout(email: string, isAuthenticated: boolean) {
-  const body: Record<string, string> = { service: "app_builder" };
-  if (!isAuthenticated && email) {
-    body.email = email;
-  }
-
-  const res = await fetch(apiUrl("/checkout/service"), {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(body),
-  });
-
-  if (!res.ok) {
-    const err = (await res.json()) as { error?: string };
-    alert(err.error ?? "Checkout failed. Please try again.");
-    return;
-  }
-
-  const data = (await res.json()) as { url: string };
-  window.location.href = data.url;
-}
-
-function CtaButton({ label = "Get Started — £1,997" }: { label?: string }) {
-  const { isAuthenticated } = useAuth();
-  const [email, setEmail] = useState("");
-  const [loading, setLoading] = useState(false);
-
-  async function handleClick() {
-    setLoading(true);
-    try {
-      await handleServiceCheckout(email, isAuthenticated);
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  return (
-    <div className="flex flex-col items-center gap-3">
-      {!isAuthenticated && (
-        <input
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder="your@email.com"
-          className="w-full max-w-xs rounded-lg border border-border bg-background px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-          aria-label="Email address"
-        />
-      )}
-      <button
-        type="button"
-        onClick={handleClick}
-        disabled={loading}
-        className="rounded-lg bg-primary px-8 py-3 text-sm font-semibold text-primary-foreground transition hover:bg-primary/90 disabled:opacity-60"
-      >
-        {loading ? "Redirecting..." : label}
-      </button>
-    </div>
+          {app.emoji || "🔧"}
+        </div>
+        <div className="min-w-0 flex-1">
+          <div className="flex items-center gap-2">
+            <p className="truncate text-sm font-black tracking-tight">{app.name}</p>
+            <span
+              className="rounded-full px-2 py-0.5 text-[10px] font-black uppercase tracking-[0.18em]"
+              style={{
+                background: "color-mix(in srgb, var(--primary-color) 10%, transparent)",
+                color: "var(--primary-color)",
+              }}
+            >
+              MCP
+            </span>
+          </div>
+          <p className="mt-1 text-xs" style={{ color: "var(--muted-fg)" }}>
+            {app.tool_count} tool{app.tool_count === 1 ? "" : "s"}
+          </p>
+        </div>
+      </div>
+      <p className="mt-3 line-clamp-2 text-sm leading-6" style={{ color: "var(--muted-fg)" }}>
+        {app.description}
+      </p>
+    </button>
   );
 }
 
 export function BuildPage() {
+  const { data: apps, isLoading, isError } = useApps();
+  const [selectedSurface, setSelectedSurface] = useState<SurfaceId>("chat");
+  const [selectedAppSlug, setSelectedAppSlug] = useState<string | null>(null);
+
+  const atlasApps = useMemo(() => {
+    if (apps && apps.length > 0) return apps.slice(0, 6);
+    return FALLBACK_APPS;
+  }, [apps]);
+
+  useEffect(() => {
+    if (!selectedAppSlug && atlasApps.length > 0) {
+      setSelectedAppSlug(atlasApps[0].slug);
+    }
+  }, [atlasApps, selectedAppSlug]);
+
+  const activeApp = useMemo(() => {
+    return atlasApps.find((app) => app.slug === selectedAppSlug) ?? atlasApps[0] ?? null;
+  }, [atlasApps, selectedAppSlug]);
+
+  const activeSurface = SURFACES.find((surface) => surface.id === selectedSurface) ?? SURFACES[0];
+  const ActiveSurfaceIcon = activeSurface.Icon;
+  const registryStatus = isLoading
+    ? "Loading live registry"
+    : isError
+      ? "Showing curated atlas"
+      : "Live registry connected";
+
   return (
-    <div className="mx-auto max-w-4xl space-y-20 px-4 py-16">
-      {/* Hero */}
-      <section className="text-center space-y-6">
-        <div className="inline-flex items-center gap-2 rounded-full border border-border bg-muted px-4 py-1.5 text-xs font-semibold text-muted-foreground">
-          MCP-first development
-        </div>
-        <h1 className="text-4xl font-extrabold tracking-tight text-foreground sm:text-5xl lg:text-6xl">
-          We Build Your App
-          <br />
-          in 48 Hours
-        </h1>
-        <p className="mx-auto max-w-xl text-lg text-muted-foreground">
-          Describe what you need. Our AI agents and MCP tools build a working 3-screen MVP, deployed
-          to production — for a single fixed price.
-        </p>
-        <CtaButton />
-        <p className="text-xs text-muted-foreground">
-          One-time payment. No subscription. Source code included.
-        </p>
-      </section>
+    <div
+      className="relative overflow-hidden"
+      style={{
+        background:
+          "radial-gradient(circle at top left, color-mix(in srgb, var(--chat-accent) 12%, transparent), transparent 28%), radial-gradient(circle at 85% 10%, color-mix(in srgb, var(--primary-light) 14%, transparent), transparent 30%), var(--bg)",
+      }}
+    >
+      <div
+        className="pointer-events-none absolute left-0 top-0 h-[28rem] w-[28rem] rounded-full blur-3xl"
+        style={{ background: "color-mix(in srgb, var(--chat-accent) 10%, transparent)" }}
+      />
+      <div
+        className="pointer-events-none absolute right-[-5rem] top-[12rem] h-[24rem] w-[24rem] rounded-full blur-3xl"
+        style={{ background: "color-mix(in srgb, var(--primary-light) 13%, transparent)" }}
+      />
 
-      {/* How It Works */}
-      <section className="space-y-8">
-        <div className="text-center space-y-2">
-          <h2 className="text-2xl font-bold text-foreground">How It Works</h2>
-          <p className="text-sm text-muted-foreground">Three steps from idea to production.</p>
-        </div>
-        <div className="grid gap-6 sm:grid-cols-3">
-          {STEPS.map((step) => (
-            <div
-              key={step.number}
-              className="rounded-2xl border border-border bg-card p-6 space-y-3"
-            >
-              <span className="text-3xl font-extrabold text-primary/30">{step.number}</span>
-              <h3 className="text-base font-bold text-foreground">{step.title}</h3>
-              <p className="text-sm text-muted-foreground leading-relaxed">{step.description}</p>
+      <div className="relative mx-auto flex max-w-7xl flex-col gap-10 px-4 py-10 sm:px-6 lg:px-8 lg:py-14">
+        <section className="grid gap-5 xl:grid-cols-[1.08fr_0.92fr]">
+          <div
+            className="rounded-[34px] border p-6 sm:p-8"
+            style={{
+              borderColor: "color-mix(in srgb, var(--border-color) 85%, transparent)",
+              background:
+                "linear-gradient(180deg, color-mix(in srgb, var(--card-bg) 94%, transparent), color-mix(in srgb, var(--bg) 68%, transparent))",
+              boxShadow: "0 28px 90px color-mix(in srgb, var(--fg) 9%, transparent)",
+            }}
+          >
+            <div className="flex flex-wrap items-center gap-2.5">
+              <span
+                className="rounded-full px-3 py-1 text-[11px] font-black uppercase tracking-[0.28em]"
+                style={{
+                  background: "color-mix(in srgb, var(--chat-accent) 12%, transparent)",
+                  color: "var(--chat-accent)",
+                }}
+              >
+                vibe-code
+              </span>
+              <span className="rounded-full border border-border px-3 py-1 text-xs font-semibold text-muted-foreground">
+                spike-chat native
+              </span>
+              <span className="rounded-full border border-border px-3 py-1 text-xs font-semibold text-muted-foreground">
+                terminal + mdx + server
+              </span>
             </div>
-          ))}
-        </div>
-      </section>
 
-      {/* What You Get */}
-      <section className="space-y-8">
-        <div className="text-center space-y-2">
-          <h2 className="text-2xl font-bold text-foreground">What You Get</h2>
-          <p className="text-sm text-muted-foreground">
-            Everything you need to launch, nothing you don't.
-          </p>
-        </div>
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {DELIVERABLES.map((item) => (
-            <div key={item.title} className="rounded-xl border border-border bg-card p-5 space-y-2">
-              <div className="flex items-start gap-2">
-                <svg
-                  className="mt-0.5 h-4 w-4 shrink-0 text-primary"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  aria-hidden="true"
+            <div className="mt-6 max-w-3xl">
+              <p className="text-xs font-black uppercase tracking-[0.34em] text-muted-foreground">
+                mcp apps with a conversation model
+              </p>
+              <h1 className="mt-3 text-4xl font-black tracking-tight text-foreground sm:text-6xl">
+                Every app should feel like
+                <span
+                  className="block text-transparent"
+                  style={{
+                    backgroundImage:
+                      "linear-gradient(135deg, var(--fg) 0%, var(--chat-accent-light) 44%, var(--primary-light) 100%)",
+                    WebkitBackgroundClip: "text",
+                    backgroundClip: "text",
+                  }}
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M5 13l4 4L19 7"
-                  />
-                </svg>
-                <h3 className="text-sm font-semibold text-foreground">{item.title}</h3>
-              </div>
-              <p className="pl-6 text-xs text-muted-foreground leading-relaxed">
-                {item.description}
+                  chat, runtime, and source control at once.
+                </span>
+              </h1>
+              <p className="mt-4 max-w-2xl text-sm leading-7 text-muted-foreground sm:text-base">
+                Vibe-code is the product page for a different operating model: each MCP app gets its
+                own spike-chat channel, can be browsed from an atlas, opened in terminal mode,
+                published as an MDX app, and even edited at the MCP server layer using spike.land
+                tools first.
               </p>
             </div>
-          ))}
-        </div>
-      </section>
 
-      {/* Social Proof */}
-      <section>
-        <blockquote className="rounded-2xl border border-border bg-card p-8 text-center space-y-4">
-          <p className="text-lg font-medium text-foreground leading-relaxed">
-            "A chemistry teacher used our tools to build £90,000 worth of software in 70 hours.
-            Imagine what we can build for you."
-          </p>
-          <footer className="text-sm text-muted-foreground">— From the spike.land blog</footer>
-        </blockquote>
-      </section>
+            <div className="mt-6 flex flex-wrap gap-3">
+              <Button asChild size="lg" className="h-12 rounded-2xl px-6 text-sm font-black">
+                <Link to="/tools">
+                  Browse MCP Apps
+                  <ArrowRight className="size-4" />
+                </Link>
+              </Button>
+              <Button
+                asChild
+                variant="outline"
+                size="lg"
+                className="h-12 rounded-2xl px-6 text-sm font-bold"
+              >
+                <Link to="/messages">Open Messages</Link>
+              </Button>
+              <Button
+                asChild
+                variant="ghost"
+                size="lg"
+                className="h-12 rounded-2xl px-4 text-sm font-bold"
+              >
+                <Link to="/docs">Read Docs</Link>
+              </Button>
+            </div>
 
-      {/* Pricing */}
-      <section className="space-y-8">
-        <div className="text-center space-y-2">
-          <h2 className="text-2xl font-bold text-foreground">Simple Pricing</h2>
-          <p className="text-sm text-muted-foreground">One price. No surprises.</p>
-        </div>
-        <div className="mx-auto max-w-sm rounded-2xl border-2 border-primary bg-primary/5 p-8 shadow-sm space-y-6 text-center ring-2 ring-primary">
-          <span className="inline-block rounded-full bg-primary px-3 py-0.5 text-xs font-semibold text-primary-foreground">
-            Fixed Price
-          </span>
-          <div>
-            <span className="text-5xl font-extrabold text-foreground">£1,997</span>
-            <p className="mt-1 text-sm text-muted-foreground">one-time payment</p>
-          </div>
-          <ul className="space-y-2 text-left">
-            {DELIVERABLES.map((item) => (
-              <li key={item.title} className="flex items-start gap-2 text-sm text-foreground">
-                <svg
-                  className="mt-0.5 h-4 w-4 shrink-0 text-primary"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  aria-hidden="true"
+            <div className="mt-7 grid gap-3 sm:grid-cols-3">
+              {VALUE_POINTS.map(({ title, body, Icon }) => (
+                <div
+                  key={title}
+                  className="rounded-[24px] border p-4"
+                  style={{
+                    borderColor: "color-mix(in srgb, var(--border-color) 78%, transparent)",
+                    background: "color-mix(in srgb, var(--muted-bg) 62%, transparent)",
+                  }}
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M5 13l4 4L19 7"
-                  />
-                </svg>
-                {item.title}
-              </li>
-            ))}
-          </ul>
-          <CtaButton />
-        </div>
-      </section>
+                  <div className="flex items-center gap-2">
+                    <Icon className="size-4 text-primary" />
+                    <p className="text-sm font-black tracking-tight text-foreground">{title}</p>
+                  </div>
+                  <p className="mt-2 text-sm leading-6 text-muted-foreground">{body}</p>
+                </div>
+              ))}
+            </div>
+          </div>
 
-      {/* FAQ */}
-      <section className="space-y-6">
-        <h2 className="text-center text-2xl font-bold text-foreground">
-          Frequently Asked Questions
-        </h2>
-        <div className="mx-auto max-w-2xl">
-          {FAQ_ITEMS.map((item) => (
-            <FaqItem key={item.question} question={item.question} answer={item.answer} />
-          ))}
-        </div>
-      </section>
-
-      {/* CTA Footer */}
-      <section className="rounded-2xl border border-border bg-card p-10 text-center space-y-5">
-        <h2 className="text-2xl font-bold text-foreground">Ready to build?</h2>
-        <p className="mx-auto max-w-md text-sm text-muted-foreground">
-          Tell us what you need. We'll handle the rest — from backend to deployment — in 48 hours.
-        </p>
-        <CtaButton label="Start Your Build — £1,997" />
-        <p className="text-xs text-muted-foreground">
-          Questions?{" "}
-          <a
-            href="mailto:build@spike.land"
-            className="text-primary underline hover:text-primary/80"
+          <div
+            className="rounded-[34px] border p-5 sm:p-6"
+            style={{
+              borderColor: "color-mix(in srgb, var(--border-color) 85%, transparent)",
+              background:
+                "linear-gradient(180deg, color-mix(in srgb, var(--card-bg) 94%, transparent), color-mix(in srgb, var(--muted-bg) 66%, transparent))",
+              boxShadow: "0 26px 70px color-mix(in srgb, var(--chat-accent) 10%, transparent)",
+            }}
           >
-            Email us at build@spike.land
-          </a>
-        </p>
-      </section>
+            <div className="flex items-center justify-between gap-3">
+              <div>
+                <p className="text-xs font-black uppercase tracking-[0.22em] text-muted-foreground">
+                  channel anatomy
+                </p>
+                <h2 className="mt-2 text-2xl font-black tracking-tight text-foreground">
+                  One app, one room, many actors.
+                </h2>
+              </div>
+              <div
+                className="rounded-full px-3 py-1 text-[11px] font-black uppercase tracking-[0.22em]"
+                style={{
+                  background: "color-mix(in srgb, var(--success-fg) 12%, transparent)",
+                  color: "var(--success-fg)",
+                }}
+              >
+                live model
+              </div>
+            </div>
 
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "Service",
-            name: "AI App Builder",
-            provider: {
-              "@type": "Organization",
-              name: "spike.land",
-              url: "https://spike.land",
-            },
-            description:
-              "Get a working 3-screen MVP built in 48 hours for £1,997. MCP-first development with AI agents. Source code included.",
-            offers: {
-              "@type": "Offer",
-              price: "1997",
-              priceCurrency: "GBP",
-              name: "AI App Builder — 48-hour MVP",
-            },
-          }),
-        }}
-      />
+            <div className="mt-5 space-y-3">
+              {CHANNEL_EVENTS.map((event, index) => (
+                <div
+                  key={String(index)}
+                  className="rounded-[24px] border p-4"
+                  style={{
+                    borderColor: "color-mix(in srgb, var(--border-color) 78%, transparent)",
+                    background: "color-mix(in srgb, var(--bg) 74%, transparent)",
+                  }}
+                >
+                  <div className="flex items-center gap-2">
+                    <span
+                      className="rounded-full px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.18em]"
+                      style={{
+                        background:
+                          event.badge === "agent"
+                            ? "color-mix(in srgb, var(--chat-accent) 12%, transparent)"
+                            : event.badge === "event"
+                              ? "color-mix(in srgb, var(--info-fg) 12%, transparent)"
+                              : "color-mix(in srgb, var(--primary-color) 10%, transparent)",
+                        color:
+                          event.badge === "agent"
+                            ? "var(--chat-accent)"
+                            : event.badge === "event"
+                              ? "var(--info-fg)"
+                              : "var(--primary-color)",
+                      }}
+                    >
+                      {event.badge}
+                    </span>
+                    <span className="text-xs font-bold uppercase tracking-[0.18em] text-muted-foreground">
+                      {event.speaker}
+                    </span>
+                  </div>
+                  <p className="mt-3 text-sm leading-6 text-foreground">{event.message}</p>
+                </div>
+              ))}
+            </div>
+
+            <div className="mt-5 grid gap-3 sm:grid-cols-2">
+              <div
+                className="rounded-[24px] border p-4"
+                style={{
+                  borderColor: "color-mix(in srgb, var(--border-color) 78%, transparent)",
+                  background: "color-mix(in srgb, var(--muted-bg) 55%, transparent)",
+                }}
+              >
+                <div className="flex items-center gap-2">
+                  <Bot className="size-4 text-primary" />
+                  <p className="text-sm font-black text-foreground">Bot-safe updates</p>
+                </div>
+                <p className="mt-2 text-sm leading-6 text-muted-foreground">
+                  Agents post full messages, structured events, and code changes back into the same
+                  app identity.
+                </p>
+              </div>
+              <div
+                className="rounded-[24px] border p-4"
+                style={{
+                  borderColor: "color-mix(in srgb, var(--border-color) 78%, transparent)",
+                  background: "color-mix(in srgb, var(--muted-bg) 55%, transparent)",
+                }}
+              >
+                <div className="flex items-center gap-2">
+                  <Zap className="size-4 text-primary" />
+                  <p className="text-sm font-black text-foreground">Preview-aware events</p>
+                </div>
+                <p className="mt-2 text-sm leading-6 text-muted-foreground">
+                  app_updated is not just a message. It is a chat-visible summary plus a reload
+                  trigger for the active surface.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section className="grid gap-5 xl:grid-cols-[0.92fr_1.08fr]">
+          <div
+            className="rounded-[34px] border p-5 sm:p-6"
+            style={{
+              borderColor: "color-mix(in srgb, var(--border-color) 82%, transparent)",
+              background:
+                "linear-gradient(180deg, color-mix(in srgb, var(--card-bg) 94%, transparent), color-mix(in srgb, var(--bg) 72%, transparent))",
+            }}
+          >
+            <div className="flex items-center justify-between gap-3">
+              <div>
+                <p className="text-xs font-black uppercase tracking-[0.22em] text-muted-foreground">
+                  app atlas
+                </p>
+                <h2 className="mt-2 text-2xl font-black tracking-tight text-foreground">
+                  Browse real apps, then choose the surface.
+                </h2>
+              </div>
+              <div className="text-right">
+                <p className="text-xs font-bold uppercase tracking-[0.18em] text-muted-foreground">
+                  {registryStatus}
+                </p>
+                <p className="mt-1 text-sm font-semibold text-foreground">{atlasApps.length} shown</p>
+              </div>
+            </div>
+
+            <div className="mt-5 grid gap-3">
+              {atlasApps.map((app) => (
+                <AppAtlasCard
+                  key={app.slug}
+                  app={app}
+                  selected={activeApp?.slug === app.slug}
+                  onSelect={() => setSelectedAppSlug(app.slug)}
+                />
+              ))}
+            </div>
+          </div>
+
+          <div
+            className="rounded-[34px] border p-5 sm:p-6"
+            style={{
+              borderColor: "color-mix(in srgb, var(--border-color) 82%, transparent)",
+              background:
+                "linear-gradient(180deg, color-mix(in srgb, var(--card-bg) 94%, transparent), color-mix(in srgb, var(--muted-bg) 60%, transparent))",
+            }}
+          >
+            {activeApp ? (
+              <>
+                <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+                  <div className="max-w-2xl">
+                    <div className="flex items-center gap-3">
+                      <div
+                        className="flex size-14 items-center justify-center rounded-[20px] text-2xl"
+                        style={{
+                          background: "color-mix(in srgb, var(--chat-accent) 12%, transparent)",
+                        }}
+                      >
+                        {activeApp.emoji || "🔧"}
+                      </div>
+                      <div>
+                        <p className="text-xs font-black uppercase tracking-[0.22em] text-muted-foreground">
+                          active app
+                        </p>
+                        <h3 className="mt-1 text-3xl font-black tracking-tight text-foreground">
+                          {activeApp.name}
+                        </h3>
+                      </div>
+                    </div>
+                    <p className="mt-4 max-w-2xl text-sm leading-7 text-muted-foreground">
+                      {activeApp.description}
+                    </p>
+                  </div>
+
+                  <div className="grid shrink-0 gap-3 sm:grid-cols-2">
+                    <div
+                      className="rounded-[22px] border px-4 py-3"
+                      style={{
+                        borderColor: "color-mix(in srgb, var(--border-color) 75%, transparent)",
+                        background: "color-mix(in srgb, var(--bg) 70%, transparent)",
+                      }}
+                    >
+                      <p className="text-[11px] font-black uppercase tracking-[0.18em] text-muted-foreground">
+                        tools
+                      </p>
+                      <p className="mt-2 text-2xl font-black text-foreground">{activeApp.tool_count}</p>
+                    </div>
+                    <div
+                      className="rounded-[22px] border px-4 py-3"
+                      style={{
+                        borderColor: "color-mix(in srgb, var(--border-color) 75%, transparent)",
+                        background: "color-mix(in srgb, var(--bg) 70%, transparent)",
+                      }}
+                    >
+                      <p className="text-[11px] font-black uppercase tracking-[0.18em] text-muted-foreground">
+                        route
+                      </p>
+                      <p className="mt-2 text-sm font-black text-foreground">/tools/{activeApp.slug}</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                  {SURFACES.map((surface) => {
+                    const Icon = surface.Icon;
+                    const isActive = surface.id === selectedSurface;
+
+                    return (
+                      <button
+                        key={surface.id}
+                        type="button"
+                        onClick={() => setSelectedSurface(surface.id)}
+                        className="rounded-[24px] border p-4 text-left transition-all duration-200 hover:-translate-y-0.5"
+                        style={{
+                          borderColor: isActive
+                            ? "color-mix(in srgb, var(--chat-accent) 55%, transparent)"
+                            : "color-mix(in srgb, var(--border-color) 80%, transparent)",
+                          background: isActive
+                            ? "color-mix(in srgb, var(--chat-accent) 10%, var(--card-bg))"
+                            : "color-mix(in srgb, var(--bg) 72%, transparent)",
+                        }}
+                      >
+                        <Icon className="size-4 text-primary" />
+                        <p className="mt-3 text-sm font-black tracking-tight text-foreground">
+                          {surface.label}
+                        </p>
+                        <p className="mt-1 text-xs leading-5 text-muted-foreground">
+                          {surface.eyebrow}
+                        </p>
+                      </button>
+                    );
+                  })}
+                </div>
+
+                <div className="mt-6 grid gap-4 lg:grid-cols-[0.98fr_1.02fr]">
+                  <div
+                    className="rounded-[28px] border p-5"
+                    style={{
+                      borderColor: "color-mix(in srgb, var(--border-color) 80%, transparent)",
+                      background: "color-mix(in srgb, var(--bg) 72%, transparent)",
+                    }}
+                  >
+                    <div className="flex items-center gap-2">
+                      <ActiveSurfaceIcon className="size-4 text-primary" />
+                      <p className="text-xs font-black uppercase tracking-[0.22em] text-muted-foreground">
+                        {activeSurface.eyebrow}
+                      </p>
+                    </div>
+                    <h4 className="mt-3 text-2xl font-black tracking-tight text-foreground">
+                      {activeSurface.title}
+                    </h4>
+                    <p className="mt-3 text-sm leading-7 text-muted-foreground">
+                      {activeSurface.description}
+                    </p>
+                    <div className="mt-5 grid gap-3">
+                      {activeSurface.points.map((point) => (
+                        <div
+                          key={point}
+                          className="rounded-[20px] border px-4 py-3"
+                          style={{
+                            borderColor: "color-mix(in srgb, var(--border-color) 76%, transparent)",
+                            background: "color-mix(in srgb, var(--muted-bg) 54%, transparent)",
+                          }}
+                        >
+                          <p className="text-sm leading-6 text-foreground">{point}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div
+                    className="rounded-[28px] border p-5"
+                    style={{
+                      borderColor: "color-mix(in srgb, var(--border-color) 80%, transparent)",
+                      background:
+                        "linear-gradient(180deg, color-mix(in srgb, var(--card-bg) 94%, transparent), color-mix(in srgb, var(--muted-bg) 52%, transparent))",
+                    }}
+                  >
+                    <div className="flex items-center gap-2">
+                      <Braces className="size-4 text-primary" />
+                      <p className="text-xs font-black uppercase tracking-[0.22em] text-muted-foreground">
+                        execution sketch
+                      </p>
+                    </div>
+                    <div className="mt-4 rounded-[24px] border border-border bg-black px-4 py-4 font-mono text-[12px] leading-6 text-white shadow-xl shadow-black/15">
+                      {activeSurface.commands.map((command) => (
+                        <div key={command} className="flex gap-3">
+                          <span className="text-amber-300">$</span>
+                          <span>{command}</span>
+                        </div>
+                      ))}
+                    </div>
+
+                    <div className="mt-4 flex flex-wrap gap-2">
+                      <Button asChild className="h-11 rounded-2xl px-5 text-sm font-black">
+                        <Link
+                          to="/tools/$appSlug"
+                          params={{ appSlug: activeApp.slug }}
+                        >
+                          Open {activeApp.name}
+                        </Link>
+                      </Button>
+                      <Button
+                        asChild
+                        variant="outline"
+                        className="h-11 rounded-2xl px-5 text-sm font-bold"
+                      >
+                        <Link to="/tools">Back to Atlas</Link>
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </>
+            ) : null}
+          </div>
+        </section>
+
+        <section className="grid gap-5 xl:grid-cols-[0.88fr_1.12fr]">
+          <div
+            className="rounded-[34px] border p-5 sm:p-6"
+            style={{
+              borderColor: "color-mix(in srgb, var(--border-color) 82%, transparent)",
+              background:
+                "linear-gradient(180deg, color-mix(in srgb, var(--card-bg) 94%, transparent), color-mix(in srgb, var(--bg) 70%, transparent))",
+            }}
+          >
+            <div className="flex items-center gap-2">
+              <Blocks className="size-4 text-primary" />
+              <p className="text-xs font-black uppercase tracking-[0.22em] text-muted-foreground">
+                generation rules
+              </p>
+            </div>
+            <h2 className="mt-3 text-3xl font-black tracking-tight text-foreground">
+              Code should stay inside the spike.land ecosystem.
+            </h2>
+            <p className="mt-3 text-sm leading-7 text-muted-foreground">
+              If vibe-code writes a feature, it should reach for spike.land tools, internal packages,
+              and MCP contracts before inventing random infrastructure around them.
+            </p>
+
+            <div className="mt-5 grid gap-3">
+              {PRODUCT_RULES.map((rule) => (
+                <div
+                  key={rule}
+                  className="rounded-[22px] border px-4 py-4"
+                  style={{
+                    borderColor: "color-mix(in srgb, var(--border-color) 76%, transparent)",
+                    background: "color-mix(in srgb, var(--muted-bg) 54%, transparent)",
+                  }}
+                >
+                  <p className="text-sm leading-6 text-foreground">{rule}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div
+            className="rounded-[34px] border p-5 sm:p-6"
+            style={{
+              borderColor: "color-mix(in srgb, var(--border-color) 82%, transparent)",
+              background:
+                "linear-gradient(180deg, color-mix(in srgb, var(--card-bg) 94%, transparent), color-mix(in srgb, var(--muted-bg) 56%, transparent))",
+            }}
+          >
+            <div className="grid gap-4 lg:grid-cols-2">
+              <div
+                className="rounded-[28px] border p-5"
+                style={{
+                  borderColor: "color-mix(in srgb, var(--border-color) 76%, transparent)",
+                  background: "color-mix(in srgb, var(--bg) 74%, transparent)",
+                }}
+              >
+                <div className="flex items-center gap-2">
+                  <Sparkles className="size-4 text-primary" />
+                  <p className="text-xs font-black uppercase tracking-[0.2em] text-muted-foreground">
+                    from app page to editor
+                  </p>
+                </div>
+                <p className="mt-3 text-lg font-black tracking-tight text-foreground">
+                  Browse, select, and launch.
+                </p>
+                <p className="mt-2 text-sm leading-6 text-muted-foreground">
+                  Start from a real app in the atlas instead of a blank editor. The app identity,
+                  tools, and channel already exist before the first generated diff.
+                </p>
+              </div>
+
+              <div
+                className="rounded-[28px] border p-5"
+                style={{
+                  borderColor: "color-mix(in srgb, var(--border-color) 76%, transparent)",
+                  background: "color-mix(in srgb, var(--bg) 74%, transparent)",
+                }}
+              >
+                <div className="flex items-center gap-2">
+                  <FileCode2 className="size-4 text-primary" />
+                  <p className="text-xs font-black uppercase tracking-[0.2em] text-muted-foreground">
+                    one source of truth
+                  </p>
+                </div>
+                <p className="mt-3 text-lg font-black tracking-tight text-foreground">
+                  Frontend and MCP logic stay linked.
+                </p>
+                <p className="mt-2 text-sm leading-6 text-muted-foreground">
+                  UI changes, MDX flows, terminal commands, and server patches should resolve back to
+                  the same package graph.
+                </p>
+              </div>
+            </div>
+
+            <div
+              className="mt-4 rounded-[28px] border p-5"
+              style={{
+                borderColor: "color-mix(in srgb, var(--border-color) 76%, transparent)",
+                background:
+                  "linear-gradient(180deg, color-mix(in srgb, var(--chat-accent) 8%, var(--card-bg)), color-mix(in srgb, var(--bg) 72%, transparent))",
+              }}
+            >
+              <div className="flex flex-wrap items-center gap-2">
+                <span
+                  className="rounded-full px-3 py-1 text-[11px] font-black uppercase tracking-[0.22em]"
+                  style={{
+                    background: "color-mix(in srgb, var(--chat-accent) 12%, transparent)",
+                    color: "var(--chat-accent)",
+                  }}
+                >
+                  product claim
+                </span>
+                <span className="text-xs font-semibold text-muted-foreground">
+                  Slack-like shape, but attached to execution.
+                </span>
+              </div>
+              <p className="mt-4 max-w-3xl text-2xl font-black tracking-tight text-foreground sm:text-3xl">
+                A message can become a command, a command can become an app update, and the update
+                can become the new default surface.
+              </p>
+              <p className="mt-3 max-w-3xl text-sm leading-7 text-muted-foreground">
+                That is the real difference: the conversation is not commentary around the app. It is
+                how the app gets shaped, run, reviewed, and evolved.
+              </p>
+            </div>
+          </div>
+        </section>
+      </div>
     </div>
   );
 }
