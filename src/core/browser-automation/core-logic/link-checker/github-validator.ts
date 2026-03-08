@@ -82,14 +82,14 @@ export async function validateGitHubUrl(
 
   // Resolve token from options or environment
   const authToken = token
-    ?? (typeof process !== "undefined" ? process.env["GITHUB_TOKEN"] ?? process.env["GH_TOKEN"] : undefined);
+    ?? (typeof process !== "undefined" ? process.env.GITHUB_TOKEN ?? process.env.GH_TOKEN : undefined);
 
   const headers: Record<string, string> = {
     Accept: "application/vnd.github.v3+json",
     "User-Agent": "spike-land-ai-link-checker/1.0",
   };
   if (authToken) {
-    headers["Authorization"] = `Bearer ${authToken}`;
+    headers.Authorization = `Bearer ${authToken}`;
   }
 
   await rateLimiter.checkAndWait();

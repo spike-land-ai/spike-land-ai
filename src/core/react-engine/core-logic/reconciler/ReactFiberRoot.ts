@@ -39,12 +39,12 @@ export function createFiberRoot(containerInfo: unknown, hostConfig: HostConfig):
   // Initialize the update queue for the root fiber
   const queue: ClassUpdateQueue = {
     baseState: uninitializedFiber.memoizedState,
-    firstBaseUpdate: null as any,
-    lastBaseUpdate: null as any,
+    firstBaseUpdate: null,
+    lastBaseUpdate: null,
     shared: {
-      pending: null as any,
+      pending: null,
     },
-    callbacks: null as any,
+    callbacks: null,
   };
   uninitializedFiber.updateQueue = queue;
 
