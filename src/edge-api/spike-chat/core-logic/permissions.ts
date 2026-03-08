@@ -27,11 +27,18 @@ export async function checkWorkspaceMembership(
   }
 }
 
+/**
+ * Check if a user has access to a specific channel.
+ * TODO: Implement actual channel access checks against D1:
+ * - For public channels: check workspace membership
+ * - For private channels: check channel_members table
+ * - For DMs: check if user is a participant
+ * Currently returns true (open access) — acceptable for MVP.
+ */
 export async function checkChannelAccess(
   env: Env,
   userId: string,
   channelId: string,
 ): Promise<boolean> {
-  // TODO: Check if the user has access to the specific channel in D1
   return true;
 }

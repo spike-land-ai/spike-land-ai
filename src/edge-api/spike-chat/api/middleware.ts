@@ -48,7 +48,12 @@ export async function authMiddleware(
     return c.json({ error: "Invalid or expired session" }, 401);
   }
 
-  const session = (await sessionRes.json()) as { session?: unknown; user?: { id: string } };
+  let session: { session?: unknown; user?: { id: string } };
+  try {
+    session = (await sessionRes.json()) as { session?: unknown; user?: { id: string } };
+  } catch {
+    return c.json({ error: "Invalid session response" }, 401);
+  }
 
   if (!session?.session || !session?.user) {
     return c.json({ error: "Invalid or expired session" }, 401);

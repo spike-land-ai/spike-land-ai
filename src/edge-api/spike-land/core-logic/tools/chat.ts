@@ -39,7 +39,7 @@ export function registerChatTools(
 ): void {
   registry.registerBuilt(
     freeTool(userId, db)
-      .tool("chat_send_message", "Send a message to Claude and get a non-streaming AI response.", {
+      .tool("ai_chat", "Send a message to the Anthropic Claude API and get a non-streaming AI response. This is for direct AI conversations, not for spike-chat channel messaging.", {
         message: z.string().min(1).describe("The message to send to the AI."),
         model: z
           .enum(["opus", "sonnet", "haiku"])
@@ -54,7 +54,7 @@ export function registerChatTools(
       .meta({ category: "chat", tier: "free" })
       .handler(async ({ input }) => {
         const { message, model = "sonnet", system_prompt } = input;
-        return safeToolCall("chat_send_message", async () => {
+        return safeToolCall("ai_chat", async () => {
           const apiKey = env.ANTHROPIC_API_KEY;
           if (!apiKey) {
             throw new McpError("ANTHROPIC_API_KEY not configured.", McpErrorCode.AUTH_ERROR, false);

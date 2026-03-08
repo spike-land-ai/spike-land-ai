@@ -10,6 +10,7 @@ export const embedRouter = new Hono<{ Bindings: Env }>();
 embedRouter.get("/:workspace/:channel", async (c) => {
   const workspaceId = c.req.param("workspace");
   const channelSlug = c.req.param("channel");
+  const guestAccess = c.req.query("guest") !== "false";
   
   const db = createDb(c.env.DB);
   
@@ -33,6 +34,7 @@ embedRouter.get("/:workspace/:channel", async (c) => {
 
   // Define the WS URL logic in script
   const scriptContent = `
+        const guestAccess = ${guestAccess};
         const channelId = "${channelId}";
         const wsUrl = \`\${window.location.protocol === 'https:' ? 'wss:' : 'ws:'}//\${window.location.host}/api/v1/channels/\${channelId}/ws?userId=visitor-\${crypto.randomUUID()}&displayName=Visitor\`;
         
