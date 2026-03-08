@@ -3,6 +3,11 @@ import { render, screen, waitFor } from "@testing-library/react";
 import { Dashboard } from "../Dashboard";
 import { callTool, parseToolResult } from "@/api/client";
 import { toast } from "sonner";
+import { useAuth } from "@/contexts/AuthContext";
+
+vi.mock("@/contexts/AuthContext", () => ({
+  useAuth: vi.fn(),
+}));
 
 vi.mock("@/api/client", () => ({
   callTool: vi.fn(),
@@ -18,6 +23,14 @@ vi.mock("sonner", () => ({
 describe("Dashboard", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.mocked(useAuth).mockReturnValue({
+      user: { name: "Test User", email: "test@example.com", image: null },
+      isLoggedIn: true,
+      login: vi.fn(),
+      logout: vi.fn(),
+      loading: false,
+      error: null,
+    });
   });
 
   it("renders the loading skeleton initially", () => {
