@@ -28,6 +28,7 @@ interface LocalMonacoEditorProps {
   value: string;
   language?: string;
   theme?: string;
+  isDark?: boolean;
   fileName?: string;
   onChange?: (value: string) => void;
   options?: Record<string, unknown>;
@@ -70,6 +71,7 @@ function LocalMonacoEditor({
   value,
   language,
   theme,
+  isDark,
   fileName,
   onChange,
   options,
@@ -82,13 +84,24 @@ function LocalMonacoEditor({
     value,
     language,
     theme,
+    isDark,
     fileName,
     onChange,
     options,
     onMount,
     beforeMount,
   });
-  propsRef.current = { value, language, theme, fileName, onChange, options, onMount, beforeMount };
+  propsRef.current = {
+    value,
+    language,
+    theme,
+    isDark,
+    fileName,
+    onChange,
+    options,
+    onMount,
+    beforeMount,
+  };
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -152,7 +165,7 @@ function LocalMonacoEditor({
         if (themeToApply === SPIKE_PLATFORM_MONACO_THEME) {
           definePlatformMonacoTheme(
             monaco as unknown as { editor: MonacoModule["editor"] },
-            document.documentElement.classList.contains("dark"),
+            isDark ?? document.documentElement.classList.contains("dark"),
           );
         }
 
@@ -163,7 +176,7 @@ function LocalMonacoEditor({
         }
       });
     }
-  }, [theme, language]);
+  }, [theme, language, isDark]);
 
   return <div ref={containerRef} className="w-full h-full" />;
 }
@@ -395,6 +408,7 @@ export function CodeEditor({
               height="100%"
               language={resolvedLanguage}
               theme={monacoTheme}
+              isDark={isDarkMode}
               value={value}
               fileName={fileName}
               onChange={handleChange}
