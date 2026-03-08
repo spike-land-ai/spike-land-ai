@@ -1,7 +1,12 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen, waitFor, fireEvent } from "@testing-library/react";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { render, screen, waitFor, fireEvent, cleanup } from "@testing-library/react";
+import "@testing-library/jest-dom/vitest";
 import userEvent from "@testing-library/user-event";
-import { PixelTerminal } from "../PixelTerminal";
+
+afterEach(() => {
+  cleanup();
+});
+import { PixelTerminal } from "@/components/sections/PixelTerminal";
 import { useTools } from "@/hooks/useTools";
 import { callTool, parseToolResult } from "@/api/client";
 
