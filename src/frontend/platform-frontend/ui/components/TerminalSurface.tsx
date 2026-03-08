@@ -1,6 +1,7 @@
 import { useState, useCallback } from "react";
 import { Terminal, Play, Loader2, ChevronRight } from "lucide-react";
 import { resolveMcpCommandLine } from "./mcp-command-line";
+import { callMcpTool } from "../../core-logic/mcp-client";
 
 interface ToolResult {
   content: Array<{ type: string; text: string }>;
@@ -60,26 +61,11 @@ export function TerminalSurface({ appSlug, availableTools = [], className = "" }
     };
 
     try {
-      const res = await fetch("/mcp", {
-        method: "POST",
-        credentials: "include",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          jsonrpc: "2.0",
-          method: "tools/call",
-          params: { name: resolved.toolName, arguments: resolved.args },
-          id: crypto.randomUUID(),
-        }),
-      });
-      const data = await res.json();
-      if (data.error) {
-        entry.output = JSON.stringify(data.error, null, 2);
-        entry.isError = true;
-      } else {
-        const result = data.result as ToolResult;
-        entry.output = result.content?.map((c: { text: string }) => c.text).join("\n") || JSON.stringify(result, null, 2);
-        entry.isError = !!result.isError;
-      }
+      const result = await callMcpTool<ToolResult>(resolved.toolName, resolved.args);
+      entry.output =
+        result.content?.map((c: { text: string }) => c.text).join("\n") ||
+        JSON.stringify(result, null, 2);
+      entry.isError = !!result.isError;
     } catch (err) {
       entry.output = err instanceof Error ? err.message : "Execution failed";
       entry.isError = true;

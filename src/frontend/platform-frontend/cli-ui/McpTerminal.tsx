@@ -3,6 +3,7 @@ import { Terminal } from "@xterm/xterm";
 import { FitAddon } from "@xterm/addon-fit";
 import "@xterm/xterm/css/xterm.css";
 import { mcpUrl } from "../core-logic/api";
+import { callMcpTool } from "../core-logic/mcp-client";
 import { Terminal as TerminalIcon, Copy, Check, List } from "lucide-react";
 import { Button } from "../ui/shared/ui/button";
 
@@ -40,17 +41,7 @@ export function McpTerminal({ appId }: McpTerminalProps) {
   }, []);
 
   const callTool = useCallback(async (toolName: string, args: Record<string, unknown>) => {
-    const res = await fetch(mcpUrl("/mcp"), {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        jsonrpc: "2.0",
-        id: crypto.randomUUID(),
-        method: "tools/call",
-        params: { name: toolName, arguments: args },
-      }),
-    });
-    return res.json();
+    return callMcpTool(toolName, args);
   }, []);
 
   const writeOutput = useCallback((term: Terminal, text: string) => {

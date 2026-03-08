@@ -107,10 +107,6 @@ export async function ensureMcpSession(): Promise<string> {
   return pendingInitialization;
 }
 
-function isNotInitialized(payload: JsonRpcEnvelope | null): boolean {
-  return payload?.error?.message?.toLowerCase().includes("not initialized") ?? false;
-}
-
 async function executeTool<T>(toolName: string, args: Record<string, unknown>): Promise<T> {
   const sessionId = await ensureMcpSession();
   const response = await fetch(MCP_PROXY_PATH, {
