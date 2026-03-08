@@ -9,7 +9,7 @@ vi.mock("@anthropic-ai/sdk", () => ({
   },
 }));
 
-import { ChatClient } from "../../../../src/cli/spike-cli/ai/client.js";
+import { ChatClient } from "../../../../src/cli/spike-cli/core-logic/chat/client.js";
 
 describe("ChatClient", () => {
   beforeEach(() => {

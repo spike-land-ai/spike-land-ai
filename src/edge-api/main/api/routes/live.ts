@@ -43,15 +43,6 @@ live.get("/live/:appId", async (c) => {
   return cached;
 });
 
-// Proxy codeSpace source files to the backend Durable Object worker
-live.get("/live/:appId/:file{.+\\.(?:tsx?|jsx?|mjs|css)$}", async (c) => {
-  const backend = c.env.SPIKE_LAND_BACKEND;
-  if (!backend) return c.json({ error: "Backend service not configured" }, 503);
-
-  const url = new URL(c.req.url);
-  return backend.fetch(new Request(url.toString(), c.req.raw));
-});
-
 live.get("/live/:appId/index.html", async (c) => {
   const appId = c.req.param("appId");
   const html = `<!DOCTYPE html>

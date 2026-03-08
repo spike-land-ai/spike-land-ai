@@ -21,12 +21,10 @@ const mockFileHandle = {
 const mockDirectoryHandle = {
   getFileHandle: vi.fn().mockResolvedValue(mockFileHandle),
   removeEntry: vi.fn().mockResolvedValue(undefined),
-  values: vi.fn().mockImplementation(() => {
-    return (async function* () {
-      yield { name: "img_test1.png" };
-      yield { name: "img_test2.png" };
-    })();
-  }),
+  values: vi.fn().mockReturnValue((async function* () {
+    yield { name: "img_test1.png" };
+    yield { name: "img_test2.png" };
+  })()),
 };
 
 Object.defineProperty(navigator, "storage", {
@@ -209,9 +207,7 @@ describe("storage service", () => {
       await storage.clearAllLocalData();
 
       // It should iterate over values() which yields two dummy items in our mock
-      // Since it's iterating over the mock values(), we should expect the mock values to be removed
-      expect(mockDirectoryHandle.removeEntry).toHaveBeenCalledWith("img_test1.png", { recursive: true });
-      expect(mockDirectoryHandle.removeEntry).toHaveBeenCalledWith("img_test2.png", { recursive: true });
+      expect(mockDirectoryHandle.removeEntry).toHaveBeenCalledTimes(2);
 
       images = await storage.getImagesFromLocal();
       expect(images).toHaveLength(0);

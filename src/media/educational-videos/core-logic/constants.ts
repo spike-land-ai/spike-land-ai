@@ -32,61 +32,34 @@ export const VCP_TIMING = {
 } as const;
 
 /**
- * Media color tokens aligned with spike.land's semantic dark theme.
- *
- * Keep the semantic names as the source of truth and preserve the older
- * aliases (`darkBg`, `textPrimary`, `cyan`, etc.) for compatibility with the
- * existing scene/component library.
+ * Brand colors from spike.land design system
  */
-const MEDIA_THEME = {
-  background: "hsl(224 71% 4%)",
-  foreground: "hsl(210 40% 98%)",
-  card: "hsl(222 47% 7%)",
-  muted: "hsl(222 47% 11%)",
-  mutedForeground: "hsl(215 20% 65%)",
-  border: "hsl(217 33% 17%)",
-  primary: "hsl(263 70% 50%)",
-  accent: "hsl(187 100% 50%)",
-  destructive: "hsl(0 84% 60%)",
-  success: "hsl(150 90% 35%)",
-  warning: "hsl(45 90% 45%)",
-  info: "hsl(187 100% 50%)",
-  fuchsia: "hsl(322 81% 55%)",
-  gold: "hsl(48 89% 47%)",
-} as const;
-
 export const COLORS = {
-  // Semantic surface + text roles
-  background: MEDIA_THEME.background,
-  foreground: MEDIA_THEME.foreground,
-  card: MEDIA_THEME.card,
-  muted: MEDIA_THEME.muted,
-  mutedForeground: MEDIA_THEME.mutedForeground,
-  border: MEDIA_THEME.border,
-  primary: MEDIA_THEME.primary,
-  accent: MEDIA_THEME.accent,
-  destructive: MEDIA_THEME.destructive,
-  success: MEDIA_THEME.success,
-  warning: MEDIA_THEME.warning,
-  info: MEDIA_THEME.info,
+  // Primary brand colors
+  cyan: "#00E5FF",
+  fuchsia: "#FF00FF",
+  purple: "#9945FF",
+  amber: "#F59E0B",
+  gold: "#FBBF24",
 
-  // Compatibility aliases for the existing media components
-  darkBg: MEDIA_THEME.background,
-  darkCard: MEDIA_THEME.card,
-  darkBorder: MEDIA_THEME.border,
-  textPrimary: MEDIA_THEME.foreground,
-  textSecondary: MEDIA_THEME.mutedForeground,
-  textMuted: MEDIA_THEME.mutedForeground,
-  cyan: MEDIA_THEME.accent,
-  fuchsia: MEDIA_THEME.fuchsia,
-  purple: MEDIA_THEME.primary,
-  amber: MEDIA_THEME.warning,
-  gold: MEDIA_THEME.gold,
-  error: MEDIA_THEME.destructive,
+  // Dark theme
+  darkBg: "#0a0a0f",
+  darkCard: "#1a1a2e",
+  darkBorder: "#2a2a3e",
+
+  // Text colors
+  textPrimary: "#ffffff",
+  textSecondary: "#a0a0a0",
+  textMuted: "#6b7280",
+
+  // Status colors
+  success: "#22c55e",
+  warning: "#eab308",
+  error: "#ef4444",
 
   // Chart colors for A/B testing
-  variantA: MEDIA_THEME.accent,
-  variantB: MEDIA_THEME.fuchsia,
+  variantA: "#00E5FF", // Cyan
+  variantB: "#FF00FF", // Fuchsia
 } as const;
 
 /**
@@ -94,8 +67,8 @@ export const COLORS = {
  */
 export const TYPOGRAPHY = {
   fontFamily: {
-    sans: '"Rubik", ui-sans-serif, system-ui, sans-serif',
-    mono: '"JetBrains Mono", ui-monospace, monospace',
+    sans: "Inter, system-ui, sans-serif",
+    mono: "JetBrains Mono, monospace",
   },
   fontSize: {
     xs: 12,
@@ -128,22 +101,22 @@ export const SPRING_CONFIGS = {
  */
 export const VERITASIUM_COLORS = {
   // Agent states
-  planning: COLORS.primary,
-  generating: "hsl(221 83% 53%)",
-  transpiling: COLORS.accent,
-  fixing: COLORS.warning,
-  learning: COLORS.success,
-  published: COLORS.success,
-  failed: COLORS.destructive,
+  planning: "#8B5CF6",
+  generating: "#3B82F6",
+  transpiling: "#06B6D4",
+  fixing: "#F59E0B",
+  learning: "#10B981",
+  published: "#22C55E",
+  failed: "#EF4444",
 
   // Note lifecycle
-  candidate: COLORS.warning,
-  active: COLORS.success,
-  deprecated: COLORS.mutedForeground,
+  candidate: "#EAB308",
+  active: "#22C55E",
+  deprecated: "#6B7280",
 
   // Laplace formula
-  bayesian: "hsl(262 83% 58%)",
+  bayesian: "#A78BFA",
 
   // Flywheel
-  flywheel: COLORS.accent,
+  flywheel: "#00E5FF",
 } as const;

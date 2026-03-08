@@ -41,7 +41,7 @@ describe("state-machine CLI module", () => {
   it("cli.ts can be imported without errors", async () => {
     // Just importing the module exercises the module-level code
     // (createInterface call, console.error, rl.on registration)
-    const mod = await import("../../src/core/statecharts/cli/cli.js");
+    const mod = await import("../../src/core/statecharts/cli.js");
     expect(mod).toBeDefined();
   });
 
@@ -239,7 +239,7 @@ describe("state-machine CLI module", () => {
     );
 
     // Force current state to a
-    const { clearMachines, getMachine } = await import("../../src/core/statecharts/node-sys/engine.js");
+    const { clearMachines, getMachine } = await import("../../src/core/statecharts/engine.js");
     const instance = getMachine(machineId);
     instance.currentStates = ["a"];
 

@@ -12,7 +12,6 @@ export interface Env {
   LIMITERS: DurableObjectNamespace;
   AUTH_MCP: Fetcher;
   MCP_SERVICE: Fetcher;
-  SPIKE_LAND_BACKEND: Fetcher;
   STRIPE_SECRET_KEY: string;
   STRIPE_WEBHOOK_SECRET: string;
   GEMINI_API_KEY: string;

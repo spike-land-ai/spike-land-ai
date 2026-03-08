@@ -70,7 +70,7 @@ export function BarChart({
                   fontWeight: 600,
                   color: item.color,
                   opacity: valueOpacity,
-                  fontFamily: "Rubik, ui-sans-serif, system-ui, sans-serif",
+                  fontFamily: "Inter, sans-serif",
                 }}
               >
                 {Math.round(item.value * progress)}%
@@ -90,7 +90,7 @@ export function BarChart({
                 style={{
                   fontSize: 14,
                   color: COLORS.textSecondary,
-                  fontFamily: "Rubik, ui-sans-serif, system-ui, sans-serif",
+                  fontFamily: "Inter, sans-serif",
                 }}
               >
                 {item.label}

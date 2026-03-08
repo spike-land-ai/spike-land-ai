@@ -36,7 +36,7 @@ export const SplitScreenCore: FC<SplitScreenCoreProps> = ({
         background: COLORS.darkBg, // keep dark bg
         position: "relative",
         overflow: "hidden",
-        fontFamily: "Rubik, ui-sans-serif, system-ui, sans-serif",
+        fontFamily: "Inter, sans-serif",
       }}
     >
       {/* Background texture/grid */}

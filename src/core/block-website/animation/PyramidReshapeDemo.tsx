@@ -173,7 +173,7 @@ function LayerShape({
           textAnchor="middle"
           fill={layer.textColor}
           fontSize={11}
-          fontFamily="JetBrains Mono, ui-monospace, monospace"
+          fontFamily="JetBrains Mono, monospace"
           fontWeight="bold"
           letterSpacing={0.5}
         >
@@ -185,7 +185,7 @@ function LayerShape({
           textAnchor="middle"
           fill={layer.textColor}
           fontSize={9}
-          fontFamily="JetBrains Mono, ui-monospace, monospace"
+          fontFamily="JetBrains Mono, monospace"
           opacity={0.7}
         >
           {layer.classicSub}
@@ -200,7 +200,7 @@ function LayerShape({
           textAnchor="middle"
           fill={layer.textColor}
           fontSize={11}
-          fontFamily="JetBrains Mono, ui-monospace, monospace"
+          fontFamily="JetBrains Mono, monospace"
           fontWeight="bold"
           letterSpacing={0.5}
         >
@@ -212,7 +212,7 @@ function LayerShape({
           textAnchor="middle"
           fill={layer.textColor}
           fontSize={9}
-          fontFamily="JetBrains Mono, ui-monospace, monospace"
+          fontFamily="JetBrains Mono, monospace"
           opacity={0.7}
         >
           {layer.modernSub}
@@ -260,7 +260,7 @@ function StageLabel({ progress }: StageLabelProps) {
         textAnchor="middle"
         fill={color}
         fontSize={9}
-        fontFamily="JetBrains Mono, ui-monospace, monospace"
+        fontFamily="JetBrains Mono, monospace"
         fontWeight="bold"
         letterSpacing={1.5}
       >

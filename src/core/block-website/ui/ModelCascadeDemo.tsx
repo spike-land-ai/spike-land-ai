@@ -38,8 +38,8 @@ const TIER_CONFIG: Record<ModelTier, TierConfig> = {
   opus: {
     label: "Claude Opus",
     tagline: "Deep reasoning & architecture",
-    color: "hsl(var(--primary))",
-    glow: "hsl(var(--primary) / 0.3)",
+    color: "#8b5cf6",
+    glow: "rgba(139,92,246,0.3)",
     costLabel: "$$$",
     speedLabel: "1x",
     taskExamples: [
@@ -54,8 +54,8 @@ const TIER_CONFIG: Record<ModelTier, TierConfig> = {
   sonnet: {
     label: "Claude Sonnet",
     tagline: "Balanced code generation",
-    color: "hsl(221 83% 53%)",
-    glow: "hsl(221 83% 53% / 0.3)",
+    color: "#3b82f6",
+    glow: "rgba(59,130,246,0.3)",
     costLabel: "$$",
     speedLabel: "4x",
     taskExamples: [
@@ -70,8 +70,8 @@ const TIER_CONFIG: Record<ModelTier, TierConfig> = {
   haiku: {
     label: "Claude Haiku",
     tagline: "Fast fixes & small diffs",
-    color: "hsl(var(--accent, 187 100% 50%))",
-    glow: "hsl(var(--accent, 187 100% 50%) / 0.3)",
+    color: "#0ea5e9",
+    glow: "rgba(14,165,233,0.3)",
     costLabel: "$",
     speedLabel: "20x",
     taskExamples: ["Fix syntax error", "Format code", "Rename variable", "Add type annotation"],

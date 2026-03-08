@@ -111,7 +111,7 @@ export const DiminishingReturnsGraph: FC<DiminishingReturnsGraphProps> = ({
           fontSize: 24,
           fontWeight: 700,
           color: COLORS.textPrimary,
-          fontFamily: "Rubik, ui-sans-serif, system-ui, sans-serif",
+          fontFamily: "Inter, sans-serif",
           opacity: titleProgress,
         }}
       >
@@ -151,7 +151,7 @@ export const DiminishingReturnsGraph: FC<DiminishingReturnsGraphProps> = ({
                 textAnchor="end"
                 fill={COLORS.textMuted}
                 fontSize={12}
-                fontFamily="JetBrains Mono, ui-monospace, monospace"
+                fontFamily="JetBrains Mono, monospace"
                 opacity={titleProgress}
               >
                 {val}%
@@ -180,7 +180,7 @@ export const DiminishingReturnsGraph: FC<DiminishingReturnsGraphProps> = ({
               textAnchor="middle"
               fill={COLORS.textMuted}
               fontSize={12}
-              fontFamily="JetBrains Mono, ui-monospace, monospace"
+              fontFamily="JetBrains Mono, monospace"
               opacity={titleProgress}
             >
               {val}
@@ -195,7 +195,7 @@ export const DiminishingReturnsGraph: FC<DiminishingReturnsGraphProps> = ({
           textAnchor="middle"
           fill={COLORS.textSecondary}
           fontSize={14}
-          fontFamily="Rubik, ui-sans-serif, system-ui, sans-serif"
+          fontFamily="Inter, sans-serif"
           opacity={titleProgress}
         >
           Learning Notes
@@ -206,7 +206,7 @@ export const DiminishingReturnsGraph: FC<DiminishingReturnsGraphProps> = ({
           textAnchor="middle"
           fill={COLORS.textSecondary}
           fontSize={14}
-          fontFamily="Rubik, ui-sans-serif, system-ui, sans-serif"
+          fontFamily="Inter, sans-serif"
           opacity={titleProgress}
           transform={`rotate(-90, 16, ${padY + chartHeight / 2})`}
         >
@@ -254,7 +254,7 @@ export const DiminishingReturnsGraph: FC<DiminishingReturnsGraphProps> = ({
             textAnchor="end"
             fill={COLORS.error}
             fontSize={13}
-            fontFamily="Rubik, ui-sans-serif, system-ui, sans-serif"
+            fontFamily="Inter, sans-serif"
             fontWeight={600}
             opacity={competitionProgress}
           >
@@ -290,7 +290,7 @@ export const DiminishingReturnsGraph: FC<DiminishingReturnsGraphProps> = ({
             textAnchor="middle"
             fill={COLORS.amber}
             fontSize={12}
-            fontFamily="Rubik, ui-sans-serif, system-ui, sans-serif"
+            fontFamily="Inter, sans-serif"
             fontWeight={600}
           >
             Diminishing returns

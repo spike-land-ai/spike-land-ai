@@ -293,7 +293,7 @@ function HourglassSvg({ progress }: HourglassSvgProps) {
           textAnchor="end"
           fill="#f59e0b"
           fontSize="22"
-          fontFamily="JetBrains Mono, ui-monospace, monospace"
+          fontFamily="JetBrains Mono, monospace"
           fontWeight="bold"
         >
           20%
@@ -308,7 +308,7 @@ function HourglassSvg({ progress }: HourglassSvgProps) {
           textAnchor="end"
           fill="hsl(var(--muted-foreground))"
           fontSize="16"
-          fontFamily="JetBrains Mono, ui-monospace, monospace"
+          fontFamily="JetBrains Mono, monospace"
           fontWeight="bold"
         >
           10%
@@ -323,7 +323,7 @@ function HourglassSvg({ progress }: HourglassSvgProps) {
           textAnchor="start"
           fill="#06b6d4"
           fontSize="22"
-          fontFamily="JetBrains Mono, ui-monospace, monospace"
+          fontFamily="JetBrains Mono, monospace"
           fontWeight="bold"
           filter={botGlowIntensity > 0.7 ? "url(#hg-glow-cyan)" : undefined}
         >
@@ -340,7 +340,7 @@ function HourglassSvg({ progress }: HourglassSvgProps) {
           textAnchor="start"
           fill="#f59e0b"
           fontSize="11"
-          fontFamily="JetBrains Mono, ui-monospace, monospace"
+          fontFamily="JetBrains Mono, monospace"
           fontWeight="bold"
           letterSpacing="1"
         >
@@ -352,7 +352,7 @@ function HourglassSvg({ progress }: HourglassSvgProps) {
           textAnchor="start"
           fill="rgba(245,158,11,0.65)"
           fontSize="9"
-          fontFamily="JetBrains Mono, ui-monospace, monospace"
+          fontFamily="JetBrains Mono, monospace"
         >
           Humans write these
         </text>
@@ -366,7 +366,7 @@ function HourglassSvg({ progress }: HourglassSvgProps) {
           textAnchor="start"
           fill="hsl(var(--muted-foreground))"
           fontSize="10"
-          fontFamily="JetBrains Mono, ui-monospace, monospace"
+          fontFamily="JetBrains Mono, monospace"
           fontWeight="bold"
           letterSpacing="1"
         >
@@ -378,7 +378,7 @@ function HourglassSvg({ progress }: HourglassSvgProps) {
           textAnchor="start"
           fill="hsl(var(--muted-foreground) / 0.55)"
           fontSize="8.5"
-          fontFamily="JetBrains Mono, ui-monospace, monospace"
+          fontFamily="JetBrains Mono, monospace"
         >
           Disposable, AI-gen
         </text>
@@ -392,7 +392,7 @@ function HourglassSvg({ progress }: HourglassSvgProps) {
           textAnchor="end"
           fill="#06b6d4"
           fontSize="11"
-          fontFamily="JetBrains Mono, ui-monospace, monospace"
+          fontFamily="JetBrains Mono, monospace"
           fontWeight="bold"
           letterSpacing="1"
           filter={botGlowIntensity > 0.8 ? "url(#hg-glow-cyan)" : undefined}
@@ -405,7 +405,7 @@ function HourglassSvg({ progress }: HourglassSvgProps) {
           textAnchor="end"
           fill="rgba(6,182,212,0.65)"
           fontSize="9"
-          fontFamily="JetBrains Mono, ui-monospace, monospace"
+          fontFamily="JetBrains Mono, monospace"
         >
           Bulletproof, milliseconds
         </text>

@@ -94,7 +94,7 @@ export const AttentionSpotlightCore: FC<AttentionSpotlightCoreProps> = ({
       preserveAspectRatio="xMidYMid meet"
       style={{
         background: COLORS.darkBg,
-        fontFamily: "JetBrains Mono, ui-monospace, monospace",
+        fontFamily: "JetBrains Mono, monospace",
       }}
     >
       <defs>

@@ -39,7 +39,7 @@ export const AccuracyDropChart: FC<AccuracyDropChartProps> = ({ delay = 0 }) => 
           fontSize: 24,
           fontWeight: 700,
           color: COLORS.textPrimary,
-          fontFamily: "Rubik, ui-sans-serif, system-ui, sans-serif",
+          fontFamily: "Inter, sans-serif",
           opacity: titleProgress,
         }}
       >
@@ -86,7 +86,7 @@ export const AccuracyDropChart: FC<AccuracyDropChartProps> = ({ delay = 0 }) => 
                   fontSize: 42,
                   fontWeight: 800,
                   color: bar.color,
-                  fontFamily: "JetBrains Mono, ui-monospace, monospace",
+                  fontFamily: "JetBrains Mono, monospace",
                   opacity: valueOpacity,
                 }}
               >
@@ -137,7 +137,7 @@ export const AccuracyDropChart: FC<AccuracyDropChartProps> = ({ delay = 0 }) => 
                   fontSize: 16,
                   fontWeight: 600,
                   color: COLORS.textPrimary,
-                  fontFamily: "Rubik, ui-sans-serif, system-ui, sans-serif",
+                  fontFamily: "Inter, sans-serif",
                 }}
               >
                 {bar.label}
@@ -153,7 +153,7 @@ export const AccuracyDropChart: FC<AccuracyDropChartProps> = ({ delay = 0 }) => 
           fontSize: 18,
           fontWeight: 600,
           color: COLORS.error,
-          fontFamily: "Rubik, ui-sans-serif, system-ui, sans-serif",
+          fontFamily: "Inter, sans-serif",
           opacity: interpolate(frame, [delay + 50, delay + 65], [0, 1], {
             extrapolateLeft: "clamp",
             extrapolateRight: "clamp",

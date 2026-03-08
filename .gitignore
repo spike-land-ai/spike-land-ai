@@ -43,9 +43,6 @@ incremental-coverage.json
 *.tfstate.backup
 terraform.tfvars
 
-# Secrets
-**/google-client-secret.json
-
 # Local dev certs
 .dev-certs/
 

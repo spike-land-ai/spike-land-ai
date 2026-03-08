@@ -293,7 +293,7 @@ function LayerCard({
                 fontWeight: 800,
                 textTransform: "uppercase",
                 letterSpacing: "0.1em",
-                fontFamily: "Rubik, ui-sans-serif, system-ui, sans-serif",
+                fontFamily: "Inter, sans-serif",
                 textShadow: isHovered ? `0 0 10px ${layer.color}70` : "none",
               }}
             >
@@ -306,7 +306,7 @@ function LayerCard({
                 border: `1px solid ${layer.color}35`,
                 color: layer.color,
                 fontSize: 9,
-                fontFamily: "JetBrains Mono, ui-monospace, monospace",
+                fontFamily: "JetBrains Mono, monospace",
                 fontWeight: "bold",
                 borderRadius: 4,
                 letterSpacing: "0.12em",
@@ -319,7 +319,7 @@ function LayerCard({
             style={{
               color: "hsl(var(--muted-foreground))",
               fontSize: 12,
-              fontFamily: "JetBrains Mono, ui-monospace, monospace",
+              fontFamily: "JetBrains Mono, monospace",
               marginTop: 3,
             }}
           >
@@ -331,7 +331,7 @@ function LayerCard({
           style={{
             color: `${layer.color}55`,
             fontSize: 10,
-            fontFamily: "JetBrains Mono, ui-monospace, monospace",
+            fontFamily: "JetBrains Mono, monospace",
             fontWeight: "bold",
             flexShrink: 0,
           }}
@@ -381,7 +381,7 @@ function LayerCard({
               style={{
                 color: layer.color,
                 fontSize: 10,
-                fontFamily: "JetBrains Mono, ui-monospace, monospace",
+                fontFamily: "JetBrains Mono, monospace",
                 fontWeight: "bold",
                 letterSpacing: "0.1em",
                 marginBottom: 5,
@@ -395,7 +395,7 @@ function LayerCard({
                 color: "hsl(var(--muted-foreground))",
                 fontSize: 12,
                 lineHeight: 1.6,
-                fontFamily: "Rubik, ui-sans-serif, system-ui, sans-serif",
+                fontFamily: "Inter, sans-serif",
               }}
             >
               {layer.detail}
@@ -443,7 +443,7 @@ function KvCacheBoundary({ progress }: KvBoundaryProps) {
           borderRadius: 4,
           color: "rgba(14,165,233,0.85)",
           fontSize: 9,
-          fontFamily: "JetBrains Mono, ui-monospace, monospace",
+          fontFamily: "JetBrains Mono, monospace",
           fontWeight: "bold",
           letterSpacing: "0.13em",
           whiteSpace: "nowrap",
@@ -644,7 +644,7 @@ export function FiveLayerStackDemo() {
                           fontWeight: "bold",
                           borderRadius: 3,
                           letterSpacing: "0.1em",
-                          fontFamily: "JetBrains Mono, ui-monospace, monospace",
+                          fontFamily: "JetBrains Mono, monospace",
                         }}
                       >
                         {layer.badge}
@@ -654,7 +654,7 @@ export function FiveLayerStackDemo() {
                       style={{
                         color: "hsl(var(--muted-foreground))",
                         fontSize: 11,
-                        fontFamily: "JetBrains Mono, ui-monospace, monospace",
+                        fontFamily: "JetBrains Mono, monospace",
                         marginTop: 2,
                       }}
                     >

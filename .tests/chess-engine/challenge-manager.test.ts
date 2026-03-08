@@ -13,7 +13,7 @@ const mockPrisma = vi.hoisted(() => ({
   },
 }));
 
-vi.mock("@/core-logic/prisma", () => ({ default: mockPrisma }));
+vi.mock("@/lib/prisma", () => ({ default: mockPrisma }));
 
 import {
   acceptChallenge,

@@ -41,10 +41,6 @@ service = "mcp-auth"
 binding = "MCP_SERVICE"
 service = "spike-land-mcp"
 
-[[services]]
-binding = "SPIKE_LAND_BACKEND"
-service = "spike-land"
-
 [[routes]]
 pattern = "edge.spike.land"
 custom_domain = true

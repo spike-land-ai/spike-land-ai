@@ -95,7 +95,7 @@ export const NoteLifecycle: FC<NoteLifecycleProps> = ({
                   fontSize: 16,
                   fontWeight: 700,
                   color: stage.color,
-                  fontFamily: "JetBrains Mono, ui-monospace, monospace",
+                  fontFamily: "JetBrains Mono, monospace",
                   letterSpacing: "0.05em",
                 }}
               >
@@ -105,7 +105,7 @@ export const NoteLifecycle: FC<NoteLifecycleProps> = ({
                 style={{
                   fontSize: 13,
                   color: COLORS.textMuted,
-                  fontFamily: "Rubik, ui-sans-serif, system-ui, sans-serif",
+                  fontFamily: "Inter, sans-serif",
                   textAlign: "center",
                   maxWidth: 140,
                 }}

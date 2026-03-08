@@ -70,7 +70,7 @@ export function FourOhFourSkull({ delay = 0 }: FourOhFourSkullProps) {
                     mixBlendMode: "screen",
                     transform: `translate(${redOffset}px, ${redOffset * 0.3}px)`,
                     opacity: 0.7,
-                    fontFamily: "Rubik, ui-sans-serif, system-ui, sans-serif",
+                    fontFamily: "Inter, sans-serif",
                   }}
                 >
                   404
@@ -84,7 +84,7 @@ export function FourOhFourSkull({ delay = 0 }: FourOhFourSkullProps) {
                     mixBlendMode: "screen",
                     transform: `translate(${blueOffset}px, ${blueOffset * -0.3}px)`,
                     opacity: 0.7,
-                    fontFamily: "Rubik, ui-sans-serif, system-ui, sans-serif",
+                    fontFamily: "Inter, sans-serif",
                   }}
                 >
                   404
@@ -97,7 +97,7 @@ export function FourOhFourSkull({ delay = 0 }: FourOhFourSkullProps) {
                 fontSize: 120,
                 fontWeight: 900,
                 color: isGlitchPhase ? COLORS.error : COLORS.error,
-                fontFamily: "Rubik, ui-sans-serif, system-ui, sans-serif",
+                fontFamily: "Inter, sans-serif",
                 textShadow: `0 0 30px ${COLORS.error}80`,
               }}
             >
@@ -108,7 +108,7 @@ export function FourOhFourSkull({ delay = 0 }: FourOhFourSkullProps) {
             style={{
               fontSize: 20,
               color: COLORS.textSecondary,
-              fontFamily: "Rubik, ui-sans-serif, system-ui, sans-serif",
+              fontFamily: "Inter, sans-serif",
               marginTop: 8,
             }}
           >
@@ -160,7 +160,7 @@ export function FourOhFourSkull({ delay = 0 }: FourOhFourSkullProps) {
             fontSize: 22,
             fontWeight: 600,
             color: COLORS.success,
-            fontFamily: "Rubik, ui-sans-serif, system-ui, sans-serif",
+            fontFamily: "Inter, sans-serif",
             marginTop: 16,
             textShadow: `0 0 20px ${COLORS.success}60`,
           }}

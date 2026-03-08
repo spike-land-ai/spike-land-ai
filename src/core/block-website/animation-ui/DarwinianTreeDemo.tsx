@@ -291,7 +291,7 @@ function FitnessLabel({ branch, globalProgress }: FitnessLabelProps) {
         textAnchor={isRight ? "start" : "end"}
         fill={color}
         fontSize={9}
-        fontFamily="JetBrains Mono, ui-monospace, monospace"
+        fontFamily="JetBrains Mono, monospace"
         fontWeight="bold"
         letterSpacing={1}
       >
@@ -341,7 +341,7 @@ function LearningParticle({
         fontSize={8}
         textAnchor="middle"
         opacity={0.85}
-        fontFamily="JetBrains Mono, ui-monospace, monospace"
+        fontFamily="JetBrains Mono, monospace"
       >
         {"\u0394"}
       </text>
@@ -413,7 +413,7 @@ function DarwinianTreeSvg({ generations, progress, instanceKey }: DarwinianTreeS
               fill="hsl(var(--muted-foreground))"
               opacity={0.65}
               fontSize={10}
-              fontFamily="JetBrains Mono, ui-monospace, monospace"
+              fontFamily="JetBrains Mono, monospace"
               letterSpacing={1}
             >
               {`GEN ${gen}`}
@@ -486,7 +486,7 @@ function DarwinianTreeSvg({ generations, progress, instanceKey }: DarwinianTreeS
           textAnchor="middle"
           fill={C_PARTICLE}
           fontSize={10}
-          fontFamily="JetBrains Mono, ui-monospace, monospace"
+          fontFamily="JetBrains Mono, monospace"
           fontWeight="bold"
           letterSpacing={3}
         >
@@ -502,7 +502,7 @@ function DarwinianTreeSvg({ generations, progress, instanceKey }: DarwinianTreeS
           fill="hsl(var(--muted-foreground))"
           opacity={0.7}
           fontSize={9}
-          fontFamily="JetBrains Mono, ui-monospace, monospace"
+          fontFamily="JetBrains Mono, monospace"
         >
           Survives
         </text>
@@ -513,7 +513,7 @@ function DarwinianTreeSvg({ generations, progress, instanceKey }: DarwinianTreeS
           fill="hsl(var(--muted-foreground))"
           opacity={0.7}
           fontSize={9}
-          fontFamily="JetBrains Mono, ui-monospace, monospace"
+          fontFamily="JetBrains Mono, monospace"
         >
           Failed
         </text>
@@ -524,7 +524,7 @@ function DarwinianTreeSvg({ generations, progress, instanceKey }: DarwinianTreeS
           fill="hsl(var(--muted-foreground))"
           opacity={0.7}
           fontSize={9}
-          fontFamily="JetBrains Mono, ui-monospace, monospace"
+          fontFamily="JetBrains Mono, monospace"
         >
           Learning {"\u0394"}
         </text>

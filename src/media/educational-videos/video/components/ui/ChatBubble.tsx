@@ -92,7 +92,7 @@ export function ChatBubble({
               fontWeight: 800,
               textTransform: "uppercase",
               letterSpacing: 1,
-              fontFamily: "Rubik, ui-sans-serif, system-ui, sans-serif",
+              fontFamily: "Inter, sans-serif",
             }}
           >
             Spike Assistant
@@ -104,7 +104,7 @@ export function ChatBubble({
             color: COLORS.textPrimary,
             lineHeight: 1.6,
             fontWeight: 500,
-            fontFamily: "Rubik, ui-sans-serif, system-ui, sans-serif",
+            fontFamily: "Inter, sans-serif",
           }}
         >
           {visibleText}

@@ -55,7 +55,7 @@ function makeLogger(service: string, minLevel: LogLevel, requestId: string | und
 
   return {
     debug: (message, data) => log("debug", console.debug, message, data),
-    info: (message, data) => log("info", console.log, message, data),
+    info: (message, data) => log("info", console.info, message, data),
     warn: (message, data) => log("warn", console.warn, message, data),
     error: (message, data) => log("error", console.error, message, data),
     withRequestId: (id) => makeLogger(service, minLevel, id),

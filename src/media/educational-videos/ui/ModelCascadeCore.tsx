@@ -1,5 +1,5 @@
 import { type FC, useId } from "react";
-import { COLORS, VERITASIUM_COLORS } from "../core-logic/constants";
+import { COLORS } from "../core-logic/constants";
 import { clamp, interpolate } from "../core-logic/animation-utils";
 
 export type ModelTier = "opus" | "sonnet" | "haiku";
@@ -33,9 +33,9 @@ const MODELS: Record<
     speed: "1x",
     width: 600,
     x: 960,
-    color: VERITASIUM_COLORS.planning,
+    color: "#8b5cf6",
     yOffset: 200,
-  },
+  }, // Violet
   sonnet: {
     label: "Claude 3.5 Sonnet",
     desc: "Targeted refactoring / Code generation",
@@ -43,9 +43,9 @@ const MODELS: Record<
     speed: "4x",
     width: 400,
     x: 960,
-    color: VERITASIUM_COLORS.generating,
+    color: "#3b82f6",
     yOffset: 450,
-  },
+  }, // Blue
   haiku: {
     label: "Claude 3.5 Haiku",
     desc: "Pinpoint fixes / Small diffs",
@@ -53,9 +53,9 @@ const MODELS: Record<
     speed: "20x",
     width: 250,
     x: 960,
-    color: COLORS.accent,
+    color: "#0ea5e9",
     yOffset: 700,
-  },
+  }, // Sky
 };
 
 export const ModelCascadeCore: FC<ModelCascadeCoreProps> = ({
@@ -77,7 +77,7 @@ export const ModelCascadeCore: FC<ModelCascadeCoreProps> = ({
       preserveAspectRatio="xMidYMid meet"
       style={{
         background: COLORS.darkBg,
-        fontFamily: "Rubik, ui-sans-serif, system-ui, sans-serif",
+        fontFamily: "Inter, sans-serif",
         ...style,
       }}
     >
@@ -293,7 +293,7 @@ export const ModelCascadeCore: FC<ModelCascadeCoreProps> = ({
                 y={0}
                 fill={COLORS.textMuted}
                 fontSize={10}
-                fontFamily="JetBrains Mono, ui-monospace, monospace"
+                fontFamily="JetBrains Mono, monospace"
               >
                 COST
               </text>
@@ -303,7 +303,7 @@ export const ModelCascadeCore: FC<ModelCascadeCoreProps> = ({
                 fill={model.color}
                 fontSize={14}
                 fontWeight="bold"
-                fontFamily="JetBrains Mono, ui-monospace, monospace"
+                fontFamily="JetBrains Mono, monospace"
               >
                 {model.cost}
               </text>
@@ -316,7 +316,7 @@ export const ModelCascadeCore: FC<ModelCascadeCoreProps> = ({
                 fontSize={22}
                 fontWeight="bold"
                 textAnchor="middle"
-                fontFamily="Rubik, ui-sans-serif, system-ui, sans-serif"
+                fontFamily="Inter, sans-serif"
               >
                 {model.label}
               </text>
@@ -326,7 +326,7 @@ export const ModelCascadeCore: FC<ModelCascadeCoreProps> = ({
                 fill={COLORS.textMuted}
                 fontSize={13}
                 textAnchor="middle"
-                fontFamily="JetBrains Mono, ui-monospace, monospace"
+                fontFamily="JetBrains Mono, monospace"
                 className="uppercase tracking-widest"
               >
                 // {model.desc}
@@ -346,7 +346,7 @@ export const ModelCascadeCore: FC<ModelCascadeCoreProps> = ({
                 y={0}
                 fill={COLORS.textMuted}
                 fontSize={10}
-                fontFamily="JetBrains Mono, ui-monospace, monospace"
+                fontFamily="JetBrains Mono, monospace"
               >
                 SPEED
               </text>
@@ -356,7 +356,7 @@ export const ModelCascadeCore: FC<ModelCascadeCoreProps> = ({
                 fill={model.color}
                 fontSize={14}
                 fontWeight="bold"
-                fontFamily="JetBrains Mono, ui-monospace, monospace"
+                fontFamily="JetBrains Mono, monospace"
               >
                 {model.speed}
               </text>
@@ -383,7 +383,7 @@ export const ModelCascadeCore: FC<ModelCascadeCoreProps> = ({
                     y={-29}
                     fill={model.color}
                     fontSize={8}
-                    fontFamily="JetBrains Mono, ui-monospace, monospace"
+                    fontFamily="JetBrains Mono, monospace"
                     fontWeight="bold"
                   >
                     ACTIVE

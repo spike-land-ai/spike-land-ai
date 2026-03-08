@@ -111,7 +111,7 @@ export function AttentionPie({ segments, size = 400, delay = 0 }: AttentionPiePr
             color: "white",
             fontSize: 24,
             fontWeight: 800,
-            fontFamily: "Rubik, ui-sans-serif, system-ui, sans-serif",
+            fontFamily: "Inter, sans-serif",
           }}
         >
           ATTENTION
@@ -121,7 +121,7 @@ export function AttentionPie({ segments, size = 400, delay = 0 }: AttentionPiePr
             color: COLORS.cyan,
             fontSize: 16,
             fontWeight: 500,
-            fontFamily: "Rubik, ui-sans-serif, system-ui, sans-serif",
+            fontFamily: "Inter, sans-serif",
             opacity: 0.7,
           }}
         >

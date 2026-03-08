@@ -121,7 +121,7 @@ function OldWayPanel({ opacity }: OldWayPanelProps) {
         <span
           style={{
             fontSize: 9,
-            fontFamily: "JetBrains Mono, ui-monospace, monospace",
+            fontFamily: "JetBrains Mono, monospace",
             fontWeight: 700,
             color: "rgba(239,68,68,0.8)",
             letterSpacing: "0.15em",
@@ -133,7 +133,7 @@ function OldWayPanel({ opacity }: OldWayPanelProps) {
         <span
           style={{
             fontSize: 8,
-            fontFamily: "JetBrains Mono, ui-monospace, monospace",
+            fontFamily: "JetBrains Mono, monospace",
             color: "hsl(var(--muted-foreground) / 0.4)",
             marginLeft: 8,
           }}
@@ -187,7 +187,7 @@ function OldWayPanel({ opacity }: OldWayPanelProps) {
                     fontSize: 10,
                     fontWeight: 700,
                     color: svc.color,
-                    fontFamily: "JetBrains Mono, ui-monospace, monospace",
+                    fontFamily: "JetBrains Mono, monospace",
                     lineHeight: 1.2,
                   }}
                 >
@@ -197,7 +197,7 @@ function OldWayPanel({ opacity }: OldWayPanelProps) {
                   style={{
                     fontSize: 8.5,
                     color: "hsl(var(--muted-foreground) / 0.7)",
-                    fontFamily: "JetBrains Mono, ui-monospace, monospace",
+                    fontFamily: "JetBrains Mono, monospace",
                   }}
                 >
                   {svc.sublabel}
@@ -258,7 +258,7 @@ function OldWayPanel({ opacity }: OldWayPanelProps) {
               <span
                 style={{
                   fontSize: 7.5,
-                  fontFamily: "JetBrains Mono, ui-monospace, monospace",
+                  fontFamily: "JetBrains Mono, monospace",
                   color: "hsl(var(--muted-foreground) / 0.5)",
                   letterSpacing: "0.06em",
                   textAlign: "center",
@@ -280,7 +280,7 @@ function OldWayPanel({ opacity }: OldWayPanelProps) {
               borderRadius: 4,
               padding: "2px 6px",
               fontSize: 7.5,
-              fontFamily: "JetBrains Mono, ui-monospace, monospace",
+              fontFamily: "JetBrains Mono, monospace",
               color: "rgba(239,68,68,0.7)",
               whiteSpace: "nowrap",
             }}
@@ -327,7 +327,7 @@ function SpacetimePanel({ opacity, glowLevel }: SpacetimePanelProps) {
         <span
           style={{
             fontSize: 9,
-            fontFamily: "JetBrains Mono, ui-monospace, monospace",
+            fontFamily: "JetBrains Mono, monospace",
             fontWeight: 700,
             color: `rgba(6,182,212,${0.6 + glowLevel * 0.3})`,
             letterSpacing: "0.15em",
@@ -340,7 +340,7 @@ function SpacetimePanel({ opacity, glowLevel }: SpacetimePanelProps) {
         <span
           style={{
             fontSize: 8,
-            fontFamily: "JetBrains Mono, ui-monospace, monospace",
+            fontFamily: "JetBrains Mono, monospace",
             color: "hsl(var(--muted-foreground) / 0.4)",
             marginLeft: 8,
           }}
@@ -414,7 +414,7 @@ function SpacetimePanel({ opacity, glowLevel }: SpacetimePanelProps) {
                   fontSize: 10,
                   fontWeight: 700,
                   color: table.color,
-                  fontFamily: "JetBrains Mono, ui-monospace, monospace",
+                  fontFamily: "JetBrains Mono, monospace",
                   lineHeight: 1.2,
                   textShadow: glowLevel > 0.6 ? `0 0 8px ${table.color}80` : "none",
                 }}
@@ -425,7 +425,7 @@ function SpacetimePanel({ opacity, glowLevel }: SpacetimePanelProps) {
                 style={{
                   fontSize: 8.5,
                   color: "hsl(var(--muted-foreground) / 0.7)",
-                  fontFamily: "JetBrains Mono, ui-monospace, monospace",
+                  fontFamily: "JetBrains Mono, monospace",
                 }}
               >
                 {table.sublabel}
@@ -435,7 +435,7 @@ function SpacetimePanel({ opacity, glowLevel }: SpacetimePanelProps) {
             <span
               style={{
                 fontSize: 7,
-                fontFamily: "JetBrains Mono, ui-monospace, monospace",
+                fontFamily: "JetBrains Mono, monospace",
                 color: `rgba(6,182,212,${0.4 + glowLevel * 0.35})`,
                 background: `rgba(6,182,212,${0.06 + glowLevel * 0.06})`,
                 border: `1px solid rgba(6,182,212,${0.15 + glowLevel * 0.15})`,
@@ -460,7 +460,7 @@ function SpacetimePanel({ opacity, glowLevel }: SpacetimePanelProps) {
           <span
             style={{
               fontSize: 7.5,
-              fontFamily: "JetBrains Mono, ui-monospace, monospace",
+              fontFamily: "JetBrains Mono, monospace",
               color: `rgba(6,182,212,${0.5 + glowLevel * 0.4})`,
               background: `rgba(6,182,212,${0.06 + glowLevel * 0.06})`,
               border: `1px solid rgba(6,182,212,${0.15 + glowLevel * 0.2})`,
@@ -517,7 +517,7 @@ function VsDivider({ progress }: VsDividerProps) {
           border: "1px solid rgba(148,163,184,0.15)",
           borderRadius: 6,
           fontSize: 9,
-          fontFamily: "JetBrains Mono, ui-monospace, monospace",
+          fontFamily: "JetBrains Mono, monospace",
           fontWeight: 700,
           color: "rgba(148,163,184,0.4)",
           letterSpacing: "0.1em",
@@ -565,7 +565,7 @@ function MetricBar({ progress }: MetricBarProps) {
       <span
         style={{
           fontSize: 9,
-          fontFamily: "JetBrains Mono, ui-monospace, monospace",
+          fontFamily: "JetBrains Mono, monospace",
           color: "rgba(148,163,184,0.5)",
           letterSpacing: "0.12em",
           textTransform: "uppercase",
@@ -614,7 +614,7 @@ function MetricBar({ progress }: MetricBarProps) {
       <span
         style={{
           fontSize: 11,
-          fontFamily: "JetBrains Mono, ui-monospace, monospace",
+          fontFamily: "JetBrains Mono, monospace",
           fontWeight: 700,
           color:
             reduceProgress > 0.5
@@ -632,7 +632,7 @@ function MetricBar({ progress }: MetricBarProps) {
       <span
         style={{
           fontSize: 8,
-          fontFamily: "JetBrains Mono, ui-monospace, monospace",
+          fontFamily: "JetBrains Mono, monospace",
           color: "rgba(148,163,184,0.3)",
           flexShrink: 0,
         }}

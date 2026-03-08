@@ -1,6 +1,6 @@
 <p align="center">
   <a href="https://spike.land">
-    <img src=".github/assets/hero-banner.svg" alt="spike.land — AI-Native Development Platform" width="100%" />
+    <img src="https://raw.githubusercontent.com/spike-land-ai/.github/main/assets/hero-banner.svg" alt="spike.land — AI-Native Development Platform" width="100%" />
   </a>
 </p>
 
@@ -36,19 +36,19 @@ See [docs/](docs/README.md) for full documentation.
 ---
 
 <p align="center">
-  <img src=".github/assets/stats-dashboard.svg" alt="Platform Stats" width="100%" />
+  <img src="https://raw.githubusercontent.com/spike-land-ai/.github/main/assets/stats-dashboard.svg" alt="Platform Stats" width="100%" />
 </p>
 
 ## Architecture
 
 <p align="center">
-  <img src=".github/assets/architecture.svg" alt="Architecture Diagram" width="100%" />
+  <img src="https://raw.githubusercontent.com/spike-land-ai/.github/main/assets/architecture.svg" alt="Architecture Diagram" width="100%" />
 </p>
 
 ## MCP Ecosystem
 
 <p align="center">
-  <img src=".github/assets/mcp-ecosystem.svg" alt="MCP Tool Ecosystem" width="680" />
+  <img src="https://raw.githubusercontent.com/spike-land-ai/.github/main/assets/mcp-ecosystem.svg" alt="MCP Tool Ecosystem" width="680" />
 </p>
 
 ## Packages
@@ -57,43 +57,43 @@ See [docs/](docs/README.md) for full documentation.
 
 | Package | Runtime | Description | Status |
 |---------|---------|-------------|--------|
-| [spike-app](src/frontend/platform-frontend) | Browser (Vite + TanStack Router) | **Frontend SPA**: Frontend with TanStack Router, Vite, and React. | [![CI](https://img.shields.io/github/actions/workflow/status/spike-land-ai/spike-land-ai/ci-publish.yml?branch=main&label=CI)](https://github.com/spike-land-ai/spike-land-ai/actions) |
-| [spike-edge](src/edge-api/main) | Cloudflare Workers | **Edge API**: Primary edge API service using Hono framework. | [![CI](https://img.shields.io/github/actions/workflow/status/spike-land-ai/spike-land-ai/ci-publish.yml?branch=main&label=CI)](https://github.com/spike-land-ai/spike-land-ai/actions) |
-| [spike-land-mcp](src/edge-api/spike-land) | CF Workers + D1 | **MCP Registry**: Tool registry with 80+ tools, D1-backed storage. | [![CI](https://img.shields.io/github/actions/workflow/status/spike-land-ai/spike-land-ai/ci-publish.yml?branch=main&label=CI)](https://github.com/spike-land-ai/spike-land-ai/actions) |
-| [mcp-auth](src/edge-api/auth) | Cloudflare Workers | **Auth Service**: Authentication MCP server using Better Auth + Drizzle. | [![CI](https://img.shields.io/github/actions/workflow/status/spike-land-ai/spike-land-ai/ci-publish.yml?branch=main&label=CI)](https://github.com/spike-land-ai/spike-land-ai/actions) |
-| [mcp-server-base](src/core/server-base) | Node.js | **MCP Utilities**: Shared base utilities for building MCP servers. | [![CI](https://img.shields.io/github/actions/workflow/status/spike-land-ai/spike-land-ai/ci-publish.yml?branch=main&label=CI)](https://github.com/spike-land-ai/spike-land-ai/actions) |
+| [spike-app](https://github.com/spike-land-ai/spike-app) | Browser (Vite + TanStack Router) | **Frontend SPA**: Frontend with TanStack Router, Vite, and React. | [![CI](https://img.shields.io/github/actions/workflow/status/spike-land-ai/spike-app/ci-publish.yml?branch=main&label=CI)](https://github.com/spike-land-ai/spike-app/actions) |
+| [spike-edge](https://github.com/spike-land-ai/spike-edge) | Cloudflare Workers | **Edge API**: Primary edge API service using Hono framework. | [![CI](https://img.shields.io/github/actions/workflow/status/spike-land-ai/spike-edge/ci-publish.yml?branch=main&label=CI)](https://github.com/spike-land-ai/spike-edge/actions) |
+| [spike-land-mcp](https://github.com/spike-land-ai/spike-land-mcp) | CF Workers + D1 | **MCP Registry**: Tool registry with 80+ tools, D1-backed storage. | [![CI](https://img.shields.io/github/actions/workflow/status/spike-land-ai/spike-land-mcp/ci-publish.yml?branch=main&label=CI)](https://github.com/spike-land-ai/spike-land-mcp/actions) |
+| [mcp-auth](https://github.com/spike-land-ai/mcp-auth) | Cloudflare Workers | **Auth Service**: Authentication MCP server using Better Auth + Drizzle. | [![CI](https://img.shields.io/github/actions/workflow/status/spike-land-ai/mcp-auth/ci-publish.yml?branch=main&label=CI)](https://github.com/spike-land-ai/mcp-auth/actions) |
+| [mcp-server-base](https://github.com/spike-land-ai/mcp-server-base) | Node.js | **MCP Utilities**: Shared base utilities for building MCP servers. | [![CI](https://img.shields.io/github/actions/workflow/status/spike-land-ai/mcp-server-base/ci-publish.yml?branch=main&label=CI)](https://github.com/spike-land-ai/mcp-server-base/actions) |
 
 ### Domain Packages
 
 | Package | Runtime | Description | Status |
 |---------|---------|-------------|--------|
-| [chess-engine](src/core/chess) | Node.js | **Chess Engine**: ELO rating engine with game, player, and challenge managers. | [![CI](https://img.shields.io/github/actions/workflow/status/spike-land-ai/spike-land-ai/ci-publish.yml?branch=main&label=CI)](https://github.com/spike-land-ai/spike-land-ai/actions) |
-| [qa-studio](src/core/browser-automation) | Node.js | **QA Automation**: Browser automation utilities built on Playwright. | [![CI](https://img.shields.io/github/actions/workflow/status/spike-land-ai/spike-land-ai/ci-publish.yml?branch=main&label=CI)](https://github.com/spike-land-ai/spike-land-ai/actions) |
-| [state-machine](src/core/statecharts) | Node.js | **Statecharts**: Statechart engine with guard parser and CLI. | [![CI](https://img.shields.io/github/actions/workflow/status/spike-land-ai/spike-land-ai/ci-publish.yml?branch=main&label=CI)](https://github.com/spike-land-ai/spike-land-ai/actions) |
+| [chess-engine](https://github.com/spike-land-ai/chess-engine) | Node.js | **Chess Engine**: ELO rating engine with game, player, and challenge managers. | [![CI](https://img.shields.io/github/actions/workflow/status/spike-land-ai/chess-engine/ci-publish.yml?branch=main&label=CI)](https://github.com/spike-land-ai/chess-engine/actions) |
+| [qa-studio](https://github.com/spike-land-ai/qa-studio) | Node.js | **QA Automation**: Browser automation utilities built on Playwright. | [![CI](https://img.shields.io/github/actions/workflow/status/spike-land-ai/qa-studio/ci-publish.yml?branch=main&label=CI)](https://github.com/spike-land-ai/qa-studio/actions) |
+| [state-machine](https://github.com/spike-land-ai/state-machine) | Node.js | **Statecharts**: Statechart engine with guard parser and CLI. | [![CI](https://img.shields.io/github/actions/workflow/status/spike-land-ai/state-machine/ci-publish.yml?branch=main&label=CI)](https://github.com/spike-land-ai/state-machine/actions) |
 
 ### Core Infrastructure
 
 | Package | Runtime | Description | Status |
 |---------|---------|-------------|--------|
-| [code](src/frontend/monaco-editor) | Browser (Vite) | **Code Editor**: A real-time collaborative code editor based on Monaco. Supports TypeScript and live preview for rapid prototyping. | [![CI](https://img.shields.io/github/actions/workflow/status/spike-land-ai/spike-land-ai/ci-publish.yml?branch=main&label=CI)](https://github.com/spike-land-ai/spike-land-ai/actions) |
-| [spike-land-backend](src/edge-api/backend) | Cloudflare Workers | **Edge Backend**: Main API services using Hono and Cloudflare Durable Objects. Handles real-time synchronization and state management. | [![CI](https://img.shields.io/github/actions/workflow/status/spike-land-ai/spike-land-ai/ci-publish.yml?branch=main&label=CI)](https://github.com/spike-land-ai/spike-land-ai/actions) |
-| [transpile](src/edge-api/transpile) | Cloudflare Workers | **Edge Transpilation**: High-speed JavaScript/TypeScript compilation service using `esbuild-wasm` running on the edge. | [![CI](https://img.shields.io/github/actions/workflow/status/spike-land-ai/spike-land-ai/ci-publish.yml?branch=main&label=CI)](https://github.com/spike-land-ai/spike-land-ai/actions) |
-| [react-ts-worker](src/core/react-engine) | Browser / Workers | **Custom React**: A from-scratch React implementation featuring a Fiber reconciler, lane-based scheduling, and multi-target rendering. | [![CI](https://img.shields.io/github/actions/workflow/status/spike-land-ai/spike-land-ai/ci-publish.yml?branch=main&label=CI)](https://github.com/spike-land-ai/spike-land-ai/actions) |
-| [esbuild-wasm](src/mcp-tools/esbuild-wasm) | Browser (WASM) | **WASM Build**: Cross-platform esbuild WASM binary distribution. | [![CI](https://img.shields.io/github/actions/workflow/status/spike-land-ai/spike-land-ai/ci-publish.yml?branch=main&label=CI)](https://github.com/spike-land-ai/spike-land-ai/actions) |
-| [esbuild-wasm-mcp](src/mcp-tools/esbuild-wasm) | Node.js | **Build MCP**: MCP server that provides full control over the esbuild-wasm lifecycle for agents to perform builds. | [![CI](https://img.shields.io/github/actions/workflow/status/spike-land-ai/spike-land-ai/ci-publish.yml?branch=main&label=CI)](https://github.com/spike-land-ai/spike-land-ai/actions) |
-| [shared](src/core/shared-utils) | isomorphic | **Core Logic**: Shared TypeScript types, validation logic (Zod), constants, and common utilities used across all packages. | [![CI](https://img.shields.io/github/actions/workflow/status/spike-land-ai/spike-land-ai/ci-publish.yml?branch=main&label=CI)](https://github.com/spike-land-ai/spike-land-ai/actions) |
+| [code](https://github.com/spike-land-ai/code) | Browser (Vite) | **Code Editor**: A real-time collaborative code editor based on Monaco. Supports TypeScript and live preview for rapid prototyping. | [![CI](https://img.shields.io/github/actions/workflow/status/spike-land-ai/code/ci-publish.yml?branch=main&label=CI)](https://github.com/spike-land-ai/code/actions) |
+| [spike-land-backend](https://github.com/spike-land-ai/spike-land-backend) | Cloudflare Workers | **Edge Backend**: Main API services using Hono and Cloudflare Durable Objects. Handles real-time synchronization and state management. | [![CI](https://img.shields.io/github/actions/workflow/status/spike-land-ai/spike-land-backend/ci-publish.yml?branch=main&label=CI)](https://github.com/spike-land-ai/spike-land-backend/actions) |
+| [transpile](https://github.com/spike-land-ai/transpile) | Cloudflare Workers | **Edge Transpilation**: High-speed JavaScript/TypeScript compilation service using `esbuild-wasm` running on the edge. | [![CI](https://img.shields.io/github/actions/workflow/status/spike-land-ai/transpile/ci-publish.yml?branch=main&label=CI)](https://github.com/spike-land-ai/transpile/actions) |
+| [react-ts-worker](https://github.com/spike-land-ai/react-ts-worker) | Browser / Workers | **Custom React**: A from-scratch React implementation featuring a Fiber reconciler, lane-based scheduling, and multi-target rendering. | [![CI](https://img.shields.io/github/actions/workflow/status/spike-land-ai/react-ts-worker/ci-publish.yml?branch=main&label=CI)](https://github.com/spike-land-ai/react-ts-worker/actions) |
+| [esbuild-wasm](https://github.com/spike-land-ai/esbuild-wasm) | Browser (WASM) | **WASM Build**: Cross-platform esbuild WASM binary distribution. | [![CI](https://img.shields.io/github/actions/workflow/status/spike-land-ai/esbuild-wasm/ci-publish.yml?branch=main&label=CI)](https://github.com/spike-land-ai/esbuild-wasm/actions) |
+| [esbuild-wasm-mcp](https://github.com/spike-land-ai/esbuild-wasm-mcp) | Node.js | **Build MCP**: MCP server that provides full control over the esbuild-wasm lifecycle for agents to perform builds. | [![CI](https://img.shields.io/github/actions/workflow/status/spike-land-ai/esbuild-wasm-mcp/ci-publish.yml?branch=main&label=CI)](https://github.com/spike-land-ai/esbuild-wasm-mcp/actions) |
+| [shared](https://github.com/spike-land-ai/shared) | isomorphic | **Core Logic**: Shared TypeScript types, validation logic (Zod), constants, and common utilities used across all packages. | [![CI](https://img.shields.io/github/actions/workflow/status/spike-land-ai/shared/ci-publish.yml?branch=main&label=CI)](https://github.com/spike-land-ai/shared/actions) |
 
 ### MCP Servers & Tools
 
 | Package | Runtime | Description | Status |
 |---------|---------|-------------|--------|
-| [spike-cli](src/cli/spike-cli) | Node.js CLI | **Command Line Hub**: A multiplexer CLI that aggregates multiple MCP servers into a single endpoint with an interactive chat interface powered by Claude. | [![CI](https://img.shields.io/github/actions/workflow/status/spike-land-ai/spike-land-ai/ci-publish.yml?branch=main&label=CI)](https://github.com/spike-land-ai/spike-land-ai/actions) |
-| [mcp-image-studio](src/mcp-tools/image-studio) | Node.js | **Pixel Studio**: Advanced image management and enhancement MCP server. Provides ~42 tools for generation, upscaling, background removal, and album management. | [![CI](https://img.shields.io/github/actions/workflow/status/spike-land-ai/spike-land-ai/ci-publish.yml?branch=main&label=CI)](https://github.com/spike-land-ai/spike-land-ai/actions) |
-| [spike-review](src/mcp-tools/code-review) | Node.js | **Review Bot**: Branded AI code review assistant that enforces BAZDMEG quality gates across the entire org. | [![CI](https://img.shields.io/github/actions/workflow/status/spike-land-ai/spike-land-ai/ci-publish.yml?branch=main&label=CI)](https://github.com/spike-land-ai/spike-land-ai/actions) |
-| [hackernews-mcp](src/mcp-tools/hackernews) | Node.js | **HN Integration**: Specialized MCP server for reading and interacting with HackerNews. | [![CI](https://img.shields.io/github/actions/workflow/status/spike-land-ai/spike-land-ai/ci-publish.yml?branch=main&label=CI)](https://github.com/spike-land-ai/spike-land-ai/actions) |
-| [openclaw-mcp](src/mcp-tools/openclaw) | Node.js | **OpenClaw Bridge**: Standalone MCP bridge providing interoperability with the OpenClaw gateway. | [![CI](https://img.shields.io/github/actions/workflow/status/spike-land-ai/spike-land-ai/ci-publish.yml?branch=main&label=CI)](https://github.com/spike-land-ai/spike-land-ai/actions) |
-| [vibe-dev](src/cli/docker-dev) | Node.js CLI | **Vibe Workflow**: Docker-based development workflow optimizer for vibe-coded applications. | [![CI](https://img.shields.io/github/actions/workflow/status/spike-land-ai/spike-land-ai/ci-publish.yml?branch=main&label=CI)](https://github.com/spike-land-ai/spike-land-ai/actions) |
-| [video](src/media/educational-videos) | Remotion | **Programmatic Video**: Educational and promotional video assets built using React and Remotion. | [![CI](https://img.shields.io/github/actions/workflow/status/spike-land-ai/spike-land-ai/ci-publish.yml?branch=main&label=CI)](https://github.com/spike-land-ai/spike-land-ai/actions) |
+| [spike-cli](https://github.com/spike-land-ai/spike-cli) | Node.js CLI | **Command Line Hub**: A multiplexer CLI that aggregates multiple MCP servers into a single endpoint with an interactive chat interface powered by Claude. | [![CI](https://img.shields.io/github/actions/workflow/status/spike-land-ai/spike-cli/ci-publish.yml?branch=main&label=CI)](https://github.com/spike-land-ai/spike-cli/actions) |
+| [mcp-image-studio](https://github.com/spike-land-ai/mcp-image-studio) | Node.js | **Pixel Studio**: Advanced image management and enhancement MCP server. Provides ~42 tools for generation, upscaling, background removal, and album management. | [![CI](https://img.shields.io/github/actions/workflow/status/spike-land-ai/mcp-image-studio/ci-publish.yml?branch=main&label=CI)](https://github.com/spike-land-ai/mcp-image-studio/actions) |
+| [spike-review](https://github.com/spike-land-ai/spike-review) | Node.js | **Review Bot**: Branded AI code review assistant that enforces BAZDMEG quality gates across the entire org. | [![CI](https://img.shields.io/github/actions/workflow/status/spike-land-ai/spike-review/ci-publish.yml?branch=main&label=CI)](https://github.com/spike-land-ai/spike-review/actions) |
+| [hackernews-mcp](https://github.com/spike-land-ai/hackernews-mcp) | Node.js | **HN Integration**: Specialized MCP server for reading and interacting with HackerNews. | [![CI](https://img.shields.io/github/actions/workflow/status/spike-land-ai/hackernews-mcp/ci-publish.yml?branch=main&label=CI)](https://github.com/spike-land-ai/hackernews-mcp/actions) |
+| [openclaw-mcp](https://github.com/spike-land-ai/openclaw-mcp) | Node.js | **OpenClaw Bridge**: Standalone MCP bridge providing interoperability with the OpenClaw gateway. | [![CI](https://img.shields.io/github/actions/workflow/status/spike-land-ai/openclaw-mcp/ci-publish.yml?branch=main&label=CI)](https://github.com/spike-land-ai/openclaw-mcp/actions) |
+| [vibe-dev](https://github.com/spike-land-ai/vibe-dev) | Node.js CLI | **Vibe Workflow**: Docker-based development workflow optimizer for vibe-coded applications. | [![CI](https://img.shields.io/github/actions/workflow/status/spike-land-ai/vibe-dev/ci-publish.yml?branch=main&label=CI)](https://github.com/spike-land-ai/vibe-dev/actions) |
+| [video](https://github.com/spike-land-ai/video) | Remotion | **Programmatic Video**: Educational and promotional video assets built using React and Remotion. | [![CI](https://img.shields.io/github/actions/workflow/status/spike-land-ai/video/ci-publish.yml?branch=main&label=CI)](https://github.com/spike-land-ai/video/actions) |
 
 ## Repository Deep Dive
 
@@ -164,7 +164,7 @@ make health
 ## CI/CD Pipeline
 
 <p align="center">
-  <img src=".github/assets/ci-pipeline.svg" alt="CI/CD Pipeline" width="100%" />
+  <img src="https://raw.githubusercontent.com/spike-land-ai/.github/main/assets/ci-pipeline.svg" alt="CI/CD Pipeline" width="100%" />
 </p>
 
 All packages share a reusable workflow at `.github/.github/workflows/ci-publish.yml` running on Node 24. Changesets manages versioning; packages publish to GitHub Packages on every merge to `main`.
@@ -172,7 +172,7 @@ All packages share a reusable workflow at `.github/.github/workflows/ci-publish.
 ## Dependency Cascade
 
 <p align="center">
-  <img src=".github/assets/dependency-flow.svg" alt="Dependency Cascade" width="100%" />
+  <img src="https://raw.githubusercontent.com/spike-land-ai/.github/main/assets/dependency-flow.svg" alt="Dependency Cascade" width="100%" />
 </p>
 
 Publishing any `@spike-land-ai/*` package triggers automated PRs in downstream repos. The DAG is defined in `.github/dependency-map.json`. Check for drift locally:

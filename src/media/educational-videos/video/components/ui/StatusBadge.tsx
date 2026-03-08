@@ -40,7 +40,7 @@ export function StatusBadge({ status, delay = 0 }: StatusBadgeProps) {
         color: style.bg,
         fontSize: 14,
         fontWeight: 600,
-        fontFamily: "Rubik, ui-sans-serif, system-ui, sans-serif",
+        fontFamily: "Inter, sans-serif",
         transform: `scale(${entry})`,
         opacity: entry,
         boxShadow: glow,

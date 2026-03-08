@@ -69,7 +69,7 @@ export const CostValueChart: FC<CostValueChartProps> = ({ delay = 0 }) => {
           fontSize: 24,
           fontWeight: 700,
           color: COLORS.textPrimary,
-          fontFamily: "Rubik, ui-sans-serif, system-ui, sans-serif",
+          fontFamily: "Inter, sans-serif",
           opacity: titleProgress,
         }}
       >
@@ -99,7 +99,7 @@ export const CostValueChart: FC<CostValueChartProps> = ({ delay = 0 }) => {
               fontSize: 18,
               fontWeight: 700,
               color: COLORS.amber,
-              fontFamily: "JetBrains Mono, ui-monospace, monospace",
+              fontFamily: "JetBrains Mono, monospace",
               opacity: costLabelOpacity,
             }}
           >
@@ -119,7 +119,7 @@ export const CostValueChart: FC<CostValueChartProps> = ({ delay = 0 }) => {
               fontSize: 14,
               fontWeight: 600,
               color: COLORS.textSecondary,
-              fontFamily: "Rubik, ui-sans-serif, system-ui, sans-serif",
+              fontFamily: "Inter, sans-serif",
               textAlign: "center",
             }}
           >
@@ -129,7 +129,7 @@ export const CostValueChart: FC<CostValueChartProps> = ({ delay = 0 }) => {
             style={{
               fontSize: 12,
               color: COLORS.textMuted,
-              fontFamily: "Rubik, ui-sans-serif, system-ui, sans-serif",
+              fontFamily: "Inter, sans-serif",
               opacity: costLabelOpacity,
             }}
           >
@@ -151,7 +151,7 @@ export const CostValueChart: FC<CostValueChartProps> = ({ delay = 0 }) => {
               fontSize: 18,
               fontWeight: 700,
               color: COLORS.success,
-              fontFamily: "JetBrains Mono, ui-monospace, monospace",
+              fontFamily: "JetBrains Mono, monospace",
               opacity: valueLabelOpacity,
             }}
           >
@@ -171,7 +171,7 @@ export const CostValueChart: FC<CostValueChartProps> = ({ delay = 0 }) => {
               fontSize: 14,
               fontWeight: 600,
               color: COLORS.textSecondary,
-              fontFamily: "Rubik, ui-sans-serif, system-ui, sans-serif",
+              fontFamily: "Inter, sans-serif",
               textAlign: "center",
             }}
           >
@@ -181,7 +181,7 @@ export const CostValueChart: FC<CostValueChartProps> = ({ delay = 0 }) => {
             style={{
               fontSize: 12,
               color: COLORS.textMuted,
-              fontFamily: "Rubik, ui-sans-serif, system-ui, sans-serif",
+              fontFamily: "Inter, sans-serif",
               opacity: valueLabelOpacity,
             }}
           >
@@ -196,7 +196,7 @@ export const CostValueChart: FC<CostValueChartProps> = ({ delay = 0 }) => {
           fontSize: 18,
           fontWeight: 600,
           color: COLORS.success,
-          fontFamily: "Rubik, ui-sans-serif, system-ui, sans-serif",
+          fontFamily: "Inter, sans-serif",
           opacity: annotationOpacity,
           marginTop: 8,
         }}

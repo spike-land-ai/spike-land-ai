@@ -48,7 +48,7 @@ export const PhysicsMapping: FC<PhysicsMappingProps> = ({ delay = 0, revealCount
           fontWeight: 700,
           letterSpacing: 1.5,
           color: COLORS.textMuted,
-          fontFamily: "JetBrains Mono, ui-monospace, monospace",
+          fontFamily: "JetBrains Mono, monospace",
           textTransform: "uppercase",
           opacity: spring({
             frame: frame - delay,
@@ -70,7 +70,7 @@ export const PhysicsMapping: FC<PhysicsMappingProps> = ({ delay = 0, revealCount
           fontWeight: 700,
           letterSpacing: 1.5,
           color: COLORS.textMuted,
-          fontFamily: "JetBrains Mono, ui-monospace, monospace",
+          fontFamily: "JetBrains Mono, monospace",
           textTransform: "uppercase",
           opacity: spring({
             frame: frame - delay,
@@ -174,7 +174,7 @@ export const PhysicsMapping: FC<PhysicsMappingProps> = ({ delay = 0, revealCount
                 fontSize: 16,
                 fontWeight: 600,
                 color: COLORS.purple,
-                fontFamily: "Rubik, ui-sans-serif, system-ui, sans-serif",
+                fontFamily: "Inter, sans-serif",
                 opacity: progress,
                 transform: `translateX(${(1 - progress) * -40}px)`,
               }}
@@ -199,7 +199,7 @@ export const PhysicsMapping: FC<PhysicsMappingProps> = ({ delay = 0, revealCount
                 fontSize: 16,
                 fontWeight: 600,
                 color: COLORS.cyan,
-                fontFamily: "Rubik, ui-sans-serif, system-ui, sans-serif",
+                fontFamily: "Inter, sans-serif",
                 opacity: progress,
                 transform: `translateX(${(1 - progress) * 40}px)`,
               }}

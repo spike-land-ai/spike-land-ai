@@ -1,5 +1,5 @@
 import { type FC, useId } from "react";
-import { COLORS, VERITASIUM_COLORS } from "../core-logic/constants";
+import { COLORS } from "../core-logic/constants";
 import { clamp } from "../core-logic/animation-utils";
 
 export type AgentState = "planning" | "generating" | "transpiling" | "fixing" | "learning";
@@ -20,33 +20,33 @@ const STATE_CONFIG: Record<
   planning: {
     label: "Planning",
     angle: -Math.PI / 2,
-    color: VERITASIUM_COLORS.planning,
+    color: "#3b82f6",
     icon: "M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6",
-  },
+  }, // Blue
   generating: {
     label: "Generating",
     angle: -Math.PI / 10,
-    color: VERITASIUM_COLORS.generating,
+    color: "#8b5cf6",
     icon: "M12 2L2 22l10-4 10 4L12 2z",
-  },
+  }, // Violet
   transpiling: {
     label: "Transpiling",
     angle: (3 * Math.PI) / 10,
-    color: VERITASIUM_COLORS.transpiling,
+    color: "#d946ef",
     icon: "M4 17l6-6-6-6M12 19h8",
-  },
+  }, // Fuchsia
   fixing: {
     label: "Fixing",
     angle: (7 * Math.PI) / 10,
-    color: VERITASIUM_COLORS.fixing,
+    color: "#ef4444",
     icon: "M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z",
-  },
+  }, // Red
   learning: {
     label: "Learning",
     angle: (11 * Math.PI) / 10,
-    color: VERITASIUM_COLORS.learning,
+    color: "#10b981",
     icon: "M22 12h-4l-3 9L9 3l-3 9H2",
-  },
+  }, // Emerald
 };
 
 const ORDERED_STATES: AgentState[] = [
@@ -81,7 +81,7 @@ export const AgentLoopCore: FC<AgentLoopCoreProps> = ({
       preserveAspectRatio="xMidYMid meet"
       style={{
         background: COLORS.darkBg,
-        fontFamily: "Rubik, ui-sans-serif, system-ui, sans-serif",
+        fontFamily: "Inter, sans-serif",
       }}
     >
       <defs>
@@ -309,7 +309,7 @@ export const AgentLoopCore: FC<AgentLoopCoreProps> = ({
                 <path
                   d={config.icon}
                   fill="none"
-                  stroke={isActive ? COLORS.textPrimary : config.color}
+                  stroke={isActive ? "#fff" : config.color}
                   strokeWidth={2}
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -320,7 +320,7 @@ export const AgentLoopCore: FC<AgentLoopCoreProps> = ({
               <text
                 y={20}
                 textAnchor="middle"
-                fill={isActive ? COLORS.textPrimary : COLORS.textMuted}
+                fill={isActive ? "#fff" : COLORS.textMuted}
                 fontSize={11}
                 fontWeight={isActive ? 700 : 500}
                 letterSpacing={1}

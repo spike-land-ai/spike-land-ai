@@ -20,7 +20,7 @@ const mockPrisma = vi.hoisted(() => ({
   },
 }));
 
-vi.mock("@/core-logic/prisma", () => ({ default: mockPrisma }));
+vi.mock("@/lib/prisma", () => ({ default: mockPrisma }));
 
 const mockEngine = vi.hoisted(() => ({
   createGame: vi.fn(),
@@ -28,13 +28,13 @@ const mockEngine = vi.hoisted(() => ({
   getGameState: vi.fn(),
 }));
 
-vi.mock("../../src/core/chess/chess-core/engine", () => mockEngine);
+vi.mock("../../src/core/chess/engine", () => mockEngine);
 
 const mockElo = vi.hoisted(() => ({
   calculateEloChange: vi.fn(),
 }));
 
-vi.mock("../../src/core/chess/lazy-imports/elo", () => mockElo);
+vi.mock("../../src/core/chess/elo", () => mockElo);
 
 import {
   acceptDraw,

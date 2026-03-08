@@ -13,8 +13,6 @@ import type { DrizzleDB } from "../../db/db-index.ts";
 import { personaAuditBatches, personaAuditResults } from "../../db/schema";
 import { PERSONAS } from "../../../core-logic/lib/persona-data";
 
-const PERSONAS_BY_SLUG = new Map(PERSONAS.map((p) => [p.slug, p]));
-
 const SEGMENTS: Record<string, string[]> = {
   Developer: [
     "ai-indie",
@@ -144,7 +142,7 @@ export function registerAuditQuestionnaireTools(
         const header = "| Persona | UX | Content | CTA | Apps | Sign Up | Blockers |";
         const divider = "|---------|----|---------| ----|------|---------|----------|";
         const rows = results.map((r) => {
-          const persona = PERSONAS_BY_SLUG.get(r.personaSlug);
+          const persona = PERSONAS.find((p) => p.slug === r.personaSlug);
           const name = persona ? persona.name : r.personaSlug;
           const signUp = r.wouldSignUp ? "Yes" : "No";
           const blockers = r.blockers || "-";
@@ -219,7 +217,7 @@ export function registerAuditQuestionnaireTools(
         const scored = results.map((r) => {
           const avg =
             (r.uxScore + r.contentRelevance + r.ctaCompelling + r.recommendedAppsRelevant) / 4;
-          const persona = PERSONAS_BY_SLUG.get(r.personaSlug);
+          const persona = PERSONAS.find((p) => p.slug === r.personaSlug);
           return { slug: r.personaSlug, name: persona ? persona.name : r.personaSlug, avg };
         });
         scored.sort((a, b) => b.avg - a.avg);

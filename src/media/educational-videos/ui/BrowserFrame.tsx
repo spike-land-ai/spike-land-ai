@@ -79,7 +79,7 @@ export const BrowserFrame: FC<BrowserFrameProps> = ({
             padding: "0 12px",
             fontSize: 12,
             color: COLORS.textSecondary,
-            fontFamily: "Rubik, ui-sans-serif, system-ui, sans-serif",
+            fontFamily: "Inter, sans-serif",
             border: `1px solid ${COLORS.darkBorder}`,
           }}
         >

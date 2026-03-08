@@ -1,10 +1,10 @@
 /**
- * Google Ads API v19 client using native fetch.
+ * Google Ads API v17 client using native fetch.
  */
 
 import type { GoogleAdsAuthClient } from "./google-oauth.js";
 
-const API_BASE = "https://googleads.googleapis.com/v19";
+const API_BASE = "https://googleads.googleapis.com/v17";
 
 interface SearchStreamResponse {
   results?: unknown[];

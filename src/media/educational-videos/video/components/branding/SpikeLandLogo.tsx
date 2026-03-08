@@ -98,7 +98,7 @@ export function SpikeLandLogo({
             style={{
               fontSize: size * 0.5,
               fontWeight: 700,
-              fontFamily: "Rubik, ui-sans-serif, system-ui, sans-serif",
+              fontFamily: "Inter, sans-serif",
               color: COLORS.textPrimary,
               letterSpacing: "-0.02em",
             }}
@@ -152,7 +152,7 @@ export function LogoWithTagline({
           transform: `translateY(${taglineY}px)`,
           fontSize: 24,
           color: COLORS.textSecondary,
-          fontFamily: "Rubik, ui-sans-serif, system-ui, sans-serif",
+          fontFamily: "Inter, sans-serif",
           fontWeight: 500,
           letterSpacing: "0.02em",
         }}

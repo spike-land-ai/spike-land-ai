@@ -31,7 +31,7 @@ export const LivePreviewMockup: FC<LivePreviewMockupProps> = ({ delay = 0 }) => 
         borderRadius: 12,
         padding: 24,
         width: "100%",
-        fontFamily: "Rubik, ui-sans-serif, system-ui, sans-serif",
+        fontFamily: "Inter, sans-serif",
       }}
     >
       <div

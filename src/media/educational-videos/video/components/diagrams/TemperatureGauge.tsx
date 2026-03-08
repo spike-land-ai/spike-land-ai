@@ -177,7 +177,7 @@ export const TemperatureGauge: FC<TemperatureGaugeProps> = ({ delay = 0, showLab
                 fontSize: 22,
                 fontWeight: 700,
                 color: gauge.fillColor,
-                fontFamily: "Rubik, ui-sans-serif, system-ui, sans-serif",
+                fontFamily: "Inter, sans-serif",
                 opacity: entryProgress,
               }}
             >
@@ -197,7 +197,7 @@ export const TemperatureGauge: FC<TemperatureGaugeProps> = ({ delay = 0, showLab
                 fontSize: 28,
                 fontWeight: 800,
                 color: gauge.fillColor,
-                fontFamily: "JetBrains Mono, ui-monospace, monospace",
+                fontFamily: "JetBrains Mono, monospace",
                 opacity: entryProgress,
               }}
             >
@@ -210,7 +210,7 @@ export const TemperatureGauge: FC<TemperatureGaugeProps> = ({ delay = 0, showLab
                 fontSize: 16,
                 fontWeight: 600,
                 color: COLORS.textSecondary,
-                fontFamily: "Rubik, ui-sans-serif, system-ui, sans-serif",
+                fontFamily: "Inter, sans-serif",
                 padding: "4px 16px",
                 borderRadius: 12,
                 background: `${gauge.fillColor}10`,

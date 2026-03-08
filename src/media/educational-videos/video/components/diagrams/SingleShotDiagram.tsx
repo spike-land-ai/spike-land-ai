@@ -47,7 +47,7 @@ export const SingleShotDiagram: FC<SingleShotDiagramProps> = ({ delay = 0, attem
             fontSize: 18,
             fontWeight: 600,
             color: COLORS.purple,
-            fontFamily: "Rubik, ui-sans-serif, system-ui, sans-serif",
+            fontFamily: "Inter, sans-serif",
           }}
         >
           Prompt
@@ -77,7 +77,7 @@ export const SingleShotDiagram: FC<SingleShotDiagramProps> = ({ delay = 0, attem
             fontSize: 18,
             fontWeight: 600,
             color: COLORS.cyan,
-            fontFamily: "Rubik, ui-sans-serif, system-ui, sans-serif",
+            fontFamily: "Inter, sans-serif",
           }}
         >
           AI Model
@@ -107,7 +107,7 @@ export const SingleShotDiagram: FC<SingleShotDiagramProps> = ({ delay = 0, attem
             fontSize: 18,
             fontWeight: 600,
             color: COLORS.textSecondary,
-            fontFamily: "Rubik, ui-sans-serif, system-ui, sans-serif",
+            fontFamily: "Inter, sans-serif",
           }}
         >
           Code
@@ -190,7 +190,7 @@ export const SingleShotDiagram: FC<SingleShotDiagramProps> = ({ delay = 0, attem
             style={{
               fontSize: 14,
               color: COLORS.textSecondary,
-              fontFamily: "Rubik, ui-sans-serif, system-ui, sans-serif",
+              fontFamily: "Inter, sans-serif",
             }}
           >
             Success (~60%)
@@ -215,7 +215,7 @@ export const SingleShotDiagram: FC<SingleShotDiagramProps> = ({ delay = 0, attem
             style={{
               fontSize: 14,
               color: COLORS.textSecondary,
-              fontFamily: "Rubik, ui-sans-serif, system-ui, sans-serif",
+              fontFamily: "Inter, sans-serif",
             }}
           >
             Failure → Trash

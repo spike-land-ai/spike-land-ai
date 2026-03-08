@@ -242,7 +242,7 @@ function ServiceBoxCard({
             fontSize: 11,
             fontWeight: 700,
             color: service.color,
-            fontFamily: "JetBrains Mono, ui-monospace, monospace",
+            fontFamily: "JetBrains Mono, monospace",
             letterSpacing: "0.06em",
           }}
         >
@@ -252,7 +252,7 @@ function ServiceBoxCard({
           style={{
             fontSize: 8.5,
             color: "hsl(var(--muted-foreground) / 0.7)",
-            fontFamily: "JetBrains Mono, ui-monospace, monospace",
+            fontFamily: "JetBrains Mono, monospace",
             textAlign: "center",
             padding: "0 4px",
           }}
@@ -332,7 +332,7 @@ function SpacetimeBox({ progress }: SpacetimeBoxProps) {
           <div
             style={{
               fontSize: 11,
-              fontFamily: "JetBrains Mono, ui-monospace, monospace",
+              fontFamily: "JetBrains Mono, monospace",
               color: "rgba(6,182,212,0.6)",
               letterSpacing: "0.18em",
               textTransform: "uppercase",
@@ -346,7 +346,7 @@ function SpacetimeBox({ progress }: SpacetimeBoxProps) {
               fontSize: 26,
               fontWeight: 800,
               color: "#06b6d4",
-              fontFamily: "Rubik, ui-sans-serif, system-ui, sans-serif",
+              fontFamily: "Inter, sans-serif",
               letterSpacing: "-0.02em",
               textShadow: `0 0 ${20 * glowIntensity}px rgba(6,182,212,0.6)`,
             }}
@@ -369,7 +369,7 @@ function SpacetimeBox({ progress }: SpacetimeBoxProps) {
                 display: "flex",
                 alignItems: "baseline",
                 gap: 5,
-                fontFamily: "JetBrains Mono, ui-monospace, monospace",
+                fontFamily: "JetBrains Mono, monospace",
               }}
             >
               <span
@@ -434,7 +434,7 @@ function PhaseLabel({ progress }: PhaseLabel) {
               background: "rgba(239,68,68,0.08)",
               border: "1px solid rgba(239,68,68,0.25)",
               borderRadius: 20,
-              fontFamily: "JetBrains Mono, ui-monospace, monospace",
+              fontFamily: "JetBrains Mono, monospace",
               fontSize: 9,
               fontWeight: 700,
               color: "rgba(239,68,68,0.8)",
@@ -468,7 +468,7 @@ function PhaseLabel({ progress }: PhaseLabel) {
               background: "rgba(6,182,212,0.08)",
               border: "1px solid rgba(6,182,212,0.3)",
               borderRadius: 20,
-              fontFamily: "JetBrains Mono, ui-monospace, monospace",
+              fontFamily: "JetBrains Mono, monospace",
               fontSize: 9,
               fontWeight: 700,
               color: "rgba(6,182,212,0.9)",

@@ -54,7 +54,7 @@ describe("listTools", () => {
     expect(global.fetch).toHaveBeenCalledWith("/api/tools", expect.objectContaining({
       headers: expect.objectContaining({
         "Content-Type": "application/json",
-        "Authorization": "Bearer demo"
+        "Authorization": "Bearer test-token"
       })
     }));
 

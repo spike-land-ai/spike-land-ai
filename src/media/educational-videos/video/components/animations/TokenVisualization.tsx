@@ -97,7 +97,7 @@ export function TokenVisualization({
                   border: `1px solid ${COLORS.darkBorder}`,
                   borderRadius: 8,
                   color: COLORS.textPrimary,
-                  fontFamily: "JetBrains Mono, ui-monospace, monospace",
+                  fontFamily: "JetBrains Mono, monospace",
                   fontSize: 24,
                   whiteSpace: "nowrap",
                 }}
@@ -137,7 +137,7 @@ export function TokenVisualization({
                       border: `2px solid ${bgColor > 0.5 ? color : COLORS.darkBorder}`,
                       borderRadius: 6,
                       color: bgColor > 0.5 ? color : COLORS.textPrimary,
-                      fontFamily: "JetBrains Mono, ui-monospace, monospace",
+                      fontFamily: "JetBrains Mono, monospace",
                       fontSize: 22,
                       fontWeight: 600,
                       whiteSpace: "nowrap",
@@ -164,7 +164,7 @@ export function TokenVisualization({
             textAlign: "center",
             color: COLORS.textSecondary,
             fontSize: 18,
-            fontFamily: "JetBrains Mono, ui-monospace, monospace",
+            fontFamily: "JetBrains Mono, monospace",
             opacity: splitPhaseProgress,
           }}
         >

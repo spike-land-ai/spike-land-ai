@@ -66,8 +66,8 @@ Many Monaco related objects often implement the `.dispose()` method. This method
 
 ## Documentation
 
-- Learn how to integrate the editor with these [complete samples](https://github.com/microsoft/monaco-editor/tree/main/samples).
-  - [Integrate the ESM version](https://github.com/microsoft/monaco-editor/blob/main/docs/integrate-esm.md)
+- Learn how to integrate the editor with these [complete samples](./samples/).
+  - [Integrate the ESM version](./docs/integrate-esm.md)
 - Learn how to use the editor API and try out your own customizations in the [playground](https://microsoft.github.io/monaco-editor/playground.html).
 - Explore the [API docs](https://microsoft.github.io/monaco-editor/docs.html) or read them straight from [`monaco.d.ts`](https://github.com/microsoft/monaco-editor/blob/gh-pages/node_modules/monaco-editor/monaco.d.ts).
 - Read [this guide](https://github.com/microsoft/monaco-editor/wiki/Accessibility-Guide-for-Integrators) to ensure the editor is accessible to all your users!

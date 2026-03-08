@@ -33,8 +33,11 @@ describe("client", () => {
     });
 
     it("should include gemini key and image model in headers if present in storage", async () => {
-      vi.spyOn(Storage.prototype, "getItem").mockImplementation((key) => {
+      vi.spyOn(sessionStorage, "getItem").mockImplementation((key) => {
         if (key === "gemini_api_key") return "test-gemini-key";
+        return null;
+      });
+      vi.spyOn(localStorage, "getItem").mockImplementation((key) => {
         if (key === "pref_image_model") return "test-image-model";
         return null;
       });
@@ -47,14 +50,15 @@ describe("client", () => {
 
       await deleteGalleryImage("test-image-id");
 
-      expect(mockFetch).toHaveBeenCalledWith("/api/gallery/image/test-image-id", expect.objectContaining({
+      expect(mockFetch).toHaveBeenCalledWith("/api/gallery/image/test-image-id", {
         method: "DELETE",
-        headers: expect.objectContaining({
+        headers: {
           "Content-Type": "application/json",
+          Authorization: "Bearer demo",
           "X-Gemini-Key": "test-gemini-key",
           "X-Image-Model": "test-image-model",
-        }),
-      }));
+        },
+      });
     });
 
     it("should throw an error if the response is not ok", async () => {

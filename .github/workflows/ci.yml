@@ -217,10 +217,6 @@ jobs:
 
       - name: Build spike-app SPA
         run: cd packages/spike-app && npm run build
-        env:
-          VITE_GOOGLE_TAG_ID: GT-TQK4WH8K
-          VITE_GA4_MEASUREMENT_ID: G-9WNEM9ZHE7
-          VITE_GOOGLE_ADS_ID: AW-17978085462
 
       - name: Deploy spike-app SPA
         run: bash packages/spike-app/deploy.sh

@@ -164,7 +164,7 @@ export class PuppeteerAdapter implements BrowserAdapter {
 
   async launch(): Promise<void> {
     if (this._browser?.isConnected()) return;
-    const puppeteer = await import("@cloudflare/puppeteer" as string);
+    const puppeteer = await import("@cloudflare/puppeteer");
     this._browser = (await (puppeteer.default ?? puppeteer).launch(
       this._browserBinding,
     )) as unknown as PuppeteerBrowser;

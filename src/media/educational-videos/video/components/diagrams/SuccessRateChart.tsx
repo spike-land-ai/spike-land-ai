@@ -52,7 +52,7 @@ export const SuccessRateChart: FC<SuccessRateChartProps> = ({ delay = 0, revealC
           fontSize: 24,
           fontWeight: 700,
           color: COLORS.textPrimary,
-          fontFamily: "Rubik, ui-sans-serif, system-ui, sans-serif",
+          fontFamily: "Inter, sans-serif",
           opacity: spring({
             frame: frame - delay,
             fps,
@@ -104,7 +104,7 @@ export const SuccessRateChart: FC<SuccessRateChartProps> = ({ delay = 0, revealC
                   fontSize: 36,
                   fontWeight: 800,
                   color: bar.color,
-                  fontFamily: "JetBrains Mono, ui-monospace, monospace",
+                  fontFamily: "JetBrains Mono, monospace",
                   opacity: valueOpacity,
                 }}
               >
@@ -144,7 +144,7 @@ export const SuccessRateChart: FC<SuccessRateChartProps> = ({ delay = 0, revealC
                   fontSize: 16,
                   fontWeight: 600,
                   color: COLORS.textPrimary,
-                  fontFamily: "Rubik, ui-sans-serif, system-ui, sans-serif",
+                  fontFamily: "Inter, sans-serif",
                   textAlign: "center",
                 }}
               >
@@ -154,7 +154,7 @@ export const SuccessRateChart: FC<SuccessRateChartProps> = ({ delay = 0, revealC
                 style={{
                   fontSize: 12,
                   color: COLORS.textMuted,
-                  fontFamily: "Rubik, ui-sans-serif, system-ui, sans-serif",
+                  fontFamily: "Inter, sans-serif",
                   textAlign: "center",
                 }}
               >

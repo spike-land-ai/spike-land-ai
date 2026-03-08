@@ -52,7 +52,7 @@ export async function createGameRecord(
   whitePlayerId: string,
   timeControl: string = "BLITZ_5",
 ): Promise<{ id: string }> {
-  const prisma = (await import("@/core-logic/prisma")).default;
+  const prisma = (await import("./prisma")).default;
   const timeMs = TIME_CONTROL_MS[timeControl] ?? TIME_CONTROL_MS.BLITZ_5;
 
   const resolvedTimeMs = timeMs ?? 300_000;
@@ -61,7 +61,7 @@ export async function createGameRecord(
       whitePlayerId,
       status: "WAITING",
       fen: INITIAL_FEN,
-      timeControl: timeControl as import("@/core-logic/prisma").ChessTimeControl,
+      timeControl: timeControl as import("./prisma").ChessTimeControl,
       whiteTimeMs: resolvedTimeMs,
       blackTimeMs: resolvedTimeMs,
     },
@@ -71,7 +71,7 @@ export async function createGameRecord(
 }
 
 export async function joinGame(gameId: string, blackPlayerId: string): Promise<{ id: string }> {
-  const prisma = (await import("@/core-logic/prisma")).default;
+  const prisma = (await import("./prisma")).default;
   const game = await prisma.chessGame.findUnique({ where: { id: gameId } });
 
   if (!game) {
@@ -102,7 +102,7 @@ export async function makeGameMove(
   to: string,
   promotion?: string,
 ): Promise<MoveResult> {
-  const prisma = (await import("@/core-logic/prisma")).default;
+  const prisma = (await import("./prisma")).default;
   const game = (await prisma.chessGame.findUnique({
     where: { id: gameId },
   })) as GameRecord | null;
@@ -132,7 +132,7 @@ export async function makeGameMove(
   const state = getGameState(chess);
   const newMoveCount = game.moveCount + 1;
 
-  type ChessGameStatus = import("@/core-logic/prisma").ChessGameStatus;
+  type ChessGameStatus = import("./prisma").ChessGameStatus;
   let newStatus: ChessGameStatus = "ACTIVE" as ChessGameStatus;
   if (state.isCheckmate) {
     newStatus = "CHECKMATE" as ChessGameStatus;
@@ -184,7 +184,7 @@ export async function makeGameMove(
 }
 
 export async function getGame(gameId: string): Promise<GameRecord> {
-  const prisma = (await import("@/core-logic/prisma")).default;
+  const prisma = (await import("./prisma")).default;
   const game = await prisma.chessGame.findUnique({
     where: { id: gameId },
     include: { moves: true },
@@ -198,7 +198,7 @@ export async function getGame(gameId: string): Promise<GameRecord> {
 }
 
 export async function listGames(playerId: string, status?: string): Promise<GameRecord[]> {
-  const prisma = (await import("@/core-logic/prisma")).default;
+  const prisma = (await import("./prisma")).default;
 
   const where: Record<string, unknown> = {
     OR: [{ whitePlayerId: playerId }, { blackPlayerId: playerId }],
@@ -230,7 +230,7 @@ export async function listGames(playerId: string, status?: string): Promise<Game
 }
 
 export async function resignGame(gameId: string, playerId: string): Promise<void> {
-  const prisma = (await import("@/core-logic/prisma")).default;
+  const prisma = (await import("./prisma")).default;
   const game = (await prisma.chessGame.findUnique({
     where: { id: gameId },
   })) as GameRecord | null;
@@ -254,7 +254,7 @@ export async function resignGame(gameId: string, playerId: string): Promise<void
 }
 
 export async function offerDraw(gameId: string, playerId: string): Promise<{ offered: true }> {
-  const prisma = (await import("@/core-logic/prisma")).default;
+  const prisma = (await import("./prisma")).default;
   const game = (await prisma.chessGame.findUnique({
     where: { id: gameId },
   })) as GameRecord | null;
@@ -273,7 +273,7 @@ export async function offerDraw(gameId: string, playerId: string): Promise<{ off
 }
 
 export async function acceptDraw(gameId: string, _playerId: string): Promise<void> {
-  const prisma = (await import("@/core-logic/prisma")).default;
+  const prisma = (await import("./prisma")).default;
 
   await prisma.chessGame.update({
     where: { id: gameId },
@@ -284,7 +284,7 @@ export async function acceptDraw(gameId: string, _playerId: string): Promise<voi
 }
 
 export async function declineDraw(gameId: string, playerId: string): Promise<{ declined: true }> {
-  const prisma = (await import("@/core-logic/prisma")).default;
+  const prisma = (await import("./prisma")).default;
   const game = (await prisma.chessGame.findUnique({
     where: { id: gameId },
   })) as GameRecord | null;
@@ -305,7 +305,7 @@ export async function declineDraw(gameId: string, playerId: string): Promise<{ d
 export async function getGameReplay(
   gameId: string,
 ): Promise<{ moves: MoveRecord[]; pgn: string; result: string | null }> {
-  const prisma = (await import("@/core-logic/prisma")).default;
+  const prisma = (await import("./prisma")).default;
   const game = (await prisma.chessGame.findUnique({
     where: { id: gameId },
   })) as GameRecord | null;
@@ -327,7 +327,7 @@ export async function getGameReplay(
 }
 
 export async function handleTimeExpiry(gameId: string, playerId: string): Promise<void> {
-  const prisma = (await import("@/core-logic/prisma")).default;
+  const prisma = (await import("./prisma")).default;
   const game = (await prisma.chessGame.findUnique({
     where: { id: gameId },
   })) as GameRecord | null;
@@ -352,7 +352,7 @@ export async function finalizeGame(
   result: GameResult,
   winnerId?: string,
 ): Promise<void> {
-  const prisma = (await import("@/core-logic/prisma")).default;
+  const prisma = (await import("./prisma")).default;
   const game = (await prisma.chessGame.findUnique({
     where: { id: gameId },
   })) as GameRecord | null;

@@ -52,7 +52,7 @@ export const LearningNoteCard: FC<LearningNoteCardProps> = ({
         borderRadius: 16,
         border: `1px solid ${statusColor}50`,
         padding: 28,
-        fontFamily: "JetBrains Mono, ui-monospace, monospace",
+        fontFamily: "JetBrains Mono, monospace",
         maxWidth: 600,
         boxShadow: showGlow
           ? `0 0 ${glowIntensity}px ${statusColor}30, 0 8px 32px rgba(0,0,0,0.4)`

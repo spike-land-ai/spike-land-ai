@@ -335,7 +335,7 @@ function Node({ node, progress, filterId }: { node: NodeDef; progress: number; f
         textAnchor="middle"
         fill={nodeColor}
         fontSize={node.isRoot ? 10 : 9}
-        fontFamily="JetBrains Mono, ui-monospace, monospace"
+        fontFamily="JetBrains Mono, monospace"
         fontWeight="bold"
         letterSpacing={0.5}
       >
@@ -350,7 +350,7 @@ function Node({ node, progress, filterId }: { node: NodeDef; progress: number; f
         textAnchor="middle"
         fill={sublabelColor}
         fontSize={7.5}
-        fontFamily="JetBrains Mono, ui-monospace, monospace"
+        fontFamily="JetBrains Mono, monospace"
         letterSpacing={0.3}
         style={{ transition: "fill 0.4s ease" }}
       >
@@ -367,7 +367,7 @@ function Node({ node, progress, filterId }: { node: NodeDef; progress: number; f
         textAnchor="middle"
         fill={labelColor}
         fontSize={8}
-        fontFamily="JetBrains Mono, ui-monospace, monospace"
+        fontFamily="JetBrains Mono, monospace"
         style={{ transition: "fill 0.4s ease" }}
       >
         {node.isRoot ? "" : node.label}
@@ -391,7 +391,7 @@ function Node({ node, progress, filterId }: { node: NodeDef; progress: number; f
             y={2}
             fill="rgba(34,197,94,0.9)"
             fontSize={7}
-            fontFamily="JetBrains Mono, ui-monospace, monospace"
+            fontFamily="JetBrains Mono, monospace"
             fontWeight="bold"
             letterSpacing={0.5}
           >
@@ -569,7 +569,7 @@ export function DependencyCascadeDemo() {
                 y={3}
                 fill="rgba(34,211,238,0.85)"
                 fontSize={9}
-                fontFamily="JetBrains Mono, ui-monospace, monospace"
+                fontFamily="JetBrains Mono, monospace"
                 fontWeight="bold"
                 letterSpacing={1.2}
               >
@@ -596,7 +596,7 @@ export function DependencyCascadeDemo() {
                 y={2}
                 fill="rgba(34,197,94,0.85)"
                 fontSize={9}
-                fontFamily="JetBrains Mono, ui-monospace, monospace"
+                fontFamily="JetBrains Mono, monospace"
                 fontWeight="bold"
                 letterSpacing={0.8}
               >
@@ -620,7 +620,7 @@ export function DependencyCascadeDemo() {
               y={4}
               fill="rgba(100,116,139,0.7)"
               fontSize={9}
-              fontFamily="JetBrains Mono, ui-monospace, monospace"
+              fontFamily="JetBrains Mono, monospace"
             >
               Lit = updated
             </text>
@@ -639,7 +639,7 @@ export function DependencyCascadeDemo() {
               y={3}
               fill="rgba(34,197,94,0.8)"
               fontSize={7}
-              fontFamily="JetBrains Mono, ui-monospace, monospace"
+              fontFamily="JetBrains Mono, monospace"
               fontWeight="bold"
             >
               PR
@@ -649,7 +649,7 @@ export function DependencyCascadeDemo() {
               y={4}
               fill="rgba(100,116,139,0.7)"
               fontSize={9}
-              fontFamily="JetBrains Mono, ui-monospace, monospace"
+              fontFamily="JetBrains Mono, monospace"
             >
               auto-PR opened
             </text>
