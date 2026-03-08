@@ -14,9 +14,8 @@ const securityHeaders: Record<string, string> = {
   "Permissions-Policy": "autoplay=*",
 };
 
-/** CSP frame-ancestors directive — always applied to allow iframe embedding from spike.land */
-const FRAME_ANCESTORS =
-  "frame-ancestors 'self' https://spike.land https://*.spike.land http://localhost:3000";
+/** CSP frame-ancestors directive — allows iframe embedding from any origin */
+const FRAME_ANCESTORS = "frame-ancestors *";
 
 /**
  * Adds security headers to a response.

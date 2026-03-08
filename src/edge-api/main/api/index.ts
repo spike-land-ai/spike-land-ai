@@ -105,13 +105,8 @@ app.use("*", async (c, next) => {
     });
   }
 
-  const isLive = c.req.path.startsWith("/live/");
-
   c.res.headers.set("X-Content-Type-Options", "nosniff");
   c.res.headers.set("Permissions-Policy", "camera=(), microphone=(), geolocation=(), payment=()");
-  if (!isLive) {
-    c.res.headers.set("X-Frame-Options", "DENY");
-  }
   c.res.headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
   c.res.headers.set("Strict-Transport-Security", "max-age=63072000; includeSubDomains; preload");
   c.res.headers.set(
@@ -124,11 +119,11 @@ app.use("*", async (c, next) => {
       "font-src 'self' https://fonts.gstatic.com https://esm.spike.land data:",
       "connect-src 'self' https://api.spike.land https://edge.spike.land https://auth-mcp.spike.land https://mcp.spike.land https://js.spike.land https://image-studio-mcp.spike.land https://checkout.stripe.com wss://spike.land https://esm.sh https://esm.spike.land https://unpkg.com https://local.spike.land:5173 https://www.google-analytics.com https://www.googletagmanager.com blob: data:",
       "worker-src 'self' blob: https://esm.sh https://esm.spike.land",
-      "frame-src 'self' https://edge.spike.land",
+      "frame-src *",
       "object-src 'none'",
       "base-uri 'self'",
       "form-action 'self'",
-      isLive ? "frame-ancestors https://spike.land" : "frame-ancestors 'none'",
+      "frame-ancestors *",
       "upgrade-insecure-requests",
     ].join("; "),
   );
