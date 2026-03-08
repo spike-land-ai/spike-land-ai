@@ -225,21 +225,29 @@ describe("GET /mcp (mcpRoute handler)", () => {
     expect(res.status).toBe(401);
   });
 
-  it("returns 405 with auth", async () => {
+  it("supports SSE connection with auth", async () => {
     const app = await buildTestApp();
     const env = mockEnv();
 
+    // In stateful transport mode, an uninitialized server returns 400 Bad Request
+    // on a GET request because it hasn't received the "initialize" POST.
+    // However, it correctly returns this validation error rather than the 405 error
+    // it returned previously before SSE was enabled.
     const res = await app.request(
       "/",
       {
         method: "GET",
-        headers: { Authorization: "Bearer valid-test-token" },
+        headers: {
+          Authorization: "Bearer valid-test-token",
+          Accept: "text/event-stream"
+        },
       },
       env,
       { waitUntil: () => {} },
     );
 
-    expect(res.status).toBe(405);
+    expect(res.status).toBe(400);
+    expect(res.headers.get("content-type")).toContain("application/json");
   });
 
   it("returns 401 from route handler when no Authorization header (covers line 206)", async () => {

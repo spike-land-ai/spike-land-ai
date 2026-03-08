@@ -286,6 +286,18 @@ const appSessionRoute = createRoute({
   component: withSuspense(() => import("./routes/tools/$appSlug"), "AppSessionPage"),
 });
 
+// Agency routes
+const agencyRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/agency",
+});
+
+const agencyPortfolioRoute = createRoute({
+  getParentRoute: () => agencyRoute,
+  path: "portfolio",
+  component: withSuspense(() => import("../../../app/agency/portfolio/page"), "PortfolioPage"),
+});
+
 // MCP routes
 const mcpRoute = createRoute({
   getParentRoute: () => rootRoute,
@@ -316,13 +328,11 @@ const vibeCodeRoute = createRoute({
   component: withSuspense(() => import("../core-logic/vibe-code"), "VibeCodePage"),
 });
 
-// Backwards-compat redirect: /bazdmeg → /vibe-code
-const bazdmegRedirectRoute = createRoute({
+// BAZDMEG Method Presentation
+const bazdmegRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/bazdmeg",
-  beforeLoad: () => {
-    throw redirect({ to: "/vibe-code" });
-  },
+  component: withSuspense(() => import("../../../app/bazdmeg/page"), "BazdmegPage"),
 });
 
 const whatWeDoRoute = createRoute({
@@ -360,7 +370,7 @@ const routeTree = rootRoute.addChildren([
   indexRoute,
   cockpitRoute,
   vibeCodeRoute,
-  bazdmegRedirectRoute,
+  bazdmegRoute,
   whatWeDoRoute,
   buildRoute,
   startChecklistRoute,
@@ -388,6 +398,7 @@ const routeTree = rootRoute.addChildren([
   messagesRoute.addChildren([messagesIndexRoute, messageThreadRoute]),
   toolsRoute.addChildren([toolsIndexRoute, appSessionRoute]),
   mcpRoute.addChildren([mcpIndexRoute, mcpAuthorizeRoute]),
+  agencyRoute.addChildren([agencyPortfolioRoute]),
 ]);
 
 export const router = createRouter({

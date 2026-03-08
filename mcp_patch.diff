@@ -1,0 +1,73 @@
+<<<<<<< SEARCH
+  // Stateless transport — always JSON (no hanging SSE streams)
+  const transport = new WebStandardStreamableHTTPServerTransport({
+    enableJsonResponse: true,
+  });
+
+  await mcpServer.connect(transport);
+
+  try {
+    const response = await transport.handleRequest(mcpRequest, {
+      parsedBody: body,
+    });
+=======
+  const sessionId = c.req.header("Mcp-Session-Id");
+  const transport = new WebStandardStreamableHTTPServerTransport({
+    sessionIdGenerator: () => sessionId ?? crypto.randomUUID(),
+  });
+
+  await mcpServer.connect(transport);
+
+  try {
+    const response = await transport.handleRequest(mcpRequest, {
+      parsedBody: body,
+    });
+>>>>>>> REPLACE
+<<<<<<< SEARCH
+mcpRoute.get("/", (c) => {
+  const authHeader = c.req.header("Authorization");
+  if (!authHeader) {
+    return c.json({ error: "Unauthorized" }, 401);
+  }
+  return c.json(
+    {
+      error: "SSE server-initiated mode not supported.",
+      hint: "POST with Accept: text/event-stream for streaming.",
+    },
+    405,
+  );
+});
+
+mcpRoute.delete("/", () => Response.json({ ok: true }));
+=======
+mcpRoute.get("/", async (c) => {
+  const authHeader = c.req.header("Authorization");
+  if (!authHeader) {
+    return c.json({ error: "Unauthorized" }, 401);
+  }
+
+  const userId = c.var.userId;
+  const db = c.var.db;
+
+  const enabledCategories = await loadEnabledCategories(userId, c.env.KV);
+  const mcpServer = await createMcpServer(userId, db, {
+    enabledCategories,
+    kv: c.env.KV,
+    vaultSecret: c.env.VAULT_SECRET,
+    mcpInternalSecret: c.env.MCP_INTERNAL_SECRET,
+    spikeEdge: c.env.SPIKE_EDGE,
+    spaAssets: c.env.SPA_ASSETS,
+  });
+
+  const sessionId = c.req.header("Mcp-Session-Id");
+  const transport = new WebStandardStreamableHTTPServerTransport({
+    sessionIdGenerator: () => sessionId ?? crypto.randomUUID(),
+  });
+
+  await mcpServer.connect(transport);
+
+  return transport.handleRequest(c.req.raw);
+});
+
+mcpRoute.delete("/", () => Response.json({ ok: true }));
+>>>>>>> REPLACE
