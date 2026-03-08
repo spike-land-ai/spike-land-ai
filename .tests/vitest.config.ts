@@ -55,6 +55,7 @@ const packagePathMap: Record<string, string> = {
   "spike-app": "frontend/platform-frontend",
   "spike-cli": "cli/spike-cli",
   "spike-edge": "edge-api/main",
+  "spike-chat": "edge-api/spike-chat",
   "spike-land-backend": "edge-api/backend",
   "spike-land-mcp": "edge-api/spike-land",
   "spike-review": "mcp-tools/code-review",
@@ -78,6 +79,8 @@ const baseAliases: Record<string, string> = {
   "@spike-land-ai/block-tasks": src("core/block-tasks/lazy-imports/index.ts"),
   "@spike-land-ai/mcp-server-base": src("core/server-base/core-logic/index.ts"),
   "@spike-land-ai/mcp-image-studio": src("mcp-tools/image-studio/core-logic/index.ts"),
+  "react/jsx-dev-runtime": src("core/react-engine/core-logic/react/jsx-runtime.ts"),
+  "react/jsx-runtime": src("core/react-engine/core-logic/react/jsx-runtime.ts"),
 };
 
 // ── Per-package config type ────────────────────────────────────────
@@ -144,6 +147,8 @@ const packages: Record<string, PkgConfig> = {
     aliases: {
       react: src("core/react-engine/core-logic/react/index.ts"),
       "react-dom": src("core/react-engine/core-logic/react-dom/client.ts"),
+      "react/jsx-dev-runtime": src("core/react-engine/core-logic/react/jsx-runtime.ts"),
+      "react/jsx-runtime": src("core/react-engine/core-logic/react/jsx-runtime.ts"),
     },
     includeSrc: [
       src("core/block-website/core-logic/**/*.ts"),
@@ -269,6 +274,12 @@ const packages: Record<string, PkgConfig> = {
     tier: 2,
     coverageReporter: ["text"],
     coverageExclude: ["**/dist/**", "**/cli.ts", "**/*.d.ts"],
+  },
+
+  "spike-chat": {
+    tier: 1,
+    aliases: { "cloudflare:workers": src("edge-api/main/core-logic/cloudflare-workers.ts") },
+    coverageExclude: [],
   },
 
   "spike-edge": {

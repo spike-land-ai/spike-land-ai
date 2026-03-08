@@ -2,5 +2,10 @@
  * Mock for cloudflare:workers module used in Vitest (Node.js environment).
  */
 export class DurableObject {
-  constructor() {}
+  ctx: any;
+  env: any;
+  constructor(ctx?: any, env?: any) {
+    this.ctx = ctx;
+    this.env = env;
+  }
 }

@@ -13,7 +13,7 @@ import {
   refreshAta,
   setupResponsiveEditor,
 } from "./utils";
-import { defineObsidianTheme } from "../../../../editor/theme";
+import { ensureSpikeLandMonacoTheme } from "../../../../editor/theme";
 
 // Global API interface for agent control
 interface SpikeEditorAPI {
@@ -107,8 +107,7 @@ async function createEditorModel(
   // Initialize languages and compiler options
   registerLanguages();
 
-  // Define custom themes
-  defineObsidianTheme();
+  ensureSpikeLandMonacoTheme();
 
   // Process code and prepare for editor
 

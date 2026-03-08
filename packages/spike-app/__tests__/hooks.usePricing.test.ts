@@ -1,0 +1,135 @@
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { renderHook, waitFor } from "@testing-library/react";
+
+// Mock fetch globally
+const mockFetch = vi.fn();
+global.fetch = mockFetch;
+
+describe("usePricing", () => {
+  beforeEach(() => {
+    vi.resetModules();
+    mockFetch.mockReset();
+  });
+
+  afterEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it("returns USD defaults initially and starts loading", async () => {
+    // Mock a slow response
+    mockFetch.mockReturnValue(new Promise(() => {}));
+
+    const { usePricing } = await import("@/hooks/usePricing");
+    const { result } = renderHook(() => usePricing());
+
+    expect(result.current.loading).toBe(true);
+    expect(result.current.pricing.currency).toBe("USD");
+    expect(result.current.pricing.pro.monthly).toBe("$29");
+  });
+
+  it("updates pricing data after successful fetch", async () => {
+    const mockData = {
+      currency: "EUR",
+      billedInUsd: true,
+      pro: {
+        monthlyFormatted: "€29",
+        annualFormatted: "€23",
+        annualTotalFormatted: "€276/yr",
+      },
+      business: {
+        monthlyFormatted: "€99",
+        annualFormatted: "€79",
+        annualTotalFormatted: "€948/yr",
+      },
+      credits: {
+        starter: { formatted: "€5" },
+        popular: { formatted: "€20" },
+        power: { formatted: "€50" },
+      },
+    };
+
+    mockFetch.mockResolvedValue({
+      ok: true,
+      json: async () => mockData,
+    });
+
+    const { usePricing } = await import("@/hooks/usePricing");
+    const { result } = renderHook(() => usePricing());
+
+    await waitFor(() => expect(result.current.loading).toBe(false));
+
+    expect(result.current.pricing.currency).toBe("EUR");
+    expect(result.current.pricing.billedInUsd).toBe(true);
+    expect(result.current.pricing.pro.monthly).toBe("€29");
+    expect(result.current.pricing.business.annualTotal).toBe("€948/yr");
+    expect(result.current.pricing.credits.power).toBe("€50");
+  });
+
+  it("stays on USD defaults if fetch fails", async () => {
+    mockFetch.mockResolvedValue({
+      ok: false,
+    });
+
+    const { usePricing } = await import("@/hooks/usePricing");
+    const { result } = renderHook(() => usePricing());
+
+    await waitFor(() => expect(result.current.loading).toBe(false));
+
+    expect(result.current.pricing.currency).toBe("USD");
+    expect(result.current.pricing.pro.monthly).toBe("$29");
+  });
+
+  it("stays on USD defaults if fetch throws error", async () => {
+    mockFetch.mockRejectedValue(new Error("Network error"));
+
+    const { usePricing } = await import("@/hooks/usePricing");
+    const { result } = renderHook(() => usePricing());
+
+    await waitFor(() => expect(result.current.loading).toBe(false));
+
+    expect(result.current.pricing.currency).toBe("USD");
+  });
+
+  it("uses cached data on subsequent hook calls", async () => {
+    const mockData = {
+      currency: "GBP",
+      billedInUsd: false,
+      pro: {
+        monthlyFormatted: "£29",
+        annualFormatted: "£23",
+        annualTotalFormatted: "£276/yr",
+      },
+      business: {
+        monthlyFormatted: "£99",
+        annualFormatted: "£79",
+        annualTotalFormatted: "£948/yr",
+      },
+      credits: {
+        starter: { formatted: "£5" },
+        popular: { formatted: "£20" },
+        power: { formatted: "£50" },
+      },
+    };
+
+    mockFetch.mockResolvedValue({
+      ok: true,
+      json: async () => mockData,
+    });
+
+    const { usePricing } = await import("@/hooks/usePricing");
+    
+    // First call to fetch data
+    const { result: result1, unmount: unmount1 } = renderHook(() => usePricing());
+    await waitFor(() => expect(result1.current.loading).toBe(false));
+    expect(result1.current.pricing.currency).toBe("GBP");
+    unmount1();
+
+    // Second call should use cache and not be loading
+    const { result: result2 } = renderHook(() => usePricing());
+    expect(result2.current.loading).toBe(false);
+    expect(result2.current.pricing.currency).toBe("GBP");
+    
+    // Should only have fetched once
+    expect(mockFetch).toHaveBeenCalledTimes(1);
+  });
+});

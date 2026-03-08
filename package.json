@@ -11,7 +11,7 @@
     "build": "yarn workspaces foreach -Apt run build",
     "build:src": "npx tsx esbuild.config.ts --all",
     "test": "vitest run --config .tests/vitest.config.ts",
-    "test:src": "vitest run --config .tests/vitest.config.ts --changed HEAD~1",
+    "test:src": "vitest run --config .tests/vitest.config.ts --changed main",
     "typecheck": "tsc --noEmit --incremental",
     "typecheck:legacy": "yarn workspaces foreach -Apt run typecheck",
     "lint": "eslint --fix --cache src/ ",

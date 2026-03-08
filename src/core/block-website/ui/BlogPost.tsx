@@ -100,6 +100,7 @@ const COMPONENT_MAP: Record<string, React.ComponentType<Record<string, unknown>>
   toolsbycategorygrid: lazyDemo(interactiveImport, "ToolsByCategoryGrid"),
   personalizedsupportbox: lazyDemo(interactiveImport, "PersonalizedSupportBox"),
   rentstorytoggle: lazyDemo(interactiveImport, "RentStoryToggle"),
+  spikechatembed: lazyDemo(interactiveImport, "SpikeChatEmbed"),
   tldr: ({ children, title }: { children?: React.ReactNode; title?: string }) => (
     <div className="bg-primary/[0.03] border-2 border-primary/10 rounded-[2rem] p-8 my-12 relative overflow-hidden">
       <div className="absolute top-0 right-0 p-4 opacity-5 rotate-12">

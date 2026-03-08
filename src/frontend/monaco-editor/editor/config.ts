@@ -1,6 +1,7 @@
 import { typescript } from "./monaco-editor.worker";
 import type { editor as Editor } from "monaco-editor";
 import type { ResponsiveSettings } from "./types";
+import { SPIKE_LAND_MONACO_THEME } from "./theme";
 
 // Validate origin and provide fallback
 export const originToUse = (() => {
@@ -95,7 +96,7 @@ export const responsiveSettings: ResponsiveSettings = {
 // Base editor configuration object
 export const baseEditorOptions: Editor.IStandaloneEditorConstructionOptions = {
   // Common settings for all devices
-  theme: "obsidian-dark",
+  theme: SPIKE_LAND_MONACO_THEME,
   links: true,
   tabSize: 2,
   insertSpaces: true,

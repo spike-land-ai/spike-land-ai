@@ -35,3 +35,4 @@ export { LiveCategorizer } from "../ui/LiveCategorizer";
 export { ToolsByCategoryGrid } from "../ui/ToolsByCategoryGrid";
 export { PersonalizedSupportBox } from "../ui/PersonalizedSupportBox";
 export { RentStoryToggle } from "../ui/RentStoryToggle";
+export { SpikeChatEmbed } from "../ui/SpikeChatEmbed";

@@ -1,0 +1,33 @@
+name = "spike-chat"
+main = "../../src/edge-api/spike-chat/api/app.ts"
+compatibility_date = "2025-07-12"
+compatibility_flags = ["nodejs_compat"]
+
+[[d1_databases]]
+binding = "DB"
+database_name = "spike-chat"
+# TODO: Replace with actual D1 database ID after running: wrangler d1 create spike-chat
+database_id = "TO_BE_CREATED"
+migrations_dir = "../../src/edge-api/spike-chat/db/migrations"
+
+[durable_objects]
+bindings = [
+  { name = "CHANNEL_DO", class_name = "ChannelDurableObject" },
+  { name = "PRESENCE_DO", class_name = "PresenceDurableObject" },
+]
+
+[[migrations]]
+tag = "v1"
+new_classes = ["ChannelDurableObject", "PresenceDurableObject"]
+
+[[services]]
+binding = "AUTH_MCP"
+service = "mcp-auth"
+
+[[services]]
+binding = "MCP_SERVICE"
+service = "spike-land-mcp"
+
+[[routes]]
+pattern = "chat.spike.land/*"
+zone_name = "spike.land"

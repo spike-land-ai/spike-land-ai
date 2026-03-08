@@ -422,3 +422,26 @@ packages:
     description: Educational video compositions (Remotion)
     entry: index.ts
     private: true
+
+  spike-chat:
+    kind: worker
+    version: 1.0.0
+    description: Universal Chat Service (Cloudflare Workers + Durable Objects + D1)
+    entry: index.ts
+    worker:
+      name: spike-chat
+      compatibility_date: "2025-07-12"
+      compatibility_flags: [nodejs_compat]
+      d1_databases:
+        - binding: DB
+          database_name: spike-chat
+          database_id: TO_BE_CREATED
+          migrations_dir: db/migrations
+      durable_objects:
+        - name: CHANNEL_DO
+          class_name: ChannelDurableObject
+        - name: PRESENCE_DO
+          class_name: PresenceDurableObject
+      routes:
+        - pattern: chat.spike.land/*
+          zone_name: spike.land
