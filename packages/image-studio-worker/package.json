@@ -18,6 +18,7 @@
     "lint": "eslint --quiet ."
   },
   "dependencies": {
+    "@google/genai": "^1.44.0",
     "@spike-land-ai/mcp-image-studio": "*",
     "@spike-land-ai/shared": "*",
     "hono": "^4.12.5"
