@@ -1,0 +1,23 @@
+<<<<<<< SEARCH
+  // Initialize the update queue for the root fiber
+  const queue: ClassUpdateQueue = {
+    baseState: uninitializedFiber.memoizedState,
+    firstBaseUpdate: null as any,
+    lastBaseUpdate: null as any,
+    shared: {
+      pending: null as any,
+    },
+    callbacks: null as any,
+  };
+=======
+  // Initialize the update queue for the root fiber
+  const queue: ClassUpdateQueue = {
+    baseState: uninitializedFiber.memoizedState,
+    firstBaseUpdate: null,
+    lastBaseUpdate: null,
+    shared: {
+      pending: null,
+    },
+    callbacks: null,
+  };
+>>>>>>> REPLACE
