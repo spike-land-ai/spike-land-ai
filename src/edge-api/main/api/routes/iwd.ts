@@ -71,8 +71,8 @@ iwd.get("/iwd", (c) => {
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>International Women's Day 2026 — spike.land</title>
 <meta name="description" content="See visitors from around the world lighting up the map in real-time for International Women's Day 2026">
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"><\/script>
+<link rel="stylesheet" href="https://esm.spike.land/leaflet@1.9.4/dist/leaflet.css">
+<script src="https://esm.spike.land/leaflet@1.9.4/dist/leaflet.js"><\/script>
 <script src="https://unpkg.com/canvas-confetti@1.9.3/dist/confetti.browser.js"><\/script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
