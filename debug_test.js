@@ -1,6 +1,5 @@
-const { execSync } = require('child_process');
-try {
-  execSync('npx vitest run --project chess-engine -t "updates game status on check$"', { stdio: 'inherit' });
-} catch (e) {
-  // failed
-}
+const res = {
+  status: 200,
+  headers: new Map([["content-type", "application/json"]])
+};
+console.log(res);
