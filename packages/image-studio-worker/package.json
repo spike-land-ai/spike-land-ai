@@ -24,6 +24,7 @@
   },
   "devDependencies": {
     "@cloudflare/workers-types": "4.20260307.1",
+    "@google/genai": "^1.44.0",
     "@testing-library/dom": "^10.4.1",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",

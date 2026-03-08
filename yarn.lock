@@ -4353,6 +4353,7 @@ __metadata:
   resolution: "@spike-land-ai/image-studio-worker@workspace:packages/image-studio-worker"
   dependencies:
     "@cloudflare/workers-types": "npm:4.20260307.1"
+    "@google/genai": "npm:^1.44.0"
     "@spike-land-ai/mcp-image-studio": "npm:*"
     "@spike-land-ai/shared": "npm:*"
     "@testing-library/dom": "npm:^10.4.1"
@@ -15417,6 +15418,8 @@ __metadata:
     "@tanstack/react-query": "npm:^5.90.21"
     "@tanstack/react-router": "npm:^1.166.2"
     "@tanstack/router-cli": "npm:^1.166.2"
+    "@types/cors": "npm:^2.8.19"
+    "@types/express": "npm:^5.0.6"
     "@types/mime-types": "npm:^3.0.1"
     "@types/node": "npm:25.3.5"
     "@vitest/coverage-v8": "npm:4.0.18"
