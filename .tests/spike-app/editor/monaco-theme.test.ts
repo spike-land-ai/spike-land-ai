@@ -15,6 +15,8 @@ const lightTokens = {
   input: "#d1d5db",
   primary: "#2563eb",
   primaryLight: "#60a5fa",
+  chatAccent: "#f0a500",
+  chatAccentLight: "#f6c453",
   accentForeground: "#1e40af",
   destructiveForeground: "#dc2626",
 };
@@ -29,6 +31,8 @@ const darkTokens = {
   input: "#ffffff1f",
   primary: "#ffb800",
   primaryLight: "#fcd34d",
+  chatAccent: "#ffb800",
+  chatAccentLight: "#fcd34d",
   accentForeground: "#a3b8fc",
   destructiveForeground: "#fca5a5",
 };
@@ -40,8 +44,8 @@ describe("platform Monaco theme", () => {
     expect(theme.background).toBe("#f9fafb");
     expect(theme.foreground).toBe("#111827");
     expect(theme.activeLineNumber).toBe("#111827");
-    expect(theme.tokenColors.keyword).toBe("#2563eb");
-    expect(theme.tokenColors.string).toBe("#1e40af");
+    expect(theme.tokenColors.keyword).toBe("#f0a500");
+    expect(theme.tokenColors.string).toBe("#f6c453");
   });
 
   it("maps dark design tokens into the Monaco theme data", () => {
@@ -50,6 +54,7 @@ describe("platform Monaco theme", () => {
     expect(theme.base).toBe("vs-dark");
     expect(theme.colors["editor.background"]).toBe("#0a0c14");
     expect(theme.colors["editor.foreground"]).toBe("#e2e8f0");
+    expect(theme.colors["editorCursor.foreground"]).toBe("#ffb800");
     expect(theme.colors["editorSuggestWidget.background"]).toBe("#0d1323cc");
     expect(theme.rules).toContainEqual(
       expect.objectContaining({
