@@ -1,9 +1,8 @@
-import { Suspense, useState, useCallback, useMemo, useRef, useEffect } from "react";
+import { useState, useCallback, useMemo, useRef, useEffect } from "react";
 import { Copy, Check, FileCode } from "lucide-react";
 import { cn } from "../styling/cn";
 import { useDarkMode } from "../ui/hooks/useDarkMode";
 import { useMonacoTypeAcquisition } from "../ui/hooks/useMonacoTypeAcquisition";
-import { MonacoCover } from "./monaco-cover/MonacoCover";
 import { definePlatformMonacoTheme, SPIKE_PLATFORM_MONACO_THEME } from "./monaco-cover/theme";
 
 import EditorWorker from "../../../monaco-editor/src/deprecated/editor/editor.worker?worker";
@@ -80,6 +79,7 @@ function LocalMonacoEditor({
 }: LocalMonacoEditorProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const editorRef = useRef<MonacoEditorInstance | null>(null);
+  const [isReady, setIsReady] = useState(false);
   const propsRef = useRef({
     value,
     language,
@@ -107,6 +107,7 @@ function LocalMonacoEditor({
     if (!containerRef.current) return;
     let isMounted = true;
     const props = propsRef.current;
+    setIsReady(false);
 
     import("monaco-editor")
       .then((monaco: MonacoModule) => {
@@ -138,6 +139,8 @@ function LocalMonacoEditor({
         editorRef.current.onDidChangeModelContent(() => {
           propsRef.current.onChange?.(editorRef.current!.getValue());
         });
+
+        setIsReady(true);
       })
       .catch((err: unknown) => {
         console.error("Failed to load monaco-editor", err);
@@ -145,6 +148,7 @@ function LocalMonacoEditor({
 
     return () => {
       isMounted = false;
+      setIsReady(false);
       if (editorRef.current) {
         editorRef.current.dispose();
       }
@@ -178,7 +182,16 @@ function LocalMonacoEditor({
     }
   }, [theme, language, isDark]);
 
-  return <div ref={containerRef} className="w-full h-full" />;
+  return (
+    <div className="relative h-full w-full">
+      <div ref={containerRef} className="h-full w-full" />
+      {!isReady && (
+        <div className="pointer-events-none absolute inset-0">
+          <LoadingSpinner />
+        </div>
+      )}
+    </div>
+  );
 }
 
 /** Map file extensions to Monaco language identifiers. */
@@ -241,7 +254,6 @@ export function CodeEditor({
   const { isDarkMode } = useDarkMode();
   const [copied, setCopied] = useState(false);
   const [monacoInstance, setMonacoInstance] = useState<typeof import("monaco-editor") | null>(null);
-  const [isEditing, setIsEditing] = useState(false);
 
   const { typesReady } = useMonacoTypeAcquisition({
     monaco: monacoInstance,
@@ -315,7 +327,6 @@ export function CodeEditor({
 
   // Focus the editor as soon as it mounts so users can type immediately.
   const handleMount = useCallback((editor: MonacoEditorInstance, monaco: MonacoModule) => {
-    editor.focus();
     setMonacoInstance(monaco);
   }, []);
 
@@ -329,8 +340,7 @@ export function CodeEditor({
     >
       {/* Toolbar */}
       <div
-        className="flex shrink-0 items-center justify-between border-b border-border bg-muted/40 px-3 py-2 cursor-pointer select-none"
-        onClick={() => setIsEditing(true)}
+        className="flex shrink-0 items-center justify-between border-b border-border bg-muted/40 px-3 py-2"
       >
         <div className="flex items-center gap-2">
           <FileCode className="h-4 w-4 text-muted-foreground" />
@@ -351,11 +361,7 @@ export function CodeEditor({
           >
             {lineCount} {lineCount === 1 ? "line" : "lines"}
           </span>
-          {!isEditing && (
-            <span className="text-xs font-medium text-muted-foreground/60 ml-2">Click to edit</span>
-          )}
           {monacoInstance &&
-            isEditing &&
             (resolvedLanguage === "typescript" || resolvedLanguage === "typescriptreact") && (
               <span
                 className={cn(
@@ -400,42 +406,46 @@ export function CodeEditor({
 
       {/* Editor area */}
       <div className="min-h-0 flex-1 relative bg-background">
-        {!isEditing ? (
-          <MonacoCover value={value} isDark={isDarkMode} onClick={() => setIsEditing(true)} />
-        ) : (
-          <Suspense fallback={<LoadingSpinner />}>
-            <LocalMonacoEditor
-              height="100%"
-              language={resolvedLanguage}
-              theme={monacoTheme}
-              isDark={isDarkMode}
-              value={value}
-              fileName={fileName}
-              onChange={handleChange}
-              beforeMount={handleBeforeMount}
-              onMount={handleMount}
-              options={{
-                readOnly,
-                minimap: { enabled: false },
-                fontSize: 14,
-                lineHeight: 22,
-                fontFamily:
-                  '"JetBrains Mono", "Fira Code", "Cascadia Code", ui-monospace, monospace',
-                fontLigatures: true,
-                scrollBeyondLastLine: false,
-                wordWrap: "on",
-                tabSize: 2,
-                renderWhitespace: "selection",
-                smoothScrolling: true,
-                cursorBlinking: "smooth",
-                padding: { top: 12, bottom: 12 },
-                bracketPairColorization: { enabled: true },
-                guides: { bracketPairs: true },
-                suggest: { showKeywords: true },
-              }}
-            />
-          </Suspense>
-        )}
+        <LocalMonacoEditor
+          language={resolvedLanguage}
+          theme={monacoTheme}
+          isDark={isDarkMode}
+          value={value}
+          fileName={fileName}
+          onChange={handleChange}
+          beforeMount={handleBeforeMount}
+          onMount={handleMount}
+          options={{
+            readOnly,
+            minimap: { enabled: false },
+            fontSize: 14,
+            lineHeight: 22,
+            fontFamily:
+              '"JetBrains Mono", "Fira Code", "Cascadia Code", ui-monospace, monospace',
+            fontLigatures: true,
+            lineNumbers: "off",
+            lineNumbersMinChars: 0,
+            lineDecorationsWidth: 0,
+            glyphMargin: false,
+            folding: false,
+            renderLineHighlight: "none",
+            scrollBeyondLastLine: false,
+            scrollBeyondLastColumn: 12,
+            wordWrap: "off",
+            wrappingIndent: "none",
+            tabSize: 2,
+            renderWhitespace: "selection",
+            smoothScrolling: true,
+            cursorBlinking: "smooth",
+            overviewRulerBorder: false,
+            overviewRulerLanes: 0,
+            hideCursorInOverviewRuler: true,
+            padding: { top: 12, bottom: 12 },
+            bracketPairColorization: { enabled: true },
+            guides: { bracketPairs: true, indentation: false },
+            suggest: { showKeywords: true },
+          }}
+        />
       </div>
     </div>
   );
