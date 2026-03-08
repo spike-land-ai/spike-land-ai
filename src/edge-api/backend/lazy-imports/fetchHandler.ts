@@ -8,13 +8,13 @@ const ESM_CDN = "https://esm.sh";
 /** Redirect with CORS headers so cross-origin module imports can follow the redirect. */
 function corsRedirect(target: string, requestUrl: string): Response {
   const origin = new URL(requestUrl).origin;
-  const isAllowedOrigin = origin.endsWith(".spike.land") || origin === "https://spike.land";
+  const isAllowedOrigin = true;
 
   return new Response(null, {
     status: 302,
     headers: {
       Location: target,
-      "Access-Control-Allow-Origin": isAllowedOrigin ? origin : "https://spike.land",
+      "Access-Control-Allow-Origin": origin || "*",
       "Access-Control-Allow-Methods": "GET, OPTIONS",
       "Cache-Control": "public, max-age=86400",
     },
@@ -269,8 +269,7 @@ async function handlePublicRequest(codeSpace: string, path: string[], request: R
       headers.set("Cache-Control", "public, max-age=3600, stale-while-revalidate=86400");
 
       const reqOrigin = request.headers.get("Origin") || "";
-      const isAllowed = reqOrigin.endsWith(".spike.land") || reqOrigin === "https://spike.land";
-      headers.set("Access-Control-Allow-Origin", isAllowed ? reqOrigin : "https://spike.land");
+      headers.set("Access-Control-Allow-Origin", reqOrigin || "*");
 
       return new Response(object.body, { headers });
     }
@@ -314,8 +313,7 @@ async function handleLiveIndexRequest(request: Request, env: Env) {
       headers.set("Cache-Control", "public, max-age=31536000");
 
       const reqOrigin = request.headers.get("Origin") || "";
-      const isAllowed = reqOrigin.endsWith(".spike.land") || reqOrigin === "https://spike.land";
-      headers.set("Access-Control-Allow-Origin", isAllowed ? reqOrigin : "https://spike.land");
+      headers.set("Access-Control-Allow-Origin", reqOrigin || "*");
 
       headers.set("Cross-Origin-Embedder-Policy", "require-corp");
       headers.set("Content-Type", "application/javascript; charset=UTF-8");
@@ -341,14 +339,10 @@ async function handleRestApiRequest(path: string[], request: Request, env: Env):
   // but kept as a safety net if handleRestApiRequest is ever called directly)
   if (request.method === "OPTIONS") {
     const reqOrigin = request.headers.get("Origin") || "";
-    const isAllowed =
-      reqOrigin.endsWith(".spike.land") ||
-      reqOrigin === "https://spike.land" ||
-      reqOrigin.startsWith("http://localhost:");
 
     return new Response(null, {
       headers: {
-        "Access-Control-Allow-Origin": isAllowed ? reqOrigin : "https://spike.land",
+        "Access-Control-Allow-Origin": reqOrigin || "*",
         "Access-Control-Allow-Methods": "GET, PUT, POST, DELETE, OPTIONS",
         "Access-Control-Allow-Headers": "Content-Type",
         "Access-Control-Max-Age": "86400",
