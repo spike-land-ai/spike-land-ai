@@ -29,6 +29,12 @@ describe("SpikeChatEmbed", () => {
     const prodResult = SpikeChatEmbed({ channelSlug: "test-chan", workspaceSlug: "test-work", guestAccess: true });
     expect(prodResult).toBeDefined();
 
+    // Find the iframe in the prodResult children and call its onLoad
+    const iframe = (prodResult as any).props.children[1];
+    if (iframe && iframe.props && iframe.props.onLoad) {
+      iframe.props.onLoad();
+    }
+
     // Restore location
     Object.defineProperty(window, 'location', {
       writable: true,
