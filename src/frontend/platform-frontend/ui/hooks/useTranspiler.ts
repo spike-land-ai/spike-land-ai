@@ -8,6 +8,48 @@ interface TranspileResult {
 
 const TRANSPILE_ENDPOINT = "https://js.spike.land";
 
+function getPreviewTokens(isDarkMode: boolean) {
+  if (isDarkMode) {
+    return {
+      bg: "#0a0c14",
+      fg: "#e2e8f0",
+      cardBg: "rgba(255, 255, 255, 0.05)",
+      cardFg: "#f8fafc",
+      mutedBg: "rgba(255, 255, 255, 0.08)",
+      mutedFg: "#94a3b8",
+      border: "rgba(255, 255, 255, 0.1)",
+      primary: "#ffb800",
+      primaryFg: "#0a0c14",
+      primaryLight: "#fcd34d",
+      successFg: "#34d399",
+      warningFg: "#fbbf24",
+      infoFg: "#38bdf8",
+      chatAccent: "#ffb800",
+      chatAccentLight: "#fcd34d",
+      destructiveFg: "#fca5a5",
+    };
+  }
+
+  return {
+    bg: "#f9fafb",
+    fg: "#111827",
+    cardBg: "#ffffff",
+    cardFg: "#111827",
+    mutedBg: "#f3f4f6",
+    mutedFg: "#4b5563",
+    border: "#e5e7eb",
+    primary: "#2563eb",
+    primaryFg: "#ffffff",
+    primaryLight: "#60a5fa",
+    successFg: "#16a34a",
+    warningFg: "#d97706",
+    infoFg: "#0891b2",
+    chatAccent: "#f0a500",
+    chatAccentLight: "#f6c453",
+    destructiveFg: "#dc2626",
+  };
+}
+
 /**
  * Post-process transpiled code so it can run in an inline module script.
  * - Named default exports (`export default function App`) keep the binding.
@@ -50,14 +92,19 @@ function prepareForPreview(transpiled: string): { code: string; appRef: string }
   return { code, appRef };
 }
 
-function buildPreviewHtml(transpiledCode: string): string {
+function buildPreviewHtml(transpiledCode: string, isDarkMode: boolean): string {
   const { code, appRef } = prepareForPreview(transpiledCode);
+  const tokens = getPreviewTokens(isDarkMode);
+  const themeName = isDarkMode ? "dark" : "light";
 
   return `<!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="${themeName}">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
   <script type="importmap">
   {
     "imports": {
@@ -73,14 +120,67 @@ function buildPreviewHtml(transpiledCode: string): string {
   }
   </script>
   <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+  <style type="text/tailwindcss">
+    @theme inline {
+      --font-sans: var(--font-sans);
+      --font-display: var(--font-display);
+      --font-mono: var(--font-mono);
+      --color-background: var(--bg);
+      --color-foreground: var(--fg);
+      --color-card: var(--card-bg);
+      --color-card-foreground: var(--card-fg);
+      --color-muted: var(--muted-bg);
+      --color-muted-foreground: var(--muted-fg);
+      --color-border: var(--border-color);
+      --color-primary: var(--primary-color);
+      --color-primary-foreground: var(--primary-fg);
+      --color-primary-light: var(--primary-light);
+      --color-success-foreground: var(--success-fg);
+      --color-warning-foreground: var(--warning-fg);
+      --color-info-foreground: var(--info-fg);
+    }
+  </style>
   <style>
+    :root {
+      --font-sans: "Rubik", ui-sans-serif, system-ui, sans-serif;
+      --font-display: "Rubik", ui-sans-serif, system-ui, sans-serif;
+      --font-mono: "JetBrains Mono", ui-monospace, monospace;
+      --bg: ${tokens.bg};
+      --fg: ${tokens.fg};
+      --card-bg: ${tokens.cardBg};
+      --card-fg: ${tokens.cardFg};
+      --muted-bg: ${tokens.mutedBg};
+      --muted-fg: ${tokens.mutedFg};
+      --border-color: ${tokens.border};
+      --primary-color: ${tokens.primary};
+      --primary-fg: ${tokens.primaryFg};
+      --primary-light: ${tokens.primaryLight};
+      --success-fg: ${tokens.successFg};
+      --warning-fg: ${tokens.warningFg};
+      --info-fg: ${tokens.infoFg};
+      --chat-accent: ${tokens.chatAccent};
+      --chat-accent-light: ${tokens.chatAccentLight};
+      --destructive-fg: ${tokens.destructiveFg};
+    }
+
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: system-ui, -apple-system, sans-serif; }
+    html { color-scheme: ${themeName}; }
+    html, body, #root { min-height: 100%; }
+    body {
+      background: var(--bg);
+      color: var(--fg);
+      font-family: var(--font-sans);
+      -webkit-font-smoothing: antialiased;
+      font-feature-settings: "cv02", "cv03", "cv04", "cv11", "ss01";
+    }
+    ::selection {
+      background: color-mix(in srgb, var(--chat-accent) 22%, transparent);
+    }
   </style>
 </head>
 <body>
   <div id="root"></div>
-  <div id="error-display" style="display:none;padding:1rem;color:#ef4444;font-family:ui-monospace,monospace;font-size:13px;white-space:pre-wrap;background:#fef2f2;border:1px solid #fecaca;margin:1rem;border-radius:8px;"></div>
+  <div id="error-display" style="display:none;padding:1rem;color:var(--destructive-fg);font-family:var(--font-mono);font-size:13px;white-space:pre-wrap;background:color-mix(in srgb, var(--destructive-fg) 8%, var(--card-bg));border:1px solid color-mix(in srgb, var(--destructive-fg) 18%, transparent);margin:1rem;border-radius:16px;"></div>
   <script>
   globalThis.process ??= { env: {} };
   globalThis.process.env ??= {};
@@ -161,9 +261,11 @@ export function useTranspiler(source: string, debounceMs = 300): TranspileResult
 
         try {
           const transpiledCode = await fetchTranspiledCode(source, originToUse);
-          const html = buildPreviewHtml(transpiledCode);
+          lastTranspiledRef.current = transpiledCode;
+          const html = buildPreviewHtml(transpiledCode, isDarkMode);
           setResult({ html, error: null, isTranspiling: false });
         } catch (err) {
+          lastTranspiledRef.current = null;
           setResult({
             html: null,
             error: `Transpiler failed: ${err instanceof Error ? err.message : String(err)}`,

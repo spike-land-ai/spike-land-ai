@@ -31,6 +31,7 @@ import { AiChatMessage } from "./AiChatMessage";
 import { LivePreview } from "./LivePreview";
 import { Button } from "../shared/ui/button";
 import { useTranspiler } from "../hooks/useTranspiler";
+import { DEFAULT_VIBE_CODE } from "../vibe-code-default";
 
 // Lazy-load the Monaco-based code editor to keep initial bundle small
 const CodeEditor = lazy(() =>
@@ -43,46 +44,6 @@ export interface VibeCoderProps {
 }
 
 type MobilePanel = "chat" | "code" | "preview";
-
-const DEFAULT_CODE = `import React, { useState } from "react";
-
-export default function App() {
-  const [hovered, setHovered] = useState(false);
-  const [clicks, setClicks] = useState(0);
-
-  return (
-    <div className="flex items-center justify-center h-screen bg-background">
-      <div
-        onMouseEnter={() => setHovered(true)}
-        onMouseLeave={() => setHovered(false)}
-        onClick={() => setClicks(c => c + 1)}
-        className="relative cursor-pointer select-none rounded-2xl p-px transition-all duration-300"
-        style={{
-          background: hovered
-            ? "hsl(var(--primary))"
-            : "hsl(var(--muted-foreground) / 0.3)",
-          boxShadow: hovered
-            ? "0 0 40px 8px hsl(var(--primary) / 0.4)"
-            : "none",
-        }}
-      >
-        <div className="rounded-2xl bg-card/90 backdrop-blur-xl px-10 py-8 text-center border border-border">
-          <div
-            className="text-5xl mb-3 transition-all duration-300 text-primary"
-            style={{ filter: hovered ? "drop-shadow(0 0 12px hsl(var(--primary) / 0.8))" : "none" }}
-          >
-            ✦
-          </div>
-          <h1 className="text-2xl font-bold text-foreground tracking-tight">VibeCoder</h1>
-          <p className="text-sm text-muted-foreground mt-1 mb-4">Edit me. I react to you.</p>
-          <div className="inline-block rounded-full bg-muted border border-border px-4 py-1 text-xs text-muted-foreground">
-            {clicks === 0 ? "hover · click · vibe" : \`clicked \${clicks}×\`}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}`;
 
 // ---------------------------------------------------------------------------
 // Resizable divider
@@ -534,7 +495,7 @@ interface PreviewPanelProps {
 }
 
 function PreviewPanel({ appId, code, isDarkMode, className }: PreviewPanelProps) {
-  const { html, error: transpileError, isTranspiling } = useTranspiler(code);
+  const { html, error: transpileError, isTranspiling } = useTranspiler(code, 300, isDarkMode);
 
   return (
     <div className={cn("flex flex-col h-full overflow-hidden", "bg-background", className)}>
@@ -805,7 +766,7 @@ const MIN_PANEL_WIDTH = 240; // px
 const DEFAULT_CHAT_WIDTH = 320; // px
 const DEFAULT_PREVIEW_WIDTH = 400; // px
 
-export function VibeCoder({ initialCode = DEFAULT_CODE, appId }: VibeCoderProps) {
+export function VibeCoder({ initialCode = DEFAULT_VIBE_CODE, appId }: VibeCoderProps) {
   const { isDarkMode } = useDarkMode();
   const [code, setCode] = useState(initialCode);
   const [activePanel, setActivePanel] = useState<MobilePanel>("chat");

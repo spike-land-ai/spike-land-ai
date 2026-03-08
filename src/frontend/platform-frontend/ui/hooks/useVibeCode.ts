@@ -1,5 +1,6 @@
 import { useCallback, useState, useRef } from "react";
 import type { ChatMessage } from "./useChat";
+import { DEFAULT_VIBE_CODE } from "../vibe-code-default";
 
 interface UseVibeCodeReturn {
   code: string;
@@ -13,29 +14,12 @@ interface UseVibeCodeReturn {
   undo: () => void;
 }
 
-const DEFAULT_CODE = `// Welcome to Vibe Coder
-// Chat with the AI to start building your app
-
-import React from "react";
-
-export default function App() {
-  return (
-    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-purple-500 to-pink-500">
-      <div className="text-center text-white">
-        <h1 className="text-4xl font-bold mb-4">Hello, Vibe Coder!</h1>
-        <p className="text-lg opacity-80">Start chatting to build something amazing.</p>
-      </div>
-    </div>
-  );
-}
-`;
-
 export function useVibeCode(): UseVibeCodeReturn {
-  const [code, setCodeRaw] = useState(DEFAULT_CODE);
+  const [code, setCodeRaw] = useState(DEFAULT_VIBE_CODE);
   const [language, setLanguage] = useState("typescript");
   const [fileName, setFileName] = useState("App.tsx");
   const historyRef = useRef<Array<{ code: string; timestamp: number }>>([
-    { code: DEFAULT_CODE, timestamp: Date.now() },
+    { code: DEFAULT_VIBE_CODE, timestamp: Date.now() },
   ]);
 
   const setCode = useCallback((newCode: string) => {
