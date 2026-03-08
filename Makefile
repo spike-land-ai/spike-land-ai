@@ -10,7 +10,7 @@
 SHELL := /bin/bash
 ROOT := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 
-.PHONY: build-all test-all lint-all check-all health status validate \
+.PHONY: build-all test-all lint-all check-all status validate \
         build test test-watch test-coverage typecheck lint \
         rollback-worker rollback-spa rollback-spa-list \
         docker-setup docker-dev docker-ci docker-staging docker-prod \
@@ -30,9 +30,6 @@ lint-all:
 
 check-all: lint-all test-all
 	@echo "All checks passed"
-
-health:
-	@bash "$(ROOT).github/scripts/org-health.sh" "$(ROOT)"
 
 validate:
 	node "$(ROOT).github/scripts/validate-workspace-graph.mjs"

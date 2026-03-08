@@ -40,13 +40,11 @@ const packagePathMap: Record<string, string> = {
   "block-website": "core/block-website",
   "chess-engine": "core/chess",
   code: "frontend/monaco-editor",
-  "esm-cdn": "utilities/esm-cdn",
   "esbuild-wasm-mcp": "mcp-tools/esbuild-wasm",
   "google-analytics-mcp": "mcp-tools/google-analytics",
   "google-ads-mcp": "mcp-tools/google-ads",
   "hackernews-mcp": "mcp-tools/hackernews",
   "image-studio-worker": "edge-api/image-studio-worker",
-  "incremental-test-mcp": "utilities/incremental-test",
   "mcp-auth": "edge-api/auth",
   "mcp-image-studio": "mcp-tools/image-studio",
   "mcp-server-base": "core/server-base",
@@ -179,11 +177,6 @@ const packages: Record<string, PkgConfig> = {
     reportsDirectory: path.join(root, "coverage/code"),
   },
 
-  "esm-cdn": {
-    tier: 3,
-    includeTests: [src("utilities/esm-cdn/**/*.spec.ts")],
-    coverageExclude: [],
-  },
   "esbuild-wasm-mcp": { tier: 2, pool: "forks" },
   "google-analytics-mcp": { tier: 2, pool: "forks" },
   "google-ads-mcp": { tier: 2, pool: "forks" },
@@ -204,8 +197,6 @@ const packages: Record<string, PkgConfig> = {
       "**/shared-types.ts",
     ],
   },
-
-  "incremental-test-mcp": { tier: 3, coverageExclude: [] },
 
   "mcp-auth": {
     tier: 1,

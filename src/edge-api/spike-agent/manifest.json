@@ -1,6 +1,0 @@
-{
-  "name": "spike-agent",
-  "category": "edge-api",
-  "dependencies": ["agents", "hono"],
-  "files": ["api/index.ts", "core-logic/env.ts"]
-}

@@ -172,7 +172,7 @@ jobs:
       # D10: Parallelize independent worker deploys (wave 1: no deps)
       - name: "Deploy wave 1: independent workers"
         run: |
-          echo "--- Wave 1: transpile, mcp-auth, spike-land-mcp, spike-review, image-studio-worker, spike-agent (parallel) ---"
+          echo "--- Wave 1: transpile, mcp-auth, spike-land-mcp, spike-review, image-studio-worker (parallel) ---"
           (cd packages/transpile && npm run deploy) &
           PID_TRANSPILE=$!
           (cd packages/mcp-auth && npm run deploy) &
@@ -183,15 +183,12 @@ jobs:
           PID_REVIEW=$!
           (cd packages/image-studio-worker && npm run deploy) &
           PID_IMAGE=$!
-          (cd packages/spike-agent && npm run deploy) &
-          PID_AGENT=$!
 
           wait $PID_TRANSPILE || { echo "FATAL: transpile deploy failed"; exit 1; }
           wait $PID_AUTH || { echo "FATAL: mcp-auth deploy failed"; exit 1; }
           wait $PID_MCP || { echo "FATAL: spike-land-mcp deploy failed"; exit 1; }
           wait $PID_REVIEW || { echo "FATAL: spike-review deploy failed"; exit 1; }
           wait $PID_IMAGE || { echo "FATAL: image-studio-worker deploy failed"; exit 1; }
-          wait $PID_AGENT || { echo "FATAL: spike-agent deploy failed"; exit 1; }
           echo "Wave 1 complete."
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}

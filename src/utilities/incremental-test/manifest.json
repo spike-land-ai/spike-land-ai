@@ -1,6 +1,0 @@
-{
-  "name": "incremental-test",
-  "category": "utilities",
-  "dependencies": ["node:child_process", "node:crypto", "node:fs"],
-  "files": ["core-logic/index.ts", "node-sys/logic.ts"]
-}
