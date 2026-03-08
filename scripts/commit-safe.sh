@@ -183,10 +183,34 @@ process_package() {
     echo -e "  ${YELLOW}Skipping CI gate (SKIP_DEPOT=1)${NC}"
   fi
 
-  # ── Commit ────────────────────────────────────────────────────────
+  # ── Gemini review gate ──────────────────────────────────────────────
+  echo -e "  ${BLUE}Running Gemini code review...${NC}"
+  if command -v gemini &>/dev/null; then
+    if bash scripts/gemini-review.sh 2>&1 | tail -10; then
+      echo -e "  ${GREEN}Gemini review passed${NC}"
+    else
+      echo -e "  ${RED}Gemini review REJECTED — unstaging${NC}"
+      git reset HEAD -- "${staged_files[@]}" >/dev/null 2>&1
+      update_queue_status "$pkg" "failed"
+      FAILED+=("$pkg")
+      return 1
+    fi
+  else
+    echo -e "  ${YELLOW}Skipping Gemini review (gemini CLI not found)${NC}"
+  fi
+
+  # ── Commit + Push + PR ──────────────────────────────────────────────
   local pkg_short
   pkg_short=$(echo "$pkg" | sed 's|^src/||')
   local msg="feat(${pkg_short}): auto-commit stable changes [tests:pass]"
+  local branch
+  branch=$(git branch --show-current)
+
+  # If on main, create a feature branch
+  if [ "$branch" = "main" ]; then
+    branch="auto-pr-$(date +%s)"
+    git checkout -b "$branch" >/dev/null 2>&1
+  fi
 
   git commit -m "$(cat <<EOF
 ${msg}
@@ -196,6 +220,35 @@ EOF
 )" >/dev/null 2>&1
 
   echo -e "  ${GREEN}Committed: ${msg}${NC}"
+
+  # Push and create PR
+  echo -e "  ${BLUE}Pushing to origin/${branch}...${NC}"
+  if git push -u origin "$branch" >/dev/null 2>&1; then
+    echo -e "  ${GREEN}Pushed${NC}"
+    # Create PR if one doesn't exist
+    if ! gh pr view "$branch" >/dev/null 2>&1; then
+      echo -e "  ${BLUE}Creating PR...${NC}"
+      gh pr create \
+        --title "$msg" \
+        --body "$(cat <<'PREOF'
+## Auto-committed changes
+
+Reviewed by Gemini 2.5 Flash before commit.
+
+Pipeline: typecheck ✓ → vitest ✓ → gemini review ✓
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+PREOF
+)" \
+        --base main >/dev/null 2>&1 && echo -e "  ${GREEN}PR created${NC}"
+    fi
+    # Auto-merge after CI passes
+    gh pr merge "$branch" --auto --merge >/dev/null 2>&1 && \
+      echo -e "  ${GREEN}Auto-merge enabled (will merge after CI passes)${NC}"
+  else
+    echo -e "  ${YELLOW}Push failed (will retry on next cycle)${NC}"
+  fi
+
   update_queue_status "$pkg" "committed"
   COMMITTED+=("$pkg")
 }

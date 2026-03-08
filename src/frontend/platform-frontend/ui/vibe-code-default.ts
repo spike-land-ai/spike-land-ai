@@ -7,8 +7,10 @@ const APPS = [
     category: "Browser automation",
     status: "Live",
     metric: "128 checks in 41s",
+    focus: "Playwright-grade browser loops",
     pitch: "Turn acceptance criteria into browser sessions with screenshots, traces, and deterministic assertions.",
     features: ["Playwright-grade runs", "Visual diffs", "Console capture"],
+    bars: [92, 74, 88],
     command: [
       "browser.open('/pricing')",
       "browser.click('Start free')",
@@ -22,8 +24,10 @@ const APPS = [
     category: "Signal-ranked triage",
     status: "Shipping",
     metric: "ELO-ranked fixes",
+    focus: "Prioritize fixes by proof",
     pitch: "Rank bugs by urgency, not vibes, so the team ships the highest-leverage fix first.",
     features: ["Public queue", "ELO severity", "Fix history"],
+    bars: [76, 96, 82],
     command: [
       "bugbook.report('Payment CTA is clipped on iPhone SE')",
       "bugbook.rank({ severity: 'high', reproducible: true })",
@@ -37,8 +41,10 @@ const APPS = [
     category: "Interactive learning",
     status: "Verify",
     metric: "Proof, not passive reading",
+    focus: "Adaptive learning loops",
     pitch: "Convert content into adaptive quizzes, badges, and verifiable understanding in one pass.",
     features: ["Quiz generation", "Badge proofs", "Session replay"],
+    bars: [72, 88, 94],
     command: [
       "learn.extract('cloudflare-workers-guide')",
       "learn.generateQuiz({ rounds: 5, difficulty: 'adaptive' })",
@@ -52,8 +58,10 @@ const APPS = [
     category: "Media pipelines",
     status: "Ready",
     metric: "Campaign art in minutes",
+    focus: "Asset pipelines at launch speed",
     pitch: "Go from prompt to generated assets, variations, and delivery-ready bundles without leaving the workspace.",
     features: ["Prompt chains", "Batch variants", "Album outputs"],
+    bars: [90, 68, 84],
     command: [
       "image.generate('Launch poster with amber kinetic type')",
       "image.upscale('hero-poster')",
@@ -63,43 +71,37 @@ const APPS = [
   },
 ] as const;
 
-const SIGNALS = [
-  { value: "84", label: "tools wired", note: "registry, auth, browser, image and edge" },
+const METRICS = [
+  { value: "84", label: "tools live", note: "registry, auth, browser, image and edge" },
   { value: "310ms", label: "preview loop", note: "edit, transpile, re-render in place" },
-  { value: "3 rails", label: "one workspace", note: "chat, code and live app stay in sync" },
+  { value: "4", label: "apps on deck", note: "interactive MCP surfaces in one shell" },
 ] as const;
 
-const WALKTHROUGH = [
+const PIPELINE = [
   {
-    title: "Prompt the workflow",
-    detail: "Describe the app in plain English and let the editor scaffold the first product-shaped slice.",
+    title: "Prompt",
+    detail: "Describe the product slice in plain English.",
   },
   {
-    title: "Watch the preview lock in",
-    detail: "The live iframe mirrors every edit while syntax context and type feedback stay awake.",
+    title: "Shape",
+    detail: "Monaco keeps syntax, types, and the preview in sync.",
   },
   {
-    title: "Wire MCP actions",
-    detail: "Swap static cards for real tools, browser flows, image pipelines, or bug streams without changing the shell.",
+    title: "Wire",
+    detail: "Swap placeholders for browser runs, bug flows, and media tools.",
   },
-] as const;
-
-const ORBIT_CHIPS = [
-  { label: "registry.search()", top: "10%", left: "12%" },
-  { label: "browser.assert()", top: "21%", right: "7%" },
-  { label: "image.generate()", top: "56%", right: "9%" },
-  { label: "bugbook.rank()", bottom: "18%", left: "11%" },
-  { label: "learn.issueBadge()", bottom: "8%", right: "23%" },
-  { label: "workers.deploy()", top: "38%", left: "4%" },
+  {
+    title: "Ship",
+    detail: "Keep the same shell from preview to edge deploy.",
+  },
 ] as const;
 
 const STYLES = [
-  "@keyframes orbitFloat { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-10px); } }",
   "@keyframes scanLine { 0% { transform: translateY(-25%); opacity: 0; } 20% { opacity: 1; } 100% { transform: translateY(140%); opacity: 0; } }",
+  "@keyframes pulseGlow { 0%, 100% { box-shadow: 0 0 0 rgba(0, 0, 0, 0); } 50% { box-shadow: 0 0 0 1px color-mix(in srgb, var(--chat-accent) 20%, transparent), 0 18px 44px color-mix(in srgb, var(--chat-accent) 14%, transparent); } }",
   ".spike-grid { background-image: linear-gradient(to right, color-mix(in srgb, var(--border-color) 72%, transparent) 1px, transparent 1px), linear-gradient(to bottom, color-mix(in srgb, var(--border-color) 72%, transparent) 1px, transparent 1px); background-size: 42px 42px; }",
-  ".glass-panel { background: color-mix(in srgb, var(--card-bg) 84%, transparent); backdrop-filter: blur(24px); }",
-  ".orbit-chip { animation: orbitFloat 7s ease-in-out infinite; }",
   ".scan-line { animation: scanLine 6.5s linear infinite; }",
+  ".pulse-glow { animation: pulseGlow 6s ease-in-out infinite; }",
 ].join("");
 
 const PANEL_STYLE = {
@@ -141,7 +143,7 @@ export default function App() {
         />
 
         <div className="relative mx-auto flex h-full max-w-[1500px] flex-col px-4 py-4 sm:px-6 lg:px-8">
-          <div className="grid gap-4 xl:grid-cols-[1.06fr_0.94fr]">
+          <div className="grid gap-4 xl:grid-cols-[1.08fr_0.92fr]">
             <section className="rounded-[2rem] p-5 sm:p-6" style={PANEL_STYLE}>
               <div className="flex flex-wrap items-center gap-3">
                 <span
@@ -161,184 +163,88 @@ export default function App() {
                 </span>
               </div>
 
-              <div className="mt-6 max-w-2xl">
-                <p className="text-xs font-black uppercase tracking-[0.34em] text-muted-foreground">
-                  spike.land / chat + code + preview
-                </p>
-                <h1
-                  className="mt-3 text-4xl font-black tracking-tight sm:text-5xl 2xl:text-6xl"
-                  style={{ fontFamily: "var(--font-display)" }}
-                >
-                  MCP apps that look like product
-                  <span
-                    className="mt-1 block text-transparent"
-                    style={{
-                      backgroundImage:
-                        "linear-gradient(135deg, var(--fg) 0%, var(--chat-accent-light) 45%, var(--primary-light) 100%)",
-                      WebkitBackgroundClip: "text",
-                      backgroundClip: "text",
-                    }}
+              <div className="mt-6 grid gap-4 lg:grid-cols-[1.25fr_0.75fr]">
+                <div className="max-w-2xl">
+                  <p className="text-xs font-black uppercase tracking-[0.34em] text-muted-foreground">
+                    spike.land / chat + code + preview
+                  </p>
+                  <h1
+                    className="mt-3 text-4xl font-black tracking-tight sm:text-5xl 2xl:text-[3.6rem]"
+                    style={{ fontFamily: "var(--font-display)" }}
                   >
-                    and feel like instruments.
-                  </span>
-                </h1>
-                <p className="mt-4 max-w-xl text-sm leading-6 text-muted-foreground sm:text-base">
-                  Vibe through a live editor, let the preview answer instantly, then route browser
-                  automation, bug triage, learning loops, and media pipelines through one design
-                  language.
-                </p>
-              </div>
-
-              <div className="mt-6 flex flex-wrap gap-2.5">
-                {[
-                  "live preview",
-                  "dark/light aware surfaces",
-                  "edge-ready from chat",
-                ].map((label) => (
-                  <span
-                    key={label}
-                    className="rounded-full border border-border px-3 py-1.5 text-xs font-semibold text-foreground"
-                    style={{ background: "color-mix(in srgb, var(--muted-bg) 74%, transparent)" }}
-                  >
-                    {label}
-                  </span>
-                ))}
-              </div>
-
-              <div className="mt-6 grid gap-3 sm:grid-cols-3">
-                {SIGNALS.map((signal) => (
-                  <div
-                    key={signal.label}
-                    className="rounded-[1.35rem] p-3.5"
-                    style={{
-                      background: "color-mix(in srgb, var(--bg) 72%, transparent)",
-                      border: "1px solid color-mix(in srgb, var(--border-color) 80%, transparent)",
-                    }}
-                  >
-                    <p className="text-3xl font-black tracking-tight text-foreground">{signal.value}</p>
-                    <p className="mt-1 text-xs font-black uppercase tracking-[0.24em] text-muted-foreground">
-                      {signal.label}
-                    </p>
-                    <p className="mt-2 text-[13px] leading-5 text-muted-foreground">{signal.note}</p>
-                  </div>
-                ))}
-              </div>
-            </section>
-
-            <section className="relative min-h-[320px] overflow-hidden rounded-[2rem] p-5" style={PANEL_STYLE}>
-              <div className="absolute inset-5 rounded-full border border-border opacity-60" />
-              <div className="absolute inset-12 rounded-full border border-border opacity-35" />
-              <div className="scan-line absolute inset-x-0 top-0 h-24" style={{
-                background:
-                  "linear-gradient(180deg, transparent, color-mix(in srgb, var(--chat-accent) 16%, transparent), transparent)",
-              }} />
-
-              {ORBIT_CHIPS.map((chip, index) => (
-                <div
-                  key={chip.label}
-                  className={"orbit-chip absolute rounded-full border border-border px-2.5 py-1 text-[10px] font-semibold text-muted-foreground " + (index > 2 ? "hidden 2xl:block" : "")}
-                  style={{
-                    ...chip,
-                    background: "color-mix(in srgb, var(--bg) 82%, transparent)",
-                    animationDelay: index * 0.55 + "s",
-                    opacity: index > 2 ? 0.78 : 1,
-                  }}
-                >
-                  {chip.label}
-                </div>
-              ))}
-
-              <div className="relative z-10 ml-auto mt-10 max-w-[360px] rounded-[1.5rem] p-4" style={INNER_PANEL_STYLE}>
-                <div className="flex items-center justify-between gap-3">
-                  <div>
-                    <p className="text-[10px] font-black uppercase tracking-[0.28em] text-muted-foreground">
-                      Selected app
-                    </p>
-                    <h2 className="mt-1.5 text-2xl font-black tracking-tight text-foreground">
-                      {activeApp.name}
-                    </h2>
-                  </div>
-                  <span
-                    className="rounded-full px-3 py-1 text-xs font-black uppercase tracking-[0.24em]"
-                    style={{
-                      background:
-                        activeApp.status === "Live"
-                          ? "color-mix(in srgb, var(--success-fg) 14%, transparent)"
-                          : activeApp.status === "Verify"
-                            ? "color-mix(in srgb, var(--info-fg) 14%, transparent)"
-                            : "color-mix(in srgb, var(--chat-accent) 14%, transparent)",
-                      color:
-                        activeApp.status === "Live"
-                          ? "var(--success-fg)"
-                          : activeApp.status === "Verify"
-                            ? "var(--info-fg)"
-                            : "var(--chat-accent)",
-                    }}
-                  >
-                    {activeApp.status}
-                  </span>
-                </div>
-
-                <p className="mt-3 text-sm leading-6 text-muted-foreground">{activeApp.pitch}</p>
-
-                <div className="mt-4 grid grid-cols-3 gap-2">
-                  <div
-                    className="rounded-[1rem] px-3 py-2.5"
-                    style={{ background: "color-mix(in srgb, var(--muted-bg) 72%, transparent)" }}
-                  >
-                    <p className="text-[10px] font-black uppercase tracking-[0.24em] text-muted-foreground">
-                      category
-                    </p>
-                    <p className="mt-1.5 text-sm font-bold text-foreground">{activeApp.category}</p>
-                  </div>
-                  <div
-                    className="rounded-[1rem] px-3 py-2.5"
-                    style={{ background: "color-mix(in srgb, var(--muted-bg) 72%, transparent)" }}
-                  >
-                    <p className="text-[10px] font-black uppercase tracking-[0.24em] text-muted-foreground">
-                      signal
-                    </p>
-                    <p className="mt-1.5 text-sm font-bold text-foreground">{activeApp.metric}</p>
-                  </div>
-                  <div
-                    className="rounded-[1rem] px-3 py-2.5"
-                    style={{ background: "color-mix(in srgb, var(--muted-bg) 72%, transparent)" }}
-                  >
-                    <p className="text-[10px] font-black uppercase tracking-[0.24em] text-muted-foreground">
-                      theme
-                    </p>
-                    <p className="mt-1.5 text-sm font-bold capitalize text-foreground">{themeMode}</p>
-                  </div>
-                </div>
-
-                <div className="mt-4 flex flex-wrap gap-2">
-                  {activeApp.features.map((feature) => (
+                    MCP apps that look like product
                     <span
-                      key={feature}
-                      className="rounded-full border border-border px-3 py-1 text-xs font-semibold text-foreground"
-                      style={{ background: "color-mix(in srgb, var(--card-bg) 70%, transparent)" }}
+                      className="mt-1 block text-transparent"
+                      style={{
+                        backgroundImage:
+                          "linear-gradient(135deg, var(--fg) 0%, var(--chat-accent-light) 42%, var(--primary-light) 100%)",
+                        WebkitBackgroundClip: "text",
+                        backgroundClip: "text",
+                      }}
                     >
-                      {feature}
+                      and behave like instruments.
                     </span>
+                  </h1>
+                  <p className="mt-4 max-w-xl text-sm leading-6 text-muted-foreground sm:text-base">
+                    Build in one loop: prompt, edit, preview, and wire real MCP actions without
+                    breaking the visual system between idea and deploy.
+                  </p>
+
+                  <div className="mt-5 flex flex-wrap gap-2.5">
+                    {[
+                      "live preview",
+                      "type-aware editor",
+                      "dark/light aware surfaces",
+                      "edge-ready from chat",
+                    ].map((label) => (
+                      <span
+                        key={label}
+                        className="rounded-full border border-border px-3 py-1.5 text-xs font-semibold text-foreground"
+                        style={{
+                          background: "color-mix(in srgb, var(--muted-bg) 74%, transparent)",
+                        }}
+                      >
+                        {label}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="grid gap-3 sm:grid-cols-3 lg:grid-cols-1">
+                  {METRICS.map((metric) => (
+                    <div
+                      key={metric.label}
+                      className="rounded-[1.35rem] p-3.5"
+                      style={{
+                        background: "color-mix(in srgb, var(--bg) 72%, transparent)",
+                        border: "1px solid color-mix(in srgb, var(--border-color) 80%, transparent)",
+                      }}
+                    >
+                      <p className="text-3xl font-black tracking-tight text-foreground">{metric.value}</p>
+                      <p className="mt-1 text-xs font-black uppercase tracking-[0.24em] text-muted-foreground">
+                        {metric.label}
+                      </p>
+                      <p className="mt-2 text-[13px] leading-5 text-muted-foreground">{metric.note}</p>
+                    </div>
                   ))}
                 </div>
               </div>
             </section>
           </div>
 
-          <div className="mt-4 grid min-h-0 gap-4 xl:grid-cols-[1.06fr_0.94fr]">
+          <div className="mt-4 grid min-h-0 gap-4 xl:grid-cols-[1.08fr_0.92fr]">
             <section className="rounded-[2rem] p-5" style={PANEL_STYLE}>
               <div className="flex flex-wrap items-end justify-between gap-4">
                 <div>
                   <p className="text-xs font-black uppercase tracking-[0.28em] text-muted-foreground">
-                    Featured MCP apps
+                    App atlas
                   </p>
                   <h2 className="mt-2 text-2xl font-black tracking-tight text-foreground">
-                    Click an app. The control stack reconfigures.
+                    Click an app. The shell reconfigures instantly.
                   </h2>
                 </div>
                 <p className="max-w-sm text-sm leading-6 text-muted-foreground">
-                  A real product sample, not a floating hero card.
+                  Each card is a concrete MCP surface, not a placeholder tile.
                 </p>
               </div>
 
@@ -372,6 +278,7 @@ export default function App() {
                           <h3 className="mt-1.5 text-lg font-black tracking-tight text-foreground">
                             {app.name}
                           </h3>
+                          <p className="mt-1 text-xs font-semibold text-primary">{app.focus}</p>
                         </div>
                         <span
                           className="rounded-full px-3 py-1 text-[10px] font-black uppercase tracking-[0.24em]"
@@ -386,7 +293,7 @@ export default function App() {
                         </span>
                       </div>
 
-                      <p className="mt-2.5 text-sm leading-5.5 text-muted-foreground">{app.pitch}</p>
+                      <p className="mt-2.5 text-sm leading-6 text-muted-foreground">{app.pitch}</p>
 
                       <div className="mt-3 flex flex-wrap gap-2">
                         {app.features.map((feature) => (
@@ -411,52 +318,175 @@ export default function App() {
               </div>
             </section>
 
-            <section className="rounded-[2rem] p-5" style={PANEL_STYLE}>
-              <div className="flex items-end justify-between gap-4">
-                <div>
-                  <p className="text-xs font-black uppercase tracking-[0.28em] text-muted-foreground">
-                    DX walkthrough
-                  </p>
-                  <h2 className="mt-2 text-2xl font-black tracking-tight text-foreground">
-                    The whole path is thought through.
-                  </h2>
+            <section className="grid min-h-0 gap-4">
+              <div className="relative overflow-hidden rounded-[2rem] p-5 pulse-glow" style={PANEL_STYLE}>
+                <div className="scan-line absolute inset-x-0 top-0 h-24" style={{
+                  background:
+                    "linear-gradient(180deg, transparent, color-mix(in srgb, var(--chat-accent) 18%, transparent), transparent)",
+                }} />
+
+                <div className="relative z-10">
+                  <div className="flex items-start justify-between gap-4">
+                    <div>
+                      <p className="text-xs font-black uppercase tracking-[0.28em] text-muted-foreground">
+                        Selected app
+                      </p>
+                      <h2 className="mt-2 text-3xl font-black tracking-tight text-foreground">
+                        {activeApp.name}
+                      </h2>
+                      <p className="mt-1 text-sm font-semibold text-primary">{activeApp.focus}</p>
+                    </div>
+                    <span
+                      className="rounded-full px-3 py-1 text-xs font-black uppercase tracking-[0.24em]"
+                      style={{
+                        background:
+                          activeApp.status === "Live"
+                            ? "color-mix(in srgb, var(--success-fg) 14%, transparent)"
+                            : activeApp.status === "Verify"
+                              ? "color-mix(in srgb, var(--info-fg) 14%, transparent)"
+                              : "color-mix(in srgb, var(--chat-accent) 14%, transparent)",
+                        color:
+                          activeApp.status === "Live"
+                            ? "var(--success-fg)"
+                            : activeApp.status === "Verify"
+                              ? "var(--info-fg)"
+                              : "var(--chat-accent)",
+                      }}
+                    >
+                      {activeApp.status}
+                    </span>
+                  </div>
+
+                  <div className="mt-4 grid gap-4 lg:grid-cols-[1fr_160px]">
+                    <div>
+                      <p className="text-sm leading-6 text-muted-foreground">{activeApp.pitch}</p>
+
+                      <div className="mt-4 grid grid-cols-3 gap-2">
+                        <div
+                          className="rounded-[1rem] px-3 py-2.5"
+                          style={{
+                            background: "color-mix(in srgb, var(--muted-bg) 72%, transparent)",
+                          }}
+                        >
+                          <p className="text-[10px] font-black uppercase tracking-[0.24em] text-muted-foreground">
+                            category
+                          </p>
+                          <p className="mt-1.5 text-sm font-bold text-foreground">{activeApp.category}</p>
+                        </div>
+                        <div
+                          className="rounded-[1rem] px-3 py-2.5"
+                          style={{
+                            background: "color-mix(in srgb, var(--muted-bg) 72%, transparent)",
+                          }}
+                        >
+                          <p className="text-[10px] font-black uppercase tracking-[0.24em] text-muted-foreground">
+                            signal
+                          </p>
+                          <p className="mt-1.5 text-sm font-bold text-foreground">{activeApp.metric}</p>
+                        </div>
+                        <div
+                          className="rounded-[1rem] px-3 py-2.5"
+                          style={{
+                            background: "color-mix(in srgb, var(--muted-bg) 72%, transparent)",
+                          }}
+                        >
+                          <p className="text-[10px] font-black uppercase tracking-[0.24em] text-muted-foreground">
+                            theme
+                          </p>
+                          <p className="mt-1.5 text-sm font-bold capitalize text-foreground">{themeMode}</p>
+                        </div>
+                      </div>
+
+                      <div className="mt-4 flex flex-wrap gap-2">
+                        {activeApp.features.map((feature) => (
+                          <span
+                            key={feature}
+                            className="rounded-full border border-border px-3 py-1 text-xs font-semibold text-foreground"
+                            style={{
+                              background: "color-mix(in srgb, var(--card-bg) 70%, transparent)",
+                            }}
+                          >
+                            {feature}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div
+                      className="rounded-[1.25rem] p-3"
+                      style={INNER_PANEL_STYLE}
+                    >
+                      <p className="text-[10px] font-black uppercase tracking-[0.28em] text-muted-foreground">
+                        Signal board
+                      </p>
+                      <div className="mt-3 flex h-24 items-end gap-2">
+                        {activeApp.bars.map((bar, index) => (
+                          <div
+                            key={bar + '-' + index}
+                            className="flex-1 rounded-t-xl"
+                            style={{
+                              height: bar + "%",
+                              background:
+                                index === 1
+                                  ? "linear-gradient(180deg, var(--primary-light), var(--chat-accent))"
+                                  : "linear-gradient(180deg, color-mix(in srgb, var(--chat-accent-light) 72%, transparent), color-mix(in srgb, var(--chat-accent) 68%, transparent))",
+                              boxShadow:
+                                "0 0 0 1px color-mix(in srgb, var(--chat-accent) 18%, transparent)",
+                            }}
+                          />
+                        ))}
+                      </div>
+                      <div className="mt-3 space-y-1.5 text-[11px] font-semibold text-muted-foreground">
+                        <p>preview stable</p>
+                        <p>types loaded</p>
+                        <p>tool rail ready</p>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
 
-              <div className="mt-4 space-y-2.5">
-                {WALKTHROUGH.map((item, index) => (
-                  <div
-                    key={item.title}
-                    className="flex gap-3 rounded-[1.25rem] px-3.5 py-3.5"
-                    style={{
-                      background: "color-mix(in srgb, var(--bg) 74%, transparent)",
-                      border: "1px solid color-mix(in srgb, var(--border-color) 82%, transparent)",
-                    }}
-                  >
+              <div className="rounded-[2rem] p-5" style={PANEL_STYLE}>
+                <div className="flex items-end justify-between gap-4">
+                  <div>
+                    <p className="text-xs font-black uppercase tracking-[0.28em] text-muted-foreground">
+                      DX walkthrough
+                    </p>
+                    <h2 className="mt-2 text-2xl font-black tracking-tight text-foreground">
+                      The whole path is thought through.
+                    </h2>
+                  </div>
+                </div>
+
+                <div className="mt-4 grid gap-3 md:grid-cols-2">
+                  {PIPELINE.map((item, index) => (
                     <div
-                      className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl text-sm font-black"
+                      key={item.title}
+                      className="flex gap-3 rounded-[1.25rem] px-3.5 py-3.5"
                       style={{
-                        background: "color-mix(in srgb, var(--chat-accent) 14%, transparent)",
-                        color: "var(--chat-accent)",
+                        background: "color-mix(in srgb, var(--bg) 74%, transparent)",
+                        border: "1px solid color-mix(in srgb, var(--border-color) 82%, transparent)",
                       }}
                     >
-                      {String(index + 1).padStart(2, "0")}
+                      <div
+                        className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl text-sm font-black"
+                        style={{
+                          background: "color-mix(in srgb, var(--chat-accent) 14%, transparent)",
+                          color: "var(--chat-accent)",
+                        }}
+                      >
+                        {String(index + 1).padStart(2, "0")}
+                      </div>
+                      <div>
+                        <p className="text-sm font-black tracking-tight text-foreground">{item.title}</p>
+                        <p className="mt-1 text-[13px] leading-5 text-muted-foreground">{item.detail}</p>
+                      </div>
                     </div>
-                    <div>
-                      <p className="text-sm font-black tracking-tight text-foreground">{item.title}</p>
-                      <p className="mt-1 text-[13px] leading-5.5 text-muted-foreground">{item.detail}</p>
-                    </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
 
-              <div
-                className="mt-4 rounded-[1.25rem] p-3.5"
-                style={{
-                  background: "color-mix(in srgb, var(--bg) 74%, transparent)",
-                  border: "1px solid color-mix(in srgb, var(--border-color) 82%, transparent)",
-                }}
-              >
+              <div className="rounded-[2rem] p-5" style={PANEL_STYLE}>
                 <div className="flex flex-wrap items-center justify-between gap-3">
                   <div>
                     <p className="text-xs font-black uppercase tracking-[0.28em] text-muted-foreground">

@@ -35,7 +35,8 @@
     "dev": "bash scripts/dev-local.sh",
     "docker:setup": "bash docker/scripts/setup-certs.sh && bash docker/scripts/setup-dns.sh",
     "docker:dev": "docker compose -f docker/docker-compose.yml -f docker/docker-compose.dev.yml up -d",
-    "docker:down": "docker compose -f docker/docker-compose.yml down"
+    "docker:down": "docker compose -f docker/docker-compose.yml down",
+    "review": "bash scripts/gemini-review.sh"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.27.1",

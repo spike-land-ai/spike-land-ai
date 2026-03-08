@@ -1,6 +1,6 @@
 ---
 name: rubik
-description: spike.land web design system — typography, components, styling, UI patterns, kinetic type effects. Use for any spike.land design, UI, styling, font, or typography work.
+description: spike.land web design system — typography, components, styling, UI patterns, embedded preview surfaces, semantic-token theming, and kinetic type effects. Use for any spike.land design, UI, styling, font, layout, theme, dashboard, preview iframe, Monaco-adjacent demo, or typography work. Reach for this skill whenever a spike.land screen feels generic, too spacious, visually inconsistent, or weak in light/dark mode.
 ---
 
 # Rubik: spike.land Design System
@@ -12,6 +12,22 @@ Named after Erno Rubik — geometric precision meets expressive motion.
 spike.land's visual DNA: **geometric, slightly rounded, futuristic**. The site
 feels like a developer tool that has a personality — clean and functional, but
 never boring.
+
+## Working Mode
+
+Start by identifying the surface you are designing. Rubik should produce
+different density, type scale, and composition for a landing page than for an
+embedded app preview.
+
+| Surface | Use when | Default posture | Common failure mode |
+|---------|----------|-----------------|---------------------|
+| **Marketing / hero** | Homepages, launches, storytelling sections | Bigger type, more atmosphere, fewer UI controls | Looks like a generic SaaS gradient |
+| **Product / dashboard** | Logged-in tools, settings, analytics, MCP control surfaces | Denser layout, clearer information hierarchy, stronger panel structure | Becomes flat and boxy |
+| **Embedded / preview** | Iframes, live demos, Monaco examples, generated sample apps | Compact, viewport-aware, compositional, no wasted space | Ships a squeezed landing page instead of a product surface |
+
+For embedded previews, prefer **density over sprawl**. A preview should feel
+like a complete instrument panel, not a full marketing page crammed into a
+smaller box.
 
 ### Typography Stack
 
@@ -68,6 +84,54 @@ All colors use semantic CSS variables. **Never hardcode colors.**
 
 See `references/tokens.md` for full token map.
 
+### Token Propagation
+
+If the UI renders inside an iframe, generated preview shell, or any isolated
+runtime, do not assume the host app's CSS variables exist there.
+
+- Inject the semantic tokens the surface needs into the preview shell
+- Mirror typography tokens too: `--font-sans`, `--font-display`, `--font-mono`
+- Recompute light and dark colors independently; a color that works on dark can
+  wash out on a pale background
+- Prefer mixing accent colors with foreground on light surfaces to keep contrast
+
+When a task involves Monaco, code previews, or generated sample apps, make the
+preview itself theme-aware, not just the host UI around it.
+
+## Layout Heuristics
+
+### Embedded Preview Rules
+
+Use these defaults for live demos, generated TSX samples, or product previews:
+
+- Assume the default safe viewport is roughly `900-1400px` wide and `700-900px` tall
+- Design so the first meaningful composition fits without scrolling unless the
+  user explicitly wants a long page
+- Keep to `2-4` primary panels
+- Keep most explanatory copy to `1-2` sentences per block
+- Prefer one strong focal panel over multiple giant cards competing at once
+- Remove ornamental empty stages unless they communicate system state
+- Make the narrowest likely state look intentional, not merely acceptable
+
+If the surface is meant to fit in-frame, verify:
+
+- `scrollHeight <= clientHeight`
+- `scrollWidth <= clientWidth`
+- light mode remains legible
+- dark mode remains legible
+
+### Density Ladder
+
+Pick type and spacing based on containment, not habit.
+
+| Context | H1 | Section title | Body | Card padding |
+|--------|----|---------------|------|--------------|
+| Hero / page top | `text-5xl sm:text-7xl` | `text-2xl sm:text-3xl` | `text-base` | `p-6` to `p-8` |
+| Product surface | `text-3xl sm:text-5xl` | `text-xl sm:text-2xl` | `text-sm` to `text-base` | `p-4` to `p-6` |
+| Embedded preview | `text-3xl sm:text-5xl`, bias smaller | `text-lg sm:text-2xl` | `text-xs` to `text-sm` | `p-3` to `p-5` |
+
+When in doubt inside a preview, reduce vertical padding before reducing contrast.
+
 ## Kinetic Typography
 
 spike.land blog posts use **expressive typography** — text that communicates
@@ -116,6 +180,41 @@ In Framer Motion:
 - Optional `backdrop-blur-sm` for glass effect
 - `hover:border-muted-foreground/30` for subtle hover
 
+### Product Panels
+
+For spike.land product surfaces, think in **stacked instruments** rather than
+generic cards.
+
+- Use one primary panel with the strongest story or interaction
+- Support it with smaller panels that clarify state, commands, or metrics
+- Let asymmetry carry hierarchy; not every panel must be the same size
+- If a panel has no clear job, compress it or remove it
+
+Useful panel roles:
+
+- **Atlas**: selectable app/tool cards
+- **Detail**: active item state, status, features, metrics
+- **Command rail**: monospace or procedural steps
+- **Signal strip**: small metrics or status tiles
+- **Flow list**: 3-4 concise steps for the interaction model
+
+### Embedded Sample Apps
+
+When generating a sample app for a code editor or preview pane:
+
+- Build a **real product-shaped slice**, not a toy hover card
+- Show at least one meaningful interaction or state switch
+- Reflect spike.land themes with semantic tokens, not one-off colors
+- Keep the layout visually complete even before user interaction
+- Avoid giant hero sections if the sample lives inside another app shell
+- Make the first screen explain the product immediately
+
+Good sample structures:
+
+- two-column atlas + detail panel
+- dashboard header + interactive card grid + command rail
+- compact console with metrics, selected item, and procedural flow
+
 ### Buttons
 - Primary: `bg-foreground text-background rounded-xl hover:opacity-90`
 - Secondary: `bg-background border border-border text-foreground rounded-xl hover:bg-muted/50`
@@ -145,11 +244,35 @@ Prefer CSS transitions for simple hover/focus states. Use Framer Motion only for
 - Layout animations
 - Complex spring physics
 
+For embedded previews, animation should reinforce structure, not create noise.
+Bias toward:
+
+- slow ambient glows
+- one scanning or sweep effect
+- staggered reveals only when they do not delay comprehension
+
+Avoid multiple competing decorative motions in small viewports.
+
+## Design Review Checklist
+
+Before calling a spike.land UI done, review it against this list:
+
+- Does the screen match the surface type: hero, product, or embedded preview?
+- Is the hierarchy obvious in three seconds?
+- Are light and dark mode both intentionally tuned, not just mechanically inverted?
+- Are semantic tokens used everywhere color matters?
+- Does the typography feel like Rubik, not default web UI?
+- Is there any panel that is mostly empty atmosphere instead of useful composition?
+- If embedded, does it fit without awkward clipping or unnecessary scrolling?
+- Does motion add meaning, or just movement?
+
 ## Prohibitions
 
 - **No Inter, Roboto, Arial, Schibsted Grotesk** — Rubik is the identity font
 - **No hardcoded colors** — semantic tokens only
 - **No `dark:` prefix** — CSS variables handle themes
 - **No generic layouts** — every section should feel intentional
+- **No full landing pages inside small previews** — design for containment
+- **No washed-out accent palettes in light mode** — increase contrast deliberately
 - **No `any` type** — use `unknown` or proper types
 - **No `@ts-ignore` / `eslint-disable`**
