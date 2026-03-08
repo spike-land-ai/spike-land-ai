@@ -1,12 +1,6 @@
 import type { Command } from "commander";
-import { GoogleGenAI } from "@google/genai";
 import express from "express";
 import cors from "cors";
-
-// Fallback to CLAUDE_CODE_OAUTH_TOKEN if GEMINI_API_KEY isn't available
-export const ai = new GoogleGenAI(
-  process.env.GEMINI_API_KEY ? { apiKey: process.env.GEMINI_API_KEY } : {},
-);
 
 export function startCompletionServer(port: number) {
   const app = express();
@@ -22,28 +16,53 @@ export function startCompletionServer(port: number) {
         return;
       }
 
-      const response = await ai.models.generateContent({
-        model: "gemini-2.5-flash",
-        contents: [
-          {
-            role: "user",
-            parts: [
+      const apiKey = process.env.GEMINI_API_KEY || process.env.CLAUDE_CODE_OAUTH_TOKEN;
+      if (!apiKey) {
+        res.status(500).json({ error: "GEMINI_API_KEY is not configured" });
+        return;
+      }
+
+      const response = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            contents: [
               {
-                text: `<prefix>\n${prefix}\n</prefix>\n<suffix>\n${
-                  suffix || ""
-                }\n</suffix>\n\nComplete the code exactly where prefix ends and suffix begins. Output only the missing code.`,
+                role: "user",
+                parts: [
+                  {
+                    text: `<prefix>\n${prefix}\n</prefix>\n<suffix>\n${
+                      suffix || ""
+                    }\n</suffix>\n\nComplete the code exactly where prefix ends and suffix begins. Output only the missing code.`,
+                  },
+                ],
               },
             ],
-          },
-        ],
-        config: {
-          systemInstruction:
-            "You are an AI code completion engine. You receive the prefix and suffix of a TypeScript/TSX code file. Your task is to output ONLY the code that should be inserted exactly at the cursor position. DO NOT add markdown blocks or explanations.",
-          maxOutputTokens: 150,
-        },
-      });
+            systemInstruction: {
+              parts: [
+                {
+                  text: "You are an AI code completion engine. You receive the prefix and suffix of a TypeScript/TSX code file. Your task is to output ONLY the code that should be inserted exactly at the cursor position. DO NOT add markdown blocks or explanations.",
+                },
+              ],
+            },
+            generationConfig: {
+              maxOutputTokens: 150,
+            },
+          }),
+        }
+      );
 
-      const completionText = (response.text || "").trim();
+      if (!response.ok) {
+        throw new Error(`Google API returned ${response.status}: ${await response.text()}`);
+      }
+
+      const data = await response.json() as any;
+      const completionText = (data.candidates?.[0]?.content?.parts?.[0]?.text || "").trim();
+      
       res.json({ completion: completionText });
     } catch (error) {
       console.error("[Agent] Completion error:", error);

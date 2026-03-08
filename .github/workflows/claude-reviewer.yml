@@ -1,0 +1,120 @@
+name: Claude AI PR Reviewer
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Run Claude Review
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          cat << 'EOF' > review.js
+          const fs = require('fs');
+          const { execSync } = require('child_process');
+
+          async function run() {
+            if (!process.env.ANTHROPIC_API_KEY) {
+              console.log('ANTHROPIC_API_KEY not set. Skipping review.');
+              return;
+            }
+
+            // Get PR diff
+            let diff = '';
+            try {
+              diff = execSync(`gh pr diff ${process.env.PR_NUMBER}`).toString();
+            } catch (e) {
+              console.error('Failed to get PR diff:', e.message);
+              process.exit(1);
+            }
+            
+            let processGuidelines = '';
+            try {
+              processGuidelines = fs.readFileSync('docs/archive/JULES_PROCESS_OBSERVATIONS_AND_FUTURE_IMPROVEMENTS.md', 'utf8');
+            } catch (e) {
+              console.log('Could not read guidelines file:', e.message);
+            }
+
+            const prompt = `You are an expert AI code reviewer.
+          Review the following PR diff.
+          You must verify if the PR addresses or respects the guidelines and observations in this document:
+          <document>
+          ${processGuidelines}
+          </document>
+          
+          <diff>
+          ${diff}
+          </diff>
+          
+          If the PR looks good, requires no changes, and aligns with the document, output exactly "APPROVE".
+          Otherwise, provide a detailed review commenting on what needs to be changed. Refer explicitly to the provided document.`;
+
+            const response = await fetch("https://api.anthropic.com/v1/messages", {
+              method: "POST",
+              headers: {
+                "x-api-key": process.env.ANTHROPIC_API_KEY,
+                "anthropic-version": "2023-06-01",
+                "content-type": "application/json"
+              },
+              body: JSON.stringify({
+                model: "claude-3-7-sonnet-20250219",
+                max_tokens: 4000,
+                messages: [{ role: "user", content: prompt }]
+              })
+            });
+
+            if (!response.ok) {
+              const errText = await response.text();
+              console.error('Anthropic API error:', response.status, errText);
+              process.exit(1);
+            }
+
+            const data = await response.json();
+            const reply = data.content[0].text.trim();
+
+            if (reply === 'APPROVE') {
+              console.log('Approving and merging PR...');
+              execSync(`gh pr review ${process.env.PR_NUMBER} --approve --body "LGTM! The code respects the Jules process observations."`);
+              try {
+                // Try to merge the PR
+                execSync(`gh pr merge ${process.env.PR_NUMBER} --squash`);
+              } catch (e) {
+                console.log('Could not merge PR automatically:', e.message);
+                try {
+                  // Fallback to enable auto-merge
+                  execSync(`gh pr merge ${process.env.PR_NUMBER} --squash --auto`);
+                } catch (e2) {
+                  console.log('Could not enable auto-merge either:', e2.message);
+                }
+              }
+            } else {
+              console.log('Requesting changes...');
+              fs.writeFileSync('reply.txt', reply);
+              execSync(`gh pr review ${process.env.PR_NUMBER} --request-changes --body-file reply.txt`);
+            }
+          }
+
+          run().catch(e => {
+            console.error(e);
+            process.exit(1);
+          });
+          EOF
+          node review.js

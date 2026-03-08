@@ -43,6 +43,10 @@ incremental-coverage.json
 *.tfstate.backup
 terraform.tfvars
 
+# Secrets / credentials
+*-client-secret*.json
+*-credentials*.json
+
 # Local dev certs
 .dev-certs/
 

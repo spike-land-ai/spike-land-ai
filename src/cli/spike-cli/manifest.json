@@ -3,7 +3,6 @@
   "category": "cli",
   "dependencies": [
     "@anthropic-ai/sdk",
-    "@google/genai",
     "commander",
     "cors",
     "dotenv",

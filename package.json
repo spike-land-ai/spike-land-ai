@@ -60,7 +60,6 @@
   "devDependencies": {
     "@biomejs/biome": "^2.4.6",
     "@changesets/cli": "2.30.0",
-    "@google/genai": "^1.44.0",
     "@radix-ui/react-slot": "^1.2.4",
     "@types/mime-types": "^3.0.1",
     "@types/node": "25.3.5",
