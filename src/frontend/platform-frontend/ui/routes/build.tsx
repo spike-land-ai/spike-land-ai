@@ -438,7 +438,7 @@ export function BuildPage() {
 
             <div className="mt-6 flex flex-wrap gap-3">
               <Button asChild size="lg" className="h-12 rounded-2xl px-6 text-sm font-black">
-                <Link to="/tools">
+                <Link to="/apps">
                   Browse MCP Apps
                   <ArrowRight className="size-4" />
                 </Link>

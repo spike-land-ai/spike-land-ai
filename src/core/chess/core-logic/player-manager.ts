@@ -93,14 +93,22 @@ export async function deletePlayer(playerId: string, userId: string): Promise<vo
   }
 }
 
-export async function setPlayerOnline(playerId: string, isOnline: boolean): Promise<void> {
-  await prisma.chessPlayer.update({
-    where: { id: playerId },
-    data: {
-      isOnline,
-      lastSeenAt: new Date(),
-    },
-  });
+export async function setPlayerOnline(
+  playerId: string,
+  userId: string,
+  isOnline: boolean,
+): Promise<void> {
+  try {
+    await prisma.chessPlayer.update({
+      where: { id: playerId, userId },
+      data: {
+        isOnline,
+        lastSeenAt: new Date(),
+      },
+    });
+  } catch {
+    throw new Error("Not authorized to update this player");
+  }
 }
 
 export async function listOnlinePlayers(): Promise<ChessPlayer[]> {

@@ -137,10 +137,10 @@ describe("player-manager", () => {
   it("setPlayerOnline updates status and lastSeenAt", async () => {
     mockPrisma.chessPlayer.update.mockResolvedValue({});
 
-    await setPlayerOnline("p1", true);
+    await setPlayerOnline("p1", "u1", true);
 
     expect(mockPrisma.chessPlayer.update).toHaveBeenCalledWith({
-      where: { id: "p1" },
+      where: { id: "p1", userId: "u1" },
       data: {
         isOnline: true,
         lastSeenAt: expect.any(Date),

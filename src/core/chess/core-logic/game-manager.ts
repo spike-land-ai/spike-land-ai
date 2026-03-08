@@ -266,7 +266,20 @@ export async function offerDraw(gameId: string, playerId: string): Promise<{ off
   return { offered: true };
 }
 
-export async function acceptDraw(gameId: string, _playerId: string): Promise<void> {
+export async function acceptDraw(gameId: string, playerId: string): Promise<void> {
+  const game = (await prisma.chessGame.findUnique({
+    where: { id: gameId },
+  })) as GameRecord | null;
+
+  if (!game) {
+    throw new Error("Game not found");
+  }
+  if (game.whitePlayerId !== playerId && game.blackPlayerId !== playerId) {
+    throw new Error("Player is not in this game");
+  }
+  if (game.status !== "DRAW_OFFERED") {
+    throw new Error("No draw has been offered");
+  }
 
   await prisma.chessGame.update({
     where: { id: gameId },
@@ -324,6 +337,12 @@ export async function handleTimeExpiry(gameId: string, playerId: string): Promis
 
   if (!game) {
     throw new Error("Game not found");
+  }
+  if (game.status !== "ACTIVE") {
+    throw new Error("Game is not active");
+  }
+  if (game.whitePlayerId !== playerId && game.blackPlayerId !== playerId) {
+    throw new Error("Player is not in this game");
   }
 
   const winnerId = playerId === game.whitePlayerId ? game.blackPlayerId : game.whitePlayerId;
