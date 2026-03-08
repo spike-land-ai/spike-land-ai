@@ -147,6 +147,7 @@ export function AiChatWidget({ open, onToggle }: AiChatWidgetProps) {
                     : "hover:bg-muted text-muted-foreground hover:text-destructive",
                 )}
                 title="Clear conversation"
+                aria-label="Clear conversation"
               >
                 <Trash2 className="w-4 h-4" />
               </button>
@@ -254,6 +255,7 @@ export function AiChatWidget({ open, onToggle }: AiChatWidgetProps) {
                 "p-1.5 rounded-lg transition-colors",
                 isDarkMode ? "hover:bg-white/8" : "hover:bg-white/20",
               )}
+              aria-label="Dismiss error"
             >
               <X className="w-3 h-3" />
             </button>
@@ -274,7 +276,7 @@ export function AiChatWidget({ open, onToggle }: AiChatWidgetProps) {
               "relative flex items-end gap-3 rounded-2xl p-2 transition-all",
               isDarkMode
                 ? "bg-white/5 border border-white/10 focus-within:border-primary/50 focus-within:shadow-[0_0_20px_var(--primary-glow)] focus-within:ring-1 focus-within:ring-primary/20"
-                : "bg-card border border-border",
+                : "bg-card border border-border focus-within:border-primary/50 focus-within:ring-2 focus-within:ring-primary/20",
             )}
           >
             <textarea
@@ -283,6 +285,7 @@ export function AiChatWidget({ open, onToggle }: AiChatWidgetProps) {
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKeyDown}
               placeholder={isAuthenticated ? "Ask me anything..." : "Sign in to chat..."}
+              aria-label="Chat input"
               rows={1}
               className={cn(
                 "flex-1 bg-transparent border-none outline-none px-4 py-3 text-sm resize-none max-h-32 font-medium placeholder:opacity-40",

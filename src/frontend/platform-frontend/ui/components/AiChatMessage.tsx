@@ -130,6 +130,8 @@ function ToolCallCard({ tc }: { tc: NonNullable<ChatMessageType["toolCalls"]>[nu
     >
       <button
         onClick={() => setExpanded(!expanded)}
+        aria-expanded={expanded}
+        aria-label={expanded ? "Collapse tool output" : "Expand tool output"}
         className={cn(
           "w-full flex items-center gap-3 px-4 py-2.5 transition-colors text-left",
           isDarkMode ? "hover:bg-white/5" : "hover:bg-muted/80",

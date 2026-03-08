@@ -388,6 +388,7 @@ function ChatPanel({ isDarkMode, className, onStreamingChange, onMessagesChange 
                 ? "Describe a change or ask a question..."
                 : "Sign in to chat with AI..."
             }
+            aria-label="Chat input"
             rows={1}
             className={cn(
               "flex-1 bg-transparent border-none outline-none px-2 py-2 text-sm resize-none max-h-40 font-medium",
