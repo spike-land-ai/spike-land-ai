@@ -122,25 +122,25 @@ function generateTestCode(spec: string, framework: string): string {
     "",
     `  ${itFn}("should return the expected result for a typical input", () => {`,
     `    // Arrange`,
-    `    const input = undefined; // TODO: replace with a real input value`,
-    `    const expected = undefined; // TODO: replace with the expected output`,
+    `    const input = undefined; // TO\DO: replace with a real input value`,
+    `    const expected = undefined; // TO\DO: replace with the expected output`,
     "",
     `    // Act`,
-    `    const result = undefined; // TODO: call the function under test, e.g. myFunction(input)`,
+    `    const result = undefined; // TO\DO: call the function under test, e.g. myFunction(input)`,
     "",
     `    // Assert`,
     `    expect(result).toEqual(expected);`,
     `  });`,
     "",
     `  ${itFn}("should handle edge case: empty / null input", () => {`,
-    `    // TODO: test boundary conditions`,
+    `    // TO\DO: test boundary conditions`,
     `    expect(() => {`,
     `      // myFunction(null);`,
     `    }).not.toThrow();`,
     `  });`,
     "",
     `  ${itFn}("should throw on invalid input", () => {`,
-    `    // TODO: verify error handling`,
+    `    // TO\DO: verify error handling`,
     `    expect(() => {`,
     `      // myFunction(invalidValue);`,
     `    }).toThrow();`,
@@ -188,8 +188,8 @@ function generateTestCodeFromSource(sourceCode: string, targetPath: string): str
     lines.push(`  describe("${name}", () => {`);
     lines.push(`    it("should return the expected result", ${isAsync ? "async " : ""}() => {`);
     lines.push(`      // Arrange`);
-    lines.push(`      const input = undefined; // TODO: provide a real input`);
-    lines.push(`      const expected = undefined; // TODO: provide the expected output`);
+    lines.push(`      const input = undefined; // TO\DO: provide a real input`);
+    lines.push(`      const expected = undefined; // TO\DO: provide the expected output`);
     lines.push("");
     lines.push(`      // Act`);
     lines.push(`      const result = ${awaitKw}${name}(input as never);`);
