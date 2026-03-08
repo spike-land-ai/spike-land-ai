@@ -4,7 +4,11 @@ export function CTASection() {
   return (
     <section className="relative isolate overflow-hidden bg-background py-24 sm:py-32">
       <div className="absolute inset-0 -z-10 bg-gradient-to-t from-indigo-500/20 via-background to-background" />
+<<<<<<< HEAD
 
+=======
+      
+>>>>>>> auto-pr-1772961809
       <div className="container mx-auto px-4 lg:px-8">
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}

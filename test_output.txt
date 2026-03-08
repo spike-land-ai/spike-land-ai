@@ -1,1 +1,5 @@
+<<<<<<< HEAD
 bazdmeg-mcp:
+=======
+bazdmeg-mcp: 
+>>>>>>> auto-pr-1772961809

@@ -48,7 +48,11 @@ mcpRoute.get("/", async (c) => {
 
   const userId = c.var.userId;
   const db = c.var.db;
+<<<<<<< HEAD
 
+=======
+  
+>>>>>>> auto-pr-1772961809
   const enabledCategories = await loadEnabledCategories(userId, c.env.KV);
   const mcpServer = await createMcpServer(userId, db, {
     enabledCategories,
@@ -58,14 +62,24 @@ mcpRoute.get("/", async (c) => {
     spikeEdge: c.env.SPIKE_EDGE,
     spaAssets: c.env.SPA_ASSETS,
   });
+<<<<<<< HEAD
 
+=======
+  
+>>>>>>> auto-pr-1772961809
   const sessionId = c.req.header("Mcp-Session-Id");
   const transport = new WebStandardStreamableHTTPServerTransport({
     sessionIdGenerator: () => sessionId ?? crypto.randomUUID(),
   });
+<<<<<<< HEAD
 
   await mcpServer.connect(transport);
 
+=======
+  
+  await mcpServer.connect(transport);
+  
+>>>>>>> auto-pr-1772961809
   return transport.handleRequest(c.req.raw);
 });
 

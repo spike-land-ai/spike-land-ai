@@ -20,12 +20,20 @@
 
   try {
     const sessionId = c.req.header("Mcp-Session-Id");
+<<<<<<< HEAD
 
+=======
+    
+>>>>>>> auto-pr-1772961809
     // WebStandardStreamableHTTPServerTransport uses session ID implicitly from URL or state
     // but the original code creates a fresh mcpServer every request.
     // In serverless, we must reuse transport state if we want SSE, which is tricky.
     // For now we initialize it to support SSE parsing.
+<<<<<<< HEAD
 
+=======
+    
+>>>>>>> auto-pr-1772961809
     const response = await transport.handleRequest(mcpRequest, {
       parsedBody: body,
     });
