@@ -4838,6 +4838,15 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@spike-land-ai/status@workspace:packages/status":
+  version: 0.0.0-use.local
+  resolution: "@spike-land-ai/status@workspace:packages/status"
+  dependencies:
+    hono: "npm:^4"
+    wrangler: "npm:^4"
+  languageName: unknown
+  linkType: soft
+
 "@spike-land-ai/stripe-analytics-mcp@workspace:packages/stripe-analytics-mcp":
   version: 0.0.0-use.local
   resolution: "@spike-land-ai/stripe-analytics-mcp@workspace:packages/stripe-analytics-mcp"
@@ -11110,7 +11119,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"hono@npm:^4.11.4, hono@npm:^4.12.5, hono@npm:^4.6.14":
+"hono@npm:^4, hono@npm:^4.11.4, hono@npm:^4.12.5, hono@npm:^4.6.14":
   version: 4.12.5
   resolution: "hono@npm:4.12.5"
   checksum: 10c0/a8cf0c988e84b370978b57d941fc543b93994b7b01c847611ec73be8e8c9fda5baeac8be08a44eaefdf215381fea2620ccb742ff5c4eaeecb35b92f6a75832c6
@@ -17976,7 +17985,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"wrangler@npm:4.71.0, wrangler@npm:^4.71.0":
+"wrangler@npm:4.71.0, wrangler@npm:^4, wrangler@npm:^4.71.0":
   version: 4.71.0
   resolution: "wrangler@npm:4.71.0"
   dependencies:
