@@ -67,25 +67,20 @@ const SIGNALS = [
   { value: "84", label: "tools wired", note: "registry, auth, browser, image and edge" },
   { value: "310ms", label: "preview loop", note: "edit, transpile, re-render in place" },
   { value: "3 rails", label: "one workspace", note: "chat, code and live app stay in sync" },
-  { value: "24/7", label: "deployment path", note: "ship from the same prompt that shaped it" },
 ] as const;
 
 const WALKTHROUGH = [
   {
     title: "Prompt the workflow",
-    detail: "Describe the app in plain English and let the editor scaffold the first production-shaped slice.",
+    detail: "Describe the app in plain English and let the editor scaffold the first product-shaped slice.",
   },
   {
     title: "Watch the preview lock in",
-    detail: "The live iframe mirrors every edit while type acquisition and syntax context stay active in the editor.",
+    detail: "The live iframe mirrors every edit while syntax context and type feedback stay awake.",
   },
   {
     title: "Wire MCP actions",
-    detail: "Swap static cards for real tools, browser flows, image pipelines, or bug streams without changing the visual system.",
-  },
-  {
-    title: "Ship the edge version",
-    detail: "Keep the same design language, same TSX surface, and the same feedback loop from prototype to deploy.",
+    detail: "Swap static cards for real tools, browser flows, image pipelines, or bug streams without changing the shell.",
   },
 ] as const;
 
@@ -127,13 +122,10 @@ export default function App() {
     typeof document !== "undefined" ? document.documentElement.dataset.theme || "light" : "light";
 
   return (
-    <div
-      className="min-h-screen bg-background text-foreground"
-      style={{ fontFamily: "var(--font-sans)" }}
-    >
+    <div className="h-screen overflow-hidden bg-background text-foreground" style={{ fontFamily: "var(--font-sans)" }}>
       <style>{STYLES}</style>
 
-      <div className="relative isolate min-h-screen overflow-hidden">
+      <div className="relative isolate h-screen overflow-hidden">
         <div className="spike-grid absolute inset-0 opacity-45" />
         <div
           className="absolute -left-16 top-0 h-72 w-72 rounded-full blur-3xl"
@@ -148,9 +140,9 @@ export default function App() {
           style={{ background: "color-mix(in srgb, var(--chat-accent) 14%, transparent)" }}
         />
 
-        <div className="relative mx-auto max-w-7xl px-6 py-8 sm:px-10 lg:px-12">
-          <div className="grid gap-6 xl:grid-cols-[1.08fr_0.92fr]">
-            <section className="rounded-[2rem] p-6 sm:p-8" style={PANEL_STYLE}>
+        <div className="relative mx-auto flex h-full max-w-[1500px] flex-col px-4 py-4 sm:px-6 lg:px-8">
+          <div className="grid gap-4 xl:grid-cols-[1.06fr_0.94fr]">
+            <section className="rounded-[2rem] p-5 sm:p-6" style={PANEL_STYLE}>
               <div className="flex flex-wrap items-center gap-3">
                 <span
                   className="rounded-full px-3 py-1 text-[11px] font-black uppercase tracking-[0.32em]"
@@ -169,12 +161,12 @@ export default function App() {
                 </span>
               </div>
 
-              <div className="mt-8 max-w-3xl">
+              <div className="mt-6 max-w-2xl">
                 <p className="text-xs font-black uppercase tracking-[0.34em] text-muted-foreground">
                   spike.land / chat + code + preview
                 </p>
                 <h1
-                  className="mt-4 text-5xl font-black tracking-tight sm:text-6xl xl:text-7xl"
+                  className="mt-3 text-4xl font-black tracking-tight sm:text-5xl 2xl:text-6xl"
                   style={{ fontFamily: "var(--font-display)" }}
                 >
                   MCP apps that look like product
@@ -190,23 +182,22 @@ export default function App() {
                     and feel like instruments.
                   </span>
                 </h1>
-                <p className="mt-5 max-w-2xl text-base leading-7 text-muted-foreground sm:text-lg">
+                <p className="mt-4 max-w-xl text-sm leading-6 text-muted-foreground sm:text-base">
                   Vibe through a live editor, let the preview answer instantly, then route browser
-                  automation, bug triage, learning loops, and media pipelines through the same
-                  design language.
+                  automation, bug triage, learning loops, and media pipelines through one design
+                  language.
                 </p>
               </div>
 
-              <div className="mt-8 flex flex-wrap gap-3">
+              <div className="mt-6 flex flex-wrap gap-2.5">
                 {[
-                  "live preview in place",
-                  "type-aware editor",
+                  "live preview",
                   "dark/light aware surfaces",
                   "edge-ready from chat",
                 ].map((label) => (
                   <span
                     key={label}
-                    className="rounded-full border border-border px-4 py-2 text-sm font-semibold text-foreground"
+                    className="rounded-full border border-border px-3 py-1.5 text-xs font-semibold text-foreground"
                     style={{ background: "color-mix(in srgb, var(--muted-bg) 74%, transparent)" }}
                   >
                     {label}
@@ -214,11 +205,11 @@ export default function App() {
                 ))}
               </div>
 
-              <div className="mt-8 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+              <div className="mt-6 grid gap-3 sm:grid-cols-3">
                 {SIGNALS.map((signal) => (
                   <div
                     key={signal.label}
-                    className="rounded-[1.5rem] p-4"
+                    className="rounded-[1.35rem] p-3.5"
                     style={{
                       background: "color-mix(in srgb, var(--bg) 72%, transparent)",
                       border: "1px solid color-mix(in srgb, var(--border-color) 80%, transparent)",
@@ -228,16 +219,16 @@ export default function App() {
                     <p className="mt-1 text-xs font-black uppercase tracking-[0.24em] text-muted-foreground">
                       {signal.label}
                     </p>
-                    <p className="mt-3 text-sm leading-6 text-muted-foreground">{signal.note}</p>
+                    <p className="mt-2 text-[13px] leading-5 text-muted-foreground">{signal.note}</p>
                   </div>
                 ))}
               </div>
             </section>
 
-            <section className="relative overflow-hidden rounded-[2rem] p-6" style={PANEL_STYLE}>
+            <section className="relative min-h-[320px] overflow-hidden rounded-[2rem] p-5" style={PANEL_STYLE}>
               <div className="absolute inset-5 rounded-full border border-border opacity-60" />
-              <div className="absolute inset-14 rounded-full border border-border opacity-35" />
-              <div className="scan-line absolute inset-x-0 top-0 h-32" style={{
+              <div className="absolute inset-12 rounded-full border border-border opacity-35" />
+              <div className="scan-line absolute inset-x-0 top-0 h-24" style={{
                 background:
                   "linear-gradient(180deg, transparent, color-mix(in srgb, var(--chat-accent) 16%, transparent), transparent)",
               }} />
@@ -245,24 +236,25 @@ export default function App() {
               {ORBIT_CHIPS.map((chip, index) => (
                 <div
                   key={chip.label}
-                  className="orbit-chip absolute rounded-full border border-border px-3 py-1 text-[11px] font-semibold text-muted-foreground"
+                  className={"orbit-chip absolute rounded-full border border-border px-2.5 py-1 text-[10px] font-semibold text-muted-foreground " + (index > 2 ? "hidden 2xl:block" : "")}
                   style={{
                     ...chip,
                     background: "color-mix(in srgb, var(--bg) 82%, transparent)",
                     animationDelay: index * 0.55 + "s",
+                    opacity: index > 2 ? 0.78 : 1,
                   }}
                 >
                   {chip.label}
                 </div>
               ))}
 
-              <div className="relative z-10 ml-auto mt-20 max-w-md rounded-[1.75rem] p-5" style={INNER_PANEL_STYLE}>
+              <div className="relative z-10 ml-auto mt-10 max-w-[360px] rounded-[1.5rem] p-4" style={INNER_PANEL_STYLE}>
                 <div className="flex items-center justify-between gap-3">
                   <div>
-                    <p className="text-xs font-black uppercase tracking-[0.28em] text-muted-foreground">
+                    <p className="text-[10px] font-black uppercase tracking-[0.28em] text-muted-foreground">
                       Selected app
                     </p>
-                    <h2 className="mt-2 text-3xl font-black tracking-tight text-foreground">
+                    <h2 className="mt-1.5 text-2xl font-black tracking-tight text-foreground">
                       {activeApp.name}
                     </h2>
                   </div>
@@ -287,39 +279,39 @@ export default function App() {
                   </span>
                 </div>
 
-                <p className="mt-4 text-sm leading-7 text-muted-foreground">{activeApp.pitch}</p>
+                <p className="mt-3 text-sm leading-6 text-muted-foreground">{activeApp.pitch}</p>
 
-                <div className="mt-5 grid grid-cols-3 gap-3">
+                <div className="mt-4 grid grid-cols-3 gap-2">
                   <div
-                    className="rounded-2xl px-3 py-3"
+                    className="rounded-[1rem] px-3 py-2.5"
                     style={{ background: "color-mix(in srgb, var(--muted-bg) 72%, transparent)" }}
                   >
                     <p className="text-[10px] font-black uppercase tracking-[0.24em] text-muted-foreground">
                       category
                     </p>
-                    <p className="mt-2 text-sm font-bold text-foreground">{activeApp.category}</p>
+                    <p className="mt-1.5 text-sm font-bold text-foreground">{activeApp.category}</p>
                   </div>
                   <div
-                    className="rounded-2xl px-3 py-3"
+                    className="rounded-[1rem] px-3 py-2.5"
                     style={{ background: "color-mix(in srgb, var(--muted-bg) 72%, transparent)" }}
                   >
                     <p className="text-[10px] font-black uppercase tracking-[0.24em] text-muted-foreground">
                       signal
                     </p>
-                    <p className="mt-2 text-sm font-bold text-foreground">{activeApp.metric}</p>
+                    <p className="mt-1.5 text-sm font-bold text-foreground">{activeApp.metric}</p>
                   </div>
                   <div
-                    className="rounded-2xl px-3 py-3"
+                    className="rounded-[1rem] px-3 py-2.5"
                     style={{ background: "color-mix(in srgb, var(--muted-bg) 72%, transparent)" }}
                   >
                     <p className="text-[10px] font-black uppercase tracking-[0.24em] text-muted-foreground">
                       theme
                     </p>
-                    <p className="mt-2 text-sm font-bold capitalize text-foreground">{themeMode}</p>
+                    <p className="mt-1.5 text-sm font-bold capitalize text-foreground">{themeMode}</p>
                   </div>
                 </div>
 
-                <div className="mt-5 flex flex-wrap gap-2">
+                <div className="mt-4 flex flex-wrap gap-2">
                   {activeApp.features.map((feature) => (
                     <span
                       key={feature}
@@ -334,24 +326,23 @@ export default function App() {
             </section>
           </div>
 
-          <div className="mt-6 grid gap-6 xl:grid-cols-[1.08fr_0.92fr]">
-            <section className="rounded-[2rem] p-6" style={PANEL_STYLE}>
+          <div className="mt-4 grid min-h-0 gap-4 xl:grid-cols-[1.06fr_0.94fr]">
+            <section className="rounded-[2rem] p-5" style={PANEL_STYLE}>
               <div className="flex flex-wrap items-end justify-between gap-4">
                 <div>
                   <p className="text-xs font-black uppercase tracking-[0.28em] text-muted-foreground">
                     Featured MCP apps
                   </p>
-                  <h2 className="mt-2 text-3xl font-black tracking-tight text-foreground">
+                  <h2 className="mt-2 text-2xl font-black tracking-tight text-foreground">
                     Click an app. The control stack reconfigures.
                   </h2>
                 </div>
-                <p className="max-w-md text-sm leading-6 text-muted-foreground">
-                  The sample stays deliberately product-shaped: clear hierarchy, strong tokens,
-                  and enough interaction to prove the editor is not rendering toy code.
+                <p className="max-w-sm text-sm leading-6 text-muted-foreground">
+                  A real product sample, not a floating hero card.
                 </p>
               </div>
 
-              <div className="mt-5 grid gap-3 md:grid-cols-2">
+              <div className="mt-4 grid gap-3 md:grid-cols-2">
                 {APPS.map((app) => {
                   const active = app.id === activeId;
 
@@ -360,7 +351,7 @@ export default function App() {
                       key={app.id}
                       type="button"
                       onClick={() => setActiveId(app.id)}
-                      className="rounded-[1.5rem] p-5 text-left transition-transform duration-300 hover:-translate-y-0.5"
+                      className="rounded-[1.35rem] p-4 text-left transition-transform duration-300 hover:-translate-y-0.5"
                       style={{
                         background: active
                           ? "color-mix(in srgb, var(--chat-accent) 11%, var(--card-bg) 89%)"
@@ -378,7 +369,7 @@ export default function App() {
                           <p className="text-[10px] font-black uppercase tracking-[0.28em] text-muted-foreground">
                             {app.category}
                           </p>
-                          <h3 className="mt-2 text-xl font-black tracking-tight text-foreground">
+                          <h3 className="mt-1.5 text-lg font-black tracking-tight text-foreground">
                             {app.name}
                           </h3>
                         </div>
@@ -395,9 +386,9 @@ export default function App() {
                         </span>
                       </div>
 
-                      <p className="mt-3 text-sm leading-6 text-muted-foreground">{app.pitch}</p>
+                      <p className="mt-2.5 text-sm leading-5.5 text-muted-foreground">{app.pitch}</p>
 
-                      <div className="mt-4 flex flex-wrap gap-2">
+                      <div className="mt-3 flex flex-wrap gap-2">
                         {app.features.map((feature) => (
                           <span
                             key={feature}
@@ -411,7 +402,7 @@ export default function App() {
                         ))}
                       </div>
 
-                      <p className="mt-4 text-xs font-black uppercase tracking-[0.28em] text-primary">
+                      <p className="mt-3 text-xs font-black uppercase tracking-[0.28em] text-primary">
                         {app.metric}
                       </p>
                     </button>
@@ -420,23 +411,23 @@ export default function App() {
               </div>
             </section>
 
-            <section className="rounded-[2rem] p-6" style={PANEL_STYLE}>
+            <section className="rounded-[2rem] p-5" style={PANEL_STYLE}>
               <div className="flex items-end justify-between gap-4">
                 <div>
                   <p className="text-xs font-black uppercase tracking-[0.28em] text-muted-foreground">
                     DX walkthrough
                   </p>
-                  <h2 className="mt-2 text-3xl font-black tracking-tight text-foreground">
+                  <h2 className="mt-2 text-2xl font-black tracking-tight text-foreground">
                     The whole path is thought through.
                   </h2>
                 </div>
               </div>
 
-              <div className="mt-5 space-y-3">
+              <div className="mt-4 space-y-2.5">
                 {WALKTHROUGH.map((item, index) => (
                   <div
                     key={item.title}
-                    className="flex gap-4 rounded-[1.5rem] px-4 py-4"
+                    className="flex gap-3 rounded-[1.25rem] px-3.5 py-3.5"
                     style={{
                       background: "color-mix(in srgb, var(--bg) 74%, transparent)",
                       border: "1px solid color-mix(in srgb, var(--border-color) 82%, transparent)",
@@ -453,14 +444,14 @@ export default function App() {
                     </div>
                     <div>
                       <p className="text-sm font-black tracking-tight text-foreground">{item.title}</p>
-                      <p className="mt-1 text-sm leading-6 text-muted-foreground">{item.detail}</p>
+                      <p className="mt-1 text-[13px] leading-5.5 text-muted-foreground">{item.detail}</p>
                     </div>
                   </div>
                 ))}
               </div>
 
               <div
-                className="mt-5 rounded-[1.5rem] p-4"
+                className="mt-4 rounded-[1.25rem] p-3.5"
                 style={{
                   background: "color-mix(in srgb, var(--bg) 74%, transparent)",
                   border: "1px solid color-mix(in srgb, var(--border-color) 82%, transparent)",
@@ -487,7 +478,7 @@ export default function App() {
                 </div>
 
                 <pre
-                  className="mt-4 overflow-x-auto rounded-[1.25rem] px-4 py-4 text-sm leading-7 text-foreground"
+                  className="mt-3 overflow-x-auto rounded-[1rem] px-4 py-3 text-[13px] leading-6 text-foreground"
                   style={{
                     background: "color-mix(in srgb, var(--card-bg) 78%, transparent)",
                     border: "1px solid color-mix(in srgb, var(--border-color) 82%, transparent)",
