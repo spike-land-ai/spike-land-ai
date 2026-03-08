@@ -229,6 +229,13 @@ describe("GET /mcp (mcpRoute handler)", () => {
     const app = await buildTestApp();
     const env = mockEnv();
 
+    // Mock the transport to return 400 Bad Request to simulate an uninitialized server
+    _transportHandleRequest = async () =>
+      new Response(JSON.stringify({ error: "Bad Request" }), {
+        status: 400,
+        headers: new Headers({ "Content-Type": "application/json" }),
+      });
+
     // In stateful transport mode, an uninitialized server returns 400 Bad Request
     // on a GET request because it hasn't received the "initialize" POST.
     // However, it correctly returns this validation error rather than the 405 error
@@ -248,6 +255,13 @@ describe("GET /mcp (mcpRoute handler)", () => {
 
     expect(res.status).toBe(400);
     expect(res.headers.get("content-type")).toContain("application/json");
+
+    // Reset back to default
+    _transportHandleRequest = async () =>
+      new Response(JSON.stringify({ jsonrpc: "2.0", result: { tools: [] }, id: 1 }), {
+        status: 200,
+        headers: new Headers({ "Content-Type": "application/json" }),
+      });
   });
 
   it("returns 401 from route handler when no Authorization header (covers line 206)", async () => {
