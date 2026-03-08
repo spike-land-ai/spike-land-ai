@@ -5,6 +5,21 @@ and services.
 
 ## Files
 
+### app-store-performance.md
+
+**Performance Budgets For spike.land App Store Apps**
+
+Covers latency targets, edge cache strategy, cold-start expectations, and
+operational SLAs for hosted, cross-origin, and offline-capable MCP apps.
+
+### offline-first.md
+
+**Offline-First Patterns For MCP Apps**
+
+Covers IndexedDB-backed persistence, service worker asset caching, sync queues,
+and packaging requirements for browser bundles that must keep working without a
+network connection.
+
 ### api-design.md
 
 **Complete REST API Design Best Practices Guide**

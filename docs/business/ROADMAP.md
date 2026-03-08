@@ -30,7 +30,7 @@ Protocol.
 3. **UK Ltd with Stripe-first billing** - Global payments, VAT handling,
    SEIS/EIS eligible
 
-**Positioning**: Managed Deployment Platform with MCP Registry **Core Product**:
+**Positioning**: Open MCP app store with managed runtime **Core Product**:
 spike-cli (MCP multiplexer CLI), Spike web chat, WhatsApp & Telegram bots
 **Supporting Tools**: App Store, vibe coding, real-time code editor, offline
 bundling, Cloudflare deployment guides **Target Market**: Developers, AI agent
@@ -245,7 +245,7 @@ the same capabilities as web chat and spike-cli.
 **Exit criteria**: API PRO add-on purchasable, rate-limited, metered,
 documented. Third-party developers can submit tools.
 
-#### Phase 14: Managed Deployments (Q3 2026)
+#### Phase 15: Managed Deployments (Q3 2026)
 
 **Goal**: One-command deployment for vibe-coded apps
 
@@ -385,8 +385,8 @@ accessible via CLI, web, WhatsApp, and Telegram.** This is the differentiator.
 
 | Tool                      | Priority | Phase    |
 | ------------------------- | -------- | -------- |
-| `deploy_app`              | Critical | Phase 14 |
-| `manage_deployment`       | Critical | Phase 14 |
+| `deploy_app`              | Critical | Phase 15 |
+| `manage_deployment`       | Critical | Phase 15 |
 | `whatsapp_send`           | High     | Phase 12 |
 | `telegram_send`           | High     | Phase 12 |
 | `marketplace_submit_tool` | High     | Phase 13 |
