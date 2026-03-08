@@ -12,7 +12,7 @@ import { MessageCircle } from "lucide-react";
 import { AiChatWidget } from "../components/AiChatWidget";
 import { ThemeSwitcher } from "../components/ThemeSwitcher";
 import { apiUrl } from "../../core-logic/api";
-import { initGoogleAds } from "../../core-logic/google-ads";
+import { initGoogleAds, initGtm } from "../../core-logic/google-ads";
 
 const DEFAULT_TITLE = "spike.land - MCP-First AI Development Platform";
 const DEFAULT_DESCRIPTION =
@@ -221,6 +221,7 @@ export function RootLayout() {
     injectJsonLd("jsonld-organization", ORGANIZATION_JSON_LD);
     injectJsonLd("jsonld-webapp", WEB_APP_JSON_LD);
     initGoogleAds();
+    initGtm();
 
     if (!document.querySelector('link[type="application/rss+xml"]')) {
       const rssLink = document.createElement("link");
@@ -236,9 +237,9 @@ export function RootLayout() {
     // Match exact path first, then strip dynamic segments for a best-effort match
     let meta = ROUTE_META[pathname] ??
       ROUTE_META[pathname.replace(/\/[^/]+$/, "")] ?? {
-        title: DEFAULT_TITLE,
-        description: DEFAULT_DESCRIPTION,
-      };
+      title: DEFAULT_TITLE,
+      description: DEFAULT_DESCRIPTION,
+    };
 
     // Special handling for dynamic app pages
     if (pathname.startsWith("/apps/") && pathname !== "/apps/new") {
@@ -318,11 +319,10 @@ export function RootLayout() {
                     key={to}
                     to={to}
                     aria-current={pathname === to ? "page" : undefined}
-                    className={`text-sm font-medium transition-colors hover:text-foreground ${
-                      pathname === to
+                    className={`text-sm font-medium transition-colors hover:text-foreground ${pathname === to
                         ? "text-foreground underline underline-offset-4 decoration-primary/50"
                         : "text-muted-foreground"
-                    }`}
+                      }`}
                   >
                     {label}
                   </Link>
@@ -423,9 +423,8 @@ export function RootLayout() {
                 <Link
                   key={to}
                   to={to}
-                  className={`block py-3 text-lg font-medium border-b border-border transition-colors hover:text-foreground ${
-                    pathname === to ? "text-foreground" : "text-muted-foreground"
-                  }`}
+                  className={`block py-3 text-lg font-medium border-b border-border transition-colors hover:text-foreground ${pathname === to ? "text-foreground" : "text-muted-foreground"
+                    }`}
                   onClick={() => setMobileNavOpen(false)}
                 >
                   {label}

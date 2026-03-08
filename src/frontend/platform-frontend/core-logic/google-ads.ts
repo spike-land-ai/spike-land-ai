@@ -13,10 +13,12 @@ declare global {
   }
 }
 
-const GOOGLE_ADS_ID = "AW-17978085462";
+const GOOGLE_ADS_ID = import.meta.env.VITE_GOOGLE_ADS_ID || "AW-17978085462";
 const CONVERSION_LABEL: string | undefined = import.meta.env.VITE_GOOGLE_ADS_CONVERSION_LABEL;
+const GTM_ID: string | undefined = import.meta.env.VITE_GTM_ID;
 
 let gtagLoaded = false;
+let gtmLoaded = false;
 
 function hasConsent(): boolean {
   try {
@@ -48,6 +50,28 @@ function loadGtagScript(): void {
   script.async = true;
   script.src = `https://www.googletagmanager.com/gtag/js?id=${GOOGLE_ADS_ID}`;
   document.head.appendChild(script);
+}
+
+function loadGtmScript(): void {
+  if (gtmLoaded || !GTM_ID) return;
+  gtmLoaded = true;
+
+  window.dataLayer = window.dataLayer || [];
+  window.dataLayer.push({
+    "gtm.start": new Date().getTime(),
+    event: "gtm.js",
+  });
+
+  const script = document.createElement("script");
+  script.async = true;
+  script.src = `https://www.googletagmanager.com/gtm.js?id=${GTM_ID}`;
+  document.head.appendChild(script);
+}
+
+/** Initialize Google Tag Manager. Call once on app mount. Only loads if consent is given. */
+export function initGtm(): void {
+  if (!hasConsent()) return;
+  loadGtmScript();
 }
 
 /** Initialize Google Ads tracking. Call once on app mount. Only loads if consent is given. */
