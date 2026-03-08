@@ -1,0 +1,13 @@
+name: test-changed
+on: push
+jobs:
+  test:
+    runs-on: depot-ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: yarn
+      - run: yarn install
+      - run: yarn vitest run --config .tests/vitest.config.ts --changed HEAD
