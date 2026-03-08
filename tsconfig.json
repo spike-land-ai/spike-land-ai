@@ -99,6 +99,7 @@
     "src/core/statecharts/node-sys/persistence.ts",
     "src/frontend/platform-frontend/**",
     "src/frontend/monaco-editor/**",
-    "src/media/educational-videos/**"
+    "src/media/educational-videos/**",
+    "src/app/**"
   ]
 }
