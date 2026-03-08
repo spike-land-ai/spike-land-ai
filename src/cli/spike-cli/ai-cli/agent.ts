@@ -61,7 +61,7 @@ export function registerAgentCommand(program: Command): void {
     .command("agent")
     .description("Run the Spike CLI AI Agent that provides code completion")
     .option("--port <port>", "Port for local HTTP completion API", "3005")
-    .action((options) => {
+    .action((options: { port: string }) => {
       if (!process.env.GEMINI_API_KEY && !process.env.CLAUDE_CODE_OAUTH_TOKEN) {
         console.error("Error: GEMINI_API_KEY is not set.");
         process.exit(1);
