@@ -49,7 +49,7 @@ function makePlans(pricing: import("../hooks/usePricing").PricingData): PricingP
       description: "Unlock professional tools and higher limits.",
       features: [
         { text: "500 AI requests/day" },
-        { text: "All 80+ MCP tools" },
+        { text: "All 250+ MCP tools" },
         { text: "Priority support" },
         { text: "API key vault — Bring Your Own Keys (BYOK)" },
         { text: "Advanced analytics" },
@@ -67,7 +67,7 @@ function makePlans(pricing: import("../hooks/usePricing").PricingData): PricingP
       description: "Unlimited access and dedicated support for teams.",
       features: [
         { text: "Unlimited AI requests" },
-        { text: "All 80+ MCP tools" },
+        { text: "All 250+ MCP tools" },
         { text: "Dedicated support" },
         { text: "Team management" },
         { text: "Custom integrations" },
@@ -123,7 +123,7 @@ const FAQ_ITEMS = [
   {
     question: "What MCP tools are available?",
     answer:
-      "The platform currently offers 80+ MCP tools covering code generation, image processing, data analysis, browser automation, and more. Free users can access 10 core tools; Pro and Business users get all 80+.",
+      "The platform currently offers 250+ MCP tools covering code generation, image processing, data analysis, browser automation, and more. Free users can access 10 core tools; Pro and Business users get all 250+.",
   },
   {
     question: "How does the marketplace revenue share work?",

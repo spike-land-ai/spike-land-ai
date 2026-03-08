@@ -1,6 +1,10 @@
 import { describe, it, expect, vi } from "vitest";
 import { SpikeChatEmbed } from "../../src/core/block-website/ui/SpikeChatEmbed";
 
+vi.mock("lucide-react", () => ({
+  Loader2: () => null,
+}));
+
 vi.mock("react", () => ({
   useState: (initialValue: any) => [initialValue, vi.fn()],
 }));

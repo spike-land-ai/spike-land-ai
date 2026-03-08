@@ -124,11 +124,19 @@ function generateMockSession(content: string): SessionState {
 
   const questions: QuizQuestion[] = concepts.slice(0, 3).map((name, idx) => {
     const correctIndex = Math.floor(Math.random() * 4);
+    const varOpts: [string, string, string, string] = [
+      "Concept effectively applies here",
+      "Contradicts the core principle",
+      "Lacks direct relevance",
+      "Misses important nuances"
+    ];
+    // Randomize the texts so they aren't identical every question
+    const shuffledOpts = [...varOpts].sort(() => Math.random() - 0.5);
     const opts: [string, string, string, string] = [
-      "This accurately reflects the concept",
-      "This contradicts the concept",
-      "This is unrelated to the concept",
-      "This oversimplifies the concept",
+      shuffledOpts[0]!,
+      shuffledOpts[1]!,
+      shuffledOpts[2]!,
+      shuffledOpts[3]!
     ];
     if (correctIndex !== 0) {
       [opts[0], opts[correctIndex]] = [opts[correctIndex]!, opts[0]!];
@@ -229,11 +237,19 @@ function evaluateMockAnswers(
     const idx = unmasteredIndices[i % unmasteredIndices.length] ?? i;
     const name = state.concepts[idx] ?? `Concept ${idx}`;
     const correctIndex = Math.floor(Math.random() * 4);
+    const varOpts: [string, string, string, string] = [
+      "Concept effectively applies here",
+      "Contradicts the core principle",
+      "Lacks direct relevance",
+      "Misses important nuances"
+    ];
+    // Randomize the texts so they aren't identical every question
+    const shuffledOpts = [...varOpts].sort(() => Math.random() - 0.5);
     const opts: [string, string, string, string] = [
-      "This accurately reflects the concept",
-      "This contradicts the concept",
-      "This is unrelated to the concept",
-      "This oversimplifies the concept",
+      shuffledOpts[0]!,
+      shuffledOpts[1]!,
+      shuffledOpts[2]!,
+      shuffledOpts[3]!
     ];
     if (correctIndex !== 0) {
       [opts[0], opts[correctIndex]] = [opts[correctIndex]!, opts[0]!];
