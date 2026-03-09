@@ -7,6 +7,6 @@
     "declarationMap": true,
     "types": ["@cloudflare/workers-types"]
   },
-  "include": ["index.ts"],
+  "include": ["index.ts", "../../src/global-typings.d.ts"],
   "references": []
 }

@@ -47,6 +47,70 @@ export default defineConfig(() => ({
   },
   resolve: {
     alias: {
+      // Shorthand aliases so tests can use @/components/…, @/hooks/…, @/routes/…, @/lib/…
+      // without the ui/ or core-logic/ prefix.
+      // Quiz components split across ui/components/quiz/ and core-logic/ — each mapped explicitly.
+      "@/components/quiz/BadgeDisplay": resolve(
+        import.meta.dirname,
+        "../../src/frontend/platform-frontend/ui/components/quiz/BadgeDisplay.tsx",
+      ),
+      "@/components/quiz/QuizRound": resolve(
+        import.meta.dirname,
+        "../../src/frontend/platform-frontend/ui/components/quiz/QuizRound.tsx",
+      ),
+      "@/components/quiz/QuizCard": resolve(
+        import.meta.dirname,
+        "../../src/frontend/platform-frontend/core-logic/QuizCard.tsx",
+      ),
+      "@/components/quiz/QuizProgress": resolve(
+        import.meta.dirname,
+        "../../src/frontend/platform-frontend/core-logic/QuizProgress.tsx",
+      ),
+      "@/components/quiz/ConflictAlert": resolve(
+        import.meta.dirname,
+        "../../src/frontend/platform-frontend/core-logic/ConflictAlert.tsx",
+      ),
+      "@/components/quiz/ArticleView": resolve(
+        import.meta.dirname,
+        "../../src/frontend/platform-frontend/core-logic/ArticleView.tsx",
+      ),
+      "@/components": resolve(
+        import.meta.dirname,
+        "../../src/frontend/platform-frontend/ui/components",
+      ),
+      "@/hooks": resolve(
+        import.meta.dirname,
+        "../../src/frontend/platform-frontend/ui/hooks",
+      ),
+      // Static route pages that live in core-logic/ rather than ui/routes/
+      "@/routes/about": resolve(
+        import.meta.dirname,
+        "../../src/frontend/platform-frontend/core-logic/about.tsx",
+      ),
+      "@/routes/privacy": resolve(
+        import.meta.dirname,
+        "../../src/frontend/platform-frontend/core-logic/privacy.tsx",
+      ),
+      "@/routes/terms": resolve(
+        import.meta.dirname,
+        "../../src/frontend/platform-frontend/core-logic/terms.tsx",
+      ),
+      "@/routes": resolve(
+        import.meta.dirname,
+        "../../src/frontend/platform-frontend/ui/routes",
+      ),
+      "@/lib/auth": resolve(
+        import.meta.dirname,
+        "../../src/frontend/platform-frontend/auth/auth.ts",
+      ),
+      "@/lib/reportError": resolve(
+        import.meta.dirname,
+        "../../src/frontend/platform-frontend/core-logic/reportError.ts",
+      ),
+      "@/lib": resolve(
+        import.meta.dirname,
+        "../../src/frontend/platform-frontend/core-logic/lib",
+      ),
       "@": resolve(import.meta.dirname, "../../src/frontend/platform-frontend"),
       "@spike-land-ai/block-website/ui": resolve(
         import.meta.dirname,

@@ -39,6 +39,9 @@ describe("useAnalytics", () => {
       userAgent: "test-agent",
     });
 
+    // Grant analytics consent so enqueueEvent doesn't drop events
+    localStorage.setItem("cookie_consent", "accepted");
+
     // Reset module state between tests
     vi.resetModules();
     mockSubscribe.mockClear();
@@ -48,6 +51,7 @@ describe("useAnalytics", () => {
   afterEach(() => {
     vi.unstubAllGlobals();
     vi.useRealTimers();
+    localStorage.removeItem("cookie_consent");
   });
 
   it("flushEvents POSTs to /api/analytics/ingest with correct format", async () => {

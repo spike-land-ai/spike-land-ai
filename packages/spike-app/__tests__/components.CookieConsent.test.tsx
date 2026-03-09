@@ -35,69 +35,69 @@ describe("CookieConsent", () => {
   async function renderAndReveal() {
     render(<CookieConsent />);
     await act(async () => {
-      vi.advanceTimersByTime(100);
+      vi.advanceTimersByTime(1100);
     });
   }
 
-  it("renders consent dialog when no prior consent", async () => {
+  it("renders consent region when no prior consent", async () => {
     await renderAndReveal();
-    expect(screen.getByRole("dialog")).toBeInTheDocument();
+    expect(screen.getByRole("region")).toBeInTheDocument();
   });
 
   it("does not render when consent is already accepted", async () => {
     localStorage.setItem("cookie_consent", "accepted");
     render(<CookieConsent />);
-    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    expect(screen.queryByRole("region", { name: /cookie/i })).not.toBeInTheDocument();
   });
 
   it("does not render when consent is already rejected", async () => {
     localStorage.setItem("cookie_consent", "rejected");
     render(<CookieConsent />);
-    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    expect(screen.queryByRole("region", { name: /cookie/i })).not.toBeInTheDocument();
   });
 
   it("renders cookie consent title", async () => {
     await renderAndReveal();
-    expect(screen.getByText("Cookie Preferences")).toBeInTheDocument();
+    expect(screen.getByText("We use cookies")).toBeInTheDocument();
   });
 
   it("shows accept and reject buttons", async () => {
     await renderAndReveal();
     expect(screen.getByText("Accept All")).toBeInTheDocument();
-    expect(screen.getByText("Reject Non-Essential")).toBeInTheDocument();
+    expect(screen.getByText("Necessary Only")).toBeInTheDocument();
   });
 
   it("clicking Accept All hides the dialog", async () => {
     await renderAndReveal();
     fireEvent.click(screen.getByText("Accept All"));
-    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    expect(screen.queryByText("We use cookies")).not.toBeInTheDocument();
     expect(localStorage.getItem("cookie_consent")).toBe("accepted");
   });
 
-  it("clicking Reject Non-Essential hides the dialog", async () => {
+  it("clicking Necessary Only hides the dialog", async () => {
     await renderAndReveal();
-    fireEvent.click(screen.getByText("Reject Non-Essential"));
-    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    fireEvent.click(screen.getByText("Necessary Only"));
+    expect(screen.queryByText("We use cookies")).not.toBeInTheDocument();
     expect(localStorage.getItem("cookie_consent")).toBe("rejected");
   });
 
-  it("has Learn more link pointing to /privacy", async () => {
+  it("has Cookie Policy link pointing to /privacy", async () => {
     await renderAndReveal();
-    const link = screen.getByText("Learn more").closest("a");
+    const link = screen.getByText("Cookie Policy").closest("a");
     expect(link).toHaveAttribute("href", "/privacy");
   });
 
-  it("dialog starts invisible then becomes visible after 50ms delay", async () => {
+  it("dialog starts hidden then becomes visible after 1000ms delay", async () => {
     const { container } = render(<CookieConsent />);
-    // Before delay fires
-    const dialogBefore = container.querySelector("[role='dialog']");
-    expect(dialogBefore).toHaveStyle({ opacity: "0" });
+    // Before delay fires - should have opacity-0 class
+    const dialogBefore = container.querySelector("[role='region']");
+    expect(dialogBefore?.className).toContain("opacity-0");
 
     await act(async () => {
-      vi.advanceTimersByTime(100);
+      vi.advanceTimersByTime(1100);
     });
 
-    const dialogAfter = container.querySelector("[role='dialog']");
-    expect(dialogAfter).toHaveStyle({ opacity: "1" });
+    const dialogAfter = container.querySelector("[role='region']");
+    expect(dialogAfter?.className).toContain("opacity-100");
   });
 });

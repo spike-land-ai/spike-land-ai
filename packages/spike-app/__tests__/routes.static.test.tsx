@@ -1,6 +1,23 @@
 import { describe, it, expect, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 
+// Mock hooks used by CallbackPage
+vi.mock("@/ui/hooks/useAnalytics", () => ({
+  useAnalytics: () => ({ trackEvent: vi.fn(), trackPageView: vi.fn() }),
+}));
+
+vi.mock("@/hooks/useAnalytics", () => ({
+  useAnalytics: () => ({ trackEvent: vi.fn(), trackPageView: vi.fn() }),
+}));
+
+vi.mock("@/hooks/useAuth", () => ({
+  useAuth: () => ({ isAuthenticated: false, user: null }),
+}));
+
+vi.mock("@/ui/hooks/useAuth", () => ({
+  useAuth: () => ({ isAuthenticated: false, user: null }),
+}));
+
 // Mock TanStack Router Navigate for routes that use it
 vi.mock("@tanstack/react-router", async (importOriginal) => {
   const actual = await importOriginal<typeof import("@tanstack/react-router")>();

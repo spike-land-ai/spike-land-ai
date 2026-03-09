@@ -20,26 +20,28 @@ describe("StatusBadge", () => {
 
   it("applies success color class for live status", () => {
     const { container } = render(<StatusBadge status="live" />);
-    expect(container.firstChild).toHaveClass("bg-success");
+    expect(container.firstChild).toHaveClass("bg-success/70");
   });
 
   it("applies destructive color class for deleted status", () => {
     const { container } = render(<StatusBadge status="deleted" />);
-    expect(container.firstChild).toHaveClass("bg-destructive");
+    expect(container.firstChild).toHaveClass("bg-destructive/70");
   });
 
   it("applies muted color class for archived status", () => {
     const { container } = render(<StatusBadge status="archived" />);
-    expect(container.firstChild).toHaveClass("bg-muted");
+    expect(container.firstChild).toHaveClass("bg-muted/80");
   });
 
-  it("renders icon character for live status (bullet)", () => {
+  it("renders a lucide icon for live status", () => {
     const { container } = render(<StatusBadge status="live" />);
-    expect(container.textContent).toContain("\u25CF");
+    // Component renders a Circle lucide icon (svg element)
+    expect(container.querySelector("svg")).toBeInTheDocument();
   });
 
-  it("renders icon character for deleted status (x)", () => {
+  it("renders a lucide icon for deleted status", () => {
     const { container } = render(<StatusBadge status="deleted" />);
-    expect(container.textContent).toContain("\u2715");
+    // Component renders an X lucide icon (svg element)
+    expect(container.querySelector("svg")).toBeInTheDocument();
   });
 });

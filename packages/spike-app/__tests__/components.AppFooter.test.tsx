@@ -1,10 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { AppFooter } from "@/components/AppFooter";
-import { createMemoryRouter, RouterProvider } from "@tanstack/react-router";
-import { routeTree } from "../../../src/spike-app/routeTree.gen";
 
-// Simpler approach: mock the router Link
 vi.mock("@tanstack/react-router", async (importOriginal) => {
   const actual = await importOriginal<typeof import("@tanstack/react-router")>();
   return {
@@ -39,7 +36,7 @@ describe("AppFooter", () => {
 
   it("renders platform navigation links", () => {
     render(<AppFooter />);
-    expect(screen.getByText("App Registry")).toBeInTheDocument();
+    expect(screen.getByText("Packages")).toBeInTheDocument();
     expect(screen.getByText("Pricing")).toBeInTheDocument();
     expect(screen.getByText("App Store")).toBeInTheDocument();
   });
@@ -48,7 +45,7 @@ describe("AppFooter", () => {
     render(<AppFooter />);
     expect(screen.getByText("Documentation")).toBeInTheDocument();
     expect(screen.getByText("Blog")).toBeInTheDocument();
-    expect(screen.getByText("About Us")).toBeInTheDocument();
+    expect(screen.getByText("About")).toBeInTheDocument();
   });
 
   it("renders legal links", () => {
@@ -59,23 +56,23 @@ describe("AppFooter", () => {
 
   it("renders social links with proper rel attributes", () => {
     render(<AppFooter />);
-    const githubLink = screen.getByText("GitHub").closest("a");
+    const githubLink = screen.getByLabelText("Visit our GitHub").closest("a");
     expect(githubLink).toHaveAttribute("rel", "noopener noreferrer");
     expect(githubLink).toHaveAttribute("target", "_blank");
 
-    const twitterLink = screen.getByText("Twitter").closest("a");
+    const twitterLink = screen.getByLabelText("Follow us on Twitter").closest("a");
     expect(twitterLink).toHaveAttribute("rel", "noopener noreferrer");
   });
 
   it("shows system status indicator", () => {
     render(<AppFooter />);
-    expect(screen.getByRole("status")).toHaveTextContent("All systems operational");
+    expect(screen.getByRole("status")).toHaveTextContent("Status healthy");
   });
 
-  it("renders all four section headings", () => {
+  it("renders section headings", () => {
     render(<AppFooter />);
-    expect(screen.getByText("Platform")).toBeInTheDocument();
+    expect(screen.getByText("Product")).toBeInTheDocument();
     expect(screen.getByText("Resources")).toBeInTheDocument();
-    expect(screen.getByText("Legal & Social")).toBeInTheDocument();
+    expect(screen.getByText("Trust")).toBeInTheDocument();
   });
 });

@@ -28,10 +28,13 @@ describe("VersionHistory", () => {
     ];
 
     const { container } = render(<VersionHistory versions={versions} />);
-    const badges = container.querySelectorAll("span.flex.h-8.w-8");
+    // Non-latest versions render a "v{n}" badge; latest renders a Check icon.
+    // With versions [1,2,3], v3 is latest (shows Check), v2 and v1 show text badges.
+    const badges = container.querySelectorAll("span.text-xs.font-black.uppercase");
     const labels = Array.from(badges).map((b) => b.textContent);
 
-    expect(labels).toEqual(["v3", "v2", "v1"]);
+    // Sorted descending: v2 then v1 (v3 is latest, shown as Active with Check icon)
+    expect(labels).toEqual(["v2", "v1"]);
   });
 
   it("marks the latest version as Active", () => {

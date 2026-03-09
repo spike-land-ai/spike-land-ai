@@ -72,7 +72,7 @@ export function registerLearnItTools(
             .limit(1);
 
           const parentSlug =
-            parentRelationResult.length > 0 ? parentRelationResult[0].parentSlug : null;
+            parentRelationResult.length > 0 ? parentRelationResult[0]!.parentSlug : null;
 
           // Increment view count
           await db
@@ -183,7 +183,7 @@ export function registerLearnItTools(
             return textResult(`**Error: NOT_FOUND**\nNo topic found with slug "${input.slug}".`);
           }
 
-          const topic = topicResult[0];
+          const topic = topicResult[0]!;
 
           // Fetch all outgoing relations (children, related, prerequisites)
           const outgoingResult = await db

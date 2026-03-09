@@ -19,9 +19,9 @@ const versions = [
 ];
 
 describe("VersionHistory", () => {
-  it("shows 'No versions yet' when empty", () => {
+  it("shows 'No versions recorded' when empty", () => {
     render(<VersionHistory versions={[]} />);
-    expect(screen.getByText("No versions yet.")).toBeInTheDocument();
+    expect(screen.getByText("No versions recorded")).toBeInTheDocument();
   });
 
   it("renders all versions", () => {
@@ -33,20 +33,22 @@ describe("VersionHistory", () => {
 
   it("sorts versions descending (latest first)", () => {
     const { container } = render(<VersionHistory versions={versions} />);
-    const vLabels = container.querySelectorAll("span.font-bold");
-    // First shown should be v3
-    expect(vLabels[0].textContent).toBe("v3");
+    // Non-latest versions render a vN label span with text-xs font-black uppercase classes
+    // The latest (v3) renders a Check icon instead, so v2 appears first in vN labels
+    const vLabels = container.querySelectorAll("span.text-xs.font-black.uppercase");
+    // With versions [1,3,2] sorted desc=[3,2,1], v3 is latest (no vN label), so first label is v2
+    expect(vLabels[0].textContent).toBe("v2");
   });
 
-  it("shows Current badge for latest version", () => {
+  it("shows Active badge for latest version", () => {
     render(<VersionHistory versions={versions} />);
-    expect(screen.getByText("Current")).toBeInTheDocument();
+    expect(screen.getByText("Active")).toBeInTheDocument();
   });
 
-  it("does not show Current badge for older versions", () => {
+  it("does not show Active badge for older versions", () => {
     render(<VersionHistory versions={versions} />);
-    // Only one "Current" badge should exist
-    expect(screen.getAllByText("Current")).toHaveLength(1);
+    // Only one "Active" badge should exist
+    expect(screen.getAllByText("Active")).toHaveLength(1);
   });
 
   it("shows author when provided", () => {
@@ -72,8 +74,11 @@ describe("VersionHistory", () => {
         versions={[{ version: 1, changeDescription: "Release", timestamp: "2025-06-15T10:30:00Z" }]}
       />,
     );
-    // Just verify something date-like is present; locale-dependent
-    const dateText = new Date("2025-06-15T10:30:00Z").toLocaleString();
+    // Component uses toLocaleString with dateStyle/timeStyle options
+    const dateText = new Date("2025-06-15T10:30:00Z").toLocaleString([], {
+      dateStyle: "medium",
+      timeStyle: "short",
+    });
     expect(screen.getByText(dateText)).toBeInTheDocument();
   });
 });

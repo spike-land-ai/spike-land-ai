@@ -37,7 +37,7 @@ describe("SpikeChatEmbed", () => {
     const originalLocation = window.location;
     Object.defineProperty(window, "location", {
       writable: true,
-      value: { hostname: "spike.land" },
+      value: { hostname: "spike.land", origin: "https://spike.land" },
     });
 
     const result = SpikeChatEmbed({ channelSlug: "test-chan", workspaceSlug: "test-work", guestAccess: true });

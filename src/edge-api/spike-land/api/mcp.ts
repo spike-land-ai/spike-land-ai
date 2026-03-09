@@ -460,6 +460,10 @@ mcpRoute.post("/", async (c) => {
     }
   }
 
+  if (!session) {
+    return jsonRpcError(500, -32603, "Internal error: session unavailable");
+  }
+
   applyCallerContext(session.mcpServer, callerElo, callerTier, isAgent, userRole);
 
   // parsedBody is passed directly to handleRequest, so no need to serialize body

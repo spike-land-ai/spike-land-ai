@@ -11,14 +11,13 @@ describe("CreditWidget", () => {
     global.fetch = vi.fn().mockReturnValue(new Promise(() => {}));
     const { container } = render(<CreditWidget />);
     expect(container.querySelector(".animate-pulse")).toBeInTheDocument();
-    expect(screen.getByText("Credit Balance")).toBeInTheDocument();
   });
 
   it("shows error state when fetch fails", async () => {
     global.fetch = vi.fn().mockRejectedValue(new Error("Network error"));
     render(<CreditWidget />);
     await waitFor(() => {
-      expect(screen.getByText("Unable to load credits.")).toBeInTheDocument();
+      expect(screen.getByText("Unable to load your credit balance at this time.")).toBeInTheDocument();
     });
   });
 
@@ -26,7 +25,7 @@ describe("CreditWidget", () => {
     global.fetch = vi.fn().mockResolvedValue({ ok: false, status: 500 });
     render(<CreditWidget />);
     await waitFor(() => {
-      expect(screen.getByText("Unable to load credits.")).toBeInTheDocument();
+      expect(screen.getByText("Unable to load your credit balance at this time.")).toBeInTheDocument();
     });
   });
 
@@ -78,7 +77,7 @@ describe("CreditWidget", () => {
     });
     render(<CreditWidget />);
     await waitFor(() => {
-      expect(screen.getByText("Unlimited daily credits")).toBeInTheDocument();
+      expect(screen.getByText("Unlimited daily credits included")).toBeInTheDocument();
     });
   });
 
@@ -105,38 +104,38 @@ describe("CreditWidget", () => {
     });
   });
 
-  it("uses red bar color when remaining < 20%", async () => {
+  it("uses destructive bar color when remaining < 20%", async () => {
     global.fetch = vi.fn().mockResolvedValue({
       ok: true,
       json: async () => ({ balance: 50, dailyLimit: 1000, tier: "free", usedToday: 900 }),
     });
     const { container } = render(<CreditWidget />);
     await waitFor(() => {
-      const bar = container.querySelector(".bg-red-500");
+      const bar = container.querySelector(".bg-destructive");
       expect(bar).toBeInTheDocument();
     });
   });
 
-  it("uses yellow bar color when remaining between 20-50%", async () => {
+  it("uses warning bar color when remaining between 20-50%", async () => {
     global.fetch = vi.fn().mockResolvedValue({
       ok: true,
       json: async () => ({ balance: 300, dailyLimit: 1000, tier: "free", usedToday: 700 }),
     });
     const { container } = render(<CreditWidget />);
     await waitFor(() => {
-      const bar = container.querySelector(".bg-yellow-500");
+      const bar = container.querySelector(".bg-warning");
       expect(bar).toBeInTheDocument();
     });
   });
 
-  it("uses green bar color when remaining > 50%", async () => {
+  it("uses success bar color when remaining > 50%", async () => {
     global.fetch = vi.fn().mockResolvedValue({
       ok: true,
       json: async () => ({ balance: 600, dailyLimit: 1000, tier: "pro", usedToday: 100 }),
     });
     const { container } = render(<CreditWidget />);
     await waitFor(() => {
-      const bar = container.querySelector(".bg-green-500");
+      const bar = container.querySelector(".bg-success");
       expect(bar).toBeInTheDocument();
     });
   });

@@ -3,52 +3,62 @@ import { render, screen, fireEvent } from "@testing-library/react";
 import { ThemeSwitcher } from "@/components/ThemeSwitcher";
 import type { ThemePreference } from "@/hooks/useDarkMode";
 
-describe("ThemeSwitcher", () => {
-  const themes: ThemePreference[] = ["system", "light", "dark"];
+// Mock framer-motion and block-website to avoid heavy deps in tests
+vi.mock("framer-motion", () => ({
+  useReducedMotion: () => true,
+}));
 
-  it("renders all three theme buttons", () => {
+vi.mock("@spike-land-ai/block-website/core", () => ({
+  triggerViewTransition: (_ref: unknown, fn: () => void) => fn(),
+}));
+
+describe("ThemeSwitcher", () => {
+  it("renders a toggle button", () => {
     const setTheme = vi.fn();
-    render(<ThemeSwitcher theme="system" setTheme={setTheme} />);
-    expect(screen.getByLabelText("System theme")).toBeInTheDocument();
-    expect(screen.getByLabelText("Light theme")).toBeInTheDocument();
-    expect(screen.getByLabelText("Dark theme")).toBeInTheDocument();
+    render(<ThemeSwitcher theme="light" setTheme={setTheme} />);
+    const button = screen.getByRole("button");
+    expect(button).toBeInTheDocument();
   });
 
-  it.each(themes)("marks %s button as pressed when active", (theme) => {
+  it("has aria-pressed=false when in light mode", () => {
     const setTheme = vi.fn();
-    render(<ThemeSwitcher theme={theme} setTheme={setTheme} />);
-    const label = theme.charAt(0).toUpperCase() + theme.slice(1);
-    const button = screen.getByLabelText(`${label} theme`);
+    render(<ThemeSwitcher theme={"light" as ThemePreference} setTheme={setTheme} />);
+    const button = screen.getByRole("button");
+    expect(button).toHaveAttribute("aria-pressed", "false");
+  });
+
+  it("has aria-pressed=true when in dark mode", () => {
+    const setTheme = vi.fn();
+    render(<ThemeSwitcher theme={"dark" as ThemePreference} setTheme={setTheme} />);
+    const button = screen.getByRole("button");
     expect(button).toHaveAttribute("aria-pressed", "true");
   });
 
-  it("calls setTheme with 'dark' when dark button is clicked", () => {
+  it("calls setTheme with 'dark' when clicking from light mode", () => {
     const setTheme = vi.fn();
-    render(<ThemeSwitcher theme="system" setTheme={setTheme} />);
-    fireEvent.click(screen.getByLabelText("Dark theme"));
+    render(<ThemeSwitcher theme={"light" as ThemePreference} setTheme={setTheme} />);
+    fireEvent.click(screen.getByRole("button"));
     expect(setTheme).toHaveBeenCalledWith("dark");
   });
 
-  it("calls setTheme with 'light' when light button is clicked", () => {
+  it("calls setTheme with 'light' when clicking from dark mode", () => {
     const setTheme = vi.fn();
-    render(<ThemeSwitcher theme="dark" setTheme={setTheme} />);
-    fireEvent.click(screen.getByLabelText("Light theme"));
+    render(<ThemeSwitcher theme={"dark" as ThemePreference} setTheme={setTheme} />);
+    fireEvent.click(screen.getByRole("button"));
     expect(setTheme).toHaveBeenCalledWith("light");
   });
 
-  it("calls setTheme with 'system' when system button is clicked", () => {
+  it("renders switch to dark mode label in light mode", () => {
     const setTheme = vi.fn();
-    render(<ThemeSwitcher theme="dark" setTheme={setTheme} />);
-    fireEvent.click(screen.getByLabelText("System theme"));
-    expect(setTheme).toHaveBeenCalledWith("system");
+    render(<ThemeSwitcher theme={"light" as ThemePreference} setTheme={setTheme} />);
+    const button = screen.getByRole("button");
+    expect(button).toHaveAttribute("aria-label", "Switch to dark mode");
   });
 
-  it("active theme button has different styling", () => {
+  it("renders switch to light mode label in dark mode", () => {
     const setTheme = vi.fn();
-    render(<ThemeSwitcher theme="light" setTheme={setTheme} />);
-    const lightBtn = screen.getByLabelText("Light theme");
-    const darkBtn = screen.getByLabelText("Dark theme");
-    expect(lightBtn.className).toContain("bg-card");
-    expect(darkBtn.className).not.toContain("bg-card");
+    render(<ThemeSwitcher theme={"dark" as ThemePreference} setTheme={setTheme} />);
+    const button = screen.getByRole("button");
+    expect(button).toHaveAttribute("aria-label", "Switch to light mode");
   });
 });

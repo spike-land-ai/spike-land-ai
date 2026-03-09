@@ -50,18 +50,18 @@ describe("ToastProvider / useToast", () => {
     });
   });
 
-  it("dismisses toast when dismiss button clicked", async () => {
+  it("dismisses toast when dismiss notification button clicked", async () => {
     render(<TestApp message="Dismissible" />);
     fireEvent.click(screen.getByText("Show Toast"));
     await waitFor(() => screen.getByRole("status"));
 
-    fireEvent.click(screen.getByLabelText("Dismiss"));
+    fireEvent.click(screen.getByLabelText("Dismiss notification"));
     await waitFor(() => {
       expect(screen.queryByRole("status")).not.toBeInTheDocument();
     });
   });
 
-  it("auto-dismisses toast after 4500ms", async () => {
+  it("auto-dismisses toast after TOAST_DURATION_MS (5000ms)", async () => {
     vi.useFakeTimers();
     render(<TestApp message="Auto dismiss" />);
     fireEvent.click(screen.getByText("Show Toast"));
@@ -71,7 +71,7 @@ describe("ToastProvider / useToast", () => {
     expect(screen.getByRole("status")).toBeInTheDocument();
 
     await act(async () => {
-      vi.advanceTimersByTime(4500);
+      vi.advanceTimersByTime(5000);
     });
     expect(screen.queryByRole("status")).not.toBeInTheDocument();
     vi.useRealTimers();

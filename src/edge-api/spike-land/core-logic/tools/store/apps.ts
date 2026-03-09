@@ -45,7 +45,7 @@ async function requireApp(db: DrizzleDB, slug: string) {
   if (rows.length === 0) {
     throw new McpError(`App "${slug}" not found.`, McpErrorCode.APP_NOT_FOUND, false);
   }
-  return rows[0];
+  return rows[0]!;
 }
 
 export function registerStoreAppsTools(
@@ -85,7 +85,7 @@ export function registerStoreAppsTools(
             await db
               .update(appRatings)
               .set({ rating: input.rating, body: bodyText, updatedAt: now })
-              .where(eq(appRatings.id, existing[0].id));
+              .where(eq(appRatings.id, existing[0]!.id));
           } else {
             await db.insert(appRatings).values({
               id: generateId(),
@@ -275,7 +275,7 @@ export function registerStoreAppsTools(
             );
           }
 
-          const source = sourceRows[0];
+          const source = sourceRows[0]!;
           const sourceTags = new Set(parseTags(source.tags));
 
           // Load all live apps except the source

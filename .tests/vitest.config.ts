@@ -153,10 +153,12 @@ const packages: Record<string, PkgConfig> = {
     env: "jsdom",
     includeTests: [tests("block-website/**/*.test.ts"), tests("block-website/**/*.test.tsx")],
     aliases: {
-      react: src("core/react-engine/core-logic/react/index.ts"),
-      "react-dom": src("core/react-engine/core-logic/react-dom/client.ts"),
+      // Subpath aliases must be listed before the bare "react" alias so Vite's
+      // import-analysis plugin resolves them before falling back to the custom react path.
       "react/jsx-dev-runtime": src("core/react-engine/core-logic/react/jsx-runtime.ts"),
       "react/jsx-runtime": src("core/react-engine/core-logic/react/jsx-runtime.ts"),
+      "react-dom": src("core/react-engine/core-logic/react-dom/client.ts"),
+      react: src("core/react-engine/core-logic/react/index.ts"),
     },
     includeSrc: [
       src("core/block-website/core-logic/**/*.ts"),
@@ -461,7 +463,13 @@ function buildProject(name: string, cfg: PkgConfig) {
   if (cfg.setup) testConfig.setupFiles = cfg.setup;
 
   const project: Record<string, unknown> = { test: testConfig };
-  project.resolve = { alias: { ...baseAliases, ...(cfg.aliases ?? {}) } };
+  // Merge aliases so that subpath specifiers (e.g. "react/jsx-dev-runtime") are
+  // checked before their prefix ("react"). We achieve this by sorting the merged
+  // entries from longest key to shortest before building the final object.
+  const mergedAliasEntries = Object.entries({ ...baseAliases, ...(cfg.aliases ?? {}) }).sort(
+    ([a], [b]) => b.length - a.length,
+  );
+  project.resolve = { alias: Object.fromEntries(mergedAliasEntries) };
   if (cfg.plugins) project.plugins = cfg.plugins;
 
   return project;

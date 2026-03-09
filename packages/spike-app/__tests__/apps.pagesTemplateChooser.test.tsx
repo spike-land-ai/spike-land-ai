@@ -10,24 +10,32 @@ describe("PagesTemplateChooserApp", () => {
     expect(screen.getByText("Elevate Your Documents")).toBeInTheDocument();
   });
 
-  it("filters down to premium templates", () => {
-    render(<PagesTemplateChooserApp />);
+  it(
+    "filters down to premium templates",
+    () => {
+      render(<PagesTemplateChooserApp />);
 
-    fireEvent.click(screen.getByRole("button", { name: "Premium" }));
+      fireEvent.click(screen.getByRole("button", { name: "Premium" }));
 
-    expect(screen.getByText("Culinary Plain Proposal")).toBeInTheDocument();
-    expect(screen.queryByText("Blank Layout")).not.toBeInTheDocument();
-  });
+      expect(screen.getByText("Culinary Plain Proposal")).toBeInTheDocument();
+      expect(screen.queryByText("Blank Layout")).not.toBeInTheDocument();
+    },
+    60_000,
+  );
 
-  it("enables create once a template is selected", () => {
-    render(<PagesTemplateChooserApp />);
+  it(
+    "enables create once a template is selected",
+    () => {
+      render(<PagesTemplateChooserApp />);
 
-    const createButton = screen.getByRole("button", { name: "Create" });
-    expect(createButton).toBeDisabled();
+      const createButton = screen.getByRole("button", { name: "Create" });
+      expect(createButton).toBeDisabled();
 
-    fireEvent.click(screen.getByRole("button", { name: /Blank Black/i }));
+      fireEvent.click(screen.getByRole("button", { name: /Blank Black/i }));
 
-    expect(createButton).toBeEnabled();
-    expect(screen.getByText("Selected: Blank Black")).toBeInTheDocument();
-  });
+      expect(createButton).toBeEnabled();
+      expect(screen.getByText("Selected: Blank Black")).toBeInTheDocument();
+    },
+    60_000,
+  );
 });

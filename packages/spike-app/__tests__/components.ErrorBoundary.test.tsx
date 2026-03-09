@@ -34,7 +34,7 @@ describe("ErrorBoundary", () => {
         <Bomb shouldThrow={true} />
       </ErrorBoundary>,
     );
-    expect(screen.getByText("Something went wrong")).toBeInTheDocument();
+    expect(screen.getByText("Ouch! Something broke.")).toBeInTheDocument();
     expect(screen.getByText("Test explosion")).toBeInTheDocument();
   });
 
@@ -45,10 +45,10 @@ describe("ErrorBoundary", () => {
       </ErrorBoundary>,
     );
     expect(screen.getByText("Custom Error UI")).toBeInTheDocument();
-    expect(screen.queryByText("Something went wrong")).not.toBeInTheDocument();
+    expect(screen.queryByText("Ouch! Something broke.")).not.toBeInTheDocument();
   });
 
-  it("has a Reload page button that calls window.location.reload", () => {
+  it("has a Reload Application button that calls window.location.reload", () => {
     const reloadMock = vi.fn();
     Object.defineProperty(window, "location", {
       writable: true,
@@ -61,7 +61,7 @@ describe("ErrorBoundary", () => {
       </ErrorBoundary>,
     );
 
-    fireEvent.click(screen.getByText("Reload page"));
+    fireEvent.click(screen.getByText("Reload Application"));
     expect(reloadMock).toHaveBeenCalledOnce();
   });
 
@@ -79,12 +79,11 @@ describe("ErrorBoundary", () => {
   });
 
   it("getDerivedStateFromError updates state correctly", () => {
-    // This is tested implicitly via render, but confirm state transitions
     const { container } = render(
       <ErrorBoundary>
         <Bomb shouldThrow={true} />
       </ErrorBoundary>,
     );
-    expect(container.querySelector("h1")).toHaveTextContent("Something went wrong");
+    expect(container.querySelector("h2")).toHaveTextContent("Ouch! Something broke.");
   });
 });

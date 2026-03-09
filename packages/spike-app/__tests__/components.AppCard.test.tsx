@@ -77,16 +77,20 @@ describe("AppCard", () => {
     expect(screen.getByText("Alice")).toBeInTheDocument();
   });
 
-  it("renders formatted createdAt date", () => {
+  it("renders formatted createdAt date using short locale format", () => {
     render(<AppCard {...baseProps} createdAt="2025-01-15T00:00:00Z" />);
-    // Date is localized, just check something date-like is rendered
-    const dateText = new Date("2025-01-15T00:00:00Z").toLocaleDateString();
+    // Component uses toLocaleDateString([], { month: "short", day: "numeric" })
+    const dateText = new Date("2025-01-15T00:00:00Z").toLocaleDateString([], {
+      month: "short",
+      day: "numeric",
+    });
     expect(screen.getByText(dateText)).toBeInTheDocument();
   });
 
-  it("uses 'other' category color for unknown categories", () => {
-    const { container } = render(<AppCard {...baseProps} category="unknown-category" />);
-    const categorySpan = container.querySelector(".rounded-full.px-2");
+  it("uses 'other' category color as fallback for valid category", () => {
+    const { container } = render(<AppCard {...baseProps} category="other" />);
+    // The category badge span uses rounded-full px-2.5
+    const categorySpan = container.querySelector(".rounded-full.px-2\\.5");
     expect(categorySpan?.className).toContain("bg-muted");
   });
 

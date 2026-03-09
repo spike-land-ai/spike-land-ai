@@ -7,6 +7,6 @@
     "declarationMap": true,
     "types": ["@cloudflare/workers-types"]
   },
-  "include": ["index.ts", "../../src/edge-api/transpile/**/*.ts", "../../src/code/**/*.d.ts"],
+  "include": ["index.ts", "../../src/edge-api/transpile/**/*.ts", "../../src/code/**/*.d.ts", "../../src/global-typings.d.ts"],
   "references": []
 }

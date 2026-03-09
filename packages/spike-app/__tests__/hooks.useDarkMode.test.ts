@@ -22,9 +22,9 @@ describe("useDarkMode", () => {
     });
   });
 
-  it("defaults to system theme when no preference stored", () => {
+  it("defaults to light theme when no preference stored", () => {
     const { result } = renderHook(() => useDarkMode());
-    expect(result.current.theme).toBe("system");
+    expect(result.current.theme).toBe("light");
   });
 
   it("loads stored dark preference", () => {
@@ -68,70 +68,42 @@ describe("useDarkMode", () => {
     expect(document.documentElement.classList.contains("light")).toBe(true);
   });
 
-  it("setTheme('system') follows OS when OS is light", async () => {
+  it("isDarkMode is false when theme is light", () => {
     const { result } = renderHook(() => useDarkMode());
-
-    await act(async () => {
-      result.current.setTheme("system");
-    });
-
-    expect(result.current.theme).toBe("system");
-    // matchMedia returns false (light mode)
     expect(result.current.isDarkMode).toBe(false);
   });
 
-  it("system theme follows OS dark mode", async () => {
-    Object.defineProperty(window, "matchMedia", {
-      writable: true,
-      value: (query: string) => ({
-        matches: query.includes("dark"),
-        media: query,
-        onchange: null,
-        addListener: () => {},
-        removeListener: () => {},
-        addEventListener: () => {},
-        removeEventListener: () => {},
-        dispatchEvent: () => false,
-      }),
-    });
-
+  it("isDarkMode is true when theme is dark", () => {
+    localStorage.setItem("theme-preference", "dark");
     const { result } = renderHook(() => useDarkMode());
     expect(result.current.isDarkMode).toBe(true);
   });
 
-  it("listens to OS media query changes when theme is system", async () => {
-    let capturedHandler: (() => void) | null = null;
-    // mq object whose .matches can be mutated before handler fires
-    const mqObject = {
-      matches: false,
-      media: "(prefers-color-scheme: dark)",
-      onchange: null,
-      addListener: () => {},
-      removeListener: () => {},
-      addEventListener: (_event: string, handler: () => void) => {
-        capturedHandler = handler;
-      },
-      removeEventListener: () => {
-        capturedHandler = null;
-      },
-      dispatchEvent: () => false,
-    };
-
-    Object.defineProperty(window, "matchMedia", {
-      writable: true,
-      value: () => mqObject,
-    });
-
+  it("toggleTheme switches between light and dark", async () => {
     const { result } = renderHook(() => useDarkMode());
-    expect(result.current.isDarkMode).toBe(false);
-    expect(capturedHandler).not.toBeNull();
+    expect(result.current.theme).toBe("light");
 
-    // Mutate matches then fire handler — hook reads mq.matches
-    mqObject.matches = true;
     await act(async () => {
-      capturedHandler!();
+      result.current.toggleTheme();
     });
 
+    expect(result.current.theme).toBe("dark");
     expect(result.current.isDarkMode).toBe(true);
+  });
+
+  it("responds to storage events from other tabs", async () => {
+    const { result } = renderHook(() => useDarkMode());
+    expect(result.current.theme).toBe("light");
+
+    await act(async () => {
+      window.dispatchEvent(
+        new StorageEvent("storage", {
+          key: "theme-preference",
+          newValue: "dark",
+        }),
+      );
+    });
+
+    expect(result.current.theme).toBe("dark");
   });
 });
