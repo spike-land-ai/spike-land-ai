@@ -1,13 +1,13 @@
 ---
 title: "Docker Layers Are Just Like LLM Context Caching"
 slug: "docker-layers-are-just-like-llm-context-caching"
-description: "A beginner's guide to understanding how Docker layer caching and LLM prompt caching work identically, and how to optimize both."
+description: "LLM workflow design follows the same optimization law as Docker builds: stable prefixes are cheap, early changes are expensive, and monolithic pipelines waste compute."
 date: "2026-02-15"
 author: "Zoltan Erdos"
 category: "Developer Experience"
-tags: ["docker", "llm", "caching", "developer-experience", "devops", "context-engineering", "performance"]
+tags: ["docker", "llm", "caching", "developer-experience", "devops", "context-engineering", "performance", "agents"]
 featured: false
-primer: "Same caching logic. Different machines. One mental model."
+primer: "LLM systems should be designed like multi-stage Docker builds."
 heroImage: "/blog/docker-layers-are-just-like-llm-context-caching/hero.png"
 ---
 
@@ -15,86 +15,175 @@ heroImage: "/blog/docker-layers-are-just-like-llm-context-caching/hero.png"
 
 <Tldr>
 
-- Docker containers and AI Large Language Models (LLMs) both use "sequential caching" to save time and money.
-- In both systems, if you change something early on, everything after it has to be completely rebuilt or recomputed.
-- The golden rule for both: Put stable, unchanging things at the top. Put frequently changing things at the bottom.
-- Understanding this makes you better at writing Dockerfiles and better at talking to AI.
+- Current chat systems are prefix-execution systems. Change an early token and downstream cached computation is invalidated.
+- That makes Docker the right mental model. Stable inputs belong early. Volatile inputs belong late.
+- Large monolithic chats are badly structured builds. They get slower, noisier, and more expensive as they grow.
+- The fix is the same as in Docker: split the work into stages, pass small artifacts between stages, and rerun only what changed.
 
 </Tldr>
 
-## The Hidden Similarity
+## This is not a metaphor
 
-If you are a junior developer learning how to deploy apps with Docker, and also learning how to prompt AI models, you might think these are two completely unrelated skills. 
+Docker layer caching and LLM prompt caching are different mechanisms.
 
-But last week, while I was trying to make our Docker builds run faster, I realized something mind-blowing: **Docker and AI prompts use the exact same logic for caching.**
+They are the same optimization problem.
 
-Let's break down what "caching" means here. Caching is just a way for a computer to save the results of a hard task, so it doesn't have to do it again next time.
+Docker reuses deterministic build outputs. LLM systems reuse computation over stable token prefixes. In both cases, an early change forces recomputation downstream. That is enough for the mental model to hold.
 
-**Docker Layer Cache:** When Docker builds an image, it reads your `Dockerfile` line by line. Every line creates a "layer." If you change line 3, Docker has to rebuild line 3, and line 4, and line 5, and everything after it. It throws away all the saved work below the change.
-
-**LLM Prompt Cache:** When you send a long prompt to an AI, the AI reads it token by token (word by word) and saves the math calculations (the "cache") as it goes. If you change a sentence in the middle of your prompt, the AI throws away all the saved calculations after that point and has to recalculate everything.
-
-Both systems are like a stack of blocks. You can't pull out a block from the middle without knocking over everything above it.
+If you understand why `COPY . .` in the wrong place makes Docker slow, you already understand a large part of context engineering.
 
 ---
 
-## The Classic Mistake
+## Current chat models behave like layered builds
 
-Because both systems work this way, they share the exact same golden rule: **Put stable things first, and volatile (changing) things last.**
+The practical rule is simple:
 
-![An illustration comparing a Dockerfile with good layer ordering to a well-structured AI Prompt with the system prompt first](https://placehold.co/600x300)
+`change something early -> pay for everything after it again`
 
-### Docker: The Bad Way
-Look at this common Dockerfile mistake:
+That is how modern chat systems behave at the level that matters for cost and latency.
 
-```dockerfile
-# BAD DOCKERFILE
-COPY . .          # Copies all your code
-RUN npm install   # Installs your dependencies
-RUN npm run build # Builds your app
-```
+The prompt is not just text. It is an execution prefix. The model processes that prefix and builds state on top of it. If you change token 50, token 5000 is no longer sitting on the same foundation.
 
-What's wrong here? Your code changes all the time. Every time you change a single line of CSS, Docker sees that `COPY . .` changed. Because of that, it throws away the cache for `npm install` and downloads all your packages from the internet again, taking minutes.
+That has three direct consequences:
 
-### AI Prompts: The Bad Way
-Now look at this AI prompt mistake:
+- stable prefixes are valuable
+- early changes are expensive
+- bloated contexts reduce focus as well as cache efficiency
 
-```text
-User: Here is my brand new code: {code_that_changes_every_time}
-User: Please review it using these 5 pages of company guidelines: {guidelines_that_never_change}
-```
-
-The guidelines never change. But because you put the constantly changing code *before* the guidelines, the AI is forced to re-read and recalculate the math for those 5 pages of guidelines every single time you ask a question. This makes the AI slower and costs you more API money.
+This is why giant chats degrade. The system is not only carrying more information. It is carrying more recomputation and more noise.
 
 ---
 
-## How to Fix It
+## The context window problem is mostly a build-design problem
 
-The fix is identical for both! Move the stable stuff up.
+Most teams deal with long chats by summarizing them with another model.
 
-### Docker: The Good Way
+That works, but it is still a patch.
+
+You are using one model to compress the consequences of a badly structured prompt pipeline. The better default is programmatic decomposition:
+
+- keep long-lived instructions stable
+- move volatile task input to the end
+- isolate stages
+- pass typed outputs instead of whole transcripts
+
+This is exactly what good Dockerfiles do.
+
+---
+
+## Bad Dockerfiles and bad agent systems fail in the same way
+
+A bad Dockerfile looks like this:
+
 ```dockerfile
-# GOOD DOCKERFILE
-COPY package.json ./   # Just copy the package list first (rarely changes)
-RUN npm install        # Install packages (gets cached!)
-COPY . .               # NOW copy your changing code
-RUN npm run build      # Build the app
+COPY . .
+RUN npm install
+RUN npm test
+RUN npm run build
 ```
 
-Now, unless you add a new library, `npm install` is cached instantly. Docker skips right to building your code.
+Every small source change invalidates everything below it.
 
-### AI Prompts: The Good Way
-```text
-System: You are a reviewer. Use these 5 pages of guidelines: {guidelines_that_never_change}
-User: Here is my brand new code: {code_that_changes_every_time}
-```
+A bad agent workflow does the same thing:
 
-Now, the AI caches the massive guidelines perfectly. When you send new code, it only has to think about the new code, saving you time and money.
+- full repo context
+- full conversation history
+- every prior error
+- every prior review
+- every deployment log
+- one giant prompt that plans, writes, debugs, reviews, and deploys
 
-## Why This Matters
+Then one new error arrives and the whole stack has to be reconsidered again.
 
-As you grow in your career, you'll start to notice that computer science is full of these repeating patterns. 
+This is the `COPY . .` anti-pattern in AI form.
 
-Whether you are trying to make an AI agent respond instantly, or trying to get your application to deploy to the cloud faster, the mental model is exactly the same: protect your expensive work by caching it early, and isolate your frequent changes to the very end.
+---
 
-Mastering this simple concept will make you a much more efficient engineer across the entire tech stack.
+## The right pattern is multi-stage
+
+The strongest version of the analogy is not cache. It is multi-stage build design.
+
+A good agent system should look like this:
+
+1. classify the task
+2. plan the change
+3. generate the code
+4. transpile and test it
+5. repair failures
+6. review the diff
+7. deploy the result
+
+Each stage should:
+
+- receive the smallest valid context
+- reuse a stable prefix where possible
+- emit a typed artifact for the next stage
+- rerun independently when its own inputs change
+
+This is the same logic as a multi-stage Docker build. Each stage exists for one purpose. Each stage consumes only what it needs. Each stage produces a smaller, cleaner artifact for the next one.
+
+That design has an important side effect: independent stages can run in parallel.
+
+A review pass does not need the full planning transcript. A test runner does not need the entire design discussion. A repair agent needs the failing file, the error, and the constraints. Nothing else.
+
+Parallelism becomes possible once the stages are real.
+
+---
+
+## Smaller context is not only cheaper. It is better
+
+This matters for quality, not just cost.
+
+A smaller, narrower prompt gives the model a more focused search space. The model has fewer irrelevant paths to consider. The instruction hierarchy is clearer. The expected output is easier to verify.
+
+That is why a focused cheap model can outperform a more expensive model trapped inside a noisy monolithic chat.
+
+The gain comes from three places at once:
+
+- better cache reuse
+- less token waste
+- tighter reasoning scope
+
+This is also why context compression should be treated carefully. Compression can reduce token count, but it also introduces another generative step and another chance to lose signal. If you can replace transcript compression with typed intermediate artifacts and explicit stage boundaries, that is usually the better system.
+
+---
+
+## The practical rules are the same as Docker
+
+If you want a fast, cheap, reliable agent pipeline:
+
+- put stable instructions first
+- keep tool schemas stable
+- move user-specific volatility to the end
+- split the workflow into stages
+- pass small typed artifacts between stages
+- rerun only the invalidated stage
+- parallelize what does not depend on shared state
+
+This is not prompt poetry. It is build engineering.
+
+---
+
+## The real point
+
+Context engineering is often discussed like a writing skill.
+
+It is closer to systems design.
+
+Large chat transcripts are badly structured build graphs. Good agent systems are cache-aware execution pipelines.
+
+That is the useful mental model:
+
+- the stable prefix is your base layer
+- the task-specific request is your top layer
+- intermediate outputs are build artifacts
+- summarization is a lossy rebuild step
+- stage isolation is the real optimization
+
+If you already know Docker, this should feel familiar.
+
+Stable layers first. Volatile layers last. Small artifacts between stages. Rebuild only what changed.
+
+That is how you make Docker fast.
+
+That is also how you make LLM systems fast.
