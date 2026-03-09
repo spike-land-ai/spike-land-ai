@@ -2399,8 +2399,10 @@ iwd.post("/api/iwd/checkin", async (c) => {
   let country = typeof cf?.country === "string" ? cf.country : null;
 
   if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) {
-    const fallback =
-      DEV_FALLBACK_LOCATIONS[Math.floor(Math.random() * DEV_FALLBACK_LOCATIONS.length)]!;
+    const randomArray = new Uint32Array(1);
+    crypto.getRandomValues(randomArray);
+    const fallbackIndex = randomArray[0]! % DEV_FALLBACK_LOCATIONS.length;
+    const fallback = DEV_FALLBACK_LOCATIONS[fallbackIndex]!;
     latitude = fallback.latitude;
     longitude = fallback.longitude;
     city = fallback.city;

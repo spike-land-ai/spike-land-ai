@@ -360,8 +360,8 @@ export function registerCreateTools(
                 `**Healthy:** ${fallback.healthy}\n` +
                 `**Source:** legacy create health endpoint`,
             );
-          } catch (fallbackError) {
-            const msg = fallbackError instanceof Error ? fallbackError.message : "Unknown error";
+          } catch (_fallbackError) {
+            const msg = _fallbackError instanceof Error ? _fallbackError.message : "Unknown error";
             return textResult(`**Health check unavailable:** ${msg}`);
           }
         }
