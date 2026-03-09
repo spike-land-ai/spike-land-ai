@@ -189,14 +189,14 @@ function DemoShell({
             </h3>
           </div>
 
-          <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:justify-end lg:self-start">
-            <div className="flex min-h-10 w-full items-center justify-center rounded-full border border-cyan-400/20 bg-cyan-400/10 px-3 py-1.5 text-center text-[10px] font-black uppercase tracking-[0.14em] text-cyan-50 sm:min-w-[13rem] sm:w-auto sm:tracking-[0.18em]">
+          <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 lg:self-start">
+            <div className="flex min-h-10 min-w-0 items-center justify-center rounded-full border border-cyan-400/20 bg-cyan-400/10 px-3 py-1.5 text-center text-[10px] font-black uppercase tracking-[0.14em] text-cyan-50 sm:min-w-[13rem] sm:tracking-[0.18em]">
               {status}
             </div>
             <button
               type="button"
               onClick={hasStarted ? onRestart : onStart}
-              className="inline-flex min-h-10 w-full items-center justify-center gap-2 rounded-full border border-white/12 bg-white/5 px-3 py-1.5 text-[10px] font-black uppercase tracking-[0.18em] text-slate-200 transition-colors hover:border-cyan-300/50 hover:text-cyan-50 sm:min-w-[6.75rem] sm:w-auto"
+              className="inline-flex min-h-10 items-center justify-center gap-2 rounded-full border border-white/12 bg-white/5 px-3 py-1.5 text-[10px] font-black uppercase tracking-[0.18em] text-slate-200 transition-colors hover:border-cyan-300/50 hover:text-cyan-50 sm:min-w-[6.75rem]"
             >
               {hasStarted ? <RefreshCcw className="size-3.5" /> : <Play className="size-3.5" />}
               {hasStarted ? "Restart" : "Start"}
