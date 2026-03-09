@@ -401,6 +401,58 @@ export const reminders = sqliteTable(
   }),
 );
 
+// ─── Tool Reactions ───────────────────────────────────────────────────────────
+
+export const toolReactions = sqliteTable(
+  "tool_reactions",
+  {
+    id: text("id").primaryKey(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    sourceTool: text("source_tool").notNull(),
+    sourceEvent: text("source_event").notNull(),
+    targetTool: text("target_tool").notNull(),
+    targetInput: text("target_input").notNull().default("{}"), // JSON
+    description: text("description"),
+    enabled: integer("enabled", { mode: "boolean" }).notNull().default(true),
+    createdAt: integer("created_at", { mode: "number" }).notNull(),
+    updatedAt: integer("updated_at", { mode: "number" }).notNull(),
+  },
+  (t) => ({
+    userIdx: index("tool_reactions_user_id_idx").on(t.userId),
+    sourceIdx: index("tool_reactions_source_idx").on(t.userId, t.sourceTool, t.enabled),
+    eventIdx: index("tool_reactions_event_idx").on(t.userId, t.sourceTool, t.sourceEvent),
+  }),
+);
+
+// ─── Reaction Logs ────────────────────────────────────────────────────────────
+
+export const reactionLogs = sqliteTable(
+  "reaction_logs",
+  {
+    id: text("id").primaryKey(),
+    reactionId: text("reaction_id").references(() => toolReactions.id, {
+      onDelete: "set null",
+    }),
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    sourceTool: text("source_tool").notNull(),
+    sourceEvent: text("source_event").notNull(),
+    targetTool: text("target_tool").notNull(),
+    isError: integer("is_error", { mode: "boolean" }).notNull().default(false),
+    durationMs: integer("duration_ms"),
+    error: text("error"),
+    createdAt: integer("created_at", { mode: "number" }).notNull(),
+  },
+  (t) => ({
+    userCreatedIdx: index("reaction_logs_user_created_idx").on(t.userId, t.createdAt),
+    reactionCreatedIdx: index("reaction_logs_reaction_created_idx").on(t.reactionId, t.createdAt),
+    sourceIdx: index("reaction_logs_source_idx").on(t.userId, t.sourceTool, t.isError),
+  }),
+);
+
 // ─── Registered Tools (marketplace) ──────────────────────────────────────────
 
 export const registeredTools = sqliteTable(
@@ -597,6 +649,8 @@ export const usersRelations = relations(users, ({ many }) => ({
   sentMessages: many(directMessages, { relationName: "sender" }),
   receivedMessages: many(directMessages, { relationName: "recipient" }),
   reminders: many(reminders),
+  toolReactions: many(toolReactions),
+  reactionLogs: many(reactionLogs),
   registeredTools: many(registeredTools),
   toolPurchases: many(toolPurchases),
   whatsappLinks: many(whatsappLinks),
@@ -694,6 +748,25 @@ export const toolPurchasesRelations = relations(toolPurchases, ({ one }) => ({
 
 export const remindersRelations = relations(reminders, ({ one }) => ({
   user: one(users, { fields: [reminders.userId], references: [users.id] }),
+}));
+
+export const toolReactionsRelations = relations(toolReactions, ({ one, many }) => ({
+  user: one(users, {
+    fields: [toolReactions.userId],
+    references: [users.id],
+  }),
+  logs: many(reactionLogs),
+}));
+
+export const reactionLogsRelations = relations(reactionLogs, ({ one }) => ({
+  user: one(users, {
+    fields: [reactionLogs.userId],
+    references: [users.id],
+  }),
+  reaction: one(toolReactions, {
+    fields: [reactionLogs.reactionId],
+    references: [toolReactions.id],
+  }),
 }));
 
 export const auditLogsRelations = relations(auditLogs, ({ one }) => ({

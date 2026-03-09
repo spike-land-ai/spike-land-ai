@@ -1,1 +1,1 @@
-export {};
+import "@tailwindcss/browser";

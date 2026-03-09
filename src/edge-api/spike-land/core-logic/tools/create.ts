@@ -347,7 +347,7 @@ export function registerCreateTools(
               `**Score:** ${result.score}\n` +
               `**Reason:** ${result.reason}`,
           );
-        } catch (error) {
+        } catch (_error) {
           try {
             const fallback = await apiRequest<{ healthy: boolean }>(
               `/api/create/health/${encodeURIComponent(input.codespace_id)}`,
