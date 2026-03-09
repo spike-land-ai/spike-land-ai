@@ -7,6 +7,11 @@ export interface McpAppSummary {
   description: string;
   emoji: string;
   category: string;
+  tags: string[];
+  tagline: string;
+  pricing: string;
+  is_featured: boolean;
+  is_new: boolean;
   tool_count: number;
   sort_order: number;
 }
@@ -23,6 +28,11 @@ interface PublicAppSummary {
   description: string;
   emoji: string;
   category?: string;
+  tags?: string[];
+  tagline?: string;
+  pricing?: string;
+  is_featured?: boolean;
+  is_new?: boolean;
   tool_count: number;
   sort_order: number;
 }
@@ -181,6 +191,11 @@ function normalizeAppSummary(app: PublicAppSummary): McpAppSummary {
   return {
     ...app,
     category: inferAppCategory([app.category, app.slug, app.name, app.description]),
+    tags: app.tags ?? [],
+    tagline: app.tagline ?? "",
+    pricing: app.pricing ?? "free",
+    is_featured: app.is_featured ?? false,
+    is_new: app.is_new ?? false,
   };
 }
 
@@ -216,6 +231,11 @@ function buildFallbackAppsFromTools(data: StoreToolsResponse): McpAppSummary[] {
       description: string;
       emoji: string;
       category: string;
+      tags: string[];
+      tagline: string;
+      pricing: string;
+      is_featured: boolean;
+      is_new: boolean;
       tool_count: number;
       sort_order: number;
       categorySignals: string[];
@@ -250,6 +270,11 @@ function buildFallbackAppsFromTools(data: StoreToolsResponse): McpAppSummary[] {
       description: tool.description || `${humanizeAppSlug(slug)} MCP app`,
       emoji: "🔧",
       category: inferAppCategory([slug, tool.name, tool.description, tool.category]),
+      tags: tool.category ? [tool.category] : [],
+      tagline: tool.description || `${humanizeAppSlug(slug)} MCP app`,
+      pricing: "free",
+      is_featured: index < 6,
+      is_new: false,
       tool_count: 1,
       sort_order: index,
       categorySignals: tool.category ? [tool.category] : [],
@@ -364,6 +389,13 @@ export function useApp(slug: string) {
           ...matchingTools.map((tool) => tool.name),
           ...matchingTools.map((tool) => tool.category),
         ]),
+        tags: matchingTools
+          .map((tool) => tool.category)
+          .filter((category): category is string => typeof category === "string"),
+        tagline: matchingTools[0]?.description || `${humanizeAppSlug(slug)} MCP app`,
+        pricing: "free",
+        is_featured: false,
+        is_new: false,
         tool_count: matchingTools.length,
         sort_order: 0,
         status: "live",

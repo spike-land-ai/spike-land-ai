@@ -178,6 +178,7 @@ Public app listings expose the fields that matter for discovery:
 - `name`
 - `description`
 - `emoji`
+- `category`
 - `tool_count`
 - `sort_order`
 
@@ -188,8 +189,30 @@ App detail responses can also include:
 - markdown content
 - publication status
 
+The seed pipeline can also persist richer catalog metadata from
+`content/apps/*.md` frontmatter:
+
+- `category`
+- `tags`
+- `tagline`
+- `pricing`
+- `is_featured`
+- `is_new`
+
 This is what makes the store usable by both humans and agents: metadata is
 available as structured JSON, not trapped inside HTML.
+
+### Content Authoring
+
+The current authoring path for public apps is markdown-first:
+
+1. create or update a file in `content/apps/`
+2. provide frontmatter for store metadata and publication state
+3. write the app detail markdown body
+4. run `yarn seed:apps` or `yarn seed:apps:remote`
+
+That keeps the public catalog easy to review in git while still seeding a
+structured D1-backed app registry.
 
 ---
 

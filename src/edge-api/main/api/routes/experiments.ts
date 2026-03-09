@@ -163,7 +163,7 @@ experiments.post("/api/experiments/track", async (c) => {
   }
 
   // Upsert metrics
-  for (const m of metricsUpdates) {
+  for (const m of metricUpdates) {
     stmts.push(
       db
         .prepare(

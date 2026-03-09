@@ -17,7 +17,8 @@ practices for the Spike Land platform.
 8. [File Naming Conventions](#file-naming-conventions)
 9. [Writing Tests](#writing-tests)
 10. [Best Practices](#best-practices)
-11. [Troubleshooting](#troubleshooting)
+11. [Edge API Testing](#edge-api-testing)
+12. [Troubleshooting](#troubleshooting)
 
 ---
 
@@ -71,6 +72,17 @@ maintenance costs.
 - **Location**: Same as unit tests
 - **Examples**: API routes with mocked database, auth flows, form submissions
 - **Run command**: Same as unit tests
+
+### Edge API Testing
+
+For `spike-edge`, prefer a three-layer split:
+
+- pure business-logic tests for branching and scoring
+- source-local route tests for HTTP behavior with mocked bindings
+- a small number of Worker smoke tests for runtime-specific seams
+
+Detailed guidance and current migration status live in
+[EDGE_API_TESTING.md](/Users/z/Developer/spike-land-ai/docs/develop/EDGE_API_TESTING.md).
 
 ### E2E Tests (5%)
 

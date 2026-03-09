@@ -14,7 +14,7 @@ kv_namespaces = [
 binding = "DB"
 database_name = "spike-land-mcp"
 database_id = "52b72b0a-c0f8-4d7f-aaec-4f014594d0c1"
-migrations_dir = "db/migrations"
+migrations_dir = "../../src/edge-api/spike-land/db/migrations"
 
 [[r2_buckets]]
 binding = "SPA_ASSETS"

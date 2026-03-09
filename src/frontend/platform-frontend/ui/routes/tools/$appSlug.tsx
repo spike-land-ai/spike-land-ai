@@ -20,6 +20,9 @@ import {
 const HackerNewsApp = lazy(() =>
   import("../../apps/hackernews").then((m) => ({ default: m.HackerNewsApp })),
 );
+const PagesTemplateChooserApp = lazy(() =>
+  import("../../apps/pages-template-chooser").then((m) => ({ default: m.PagesTemplateChooserApp })),
+);
 
 type SurfaceType = "overview" | "chat" | "terminal" | "mdx";
 
@@ -44,7 +47,13 @@ export function AppSessionPage() {
   );
 
   const channelId = `app-${appSlug}`;
-  const activeSurface = SURFACES.some((surface) => surface.id === search.surface)
+  const isHackerNews = appSlug === "hackernews" || appSlug === "hn-reader" || appSlug === "hackernews-reader";
+  const isPagesTemplateChooser = appSlug === "pages-template-chooser";
+  const isShowcaseApp = isHackerNews || isPagesTemplateChooser;
+  const availableSurfaces = app?.tools.length
+    ? SURFACES
+    : SURFACES.filter((surface) => surface.id !== "terminal");
+  const activeSurface = availableSurfaces.some((surface) => surface.id === search.surface)
     ? (search.surface as SurfaceType)
     : "overview";
 
@@ -63,9 +72,6 @@ export function AppSessionPage() {
     // Trigger a refresh of the overview/preview when an app_updated event arrives
     setRefreshKey((k) => k + 1);
   }, []);
-
-  // Check if this is the HN showcase app
-  const isHackerNews = appSlug === "hackernews" || appSlug === "hn-reader" || appSlug === "hackernews-reader";
 
   if (isLoading) {
     return (
@@ -120,7 +126,7 @@ export function AppSessionPage() {
         role="tablist"
         aria-label="App surfaces"
       >
-        {SURFACES.map((surface) => {
+        {availableSurfaces.map((surface) => {
           const Icon = surface.icon;
           const isActive = activeSurface === surface.id;
           return (
@@ -161,6 +167,16 @@ export function AppSessionPage() {
                   >
                     <HackerNewsApp />
                   </Suspense>
+                ) : isPagesTemplateChooser ? (
+                  <Suspense
+                    fallback={
+                      <div className="flex items-center justify-center py-16">
+                        <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
+                      </div>
+                    }
+                  >
+                    <PagesTemplateChooserApp />
+                  </Suspense>
                 ) : (
                   <AppMarkdownRenderer
                     content={app.markdown}
@@ -174,7 +190,7 @@ export function AppSessionPage() {
               </div>
 
               {/* Session sidebar (only for non-showcase apps) */}
-              {!isHackerNews && (
+              {!isShowcaseApp && (
                 <div className="w-full lg:w-72 shrink-0">
                   <div className="sticky top-4 space-y-4">
                     <SessionPanel

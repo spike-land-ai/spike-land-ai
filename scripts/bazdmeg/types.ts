@@ -43,6 +43,7 @@ export interface CheckResult {
   passed: boolean;
   output: string;
   durationMs: number;
+  timedOut?: boolean;
 }
 
 export interface CheckSuite {
@@ -95,6 +96,14 @@ export interface Phase3Result {
   spaSkipped: number;
   workersDeployed: string[];
   durationMs: number;
+}
+
+export interface Phase3Plan {
+  currentSha: string;
+  lastDeployedSha: string;
+  spaDistExists: boolean;
+  spaNeedsDeploy: boolean;
+  workersPending: string[];
 }
 
 export interface PromptUsage {

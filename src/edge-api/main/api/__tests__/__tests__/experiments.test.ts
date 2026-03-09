@@ -56,7 +56,11 @@ function createMockDB(state: {
 function createApp(envOverrides: Partial<Env> = {}) {
   const app = new Hono<{ Bindings: Env }>();
   app.use("*", async (c, next) => {
-    Object.assign(c.env, envOverrides);
+    const context = c as unknown as { env?: Partial<Env> };
+    context.env = {
+      ...(context.env ?? {}),
+      ...envOverrides,
+    };
     await next();
   });
   app.route("/", experiments);

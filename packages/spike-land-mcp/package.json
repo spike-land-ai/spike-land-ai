@@ -14,7 +14,8 @@
     "typecheck": "tsc --noEmit",
     "lint": "eslint --quiet ../../src/spike-land-mcp/",
     "db:generate": "drizzle-kit generate",
-    "db:migrate:local": "wrangler d1 migrations apply spike-land-mcp --local",
+    "db:reconcile:local": "node --import tsx ../../scripts/d1-local-baseline.ts spike-land-mcp",
+    "db:migrate:local": "node --import tsx ../../scripts/d1-local-baseline.ts spike-land-mcp --apply-pending",
     "db:migrate:remote": "wrangler d1 migrations apply spike-land-mcp --remote"
   },
   "dependencies": {

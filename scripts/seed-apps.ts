@@ -1,14 +1,15 @@
-#!/usr/bin/env tsx
+#!/usr/bin/env node
 /**
  * Seed MCP apps from MD files into D1.
  *
  * Usage:
- *   tsx scripts/seed-apps.ts          # local D1
- *   tsx scripts/seed-apps.ts --remote # remote D1
+ *   node --import tsx scripts/seed-apps.ts          # local D1
+ *   node --import tsx scripts/seed-apps.ts --remote # remote D1
  */
 import { readdir, readFile, writeFile, unlink } from "node:fs/promises";
+import { readdirSync } from "node:fs";
 import { join, resolve } from "node:path";
-import { execSync } from "node:child_process";
+import { execFileSync, execSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import { type McpApp, parseMdContent, generateSQL } from "./seed-apps-lib.js";
 
@@ -38,15 +39,31 @@ async function parseMdFiles(): Promise<McpApp[]> {
 
 async function seedD1(apps: McpApp[]): Promise<void> {
   const sql = generateSQL(apps);
+
+  if (!isRemote) {
+    const dbDir = resolve(SPIKE_LAND_MCP_DIR, ".wrangler/state/v3/d1/miniflare-D1DatabaseObject");
+    const dbFile = readdirSync(dbDir).find((name) => name.endsWith(".sqlite"));
+    if (!dbFile) {
+      throw new Error(`No local D1 sqlite database found under ${dbDir}`);
+    }
+
+    execFileSync("sqlite3", [join(dbDir, dbFile), sql], {
+      cwd: ROOT,
+      encoding: "utf-8",
+      maxBuffer: 10 * 1024 * 1024,
+    });
+    console.log(`Seeded ${apps.length} MCP apps to D1 (local).`);
+    return;
+  }
+
   const tmpFile = resolve(SPIKE_LAND_MCP_DIR, ".seed-apps-tmp.sql");
 
   try {
     await writeFile(tmpFile, sql, "utf-8");
-    const remoteFlag = isRemote ? "--remote" : "--local";
-    const cmd = `npx wrangler d1 execute ${DB_NAME} --file="${tmpFile}" ${remoteFlag}`;
+    const cmd = `npx wrangler d1 execute ${DB_NAME} --file="${tmpFile}" --remote`;
     console.log(`Executing: ${cmd}`);
     execSync(cmd, { cwd: SPIKE_LAND_MCP_DIR, stdio: "inherit" });
-    console.log(`Seeded ${apps.length} MCP apps to D1 (${isRemote ? "remote" : "local"}).`);
+    console.log(`Seeded ${apps.length} MCP apps to D1 (remote).`);
   } finally {
     await unlink(tmpFile).catch(() => {});
   }

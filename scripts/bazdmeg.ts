@@ -21,6 +21,14 @@ import {
   formatTrend,
 } from "./bazdmeg/metrics.js";
 import { setVerbose, isVerbose } from "./bazdmeg/verbose.js";
+import {
+  buildDryRunActions,
+  getGitStatusSummary,
+  getSpikeEdgeSuiteSummary,
+  parseBazdmegCliArgs,
+  type BazdmegMode,
+} from "./bazdmeg/status.js";
+import { getPhase3Plan } from "./bazdmeg/deploy.js";
 import type {
   Outcome,
   Phase1Result,
@@ -30,8 +38,9 @@ import type {
   RunRecord,
 } from "./bazdmeg/types.js";
 
-// Parse --verbose flag
-if (process.argv.includes("--verbose") || process.argv.includes("-v")) {
+const cli = parseBazdmegCliArgs(process.argv.slice(2));
+
+if (cli.verbose) {
   setVerbose(true);
 }
 
@@ -47,12 +56,14 @@ function getSha(): string {
   }).trim();
 }
 
-function header(): void {
+function header(mode: BazdmegMode): void {
   const branch = getBranch();
   const sha = getSha();
   const verbose = isVerbose();
-  const mode = verbose ? " (VERBOSE)" : "";
-  const inner = `  BAZDMEG Pipeline${mode}  |  ${branch} @ ${sha}  `;
+  const verboseLabel = verbose ? " (VERBOSE)" : "";
+  const label =
+    mode === "status" ? "BAZDMEG Status" : mode === "dry-run" ? "BAZDMEG Dry Run" : "BAZDMEG Pipeline";
+  const inner = `  ${label}${verboseLabel}  |  ${branch} @ ${sha}  `;
   const bar = "═".repeat(inner.length);
   console.log(`
 ╔${bar}╗
@@ -65,6 +76,100 @@ function header(): void {
     console.log(`  [verbose] Node: ${process.version}`);
     console.log("");
   }
+}
+
+function printChangedFiles(): void {
+  const git = getGitStatusSummary();
+  const preview = git.allFiles.slice(0, 12);
+  console.log("── Working Tree ───────────────────────");
+  console.log(`  Clean: ${git.clean ? "yes" : "no"}`);
+  console.log(
+    `  Files: ${git.allFiles.length} (staged ${git.staged.length}, modified ${git.modified.length}, untracked ${git.untracked.length})`,
+  );
+  if (preview.length > 0) {
+    for (const file of preview) {
+      console.log(`  - ${file}`);
+    }
+    if (git.allFiles.length > preview.length) {
+      console.log(`  - … ${git.allFiles.length - preview.length} more`);
+    }
+  }
+  console.log("");
+}
+
+function printSpikeEdgeBacklog(): void {
+  const backlog = getSpikeEdgeSuiteSummary();
+  console.log("── spike-edge Worker Backlog ─────────");
+  console.log(`  Remaining Worker suites: ${backlog.totalSuites}`);
+  if (backlog.priorityCandidates.length > 0) {
+    console.log("  Priority migration candidates:");
+    for (const file of backlog.priorityCandidates) {
+      console.log(`  - ${file}`);
+    }
+  }
+  console.log("");
+}
+
+function printPhase3Plan(): void {
+  const plan = getPhase3Plan();
+  console.log("── Phase 3 Plan ──────────────────────");
+  console.log(`  Current SHA: ${plan.currentSha}`);
+  console.log(`  Last deployed SHA: ${plan.lastDeployedSha || "<none>"}`);
+  console.log(`  spike-app dist ready: ${plan.spaDistExists ? "yes" : "no"}`);
+  console.log(`  spike-app deploy needed: ${plan.spaNeedsDeploy ? "yes" : "no"}`);
+  console.log(`  Workers pending: ${plan.workersPending.length > 0 ? plan.workersPending.join(", ") : "none"}`);
+  console.log("");
+}
+
+function runStatusMode(): void {
+  header("status");
+  printChangedFiles();
+  printSpikeEdgeBacklog();
+  printPhase3Plan();
+  console.log("── Prompt Arena ──────────────────────");
+  console.log(formatRankings());
+  console.log("");
+  console.log(formatTrend());
+  console.log("");
+  console.log("Next:");
+  console.log("  yarn bazdmeg dry-run");
+  console.log("  Use plain `yarn bazdmeg` only after the dry run looks correct.");
+}
+
+function runDryRunMode(): void {
+  header("dry-run");
+  const suite = runAllChecks({ safe: true, timeoutMs: 60_000 });
+  const git = getGitStatusSummary();
+  const phase3Plan = getPhase3Plan();
+
+  console.log("── Phase Preview ─────────────────────");
+  console.log(formatCheckLine(suite.lint));
+  console.log(formatCheckLine(suite.typecheck));
+  console.log(formatCheckLine(suite.test));
+  console.log("");
+
+  for (const action of buildDryRunActions({
+    checks: suite,
+    git,
+    phase3Plan,
+    fixerPromptId: selectPrompt("fixer").id,
+    reviewerPromptId: selectPrompt("reviewer").id,
+    reviewFixerPromptId: selectPrompt("review-fixer").id,
+  })) {
+    console.log(`  - ${action}`);
+  }
+  console.log("");
+
+  printChangedFiles();
+  printSpikeEdgeBacklog();
+  printPhase3Plan();
+  console.log("── Prompt Arena ──────────────────────");
+  console.log(formatRankings());
+  console.log("");
+  console.log(formatTrend());
+  console.log("");
+  console.log("Dry run complete. No agent was spawned, nothing was committed, and nothing was deployed.");
+  console.log("Checks were run in read-only mode with a 60s timeout per command.");
 }
 
 // ── Phase 1: Auto-Fix Loop ──────────────────────────────────────────
@@ -269,7 +374,17 @@ function phase3(log: ReturnType<typeof createRunLog>): Phase3Result {
 // ── Main ────────────────────────────────────────────────────────────
 
 async function main(): Promise<void> {
-  header();
+  if (cli.mode === "status") {
+    runStatusMode();
+    return;
+  }
+
+  if (cli.mode === "dry-run") {
+    runDryRunMode();
+    return;
+  }
+
+  header("run");
 
   const runId = generateRunId();
   const log = createRunLog(runId);

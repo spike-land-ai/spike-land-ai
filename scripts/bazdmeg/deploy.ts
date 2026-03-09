@@ -2,7 +2,7 @@ import { execFileSync, execSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import { readFileSync, writeFileSync, existsSync, mkdirSync, readdirSync, statSync } from "node:fs";
 import { join, relative, extname } from "node:path";
-import type { DeployState, Phase3Result, VersionInfo } from "./types.js";
+import type { DeployState, Phase3Plan, Phase3Result, VersionInfo } from "./types.js";
 
 const DATA_DIR = join(process.cwd(), ".bazdmeg");
 const DEPLOY_STATE_FILE = join(DATA_DIR, "deploy-state.json");
@@ -189,6 +189,26 @@ const WORKER_PACKAGES = [
   "spike-land-backend",
   "transpile",
 ];
+
+export function getPhase3Plan(): Phase3Plan {
+  const state = loadDeployState();
+  const currentSha = getHeadSha();
+  const spaDistExists = existsSync(join(process.cwd(), "src/spike-app/dist/index.html"));
+  const workersPending = WORKER_PACKAGES.filter((pkg) => {
+    const pkgDir = join(process.cwd(), "src", pkg);
+    if (!existsSync(pkgDir)) return false;
+    const treeHash = getGitTreeHash(join("src", pkg));
+    return treeHash !== state.workerHashes[pkg];
+  });
+
+  return {
+    currentSha,
+    lastDeployedSha: state.lastSha,
+    spaDistExists,
+    spaNeedsDeploy: state.lastSha !== currentSha || !spaDistExists,
+    workersPending,
+  };
+}
 
 export function deployWorkers(): string[] {
   const state = loadDeployState();

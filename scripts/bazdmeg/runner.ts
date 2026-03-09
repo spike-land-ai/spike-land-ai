@@ -2,7 +2,26 @@ import { execSync } from "node:child_process";
 import type { CheckResult, CheckSuite } from "./types.js";
 import { isVerbose } from "./verbose.js";
 
-function runCheck(name: string, command: string): CheckResult {
+export interface CheckRunOptions {
+  safe?: boolean;
+  timeoutMs?: number;
+}
+
+export interface CheckCommands {
+  lint: string;
+  typecheck: string;
+  test: string;
+}
+
+export function getCheckCommands(options: CheckRunOptions = {}): CheckCommands {
+  return {
+    lint: options.safe ? "yarn lint:check" : "yarn lint",
+    typecheck: "yarn typecheck",
+    test: "yarn test:src",
+  };
+}
+
+function runCheck(name: string, command: string, options: CheckRunOptions = {}): CheckResult {
   const verbose = isVerbose();
   const start = Date.now();
   if (verbose) {
@@ -14,6 +33,7 @@ function runCheck(name: string, command: string): CheckResult {
       cwd: process.cwd(),
       stdio: ["pipe", "pipe", "pipe"],
       maxBuffer: 10 * 1024 * 1024,
+      timeout: options.timeoutMs,
     });
     if (verbose) {
       console.log(`    [verbose] ${name} PASS (${((Date.now() - start) / 1000).toFixed(1)}s)`);
@@ -25,14 +45,27 @@ function runCheck(name: string, command: string): CheckResult {
       durationMs: Date.now() - start,
     };
   } catch (err: unknown) {
-    const e = err as { stdout?: string; stderr?: string; status?: number };
-    const output = [e.stdout ?? "", e.stderr ?? ""].filter(Boolean).join("\n");
+    const e = err as {
+      stdout?: string | Buffer;
+      stderr?: string | Buffer;
+      status?: number;
+      signal?: string;
+      killed?: boolean;
+    };
+    const timedOut = Boolean(options.timeoutMs && (e.signal === "SIGTERM" || e.killed));
+    const output = [e.stdout ?? "", e.stderr ?? ""]
+      .map((value) => (typeof value === "string" ? value : value.toString("utf-8")))
+      .filter(Boolean)
+      .join("\n");
     const duration = Date.now() - start;
+    const normalizedOutput = timedOut
+      ? [`Timed out after ${options.timeoutMs}ms`, output.trim()].filter(Boolean).join("\n")
+      : output.trim();
 
     // Vitest may exit non-zero despite all tests passing (e.g. deprecation warnings).
     // Detect this: output contains "X passed" with no "failed" count.
     const allTestsPassed =
-      name === "test" && /\d+ passed/.test(output) && !/\d+ failed/.test(output);
+      name === "test" && /\d+ passed/.test(normalizedOutput) && !/\d+ failed/.test(normalizedOutput);
 
     if (allTestsPassed) {
       if (verbose) {
@@ -43,22 +76,24 @@ function runCheck(name: string, command: string): CheckResult {
       return {
         name,
         passed: true,
-        output: output.trim(),
+        output: normalizedOutput,
         durationMs: duration,
       };
     }
 
     if (verbose) {
-      console.log(`    [verbose] ${name} FAIL (${(duration / 1000).toFixed(1)}s)`);
+      const status = timedOut ? "TIMEOUT" : "FAIL";
+      console.log(`    [verbose] ${name} ${status} (${(duration / 1000).toFixed(1)}s)`);
       console.log(
-        `    [verbose] ${name} output:\n${output.trim().slice(0, 2000)}${output.length > 2000 ? "\n    ... (truncated)" : ""}`,
+        `    [verbose] ${name} output:\n${normalizedOutput.slice(0, 2000)}${normalizedOutput.length > 2000 ? "\n    ... (truncated)" : ""}`,
       );
     }
     return {
       name,
       passed: false,
-      output: output.trim(),
+      output: normalizedOutput,
       durationMs: duration,
+      timedOut,
     };
   }
 }
@@ -74,10 +109,11 @@ function countErrors(output: string): number {
   return Math.max(count, 0);
 }
 
-export function runAllChecks(): CheckSuite {
-  const lint = runCheck("lint", "yarn lint");
-  const typecheck = runCheck("typecheck", "yarn typecheck");
-  const test = runCheck("test", "yarn test:src");
+export function runAllChecks(options: CheckRunOptions = {}): CheckSuite {
+  const commands = getCheckCommands(options);
+  const lint = runCheck("lint", commands.lint, options);
+  const typecheck = runCheck("typecheck", commands.typecheck, options);
+  const test = runCheck("test", commands.test, options);
 
   const allPassed = lint.passed && typecheck.passed && test.passed;
   const errorCount =
@@ -103,7 +139,7 @@ export function getFailureOutput(suite: CheckSuite): string {
 }
 
 export function formatCheckLine(result: CheckResult): string {
-  const status = result.passed ? "PASS" : "FAIL";
+  const status = result.timedOut ? "TIMEOUT" : result.passed ? "PASS" : "FAIL";
   const dur = (result.durationMs / 1000).toFixed(1);
   return `    ${result.name.padEnd(15, ".")} ${status} (${dur}s)`;
 }

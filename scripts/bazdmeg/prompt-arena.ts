@@ -9,26 +9,14 @@ import type {
   PromptVariant,
 } from "./types.js";
 
-import fixerV1 from "./prompts/fixer-v1.js";
-import fixerV2 from "./prompts/fixer-v2.js";
 import fixerV3 from "./prompts/fixer-v3.js";
-import reviewerV1 from "./prompts/reviewer-v1.js";
-import reviewerV2 from "./prompts/reviewer-v2.js";
 import reviewerV3 from "./prompts/reviewer-v3.js";
-import reviewFixerV1 from "./prompts/review-fixer-v1.js";
-import reviewFixerV2 from "./prompts/review-fixer-v2.js";
 import reviewFixerV3 from "./prompts/review-fixer-v3.js";
 import reviewerPersona from "./prompts/reviewer-persona.js";
 
 const ALL_PROMPTS: PromptVariant[] = [
-  fixerV1,
-  fixerV2,
   fixerV3,
-  reviewerV1,
-  reviewerV2,
   reviewerV3,
-  reviewFixerV1,
-  reviewFixerV2,
   reviewFixerV3,
   reviewerPersona,
 ];
