@@ -322,7 +322,7 @@ export function SharedOptimizationProblemDemo() {
   const showInvalidation = step >= 2;
 
   return (
-    <div ref={ref} className="my-12">
+    <div ref={ref}>
       <DemoShell
         title="Same invalidation shape"
         kicker="Docker vs LLM cache"
@@ -415,7 +415,7 @@ export function PrefixInvalidationDemo() {
   const tokens = Array.from({ length: 8 }, (_, index) => index + 1);
 
   return (
-    <div ref={ref} className="my-12">
+    <div ref={ref}>
       <DemoShell
         title="Early edits are expensive"
         kicker="Prefix invalidation"
@@ -522,7 +522,7 @@ export function ContextWindowDesignDemo() {
   const visibleMonolithItems = Math.min(MONOLITH_ITEMS.length, (step + 1) * 2);
 
   return (
-    <div ref={ref} className="my-12">
+    <div ref={ref}>
       <DemoShell
         title="Long chats are bad build graphs"
         kicker="Context window design"
@@ -645,7 +645,7 @@ export function MonolithAntiPatternDemo() {
   const agentBreaks = step >= 2;
 
   return (
-    <div ref={ref} className="my-12">
+    <div ref={ref}>
       <DemoShell
         title="The same anti-pattern shows up twice"
         kicker="COPY . . in AI form"
@@ -785,7 +785,7 @@ export function MultiStageBuildDemo() {
   const completeIndexes = new Set<number>(getSequenceValue(COMPLETE_STAGE_INDEXES, step));
 
   return (
-    <div ref={ref} className="my-12">
+    <div ref={ref}>
       <DemoShell
         title="Build the workflow as stages"
         kicker="Multi-stage execution"
@@ -876,7 +876,7 @@ export function FocusedContextDemo() {
   const narrowReasoningFocus = getSequenceValue([60, 72, 80, 84] as const, step);
 
   return (
-    <div ref={ref} className="my-12">
+    <div ref={ref}>
       <DemoShell
         title="Smaller context improves quality"
         kicker="Focus beats bloat"
@@ -970,7 +970,7 @@ export function PracticalRulesDemo() {
   const currentRule = getSequenceValue(rules, step);
 
   return (
-    <div ref={ref} className="my-12">
+    <div ref={ref}>
       <DemoShell
         title="The rules are operational"
         kicker="Cache-aware checklist"
@@ -1027,7 +1027,7 @@ export function CacheAwareBuildGraphDemo() {
   const rebuildMode = step >= 5;
 
   return (
-    <div ref={ref} className="my-12">
+    <div ref={ref}>
       <DemoShell
         title="This is build engineering"
         kicker="Final mental model"
