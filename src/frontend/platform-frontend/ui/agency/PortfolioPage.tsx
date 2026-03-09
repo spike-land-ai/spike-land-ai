@@ -1,5 +1,5 @@
 import React from "react";
-import { PortfolioCard } from "../../../components/agency/portfolio-card";
+import { PortfolioCard } from "./PortfolioCard";
 
 const PORTFOLIO_ITEMS = [
   {

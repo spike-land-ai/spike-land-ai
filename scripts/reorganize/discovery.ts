@@ -89,7 +89,12 @@ export async function discoverFiles(
     if (!absPath.startsWith(rootWithSep)) continue;
 
     const relPath = path.relative(root, absPath);
-    const packageName = relPath.split(path.sep)[0];
+    // Handle nested category/package/ layout (e.g., "core/shared-utils/core-logic/file.ts")
+    const knownCategories = new Set(["core", "mcp-tools", "edge-api", "frontend", "cli", "media", "utilities"]);
+    const segments = relPath.split(path.sep);
+    const packageName = knownCategories.has(segments[0]) && segments.length >= 2
+      ? segments[1]
+      : segments[0];
 
     const externalDeps = new Set<string>();
     const relativeImports = new Set<string>();

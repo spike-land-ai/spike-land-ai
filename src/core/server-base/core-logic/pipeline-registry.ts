@@ -1,5 +1,5 @@
 import type { Tool } from "@modelcontextprotocol/sdk/types.js";
-import { pipelineTools } from "./tools/pipeline.js";
+import { pipelineTools } from "./pipeline-tools.js";
 
 // Define a minimal interface that matches the expected `addTool` method
 interface MinimalServer {

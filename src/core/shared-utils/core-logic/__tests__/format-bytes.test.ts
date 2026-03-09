@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { formatBytes } from '../utils';
+import { formatBytes } from '../format-bytes';
 
 describe('formatBytes', () => {
   it('should format 0 bytes correctly', () => {

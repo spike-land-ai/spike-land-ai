@@ -1,8 +1,6 @@
-"use client";
-
 import { useEffect } from "react";
 
-export default function NotFound() {
+export function NotFound() {
   useEffect(() => {
     fetch("/errors/ingest", {
       method: "POST",

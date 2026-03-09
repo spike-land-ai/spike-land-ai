@@ -1,7 +1,7 @@
 import { render } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import React from "react";
-import NotFound from "./not-found";
+import { NotFound } from "../NotFound";
 
 describe("NotFound component", () => {
   let originalPathname: string;
