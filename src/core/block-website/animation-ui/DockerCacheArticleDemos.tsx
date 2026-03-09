@@ -779,7 +779,10 @@ const ACTIVE_STAGE_INDEXES = [[0], [1], [2], [3, 4], [5]] as const;
 const COMPLETE_STAGE_INDEXES = [[], [0], [0, 1], [0, 1, 2], [0, 1, 2, 3, 4]] as const;
 
 export function MultiStageBuildDemo() {
-  const { ref, step, hasStarted, start, restart } = useDemoSequence(MULTI_STAGE_PHASES.length, 1500);
+  const { ref, step, hasStarted, start, restart } = useDemoSequence(
+    MULTI_STAGE_PHASES.length,
+    1500,
+  );
   const activeIndexes = new Set<number>(getSequenceValue(ACTIVE_STAGE_INDEXES, step));
   const completeIndexes = new Set<number>(getSequenceValue(COMPLETE_STAGE_INDEXES, step));
 
@@ -1034,7 +1037,10 @@ export function PracticalRulesDemo() {
 }
 
 export function CacheAwareBuildGraphDemo() {
-  const { ref, step, hasStarted, start, restart } = useDemoSequence(FINAL_GRAPH_PHASES.length, 1450);
+  const { ref, step, hasStarted, start, restart } = useDemoSequence(
+    FINAL_GRAPH_PHASES.length,
+    1450,
+  );
   const visibleLayers = Math.min(4, step + 1);
   const showGraph = step >= 4;
   const rebuildMode = step >= 5;
