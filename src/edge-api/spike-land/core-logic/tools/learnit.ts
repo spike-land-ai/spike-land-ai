@@ -4,15 +4,16 @@
  * Search topics, explore relationships, and navigate the AI wiki topic graph.
  * Ported from spike.land Prisma to Drizzle ORM + D1.
  *
- * Note: learnItContent table is not in the D1 schema.
- * These tools proxy to the spike.land API.
+ * Note: These tools use local D1 database schema now.
  */
 
 import { z } from "zod";
+import { eq, or, like, desc, and } from "drizzle-orm";
 import type { ToolRegistryAdapter } from "../../lazy-imports/types";
 import { freeTool } from "../../lazy-imports/procedures-index.ts";
-import { apiRequest, safeToolCall, textResult } from "../lib/tool-helpers";
+import { safeToolCall, textResult } from "../lib/tool-helpers";
 import type { DrizzleDB } from "../../db/db/db-index.ts";
+import { learnItContent, learnItRelations } from "../../db/db/schema.ts";
 
 const MAX_CONTENT_LENGTH = 4000;
 
@@ -38,23 +39,43 @@ export function registerLearnItTools(
       .meta({ category: "learnit", tier: "free" })
       .handler(async ({ input }) => {
         return safeToolCall("learnit_get_topic", async () => {
-          const topic = await apiRequest<{
-            id: string;
-            slug: string;
-            title: string;
-            description: string;
-            content: string;
-            parentSlug: string | null;
-            wikiLinks: string[];
-            viewCount: number;
-            status: string;
-          } | null>(`/api/learnit/topics/${encodeURIComponent(input.slug)}`);
+          const topicResult = await db
+            .select()
+            .from(learnItContent)
+            .where(eq(learnItContent.slug, input.slug))
+            .limit(1);
+
+          const topic = topicResult[0];
 
           if (!topic) {
             return textResult(
               `**Error: NOT_FOUND**\nNo topic found with slug "${input.slug}".\n**Retryable:** false`,
             );
           }
+
+          // Fetch parent
+          const parentRelationResult = await db
+            .select({
+              parentSlug: learnItContent.slug,
+            })
+            .from(learnItRelations)
+            .innerJoin(learnItContent, eq(learnItRelations.fromTopicId, learnItContent.id))
+            .where(
+              and(
+                eq(learnItRelations.toTopicId, topic.id),
+                eq(learnItRelations.type, "PARENT_CHILD"),
+              ),
+            )
+            .limit(1);
+
+          const parentSlug =
+            parentRelationResult.length > 0 ? parentRelationResult[0].parentSlug : null;
+
+          // Increment view count
+          await db
+            .update(learnItContent)
+            .set({ viewCount: topic.viewCount + 1 })
+            .where(eq(learnItContent.id, topic.id));
 
           const truncatedContent =
             topic.content.length > MAX_CONTENT_LENGTH
@@ -65,12 +86,9 @@ export function registerLearnItTools(
           text += `**Slug:** ${topic.slug}\n`;
           text += `**Status:** ${topic.status}\n`;
           text += `**Description:** ${topic.description}\n`;
-          text += `**Views:** ${topic.viewCount}\n`;
-          if (topic.parentSlug) {
-            text += `**Parent:** ${topic.parentSlug}\n`;
-          }
-          if (topic.wikiLinks.length > 0) {
-            text += `**Wiki Links:** ${topic.wikiLinks.join(", ")}\n`;
+          text += `**Views:** ${topic.viewCount + 1}\n`; // Include the incremented view
+          if (parentSlug) {
+            text += `**Parent:** ${parentSlug}\n`;
           }
           text += `\n---\n\n${truncatedContent}`;
 
@@ -95,28 +113,38 @@ export function registerLearnItTools(
       .meta({ category: "learnit", tier: "free" })
       .handler(async ({ input }) => {
         return safeToolCall("learnit_search_topics", async () => {
-          const params = new URLSearchParams({ query: input.query });
-          if (input.limit !== undefined) {
-            params.set("limit", String(input.limit));
-          }
+          const limit = input.limit ?? 10;
+          const searchPattern = `%${input.query}%`;
 
-          const topics = await apiRequest<
-            Array<{
-              slug: string;
-              title: string;
-              description: string;
-              viewCount: number;
-            }>
-          >(`/api/learnit/search?${params.toString()}`);
+          const topics = await db
+            .select({
+              slug: learnItContent.slug,
+              title: learnItContent.title,
+              description: learnItContent.description,
+              viewCount: learnItContent.viewCount,
+            })
+            .from(learnItContent)
+            .where(
+              and(
+                eq(learnItContent.status, "published"),
+                or(
+                  like(learnItContent.title, searchPattern),
+                  like(learnItContent.description, searchPattern),
+                  like(learnItContent.slug, searchPattern),
+                ),
+              ),
+            )
+            .orderBy(desc(learnItContent.viewCount))
+            .limit(limit);
 
           if (topics.length === 0) {
             return textResult(`No topics found matching "${input.query}".`);
           }
 
           let text = `**Found ${topics.length} topic(s) matching "${input.query}":**\n\n`;
-          for (const t of topics) {
-            text += `- **${t.title}** (\`${t.slug}\`) — ${t.viewCount} views\n`;
-            text += `  ${t.description.slice(0, 150)}\n\n`;
+          for (const topic of topics) {
+            text += `- **${topic.title}** (\`${topic.slug}\`) — ${topic.viewCount} views\n`;
+            text += `  ${topic.description.slice(0, 150)}\n\n`;
           }
 
           return textResult(text);
@@ -140,18 +168,74 @@ export function registerLearnItTools(
       .meta({ category: "learnit", tier: "free" })
       .handler(async ({ input }) => {
         return safeToolCall("learnit_get_relations", async () => {
-          const params = new URLSearchParams();
-          if (input.type) params.set("type", input.type);
+          const topicResult = await db
+            .select({ id: learnItContent.id, title: learnItContent.title })
+            .from(learnItContent)
+            .where(eq(learnItContent.slug, input.slug))
+            .limit(1);
 
-          const result = await apiRequest<{
-            title: string;
-            related: Array<{ title: string; slug: string }>;
-            prerequisites: Array<{ title: string; slug: string }>;
-            children: Array<{ title: string; slug: string }>;
-            parent: { title: string; slug: string } | null;
-          }>(
-            `/api/learnit/topics/${encodeURIComponent(input.slug)}/relations?${params.toString()}`,
-          );
+          if (topicResult.length === 0) {
+            return textResult(`**Error: NOT_FOUND**\nNo topic found with slug "${input.slug}".`);
+          }
+
+          const topic = topicResult[0];
+
+          // Fetch all outgoing relations (children, related, prerequisites)
+          const outgoingResult = await db
+            .select({
+              type: learnItRelations.type,
+              title: learnItContent.title,
+              slug: learnItContent.slug,
+            })
+            .from(learnItRelations)
+            .innerJoin(learnItContent, eq(learnItRelations.toTopicId, learnItContent.id))
+            .where(eq(learnItRelations.fromTopicId, topic.id));
+
+          // Fetch parent
+          const incomingResult = await db
+            .select({
+              type: learnItRelations.type,
+              title: learnItContent.title,
+              slug: learnItContent.slug,
+            })
+            .from(learnItRelations)
+            .innerJoin(learnItContent, eq(learnItRelations.fromTopicId, learnItContent.id))
+            .where(
+              and(
+                eq(learnItRelations.toTopicId, topic.id),
+                or(
+                  eq(learnItRelations.type, "PARENT_CHILD"),
+                  eq(learnItRelations.type, "RELATED"),
+                  eq(learnItRelations.type, "PREREQUISITE"),
+                ),
+              ),
+            );
+
+          const result = {
+            title: topic.title,
+            related: [] as Array<{ title: string; slug: string }>,
+            prerequisites: [] as Array<{ title: string; slug: string }>,
+            children: [] as Array<{ title: string; slug: string }>,
+            parent: null as { title: string; slug: string } | null,
+          };
+
+          for (const rel of outgoingResult) {
+            if (rel.type === "RELATED") result.related.push({ title: rel.title, slug: rel.slug });
+            if (rel.type === "PREREQUISITE")
+              result.prerequisites.push({ title: rel.title, slug: rel.slug });
+            if (rel.type === "PARENT_CHILD")
+              result.children.push({ title: rel.title, slug: rel.slug });
+          }
+
+          for (const rel of incomingResult) {
+            if (rel.type === "PARENT_CHILD" && !result.parent) {
+              result.parent = { title: rel.title, slug: rel.slug };
+            }
+            if (rel.type === "RELATED" && !result.related.some((r) => r.slug === rel.slug)) {
+              result.related.push({ title: rel.title, slug: rel.slug });
+            }
+            // Prerequisites are directed: if A is prerequisite for B, B is not necessarily prerequisite for A.
+          }
 
           let text = `**Relations for "${result.title}" (\`${input.slug}\`)**\n\n`;
 
@@ -205,28 +289,28 @@ export function registerLearnItTools(
       .meta({ category: "learnit", tier: "free" })
       .handler(async ({ input }) => {
         return safeToolCall("learnit_list_popular", async () => {
-          const params = new URLSearchParams();
-          if (input.limit !== undefined) {
-            params.set("limit", String(input.limit));
-          }
+          const limit = input.limit ?? 10;
 
-          const topics = await apiRequest<
-            Array<{
-              slug: string;
-              title: string;
-              description: string;
-              viewCount: number;
-            }>
-          >(`/api/learnit/popular?${params.toString()}`);
+          const topics = await db
+            .select({
+              slug: learnItContent.slug,
+              title: learnItContent.title,
+              description: learnItContent.description,
+              viewCount: learnItContent.viewCount,
+            })
+            .from(learnItContent)
+            .where(eq(learnItContent.status, "published"))
+            .orderBy(desc(learnItContent.viewCount))
+            .limit(limit);
 
           if (topics.length === 0) {
             return textResult("No published topics found.");
           }
 
           let text = `**Top ${topics.length} Topic(s) by Views:**\n\n`;
-          for (const t of topics) {
-            text += `- **${t.title}** (\`${t.slug}\`) — ${t.viewCount} views\n`;
-            text += `  ${t.description.slice(0, 120)}\n\n`;
+          for (const topic of topics) {
+            text += `- **${topic.title}** (\`${topic.slug}\`) — ${topic.viewCount} views\n`;
+            text += `  ${topic.description.slice(0, 120)}\n\n`;
           }
 
           return textResult(text);
@@ -242,30 +326,32 @@ export function registerLearnItTools(
       .meta({ category: "learnit", tier: "free" })
       .handler(async ({ input }) => {
         return safeToolCall("learnit_list_recent", async () => {
-          const params = new URLSearchParams();
-          if (input.limit !== undefined) {
-            params.set("limit", String(input.limit));
-          }
+          const limit = input.limit ?? 10;
 
-          const topics = await apiRequest<
-            Array<{
-              slug: string;
-              title: string;
-              description: string;
-              viewCount: number;
-              createdAt: string;
-            }>
-          >(`/api/learnit/recent?${params.toString()}`);
+          const topics = await db
+            .select({
+              slug: learnItContent.slug,
+              title: learnItContent.title,
+              description: learnItContent.description,
+              viewCount: learnItContent.viewCount,
+              createdAt: learnItContent.createdAt,
+            })
+            .from(learnItContent)
+            .where(eq(learnItContent.status, "published"))
+            .orderBy(desc(learnItContent.createdAt))
+            .limit(limit);
 
           if (topics.length === 0) {
             return textResult("No published topics found.");
           }
 
           let text = `**${topics.length} Most Recent Topic(s):**\n\n`;
-          for (const t of topics) {
-            text += `- **${t.title}** (\`${t.slug}\`)\n`;
-            text += `  ${t.description.slice(0, 120)}\n`;
-            text += `  Created: ${t.createdAt} | Views: ${t.viewCount}\n\n`;
+          for (const topic of topics) {
+            text += `- **${topic.title}** (\`${topic.slug}\`)\n`;
+            text += `  ${topic.description.slice(0, 120)}\n`;
+            // Quick format date
+            const dateStr = new Date(topic.createdAt).toISOString().split("T")[0];
+            text += `  Created: ${dateStr} | Views: ${topic.viewCount}\n\n`;
           }
 
           return textResult(text);

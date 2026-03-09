@@ -791,3 +791,70 @@ export const userApiKeyVaultRelations = relations(userApiKeyVault, ({ one }) => 
 export const accessGrantsRelations = relations(accessGrants, ({ one }) => ({
   user: one(users, { fields: [accessGrants.userId], references: [users.id] }),
 }));
+
+// ─── LearnIt Content ─────────────────────────────────────────────────────────
+
+export const learnItContent = sqliteTable(
+  "learn_it_content",
+  {
+    id: text("id").primaryKey(),
+    slug: text("slug").notNull().unique(),
+    title: text("title").notNull(),
+    description: text("description").notNull(),
+    content: text("content").notNull(),
+    status: text("status").notNull().default("draft"), // "draft" | "published"
+    viewCount: integer("view_count").notNull().default(0),
+    createdAt: integer("created_at", { mode: "number" }).notNull(),
+    updatedAt: integer("updated_at", { mode: "number" }).notNull(),
+  },
+  (t) => ({
+    slugIdx: uniqueIndex("learn_it_content_slug_idx").on(t.slug),
+    statusIdx: index("learn_it_content_status_idx").on(t.status),
+  }),
+);
+
+// ─── LearnIt Relations ───────────────────────────────────────────────────────
+
+export const learnItRelations = sqliteTable(
+  "learn_it_relations",
+  {
+    id: text("id").primaryKey(),
+    fromTopicId: text("from_topic_id")
+      .notNull()
+      .references(() => learnItContent.id, { onDelete: "cascade" }),
+    toTopicId: text("to_topic_id")
+      .notNull()
+      .references(() => learnItContent.id, { onDelete: "cascade" }),
+    type: text("type").notNull(), // 'PARENT_CHILD' | 'RELATED' | 'PREREQUISITE'
+    strength: integer("strength", { mode: "number" }).notNull().default(1),
+    createdAt: integer("created_at", { mode: "number" }).notNull(),
+  },
+  (t) => ({
+    fromToTypeIdx: uniqueIndex("learn_it_relations_from_to_type_idx").on(
+      t.fromTopicId,
+      t.toTopicId,
+      t.type,
+    ),
+    fromIdx: index("learn_it_relations_from_idx").on(t.fromTopicId),
+    toIdx: index("learn_it_relations_to_idx").on(t.toTopicId),
+    typeIdx: index("learn_it_relations_type_idx").on(t.type),
+  }),
+);
+
+export const learnItContentRelations = relations(learnItContent, ({ many }) => ({
+  outgoingRelations: many(learnItRelations, { relationName: "outgoingRelations" }),
+  incomingRelations: many(learnItRelations, { relationName: "incomingRelations" }),
+}));
+
+export const learnItRelationsRelations = relations(learnItRelations, ({ one }) => ({
+  fromTopic: one(learnItContent, {
+    fields: [learnItRelations.fromTopicId],
+    references: [learnItContent.id],
+    relationName: "outgoingRelations",
+  }),
+  toTopic: one(learnItContent, {
+    fields: [learnItRelations.toTopicId],
+    references: [learnItContent.id],
+    relationName: "incomingRelations",
+  }),
+}));
