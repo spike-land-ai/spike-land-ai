@@ -473,6 +473,7 @@ const projects = Object.entries(packages).map(([name, cfg]) => buildProject(name
 export default defineConfig({
   resolve: { alias: baseAliases },
   test: {
+    passWithNoTests: true,
     reporters: [reporter],
     coverage: {
       exclude: [

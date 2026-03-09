@@ -118,7 +118,8 @@ export function classifyIdeaLocally(text: string): CreateClassificationResult {
       slug: fallbackSlug,
       category: "app",
       template: "blank-react",
-      reason: "No strong keyword match. Start from a blank React app and refine the shape in-editor.",
+      reason:
+        "No strong keyword match. Start from a blank React app and refine the shape in-editor.",
     };
   }
 

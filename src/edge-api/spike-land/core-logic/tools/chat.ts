@@ -39,18 +39,22 @@ export function registerChatTools(
 ): void {
   registry.registerBuilt(
     freeTool(userId, db)
-      .tool("ai_chat", "Send a message to the Anthropic Claude API and get a non-streaming AI response. This is for direct AI conversations, not for spike-chat channel messaging.", {
-        message: z.string().min(1).describe("The message to send to the AI."),
-        model: z
-          .enum(["opus", "sonnet", "haiku"])
-          .optional()
-          .default("sonnet")
-          .describe("Claude model to use."),
-        system_prompt: z
-          .string()
-          .optional()
-          .describe("Optional system prompt for the conversation."),
-      })
+      .tool(
+        "ai_chat",
+        "Send a message to the Anthropic Claude API and get a non-streaming AI response. This is for direct AI conversations, not for spike-chat channel messaging.",
+        {
+          message: z.string().min(1).describe("The message to send to the AI."),
+          model: z
+            .enum(["opus", "sonnet", "haiku"])
+            .optional()
+            .default("sonnet")
+            .describe("Claude model to use."),
+          system_prompt: z
+            .string()
+            .optional()
+            .describe("Optional system prompt for the conversation."),
+        },
+      )
       .meta({ category: "chat", tier: "free" })
       .handler(async ({ input }) => {
         const { message, model = "sonnet", system_prompt } = input;
