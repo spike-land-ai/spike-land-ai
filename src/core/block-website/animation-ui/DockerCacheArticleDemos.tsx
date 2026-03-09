@@ -175,26 +175,28 @@ function DemoShell({
   children: ReactNode;
 }) {
   return (
-    <div className="relative overflow-hidden rounded-3xl border border-border/60 bg-[linear-gradient(180deg,rgba(15,23,42,0.98),rgba(2,6,23,0.98))] p-6 text-slate-100 md:p-8">
+    <div className="relative overflow-hidden rounded-3xl border border-border/60 bg-[linear-gradient(180deg,rgba(15,23,42,0.98),rgba(2,6,23,0.98))] p-4 text-slate-100 sm:p-5 md:p-8">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(34,211,238,0.12),transparent_38%),radial-gradient(circle_at_bottom_right,rgba(168,85,247,0.12),transparent_34%)]" />
       <div className="absolute inset-0 opacity-[0.08] [background-image:linear-gradient(rgba(255,255,255,0.28)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.28)_1px,transparent_1px)] [background-size:28px_28px]" />
-      <div className="relative space-y-5">
-        <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
-          <div className="space-y-2">
-            <div className="text-[10px] font-black uppercase tracking-[0.32em] text-cyan-200/80">
+      <div className="relative space-y-4 sm:space-y-5">
+        <div className="grid gap-3 sm:gap-4 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-start">
+          <div className="min-w-0 space-y-2">
+            <div className="text-[9px] font-black uppercase tracking-[0.24em] text-cyan-200/80 sm:text-[10px] sm:tracking-[0.32em]">
               {kicker}
             </div>
-            <h3 className="text-xl font-black tracking-tight text-white md:text-2xl">{title}</h3>
+            <h3 className="text-lg font-black leading-tight tracking-tight text-white sm:text-xl md:text-2xl">
+              {title}
+            </h3>
           </div>
 
-          <div className="flex flex-wrap items-center justify-end gap-2">
-            <div className="max-w-[16rem] rounded-full border border-cyan-400/20 bg-cyan-400/10 px-3 py-1.5 text-right text-[10px] font-black uppercase tracking-[0.18em] text-cyan-50">
+          <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:justify-end lg:self-start">
+            <div className="flex min-h-10 w-full items-center justify-center rounded-full border border-cyan-400/20 bg-cyan-400/10 px-3 py-1.5 text-center text-[10px] font-black uppercase tracking-[0.14em] text-cyan-50 sm:min-w-[13rem] sm:w-auto sm:tracking-[0.18em]">
               {status}
             </div>
             <button
               type="button"
               onClick={hasStarted ? onRestart : onStart}
-              className="inline-flex items-center gap-2 rounded-full border border-white/12 bg-white/5 px-3 py-1.5 text-[10px] font-black uppercase tracking-[0.18em] text-slate-200 transition-colors hover:border-cyan-300/50 hover:text-cyan-50"
+              className="inline-flex min-h-10 w-full items-center justify-center gap-2 rounded-full border border-white/12 bg-white/5 px-3 py-1.5 text-[10px] font-black uppercase tracking-[0.18em] text-slate-200 transition-colors hover:border-cyan-300/50 hover:text-cyan-50 sm:min-w-[6.75rem] sm:w-auto"
             >
               {hasStarted ? <RefreshCcw className="size-3.5" /> : <Play className="size-3.5" />}
               {hasStarted ? "Restart" : "Start"}
@@ -210,7 +212,7 @@ function DemoShell({
 function Panel({ children, className = "" }: { children: ReactNode; className?: string }) {
   return (
     <div
-      className={`rounded-[1.5rem] border border-white/10 bg-white/[0.045] p-4 md:p-5 ${className}`}
+      className={`rounded-[1.5rem] border border-white/10 bg-white/[0.045] p-3 sm:p-4 md:p-5 ${className}`}
     >
       {children}
     </div>
@@ -242,7 +244,6 @@ function LayerBar({
     <motion.div
       animate={{
         opacity: dim ? 0.28 : 1,
-        scale: active ? 1.02 : 1,
         boxShadow: active ? "0 0 18px rgba(34,211,238,0.2)" : "0 0 0 rgba(0,0,0,0)",
       }}
       transition={{ duration: 0.25, ease: "easeOut" }}
@@ -311,8 +312,7 @@ function PipelineBox({
     <motion.div
       animate={{
         opacity: dim ? 0.35 : 1,
-        y: 0,
-        scale: active ? 1.02 : 1,
+        boxShadow: active ? "0 0 18px rgba(255,255,255,0.08)" : "0 0 0 rgba(0,0,0,0)",
       }}
       transition={{ duration: 0.25, ease: "easeOut" }}
       className={`flex items-center gap-3 rounded-2xl border px-4 py-3 text-sm font-semibold ${toneClasses(tone)}`}
