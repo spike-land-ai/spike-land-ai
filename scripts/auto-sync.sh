@@ -27,6 +27,22 @@ while true; do
       CURRENT_BRANCH="$NEW_BRANCH"
     fi
     git add .
+    # Run incremental quality gates — unstage and skip commit on failure
+    if ! yarn typecheck; then
+      echo "[auto-sync] typecheck failed, skipping commit"
+      git reset HEAD . >/dev/null 2>&1
+      continue
+    fi
+    if ! yarn lint; then
+      echo "[auto-sync] lint failed, skipping commit"
+      git reset HEAD . >/dev/null 2>&1
+      continue
+    fi
+    if ! yarn test:src; then
+      echo "[auto-sync] tests failed, skipping commit"
+      git reset HEAD . >/dev/null 2>&1
+      continue
+    fi
     git commit -m "chore: auto-sync local changes $(date +%s)" || true
     git push -u origin "$CURRENT_BRANCH" >/dev/null 2>&1 || true
     if ! gh pr view "$CURRENT_BRANCH" >/dev/null 2>&1; then
