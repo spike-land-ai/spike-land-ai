@@ -219,11 +219,18 @@ export function registerStorageTools(
         return textResult("R2 not configured (SPA_ASSETS binding missing).");
       }
 
-      const listResult = await spaAssets.list({
-        prefix: input.prefix,
-        limit: input.limit,
-        cursor: input.cursor,
-      });
+      const listOptions: R2ListOptions = {};
+      if (input.prefix) {
+        listOptions.prefix = input.prefix;
+      }
+      if (input.limit !== undefined) {
+        listOptions.limit = input.limit;
+      }
+      if (input.cursor) {
+        listOptions.cursor = input.cursor;
+      }
+
+      const listResult = await spaAssets.list(listOptions);
 
       return jsonResult("List complete", {
         objects: listResult.objects.map((o) => ({
