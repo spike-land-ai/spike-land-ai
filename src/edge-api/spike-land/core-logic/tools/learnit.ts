@@ -42,7 +42,9 @@ export function registerLearnItTools(
           const topicResult = await db
             .select()
             .from(learnItContent)
-            .where(eq(learnItContent.slug, input.slug))
+            .where(
+              and(eq(learnItContent.slug, input.slug), eq(learnItContent.status, "published")),
+            )
             .limit(1);
 
           const topic = topicResult[0];
@@ -64,6 +66,7 @@ export function registerLearnItTools(
               and(
                 eq(learnItRelations.toTopicId, topic.id),
                 eq(learnItRelations.type, "PARENT_CHILD"),
+                eq(learnItContent.status, "published"),
               ),
             )
             .limit(1);
@@ -171,7 +174,9 @@ export function registerLearnItTools(
           const topicResult = await db
             .select({ id: learnItContent.id, title: learnItContent.title })
             .from(learnItContent)
-            .where(eq(learnItContent.slug, input.slug))
+            .where(
+              and(eq(learnItContent.slug, input.slug), eq(learnItContent.status, "published")),
+            )
             .limit(1);
 
           if (topicResult.length === 0) {
@@ -189,7 +194,12 @@ export function registerLearnItTools(
             })
             .from(learnItRelations)
             .innerJoin(learnItContent, eq(learnItRelations.toTopicId, learnItContent.id))
-            .where(eq(learnItRelations.fromTopicId, topic.id));
+            .where(
+              and(
+                eq(learnItRelations.fromTopicId, topic.id),
+                eq(learnItContent.status, "published"),
+              ),
+            );
 
           // Fetch parent
           const incomingResult = await db
@@ -203,6 +213,7 @@ export function registerLearnItTools(
             .where(
               and(
                 eq(learnItRelations.toTopicId, topic.id),
+                eq(learnItContent.status, "published"),
                 or(
                   eq(learnItRelations.type, "PARENT_CHILD"),
                   eq(learnItRelations.type, "RELATED"),
