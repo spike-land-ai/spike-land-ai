@@ -133,7 +133,7 @@ export async function discoverFiles(
         relativeImports.add(resolved);
       } else if (importPath.startsWith("@/")) {
         // Resolve @/ alias to absolute path and track as relative import
-        const resolved = resolveAliasImport(importPath, packageName, aliasMap);
+        const resolved = resolveAliasImport(importPath, packageName!, aliasMap);
         if (resolved) {
           relativeImports.add(resolved);
         }
@@ -145,7 +145,7 @@ export async function discoverFiles(
       }
     }
 
-    nodes.push({ absPath, relPath, packageName, externalDeps, relativeImports });
+    nodes.push({ absPath, relPath, packageName: packageName!, externalDeps, relativeImports });
   }
   return { nodes, aliasMap };
 }

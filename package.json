@@ -8,6 +8,7 @@
     "src/monaco-editor"
   ],
   "scripts": {
+    "prepare": "husky",
     "build": "yarn workspaces foreach -Apt run build",
     "build:src": "node --import tsx esbuild.config.ts --all",
     "test": "vitest run --config .tests/vitest.config.ts",
@@ -17,8 +18,8 @@
     "typecheck:hardened": "npx tsc --noEmit --project packages/spike-app/tsconfig.json && npx tsc --noEmit --project packages/shared/tsconfig.json && npx tsc --noEmit --project packages/block-website/tsconfig.json && npx tsc --noEmit --project packages/mcp-server-base/tsconfig.json && npx tsc --noEmit --project packages/spike-land-mcp/tsconfig.json",
     "typecheck:autofix": "bash scripts/typecheck-autofix.sh",
     "typecheck:legacy": "yarn workspaces foreach -Apt run typecheck",
-    "lint": "eslint --fix --cache src/ ",
-    "lint:check": "eslint --cache src/",
+    "lint": "eslint --fix --cache src/ .tests/",
+    "lint:check": "eslint --cache src/ .tests/",
     "lint:legacy": "yarn workspaces foreach -Ap run lint",
     "format": "biome format --write .",
     "format:check": "biome format .",
@@ -56,7 +57,11 @@
     "test:changed:ci": "bash scripts/test-changed.sh --base origin/main",
     "test:docker": "bash scripts/docker-test.sh",
     "test:docker:all": "bash scripts/docker-test.sh --all",
-    "test:docker:ci": "bash scripts/docker-test.sh --base origin/main"
+    "test:docker:ci": "bash scripts/docker-test.sh --base origin/main",
+    "dev:edge": "cd packages/spike-edge && npx wrangler dev",
+    "dev:app": "cd packages/spike-app && npx vite",
+    "dev:mcp": "cd packages/spike-land-mcp && npx wrangler dev",
+    "dev:auth": "cd packages/mcp-auth && npx wrangler dev"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.27.1",
@@ -100,6 +105,7 @@
     "eslint-plugin-react": "7.37.5",
     "eslint-plugin-react-hooks": "7.0.1",
     "fake-indexeddb": "^6.2.5",
+    "husky": "^9.1.7",
     "react-hook-form": "^7.71.2",
     "ts-morph": "^27.0.2",
     "tsx": "^4.21.0",
@@ -231,7 +237,7 @@
     }
   },
   "resolutions": {
-    "eslint": "10.0.2",
+    "eslint": "10.0.3",
     "typescript": "5.9.3",
     "@modelcontextprotocol/sdk": "1.27.1",
     "dompurify": ">=3.3.1",

@@ -1,0 +1,10 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:base"],
+  "packageRules": [
+    { "groupName": "vitest", "matchPackagePatterns": ["vitest", "@vitest/*"] },
+    { "groupName": "cloudflare", "matchPackagePatterns": ["wrangler", "@cloudflare/*"] },
+    { "groupName": "drizzle", "matchPackagePatterns": ["drizzle-*"] },
+    { "groupName": "mcp-sdk", "matchPackagePatterns": ["@modelcontextprotocol/*"] }
+  ]
+}

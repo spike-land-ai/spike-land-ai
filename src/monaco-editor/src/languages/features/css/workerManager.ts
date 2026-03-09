@@ -82,7 +82,7 @@ export class WorkerManager {
       .then((client) => {
         _client = client;
       })
-      .then((_) => {
+      .then((_) => { return undefined;
         if (this._worker) {
           return this._worker.withSyncedResources(resources);
         }

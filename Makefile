@@ -118,11 +118,17 @@ test-docker-all:
 # Only re-runs tests for packages whose source files have changed.
 # BuildKit cache hit = tests already passed for that file state.
 
-test-docker:
-	@bash scripts/docker-test.sh
-
-test-docker-all:
-	@bash scripts/docker-test.sh --all
-
-test-changed:
-	@bash scripts/test-changed.sh
+setup:
+	@echo "Checking prerequisites..."
+	@node -v >/dev/null || (echo "Node.js required" && exit 1)
+	@node -e "if(+process.versions.node.split('.')[0]<24)process.exit(1)" || echo "Warning: Node 24+ recommended"
+	@echo "Installing dependencies..."
+	yarn install
+	@echo "Setting up pre-commit hooks..."
+	yarn prepare
+	@echo "Copying .dev.vars examples..."
+	@for f in packages/*/.dev.vars.example; do \
+		dir=$$(dirname "$$f"); \
+		[ ! -f "$$dir/.dev.vars" ] && cp "$$f" "$$dir/.dev.vars" && echo "Created $$dir/.dev.vars"; \
+	done || true
+	@echo "Setup complete! Set NODE_AUTH_TOKEN if you haven't (see CONTRIBUTING.md)"

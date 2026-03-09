@@ -238,7 +238,7 @@ export function DevModeFAB({ slug, initialContent }: DevModeFABProps) {
 
   return (
     <>
-      {open && <ContentCreatorMode slug={slug} initialContent={initialContent} />}
+      {open && <ContentCreatorMode slug={slug} initialContent={initialContent!} />}
       {!open && (
         <button
           onClick={() => setOpen(true)}

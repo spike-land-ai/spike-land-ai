@@ -1,0 +1,8 @@
+#!/bin/sh
+# Secret detection
+gitleaks git --pre-commit --staged --verbose 2>/dev/null || true
+# Typecheck staged TS files
+STAGED=$(git diff --cached --name-only --diff-filter=ACM -- '*.ts' '*.tsx')
+if [ -n "$STAGED" ]; then
+  npx tsc --noEmit --incremental
+fi

@@ -38,6 +38,17 @@ export function registerCachePurgeTools(
             .boolean()
             .optional()
             .describe("Set to true to purge the entire cache. Use with caution."),
+          blog: z
+            .boolean()
+            .optional()
+            .describe("Set to true to purge all blog cache entries (index, RSS)."),
+          blog_slugs: z
+            .array(z.string())
+            .optional()
+            .describe(
+              "Array of blog slugs to purge. Also purges blog index and RSS. " +
+                "Example: ['think-slowly-ship-fast']",
+            ),
         },
       )
       .meta({ category: "infra", tier: "free" })
@@ -52,10 +63,17 @@ export function registerCachePurgeTools(
           input: { purge_everything: true },
           description: "Purge the entire CDN cache",
         },
+        {
+          name: "purge_blog_post",
+          input: { blog_slugs: ["think-slowly-ship-fast"] },
+          description: "Purge a specific blog post's cache (API + CDN + Workers Cache)",
+        },
       ])
       .handler(async ({ input }) => {
-        if (!input.files && !input.purge_everything) {
-          return textResult("Provide 'files' array or 'purge_everything: true'");
+        if (!input.files && !input.purge_everything && !input.blog && !input.blog_slugs) {
+          return textResult(
+            "Provide 'files' array, 'purge_everything: true', 'blog: true', or 'blog_slugs'",
+          );
         }
 
         if (!spikeEdge) {
@@ -71,19 +89,30 @@ export function registerCachePurgeTools(
                 ? { "X-Internal-Secret": mcpInternalSecret, "X-User-Id": userId }
                 : {}),
             },
-            body: JSON.stringify(
-              input.purge_everything ? { purge_everything: true } : { files: input.files },
-            ),
+            body: JSON.stringify({
+              ...(input.purge_everything ? { purge_everything: true } : {}),
+              ...(input.files ? { files: input.files } : {}),
+              ...(input.blog ? { blog: true } : {}),
+              ...(input.blog_slugs ? { blog_slugs: input.blog_slugs } : {}),
+            }),
           }),
         );
 
         const result = await resp.json<{ success?: boolean; errors?: unknown[] }>();
 
+        const workersPurged = (result as Record<string, unknown>).workers_cache_purged;
+        const workersInfo = Array.isArray(workersPurged) && workersPurged.length
+          ? ` + ${workersPurged.length} Workers Cache API entries`
+          : "";
+
         if (resp.ok && result.success) {
-          const target = input.purge_everything
-            ? "entire cache"
-            : `${input.files?.length ?? 0} file(s)`;
-          return textResult(`Cache purge successful: ${target} purged for spike.land`);
+          const parts: string[] = [];
+          if (input.purge_everything) parts.push("entire cache");
+          if (input.files?.length) parts.push(`${input.files.length} file(s)`);
+          if (input.blog_slugs?.length) parts.push(`blog slugs: ${input.blog_slugs.join(", ")}`);
+          else if (input.blog) parts.push("all blog cache");
+          const target = parts.join(", ") || "cache";
+          return textResult(`Cache purge successful: ${target} purged${workersInfo}`);
         }
 
         return textResult(`Cache purge failed: ${JSON.stringify(result)}`);

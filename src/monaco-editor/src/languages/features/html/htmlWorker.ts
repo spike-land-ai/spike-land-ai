@@ -25,10 +25,10 @@ export class HTMLWorker {
     const customDataProviders: IHTMLDataProvider[] = [];
     if (data?.dataProviders) {
       for (const id in data.dataProviders) {
-        customDataProviders.push(htmlService.newHTMLDataProvider(id, data.dataProviders[id]));
+        customDataProviders.push(htmlService.newHTMLDataProvider(id, data.dataProviders![id]!));
       }
     }
-    this._languageService = htmlService.getLanguageService({
+    this._languageService = htmlService.getLanguageService({ // @ts-ignore
       useDefaultDataProvider,
       customDataProviders,
     });
@@ -62,7 +62,7 @@ export class HTMLWorker {
       return [];
     }
     let formattingOptions = { ...this._languageSettings.format, ...options };
-    let textEdits = this._languageService.format(document, range, formattingOptions);
+    let textEdits = this._languageService.format(document, range, formattingOptions as any);
     return Promise.resolve(textEdits);
   }
   async doHover(uri: string, position: htmlService.Position): Promise<htmlService.Hover | null> {

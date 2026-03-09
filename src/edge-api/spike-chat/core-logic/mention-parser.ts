@@ -22,16 +22,16 @@ export function extractMentions(text: string): Mention[] {
     const id = match[2];
 
     if (prefix === "#") {
-      mentions.push({ type: "channel", id, raw });
+      mentions.push({ type: "channel", id: id!, raw });
     } else if (prefix === "@") {
-      if (id.startsWith("/")) {
-        mentions.push({ type: "file", id, raw });
+      if (id!.startsWith("/")) {
+        mentions.push({ type: "file", id: id!, raw });
       } else {
         // Just assuming user for now unless it's a known role like "here" or "channel"
         if (id === "here" || id === "channel" || id === "everyone") {
           mentions.push({ type: "role", id, raw });
         } else {
-          mentions.push({ type: "user", id, raw });
+          mentions.push({ type: "user", id: id!, raw });
         }
       }
     }

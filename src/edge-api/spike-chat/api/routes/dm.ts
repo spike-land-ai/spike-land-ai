@@ -32,7 +32,7 @@ dmRouter.post("/workspaces/:workspaceId/dm", async (c) => {
   );
 
   if (existingChannels.length > 0) {
-    return c.json({ id: existingChannels[0].id });
+    return c.json({ id: existingChannels[0]?.id });
   }
 
   const id = generateId();

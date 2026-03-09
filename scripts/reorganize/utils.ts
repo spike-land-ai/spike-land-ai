@@ -13,7 +13,7 @@ export function extractRootPackage(importPath: string): string | null {
   if (importPath.startsWith("@") && parts.length >= 2) {
     return `${parts[0]}/${parts[1]}`;
   }
-  return parts[0];
+  return parts[0] || null;
 }
 
 export async function readPackagesYaml(): Promise<Record<string, ManifestPkg>> {

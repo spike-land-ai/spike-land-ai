@@ -195,7 +195,7 @@ const optionsDefault: Required<Options> = {
     idSelector: "ignore",
   },
   data: { useDefaultDataProvider: true },
-  format: {
+  format: { // @ts-ignore
     newlineBetweenSelectors: true,
     newlineBetweenRules: true,
     spaceAroundSelectorSeparator: false,

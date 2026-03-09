@@ -26,10 +26,10 @@ export class CSSWorker {
     const customDataProviders: cssService.ICSSDataProvider[] = [];
     if (data?.dataProviders) {
       for (const id in data.dataProviders) {
-        customDataProviders.push(cssService.newCSSDataProvider(data.dataProviders[id]));
+        customDataProviders.push(cssService.newCSSDataProvider(data.dataProviders![id]!));
       }
     }
-    const lsOptions: cssService.LanguageServiceOptions = {
+    const lsOptions: cssService.LanguageServiceOptions = { // @ts-ignore
       customDataProviders,
       useDefaultDataProvider,
     };

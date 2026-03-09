@@ -28,7 +28,7 @@ export function parseGitHubUrl(url: string): ParsedGitHubUrl | null {
   if (pathType === "blob") type = "file";
   else if (pathType === "tree") type = "tree";
 
-  return { org, repo, type, branch, path, url };
+  return { org, repo, type, branch, path, url } as ParsedGitHubUrl;
 }
 
 export function parseShieldsBadge(url: string): ParsedGitHubUrl | null {

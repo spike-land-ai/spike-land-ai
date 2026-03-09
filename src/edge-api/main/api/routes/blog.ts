@@ -198,7 +198,7 @@ blog.get("/api/blog", async (c) => {
           headers: { "Content-Type": "application/json" },
         });
       },
-      { ttl: showDrafts ? 0 : 300, swr: showDrafts ? 0 : 3600 },
+      { ttl: showDrafts ? 0 : 300, swr: showDrafts ? 0 : 300 },
     );
   } catch {
     // Cache API unavailable — fall back to direct D1
@@ -254,7 +254,7 @@ blog.get("/api/blog/:slug", async (c) => {
           headers: { "Content-Type": "application/json" },
         });
       },
-      { ttl: showDrafts ? 0 : 300, swr: showDrafts ? 0 : 3600 },
+      { ttl: showDrafts ? 0 : 300, swr: showDrafts ? 0 : 300 },
     );
   } catch {
     // Cache API unavailable — fall back to direct D1

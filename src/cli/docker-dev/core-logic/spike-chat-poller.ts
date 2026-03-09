@@ -139,7 +139,7 @@ export async function pollChannels(
 
         // Update cursor to the last message ID (including bot messages)
         if (msgs.length > 0) {
-          cursors.set(channelId, msgs[msgs.length - 1].id);
+          cursors.set(channelId, msgs[msgs.length - 1]?.id);
         }
       } catch (err) {
         console.error(`[spike-chat-poller] Error polling ${channelId}:`, err);

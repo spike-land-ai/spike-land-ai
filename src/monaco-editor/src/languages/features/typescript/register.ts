@@ -658,7 +658,7 @@ class LanguageServiceDefaultsImpl implements LanguageServiceDefaults {
       filePath = _filePath;
     }
 
-    if (this._extraLibs[filePath] && this._extraLibs[filePath].content === content) {
+    if (this._extraLibs[filePath] && this._extraLibs[filePath]?.content === content) {
       // no-op, there already exists an extra lib with this content
       return {
         dispose: () => {},
@@ -667,10 +667,10 @@ class LanguageServiceDefaultsImpl implements LanguageServiceDefaults {
 
     let myVersion = 1;
     if (this._removedExtraLibs[filePath]) {
-      myVersion = this._removedExtraLibs[filePath] + 1;
+      myVersion = this._removedExtraLibs[filePath]! + 1;
     }
     if (this._extraLibs[filePath]) {
-      myVersion = this._extraLibs[filePath].version + 1;
+      myVersion = this._extraLibs[filePath]?.version + 1;
     }
 
     this._extraLibs[filePath] = {
@@ -698,7 +698,7 @@ class LanguageServiceDefaultsImpl implements LanguageServiceDefaults {
 
   setExtraLibs(libs: { content: string; filePath?: string }[]): void {
     for (const filePath in this._extraLibs) {
-      this._removedExtraLibs[filePath] = this._extraLibs[filePath].version;
+      this._removedExtraLibs[filePath] = this._extraLibs[filePath]?.version;
     }
     // clear out everything
     this._extraLibs = Object.create(null);

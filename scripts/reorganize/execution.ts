@@ -189,13 +189,13 @@ export async function copyAssets(
   for (const [oldAbs, newAbs] of pathMapping) {
     const oldRel = path.relative(srcDir, oldAbs);
     const pkgName = oldRel.split(path.sep)[0];
-    if (!pkgDirMap.has(pkgName)) {
+    if (!pkgDirMap.has(pkgName!)) {
       // Find the target directory for this package's files
       const newRel = path.relative(outputDir, newAbs);
       const parts = newRel.split(path.sep);
       // category/appName is the base
       if (parts.length >= 2) {
-        pkgDirMap.set(pkgName, path.join(parts[0], parts[1]));
+        pkgDirMap.set(pkgName!, path.join(parts[0]!, parts[1]!));
       }
     }
   }
@@ -203,7 +203,7 @@ export async function copyAssets(
   let copied = 0;
   for (const relFile of assetFiles) {
     const pkgName = relFile.split(path.sep)[0];
-    const pkgBase = pkgDirMap.get(pkgName);
+    const pkgBase = pkgDirMap.get(pkgName!);
     if (!pkgBase) continue; // package wasn't in the move plans
 
     // Preserve the path within the package
@@ -254,7 +254,7 @@ function rewriteCssSource(
 
     // Find which package this source path refers to
     const sourcePkg = relToSrc.split(path.sep)[0];
-    const targetBase = pkgDirMap.get(sourcePkg);
+    const targetBase = pkgDirMap.get(sourcePkg!);
 
     if (targetBase) {
       // Compute the glob suffix (e.g. "**/*.{ts,tsx}")
@@ -565,7 +565,7 @@ export async function updatePackagesConfigs(pathMapping: Map<string, string>, sr
                 const newRel = path.relative(outputDir, newAbs);
                 const parts = newRel.split(path.sep);
                 if (parts.length >= 2) {
-                  const appBase = path.join(outputDir, parts[0], parts[1]);
+                  const appBase = path.join(outputDir, parts[0]!, parts[1]!);
                   let relBase = path.relative(pkgPath, appBase);
                   if (!relBase.startsWith(".")) relBase = "./" + relBase;
                   const suffix = pattern.slice(pattern.indexOf(basePattern) + basePattern.length);
@@ -616,7 +616,7 @@ export async function updatePackagesConfigs(pathMapping: Map<string, string>, sr
                     const newRel = path.relative(outputDir, newAbs);
                     const parts = newRel.split(path.sep);
                     if (parts.length >= 2) {
-                      const appBase = path.join(outputDir, parts[0], parts[1]);
+                      const appBase = path.join(outputDir, parts[0]!, parts[1]!);
                       const rel = path.relative(pkgPath, appBase);
                       return (rel.startsWith(".") ? rel : "./" + rel) + "/*";
                     }
@@ -686,7 +686,7 @@ export async function updatePackagesConfigs(pathMapping: Map<string, string>, sr
                 : path.resolve(rootDir, "src");
               const relToSrc = path.relative(srcDirAbs, oldAbs);
               const pkgName = relToSrc.split(path.sep)[0];
-              const pkgRoot = path.join(srcDirAbs, pkgName);
+              const pkgRoot = path.join(srcDirAbs, pkgName!);
 
               // The sub-path beyond the package root in the reference
               const subPath = path.relative(pkgRoot, searchBase);
@@ -696,7 +696,7 @@ export async function updatePackagesConfigs(pathMapping: Map<string, string>, sr
               const newRel = path.relative(outputDir, newAbs);
               const parts = newRel.split(path.sep);
               if (parts.length >= 2) {
-                const appRoot = path.join(outputDir, parts[0], parts[1]);
+                const appRoot = path.join(outputDir, parts[0]!, parts[1]!);
                 // Append the sub-path (e.g., "public", "src/ui")
                 if (subPath && subPath !== ".") {
                   return path.join(appRoot, subPath);

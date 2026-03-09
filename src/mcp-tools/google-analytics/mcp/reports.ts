@@ -95,7 +95,7 @@ export function registerReportTools(
     },
     handler: async (args) => {
       const headers = await auth.authHeaders();
-      const body = buildReportBody(args);
+      const body = buildReportBody(args as unknown as Parameters<typeof buildReportBody>[0]);
       const url = `https://analyticsdata.googleapis.com/v1beta/properties/${propertyId}:runReport`;
 
       const result = await tryCatch(

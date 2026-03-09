@@ -114,7 +114,7 @@ export async function checkLinks(options: CheckerOptions): Promise<ScanReport> {
           }
           const parsed = parseGitHubUrl(link.target);
           if (parsed) {
-            result = await validateGitHubUrl(link, parsed, { token: githubToken, timeout });
+            result = await validateGitHubUrl(link, parsed, githubToken ? { token: githubToken, timeout } : { timeout });
             urlCache.set(link.target, result);
           } else {
             result = { link, status: "error", reason: "Could not parse GitHub URL", durationMs: 0 };
@@ -134,7 +134,7 @@ export async function checkLinks(options: CheckerOptions): Promise<ScanReport> {
           }
           const badgeParsed = parseShieldsBadge(link.target);
           if (badgeParsed) {
-            result = await validateGitHubUrl(link, badgeParsed, { token: githubToken, timeout });
+            result = await validateGitHubUrl(link, badgeParsed, githubToken ? { token: githubToken, timeout } : { timeout });
             urlCache.set(link.target, result);
           } else {
             result = { link, status: "warning", reason: "Could not parse shields.io badge URL", durationMs: 0 };

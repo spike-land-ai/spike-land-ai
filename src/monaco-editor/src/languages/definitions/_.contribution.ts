@@ -43,7 +43,7 @@ class LazyLanguageLoader {
   public load(): Promise<ILangImpl> {
     if (!this._loadingTriggered) {
       this._loadingTriggered = true;
-      languageDefinitions[this._languageId].loader().then(
+      languageDefinitions[this._languageId]?.loader().then(
         (mod) => this._lazyLoadPromiseResolve(mod),
         (err) => this._lazyLoadPromiseReject(err),
       );

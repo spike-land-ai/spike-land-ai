@@ -34,17 +34,17 @@ export class PresenceDurableObject extends DurableObject {
         return new Response("Missing userId", { status: 400 });
       }
 
-      this.ctx.acceptWebSocket(server, [userId]);
-      server.serializeAttachment({ userId });
+      this.ctx.acceptWebSocket(server!, [userId]);
+      server!.serializeAttachment({ userId });
 
       // Mark user as online
       this.updatePresence(userId, "online");
 
       // Send current presence state of everyone to the new client
       const state = Object.fromEntries(this.presence.entries());
-      server.send(JSON.stringify({ type: "presence_state", state }));
+      server!.send(JSON.stringify({ type: "presence_state", state }));
 
-      return new Response(null, { status: 101, webSocket: client });
+      return new Response(null, { status: 101, webSocket: client || null });
     }
 
     if (request.method === "GET" && url.pathname === "/state") {

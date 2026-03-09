@@ -79,7 +79,7 @@ contentEdit.post("/api/blog/:slug/edit", async (c) => {
   // Commit file to new branch
   const commitBody: Record<string, unknown> = {
     message: `Content edit: ${slug}`,
-    content: btoa(unescape(encodeURIComponent(content))),
+    content: btoa(unescape(encodeURIComponent(content!))),
     branch,
   };
   if (existingFileSha) commitBody.sha = existingFileSha;

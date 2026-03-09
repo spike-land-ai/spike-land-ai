@@ -141,6 +141,6 @@ export function createToolExecutor(
 
   return {
     execute: (name: string, input: Record<string, unknown>, schema?: Record<string, unknown>) =>
-      pipeline({ toolName: name, input, inputSchema: schema }),
+      pipeline({ toolName: name, input, ...(schema ? { inputSchema: schema } : {}) }),
   };
 }

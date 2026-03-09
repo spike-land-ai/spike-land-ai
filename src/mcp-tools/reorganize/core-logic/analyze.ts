@@ -36,7 +36,7 @@ export function registerAnalyzeTool(server: McpServer): void {
 
       for (const p of plans) {
         const cat = p.targetDir.split(path.sep)[0];
-        catStats.set(cat, (catStats.get(cat) || 0) + 1);
+        catStats.set(cat!, (catStats.get(cat!) || 0) + 1);
         dirStats.set(p.targetDir, (dirStats.get(p.targetDir) || 0) + 1);
       }
 

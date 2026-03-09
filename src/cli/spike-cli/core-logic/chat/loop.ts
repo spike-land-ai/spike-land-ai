@@ -221,7 +221,7 @@ async function streamResponse(
   const finalMessage = await stream.finalMessage();
 
   // Extract usage from final message (Anthropic.Message has usage typed directly)
-  const usage: TokenUsage | undefined = finalMessage.usage ?? undefined;
+  const usage = finalMessage.usage ?? undefined;
 
-  return { content, usage };
+  return usage ? { content, usage } : { content };
 }

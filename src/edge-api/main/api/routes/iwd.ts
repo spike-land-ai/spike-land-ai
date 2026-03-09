@@ -349,13 +349,13 @@ function resolveGreeting(
     }
   }
 
-  return GREETINGS.en;
+  return GREETINGS.en as GreetingInfo;
 }
 
 function greetingForCountry(countryCode: string | null | undefined): GreetingInfo {
-  if (!countryCode) return GREETINGS.en;
+  if (!countryCode) return GREETINGS.en as GreetingInfo;
   const locale = COUNTRY_TO_LOCALE[countryCode.toUpperCase()];
-  return (locale && GREETINGS[locale]) || GREETINGS.en;
+  return ((locale && GREETINGS[locale]) || GREETINGS.en) as GreetingInfo;
 }
 
 function normalizeVisitor(row: Record<string, unknown>): IwdVisitor {
@@ -380,7 +380,7 @@ function normalizeVisitor(row: Record<string, unknown>): IwdVisitor {
 function parseEmojiJson(value: string | null | undefined): AllowedEmoji[] {
   if (!value) return [];
   try {
-    const parsed = JSON.parse(value) as unknown;
+    const parsed = JSON.parse(value) as GreetingInfo;
     if (!Array.isArray(parsed)) return [];
     return parsed.filter(
       (item): item is AllowedEmoji =>

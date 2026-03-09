@@ -45,7 +45,7 @@ export class TypeScriptWorker implements ts.LanguageServiceHost, ITypeScriptWork
     this._ctx = ctx;
     this._compilerOptions = createData.compilerOptions;
     this._extraLibs = createData.extraLibs;
-    this._inlayHintsOptions = createData.inlayHintsOptions;
+    if (createData.inlayHintsOptions) this._inlayHintsOptions = createData.inlayHintsOptions;
   }
 
   // --- language service host ---------------
@@ -71,9 +71,9 @@ export class TypeScriptWorker implements ts.LanguageServiceHost, ITypeScriptWork
   private _getModel(fileName: string): worker.IMirrorModel | null {
     let models = this._ctx.getMirrorModels();
     for (let i = 0; i < models.length; i++) {
-      const uri = models[i].uri;
+      const uri = models[i]?.uri;
       if (uri.toString() === fileName || uri.toString(true) === fileName) {
-        return models[i];
+        return models[i] || null;
       }
     }
     return null;
@@ -87,7 +87,7 @@ export class TypeScriptWorker implements ts.LanguageServiceHost, ITypeScriptWork
       // default lib is static
       return "1";
     } else if (fileName in this._extraLibs) {
-      return String(this._extraLibs[fileName].version);
+      return String(this._extraLibs[fileName]?.version);
     }
     return "";
   }
@@ -104,12 +104,12 @@ export class TypeScriptWorker implements ts.LanguageServiceHost, ITypeScriptWork
       // a true editor model
       text = model.getValue();
     } else if (fileName in libFileMap) {
-      text = libFileMap[fileName];
+      text = libFileMap[fileName]!;
     } else if (libizedFileName in libFileMap) {
-      text = libFileMap[libizedFileName];
+      text = libFileMap[libizedFileName]!;
     } else if (fileName in this._extraLibs) {
       // extra lib
-      text = this._extraLibs[fileName].content;
+      text = this._extraLibs[fileName]?.content;
     } else {
       return;
     }
@@ -424,7 +424,7 @@ export class TypeScriptWorker implements ts.LanguageServiceHost, ITypeScriptWork
     const diagnostics = emitOutput.diagnostics
       ? TypeScriptWorker.clearFiles(emitOutput.diagnostics)
       : undefined;
-    return { ...emitOutput, diagnostics };
+    return { ...emitOutput, diagnostics } as any;
   }
 
   async getCodeFixesAtPosition(

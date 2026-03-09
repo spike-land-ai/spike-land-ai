@@ -150,7 +150,7 @@ export function timeoutMiddleware(defaultMs: number = 30000): ToolMiddleware {
       throw err;
     } finally {
       clearTimeout(timeout);
-      ctx.signal = originalSignal;
+      if (originalSignal) ctx.signal = originalSignal;
     }
   };
 }

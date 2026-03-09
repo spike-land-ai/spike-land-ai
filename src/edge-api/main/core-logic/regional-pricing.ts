@@ -260,31 +260,31 @@ export function getRegionalPricing(countryCode: string): {
   const cc = (countryCode ?? "").toUpperCase();
   const currency = COUNTRY_TO_CURRENCY[cc] ?? "USD";
   const prices = REGIONAL_PRICES[currency] ?? REGIONAL_PRICES.USD;
-  const fmt = (n: number) => formatPrice(n, prices.currency);
+  const fmt = (n: number) => formatPrice(n, prices!.currency);
 
-  const proAnnualPerMonth = Math.round(prices.pro.annual / 12);
-  const bizAnnualPerMonth = Math.round(prices.business.annual / 12);
+  const proAnnualPerMonth = Math.round(prices!.pro.annual / 12);
+  const bizAnnualPerMonth = Math.round(prices!.business.annual / 12);
 
   const formatted: FormattedPrices = {
     pro: {
-      monthly: fmt(prices.pro.monthly),
+      monthly: fmt(prices!.pro.monthly),
       annual: fmt(proAnnualPerMonth),
-      annualTotal: `${fmt(prices.pro.annual)}/yr`,
+      annualTotal: `${fmt(prices!.pro.annual)}/yr`,
     },
     business: {
-      monthly: fmt(prices.business.monthly),
+      monthly: fmt(prices!.business.monthly),
       annual: fmt(bizAnnualPerMonth),
-      annualTotal: `${fmt(prices.business.annual)}/yr`,
+      annualTotal: `${fmt(prices!.business.annual)}/yr`,
     },
     credits: {
-      starter: fmt(prices.credits.starter),
-      popular: fmt(prices.credits.popular),
-      power: fmt(prices.credits.power),
+      starter: fmt(prices!.credits.starter),
+      popular: fmt(prices!.credits.popular),
+      power: fmt(prices!.credits.power),
     },
     free: fmt(0),
-    currencyCode: prices.currency,
-    billedInUsd: prices.currency !== "USD",
+    currencyCode: prices!.currency,
+    billedInUsd: prices!.currency !== "USD",
   };
 
-  return { currency: prices.currency, prices, formatted };
+  return { currency: prices!.currency, prices, formatted };
 }

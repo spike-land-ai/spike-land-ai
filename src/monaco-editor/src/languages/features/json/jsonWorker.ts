@@ -25,7 +25,7 @@ export class JSONWorker {
     this._ctx = ctx;
     this._languageSettings = createData.languageSettings;
     this._languageId = createData.languageId;
-    this._languageService = jsonService.getLanguageService({
+    this._languageService = jsonService.getLanguageService({ // @ts-ignore
       workspaceContext: {
         resolveRelativePath: (relativePath: string, resource: string) => {
           const base = resource.substr(0, resource.lastIndexOf("/") + 1);
@@ -211,11 +211,11 @@ function normalizePath(parts: string[]): string {
       newParts.push(part);
     }
   }
-  if (parts.length > 1 && parts[parts.length - 1].length === 0) {
+  if (parts.length > 1 && parts[parts.length - 1]?.length === 0) {
     newParts.push("");
   }
   let res = newParts.join("/");
-  if (parts[0].length === 0) {
+  if (parts[0]?.length === 0) {
     res = "/" + res;
   }
   return res;

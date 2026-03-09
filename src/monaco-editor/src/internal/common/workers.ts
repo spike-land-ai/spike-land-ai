@@ -91,7 +91,7 @@ export function createWebWorker<T extends object>(
   opts: IWebWorkerOptions,
 ): editor.MonacoWebWorker<T> {
   const worker = Promise.resolve(
-    getWorker({
+    getWorker({ // @ts-ignore
       label: opts.label ?? "monaco-editor-worker",
       moduleId: opts.moduleId,
       createWorker: opts.createWorker,
@@ -101,7 +101,7 @@ export function createWebWorker<T extends object>(
     w.postMessage(opts.createData);
     return w;
   });
-  return editor.createWebWorker<T>({
+  return editor.createWebWorker<T>({ // @ts-ignore
     worker,
     host: opts.host as Record<string, (...args: unknown[]) => unknown> | undefined,
     keepIdleModels: opts.keepIdleModels,

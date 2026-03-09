@@ -76,7 +76,7 @@ export function registerStorytellingTools(server: McpServer, client: ToolClient)
         ],
       };
 
-      const prompts = themePrompts[theme].slice(0, image_count);
+      const prompts = themePrompts[theme]!.slice(0, image_count);
       const albumResult = await client.callTool("img_album_create", {
         name: albumTitle,
         description: `IWD 2026 album: ${theme}`,

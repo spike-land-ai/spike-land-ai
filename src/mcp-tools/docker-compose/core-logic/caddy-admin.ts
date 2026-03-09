@@ -62,7 +62,7 @@ export class CaddyAdminClient {
 
       const subdomain = host.replace(".spike.local", "");
       const [upstream, portStr] = dial.split(":");
-      const port = parseInt(portStr, 10);
+      const port = parseInt(portStr!, 10);
 
       if (upstream && !isNaN(port)) {
         mappings.push({ subdomain, upstream, port });
