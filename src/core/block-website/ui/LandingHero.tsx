@@ -60,6 +60,7 @@ export function LandingHero() {
       return () => clearTimeout(timer);
     }
     setShowVibeButton(false);
+    return undefined;
   }, [isDeveloper]);
 
   const handleDevToggle = useCallback(() => {

@@ -1,12 +1,5 @@
 # Open Issues Handoff
 
-## Issue 1: Tailwind preview runtime is still unresolved
-
-The preview stack no longer points at `unpkg`, but the replacement is not yet a proven first-party runtime. The lightweight preview path in [src/frontend/platform-frontend/ui/hooks/useTranspiler.ts](/Users/z/Developer/spike-land-ai/src/frontend/platform-frontend/ui/hooks/useTranspiler.ts) injects `https://js.spike.land/@/workers/tw.worker.js` as a classic `<script>` tag. The Monaco/editor preview path in [src/frontend/monaco-editor/index.html](/Users/z/Developer/spike-land-ai/src/frontend/monaco-editor/index.html) and [src/frontend/monaco-editor/core-logic/services/CodeProcessor.ts](/Users/z/Developer/spike-land-ai/src/frontend/monaco-editor/core-logic/services/CodeProcessor.ts) assumes the same worker URL exists and behaves like a normal browser-servable JavaScript asset.
-
-That path is still structurally incomplete. The source worker in [src/frontend/monaco-editor/core-logic/workers/tw.worker.ts](/Users/z/Developer/spike-land-ai/src/frontend/monaco-editor/core-logic/workers/tw.worker.ts) now imports `@tailwindcss/browser`, but the checked-in built asset in [src/frontend/monaco-editor/dist/@/workers/tw.worker.js](/Users/z/Developer/spike-land-ai/src/frontend/monaco-editor/dist/@/workers/tw.worker.js) is still an empty no-op bundle. The repository therefore has two contradictory truths at once: the source says Tailwind should load, while the committed runtime artifact says it does nothing. Until the build output and the served asset are aligned, preview behavior is not trustworthy.
-
-The runtime contract is also not actually verified. Existing tests around `useTranspiler` and the Tailwind dev setup assert generated HTML or module behavior, but they do not execute the remote script path end-to-end. That means the current green test state does not prove that the preview can fetch, execute, and compile Tailwind in the browser. This is still an open runtime risk, not a cosmetic cleanup.
 
 ## Issue 2: Tailwind dev setup removes unrelated styles
 
@@ -14,49 +7,9 @@ The cleanup logic in [src/frontend/monaco-editor/core-logic/lib/tw-dev-setup.ts]
 
 This is an architectural issue because the setup layer has no ownership boundary over the styles it removes. It assumes all head-level style tags are disposable Tailwind output, which is not true in a preview environment that also injects theme tokens, error styling, or component-library styles. Until cleanup is narrowed to Tailwind-owned nodes or a marked output channel, the preview remains vulnerable to non-deterministic style loss.
 
-## Issue 3: LearnIt has no local persistence model in D1
 
-The MCP wrapper for LearnIt exists in [src/edge-api/spike-land/core-logic/tools/learnit.ts](/Users/z/Developer/spike-land-ai/src/edge-api/spike-land/core-logic/tools/learnit.ts), but it is still entirely proxy-backed. The file explicitly states that `learnItContent` is not in the D1 schema, and every tool delegates to `/api/learnit/...` on the remote spike.land API. The worker can expose LearnIt commands, but it does not own the data or the query model.
 
-This is a deeper gap than the earlier `reactions` migration. LearnIt needs a canonical local model for topic identity, slug, title, description, content, publication status, view counts, timestamps, parent/child relationships, related-topic edges, and prerequisite dependencies. Without those tables, the worker cannot support topic lookup, search, popularity ordering, recent ordering, or relationship traversal locally. The old sketch in [docs/github-issues-snapshot.json](/Users/z/Developer/spike-land-ai/docs/github-issues-snapshot.json) also points to a missing relationship model, which confirms that graph structure was intended but has not been re-established in the D1-backed implementation.
 
-There are already consumers expecting LearnIt to behave like a first-class local product surface. [src/frontend/platform-frontend/ui/src/components/tools/JsonSchemaForm.tsx](/Users/z/Developer/spike-land-ai/src/frontend/platform-frontend/ui/src/components/tools/JsonSchemaForm.tsx) fetches `/learnit/recent`, and published content under [content/blog/think-slowly-ship-fast.mdx](/Users/z/Developer/spike-land-ai/content/blog/think-slowly-ship-fast.mdx) links heavily into `/learnit/...` routes. The worker layer is present, the topic graph is not.
-
-## Issue 4: `/create` is only partially migrated off the legacy API
-
-The `/create` tool family in [src/edge-api/spike-land/core-logic/tools/create.ts](/Users/z/Developer/spike-land-ai/src/edge-api/spike-land/core-logic/tools/create.ts) no longer depends entirely on the legacy API, but the migration is incomplete. Local classification and session-health assessment now exist, yet multiple operations still call `apiRequest` against `/api/create/...`, including app search, app detail lookup, published listings, top apps, and status checks. `create_check_health` also still contains a fallback to the old remote endpoint when the live session path is unavailable.
-
-That means `/create` currently spans two incompatible authority models. Some behavior is derived locally from heuristics and live session inspection, while discovery and retrieval still depend on the old centralized API contract. As long as those query surfaces remain remote, the tool family is not self-contained inside the worker and still inherits remote drift, remote availability, and schema coupling.
-
-## Issue 5: Reactions persistence is local, but reaction execution is not wired
-
-The `reactions` migration solved storage, not orchestration. The D1 tables now exist in [src/edge-api/spike-land/db/db/schema.ts](/Users/z/Developer/spike-land-ai/src/edge-api/spike-land/db/db/schema.ts), the tools in [src/edge-api/spike-land/core-logic/tools/reactions.ts](/Users/z/Developer/spike-land-ai/src/edge-api/spike-land/core-logic/tools/reactions.ts) can create, list, delete, and inspect logs, and the migrations are present. What is still missing is the runtime layer that actually listens for tool outcomes, matches eligible reactions, invokes the target tools, and records execution results automatically.
-
-Today the reaction system is a persisted rule registry with a log surface, not a fully reactive execution graph. The tool descriptions still promise event-driven composition, but there is no corresponding dispatcher or trigger pipeline in the worker runtime. Until that execution path exists, reactions remain administratively configurable but behaviorally incomplete.
-
-## Issue 6: Core `apps` tooling still depends on the remote spike.land API
-
-The main app-management surface in [src/edge-api/spike-land/core-logic/tools/apps.ts](/Users/z/Developer/spike-land-ai/src/edge-api/spike-land/core-logic/tools/apps.ts) is still architected as a proxy. The file header is explicit: most operations delegate to the spike.land API for codespace transpilation and AI agent features. That dependency affects the full lifecycle: app creation, listing, detail retrieval, agent chat, message history, status updates, recycle-bin actions, permanent delete, version history, batch status updates, and message posting.
-
-This remains an architectural boundary issue because `apps.ts` is one of the main product surfaces exposed through MCP. As long as it depends on a remote service for core state transitions and retrieval, the worker is not the system of record for app lifecycle management. The local worker cannot guarantee availability, consistency, or test isolation for its own top-level product primitive.
-
-## Issue 7: Store app social and recommendation surfaces are still proxy-backed
-
-The user-facing store operations in [src/edge-api/spike-land/core-logic/tools/store/apps.ts](/Users/z/Developer/spike-land-ai/src/edge-api/spike-land/core-logic/tools/store/apps.ts) still proxy to `/api/store/...`. That includes ratings, review retrieval, wishlist add/remove/list, recommendations, personalized recommendations, and store statistics. None of those tool behaviors are backed by local D1 tables or local ranking logic yet.
-
-This is not just a thin transport concern. Ratings and reviews need authoritative write paths, wishlist membership needs user-scoped state, and recommendations need a reproducible local ranking source if the worker is going to own them. Right now the worker exposes the interface, but the product behavior still lives elsewhere.
-
-## Issue 8: Store discovery and catalog lookup are still remote
-
-The catalog and search surface in [src/edge-api/spike-land/core-logic/tools/store/search.ts](/Users/z/Developer/spike-land-ai/src/edge-api/spike-land/core-logic/tools/store/search.ts) remains fully proxy-based. Listing apps with tools, ranked search, category browse, featured apps, new apps, and detailed app lookup all depend on the remote `/api/store/...` contract.
-
-This is a separate issue from ratings or installs because it means the worker does not own catalog indexing, category membership, featured/new flags, or search ranking. The product can present store discovery commands, but the discovery model itself is still external. Until catalog data and search metadata are local, the store remains split across two systems.
-
-## Issue 9: Store install state is still owned remotely
-
-The install-management surface in [src/edge-api/spike-land/core-logic/tools/store/install.ts](/Users/z/Developer/spike-land-ai/src/edge-api/spike-land/core-logic/tools/store/install.ts) still proxies install, uninstall, install status, installed-app listing, and public install counts. The worker does not currently own the user-to-app installation relationship or the aggregate install counters.
-
-This is an architectural gap because installation is one of the core state transitions for a store product. Without a local installation model, recommendation quality, entitlement checks, personalized store views, and install analytics remain downstream of an external API. The worker cannot claim full store ownership while install state remains remote.
 
 ## Issue 10: Store A/B deployment tooling is still a remote control surface
 

@@ -1,8 +1,8 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { createMockServer, createMockAdsClient } from "../__test-utils__/index.js";
 import type { MockMcpServer } from "../__test-utils__/index.js";
-import { registerReportingTools } from "../../../src/mcp-tools/google-ads/tools/reporting.js";
-import type { GoogleAdsClient } from "../../../src/mcp-tools/google-ads/clients/ads-client.js";
+import { registerReportingTools } from "../../../src/mcp-tools/google-ads/mcp/reporting.js";
+import type { GoogleAdsClient } from "../../../src/mcp-tools/google-ads/core-logic/ads-client.js";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 
 describe("reporting tools", () => {

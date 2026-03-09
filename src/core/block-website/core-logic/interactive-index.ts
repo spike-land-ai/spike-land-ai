@@ -1,5 +1,6 @@
 export * from "../animation-ui/SplitScreenDemo";
 export * from "../animation-ui/AttentionSpotlightDemo";
+export * from "../animation-ui/DockerCacheArticleDemos";
 export * from "../animation-ui/FiveLayerStackDemo";
 export * from "../animation-ui/DarwinianTreeDemo";
 export * from "../animation-ui/RecursiveZoomDemo";

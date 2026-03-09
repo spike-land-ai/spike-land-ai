@@ -89,6 +89,10 @@ export function registerStorageTools(
 
       results.forEach((res, index: number) => {
         const file = input.files[index];
+        if (!file) {
+          errors.push({ key: `index:${index}`, error: "Missing file metadata for diff result" });
+          return;
+        }
         if (res.status === "rejected") {
           errors.push({ key: file.key, error: String(res.reason) });
         } else if (res.value) {
@@ -175,6 +179,10 @@ export function registerStorageTools(
 
       results.forEach((res, index: number) => {
         const file = input.files[index];
+        if (!file) {
+          errors.push({ key: `index:${index}`, error: "Missing file metadata for upload result" });
+          return;
+        }
         if (res.status === "rejected") {
           errors.push({ key: file.key, error: String(res.reason) });
         } else {
@@ -211,11 +219,18 @@ export function registerStorageTools(
         return textResult("R2 not configured (SPA_ASSETS binding missing).");
       }
 
-      const listResult = await spaAssets.list({
-        prefix: input.prefix,
-        limit: input.limit,
-        cursor: input.cursor,
-      });
+      const listOptions: R2ListOptions = {};
+      if (input.prefix) {
+        listOptions.prefix = input.prefix;
+      }
+      if (input.limit !== undefined) {
+        listOptions.limit = input.limit;
+      }
+      if (input.cursor) {
+        listOptions.cursor = input.cursor;
+      }
+
+      const listResult = await spaAssets.list(listOptions);
 
       return jsonResult("List complete", {
         objects: listResult.objects.map((o) => ({

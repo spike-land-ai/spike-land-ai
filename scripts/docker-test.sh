@@ -109,8 +109,32 @@ else
   fi
   echo -e "${CYAN}[info]${RESET} Detecting changed packages (base=${BASE}, head=${HEAD})..."
   while IFS= read -r pkg; do
-    [[ -n "$pkg" ]] && PACKAGES+=("$pkg")
+    case "$pkg" in
+      "")
+        ;;
+      NO_CHANGES)
+        echo -e "${GREEN}[ok]${RESET} No changed packages detected. Nothing to test."
+        exit 0
+        ;;
+      ALL)
+        ALL=true
+        PACKAGES=()
+        break
+        ;;
+      *)
+        PACKAGES+=("$pkg")
+        ;;
+    esac
   done < <(bash "$DETECT_SCRIPT" --base "$BASE" --head "$HEAD" 2>/dev/null || true)
+fi
+
+if $ALL; then
+  PACKAGES=()
+  while IFS= read -r line; do
+    pkg="${line#FROM * AS test-}"
+    pkg="${line##*AS test-}"
+    [[ "$pkg" != "all" ]] && PACKAGES+=("$pkg")
+  done < <(grep -E '^FROM .+ AS test-' "$DOCKERFILE" | sed 's/.*AS test-//')
 fi
 
 if [[ ${#PACKAGES[@]} -eq 0 ]]; then
@@ -132,6 +156,20 @@ pkg_to_target() {
   pkg="${pkg//_/-}"
   echo "test-${pkg}"
 }
+
+target_exists() {
+  local target="$1"
+  grep -qE "^FROM .+ AS ${target}$" "$DOCKERFILE"
+}
+
+for pkg in "${PACKAGES[@]}"; do
+  target="$(pkg_to_target "$pkg")"
+  if ! target_exists "$target"; then
+    echo -e "${RED}[error]${RESET} Missing Docker test stage: ${target}" >&2
+    echo "       Package '${pkg}' can be emitted by detect-changed-packages.sh but has no stage in docker/Dockerfile.test." >&2
+    exit 1
+  fi
+done
 
 # ─── Temp directory for per-package output and timing ─────────────────────────
 TMPDIR_RESULTS="$(mktemp -d)"

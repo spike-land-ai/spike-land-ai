@@ -1,4 +1,5 @@
 import fs from "node:fs/promises";
+import type { Dirent } from "node:fs";
 import path from "node:path";
 import { glob } from "glob";
 import { Project, SyntaxKind, StringLiteral, NoSubstitutionTemplateLiteral } from "ts-morph";
@@ -350,7 +351,9 @@ export async function updateTsConfigPaths(pathMapping: Map<string, string>, srcD
 export async function updatePackagesConfigs(pathMapping: Map<string, string>, srcDir?: string) {
   const rootDir = process.cwd();
   const packagesDir = path.join(rootDir, "packages");
-  const entries = await fs.readdir(packagesDir, { withFileTypes: true }).catch(() => []);
+  const entries = await fs
+    .readdir(packagesDir, { withFileTypes: true })
+    .catch((): Dirent[] => []);
 
   // Build a secondary lookup: if srcDir is "src-old", also try matching
   // paths that reference "src/" (the output dir name) against the old paths.
@@ -841,7 +844,7 @@ export async function generateBarrels(outputDir: string, plans: MovePlan[]) {
       const filePath = path.join(absD, entry.name);
 
       if (entry.isDirectory()) {
-        const children = await fs.readdir(filePath).catch(() => []);
+        const children = await fs.readdir(filePath).catch((): string[] => []);
         if (children.some((f) => f === "index.ts" || f === "index.tsx")) {
           barrelContent += `export * from "./${entry.name}";\n`;
         }

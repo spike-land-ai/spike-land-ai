@@ -5,8 +5,8 @@ import {
   registerCampaignTools,
   microsToCurrency,
   currencyToMicros,
-} from "../../../src/mcp-tools/google-ads/tools/campaigns.js";
-import type { GoogleAdsClient } from "../../../src/mcp-tools/google-ads/clients/ads-client.js";
+} from "../../../src/mcp-tools/google-ads/mcp/campaigns.js";
+import type { GoogleAdsClient } from "../../../src/mcp-tools/google-ads/core-logic/ads-client.js";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 
 describe("campaign tools", () => {
