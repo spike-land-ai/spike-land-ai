@@ -131,11 +131,11 @@ const COMPONENT_MAP: Record<string, React.ComponentType<Record<string, unknown>>
         className={cn(
           "p-6 my-10 rounded-2xl border-l-4 shadow-sm",
           isInfo &&
-          "bg-blue-500/[0.03] border-l-blue-500 border-y border-r border-blue-500/10 text-blue-900 dark:text-blue-100",
+            "bg-blue-500/[0.03] border-l-blue-500 border-y border-r border-blue-500/10 text-blue-900 dark:text-blue-100",
           isSuccess &&
-          "bg-emerald-500/[0.03] border-l-emerald-500 border-y border-r border-emerald-500/10 text-emerald-900 dark:text-emerald-100",
+            "bg-emerald-500/[0.03] border-l-emerald-500 border-y border-r border-emerald-500/10 text-emerald-900 dark:text-emerald-100",
           isWarning &&
-          "bg-amber-500/[0.03] border-l-amber-500 border-y border-r border-amber-500/10 text-amber-900 dark:text-amber-100",
+            "bg-amber-500/[0.03] border-l-amber-500 border-y border-r border-amber-500/10 text-amber-900 dark:text-amber-100",
         )}
       >
         <div className="flex gap-4">
@@ -176,15 +176,21 @@ const COMPONENT_MAP: Record<string, React.ComponentType<Record<string, unknown>>
 export function BlogPostView({
   slug,
   linkComponent,
+  postOverride = null,
+  skipFetch = false,
+  loadingOverride = false,
 }: {
   slug: string;
   linkComponent?:
-  | React.ComponentType<{ to: string; className?: string; children: React.ReactNode }>
-  | "a"
-  | undefined;
+    | React.ComponentType<{ to: string; className?: string; children: React.ReactNode }>
+    | "a"
+    | undefined;
+  postOverride?: BlogPost | null;
+  skipFetch?: boolean;
+  loadingOverride?: boolean;
 }) {
-  const [post, setPost] = useState<BlogPost | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [post, setPost] = useState<BlogPost | null>(postOverride);
+  const [loading, setLoading] = useState(!postOverride && !skipFetch);
   const [error, setError] = useState(false);
   const [scrollProgress, setScrollProgress] = useState(0);
   const [isHeroExpanded, setIsHeroExpanded] = useState(false);
@@ -201,6 +207,20 @@ export function BlogPostView({
   }, []);
 
   useEffect(() => {
+    if (postOverride) {
+      setPost(postOverride);
+      setLoading(false);
+      setError(false);
+      return;
+    }
+
+    if (skipFetch) {
+      setPost(null);
+      setLoading(false);
+      setError(false);
+      return;
+    }
+
     setLoading(true);
     setError(false);
     fetch(apiUrl(`/blog/${slug}`))
@@ -211,9 +231,11 @@ export function BlogPostView({
       .then(setPost)
       .catch(() => setError(true))
       .finally(() => setLoading(false));
-  }, [slug]);
+  }, [postOverride, skipFetch, slug]);
 
-  if (loading) {
+  const resolvedPost = postOverride ?? post;
+
+  if (loading || loadingOverride) {
     return (
       <div className="max-w-4xl mx-auto py-20 px-6 animate-pulse space-y-12">
         <div className="space-y-6">
@@ -231,7 +253,7 @@ export function BlogPostView({
     );
   }
 
-  if (error || !post) {
+  if (error || !resolvedPost) {
     return (
       <div className="max-w-xl mx-auto py-32 px-6 text-center">
         <div className="inline-flex size-20 items-center justify-center rounded-3xl bg-destructive/5 text-destructive mb-8">
@@ -254,7 +276,7 @@ export function BlogPostView({
     );
   }
 
-  const cleanContent = post.content.replace(
+  const cleanContent = resolvedPost.content.replace(
     /!\[[^\]]*\]\(https:\/\/placehold\.co\/[^)]+\)\n?/g,
     "",
   );
@@ -292,7 +314,7 @@ export function BlogPostView({
           </div>
         </div>
 
-        {post.heroImage && (
+        {resolvedPost.heroImage && (
           <>
             <motion.div
               layoutId={`hero-image-${slug}`}
@@ -300,8 +322,8 @@ export function BlogPostView({
               onClick={() => setIsHeroExpanded(true)}
             >
               <motion.img
-                src={post.heroImage}
-                alt={post.title}
+                src={resolvedPost.heroImage}
+                alt={resolvedPost.title}
                 width={1200}
                 height={514}
                 loading="eager"
@@ -309,15 +331,15 @@ export function BlogPostView({
                 className="w-full aspect-[21/9] object-cover hidden dark:block"
               />
               <motion.img
-                src={post.heroImage.replace(/\.(png|jpe?g|webp|avif)$/i, '-light.$1')}
-                alt={post.title}
+                src={resolvedPost.heroImage.replace(/\.(png|jpe?g|webp|avif)$/i, "-light.$1")}
+                alt={resolvedPost.title}
                 width={1200}
                 height={514}
                 loading="eager"
                 decoding="async"
                 className="w-full aspect-[21/9] object-cover dark:hidden block"
                 onError={(e) => {
-                  (e.target as HTMLImageElement).src = post.heroImage!;
+                  (e.target as HTMLImageElement).src = resolvedPost.heroImage!;
                 }}
               />
             </motion.div>
@@ -332,17 +354,17 @@ export function BlogPostView({
                 >
                   <motion.img
                     layoutId={`hero-image-${slug}`}
-                    src={post.heroImage}
-                    alt={post.title}
+                    src={resolvedPost.heroImage}
+                    alt={resolvedPost.title}
                     className="max-w-full max-h-full rounded-2xl shadow-2xl object-contain hidden dark:block"
                   />
                   <motion.img
                     layoutId={`hero-image-${slug}-light`}
-                    src={post.heroImage.replace(/\.(png|jpe?g|webp|avif)$/i, '-light.$1')}
-                    alt={post.title}
+                    src={resolvedPost.heroImage.replace(/\.(png|jpe?g|webp|avif)$/i, "-light.$1")}
+                    alt={resolvedPost.title}
                     className="max-w-full max-h-full rounded-2xl shadow-2xl object-contain dark:hidden block"
                     onError={(e) => {
-                      (e.target as HTMLImageElement).src = post.heroImage!;
+                      (e.target as HTMLImageElement).src = resolvedPost.heroImage!;
                     }}
                   />
                 </motion.div>
@@ -355,12 +377,12 @@ export function BlogPostView({
           <div className="flex items-center gap-4 text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/60">
             <div className="flex items-center gap-1.5 bg-primary/10 text-primary px-3 py-1 rounded-full border border-primary/10">
               <Tag size={12} />
-              <span>{post.category}</span>
+              <span>{resolvedPost.category}</span>
             </div>
             <div className="flex items-center gap-1.5">
               <Clock size={12} />
-              <time dateTime={post.date}>
-                {new Date(post.date).toLocaleDateString([], {
+              <time dateTime={resolvedPost.date}>
+                {new Date(resolvedPost.date).toLocaleDateString([], {
                   month: "long",
                   day: "numeric",
                   year: "numeric",
@@ -370,22 +392,22 @@ export function BlogPostView({
           </div>
 
           <h1 className="text-5xl sm:text-7xl font-black text-foreground tracking-tighter leading-[0.85] text-balance">
-            {post.title}
+            {resolvedPost.title}
           </h1>
 
-          {post.primer && (
+          {resolvedPost.primer && (
             <p className="text-xl sm:text-2xl text-muted-foreground/80 font-medium leading-relaxed italic border-l-4 border-primary/20 pl-6">
-              "{post.primer}"
+              "{resolvedPost.primer}"
             </p>
           )}
 
           <div className="flex items-center gap-3 pt-4 border-t border-border/50">
             <div className="size-10 rounded-2xl bg-primary flex items-center justify-center text-xs font-black text-primary-foreground shadow-lg shadow-primary/20">
-              {post.author?.[0] || "S"}
+              {resolvedPost.author?.[0] || "S"}
             </div>
             <div>
               <p className="text-xs font-black uppercase tracking-widest text-foreground">
-                {post.author || "Spike land Team"}
+                {resolvedPost.author || "Spike land Team"}
               </p>
               <p className="text-[10px] font-bold text-muted-foreground/60 uppercase tracking-tighter">
                 Independent Developer & Researcher
@@ -422,7 +444,7 @@ export function BlogPostView({
         </div>
 
         <div className="max-w-3xl mx-auto">
-          <SupportWidget post={post} />
+          <SupportWidget post={resolvedPost} />
         </div>
 
         <div className="mt-32 pt-16 border-t border-border/50">
@@ -494,7 +516,7 @@ function SupportWidget({ post }: { post: BlogPost }) {
           setSupporters(data.supporters);
         }
       })
-      .catch(() => { });
+      .catch(() => {});
   }, [slug]);
 
   const handleBump = useCallback(async () => {
