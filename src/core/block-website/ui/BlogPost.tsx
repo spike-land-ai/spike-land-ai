@@ -131,18 +131,18 @@ const COMPONENT_MAP: Record<string, React.ComponentType<Record<string, unknown>>
         className={cn(
           "p-6 my-10 rounded-2xl border-l-4 shadow-sm",
           isInfo &&
-            "bg-blue-500/[0.03] border-l-blue-500 border-y border-r border-blue-500/10 text-blue-900 dark:text-blue-100",
+            "bg-info/10 border-l-info-foreground border-y border-r border-info-foreground/20 text-info-foreground",
           isSuccess &&
-            "bg-emerald-500/[0.03] border-l-emerald-500 border-y border-r border-emerald-500/10 text-emerald-900 dark:text-emerald-100",
+            "bg-success/10 border-l-success-foreground border-y border-r border-success-foreground/20 text-success-foreground",
           isWarning &&
-            "bg-amber-500/[0.03] border-l-amber-500 border-y border-r border-amber-500/10 text-amber-900 dark:text-amber-100",
+            "bg-warning/10 border-l-warning-foreground border-y border-r border-warning-foreground/20 text-warning-foreground",
         )}
       >
         <div className="flex gap-4">
           <div className="shrink-0 mt-1">
-            {isInfo && <Info size={20} className="text-blue-500" />}
-            {isSuccess && <CheckCircle2 size={20} className="text-emerald-500" />}
-            {isWarning && <AlertTriangle size={20} className="text-amber-500" />}
+            {isInfo && <Info size={20} className="text-info-foreground" />}
+            {isSuccess && <CheckCircle2 size={20} className="text-success-foreground" />}
+            {isWarning && <AlertTriangle size={20} className="text-warning-foreground" />}
           </div>
           <div className="font-medium leading-relaxed italic">{children}</div>
         </div>
