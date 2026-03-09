@@ -3,16 +3,15 @@
  *
  * Tools emit events on success/error, other tools auto-trigger via
  * configurable reaction rules. CRUD for reactions + log viewer.
- *
- * Note: toolReaction and reactionLog tables are not in the D1 schema.
- * These tools proxy to spike.land API.
  */
 
+import { and, desc, eq } from "drizzle-orm";
 import { z } from "zod";
-import type { ToolRegistryAdapter } from "../../lazy-imports/types";
-import { freeTool } from "../../lazy-imports/procedures-index.ts";
-import { apiRequest, safeToolCall, textResult } from "../lib/tool-helpers";
 import type { DrizzleDB } from "../../db/db/db-index.ts";
+import { reactionLogs, toolReactions } from "../../db/db/schema";
+import { freeTool } from "../../lazy-imports/procedures-index.ts";
+import type { ToolRegistryAdapter } from "../../lazy-imports/types";
+import { safeToolCall, textResult } from "../lib/tool-helpers";
 
 export function registerReactionsTools(
   registry: ToolRegistryAdapter,
@@ -21,7 +20,6 @@ export function registerReactionsTools(
 ): void {
   const t = freeTool(userId, db);
 
-  // create_reaction
   registry.registerBuilt(
     t
       .tool(
@@ -45,21 +43,26 @@ export function registerReactionsTools(
         },
       )
       .meta({ category: "reactions", tier: "free" })
-      .handler(async ({ input }) => {
+      .handler(async ({ input, ctx }) => {
         return safeToolCall("create_reaction", async () => {
-          const reaction = await apiRequest<{ id: string }>("/api/reactions", {
-            method: "POST",
-            body: JSON.stringify({
-              sourceTool: input.sourceTool,
-              sourceEvent: input.sourceEvent,
-              targetTool: input.targetTool,
-              targetInput: input.targetInput,
-              description: input.description,
-            }),
+          const id = crypto.randomUUID();
+          const now = Date.now();
+
+          await ctx.db.insert(toolReactions).values({
+            id,
+            userId: ctx.userId,
+            sourceTool: input.sourceTool,
+            sourceEvent: input.sourceEvent,
+            targetTool: input.targetTool,
+            targetInput: JSON.stringify(input.targetInput),
+            description: input.description ?? null,
+            enabled: true,
+            createdAt: now,
+            updatedAt: now,
           });
 
           return textResult(
-            `Reaction created (id: ${reaction.id}):\n` +
+            `Reaction created (id: ${id}):\n` +
               `  ${input.sourceTool}:${input.sourceEvent} → ${input.targetTool}\n` +
               (input.description ? `  Description: ${input.description}\n` : "") +
               `  Enabled: true`,
@@ -68,7 +71,6 @@ export function registerReactionsTools(
       }),
   );
 
-  // list_reactions
   registry.registerBuilt(
     t
       .tool(
@@ -81,37 +83,40 @@ export function registerReactionsTools(
         },
       )
       .meta({ category: "reactions", tier: "free" })
-      .handler(async ({ input }) => {
+      .handler(async ({ input, ctx }) => {
         return safeToolCall("list_reactions", async () => {
-          const params = new URLSearchParams();
-          if (input.sourceTool) params.set("sourceTool", input.sourceTool);
-          if (input.enabled !== undefined) {
-            params.set("enabled", String(input.enabled));
+          const conditions = [eq(toolReactions.userId, ctx.userId)];
+          if (input.sourceTool) {
+            conditions.push(eq(toolReactions.sourceTool, input.sourceTool));
           }
-          if (input.limit !== undefined) {
-            params.set("limit", String(input.limit));
+          if (input.enabled !== undefined) {
+            conditions.push(eq(toolReactions.enabled, input.enabled));
           }
 
-          const reactions = await apiRequest<
-            Array<{
-              id: string;
-              sourceTool: string;
-              sourceEvent: string;
-              targetTool: string;
-              enabled: boolean;
-              description: string | null;
-            }>
-          >(`/api/reactions?${params.toString()}`);
+          const reactions = await ctx.db
+            .select({
+              id: toolReactions.id,
+              sourceTool: toolReactions.sourceTool,
+              sourceEvent: toolReactions.sourceEvent,
+              targetTool: toolReactions.targetTool,
+              enabled: toolReactions.enabled,
+              description: toolReactions.description,
+            })
+            .from(toolReactions)
+            .where(and(...conditions))
+            .orderBy(desc(toolReactions.createdAt))
+            .limit(input.limit);
 
           if (reactions.length === 0) {
             return textResult("No reactions found.");
           }
 
           const lines = reactions.map(
-            (r) =>
-              `- ${r.id}: ${r.sourceTool}:${r.sourceEvent} → ${r.targetTool} [${
-                r.enabled ? "ON" : "OFF"
-              }]` + (r.description ? ` — ${r.description}` : ""),
+            (reaction) =>
+              `- ${reaction.id}: ${reaction.sourceTool}:${reaction.sourceEvent} → ${
+                reaction.targetTool
+              } [${reaction.enabled ? "ON" : "OFF"}]` +
+              (reaction.description ? ` — ${reaction.description}` : ""),
           );
 
           return textResult(`**Reactions (${reactions.length})**\n${lines.join("\n")}`);
@@ -119,25 +124,35 @@ export function registerReactionsTools(
       }),
   );
 
-  // delete_reaction
   registry.registerBuilt(
     t
       .tool("delete_reaction", "Delete a tool reaction rule by ID.", {
         reactionId: z.string().describe("ID of the reaction to delete"),
       })
       .meta({ category: "reactions", tier: "free" })
-      .handler(async ({ input }) => {
+      .handler(async ({ input, ctx }) => {
         return safeToolCall("delete_reaction", async () => {
-          await apiRequest(`/api/reactions/${input.reactionId}`, {
-            method: "DELETE",
-          });
+          const existing = await ctx.db
+            .select({ id: toolReactions.id })
+            .from(toolReactions)
+            .where(and(eq(toolReactions.id, input.reactionId), eq(toolReactions.userId, ctx.userId)))
+            .limit(1);
+
+          if (existing.length === 0) {
+            return textResult(
+              "**Error: NOT_FOUND**\nReaction not found or not owned by you.\n**Retryable:** false",
+            );
+          }
+
+          await ctx.db
+            .delete(toolReactions)
+            .where(and(eq(toolReactions.id, input.reactionId), eq(toolReactions.userId, ctx.userId)));
 
           return textResult(`Reaction '${input.reactionId}' deleted.`);
         });
       }),
   );
 
-  // reaction_log
   registry.registerBuilt(
     t
       .tool(
@@ -151,40 +166,44 @@ export function registerReactionsTools(
         },
       )
       .meta({ category: "reactions", tier: "free" })
-      .handler(async ({ input }) => {
+      .handler(async ({ input, ctx }) => {
         return safeToolCall("reaction_log", async () => {
-          const params = new URLSearchParams();
-          if (input.reactionId) params.set("reactionId", input.reactionId);
-          if (input.sourceTool) params.set("sourceTool", input.sourceTool);
-          if (input.isError !== undefined) {
-            params.set("isError", String(input.isError));
+          const conditions = [eq(reactionLogs.userId, ctx.userId)];
+          if (input.reactionId) {
+            conditions.push(eq(reactionLogs.reactionId, input.reactionId));
           }
-          if (input.limit !== undefined) {
-            params.set("limit", String(input.limit));
+          if (input.sourceTool) {
+            conditions.push(eq(reactionLogs.sourceTool, input.sourceTool));
+          }
+          if (input.isError !== undefined) {
+            conditions.push(eq(reactionLogs.isError, input.isError));
           }
 
-          const logs = await apiRequest<
-            Array<{
-              id: string;
-              sourceTool: string;
-              sourceEvent: string;
-              targetTool: string;
-              isError: boolean;
-              durationMs: number | null;
-              error: string | null;
-              createdAt: string;
-            }>
-          >(`/api/reactions/log?${params.toString()}`);
+          const logs = await ctx.db
+            .select({
+              id: reactionLogs.id,
+              sourceTool: reactionLogs.sourceTool,
+              sourceEvent: reactionLogs.sourceEvent,
+              targetTool: reactionLogs.targetTool,
+              isError: reactionLogs.isError,
+              durationMs: reactionLogs.durationMs,
+              error: reactionLogs.error,
+              createdAt: reactionLogs.createdAt,
+            })
+            .from(reactionLogs)
+            .where(and(...conditions))
+            .orderBy(desc(reactionLogs.createdAt))
+            .limit(input.limit);
 
           if (logs.length === 0) {
             return textResult("No reaction logs found.");
           }
 
           const lines = logs.map(
-            (l) =>
-              `- ${l.id} [${l.createdAt}]: ${l.sourceTool}:${l.sourceEvent} → ${l.targetTool} ` +
-              `(${l.isError ? "FAIL" : "OK"}${l.durationMs != null ? `, ${l.durationMs}ms` : ""})` +
-              (l.error ? `\n  Error: ${l.error}` : ""),
+            (log) =>
+              `- ${log.id} [${new Date(log.createdAt).toISOString()}]: ${log.sourceTool}:${log.sourceEvent} → ${log.targetTool} ` +
+              `(${log.isError ? "FAIL" : "OK"}${log.durationMs != null ? `, ${log.durationMs}ms` : ""})` +
+              (log.error ? `\n  Error: ${log.error}` : ""),
           );
 
           return textResult(`**Reaction Log (${logs.length})**\n${lines.join("\n")}`);

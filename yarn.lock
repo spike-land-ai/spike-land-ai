@@ -16005,6 +16005,7 @@ __metadata:
     "@remotion/transitions": "npm:^4.0.434"
     "@spike-land-ai/mcp-server-base": "workspace:*"
     "@spike-land-ai/shared": "workspace:*"
+    "@tailwindcss/browser": "npm:4.2.1"
     "@tanstack/react-query": "npm:^5.90.21"
     "@tanstack/react-router": "npm:^1.166.2"
     "@tanstack/router-cli": "npm:^1.166.2"

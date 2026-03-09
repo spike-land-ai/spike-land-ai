@@ -10,7 +10,7 @@ const TRANSPILE_ENDPOINT = "https://js.spike.land";
 const PREVIEW_MODULE_ORIGIN = "https://js.spike.land";
 const PREVIEW_REACT_VERSION = "19.2.4";
 const PREVIEW_EMOTION_VERSION = "11.14.0";
-const PREVIEW_TAILWIND_BROWSER_URL = "https://unpkg.com/@tailwindcss/browser@4.2.1/dist/index.global.js";
+const PREVIEW_TAILWIND_BROWSER_URL = `${PREVIEW_MODULE_ORIGIN}/@/workers/tw.worker.js`;
 
 function getPreviewTokens(isDarkMode: boolean) {
   if (isDarkMode) {

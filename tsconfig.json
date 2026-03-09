@@ -69,6 +69,7 @@
       ],
       "@spike-land-ai/mcp-image-studio/*": ["./src/mcp-tools/image-studio/*"],
       "@spike-land-ai/openclaw-mcp": ["./src/mcp-tools/openclaw/core-logic/index.ts"],
+      "@spike-land-ai/reorganize-mcp": ["./src/mcp-tools/reorganize/mcp/index.ts"],
       "@spike-land-ai/bazdmeg-mcp": ["./src/mcp-tools/bazdmeg/mcp/index.ts"],
       "@spike-land-ai/chess-engine": ["./src/core/chess/core-logic/index.ts"],
       "@spike-land-ai/qa-studio": ["./src/core/browser-automation/core-logic/index.ts"],
