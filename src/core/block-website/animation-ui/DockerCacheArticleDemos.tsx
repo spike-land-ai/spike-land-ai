@@ -186,10 +186,10 @@ function DemoShell({
   children: ReactNode;
 }) {
   return (
-    <div className="dark relative overflow-hidden rounded-3xl border border-border bg-background p-4 text-foreground sm:p-5 md:p-8">
+    <div className="dark relative flex h-[clamp(26rem,74svh,46rem)] max-h-[calc(100svh-2rem)] flex-col overflow-hidden rounded-3xl border border-border bg-background p-4 text-foreground sm:h-[clamp(28rem,72svh,48rem)] sm:p-5 md:p-8">
       <div className="absolute inset-0 opacity-100" style={demoGlowStyle} />
       <div className="absolute inset-0 opacity-[0.16]" style={demoGridStyle} />
-      <div className="relative space-y-4 sm:space-y-5">
+      <div className="relative flex min-h-0 flex-1 flex-col gap-4 sm:gap-5">
         <div className="grid gap-3 sm:gap-4 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-start">
           <div className="min-w-0 space-y-2">
             <div className="text-[9px] font-black uppercase tracking-[0.24em] text-info-foreground/80 sm:text-[10px] sm:tracking-[0.32em]">
@@ -214,7 +214,7 @@ function DemoShell({
             </button>
           </div>
         </div>
-        {children}
+        <div className="min-h-0 flex-1 overflow-hidden">{children}</div>
       </div>
     </div>
   );
