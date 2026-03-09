@@ -113,6 +113,13 @@ COPY src/core/block-tasks/   src/core/block-tasks/
 COPY src/core/block-sdk/     src/core/block-sdk/
 RUN set -e && yarn vitest run --project=block-sdk --coverage=false && touch /.ok
 
+# ── test-block-website ───────────────────────────────────────────────────────
+# Deps: block-website + react-engine
+FROM config AS test-block-website
+COPY src/core/react-engine/  src/core/react-engine/
+COPY src/core/block-website/ src/core/block-website/
+RUN set -e && yarn vitest run --project=block-website --coverage=false && touch /.ok
+
 # ── test-block-tasks ─────────────────────────────────────────────────────────
 FROM config AS test-block-tasks
 COPY src/core/shared-utils/ src/core/shared-utils/
@@ -263,6 +270,7 @@ COPY --from=test-shared              /.ok /shared.ok
 COPY --from=test-mcp-server-base     /.ok /mcp-server-base.ok
 COPY --from=test-state-machine       /.ok /state-machine.ok
 COPY --from=test-block-sdk           /.ok /block-sdk.ok
+COPY --from=test-block-website       /.ok /block-website.ok
 COPY --from=test-block-tasks         /.ok /block-tasks.ok
 COPY --from=test-react-ts-worker     /.ok /react-ts-worker.ok
 COPY --from=test-spike-chat          /.ok /spike-chat.ok
