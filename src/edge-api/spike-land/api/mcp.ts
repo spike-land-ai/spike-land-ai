@@ -99,6 +99,7 @@ async function createSession(
     mcpInternalSecret: c.env.MCP_INTERNAL_SECRET,
     spikeEdge: c.env.SPIKE_EDGE,
     spaAssets: c.env.SPA_ASSETS,
+    geminiApiKey: c.env.GEMINI_API_KEY,
   });
 
   const sessionId = crypto.randomUUID();
@@ -151,6 +152,7 @@ async function handleStatelessPost(
     mcpInternalSecret: c.env.MCP_INTERNAL_SECRET,
     spikeEdge: c.env.SPIKE_EDGE,
     spaAssets: c.env.SPA_ASSETS,
+    geminiApiKey: c.env.GEMINI_API_KEY,
   });
 
   applyCallerContext(mcpServer, callerElo, callerTier, isAgent, userRole);

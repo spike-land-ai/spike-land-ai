@@ -636,3 +636,20 @@
 .toggle-insp .insp-rip.go {
   animation: inspRipOut .7s cubic-bezier(.22,1,.36,1) forwards;
 }
+
+/* Shiki dual-theme: light mode uses --shiki-light-*, dark mode uses --shiki-dark-* */
+.shiki-container .shiki,
+.shiki-container .shiki span {
+  color: var(--shiki-light) !important;
+  background-color: transparent !important;
+  font-style: var(--shiki-light-font-style) !important;
+  font-weight: var(--shiki-light-font-weight) !important;
+  text-decoration: var(--shiki-light-text-decoration) !important;
+}
+:is(.dark, .dark *) .shiki-container .shiki,
+:is(.dark, .dark *) .shiki-container .shiki span {
+  color: var(--shiki-dark) !important;
+  font-style: var(--shiki-dark-font-style) !important;
+  font-weight: var(--shiki-dark-font-weight) !important;
+  text-decoration: var(--shiki-dark-text-decoration) !important;
+}

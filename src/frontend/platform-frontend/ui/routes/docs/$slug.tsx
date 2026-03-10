@@ -1,9 +1,15 @@
 import { Link, useParams } from "@tanstack/react-router";
+import { isValidElement, useEffect, useMemo, useState, type ReactNode } from "react";
+import ReactMarkdown from "react-markdown";
+import rehypeRaw from "rehype-raw";
+import remarkGfm from "remark-gfm";
 import { apiUrl } from "../../../core-logic/api";
-import { useEffect, useState } from "react";
 import { sanitizeUrl } from "../../../core-logic/lib/security";
+import { CodeBlock } from "../../../../../core/block-website/ui/CodeBlock";
 
 const SITE_URL = "https://spike.land";
+const GITHUB_BLOB_BASE = "https://github.com/spike-land-ai/spike-land-ai/blob/main/";
+const GITHUB_RAW_BASE = "https://raw.githubusercontent.com/spike-land-ai/spike-land-ai/main/";
 
 function injectJsonLd(id: string, content: string) {
   let el = document.getElementById(id) as HTMLScriptElement | null;
@@ -22,6 +28,67 @@ interface DocDetail {
   category: string;
   description: string;
   content: string;
+  sourcePath: string;
+}
+
+function resolveAgainstRepoBase(target: string, sourcePath: string, baseUrl: string) {
+  try {
+    return new URL(target, `${baseUrl}${sourcePath}`).toString();
+  } catch {
+    return target;
+  }
+}
+
+function resolveDocHref(href: string | undefined, sourcePath: string) {
+  if (!href) return "about:blank";
+
+  const trimmedHref = href.trim();
+
+  if (trimmedHref.startsWith("#")) {
+    return trimmedHref;
+  }
+
+  if (/^(https?|mailto|tel):/i.test(trimmedHref) || trimmedHref.startsWith("/")) {
+    return sanitizeUrl(trimmedHref);
+  }
+
+  return sanitizeUrl(resolveAgainstRepoBase(trimmedHref, sourcePath, GITHUB_BLOB_BASE));
+}
+
+function resolveDocAssetSrc(src: string | undefined, sourcePath: string) {
+  if (!src) return "about:blank";
+
+  const trimmedSrc = src.trim();
+
+  if (/^https?:/i.test(trimmedSrc) || trimmedSrc.startsWith("/")) {
+    return sanitizeUrl(trimmedSrc);
+  }
+
+  return sanitizeUrl(resolveAgainstRepoBase(trimmedSrc, sourcePath, GITHUB_RAW_BASE));
+}
+
+function getNodeText(node: ReactNode): string {
+  if (Array.isArray(node)) {
+    return node.map((item) => getNodeText(item)).join("");
+  }
+
+  if (typeof node === "string" || typeof node === "number") {
+    return String(node);
+  }
+
+  if (isValidElement(node)) {
+    return getNodeText(node.props.children);
+  }
+
+  return "";
+}
+
+function slugifyHeading(children: ReactNode) {
+  return getNodeText(children)
+    .toLowerCase()
+    .trim()
+    .replace(/[^\w\s-]/g, "")
+    .replace(/\s+/g, "-");
 }
 
 export function DocPage() {
@@ -62,17 +129,144 @@ export function DocPage() {
     );
   }, [doc, slug]);
 
+  const renderedContent = useMemo(() => {
+    if (!doc) return null;
+
+    return (
+      <ReactMarkdown
+        remarkPlugins={[remarkGfm]}
+        rehypePlugins={[rehypeRaw]}
+        components={{
+          h1: ({ children }) => {
+            const id = slugifyHeading(children);
+            return (
+              <h1
+                id={id || undefined}
+                className="scroll-mt-24 text-3xl font-bold tracking-tight text-foreground sm:text-4xl"
+              >
+                {children}
+              </h1>
+            );
+          },
+          h2: ({ children }) => {
+            const id = slugifyHeading(children);
+            return (
+              <h2
+                id={id || undefined}
+                className="mt-10 scroll-mt-24 text-2xl font-semibold tracking-tight text-foreground"
+              >
+                {children}
+              </h2>
+            );
+          },
+          h3: ({ children }) => {
+            const id = slugifyHeading(children);
+            return (
+              <h3
+                id={id || undefined}
+                className="mt-8 scroll-mt-24 text-xl font-semibold text-foreground"
+              >
+                {children}
+              </h3>
+            );
+          },
+          h4: ({ children }) => {
+            const id = slugifyHeading(children);
+            return (
+              <h4
+                id={id || undefined}
+                className="mt-6 scroll-mt-24 text-lg font-semibold text-foreground"
+              >
+                {children}
+              </h4>
+            );
+          },
+          p: ({ children }) => (
+            <p className="text-[0.98rem] leading-8 text-foreground/90">{children}</p>
+          ),
+          ul: ({ children }) => (
+            <ul className="list-disc space-y-2 pl-6 text-[0.98rem] leading-8 text-foreground/90">
+              {children}
+            </ul>
+          ),
+          ol: ({ children }) => (
+            <ol className="list-decimal space-y-2 pl-6 text-[0.98rem] leading-8 text-foreground/90">
+              {children}
+            </ol>
+          ),
+          li: ({ children }) => <li className="pl-1">{children}</li>,
+          hr: () => <hr className="my-10 border-border" />,
+          blockquote: ({ children }) => (
+            <blockquote className="border-l-2 border-primary/40 pl-4 italic text-muted-foreground">
+              {children}
+            </blockquote>
+          ),
+          a: ({ href, children }) => {
+            const resolvedHref = resolveDocHref(href, doc.sourcePath);
+            const isExternal =
+              /^(https?:|mailto:|tel:)/i.test(resolvedHref) && !resolvedHref.startsWith(SITE_URL);
+
+            return (
+              <a
+                href={resolvedHref}
+                className="font-medium text-primary underline underline-offset-2 hover:text-primary/80"
+                target={isExternal ? "_blank" : undefined}
+                rel={isExternal ? "noopener noreferrer" : undefined}
+              >
+                {children}
+              </a>
+            );
+          },
+          img: ({ src, alt }) => (
+            <img
+              src={resolveDocAssetSrc(src, doc.sourcePath)}
+              alt={alt || ""}
+              className="my-6 rounded-xl border border-border"
+              loading="lazy"
+            />
+          ),
+          pre: ({ children }: { children?: React.ReactNode }) => children,
+          code: CodeBlock as React.ComponentType<Record<string, unknown>>,
+          table: ({ children }) => (
+            <div className="my-6 overflow-x-auto rounded-2xl border border-border">
+              <table className="min-w-full border-collapse text-left text-sm">{children}</table>
+            </div>
+          ),
+          thead: ({ children }) => <thead className="bg-muted/40">{children}</thead>,
+          tbody: ({ children }) => <tbody className="divide-y divide-border/70">{children}</tbody>,
+          tr: ({ children }) => <tr className="align-top">{children}</tr>,
+          th: ({ children }) => (
+            <th className="px-4 py-3 text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground">
+              {children}
+            </th>
+          ),
+          td: ({ children }) => <td className="px-4 py-3 text-foreground/90">{children}</td>,
+          details: ({ children }) => (
+            <details className="rounded-2xl border border-border bg-card/70 px-4 py-3">
+              {children}
+            </details>
+          ),
+          summary: ({ children }) => (
+            <summary className="cursor-pointer font-medium text-foreground">{children}</summary>
+          ),
+        }}
+      >
+        {doc.content}
+      </ReactMarkdown>
+    );
+  }, [doc]);
+
   if (loading) {
     return (
       <div className="mx-auto max-w-3xl px-4 py-10">
-        <div className="text-muted-foreground text-sm">Loading...</div>
+        <div className="text-sm text-muted-foreground">Loading...</div>
       </div>
     );
   }
 
   if (error || !doc) {
     return (
-      <div className="mx-auto max-w-3xl px-4 py-10 space-y-4">
+      <div className="mx-auto max-w-3xl space-y-4 px-4 py-10">
         <h1 className="text-2xl font-bold text-foreground">Document not found</h1>
         <p className="text-muted-foreground">
           The requested documentation page could not be found.
@@ -84,80 +278,13 @@ export function DocPage() {
     );
   }
 
-  // Simple markdown-to-HTML conversion for headings and paragraphs
-  const renderContent = (content: string) => {
-    return content.split("\n").map((line, i) => {
-      if (line.startsWith("# "))
-        return (
-          <h1 key={i} className="text-3xl font-bold text-foreground mb-4">
-            {line.slice(2)}
-          </h1>
-        );
-      if (line.startsWith("## "))
-        return (
-          <h2 key={i} className="text-2xl font-semibold text-foreground mt-8 mb-3">
-            {line.slice(3)}
-          </h2>
-        );
-      if (line.startsWith("### "))
-        return (
-          <h3 key={i} className="text-xl font-semibold text-foreground mt-6 mb-2">
-            {line.slice(4)}
-          </h3>
-        );
-      if (line.startsWith("---")) return <hr key={i} className="my-8 border-border" />;
-      if (line.trim() === "") return <br key={i} />;
-
-      // Handle links in markdown [text](url) safely by splitting the string into an array of React elements
-      const linkRegex = /\[([^\]]+)\]\(([^)]+)\)/g;
-      const parts: (string | JSX.Element)[] = [];
-      let lastIndex = 0;
-      let match;
-
-      while ((match = linkRegex.exec(line)) !== null) {
-        if (match.index > lastIndex) {
-          parts.push(line.substring(lastIndex, match.index));
-        }
-
-        const text = match[1];
-        const url = match[2];
-        const safeUrl = sanitizeUrl(url);
-
-        parts.push(
-          <a
-            key={`${i}-${match.index}`}
-            href={safeUrl}
-            className="text-primary underline hover:text-primary/80"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            {text}
-          </a>,
-        );
-
-        lastIndex = linkRegex.lastIndex;
-      }
-
-      if (lastIndex < line.length) {
-        parts.push(line.substring(lastIndex));
-      }
-
-      return (
-        <p key={i} className="text-foreground leading-relaxed mb-2">
-          {parts.length > 0 ? parts : line}
-        </p>
-      );
-    });
-  };
-
   return (
-    <div className="mx-auto max-w-3xl px-4 py-10 space-y-6">
-      {/* Breadcrumb */}
+    <div className="mx-auto max-w-4xl space-y-6 px-4 py-10">
       <nav
         className="flex items-center gap-2 text-sm text-muted-foreground"
         aria-label="Breadcrumb"
       >
-        <Link to="/docs" className="hover:text-foreground transition-colors">
+        <Link to="/docs" className="transition-colors hover:text-foreground">
           Docs
         </Link>
         <span aria-hidden="true">/</span>
@@ -166,14 +293,14 @@ export function DocPage() {
         <span className="text-foreground">{doc.title}</span>
       </nav>
 
-      {/* Content */}
-      <article className="prose-like space-y-0">{renderContent(doc.content)}</article>
+      <article className="space-y-5 [&_.shiki-container]:bg-muted/50 [&_.shiki-container]:border [&_.shiki-container]:border-border [&_.shiki-container]:rounded-2xl [&_.shiki-container]:px-4 [&_.shiki-container]:py-4 [&_.shiki-container]:overflow-x-auto [&_.shiki-container]:my-4 [&_.shiki-container]:pt-10 [&_.shiki-container_code]:bg-transparent [&_.shiki-container_code]:p-0 [&_.shiki-container_code]:text-sm [&_.shiki-container_code]:border-0 [&_.shiki-container_.shiki]:!bg-transparent">
+        {renderedContent}
+      </article>
 
-      {/* Back link */}
-      <div className="pt-8 border-t border-border">
+      <div className="border-t border-border pt-8">
         <Link
           to="/docs"
-          className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+          className="text-sm text-muted-foreground transition-colors hover:text-foreground"
         >
           <span aria-hidden="true">&larr;</span> Back to Documentation
         </Link>

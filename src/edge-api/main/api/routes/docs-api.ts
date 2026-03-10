@@ -135,9 +135,9 @@ docsApi.get("/api/docs/:slug", async (c) => {
     content = `# ${entry.title}\n\n${entry.description}\n\n---\n\nThis documentation page is coming soon. Check our [GitHub docs](https://github.com/spike-land-ai/spike-land-ai/tree/main/docs) for the latest content.`;
   }
 
-  const { filePath: _fp, ...publicEntry } = entry;
+  const { filePath, ...publicEntry } = entry;
   c.header("Cache-Control", "public, max-age=14400, stale-while-revalidate=86400");
-  return c.json({ ...publicEntry, content });
+  return c.json({ ...publicEntry, content, sourcePath: filePath });
 });
 
 export { docsApi };

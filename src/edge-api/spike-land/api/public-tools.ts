@@ -33,6 +33,7 @@ publicToolsRoute.get("/", async (c) => {
     await registerAllTools(registry, "anonymous", db, {
       kv: c.env.KV,
       vaultSecret: c.env.VAULT_SECRET,
+      geminiApiKey: c.env.GEMINI_API_KEY,
     });
   } catch (err) {
     const detail = err instanceof Error ? err.message : "Unknown";

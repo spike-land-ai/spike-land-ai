@@ -8,7 +8,7 @@ import { z } from "zod";
 import type { ToolRegistry } from "../../lazy-imports/registry";
 import { freeTool, jsonResult } from "../../lazy-imports/procedures-index.ts";
 import type { DrizzleDB } from "../../db/db/db-index.ts";
-import type { Env } from "../env";
+import type { ToolRegistrationEnv } from "../mcp/manifest";
 import {
   type AnswerResult,
   type BadgePayload,
@@ -63,7 +63,7 @@ export function registerQuizTools(
   registry: ToolRegistry,
   userId: string,
   db: DrizzleDB,
-  env: Env,
+  env?: ToolRegistrationEnv,
 ): void {
   // ── quiz_create_session ──────────────────────────────────────────────────
   registry.registerBuilt(
@@ -123,7 +123,7 @@ export function registerQuizTools(
           );
         }
 
-        const concepts = await generateConceptsFromContent(articleContent, env.GEMINI_API_KEY);
+        const concepts = await generateConceptsFromContent(articleContent, env?.geminiApiKey);
         const id = crypto.randomUUID();
         const session = createQuizSession(id, userId, articleContent, concepts);
         setSession(id, session);

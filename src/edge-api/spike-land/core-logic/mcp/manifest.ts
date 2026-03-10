@@ -15,6 +15,7 @@ export interface ToolRegistrationEnv {
   mcpInternalSecret?: string | undefined;
   spikeEdge?: Fetcher | undefined;
   spaAssets?: R2Bucket | undefined;
+  geminiApiKey?: string | undefined;
 }
 
 // ─── Static Imports ───
@@ -189,7 +190,14 @@ export async function registerAllTools(
   safeRegister(registerBazdmegFaqTools, "registerBazdmegFaqTools", registry, userId, db);
   safeRegister(registerBazdmegTools, "registerBazdmegTools", registry, userId, db);
   safeRegister(registerBazdmegMemoryTools, "registerBazdmegMemoryTools", registry, userId, db);
-  safeRegister(registerBazdmegWorkflowTools, "registerBazdmegWorkflowTools", registry, userId, db);
+  safeRegister(
+    registerBazdmegWorkflowTools,
+    "registerBazdmegWorkflowTools",
+    registry,
+    userId,
+    db,
+    env,
+  );
   safeRegister(
     registerBazdmegTelemetryTools,
     "registerBazdmegTelemetryTools",

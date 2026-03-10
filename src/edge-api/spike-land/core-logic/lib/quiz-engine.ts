@@ -377,6 +377,298 @@ Generate the output in strict JSON format:
   return generateConceptsHeuristic(content);
 }
 
+// ─── Planning Interview Concepts ────────────────────────────────────────────
+
+const PLANNING_CONCEPT_NAMES = [
+  "file_awareness",
+  "test_strategy",
+  "edge_cases",
+  "dependency_chain",
+  "failure_modes",
+  "verification",
+] as const;
+
+/** Default planning concepts when Gemini is unavailable. Task-agnostic but still useful. */
+function getDefaultPlanningConcepts(): ConceptDefinition[] {
+  return [
+    {
+      name: "file_awareness",
+      variants: [
+        {
+          question: "Before making changes, which files should you identify first?",
+          options: [
+            "Source files, test files, and config files that will be affected",
+            "Only the main source file",
+            "All files in the repository",
+            "Only the test files",
+          ],
+          correctIndex: 0,
+        },
+        {
+          question: "When modifying a function used across multiple modules, what must you check?",
+          options: [
+            "Only the file containing the function",
+            "Every file that imports or depends on that function",
+            "Only the test file for that function",
+            "Only the README",
+          ],
+          correctIndex: 1,
+        },
+        {
+          question: "Which approach best identifies the blast radius of a change?",
+          options: [
+            "Reading the git log",
+            "Checking code coverage reports",
+            "Tracing imports and call sites across the codebase",
+            "Running the linter",
+          ],
+          correctIndex: 2,
+        },
+      ],
+    },
+    {
+      name: "test_strategy",
+      variants: [
+        {
+          question: "What type of test best validates business logic in isolation?",
+          options: [
+            "End-to-end browser tests",
+            "Unit tests with mocked dependencies",
+            "Manual testing",
+            "Load testing",
+          ],
+          correctIndex: 1,
+        },
+        {
+          question: "When should you write an integration test instead of a unit test?",
+          options: [
+            "Always prefer integration tests",
+            "When testing pure functions",
+            "When verifying the interaction between multiple components",
+            "Only for UI components",
+          ],
+          correctIndex: 2,
+        },
+        {
+          question: "What is the most important thing to test about error handling?",
+          options: [
+            "That errors are logged to the console",
+            "That the system recovers gracefully and communicates the failure clearly",
+            "That errors never occur",
+            "That all errors are caught silently",
+          ],
+          correctIndex: 1,
+        },
+      ],
+    },
+    {
+      name: "edge_cases",
+      variants: [
+        {
+          question: "Which input should you always test for in a function that accepts strings?",
+          options: [
+            "Only valid strings",
+            "Empty string, null/undefined, and extremely long strings",
+            "Only strings with special characters",
+            "Only numeric strings",
+          ],
+          correctIndex: 1,
+        },
+        {
+          question: "What edge case is most commonly missed in async operations?",
+          options: [
+            "Successful completion",
+            "Slow network responses",
+            "Race conditions and concurrent execution",
+            "JSON parsing",
+          ],
+          correctIndex: 2,
+        },
+        {
+          question: "When a function has a timeout parameter, which value should you test?",
+          options: [
+            "Only the default timeout",
+            "Zero, negative values, and values exceeding the maximum",
+            "Only very large timeouts",
+            "Only the value from the spec",
+          ],
+          correctIndex: 1,
+        },
+      ],
+    },
+    {
+      name: "dependency_chain",
+      variants: [
+        {
+          question: "Before adding a new dependency, what should you verify?",
+          options: [
+            "That it has the most GitHub stars",
+            "That it is compatible with your runtime, actively maintained, and not duplicating existing functionality",
+            "That it was written in TypeScript",
+            "That it has no dependencies of its own",
+          ],
+          correctIndex: 1,
+        },
+        {
+          question: "When updating an internal package, what must happen first?",
+          options: [
+            "Update all consumers simultaneously",
+            "Build and test the package, then update consumers one at a time",
+            "Skip testing and deploy directly",
+            "Wait for someone else to test it",
+          ],
+          correctIndex: 1,
+        },
+        {
+          question:
+            "What is the correct build order when package A depends on B, and B depends on C?",
+          options: ["A → B → C", "Build all three in parallel", "C → B → A", "B → A → C"],
+          correctIndex: 2,
+        },
+      ],
+    },
+    {
+      name: "failure_modes",
+      variants: [
+        {
+          question: "What should happen when an external API call fails?",
+          options: [
+            "Crash the entire application",
+            "Silently ignore the error",
+            "Return a meaningful error, retry if appropriate, and degrade gracefully",
+            "Log the error and continue with stale data without telling the user",
+          ],
+          correctIndex: 2,
+        },
+        {
+          question:
+            "When a database migration fails halfway through, what is the correct approach?",
+          options: [
+            "Delete the database and start over",
+            "Retry the migration immediately",
+            "Roll back the partial changes and investigate before retrying",
+            "Ignore the failure and proceed",
+          ],
+          correctIndex: 2,
+        },
+        {
+          question: "What is the biggest risk of deploying without a rollback plan?",
+          options: [
+            "The deploy takes longer",
+            "Extended downtime if the new version has a critical bug",
+            "Using too much disk space",
+            "Having too many git branches",
+          ],
+          correctIndex: 1,
+        },
+      ],
+    },
+    {
+      name: "verification",
+      variants: [
+        {
+          question: "How do you prove that a bug fix actually works?",
+          options: [
+            "Deploy it and wait for user reports",
+            "Write a regression test that fails before the fix and passes after",
+            "Read the code and decide it looks correct",
+            "Ask a colleague to review the PR title",
+          ],
+          correctIndex: 1,
+        },
+        {
+          question: "After deploying a change, what is the minimum verification?",
+          options: [
+            "Check that CI passed",
+            "Verify the feature works in production and monitor error rates",
+            "Send a message saying it is done",
+            "Close the ticket immediately",
+          ],
+          correctIndex: 1,
+        },
+        {
+          question: "What metric best indicates a successful deployment?",
+          options: [
+            "Number of lines changed",
+            "Speed of the deployment pipeline",
+            "Error rate staying at or below pre-deploy levels",
+            "Number of approvals on the PR",
+          ],
+          correctIndex: 2,
+        },
+      ],
+    },
+  ];
+}
+
+/**
+ * Generate planning interview concepts using Gemini API with hardcoded fallback.
+ * Unlike content-based quiz concepts, these are always structured around the
+ * 6 BAZDMEG planning concepts, contextualized to the specific task.
+ */
+export async function generatePlanningConcepts(
+  taskDescription: string,
+  packageName: string | undefined,
+  geminiApiKey: string | undefined,
+): Promise<ConceptDefinition[]> {
+  if (geminiApiKey) {
+    try {
+      const conceptList = PLANNING_CONCEPT_NAMES.join(", ");
+      const pkgContext = packageName ? ` in package "${packageName}"` : "";
+      const systemPrompt = `You are an expert software engineering interviewer. Given a task description, generate multiple-choice questions that test the developer's understanding across exactly 6 planning concepts: ${conceptList}.
+
+For each concept, create 3 variant questions (different framings of the same concept). Each question must have exactly 4 options and exactly 1 correct answer. Questions should be specific to the task described, not generic.
+
+Return strict JSON:
+{
+  "concepts": [
+    {
+      "name": "file_awareness",
+      "variants": [
+        { "question": "...", "options": ["A", "B", "C", "D"], "correctIndex": 0 }
+      ]
+    }
+  ]
+}`;
+      const userPrompt = `Task${pkgContext}: ${taskDescription}`;
+
+      const body = {
+        contents: [{ role: "user", parts: [{ text: userPrompt }] }],
+        generationConfig: {
+          maxOutputTokens: 8192,
+          temperature: 0.3,
+          response_mime_type: "application/json",
+        },
+        systemInstruction: { parts: [{ text: systemPrompt }] },
+      };
+
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${geminiApiKey}`;
+      const response = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+
+      if (response.ok) {
+        const data = (await response.json()) as {
+          candidates?: Array<{ content?: { parts?: Array<{ text?: string }> } }>;
+        };
+        const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+        if (text) {
+          const parsed = JSON.parse(text) as { concepts?: ConceptDefinition[] };
+          if (parsed.concepts && Array.isArray(parsed.concepts) && parsed.concepts.length === 6) {
+            return parsed.concepts;
+          }
+        }
+      }
+    } catch (err) {
+      console.error("[Planning] Gemini generation failed, falling back to defaults:", err);
+    }
+  }
+
+  return getDefaultPlanningConcepts();
+}
+
 // ─── Round Generation ───────────────────────────────────────────────────────
 
 /** Pick the next round of questions, choosing unmastered concepts and unused variants */

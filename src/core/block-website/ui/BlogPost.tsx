@@ -10,6 +10,7 @@ import {
   sanitizeBlogImageSrc,
 } from "../core-logic/blog-image-policy";
 import { extractHeroMedia } from "../core-logic/blog-source";
+import { CodeBlock } from "./CodeBlock";
 import { BlogListView } from "./BlogList";
 import { ImageLoader } from "./ImageLoader";
 import { ExperimentProvider, useExperiment } from "./useExperiment";
@@ -125,6 +126,8 @@ const COMPONENT_MAP: Record<string, React.ComponentType<Record<string, unknown>>
   personalizedsupportbox: lazyDemo(interactiveImport, "PersonalizedSupportBox"),
   rentstorytoggle: lazyDemo(interactiveImport, "RentStoryToggle"),
   spikechatembed: lazyDemo(interactiveImport, "SpikeChatEmbed"),
+  pre: ({ children }: { children?: React.ReactNode }) => children,
+  code: CodeBlock as React.ComponentType<Record<string, unknown>>,
   tldr: ({ children, title }: { children?: React.ReactNode; title?: string }) => (
     <div className="bg-primary/[0.03] border-2 border-primary/10 rounded-[2rem] p-8 my-12 relative overflow-hidden">
       <div className="absolute top-0 right-0 p-4 opacity-5 rotate-12">
@@ -473,6 +476,7 @@ export function BlogPostView({
           prose-strong:text-foreground prose-strong:font-black
           prose-blockquote:border-l-4 prose-blockquote:border-primary/30 prose-blockquote:bg-primary/[0.02] prose-blockquote:py-6 prose-blockquote:px-8 prose-blockquote:rounded-r-3xl prose-blockquote:text-foreground prose-blockquote:font-bold prose-blockquote:italic
           prose-code:text-primary prose-code:bg-primary/[0.05] prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded-lg prose-code:before:content-none prose-code:after:content-none prose-code:font-bold
+          [&_.shiki-container]:bg-muted/50 [&_.shiki-container]:border-2 [&_.shiki-container]:border-border/50 [&_.shiki-container]:rounded-[2rem] [&_.shiki-container]:px-4 [&_.shiki-container]:py-4 sm:[&_.shiki-container]:px-6 sm:[&_.shiki-container]:py-5 [&_.shiki-container]:overflow-x-auto [&_.shiki-container]:my-8 [&_.shiki-container]:pt-10 [&_.shiki-container_code]:bg-transparent [&_.shiki-container_code]:p-0 [&_.shiki-container_code]:text-sm [&_.shiki-container_code]:font-normal [&_.shiki-container_.shiki]:!bg-transparent
           prose-pre:bg-muted/50 prose-pre:border-2 prose-pre:border-border/50 prose-pre:rounded-[2rem] prose-pre:px-4 prose-pre:py-4 sm:prose-pre:px-6 sm:prose-pre:py-5 prose-pre:overflow-x-auto
           prose-li:text-muted-foreground prose-li:font-medium
           prose-ul:list-disc prose-ol:list-decimal

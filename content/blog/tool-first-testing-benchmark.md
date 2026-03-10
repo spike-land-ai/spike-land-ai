@@ -3,6 +3,8 @@ title: "Tool-First Testing vs Browser Testing: A Benchmark on spike.land"
 date: "2026-03-09"
 description: "A verifiable benchmark demonstrating how exposing business logic as typed MCP tools enables faster, cheaper, and more reliable testing compared to conventional browser automation."
 tags: ["engineering", "testing", "mcp", "benchmark"]
+heroImage: "/blog/tool-first-testing-benchmark/hero.png"
+heroPrompt: "A sleek futuristic lab where neon-lit robotic tools process data at hyper-speed while a bulky, slow mechanical browser trails behind in the background."
 ---
 
 ![A sleek futuristic lab where neon-lit robotic tools process data at hyper-speed while a bulky, slow mechanical browser trails behind in the background.](/images/blog/tool-first-benchmark-hero.png)
