@@ -1,3 +1,4 @@
+import type { LucideIcon } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import {
   Bot,
@@ -64,6 +65,32 @@ function useCounter(target: number, active: boolean, duration = 1200) {
 
   return count;
 }
+
+/** Extracted component so useCounter is called at the top level (Rules of Hooks). */
+function StatCard({
+  stat,
+  active,
+}: {
+  stat: { value: number; suffix: string; label: string; icon: LucideIcon };
+  active: boolean;
+}) {
+  const Icon = stat.icon;
+  const count = useCounter(stat.value, active);
+  return (
+    <div className="flex flex-col items-center justify-center p-6 text-center">
+      <Icon className="h-5 w-5 text-primary mb-2" />
+      <span className="text-3xl font-extrabold tabular-nums">
+        {count}
+        {stat.suffix}
+      </span>
+      <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider mt-1">
+        {stat.label}
+      </span>
+    </div>
+  );
+}
+
+const WHATSAPP_URL = "https://wa.me/36709537783";
 
 export function AiAutomatizalasApp() {
   const [heroRevealed, setHeroRevealed] = useState(false);
@@ -193,7 +220,7 @@ export function AiAutomatizalasApp() {
           )}
         >
           <a
-            href="https://wa.me/36301234567"
+            href={WHATSAPP_URL}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 rounded-xl bg-primary px-7 py-3 text-sm font-bold text-primary-foreground hover:bg-primary/90 transition-all shadow-lg shadow-primary/20"
@@ -214,22 +241,9 @@ export function AiAutomatizalasApp() {
         )}
       >
         <div className="rubik-panel grid grid-cols-2 divide-x divide-y divide-border sm:grid-cols-4 sm:divide-y-0 p-0 overflow-hidden">
-          {STATS.map((stat, i) => {
-            const Icon = stat.icon;
-            const count = useCounter(stat.value, statsVisible);
-            return (
-              <div key={i} className="flex flex-col items-center justify-center p-6 text-center">
-                <Icon className="h-5 w-5 text-primary mb-2" />
-                <span className="text-3xl font-extrabold tabular-nums">
-                  {count}
-                  {stat.suffix}
-                </span>
-                <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider mt-1">
-                  {stat.label}
-                </span>
-              </div>
-            );
-          })}
+          {STATS.map((stat, i) => (
+            <StatCard key={i} stat={stat} active={statsVisible} />
+          ))}
         </div>
       </section>
 
@@ -343,7 +357,7 @@ export function AiAutomatizalasApp() {
                 </li>
               </ul>
               <a
-                href="https://wa.me/36301234567"
+                href={WHATSAPP_URL}
                 target="_blank"
                 rel="noopener noreferrer"
                 className={cn(
@@ -377,7 +391,7 @@ export function AiAutomatizalasApp() {
             szabott lehetőségeket.
           </p>
           <a
-            href="https://wa.me/36301234567"
+            href={WHATSAPP_URL}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 rounded-xl bg-primary px-8 py-4 text-sm font-bold text-primary-foreground hover:bg-primary/90 transition-all shadow-lg"

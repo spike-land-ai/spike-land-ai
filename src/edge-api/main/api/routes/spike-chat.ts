@@ -49,7 +49,8 @@ async function callGrok(
 
   if (!res.ok) {
     const errText = await res.text();
-    throw new Error(`Grok API error ${res.status}: ${errText}`);
+    console.error(`Grok API error ${res.status}: ${errText}`);
+    throw new Error(`AI service error (${res.status})`);
   }
 
   const data = await res.json<{
@@ -119,7 +120,8 @@ async function streamGrokResponse(
 
   if (!res.ok) {
     const errText = await res.text();
-    throw new Error(`Grok API error ${res.status}: ${errText}`);
+    console.error(`Grok streaming API error ${res.status}: ${errText}`);
+    throw new Error(`AI service error (${res.status})`);
   }
 
   const reader = res.body?.getReader();
@@ -202,6 +204,10 @@ spikeChat.post("/api/spike-chat", async (c) => {
   }>();
   if (!body.message || typeof body.message !== "string") {
     return c.json({ error: "message is required" }, 400);
+  }
+
+  if (body.message.length > 8000) {
+    return c.json({ error: "message too long (max 8000 characters)" }, 400);
   }
 
   const apiKey = c.env.XAI_API_KEY;

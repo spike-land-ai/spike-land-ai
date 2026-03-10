@@ -311,7 +311,8 @@ export async function handleChargeRefunded(db: D1Database, event: StripeEvent): 
       }),
       customerId ? `customer_${customerId}` : "unknown",
     )
-    .run();
+    .run()
+    .catch(() => {}); // best-effort — never block the webhook flow
 
   await db
     .prepare(
@@ -323,7 +324,8 @@ export async function handleChargeRefunded(db: D1Database, event: StripeEvent): 
       JSON.stringify({ amount: charge.amount, currency: charge.currency }),
       customerId ? `customer_${customerId}` : null,
     )
-    .run();
+    .run()
+    .catch(() => {}); // best-effort
 }
 
 // ─── Charge Dispute Created ────────────────────────────────────────────────
@@ -347,7 +349,8 @@ export async function handleChargeDisputeCreated(
       JSON.stringify({ disputeId, chargeId, reason, amount }),
       chargeId ? `charge_${chargeId}` : "unknown",
     )
-    .run();
+    .run()
+    .catch(() => {}); // best-effort — never block the webhook flow
 
   await db
     .prepare(
@@ -359,5 +362,6 @@ export async function handleChargeDisputeCreated(
       JSON.stringify({ disputeId, chargeId, reason, amount }),
       chargeId ? `charge_${chargeId}` : null,
     )
-    .run();
+    .run()
+    .catch(() => {}); // best-effort
 }
