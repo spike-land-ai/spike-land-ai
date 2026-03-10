@@ -1196,11 +1196,12 @@ describe("support route", () => {
   });
 
   it("creates donation checkout session", async () => {
-    globalThis.fetch = vi.fn().mockResolvedValue(
+    const fetchMock = vi.fn().mockResolvedValue(
       new Response(JSON.stringify({ url: "https://checkout.stripe.com/session", id: "cs_123" }), {
         status: 200,
       }),
     );
+    globalThis.fetch = fetchMock;
 
     const app = makeApp(support as unknown as Hono);
     const env = createMockEnv();
@@ -1216,6 +1217,40 @@ describe("support route", () => {
     expect(res.status).toBe(200);
     const body = await res.json<{ url: string }>();
     expect(body.url).toContain("stripe.com");
+
+    const stripeParams = new URLSearchParams(String(fetchMock.mock.calls[0]?.[1]?.body ?? ""));
+    expect(stripeParams.get("line_items[0][price_data][currency]")).toBe("gbp");
+    expect(stripeParams.get("line_items[0][price_data][unit_amount]")).toBe("1000");
+    expect(stripeParams.get("line_items[0][price_data][product_data][name]")).toBe(
+      "Support spike.land — £10",
+    );
+  });
+
+  it("snaps custom donations in the magnetic range to 420", async () => {
+    const fetchMock = vi.fn().mockResolvedValue(
+      new Response(JSON.stringify({ url: "https://checkout.stripe.com/session", id: "cs_420" }), {
+        status: 200,
+      }),
+    );
+    globalThis.fetch = fetchMock;
+
+    const app = makeApp(support as unknown as Hono);
+    const env = createMockEnv();
+    const res = await app.request(
+      "/api/support/donate",
+      {
+        method: "POST",
+        body: JSON.stringify({ slug: "my-post", amount: 417, clientId: "c" }),
+        headers: { "Content-Type": "application/json" },
+      },
+      env,
+    );
+
+    expect(res.status).toBe(200);
+
+    const stripeParams = new URLSearchParams(String(fetchMock.mock.calls[0]?.[1]?.body ?? ""));
+    expect(stripeParams.get("line_items[0][price_data][unit_amount]")).toBe("42000");
+    expect(stripeParams.get("metadata[amount]")).toBe("420");
   });
 
   it("returns 400 for invalid slug in donate", async () => {

@@ -28,7 +28,17 @@ import {
   Tag,
 } from "lucide-react";
 import { Button, buttonVariants } from "../lazy-imports/button";
-import { cn } from "@spike-land-ai/shared";
+import {
+  cn,
+  formatSupportAmount,
+  isValidSupportAmount,
+  normalizeSupportAmountInput,
+  parseSupportAmount,
+  SUPPORT_AMOUNT_MAX,
+  SUPPORT_AMOUNT_MIN,
+  SUPPORT_CURRENCY_SYMBOL,
+  SUPPORT_MAGIC_AMOUNT,
+} from "@spike-land-ai/shared";
 
 /**
  * Convert self-closing JSX/HTML tags for custom components to explicit
@@ -240,6 +250,33 @@ export function BlogPostView({
   }, [postOverride, skipFetch, slug]);
 
   const resolvedPost = postOverride ?? post;
+
+  useEffect(() => {
+    const existing = document.querySelector<HTMLMetaElement>('meta[name="robots"]');
+    const previous = existing?.content ?? null;
+
+    if (!resolvedPost?.unlisted) {
+      if (existing && existing.content === "noindex") {
+        existing.content = "index, follow";
+      }
+      return;
+    }
+
+    const meta = existing ?? document.createElement("meta");
+    if (!existing) {
+      meta.name = "robots";
+      document.head.appendChild(meta);
+    }
+    meta.content = "noindex";
+
+    return () => {
+      if (!existing) {
+        meta.remove();
+        return;
+      }
+      existing.content = previous ?? "index, follow";
+    };
+  }, [resolvedPost?.unlisted]);
 
   if (loading || loadingOverride) {
     return (
@@ -462,14 +499,20 @@ export function BlogPostView({
 const SLIDER_STOPS = [
   { amount: 0, label: "Moral support", sub: "Keep building awesome stuff!", icon: Heart },
   { amount: 1, label: "A tiny coffee", sub: "Fuel for the next MCP tool.", icon: Coffee },
-  { amount: 5, label: "The proper brew", sub: "A high-end Brighton flat white.", icon: Coffee },
-  { amount: 10, label: "Server runtime", sub: "Covers our edge hosting for a week.", icon: Zap },
+  { amount: 5, label: "Workers month", sub: "Covers Cloudflare Workers for a month.", icon: Zap },
+  { amount: 10, label: "Infra buffer", sub: "Keeps two months of Workers paid ahead.", icon: Shield },
   { amount: 25, label: "Growth Fund", sub: "Help us build more complex agents.", icon: Shield },
   { amount: 100, label: "Legend Tier", sub: "We will name a variable after you.", icon: Gift },
+  {
+    amount: 420,
+    label: "Thinking mode: extra high",
+    sub: "Anything between £411 and £429 gets pulled back here on principle.",
+    icon: Gift,
+  },
 ] as const;
 
 function getArticleCopy(_category: string, _tags: string[]): string {
-  return "Independent development is a labor of love. No VC funding, no bloated team—just code, mass-produced coffee, and a vision for an agentic future. If you find value in these tools, consider supporting the journey.";
+  return "Independent development is a labor of love. No VC funding, no bloated team, just code, mass-produced coffee, and a monthly Cloudflare bill. £5 covers Cloudflare Workers for a month. If you find value in these tools, consider supporting the journey.";
 }
 
 function getClientId(): string {
@@ -501,7 +544,31 @@ function SupportWidget({ post }: { post: BlogPost }) {
   const [donating, setDonating] = useState(false);
 
   const currentStop = SLIDER_STOPS[sliderIdx] || SLIDER_STOPS[0];
-  const Icon = currentStop.icon;
+  const parsedCustomAmount = showCustom ? parseSupportAmount(customAmount) : null;
+  const selectedAmount = showCustom ? parsedCustomAmount : currentStop.amount;
+  const displayAmount = showCustom
+    ? customAmount === ""
+      ? "0"
+      : parsedCustomAmount === null
+        ? customAmount
+        : formatSupportAmount(parsedCustomAmount)
+    : formatSupportAmount(currentStop.amount);
+  const displayLabel = showCustom
+    ? parsedCustomAmount === SUPPORT_MAGIC_AMOUNT
+      ? "Thinking mode: extra high"
+      : "Custom amount"
+    : currentStop.label;
+  const displaySub = showCustom
+    ? parsedCustomAmount === SUPPORT_MAGIC_AMOUNT
+      ? "Anything from £411 to £429 resolves to £420."
+      : "Dial in your own number if the presets are not quite right."
+    : currentStop.sub;
+  const DisplayIcon = showCustom
+    ? parsedCustomAmount === SUPPORT_MAGIC_AMOUNT
+      ? Gift
+      : Heart
+    : currentStop.icon;
+  const canDonate = isValidSupportAmount(selectedAmount);
 
   useEffect(() => {
     if (!localStorage.getItem(`spike_bumped_${slug}`)) return;
@@ -541,8 +608,9 @@ function SupportWidget({ post }: { post: BlogPost }) {
   }, [bumped, slug, track]);
 
   const handleDonate = useCallback(async () => {
-    const amount = showCustom ? parseFloat(customAmount) : currentStop.amount;
-    if (!amount || amount < 1) return;
+    if (!canDonate) return;
+
+    const amount = selectedAmount;
     track("donate_click", { amount });
     setDonating(true);
     try {
@@ -559,7 +627,7 @@ function SupportWidget({ post }: { post: BlogPost }) {
     } catch {
       setDonating(false);
     }
-  }, [currentStop.amount, showCustom, customAmount, slug, track]);
+  }, [canDonate, selectedAmount, slug, track]);
 
   return (
     <div
@@ -606,14 +674,15 @@ function SupportWidget({ post }: { post: BlogPost }) {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <div className="size-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary">
-                <Icon className="size-6" />
+                <DisplayIcon className="size-6" />
               </div>
               <div>
                 <p className="text-2xl font-black leading-none">
-                  ${showCustom ? customAmount || "0" : currentStop.amount}
+                  {SUPPORT_CURRENCY_SYMBOL}
+                  {displayAmount}
                 </p>
                 <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest mt-1">
-                  {currentStop.label}
+                  {displayLabel}
                 </p>
               </div>
             </div>
@@ -652,27 +721,31 @@ function SupportWidget({ post }: { post: BlogPost }) {
           {showCustom && (
             <div className="relative">
               <span className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground/50 font-black">
-                $
+                {SUPPORT_CURRENCY_SYMBOL}
               </span>
               <input
                 type="number"
                 value={customAmount}
-                onChange={(e) => setCustomAmount(e.target.value)}
-                placeholder="0.00"
+                min={SUPPORT_AMOUNT_MIN}
+                max={SUPPORT_AMOUNT_MAX}
+                step="0.01"
+                onChange={(e) => setCustomAmount(normalizeSupportAmountInput(e.target.value))}
+                onBlur={() => setCustomAmount((currentAmount) => normalizeSupportAmountInput(currentAmount))}
+                placeholder="5.00"
                 className="w-full h-14 bg-background border-2 border-border/50 rounded-2xl px-8 font-black text-xl focus:border-primary focus:outline-none transition-all"
               />
             </div>
           )}
 
           <p className="text-xs font-medium text-muted-foreground italic leading-relaxed">
-            "{currentStop.sub}"
+            "{displaySub}"
           </p>
 
           <Button
             className="w-full rounded-2xl h-14 font-black uppercase tracking-widest text-xs shadow-xl shadow-primary/20"
             onClick={handleDonate}
             loading={donating}
-            disabled={!showCustom && currentStop.amount === 0}
+            disabled={!canDonate}
           >
             {donating ? "Redirecting..." : "Support Development"}
           </Button>

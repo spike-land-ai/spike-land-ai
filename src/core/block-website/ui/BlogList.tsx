@@ -254,7 +254,7 @@ export function BlogListView({
           if (!Array.isArray(data))
             throw new Error("Unexpected response shape");
           if (cancelled) return;
-          const posts = data as BlogMeta[];
+          const posts = (data as BlogMeta[]).filter((post) => !post.unlisted);
           if (limit) {
             const featured = posts.filter((p) => p.featured);
             const rest = posts.filter((p) => !p.featured);

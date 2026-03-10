@@ -9,6 +9,7 @@ export interface BlogPost {
   tags: string[];
   featured: boolean;
   draft?: boolean;
+  unlisted?: boolean;
   heroImage: string | null;
   content: string;
 }

@@ -8,7 +8,15 @@
 
 import { Hono } from "hono";
 import type { Env } from "../../core-logic/env.js";
-import { createLogger } from "@spike-land-ai/shared";
+import {
+  createLogger,
+  formatSupportAmount,
+  snapSupportAmount,
+  SUPPORT_AMOUNT_MAX,
+  SUPPORT_AMOUNT_MIN,
+  SUPPORT_CURRENCY_CODE,
+  SUPPORT_CURRENCY_SYMBOL,
+} from "@spike-land-ai/shared";
 
 const log = createLogger("spike-edge");
 
@@ -119,14 +127,20 @@ support.post("/api/support/donate", async (c) => {
   }
 
   const slug = body.slug;
-  const amount = body.amount;
+  const rawAmount = body.amount;
   const clientId = typeof body.clientId === "string" ? body.clientId.slice(0, 100) : "";
+  const amount = typeof rawAmount === "number" ? snapSupportAmount(rawAmount) : null;
 
   if (!slug || typeof slug !== "string" || slug.length > 200) {
     return c.json({ error: "Invalid slug" }, 400);
   }
-  if (typeof amount !== "number" || amount < 1 || amount > 999) {
-    return c.json({ error: "Amount must be between $1 and $999" }, 400);
+  if (amount === null || amount < SUPPORT_AMOUNT_MIN || amount > SUPPORT_AMOUNT_MAX) {
+    return c.json(
+      {
+        error: `Amount must be between ${SUPPORT_CURRENCY_SYMBOL}${SUPPORT_AMOUNT_MIN} and ${SUPPORT_CURRENCY_SYMBOL}${SUPPORT_AMOUNT_MAX}`,
+      },
+      400,
+    );
   }
 
   const amountCents = Math.round(amount * 100);
@@ -135,9 +149,10 @@ support.post("/api/support/donate", async (c) => {
   const params = new URLSearchParams({
     mode: "payment",
     submit_type: "donate",
-    "line_items[0][price_data][currency]": "usd",
+    "line_items[0][price_data][currency]": SUPPORT_CURRENCY_CODE,
     "line_items[0][price_data][unit_amount]": amountCents.toString(),
-    "line_items[0][price_data][product_data][name]": `Support spike.land — $${amount}`,
+    "line_items[0][price_data][product_data][name]":
+      `Support spike.land — ${SUPPORT_CURRENCY_SYMBOL}${formatSupportAmount(amount)}`,
     "line_items[0][price_data][product_data][description]":
       "One-time support for independent open-source development",
     "line_items[0][quantity]": "1",

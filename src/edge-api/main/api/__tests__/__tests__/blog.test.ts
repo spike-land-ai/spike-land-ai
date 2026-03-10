@@ -17,6 +17,7 @@ function makeRow(overrides: Partial<BlogPostRow> = {}): BlogPostRow {
     tags: '["vitest","hono"]',
     featured: 0,
     draft: 0,
+    unlisted: 0,
     hero_image: null,
     content: "# Hello World\n\nSome content here.",
     created_at: 1709251200,
@@ -117,6 +118,12 @@ describe("rowToPost", () => {
     expect(post).not.toHaveProperty("hero_image");
   });
 
+  it("converts unlisted integer 1 to boolean true", () => {
+    const row = makeRow({ unlisted: 1 });
+    const post = rowToPost(row);
+    expect(post.unlisted).toBe(true);
+  });
+
   it("sets heroImage to null when hero_image is null", () => {
     const row = makeRow({ hero_image: null });
     const post = rowToPost(row);
@@ -172,6 +179,9 @@ describe("GET /api/blog", () => {
     expect(body).toHaveLength(2);
     expect(body[0]!.slug).toBe("newer");
     expect(body[1]!.slug).toBe("older");
+    expect((db.prepare as unknown as ReturnType<typeof vi.fn>).mock.calls[0]?.[0]).toContain(
+      "unlisted = 0",
+    );
   });
 
   it("returns posts without content field", async () => {
@@ -252,6 +262,7 @@ tags: ["chat", "mcp"]
 featured: true
 primer: "Fallback primer"
 heroImage: "/blog/the-universal-interface-wasnt-graphql/hero.png"
+unlisted: true
 ---
 
 Body from source fallback.`,
@@ -274,6 +285,7 @@ Body from source fallback.`,
     expect(body.title).toBe("The Universal Interface Wasn't GraphQL");
     expect(body.content).toBe("Body from source fallback.");
     expect(body.heroImage).toBe("/blog/the-universal-interface-wasnt-graphql/hero.png");
+    expect(body.unlisted).toBe(true);
   });
 
   it("strips .mdx suffix from slug before querying", async () => {
@@ -314,6 +326,7 @@ category: "Architecture"
 tags: ["chat"]
 featured: false
 primer: "Recovered primer"
+unlisted: true
 ---
 
 Recovered body.`,
@@ -327,6 +340,7 @@ Recovered body.`,
     expect(row?.slug).toBe("recovered-post");
     expect(row?.content).toBe("Recovered body.");
     expect(row?.tags).toBe('["chat"]');
+    expect(row?.unlisted).toBe(1);
   });
 });
 

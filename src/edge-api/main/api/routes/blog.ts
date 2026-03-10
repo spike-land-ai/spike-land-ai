@@ -19,6 +19,7 @@ interface BlogPostRow {
   tags: string;
   featured: number;
   draft: number;
+  unlisted: number;
   hero_image: string | null;
   content: string;
   created_at: number;
@@ -93,6 +94,7 @@ function sourceToRow(rawContent: string, requestedSlug: string): BlogPostRow | n
     tags: JSON.stringify(parseTagsValue(getFrontmatterValue(frontmatter, "tags"))),
     featured: getFrontmatterValue(frontmatter, "featured") === "true" ? 1 : 0,
     draft: getFrontmatterValue(frontmatter, "draft") === "true" ? 1 : 0,
+    unlisted: getFrontmatterValue(frontmatter, "unlisted") === "true" ? 1 : 0,
     hero_image: heroImage,
     content: body,
     created_at: 0,
@@ -136,6 +138,7 @@ function rowToPost(row: BlogPostRow, includeContent = false) {
     tags,
     featured: Boolean(row.featured),
     draft: Boolean(row.draft),
+    unlisted: Boolean(row.unlisted),
     heroImage: row.hero_image,
   };
   if (includeContent) {
@@ -178,7 +181,7 @@ blog.get("/api/blog/posts", (c) => c.redirect("/api/blog", 301));
 
 blog.get("/api/blog", async (c) => {
   const showDrafts = isLocalDev(c);
-  const draftFilter = showDrafts ? "" : " WHERE draft = 0";
+  const visibilityFilter = showDrafts ? " WHERE unlisted = 0" : " WHERE draft = 0 AND unlisted = 0";
 
   let cached: Response | null = null;
   try {
@@ -187,8 +190,8 @@ blog.get("/api/blog", async (c) => {
       safeCtx(c),
       async () => {
         const result = await c.env.DB.prepare(
-          `SELECT slug, title, description, primer, date, author, category, tags, featured, draft, hero_image
-         FROM blog_posts${draftFilter} ORDER BY date DESC`,
+          `SELECT slug, title, description, primer, date, author, category, tags, featured, draft, unlisted, hero_image
+         FROM blog_posts${visibilityFilter} ORDER BY date DESC`,
         ).all<BlogPostRow>();
 
         if (!result.results?.length) return null;
@@ -203,8 +206,8 @@ blog.get("/api/blog", async (c) => {
   } catch {
     // Cache API unavailable — fall back to direct D1
     const result = await c.env.DB.prepare(
-      `SELECT slug, title, description, primer, date, author, category, tags, featured, draft, hero_image
-       FROM blog_posts${draftFilter} ORDER BY date DESC`,
+      `SELECT slug, title, description, primer, date, author, category, tags, featured, draft, unlisted, hero_image
+       FROM blog_posts${visibilityFilter} ORDER BY date DESC`,
     ).all<BlogPostRow>();
 
     if (result.results?.length) {
@@ -439,7 +442,7 @@ blog.get("/blog/rss", async (c) => {
       safeCtx(c),
       async () => {
         const result = await c.env.DB.prepare(
-          "SELECT * FROM blog_posts WHERE draft = 0 ORDER BY date DESC LIMIT 50",
+          "SELECT * FROM blog_posts WHERE draft = 0 AND unlisted = 0 ORDER BY date DESC LIMIT 50",
         ).all<BlogPostRow>();
 
         const posts = result.results ?? [];
@@ -454,7 +457,7 @@ blog.get("/blog/rss", async (c) => {
   } catch {
     try {
       const result = await c.env.DB.prepare(
-        "SELECT * FROM blog_posts WHERE draft = 0 ORDER BY date DESC LIMIT 50",
+        "SELECT * FROM blog_posts WHERE draft = 0 AND unlisted = 0 ORDER BY date DESC LIMIT 50",
       ).all<BlogPostRow>();
 
       const posts = result.results ?? [];

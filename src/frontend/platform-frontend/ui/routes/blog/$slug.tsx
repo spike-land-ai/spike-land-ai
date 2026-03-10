@@ -91,6 +91,7 @@ function parseLocalBlogPost(rawContent: string, requestedSlug: string): BlogPost
     tags: parseTagsValue(getFrontmatterValue(frontmatter, "tags")),
     featured: getFrontmatterValue(frontmatter, "featured") === "true",
     draft: getFrontmatterValue(frontmatter, "draft") === "true",
+    unlisted: getFrontmatterValue(frontmatter, "unlisted") === "true",
     heroImage,
     content: body,
   };

@@ -27,6 +27,7 @@ async function getBlogData(slug: string) {
       description: frontmatter.description,
       date: frontmatter.date,
       author: frontmatter.author,
+      unlisted: Boolean(frontmatter.unlisted),
       content: markdownBody,
       hero_image: frontmatter.heroImage || null,
     };
@@ -52,11 +53,14 @@ async function getAllBlogData() {
         description: data.description,
         date: data.date,
         author: data.author,
+        unlisted: data.unlisted,
       });
     }
   }
   // Sort by date descending
-  return posts.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+  return posts
+    .filter((post) => !post.unlisted)
+    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 }
 
 // Start a mock server on port 8787 to intercept /api calls

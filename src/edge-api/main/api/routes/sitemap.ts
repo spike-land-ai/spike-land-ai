@@ -66,7 +66,7 @@ sitemap.get("/sitemap.xml", async (c) => {
       safeCtx(c),
       async () => {
         const result = await c.env.DB.prepare(
-          "SELECT slug, date FROM blog_posts ORDER BY date DESC",
+          "SELECT slug, date FROM blog_posts WHERE draft = 0 AND unlisted = 0 ORDER BY date DESC",
         ).all<{ slug: string; date: string }>();
 
         const posts = result.results ?? [];
@@ -82,7 +82,7 @@ sitemap.get("/sitemap.xml", async (c) => {
     // Cache API unavailable — fall back to direct D1
     try {
       const result = await c.env.DB.prepare(
-        "SELECT slug, date FROM blog_posts ORDER BY date DESC",
+        "SELECT slug, date FROM blog_posts WHERE draft = 0 AND unlisted = 0 ORDER BY date DESC",
       ).all<{ slug: string; date: string }>();
 
       const posts = result.results ?? [];

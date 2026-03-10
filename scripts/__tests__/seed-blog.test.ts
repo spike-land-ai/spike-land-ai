@@ -71,6 +71,20 @@ Body content here.
     expect(post!.content).toBe("Body content here.");
   });
 
+  it("extracts unlisted from frontmatter", () => {
+    const mdx = `---
+title: "Hidden Post"
+slug: "hidden-post"
+date: "2026-03-10"
+unlisted: true
+---
+
+Body content here.
+`;
+    const post = parseMdxContent(mdx, "hidden-post.mdx");
+    expect(post!.unlisted).toBe(true);
+  });
+
   it("falls back to filename for slug when not in frontmatter", () => {
     const mdx = `---
 title: "No Slug"
@@ -148,6 +162,7 @@ Content.
     expect(post!.category).toBe("");
     expect(post!.tags).toEqual([]);
     expect(post!.featured).toBe(false);
+    expect(post!.unlisted).toBe(false);
     expect(post!.heroImage).toBeNull();
   });
 });
@@ -189,6 +204,8 @@ describe("generateSQL", () => {
     category: "Cat",
     tags: ["a", "b"],
     featured: false,
+    draft: false,
+    unlisted: false,
     heroImage: null,
     content: "# Hello",
   };
@@ -220,6 +237,14 @@ describe("generateSQL", () => {
 
     const sqlTrue = generateSQL([{ ...post, featured: true }]);
     expect(sqlTrue).toContain(", 1, ");
+  });
+
+  it("uses 1 for unlisted=true, 0 for false", () => {
+    const sqlFalse = generateSQL([post]);
+    expect(sqlFalse).toContain(", 0, NULL, ");
+
+    const sqlTrue = generateSQL([{ ...post, unlisted: true }]);
+    expect(sqlTrue).toContain(", 1, NULL, ");
   });
 
   it("escapes single quotes in content", () => {

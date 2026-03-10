@@ -14,6 +14,7 @@ export interface BlogPost {
   tags: string[];
   featured: boolean;
   draft: boolean;
+  unlisted: boolean;
   heroImage: string | null;
   content: string;
 }
@@ -34,6 +35,7 @@ export function parseMdxContent(rawContent: string, filename: string): BlogPost 
   const { data, content } = matter(rawContent);
 
   const isDraft = Boolean(data.draft);
+  const isUnlisted = Boolean(data.unlisted);
 
   let heroImage: string | null = data.heroImage || null;
   let body = content.trim();
@@ -69,6 +71,7 @@ export function parseMdxContent(rawContent: string, filename: string): BlogPost 
     tags: data.tags || [],
     featured: data.featured || false,
     draft: isDraft,
+    unlisted: isUnlisted,
     heroImage,
     content: body,
   };
@@ -89,8 +92,8 @@ export function generateSQL(posts: BlogPost[]): string {
 
   for (const post of posts) {
     statements.push(
-      `INSERT OR REPLACE INTO blog_posts (slug, title, description, primer, date, author, category, tags, featured, draft, hero_image, content, updated_at)
-VALUES ('${escapeSQL(post.slug)}', '${escapeSQL(post.title)}', '${escapeSQL(post.description)}', '${escapeSQL(post.primer)}', '${escapeSQL(post.date)}', '${escapeSQL(post.author)}', '${escapeSQL(post.category)}', '${escapeSQL(JSON.stringify(post.tags))}', ${post.featured ? 1 : 0}, ${post.draft ? 1 : 0}, ${post.heroImage ? `'${escapeSQL(post.heroImage)}'` : "NULL"}, '${escapeSQL(post.content)}', unixepoch());`,
+      `INSERT OR REPLACE INTO blog_posts (slug, title, description, primer, date, author, category, tags, featured, draft, unlisted, hero_image, content, updated_at)
+VALUES ('${escapeSQL(post.slug)}', '${escapeSQL(post.title)}', '${escapeSQL(post.description)}', '${escapeSQL(post.primer)}', '${escapeSQL(post.date)}', '${escapeSQL(post.author)}', '${escapeSQL(post.category)}', '${escapeSQL(JSON.stringify(post.tags))}', ${post.featured ? 1 : 0}, ${post.draft ? 1 : 0}, ${post.unlisted ? 1 : 0}, ${post.heroImage ? `'${escapeSQL(post.heroImage)}'` : "NULL"}, '${escapeSQL(post.content)}', unixepoch());`,
     );
   }
 
