@@ -102,11 +102,15 @@ import { registerAuditQuestionnaireTools } from "../../db/tools/persona/audit-qu
 /**
  * Safely call a register function, catching and logging errors.
  * Uses a generic call signature to avoid `as any` on each invocation.
+ * Tracks failure count so callers can detect partial initialization.
  */
+let registrationFailures: string[] = [];
+
 function safeRegister(fn: (...args: never[]) => void, label: string, ...args: unknown[]): void {
   try {
     (fn as (...a: unknown[]) => void)(...args);
   } catch (err) {
+    registrationFailures.push(label);
     console.error(`[MCP] Failed to register ${label}:`, err);
   }
 }
@@ -119,7 +123,8 @@ export async function registerAllTools(
   userId: string,
   db: DrizzleDB,
   env?: ToolRegistrationEnv,
-): Promise<void> {
+): Promise<{ failedCount: number; failedModules: string[] }> {
+  registrationFailures = [];
   safeRegister(
     registerGatewayMetaTools,
     "registerGatewayMetaTools",
@@ -283,4 +288,12 @@ export async function registerAllTools(
     userId,
     db,
   );
+
+  if (registrationFailures.length > 0) {
+    console.warn(
+      `[MCP] ${registrationFailures.length} tool module(s) failed to register: ${registrationFailures.join(", ")}`,
+    );
+  }
+
+  return { failedCount: registrationFailures.length, failedModules: [...registrationFailures] };
 }

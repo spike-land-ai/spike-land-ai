@@ -28,14 +28,12 @@ describe("createErrorShipper", () => {
       "https://spike.land/api/errors/ingest",
       expect.objectContaining({
         method: "POST",
-        body: JSON.stringify({
-          errors: [
-            {
-              service_name: "test-service",
-              message: "Test error",
-            },
-          ],
-        }),
+        body: JSON.stringify([
+          {
+            service_name: "test-service",
+            message: "Test error",
+          },
+        ]),
       }),
     );
   });
@@ -54,12 +52,10 @@ describe("createErrorShipper", () => {
     expect(fetch).toHaveBeenCalledWith(
       expect.any(String),
       expect.objectContaining({
-        body: JSON.stringify({
-          errors: [
-            { service_name: "test-service", message: "Error 1" },
-            { service_name: "test-service", message: "Error 2" },
-          ],
-        }),
+        body: JSON.stringify([
+          { service_name: "test-service", message: "Error 1" },
+          { service_name: "test-service", message: "Error 2" },
+        ]),
       }),
     );
   });

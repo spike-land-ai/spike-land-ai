@@ -124,37 +124,47 @@ export default {
         "Verify if a user session token is valid and returns user ID and roles",
         { sessionToken: z.string() },
         async ({ sessionToken }) => {
-          const auth = createAuth(env);
-          // We simulate a request since better-auth typically extracts the token from headers
-          const req = new Request(url.href, {
-            headers: {
-              cookie: `better-auth.session_token=${sessionToken}`,
-            },
-          });
-          const sessionResult = await auth.api.getSession({
-            headers: req.headers,
-          });
-          if (!sessionResult?.session) {
+          try {
+            const auth = createAuth(env);
+            // We simulate a request since better-auth typically extracts the token from headers
+            const req = new Request(url.href, {
+              headers: {
+                cookie: `better-auth.session_token=${sessionToken}`,
+              },
+            });
+            const sessionResult = await auth.api.getSession({
+              headers: req.headers,
+            });
+            if (!sessionResult?.session) {
+              return {
+                content: [{ type: "text", text: JSON.stringify({ valid: false }) }],
+              };
+            }
             return {
-              content: [{ type: "text", text: JSON.stringify({ valid: false }) }],
+              content: [
+                {
+                  type: "text",
+                  text: JSON.stringify(
+                    {
+                      valid: true,
+                      user: sessionResult.user,
+                      session: sessionResult.session,
+                    },
+                    null,
+                    2,
+                  ),
+                },
+              ],
+            };
+          } catch (err) {
+            console.error("[mcp-auth] verify-session error:", err);
+            return {
+              content: [
+                { type: "text", text: JSON.stringify({ valid: false, error: "Internal error" }) },
+              ],
+              isError: true,
             };
           }
-          return {
-            content: [
-              {
-                type: "text",
-                text: JSON.stringify(
-                  {
-                    valid: true,
-                    user: sessionResult.user,
-                    session: sessionResult.session,
-                  },
-                  null,
-                  2,
-                ),
-              },
-            ],
-          };
         },
       );
 
@@ -163,35 +173,45 @@ export default {
         "Lookup a user's ID by their email address",
         { email: z.string().email() },
         async ({ email }) => {
-          const db = drizzle(env.AUTH_DB, { schema });
-          const result = await db.query.user.findFirst({
-            where: (u, { eq }) => eq(u.email, email),
-          });
-          if (!result) {
+          try {
+            const db = drizzle(env.AUTH_DB, { schema });
+            const result = await db.query.user.findFirst({
+              where: (u, { eq }) => eq(u.email, email),
+            });
+            if (!result) {
+              return {
+                content: [{ type: "text", text: JSON.stringify({ found: false }) }],
+              };
+            }
             return {
-              content: [{ type: "text", text: JSON.stringify({ found: false }) }],
+              content: [
+                {
+                  type: "text",
+                  text: JSON.stringify(
+                    {
+                      found: true,
+                      user: {
+                        id: result.id,
+                        email: result.email,
+                        name: result.name,
+                        role: result.role,
+                      },
+                    },
+                    null,
+                    2,
+                  ),
+                },
+              ],
+            };
+          } catch (err) {
+            console.error("[mcp-auth] get-user-by-email error:", err);
+            return {
+              content: [
+                { type: "text", text: JSON.stringify({ found: false, error: "Internal error" }) },
+              ],
+              isError: true,
             };
           }
-          return {
-            content: [
-              {
-                type: "text",
-                text: JSON.stringify(
-                  {
-                    found: true,
-                    user: {
-                      id: result.id,
-                      email: result.email,
-                      name: result.name,
-                      role: result.role,
-                    },
-                  },
-                  null,
-                  2,
-                ),
-              },
-            ],
-          };
         },
       );
 
@@ -216,10 +236,38 @@ export default {
         enableJsonResponse: true,
       });
 
-      await mcpServer.connect(transport);
+      try {
+        await mcpServer.connect(transport);
+      } catch (connectError) {
+        console.error("[mcp-auth] Failed to connect MCP transport:", connectError);
+        return withCors(
+          new Response(
+            JSON.stringify({
+              jsonrpc: "2.0",
+              error: { code: -32603, message: "MCP transport connection failed" },
+              id: null,
+            }),
+            { status: 500, headers: { "Content-Type": "application/json" } },
+          ),
+          request,
+        );
+      }
 
       const response = await transport.handleRequest(request);
       return withCors(response, request);
+    } catch (error) {
+      console.error("[mcp-auth] Unhandled error:", error);
+      return withCors(
+        new Response(
+          JSON.stringify({
+            jsonrpc: "2.0",
+            error: { code: -32603, message: "Internal server error" },
+            id: null,
+          }),
+          { status: 500, headers: { "Content-Type": "application/json" } },
+        ),
+        request,
+      );
     } finally {
       if (shouldTrack) {
         try {

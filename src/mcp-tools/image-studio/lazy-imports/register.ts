@@ -262,7 +262,7 @@ export function registerImageStudioTools(
     handler: async (input: unknown) => {
       const args = input as Record<string, string>;
       try {
-        const res = await fetch("https://edge.spike.land/bugbook/report", {
+        const res = await fetch("https://spike.land/api/bugbook/report", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({

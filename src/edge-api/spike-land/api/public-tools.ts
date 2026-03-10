@@ -21,17 +21,24 @@ publicToolsRoute.get("/", async (c) => {
   const stabilityFilter = c.req.query("stability");
   const categoryFilter = c.req.query("category");
 
-  const db = createDb(c.env.DB);
-  const mcpServer = new McpServer(
-    { name: "spike-land-mcp", version: "1.0.0" },
-    { capabilities: { tools: { listChanged: true } } },
-  );
+  let registry: ToolRegistry;
+  try {
+    const db = createDb(c.env.DB);
+    const mcpServer = new McpServer(
+      { name: "spike-land-mcp", version: "1.0.0" },
+      { capabilities: { tools: { listChanged: true } } },
+    );
 
-  const registry = new ToolRegistry(mcpServer, "anonymous");
-  await registerAllTools(registry, "anonymous", db, {
-    kv: c.env.KV,
-    vaultSecret: c.env.VAULT_SECRET,
-  });
+    registry = new ToolRegistry(mcpServer, "anonymous");
+    await registerAllTools(registry, "anonymous", db, {
+      kv: c.env.KV,
+      vaultSecret: c.env.VAULT_SECRET,
+    });
+  } catch (err) {
+    const detail = err instanceof Error ? err.message : "Unknown";
+    console.error("[public-tools] Tool registration failed:", detail);
+    return c.json({ error: "Failed to load tools", detail }, 500);
+  }
 
   let definitions = registry.getToolDefinitions();
 

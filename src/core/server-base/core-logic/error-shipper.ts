@@ -47,7 +47,7 @@ export function createErrorShipper(options: ErrorShipperOptions = {}): ErrorShip
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ errors: entries }),
+        body: JSON.stringify(entries),
       });
     } catch {
       // Silently discard: error shipping is best-effort and must not throw

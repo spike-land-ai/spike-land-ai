@@ -314,8 +314,9 @@ mcpRoute.post("/", async (c) => {
       try {
         session = await createSession(c, userId, db);
       } catch (error) {
-        console.error("MCP session creation error", error);
-        return jsonRpcError(500, -32603, "Internal error");
+        const detail = error instanceof Error ? error.message : "Unknown";
+        console.error("MCP session creation error", { userId, detail, error });
+        return jsonRpcError(500, -32603, `Session creation failed: ${detail}`);
       }
     }
   }
@@ -462,8 +463,9 @@ mcpRoute.post("/", async (c) => {
         headers: new Headers(response.headers),
       });
     } catch (error) {
-      console.error("MCP stateless fallback error", error);
-      return jsonRpcError(500, -32603, "Internal error");
+      const detail = error instanceof Error ? error.message : "Unknown";
+      console.error("MCP stateless fallback error", { userId, rpcMethod, detail, error });
+      return jsonRpcError(500, -32603, `Stateless request failed: ${detail}`);
     }
   }
 
@@ -617,8 +619,9 @@ mcpRoute.post("/", async (c) => {
     if (isNewSession && session) {
       await disposeSession(session);
     }
-    console.error("MCP request error", error);
-    return jsonRpcError(500, -32603, "Internal error");
+    const detail = error instanceof Error ? error.message : "Unknown";
+    console.error("MCP request error", { userId, rpcMethod, detail, error });
+    return jsonRpcError(500, -32603, `Request handling failed: ${detail}`);
   }
 });
 
