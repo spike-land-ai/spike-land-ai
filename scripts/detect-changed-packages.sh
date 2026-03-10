@@ -144,7 +144,7 @@ root_package_json_requires_all() {
 # ---------------------------------------------------------------------------
 # Check for config-level ALL triggers first
 # ---------------------------------------------------------------------------
-if echo "$changed_files" | grep -qE '^(\.tests/vitest\.config\.ts|yarn\.lock|\.yarnrc\.yml)$'; then
+if echo "$changed_files" | grep -qE '^(yarn\.lock|\.yarnrc\.yml)$'; then
   echo "ALL"
   exit 0
 fi
@@ -152,6 +152,11 @@ fi
 if root_package_json_requires_all; then
   echo "ALL"
   exit 0
+fi
+
+GLOBAL_TEST_CONFIG_CHANGED=0
+if echo "$changed_files" | grep -qx '.tests/vitest.config.ts'; then
+  GLOBAL_TEST_CONFIG_CHANGED=1
 fi
 
 # ---------------------------------------------------------------------------
@@ -226,6 +231,10 @@ num_affected=$(echo "$unique_pkgs" | grep -c . 2>/dev/null || echo 0)
 
 # Empty result
 if [ -z "$unique_pkgs" ] || [ "$num_affected" -eq 0 ]; then
+  if [ "$GLOBAL_TEST_CONFIG_CHANGED" -eq 1 ]; then
+    echo "ALL"
+    exit 0
+  fi
   echo "NO_CHANGES"
   exit 0
 fi

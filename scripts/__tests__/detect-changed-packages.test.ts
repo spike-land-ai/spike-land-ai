@@ -83,7 +83,7 @@ describe("detect-changed-packages.sh", () => {
     expect(detect(repoRoot, "HEAD", "HEAD")).toEqual(["NO_CHANGES"]);
   });
 
-  it("returns ALL for vitest config changes", () => {
+  it("returns ALL for isolated vitest config changes", () => {
     const repoRoot = createFixtureRepo();
     reposToClean.push(repoRoot);
 
@@ -92,6 +92,18 @@ describe("detect-changed-packages.sh", () => {
     git(repoRoot, "commit", "-m", "change test config");
 
     expect(detect(repoRoot, "HEAD~1", "HEAD")).toEqual(["ALL"]);
+  });
+
+  it("scopes vitest config changes to the changed package when src changes are present", () => {
+    const repoRoot = createFixtureRepo();
+    reposToClean.push(repoRoot);
+
+    write(repoRoot, ".tests/vitest.config.ts", "export default { changed: true };\n");
+    write(repoRoot, "src/frontend/platform-frontend/ui/routes/store.tsx", "export const store = 2;\n");
+    git(repoRoot, "add", ".tests/vitest.config.ts", "src/frontend/platform-frontend/ui/routes/store.tsx");
+    git(repoRoot, "commit", "-m", "change test config and spike-app");
+
+    expect(detect(repoRoot, "HEAD~1", "HEAD")).toEqual(["spike-app"]);
   });
 
   it("does not force ALL for script-only root package.json changes", () => {
