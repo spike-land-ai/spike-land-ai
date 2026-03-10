@@ -173,7 +173,8 @@ export function registerSandboxTools(registry: ToolRegistry, userId: string, db:
         sandbox.execLog.push(entry);
 
         return textResult(
-          `**Execution result**\n\n` +
+          `**[SIMULATION ONLY - NO CODE WAS EXECUTED]**\n` +
+            `**Execution result**\n\n` +
             `- **Language:** ${execLanguage}\n` +
             `- **Exit code:** ${exitCode}\n` +
             `- **Duration:** ${durationMs}ms\n\n` +

@@ -128,6 +128,11 @@ function rowToPost(row: BlogPostRow, includeContent = false) {
     /* default to empty */
   }
 
+  const heroPrompt =
+    normalizePrompt(row.hero_prompt) ??
+    (row.hero_image ? inferPromptFromRow(row, row.hero_image) : null) ??
+    (row.hero_image ? buildFallbackHeroPrompt(row) : null);
+
   const post: Record<string, unknown> = {
     slug: row.slug,
     title: row.title,
@@ -141,12 +146,43 @@ function rowToPost(row: BlogPostRow, includeContent = false) {
     draft: Boolean(row.draft),
     unlisted: Boolean(row.unlisted),
     heroImage: row.hero_image,
-    heroPrompt: typeof row.hero_prompt === "string" ? row.hero_prompt : null,
+    heroPrompt,
   };
   if (includeContent) {
     post.content = row.content;
   }
   return post;
+}
+
+function buildFallbackHeroPrompt(row: Pick<BlogPostRow, "title" | "description">): string | null {
+  const fragments = [normalizePrompt(row.title), normalizePrompt(row.description)].filter(
+    (value): value is string => Boolean(value),
+  );
+  if (!fragments.length) return null;
+
+  return `${fragments.join(". ")}. Cinematic developer blog hero artwork.`;
+}
+
+async function recoverRowHeroPrompt(row: BlogPostRow): Promise<BlogPostRow> {
+  if (normalizePrompt(row.hero_prompt) || !row.hero_image) {
+    return row;
+  }
+
+  const inlinePrompt = inferPromptFromRow(row, row.hero_image);
+  if (inlinePrompt) {
+    row.hero_prompt = inlinePrompt;
+    return row;
+  }
+
+  const sourceRow = await fetchBlogPostSource(row.slug);
+  const sourcePrompt =
+    normalizePrompt(sourceRow?.hero_prompt) ??
+    (sourceRow?.hero_image ? inferPromptFromRow(sourceRow, sourceRow.hero_image) : null);
+  if (sourcePrompt) {
+    row.hero_prompt = sourcePrompt;
+  }
+
+  return row;
 }
 
 interface AnalyticsBlogPost {
@@ -172,10 +208,8 @@ function toAnalyticsBlogPost(post: unknown): AnalyticsBlogPost | null {
   return { slug, title, category, tags };
 }
 
-function isLocalDev(c: { req: { header: (name: string) => string | undefined } }): boolean {
-  const origin = c.req.header("origin") ?? "";
-  const referer = c.req.header("referer") ?? "";
-  return origin.includes("local.spike.land") || referer.includes("local.spike.land");
+function isLocalDev(c: { env: { ENVIRONMENT?: string } }): boolean {
+  return c.env.ENVIRONMENT === "development" || c.env.ENVIRONMENT === "local";
 }
 
 // /api/blog/posts is a common alias — redirect before :slug catches "posts"
@@ -197,7 +231,8 @@ blog.get("/api/blog", async (c) => {
 
         if (!result.results?.length) return null;
 
-        const posts = result.results.map((row) => rowToPost(row));
+        const rows = await Promise.all(result.results.map((row) => recoverRowHeroPrompt(row)));
+        const posts = rows.map((row) => rowToPost(row));
         return new Response(JSON.stringify(posts), {
           headers: { "Content-Type": "application/json" },
         });
@@ -211,7 +246,8 @@ blog.get("/api/blog", async (c) => {
     ).all<BlogPostRow>();
 
     if (result.results?.length) {
-      const posts = result.results.map((row) => rowToPost(row));
+      const rows = await Promise.all(result.results.map((row) => recoverRowHeroPrompt(row)));
+      const posts = rows.map((row) => rowToPost(row));
       cached = new Response(JSON.stringify(posts), {
         headers: { "Content-Type": "application/json" },
       });
@@ -637,24 +673,7 @@ async function getBlogPostRow(db: D1Database, slug: string): Promise<BlogPostRow
       .first<BlogPostRow>();
 
     if (row) {
-      if (!normalizePrompt(row.hero_prompt) && row.hero_image) {
-        const inlinePrompt = inferPromptFromRow(row, row.hero_image);
-        if (inlinePrompt) {
-          row.hero_prompt = inlinePrompt;
-        }
-      }
-
-      if (!normalizePrompt(row.hero_prompt) && row.hero_image) {
-        const sourceRow = await fetchBlogPostSource(normalizedSlug);
-        if (sourceRow?.hero_image === row.hero_image) {
-          const sourcePrompt = inferPromptFromRow(sourceRow, row.hero_image);
-          if (sourcePrompt) {
-            row.hero_prompt = sourcePrompt;
-          }
-        }
-      }
-
-      return row;
+      return recoverRowHeroPrompt(row);
     }
   } catch {
     // Fall through to the canonical MDX source when D1 is unavailable or stale.
@@ -677,9 +696,9 @@ blog.get("/blog/rss", async (c) => {
         `      <link>${link}</link>`,
         `      <description><![CDATA[${post.description}]]></description>`,
         `      <pubDate>${pubDate}</pubDate>`,
-        `      <author>${post.author}</author>`,
+        `      <author><![CDATA[${post.author}]]></author>`,
         `      <guid isPermaLink="true">${link}</guid>`,
-        `      <category>${post.category}</category>`,
+        `      <category><![CDATA[${post.category}]]></category>`,
         "    </item>",
       ].join("\n");
     });

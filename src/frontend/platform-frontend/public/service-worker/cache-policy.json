@@ -1,5 +1,5 @@
 {
-  "version": "2026-03-09-cache-v1",
+  "version": "2026-03-10-cache-v2",
   "cacheNamespace": "spike-app",
   "manifestTtlSeconds": 300,
   "clearOnVersionChange": true,

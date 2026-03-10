@@ -102,6 +102,24 @@ export function registerAuthTools(registry: ToolRegistry, userId: string, db: Dr
   registry.registerBuilt(
     t
       .tool(
+        "auth_signup",
+        "Get the registration URL to create a new account on spike.land. Call this if the user needs to sign up.",
+        {},
+      )
+      .meta({ category: "auth", tier: "free" })
+      .handler(async () => {
+        return textResult(
+          `**Registration Required**\n\n` +
+            `To create an account, please visit:\n` +
+            `https://spike.land/login\n\n` +
+            `You can sign up using GitHub, Google, or Email. Once authenticated, your MCP connection will be able to access protected tools.`,
+        );
+      }),
+  );
+
+  registry.registerBuilt(
+    t
+      .tool(
         "auth_get_profile",
         "Get the current user's full profile with optional workspace memberships.",
         {

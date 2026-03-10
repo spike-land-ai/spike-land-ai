@@ -161,14 +161,14 @@ function MetricTile({
   icon: ReactNode;
 }) {
   return (
-    <div className="rounded-[1.4rem] border border-border bg-card/85 p-5 shadow-[0_24px_60px_color-mix(in_srgb,var(--fg)_5%,transparent)] backdrop-blur">
+    <div className="rounded-2xl border border-border bg-card/85 p-5 shadow-[0_24px_60px_color-mix(in_srgb,var(--foreground)_5%,transparent)] backdrop-blur">
       <div className="flex items-center justify-between gap-3">
-        <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+        <span className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
           {label}
         </span>
         <span className="text-muted-foreground">{icon}</span>
       </div>
-      <p className="mt-3 text-3xl font-semibold tracking-[-0.06em] text-foreground">{value}</p>
+      <p className="mt-3 text-3xl font-display font-bold tracking-tight text-foreground">{value}</p>
       <p className="mt-2 text-sm text-muted-foreground">{hint}</p>
     </div>
   );
@@ -185,8 +185,8 @@ function RequestBars({
   const maxRequests = Math.max(1, ...points.map((point) => point.requestCount));
 
   return (
-    <div className="space-y-3 rounded-[1.2rem] border border-border/80 bg-background/70 p-4">
-      <div className="flex items-center justify-between gap-3 text-xs uppercase tracking-[0.16em] text-muted-foreground">
+    <div className="space-y-3 rounded-xl border border-border/80 bg-background/70 p-4">
+      <div className="flex items-center justify-between gap-3 text-xs font-semibold uppercase tracking-widest text-muted-foreground">
         <span>Requests / minute</span>
         <span>{points.length} buckets</span>
       </div>
@@ -219,18 +219,16 @@ function ServiceCard({ service, rangeLabel }: { service: StatusService; rangeLab
 
   return (
     <article
-      className={`rounded-[1.6rem] border bg-card/90 p-5 shadow-[0_24px_70px_color-mix(in_srgb,var(--fg)_5%,transparent)] backdrop-blur ${tone.panel}`}
+      className={`rounded-3xl border bg-card/90 p-5 shadow-[0_24px_70px_color-mix(in_srgb,var(--foreground)_5%,transparent)] backdrop-blur ${tone.panel}`}
     >
       <div className="flex flex-col gap-4">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
-            <p className="text-xl font-semibold tracking-[-0.04em] text-foreground">
-              {service.label}
-            </p>
+            <p className="text-xl font-display font-semibold text-foreground">{service.label}</p>
             <p className="mt-1 font-mono text-xs text-muted-foreground">{service.url}</p>
           </div>
           <span
-            className={`inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.14em] ${tone.badge}`}
+            className={`inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-semibold uppercase tracking-widest ${tone.badge}`}
           >
             <span className="h-2 w-2 rounded-full bg-current" />
             {service.status}
@@ -254,68 +252,66 @@ function ServiceCard({ service, rangeLabel }: { service: StatusService; rangeLab
         <RequestBars points={service.history.chartPoints} status={service.status} />
 
         <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-          <div className="rounded-[1.1rem] border border-border bg-background/60 p-3.5">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+          <div className="rounded-xl border border-border bg-background/60 p-3.5">
+            <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
               Current load
             </p>
-            <p className="mt-2 text-xl font-semibold tracking-[-0.04em] text-foreground">
+            <p className="mt-2 text-xl font-display font-semibold text-foreground">
               {formatRpm(service.history.summary.currentRpm)}
             </p>
             <p className="mt-1 text-sm text-muted-foreground">
               {formatSignedRpm(service.history.summary.currentRpmDelta)} vs mean
             </p>
           </div>
-          <div className="rounded-[1.1rem] border border-border bg-background/60 p-3.5">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+          <div className="rounded-xl border border-border bg-background/60 p-3.5">
+            <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
               Latency spread
             </p>
-            <p className="mt-2 text-xl font-semibold tracking-[-0.04em] text-foreground">
+            <p className="mt-2 text-xl font-display font-semibold text-foreground">
               {formatDuration(service.history.summary.stddevLatencyMs)}
             </p>
             <p className="mt-1 text-sm text-muted-foreground">
               Standard deviation over {rangeLabel.toLowerCase()}
             </p>
           </div>
-          <div className="rounded-[1.1rem] border border-border bg-background/60 p-3.5">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+          <div className="rounded-xl border border-border bg-background/60 p-3.5">
+            <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
               Mean latency
             </p>
-            <p className="mt-2 text-xl font-semibold tracking-[-0.04em] text-foreground">
+            <p className="mt-2 text-xl font-display font-semibold text-foreground">
               {formatDuration(service.history.summary.meanLatencyMs)}
             </p>
             <p className="mt-1 text-sm text-muted-foreground">
               latest {formatSignedDuration(service.history.summary.latestLatencyDeltaMs)}
             </p>
           </div>
-          <div className="rounded-[1.1rem] border border-border bg-background/60 p-3.5">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+          <div className="rounded-xl border border-border bg-background/60 p-3.5">
+            <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
               Min / max
             </p>
-            <p className="mt-2 text-xl font-semibold tracking-[-0.04em] text-foreground">
+            <p className="mt-2 text-xl font-display font-semibold text-foreground">
               {formatDuration(service.history.summary.minLatencyMs)}
             </p>
             <p className="mt-1 text-sm text-muted-foreground">
               max {formatDuration(service.history.summary.maxLatencyMs)}
             </p>
           </div>
-          <div className="rounded-[1.1rem] border border-border bg-background/60 p-3.5">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+          <div className="rounded-xl border border-border bg-background/60 p-3.5">
+            <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
               Observed requests
             </p>
-            <p className="mt-2 text-xl font-semibold tracking-[-0.04em] text-foreground">
+            <p className="mt-2 text-xl font-display font-semibold text-foreground">
               {service.history.summary.totalRequests.toLocaleString()}
             </p>
             <p className="mt-1 text-sm text-muted-foreground">
               peak {formatRpm(service.history.summary.peakRpm)}
             </p>
           </div>
-          <div className="rounded-[1.1rem] border border-border bg-background/60 p-3.5">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+          <div className="rounded-xl border border-border bg-background/60 p-3.5">
+            <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
               Request window
             </p>
-            <p className="mt-2 text-xl font-semibold tracking-[-0.04em] text-foreground">
-              {rangeLabel}
-            </p>
+            <p className="mt-2 text-xl font-display font-semibold text-foreground">{rangeLabel}</p>
             <p className="mt-1 text-sm text-muted-foreground">
               avg {formatRpm(service.history.summary.averageRpm)}
             </p>
@@ -331,12 +327,12 @@ function StatusSkeleton() {
     <div className="space-y-6">
       <div className="grid gap-4 lg:grid-cols-4">
         {Array.from({ length: 4 }).map((_, index) => (
-          <Skeleton key={index} className="h-36 rounded-[1.4rem]" />
+          <Skeleton key={index} className="h-36 rounded-2xl" />
         ))}
       </div>
       <div className="grid gap-4 xl:grid-cols-2">
         {Array.from({ length: 4 }).map((_, index) => (
-          <Skeleton key={index} className="h-[26rem] rounded-[1.6rem]" />
+          <Skeleton key={index} className="h-[26rem] rounded-3xl" />
         ))}
       </div>
     </div>
@@ -397,15 +393,15 @@ export function StatusPage() {
 
   return (
     <div className="relative isolate overflow-hidden">
-      <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_top_left,color-mix(in_srgb,var(--primary)_18%,transparent),transparent_38%),radial-gradient(circle_at_top_right,color-mix(in_srgb,var(--success)_10%,transparent),transparent_34%),linear-gradient(180deg,color-mix(in_srgb,var(--background)_96%,black_4%),color-mix(in_srgb,var(--background)_100%,black_12%))]" />
+      <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_top_left,color-mix(in_srgb,var(--primary)_18%,transparent),transparent_38%),radial-gradient(circle_at_top_right,color-mix(in_srgb,var(--success)_10%,transparent),transparent_34%),linear-gradient(180deg,color-mix(in_srgb,var(--background)_96%,var(--foreground)_4%),color-mix(in_srgb,var(--background)_100%,var(--foreground)_12%))]" />
       <div className="mx-auto flex w-full max-w-7xl flex-col gap-8 px-4 py-10 sm:px-6 lg:px-8">
         <section className="grid gap-5 xl:grid-cols-[minmax(0,1.2fr)_minmax(24rem,0.8fr)]">
-          <div className="rounded-[2rem] border border-border bg-card/90 p-7 shadow-[0_26px_90px_color-mix(in_srgb,var(--fg)_6%,transparent)] backdrop-blur sm:p-9">
-            <div className="inline-flex items-center gap-2 rounded-full border border-border bg-background/70 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+          <div className="rounded-3xl border border-border bg-card/90 p-7 shadow-[0_26px_90px_color-mix(in_srgb,var(--foreground)_6%,transparent)] backdrop-blur sm:p-9">
+            <div className="inline-flex items-center gap-2 rounded-full border border-border bg-background/70 px-3 py-1 text-xs font-semibold uppercase tracking-widest text-muted-foreground">
               <span className="h-2 w-2 rounded-full bg-primary" />
               Platform telemetry
             </div>
-            <h1 className="mt-4 max-w-4xl text-4xl font-semibold tracking-[-0.08em] text-foreground sm:text-5xl">
+            <h1 className="mt-4 max-w-4xl text-4xl font-display font-extrabold tracking-tight text-foreground sm:text-5xl">
               Historical request pressure and latency spread per service.
             </h1>
             <p className="mt-4 max-w-3xl text-base leading-7 text-muted-foreground sm:text-lg">
@@ -441,13 +437,13 @@ export function StatusPage() {
             </div>
           </div>
 
-          <div className="rounded-[2rem] border border-border bg-card/90 p-7 shadow-[0_26px_90px_color-mix(in_srgb,var(--fg)_6%,transparent)] backdrop-blur sm:p-8">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+          <div className="rounded-3xl border border-border bg-card/90 p-7 shadow-[0_26px_90px_color-mix(in_srgb,var(--foreground)_6%,transparent)] backdrop-blur sm:p-8">
+            <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
               Live status
             </p>
             <div className="mt-4 flex items-center gap-3">
               <div
-                className={`inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-semibold uppercase tracking-[0.14em] ${
+                className={`inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-semibold uppercase tracking-widest ${
                   payload?.overall === "major_outage"
                     ? "border-destructive/20 bg-destructive/70 text-destructive-foreground"
                     : payload?.overall === "partial_degradation"
@@ -463,11 +459,11 @@ export function StatusPage() {
               )}
             </div>
             <div className="mt-5 space-y-4">
-              <div className="rounded-[1.25rem] border border-border bg-background/65 p-4">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+              <div className="rounded-2xl border border-border bg-background/65 p-4">
+                <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
                   Service count
                 </p>
-                <p className="mt-2 text-2xl font-semibold tracking-[-0.05em] text-foreground">
+                <p className="mt-2 text-2xl font-display font-bold tracking-tight text-foreground">
                   {payload ? `${payload.summary.up}/${payload.summary.total}` : "—"}
                 </p>
                 <p className="mt-1 text-sm text-muted-foreground">
@@ -477,24 +473,24 @@ export function StatusPage() {
                 </p>
               </div>
               {error && (
-                <div className="rounded-[1.25rem] border border-destructive/25 bg-destructive/10 p-4 text-sm text-destructive">
+                <div className="rounded-2xl border border-destructive/25 bg-destructive/10 p-4 text-sm text-destructive">
                   {error}
                 </div>
               )}
               <div className="grid gap-3 sm:grid-cols-2">
-                <div className="rounded-[1.25rem] border border-border bg-background/65 p-4">
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+                <div className="rounded-2xl border border-border bg-background/65 p-4">
+                  <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
                     Current rpm
                   </p>
-                  <p className="mt-2 text-2xl font-semibold tracking-[-0.05em] text-foreground">
+                  <p className="mt-2 text-2xl font-display font-bold tracking-tight text-foreground">
                     {payload ? formatRpm(payload.platform.currentRpm) : "—"}
                   </p>
                 </div>
-                <div className="rounded-[1.25rem] border border-border bg-background/65 p-4">
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+                <div className="rounded-2xl border border-border bg-background/65 p-4">
+                  <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
                     Mean latency
                   </p>
-                  <p className="mt-2 text-2xl font-semibold tracking-[-0.05em] text-foreground">
+                  <p className="mt-2 text-2xl font-display font-bold tracking-tight text-foreground">
                     {payload ? formatDuration(payload.platform.meanLatencyMs) : "—"}
                   </p>
                 </div>
@@ -537,10 +533,10 @@ export function StatusPage() {
             <section className="space-y-4">
               <div className="flex items-center justify-between gap-3">
                 <div>
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                  <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
                     Service breakdown
                   </p>
-                  <h2 className="mt-1 text-2xl font-semibold tracking-[-0.05em] text-foreground">
+                  <h2 className="mt-1 text-2xl font-display font-bold tracking-tight text-foreground">
                     Requests, request time floor and ceiling, mean, and deviation.
                   </h2>
                 </div>

@@ -453,7 +453,7 @@ export function registerAppsTools(
         "PERMANENTLY delete an app. CANNOT be undone. Must be in the bin first.",
         {
           app_id: z.string().min(1).describe("App identifier. Must already be in the bin."),
-          confirm: z.coerce.boolean().describe("Must be true. This action CANNOT be undone."),
+          confirm: z.boolean().describe("Must be true. This action CANNOT be undone."),
         },
       )
       .meta({ category: "apps", tier: "free" })

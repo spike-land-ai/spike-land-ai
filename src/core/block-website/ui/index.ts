@@ -1,5 +1,6 @@
 export * from "./BayesianConfidenceCore";
 export * from "./BayesianConfidenceDemo";
+export * from "./SupportBanner";
 export * from "./BlogList";
 export * from "./BlogPost";
 export * from "./Footer";

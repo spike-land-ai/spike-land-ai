@@ -56,6 +56,9 @@ test_transport.js
 *.tfstate.backup
 terraform.tfvars
 
+# Invoices / personal documents
+content/*.pdf
+
 # Secrets / credentials
 *-client-secret*.json
 *-credentials*.json

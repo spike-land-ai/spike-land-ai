@@ -10,7 +10,10 @@ export function StorePage() {
   const { data: apps, isLoading, isError, error } = useApps();
 
   const groupedApps = useMemo(() => groupAppsByCategory(apps ?? []), [apps]);
-  const featuredApps = useMemo(() => (apps ?? []).filter((app) => app.is_featured).slice(0, 4), [apps]);
+  const featuredApps = useMemo(
+    () => (apps ?? []).filter((app) => app.is_featured).slice(0, 4),
+    [apps],
+  );
   const newestApps = useMemo(() => (apps ?? []).filter((app) => app.is_new).slice(0, 8), [apps]);
   const activeGroup = useMemo(() => {
     if (!search.category) return null;
@@ -41,7 +44,7 @@ export function StorePage() {
     return (
       <div className="rubik-container rubik-page rubik-stack">
         <div className="rubik-panel space-y-4 p-8 text-center">
-          <p className="text-lg font-semibold tracking-[-0.03em] text-foreground">
+          <p className="text-lg font-display font-semibold text-foreground">
             We couldn&apos;t load the app catalog right now.
           </p>
           <p className="text-sm text-muted-foreground">
@@ -76,10 +79,10 @@ export function StorePage() {
       <aside className="hidden xl:block xl:w-64 xl:shrink-0">
         <div className="sticky top-6 space-y-4">
           <div className="rubik-panel p-5">
-            <div className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">
+            <div className="text-xs font-semibold tracking-widest uppercase text-primary">
               Navigation
             </div>
-            <h1 className="mt-2 text-2xl font-semibold tracking-[-0.05em] text-foreground">
+            <h1 className="mt-2 text-2xl font-display font-bold tracking-tight text-foreground">
               App Store
             </h1>
             <p className="mt-2 text-sm leading-7 text-muted-foreground">
@@ -106,7 +109,7 @@ export function StorePage() {
               App Store
             </span>
             <div className="space-y-3">
-              <h2 className="text-4xl font-semibold tracking-[-0.06em] text-foreground sm:text-5xl">
+              <h2 className="text-4xl font-display font-extrabold tracking-tight text-foreground sm:text-5xl">
                 Browse product-shaped MCP apps, not disconnected tool listings.
               </h2>
               <p className="rubik-lede">
@@ -201,15 +204,15 @@ export function StorePage() {
           <>
             <section className="rubik-panel flex flex-col gap-4 p-6 sm:flex-row sm:items-end sm:justify-between">
               <div className="space-y-2">
-                <div className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">
+                <div className="text-xs font-semibold tracking-widest uppercase text-primary">
                   Category View
                 </div>
-                <h3 className="text-3xl font-semibold tracking-[-0.05em] text-foreground">
+                <h3 className="text-3xl font-display font-bold tracking-tight text-foreground">
                   {activeGroup.category}
                 </h3>
                 <p className="text-sm leading-7 text-muted-foreground">
-                  Browse {activeGroup.apps.length}{" "}
-                  {activeGroup.apps.length === 1 ? "app" : "apps"} in this capability family.
+                  Browse {activeGroup.apps.length} {activeGroup.apps.length === 1 ? "app" : "apps"}{" "}
+                  in this capability family.
                 </p>
               </div>
               <button

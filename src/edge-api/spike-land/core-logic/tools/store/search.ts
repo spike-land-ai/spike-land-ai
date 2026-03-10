@@ -23,11 +23,24 @@ export function registerStoreSearchTools(
       .tool(
         "store_list_apps_with_tools",
         "List all store apps with their MCP tool names for CLI tool grouping.",
-        {},
+        {
+          limit: z
+            .number()
+            .int()
+            .min(1)
+            .max(100)
+            .optional()
+            .describe("Max apps to return (default 50)"),
+          cursor: z.string().optional().describe("Pagination cursor for next page"),
+        },
       )
       .meta({ category: "store-search", tier: "free" })
-      .handler(async () => {
+      .handler(async ({ input }) => {
         return safeToolCall("store_list_apps_with_tools", async () => {
+          const params = new URLSearchParams();
+          if (input.limit !== undefined) params.set("limit", String(input.limit));
+          if (input.cursor) params.set("cursor", input.cursor);
+
           const apps = await apiRequest<
             Array<{
               slug: string;
@@ -37,7 +50,7 @@ export function registerStoreSearchTools(
               tagline: string;
               toolNames: string[];
             }>
-          >("/api/store/apps/with-tools");
+          >(`/api/store/apps/with-tools?${params.toString()}`);
 
           return textResult(JSON.stringify(apps));
         });
@@ -111,7 +124,7 @@ export function registerStoreSearchTools(
               tagline: string;
               slug: string;
             }>
-          >(`/api/store/category/${input.category}`);
+          >(`/api/store/category/${encodeURIComponent(input.category)}`);
 
           if (apps.length === 0) {
             return textResult(`No apps found in category "${input.category}".`);

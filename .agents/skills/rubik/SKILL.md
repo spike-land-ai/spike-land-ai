@@ -289,8 +289,14 @@ Before calling a spike.land UI done, review it against this list:
 ## Prohibitions
 
 - **No Inter, Roboto, Arial, Schibsted Grotesk** — Rubik is the identity font
-- **No hardcoded colors** — semantic tokens only
-- **No `dark:` prefix** — CSS variables handle themes
+- **No hardcoded colors** — semantic tokens only (e.g., `text-primary`, not `text-blue-500` or `text-[#123456]`).
+- **No `dark:` prefix** — CSS variables handle themes.
+- **No arbitrary geometry** — do not use improvised `rounded-[x]` values. Use the tight standard scale (`rounded-md`, `rounded-lg`, `rounded-xl`, `rounded-2xl`).
+- **No generic SaaS gradients** — avoid `bg-clip-text text-transparent bg-gradient-to-r` unless explicitly matching a branded logo. Use weight and typography scale for emphasis.
+- **No continuous pulse animations** — avoid `animate-pulse` on text. Use kinetic typography (`<whisper>`, `<crescendo>`) or deliberate state reveals.
+- **No floaty hover glows** — avoid `group-hover:shadow-[color]` for hover states. Prefer structural geometry overlays (`hover:bg-muted/50`).
+- **No naked route elements** — every root page/layout component must wrap its contents in a structural shell that ensures `bg-background text-foreground font-sans min-h-screen` context.
+- **No weak headings** — display headings (H1, H2) must include `font-display tracking-tight` with proper weight mappings (`font-bold`, `font-extrabold`, or `font-black`).
 - **No generic layouts** — every section should feel intentional
 - **No full landing pages inside small previews** — design for containment
 - **No washed-out accent palettes in light mode** — increase contrast deliberately

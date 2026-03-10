@@ -78,6 +78,21 @@ export function trackPurchaseConversion(value?: number, currency = "USD"): void 
   });
 }
 
+/** Track a migration service purchase conversion with tier and value. */
+export function trackMigrationConversion(
+  tier: "blog" | "script" | "mcp",
+  value: number,
+  currency = "USD",
+): void {
+  if (typeof window.gtag !== "function") return;
+  window.gtag("event", "conversion", {
+    send_to: `${GOOGLE_ADS_ID}/migration_${tier}_checkout`,
+    value,
+    currency,
+    migration_tier: tier,
+  });
+}
+
 /** Track a custom Google Ads event (e.g. docs engagement, CLI install page). */
 export function trackGoogleAdsEvent(eventName: string, params?: Record<string, unknown>): void {
   if (typeof window.gtag !== "function") return;

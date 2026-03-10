@@ -384,6 +384,12 @@ const whatWeDoRoute = createRoute({
   component: withSuspense(() => import("./routes/what-we-do"), "WhatWeDoPage"),
 });
 
+const migrateRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/migrate",
+  component: withSuspense(() => import("./routes/migrate"), "MigratePage"),
+});
+
 const buildRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/build",
@@ -422,6 +428,7 @@ const routeTree = rootRoute.addChildren([
   cockpitRoute,
   bazdmegRoute,
   whatWeDoRoute,
+  migrateRoute,
   vibeCodeRoute,
   buildRoute,
   toolSurfaceRoute,

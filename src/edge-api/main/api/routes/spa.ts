@@ -8,6 +8,7 @@ import { trackPageView } from "../../core-logic/analytics.js";
 import { getCacheVersion } from "../lib/cache-version.js";
 import {
   getSpaResponseCacheControl,
+  getSpaStaticAssetPolicy,
   getSpaShellStatusCode,
   getSpaStaticAssetEdgeCacheSettings,
   isHtmlLikeResponse,
@@ -21,6 +22,7 @@ const spa = new Hono<{ Bindings: Env }>();
 spa.get("/*", async (c) => {
   const path = new URL(c.req.url).pathname;
   const key = normalizeSpaAssetKey(path);
+  const staticAssetPolicy = getSpaStaticAssetPolicy(key);
 
   // For static assets (not index.html), use edge cache to avoid R2 reads
   const staticAssetCacheSettings = await (async () => {
@@ -47,6 +49,19 @@ spa.get("/*", async (c) => {
 
     // Static asset not in cache and not in R2 — return 404, never serve index.html
     return c.text("Not Found", 404);
+  }
+
+  if (staticAssetPolicy?.bypassEdgeCache) {
+    const object = await c.env.SPA_ASSETS.get(key);
+    if (!object) {
+      return c.text("Not Found", 404);
+    }
+
+    const headers = new Headers();
+    object.writeHttpMetadata(headers);
+    headers.set("etag", object.httpEtag);
+    headers.set("cache-control", staticAssetPolicy.cacheControl);
+    return new Response(object.body, { headers });
   }
 
   const object = await c.env.SPA_ASSETS.get(key);
@@ -279,6 +294,13 @@ spa.get("/*", async (c) => {
               "Technical documentation, API reference, MCP tools guide, and architecture overview for spike.land.",
             ssrContent:
               "<h1>Documentation</h1><p>Technical documentation, API reference, MCP tools guide, and architecture overview for spike.land.</p>",
+          },
+          "/migrate": {
+            title: "Migration Services - spike.land",
+            description:
+              "Migrate your legacy stack to edge-first, MCP-native architecture. Blog, Script, and full MCP server tiers available.",
+            ssrContent:
+              "<h1>Migration Services</h1><p>Migrate your legacy stack to edge-first, MCP-native architecture. Blog, Script, and full MCP server tiers available.</p>",
           },
         };
       const meta = routeMeta[path];

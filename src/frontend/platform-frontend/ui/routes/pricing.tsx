@@ -164,7 +164,7 @@ function PlanCard({
         <span className="rubik-chip rubik-chip-accent mb-4 self-start">{t("mostPopular")}</span>
       )}
 
-      <h2 id={planId} className="text-xl font-semibold tracking-[-0.03em] text-foreground">
+      <h2 id={planId} className="text-xl font-display font-bold tracking-tight text-foreground">
         {plan.name}
       </h2>
       <p className="mt-2 text-sm leading-7 text-muted-foreground">{plan.description}</p>
@@ -182,7 +182,7 @@ function PlanCard({
       </div>
 
       {annual && !isFree && (
-        <span className="mt-3 inline-flex self-start rounded-full border border-success/20 bg-success/70 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-success-foreground">
+        <span className="mt-3 inline-flex self-start rounded-full border border-primary/20 bg-primary/10 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-primary">
           {t("saveAmount")}
         </span>
       )}
@@ -280,14 +280,14 @@ export function PricingPage() {
             {t("eyebrow")}
           </span>
           <div className="space-y-3">
-            <h1 className="text-4xl font-semibold tracking-[-0.06em] text-foreground sm:text-5xl">
+            <h1 className="text-4xl font-display font-bold tracking-tight text-foreground sm:text-5xl">
               {t("title")}
             </h1>
             <p className="rubik-lede mx-auto">{t("subtitle")}</p>
           </div>
         </div>
 
-        <div className="inline-flex items-center gap-2 rounded-full border border-success/20 bg-success/70 px-4 py-2 text-sm font-medium text-success-foreground">
+        <div className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-4 py-2 text-sm font-medium text-primary">
           {t("launchPromo")}
         </div>
 
@@ -329,7 +329,7 @@ export function PricingPage() {
             }`}
           >
             {t("annual")}
-            <span className="ml-1.5 rounded-full bg-green-100 px-1.5 py-0.5 text-xs font-semibold text-green-700 dark:bg-green-900/30 dark:text-green-400">
+            <span className="ml-1.5 rounded-full bg-primary/10 px-1.5 py-0.5 text-xs font-semibold text-primary">
               {t("annualSavings")}
             </span>
           </button>
@@ -378,7 +378,7 @@ export function PricingPage() {
 
       {/* FAQ */}
       <div className="rubik-panel mx-auto max-w-3xl p-6 sm:p-8">
-        <h2 className="mb-6 text-center text-2xl font-semibold tracking-[-0.04em] text-foreground">
+        <h2 className="mb-6 text-center text-2xl font-display font-bold tracking-tight text-foreground">
           {t("faq.title")}
         </h2>
         <div>

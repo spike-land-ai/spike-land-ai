@@ -22,6 +22,18 @@ describe("SPA cache headers", () => {
   });
 
   it("derives static asset cache policy for hashed and unhashed assets", () => {
+    expect(getSpaStaticAssetPolicy("spike-cache-worker.js")).toEqual({
+      cacheControl: "public, max-age=0, must-revalidate",
+      immutable: false,
+      ttl: 0,
+      bypassEdgeCache: true,
+    });
+    expect(getSpaStaticAssetPolicy("service-worker/cache-policy.json")).toEqual({
+      cacheControl: "public, max-age=0, must-revalidate",
+      immutable: false,
+      ttl: 0,
+      bypassEdgeCache: true,
+    });
     expect(getSpaStaticAssetPolicy("assets/index.12345678.js")).toEqual({
       cacheControl: "public, max-age=31536000, immutable",
       immutable: true,
@@ -39,6 +51,13 @@ describe("SPA cache headers", () => {
   it("derives edge cache settings for static assets", () => {
     expect(
       getSpaStaticAssetEdgeCacheSettings(
+        "https://spike.land/spike-cache-worker.js",
+        "spike-cache-worker.js",
+        "v42",
+      ),
+    ).toBeNull();
+    expect(
+      getSpaStaticAssetEdgeCacheSettings(
         "https://spike.land/assets/index.12345678.js",
         "assets/index.12345678.js",
         "v42",
@@ -48,7 +67,9 @@ describe("SPA cache headers", () => {
       immutable: true,
       ttl: 31_536_000,
     });
-    expect(getSpaStaticAssetEdgeCacheSettings("https://spike.land/about", "index.html", "v42")).toBeNull();
+    expect(
+      getSpaStaticAssetEdgeCacheSettings("https://spike.land/about", "index.html", "v42"),
+    ).toBeNull();
   });
 
   it("resolves prerender fallback keys from SPA paths", () => {

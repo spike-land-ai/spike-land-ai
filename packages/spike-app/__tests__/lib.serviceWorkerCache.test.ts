@@ -12,7 +12,9 @@ function clearServiceWorker() {
 }
 
 function setServiceWorkerContainer(
-  container: ServiceWorkerContainer | (Partial<ServiceWorkerContainer> & { controller?: ServiceWorker | null }),
+  container:
+    | ServiceWorkerContainer
+    | (Partial<ServiceWorkerContainer> & { controller?: ServiceWorker | null }),
 ) {
   Object.defineProperty(navigator, "serviceWorker", {
     configurable: true,
@@ -181,11 +183,13 @@ describe("serviceWorkerCache", () => {
       ]),
     });
     setCacheStorage({
-      keys: vi.fn().mockResolvedValue([
-        "spike-cache-control-plane",
-        "spike-cache-v1-pages",
-        "unrelated-cache",
-      ]),
+      keys: vi
+        .fn()
+        .mockResolvedValue([
+          "spike-cache-control-plane",
+          "spike-cache-v1-pages",
+          "unrelated-cache",
+        ]),
       delete: deleteCache,
     } as unknown as CacheStorage);
 
@@ -300,10 +304,10 @@ describe("serviceWorkerCache", () => {
   it("reads status replies from the worker", async () => {
     const statusPayload = {
       manifestUrl: "https://dev.spike.land/service-worker/cache-policy.json",
-      version: "2026-03-09-cache-v1",
+      version: "2026-03-10-cache-v2",
       cacheNamespace: "spike-app",
       lastUpdatedAt: Date.now(),
-      cacheNames: ["spike-app-2026-03-09-cache-v1-pages"],
+      cacheNames: ["spike-app-2026-03-10-cache-v2-pages"],
     };
     const target = createWorkerTarget((message, transfer) => {
       expect(message).toEqual({ type: "get-status" });

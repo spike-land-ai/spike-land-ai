@@ -1,5 +1,3 @@
-"use client";
-
 import { useCallback, useEffect, useRef, useState } from "react";
 import { cn } from "@spike-land-ai/shared";
 import { apiUrl } from "../core-logic/api";
@@ -112,6 +110,7 @@ function BlogBanner({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ slug, clientId: getClientId() }),
       });
+      if (!res.ok) return;
       const data = (await res.json()) as { count: number };
       setBumpCount(data.count);
       setBumped(true);
@@ -135,9 +134,27 @@ function BlogBanner({
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ slug, amount, clientId: getClientId() }),
         });
+        if (!res.ok) {
+          setDonatingAmount(null);
+          return;
+        }
         const data = (await res.json()) as { url?: string };
         if (data.url) {
-          window.location.href = data.url;
+          // Only redirect to same-origin or trusted domains
+          try {
+            const target = new URL(data.url, window.location.origin);
+            const trusted = ["spike.land", "checkout.stripe.com"];
+            if (
+              target.origin === window.location.origin ||
+              trusted.some((d) => target.hostname === d || target.hostname.endsWith(`.${d}`))
+            ) {
+              window.location.href = data.url;
+            } else {
+              setDonatingAmount(null);
+            }
+          } catch {
+            setDonatingAmount(null);
+          }
         } else {
           setDonatingAmount(null);
         }
@@ -194,7 +211,10 @@ function BlogBanner({
               {bumped ? "Thanks for the love!" : "Enjoyed this? Fist bump it."}
             </p>
             {bumpCount > 0 && (
-              <p className="text-[11px] font-semibold text-muted-foreground/70 mt-0.5 tabular-nums">
+              <p
+                aria-live="polite"
+                className="text-[11px] font-semibold text-muted-foreground/70 mt-0.5 tabular-nums"
+              >
                 {bumpCount.toLocaleString()} {bumpCount === 1 ? "bump" : "bumps"}
               </p>
             )}

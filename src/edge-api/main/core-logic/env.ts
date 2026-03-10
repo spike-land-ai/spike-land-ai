@@ -32,4 +32,6 @@ export interface Env {
   CF_CACHE_PURGE_TOKEN: string;
   XAI_API_KEY: string;
   ANALYTICS: AnalyticsEngineDataset;
+  /** Set to "development" or "local" in dev wrangler config to enable draft posts */
+  ENVIRONMENT?: string;
 }

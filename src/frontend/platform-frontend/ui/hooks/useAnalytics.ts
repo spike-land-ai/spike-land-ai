@@ -109,6 +109,10 @@ const GA4_MIRRORED_EVENTS = new Set([
   "app_install",
   "blog_view",
   "credit_purchase_started",
+  "migration_interest",
+  "migration_checkout_started",
+  "migration_page_view",
+  "migration_tier_click",
 ]);
 
 function enqueueEvent(event: string, data: Record<string, unknown>) {

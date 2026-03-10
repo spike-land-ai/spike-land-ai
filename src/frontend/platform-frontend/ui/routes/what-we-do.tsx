@@ -31,8 +31,6 @@ interface Domain {
   toolCount: number;
   description: string;
   detail: string;
-  colorClass: string;
-  glowClass: string;
 }
 
 interface StatItem {
@@ -55,8 +53,6 @@ const DOMAINS: Domain[] = [
     description: "Code review, linting, transpilation",
     detail:
       "AI-powered code review, static analysis, esbuild-wasm transpilation at the edge, and Monaco-based live editing.",
-    colorClass: "text-blue-400",
-    glowClass: "group-hover:shadow-blue-500/20",
   },
   {
     id: "image-studio",
@@ -66,8 +62,6 @@ const DOMAINS: Domain[] = [
     description: "AI generation, enhancement, albums",
     detail:
       "Generate, enhance, and organize images using AI pipelines. Batch processing, album management, and style transfer.",
-    colorClass: "text-pink-400",
-    glowClass: "group-hover:shadow-pink-500/20",
   },
   {
     id: "data-analytics",
@@ -77,8 +71,6 @@ const DOMAINS: Domain[] = [
     description: "GA4, Stripe analytics, insights",
     detail:
       "Connect to Google Analytics 4, Stripe revenue dashboards, churn analysis, MRR tracking, and custom report generation.",
-    colorClass: "text-emerald-400",
-    glowClass: "group-hover:shadow-emerald-500/20",
   },
   {
     id: "chess-engine",
@@ -88,8 +80,6 @@ const DOMAINS: Domain[] = [
     description: "ELO, challenges, game management",
     detail:
       "Full ELO rating system, player tracking, challenge management, game history, and tournament bracket tools.",
-    colorClass: "text-amber-400",
-    glowClass: "group-hover:shadow-amber-500/20",
   },
   {
     id: "browser-automation",
@@ -99,8 +89,6 @@ const DOMAINS: Domain[] = [
     description: "QA studio, Playwright",
     detail:
       "End-to-end test generation, Playwright script execution, screenshot capture, performance audits, and visual diffing.",
-    colorClass: "text-cyan-400",
-    glowClass: "group-hover:shadow-cyan-500/20",
   },
   {
     id: "state-machines",
@@ -110,8 +98,6 @@ const DOMAINS: Domain[] = [
     description: "Statecharts, guards, visualization",
     detail:
       "Design and run statecharts with guard-condition parsing, transition visualization, and serializable machine export.",
-    colorClass: "text-violet-400",
-    glowClass: "group-hover:shadow-violet-500/20",
   },
   {
     id: "communication",
@@ -121,8 +107,6 @@ const DOMAINS: Domain[] = [
     description: "HackerNews, messaging, notifications",
     detail:
       "Read and post HackerNews threads, send notifications, manage real-time messaging channels, and webhook dispatch.",
-    colorClass: "text-orange-400",
-    glowClass: "group-hover:shadow-orange-500/20",
   },
   {
     id: "authentication",
@@ -132,8 +116,6 @@ const DOMAINS: Domain[] = [
     description: "OAuth, sessions, organizations",
     detail:
       "Better Auth integration: OAuth providers, session management, organization RBAC, API key vault, and BYOK support.",
-    colorClass: "text-green-400",
-    glowClass: "group-hover:shadow-green-500/20",
   },
   {
     id: "storage-cdn",
@@ -143,8 +125,6 @@ const DOMAINS: Domain[] = [
     description: "R2, edge caching, assets",
     detail:
       "Cloudflare R2 object storage, edge-cached asset delivery, D1 SQL queries, and KV key-value operations.",
-    colorClass: "text-sky-400",
-    glowClass: "group-hover:shadow-sky-500/20",
   },
   {
     id: "developer-tools",
@@ -154,8 +134,6 @@ const DOMAINS: Domain[] = [
     description: "CLI, Docker, deployment",
     detail:
       "Vibe-dev Docker workflows, Wrangler deploy automation, CLI multiplexer, dependency graph management, and CI tooling.",
-    colorClass: "text-rose-400",
-    glowClass: "group-hover:shadow-rose-500/20",
   },
   {
     id: "ai-llm",
@@ -165,8 +143,6 @@ const DOMAINS: Domain[] = [
     description: "Claude, Gemini, prompt engineering",
     detail:
       "Orchestrate Claude and Gemini models, chain prompts with structured output, manage context windows, and rate-limit safely.",
-    colorClass: "text-purple-400",
-    glowClass: "group-hover:shadow-purple-500/20",
   },
 ];
 
@@ -276,7 +252,7 @@ function DomainCard({
         "group relative flex flex-col gap-3 rounded-2xl border border-border bg-card p-5 cursor-default",
         "transition-all duration-300",
         "hover:border-primary/40 hover:bg-card/80",
-        `hover:shadow-2xl ${domain.glowClass}`,
+        "hover:shadow-2xl hover:shadow-primary/5",
         visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8",
       )}
       style={{
@@ -305,7 +281,7 @@ function DomainCard({
             hovered && "bg-primary/20 scale-110",
           )}
         >
-          <Icon className={cn("h-5 w-5", domain.colorClass)} aria-hidden="true" />
+          <Icon className="h-5 w-5 text-primary" aria-hidden="true" />
         </div>
         <span
           className={cn(
@@ -455,21 +431,13 @@ export function WhatWeDoPage() {
         <h1
           id="hero-heading"
           className={cn(
-            "relative max-w-4xl text-4xl font-extrabold tracking-tight sm:text-5xl md:text-6xl lg:text-7xl",
+            "relative max-w-4xl text-4xl font-display font-black tracking-tight sm:text-5xl md:text-6xl lg:text-7xl",
             "transition-all duration-700 delay-100",
             heroRevealed ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6",
           )}
         >
           <span className="block text-foreground">The AI Development</span>
-          <span
-            className={cn(
-              "block bg-gradient-to-r from-primary via-primary-light to-primary bg-clip-text text-transparent",
-              "animate-pulse",
-            )}
-            style={{ animationDuration: "3s" }}
-          >
-            Platform That Does
-          </span>
+          <span className="block text-primary">Platform That Does</span>
           <span className="block text-foreground">Everything.</span>
         </h1>
 
@@ -559,12 +527,9 @@ export function WhatWeDoPage() {
           >
             <h2
               id="domains-heading"
-              className="text-3xl font-extrabold tracking-tight text-foreground sm:text-4xl"
+              className="text-3xl font-display font-bold tracking-tight text-foreground sm:text-4xl"
             >
-              11 Domains.{" "}
-              <span className="bg-gradient-to-r from-primary to-primary-light bg-clip-text text-transparent">
-                Endless Possibilities.
-              </span>
+              11 Domains. <span className="text-primary">Endless Possibilities.</span>
             </h2>
             <p className="mt-3 text-muted-foreground max-w-xl mx-auto">
               Each domain is a fully-equipped toolkit. Hover a card to see what the tools actually
@@ -597,7 +562,7 @@ export function WhatWeDoPage() {
                     "hover:border-primary/40 hover:text-foreground transition-colors duration-200",
                   )}
                 >
-                  <Icon className={cn("h-3.5 w-3.5", d.colorClass)} aria-hidden="true" />
+                  <Icon className="h-3.5 w-3.5 text-primary" aria-hidden="true" />
                   {d.name}
                   <span className="font-bold text-primary">{d.toolCount}</span>
                 </span>
@@ -612,8 +577,7 @@ export function WhatWeDoPage() {
       {/* ------------------------------------------------------------------ */}
       <section
         className={cn(
-          "relative mx-4 mb-24 overflow-hidden rounded-2xl border border-border",
-          "bg-gradient-to-br from-card via-card/80 to-primary/5",
+          "relative mx-4 mb-24 overflow-hidden rounded-2xl border border-border bg-card",
         )}
         aria-label="Platform highlights"
       >
@@ -656,30 +620,19 @@ export function WhatWeDoPage() {
       <section ref={ctaRef} className="relative px-4 pb-24" aria-labelledby="cta-heading">
         <div
           className={cn(
-            "mx-auto max-w-3xl rounded-2xl border border-primary/30 bg-card/60 backdrop-blur-sm px-8 py-14 text-center",
+            "mx-auto max-w-3xl rounded-2xl border border-border bg-card px-8 py-14 text-center",
             "transition-all duration-700",
             ctaVisible ? "opacity-100 scale-100" : "opacity-0 scale-95",
           )}
         >
-          {/* Background glow */}
-          <div
-            className="pointer-events-none absolute inset-0 rounded-2xl bg-gradient-to-br from-primary/8 via-transparent to-violet-500/5"
-            aria-hidden="true"
-          />
-
           <h2
             id="cta-heading"
-            className="relative text-3xl font-extrabold tracking-tight text-foreground sm:text-4xl"
+            className="relative text-3xl font-display font-bold tracking-tight text-foreground sm:text-4xl"
           >
-            Ready to build with{" "}
-            <span className="bg-gradient-to-r from-primary to-primary-light bg-clip-text text-transparent">
-              80+ tools
-            </span>
-            ?
+            Ready to build with <span className="text-primary">80+ tools</span>?
           </h2>
           <p className="relative mt-4 text-muted-foreground max-w-lg mx-auto">
-            Browse every tool in the registry and start building
-            AI-assisted apps in seconds.
+            Browse every tool in the registry and start building AI-assisted apps in seconds.
           </p>
 
           <div className="relative mt-8 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">

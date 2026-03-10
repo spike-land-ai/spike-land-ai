@@ -7,6 +7,9 @@ export const VALID_LOOKUP_KEYS = new Set([
   "pro_annual",
   "business_monthly",
   "business_annual",
+  "migration_blog_42000",
+  "migration_script_100000",
+  "migration_mcp_1000000",
 ]);
 
 export const CREDIT_PACKS = [
@@ -33,5 +36,20 @@ export const SERVICE_PRODUCTS: Record<
     lookupKey: "workshop_team_1997",
     successPath: "/workshop?success=1",
     label: "MCP Workshop (Team)",
+  },
+  migration_blog: {
+    lookupKey: "migration_blog_42000",
+    successPath: "/migrate?success=blog",
+    label: "Next.js Migration Blog Post",
+  },
+  migration_script: {
+    lookupKey: "migration_script_100000",
+    successPath: "/migrate?success=script",
+    label: "Next.js Migration Script",
+  },
+  migration_mcp: {
+    lookupKey: "migration_mcp_1000000",
+    successPath: "/migrate?success=mcp",
+    label: "Next.js Migration MCP Server",
   },
 };

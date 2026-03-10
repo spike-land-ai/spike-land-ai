@@ -132,6 +132,31 @@ describe("rowToPost", () => {
     expect(post).not.toHaveProperty("hero_prompt");
   });
 
+  it("infers heroPrompt from matching inline hero markdown when D1 is missing it", () => {
+    const prompt = "A cinematic blueprint of an AI tool network";
+    const row = makeRow({
+      hero_image: "/blog/test-post/hero.png",
+      hero_prompt: null,
+      content: `![${prompt}](/blog/test-post/hero.png)\n\nBody content.`,
+    });
+    const post = rowToPost(row);
+    expect(post.heroPrompt).toBe(prompt);
+  });
+
+  it("builds a stable fallback heroPrompt from post metadata when no explicit prompt exists", () => {
+    const row = makeRow({
+      title: "The Grandmother Neuron Fallacy",
+      description: "Why deterministic tools become brittle inside LLM tool chains.",
+      hero_image: "/blog/test-post/hero.png",
+      hero_prompt: null,
+      content: "Body content without image metadata.",
+    });
+    const post = rowToPost(row);
+    expect(post.heroPrompt).toBe(
+      "The Grandmother Neuron Fallacy. Why deterministic tools become brittle inside LLM tool chains.. Cinematic developer blog hero artwork.",
+    );
+  });
+
   it("converts unlisted integer 1 to boolean true", () => {
     const row = makeRow({ unlisted: 1 });
     const post = rowToPost(row);
@@ -210,6 +235,113 @@ describe("GET /api/blog", () => {
 
     const body = (await res.json()) as Array<Record<string, unknown>>;
     expect(body[0]!).not.toHaveProperty("content");
+  });
+
+  it("returns inferred heroPrompt values for prompt-driven hero images", async () => {
+    const prompt = "A futuristic control room for AI tooling";
+    const rows = [
+      makeRow({
+        hero_image: "/blog/test-post/hero.png",
+        hero_prompt: null,
+        content: `![${prompt}](/blog/test-post/hero.png)\n\nBody content.`,
+      }),
+    ];
+    const db = mockDB(rows);
+
+    const res = await app(db).request("/api/blog", undefined, {
+      DB: db,
+      SPA_ASSETS: mockR2(),
+    } as unknown as Env);
+
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as Array<Record<string, unknown>>;
+    expect(body[0]!.heroPrompt).toBe(prompt);
+  });
+
+  it("recovers missing heroPrompt values from the canonical MDX source", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue(
+        new Response(
+          `---
+title: "Recovered Prompt Post"
+slug: "test-post"
+description: "Recovered description"
+date: "2026-03-08"
+author: "Fallback Author"
+category: "Architecture"
+tags: ["mcp"]
+featured: false
+heroImage: "/blog/test-post/hero.png"
+heroPrompt: "Recovered cinematic prompt"
+---
+
+Body from source fallback.`,
+          { status: 200, headers: { "Content-Type": "text/plain" } },
+        ),
+      ),
+    );
+
+    const rows = [
+      makeRow({
+        hero_image: "/blog/test-post/hero.png",
+        hero_prompt: null,
+        content: "Body content without the original hero markdown.",
+      }),
+    ];
+    const db = mockDB(rows);
+
+    const res = await app(db).request("/api/blog", undefined, {
+      DB: db,
+      SPA_ASSETS: mockR2(),
+    } as unknown as Env);
+
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as Array<Record<string, unknown>>;
+    expect(body[0]!.heroPrompt).toBe("Recovered cinematic prompt");
+  });
+
+  it("uses the canonical source prompt even when the stored hero image path is stale", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue(
+        new Response(
+          `---
+title: "Recovered Prompt Post"
+slug: "test-post"
+description: "Recovered description"
+date: "2026-03-08"
+author: "Fallback Author"
+category: "Architecture"
+tags: ["mcp"]
+featured: false
+heroImage: "/blog/test-post/hero-v2.png"
+heroPrompt: "Recovered cinematic prompt"
+---
+
+Body from source fallback.`,
+          { status: 200, headers: { "Content-Type": "text/plain" } },
+        ),
+      ),
+    );
+
+    const rows = [
+      makeRow({
+        hero_image: "/blog/test-post/hero.png",
+        hero_prompt: null,
+        content: "Body content without the original hero markdown.",
+      }),
+    ];
+    const db = mockDB(rows);
+
+    const res = await app(db).request("/api/blog", undefined, {
+      DB: db,
+      SPA_ASSETS: mockR2(),
+    } as unknown as Env);
+
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as Array<Record<string, unknown>>;
+    expect(body[0]!.heroPrompt).toBe("Recovered cinematic prompt");
   });
 
   it("returns 404 when no posts exist", async () => {

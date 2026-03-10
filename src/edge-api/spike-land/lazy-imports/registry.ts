@@ -10,7 +10,8 @@
 
 import type { McpServer, RegisteredTool } from "@modelcontextprotocol/sdk/server/mcp.js";
 import type { CallToolResult, ToolAnnotations } from "@modelcontextprotocol/sdk/types.js";
-import type { z } from "zod";
+import { z } from "zod";
+
 import type { BuiltTool } from "@spike-land-ai/shared/tool-builder";
 import { CATEGORY_DESCRIPTIONS } from "../core-logic/mcp/categories";
 
@@ -225,16 +226,17 @@ export class ToolRegistry {
           };
         }
       }
-      // RBAC role check
+      // RBAC role check — deny when callerRole is undefined or insufficient
       const requiredRole = def.requiredRole;
-      if (requiredRole && this.callerRole) {
+      if (requiredRole) {
         const ROLE_RANK: Record<string, number> = { user: 0, admin: 1, super_admin: 2 };
-        if ((ROLE_RANK[this.callerRole] ?? 0) < (ROLE_RANK[requiredRole] ?? 0)) {
+        const callerRank = ROLE_RANK[this.callerRole ?? ""] ?? -1;
+        if (callerRank < (ROLE_RANK[requiredRole] ?? 0)) {
           return {
             content: [
               {
                 type: "text",
-                text: `Insufficient permissions: This tool requires ${requiredRole} role (current role: ${this.callerRole}).`,
+                text: `Insufficient permissions: This tool requires ${requiredRole} role (current role: ${this.callerRole ?? "anonymous"}).`,
               },
             ],
             isError: true,
@@ -528,16 +530,17 @@ export class ToolRegistry {
       }
     }
 
-    // RBAC role gating
+    // RBAC role gating — deny when callerRole is undefined or insufficient
     const requiredRole = tracked.definition.requiredRole;
-    if (requiredRole && this.callerRole) {
+    if (requiredRole) {
       const ROLE_RANK: Record<string, number> = { user: 0, admin: 1, super_admin: 2 };
-      if ((ROLE_RANK[this.callerRole] ?? 0) < (ROLE_RANK[requiredRole] ?? 0)) {
+      const callerRank = ROLE_RANK[this.callerRole ?? ""] ?? -1;
+      if (callerRank < (ROLE_RANK[requiredRole] ?? 0)) {
         return {
           content: [
             {
               type: "text",
-              text: `Insufficient permissions: This tool requires ${requiredRole} role (current role: ${this.callerRole}).`,
+              text: `Insufficient permissions: This tool requires ${requiredRole} role (current role: ${this.callerRole ?? "anonymous"}).`,
             },
           ],
           isError: true,

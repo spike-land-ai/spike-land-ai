@@ -73,14 +73,20 @@ UPLOAD_HTML_LAST=1 WRANGLER="$WRANGLER" \
   bash "$(dirname "$0")/../../scripts/upload-to-r2.sh" ./dist "$R2_BUCKET"
 
 # ── 5b. Purge Cloudflare edge cache ──
-PURGE_FILES="https://spike.land/,https://spike.land/index.html,https://spike.land/manifest.webmanifest,https://spike.land/site.webmanifest,https://spike.land/about.txt"
+PURGE_FILES="https://spike.land/,https://spike.land/index.html,https://spike.land/manifest.webmanifest,https://spike.land/site.webmanifest,https://spike.land/about.txt,https://spike.land/spike-cache-worker.js,https://spike.land/service-worker/cache-policy.json"
 bash "$(dirname "$0")/../../scripts/purge-cache.sh" --files "$PURGE_FILES"
 
 # ── 6. Seed blog posts to D1 and upload images to R2 ──
 BLOG_DIR="../../content/blog"
 BLOG_HASH=""
 if [ -d "$BLOG_DIR" ]; then
-  BLOG_HASH="$(git ls-tree -r HEAD -- "$BLOG_DIR" 2>/dev/null | git hash-object --stdin 2>/dev/null || echo "")"
+  BLOG_HASH="$(
+    find "$BLOG_DIR" -type f \( -name '*.md' -o -name '*.mdx' \) -print0 2>/dev/null \
+      | LC_ALL=C sort -z \
+      | xargs -0 shasum 2>/dev/null \
+      | shasum 2>/dev/null \
+      | awk '{print $1}'
+  )"
 fi
 CACHED_BLOG_HASH=""
 if [ -f "$CACHE_DIR/blog.treehash" ]; then
@@ -90,6 +96,29 @@ fi
 if [ "$BLOG_HASH" != "$CACHED_BLOG_HASH" ] || [ -z "$BLOG_HASH" ]; then
   echo "Seeding blog content to D1 + R2..."
   (cd ../.. && yarn tsx scripts/seed-blog.ts --remote) || echo "⚠ Blog seed failed (non-fatal)"
+  BLOG_PURGE_FILES="https://spike.land/api/blog,https://spike.land/blog/rss"
+
+  CHANGED_BLOG_PATHS="$(
+    {
+      git diff --name-only HEAD -- "$BLOG_DIR" 2>/dev/null
+      git ls-files --others --exclude-standard "$BLOG_DIR" 2>/dev/null
+    } | sort -u
+  )"
+
+  if [ -n "$CHANGED_BLOG_PATHS" ]; then
+    while IFS= read -r blog_path; do
+      [ -n "$blog_path" ] || continue
+      slug="$(basename "$blog_path")"
+      slug="${slug%.mdx}"
+      slug="${slug%.md}"
+      [ -n "$slug" ] || continue
+      BLOG_PURGE_FILES="${BLOG_PURGE_FILES},https://spike.land/blog/${slug},https://spike.land/api/blog/${slug}"
+    done <<EOF
+$CHANGED_BLOG_PATHS
+EOF
+  fi
+
+  bash "$(dirname "$0")/../../scripts/purge-cache.sh" --files "$BLOG_PURGE_FILES"
   if [ -n "$BLOG_HASH" ]; then
     echo "$BLOG_HASH" > "$CACHE_DIR/blog.treehash"
   fi

@@ -183,12 +183,16 @@ export function BlogPostPage() {
   }, [normalizedSlug, postTitle]);
 
   return (
-    <BlogPostView
-      slug={normalizedSlug}
-      linkComponent={Link}
-      postOverride={localPost}
-      skipFetch={import.meta.env.DEV && (!localLookupDone || Boolean(localPost))}
-      loadingOverride={import.meta.env.DEV && !localLookupDone}
-    />
+    <div className="min-h-screen bg-background text-foreground font-sans selection:bg-primary/30 antialiased relative">
+      <main className="relative z-10 w-full">
+        <BlogPostView
+          slug={normalizedSlug}
+          linkComponent={Link}
+          postOverride={localPost}
+          skipFetch={import.meta.env.DEV && (!localLookupDone || Boolean(localPost))}
+          loadingOverride={import.meta.env.DEV && !localLookupDone}
+        />
+      </main>
+    </div>
   );
 }
