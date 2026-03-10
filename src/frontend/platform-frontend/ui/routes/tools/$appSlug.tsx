@@ -27,6 +27,9 @@ const PagesTemplateChooserApp = lazy(() =>
 const ChessArenaApp = lazy(() =>
   import("../../apps/chess-arena").then((m) => ({ default: m.ChessArenaApp })),
 );
+const AiAutomatizalasApp = lazy(() =>
+  import("../../apps/ai-automatizalas").then((m) => ({ default: m.AiAutomatizalasApp })),
+);
 
 type SurfaceType = "overview" | "chat" | "terminal" | "mdx";
 
@@ -52,7 +55,6 @@ export function AppSessionPage() {
       appName: app.name,
       category: app.category ?? "",
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [appSlug, app?.name]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const { session, recordToolResult, resetSession, isToolAvailable } = useAppSession(
@@ -66,7 +68,8 @@ export function AppSessionPage() {
     appSlug === "hackernews" || appSlug === "hn-reader" || appSlug === "hackernews-reader";
   const isPagesTemplateChooser = appSlug === "pages-template-chooser";
   const isChessArena = appSlug === "chess-arena";
-  const isShowcaseApp = isHackerNews || isPagesTemplateChooser || isChessArena;
+  const isAiAutomatizalas = appSlug === "ai-automatizalas";
+  const isShowcaseApp = isHackerNews || isPagesTemplateChooser || isChessArena || isAiAutomatizalas;
   const availableSurfaces = app?.tools.length
     ? SURFACES
     : SURFACES.filter((surface) => surface.id !== "terminal");
@@ -207,6 +210,16 @@ export function AppSessionPage() {
                     }
                   >
                     <ChessArenaApp />
+                  </Suspense>
+                ) : isAiAutomatizalas ? (
+                  <Suspense
+                    fallback={
+                      <div className="flex items-center justify-center py-16">
+                        <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
+                      </div>
+                    }
+                  >
+                    <AiAutomatizalasApp />
                   </Suspense>
                 ) : (
                   <AppMarkdownRenderer

@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useAuth } from "../hooks/useAuth";
 import { trackAnalyticsEvent } from "../hooks/useAnalytics";
 import { usePricing } from "../hooks/usePricing";
@@ -9,7 +10,10 @@ interface PricingFeature {
   text: string;
 }
 
+type PlanId = "free" | "pro" | "business" | "enterprise";
+
 interface PricingPlan {
+  id: PlanId;
   name: string;
   monthlyPrice: string;
   annualPrice: string;
@@ -23,130 +27,80 @@ interface PricingPlan {
   highlighted: boolean;
 }
 
-function makePlans(pricing: import("../hooks/usePricing").PricingData): PricingPlan[] {
+type TranslateFn = (key: string, options?: Record<string, unknown>) => unknown;
+
+function translateList(t: TranslateFn, key: string): string[] {
+  return t(key, { returnObjects: true }) as string[];
+}
+
+function makePlans(
+  pricing: import("../hooks/usePricing").PricingData,
+  t: TranslateFn,
+): PricingPlan[] {
   return [
     {
-      name: "Free",
+      id: "free",
+      name: t("plans.free.name") as string,
       monthlyPrice: "$0",
       annualPrice: "$0",
       annualTotal: "$0/yr",
-      description: "Get started with AI-powered development tools.",
-      features: [
-        { text: "50 AI requests/day" },
-        { text: "10 MCP (Model Context Protocol) tools" },
-        { text: "Community support" },
-        { text: "Basic dashboard" },
-      ],
-      cta: "Get Started Free",
+      description: t("plans.free.description") as string,
+      features: translateList(t, "plans.free.features").map((text) => ({ text })),
+      cta: t("plans.free.cta") as string,
       ctaHref: "/apps",
       highlighted: false,
     },
     {
-      name: "Pro",
+      id: "pro",
+      name: t("plans.pro.name") as string,
       monthlyPrice: pricing.pro.monthly,
       annualPrice: pricing.pro.annual,
       annualTotal: pricing.pro.annualTotal,
-      period: "/mo",
-      description: "Unlock professional tools and higher limits.",
-      features: [
-        { text: "500 AI requests/day" },
-        { text: "All 250+ MCP tools" },
-        { text: "Priority support" },
-        { text: "API key vault — Bring Your Own Keys (BYOK)" },
-        { text: "Advanced analytics" },
-      ],
-      cta: "Upgrade to Pro",
+      period: t("periodMonthly") as string,
+      description: t("plans.pro.description") as string,
+      features: translateList(t, "plans.pro.features").map((text) => ({ text })),
+      cta: t("plans.pro.cta") as string,
       tier: "pro",
       highlighted: true,
     },
     {
-      name: "Business",
+      id: "business",
+      name: t("plans.business.name") as string,
       monthlyPrice: pricing.business.monthly,
       annualPrice: pricing.business.annual,
       annualTotal: pricing.business.annualTotal,
-      period: "/mo",
-      description: "Unlimited access and dedicated support for teams.",
-      features: [
-        { text: "Unlimited AI requests" },
-        { text: "All 250+ MCP tools" },
-        { text: "Dedicated support" },
-        { text: "Team management" },
-        { text: "Custom integrations" },
-        { text: "Marketplace revenue share" },
-      ],
-      cta: "Upgrade to Business",
+      period: t("periodMonthly") as string,
+      description: t("plans.business.description") as string,
+      features: translateList(t, "plans.business.features").map((text) => ({ text })),
+      cta: t("plans.business.cta") as string,
       tier: "business",
       highlighted: false,
     },
     {
-      name: "Enterprise",
-      monthlyPrice: "Custom",
-      annualPrice: "Custom",
+      id: "enterprise",
+      name: t("plans.enterprise.name") as string,
+      monthlyPrice: t("plans.enterprise.customPrice") as string,
+      annualPrice: t("plans.enterprise.customPrice") as string,
       annualTotal: "",
-      description: "SSO, RBAC, and dedicated support for large teams.",
-      features: [
-        { text: "Everything in Business" },
-        { text: "SSO / SAML authentication" },
-        { text: "Custom RBAC & permissions" },
-        { text: "SLA guarantee (99.9%)" },
-        { text: "Dedicated support engineer" },
-        { text: "Audit logs & compliance" },
-        { text: "Custom integrations" },
-      ],
-      cta: "Contact Sales",
+      description: t("plans.enterprise.description") as string,
+      features: translateList(t, "plans.enterprise.features").map((text) => ({ text })),
+      cta: t("plans.enterprise.cta") as string,
       ctaHref: "mailto:zoltan.erdos@spike.land",
       highlighted: false,
     },
   ];
 }
 
-const FAQ_ITEMS = [
-  {
-    question: "What can I build? Do I need to code?",
-    answer:
-      "You can build AI assistants that interact with databases, read web pages, process images, and more. While some familiarity with coding helps (like using our CLI), our pre-built MCP tools mean you don't need to write the integration logic yourself.",
-  },
-  {
-    question: "What's included in the free plan?",
-    answer:
-      "The free plan gives you 50 AI requests per day, access to 10 MCP tools, a basic dashboard, and community support. It's a great way to explore the platform before committing to a paid plan.",
-  },
-  {
-    question: "How do AI requests work?",
-    answer:
-      "Each time you use a tool (like generating an image, reviewing code, or asking a question), it counts as one AI request. Your daily limit resets at midnight UTC. Unused requests don't carry over to the next day.",
-  },
-  {
-    question: "Can I bring my own API keys?",
-    answer:
-      "Yes — Pro and Business plans include the API key vault (BYOK). You can add your own OpenAI, Anthropic, or other provider keys and have them used automatically, which can reduce per-request costs.",
-  },
-  {
-    question: "What MCP tools are available?",
-    answer:
-      "The platform currently offers 250+ MCP tools covering code generation, image processing, data analysis, browser automation, and more. Free users can access 10 core tools; Pro and Business users get all 250+.",
-  },
-  {
-    question: "How does the marketplace revenue share work?",
-    answer:
-      "Business subscribers who publish tools or integrations to the spike.land marketplace receive a percentage of revenue generated by their tools. Details are set out in the marketplace agreement at sign-up.",
-  },
-  {
-    question: "What happens when I hit my daily limit?",
-    answer:
-      "When you reach your daily AI request limit, new requests will be queued and processed at a reduced rate rather than blocked entirely. You'll see a notification in your dashboard. Limits reset at midnight UTC each day. If you consistently hit your limit, consider upgrading to a higher plan for more capacity.",
-  },
-  {
-    question: "Is there a refund policy?",
-    answer:
-      "Yes. If you're not satisfied within the first 14 days of a paid plan, contact us for a full refund. After that, you can cancel anytime and your plan stays active until the end of the billing period.",
-  },
-  {
-    question: "Can I cancel anytime?",
-    answer:
-      "Yes. You can cancel your subscription at any time from the billing settings page. Your plan stays active until the end of the current billing period, after which you revert to the free tier.",
-  },
-];
+function makeFaqItems(t: TranslateFn) {
+  return Array.from({ length: 9 }, (_, index) => {
+    const questionKey = `faq.q${index + 1}`;
+    const answerKey = `faq.a${index + 1}`;
+    return {
+      question: t(questionKey) as string,
+      answer: t(answerKey) as string,
+    };
+  });
+}
 
 async function handleCheckout(
   tier: "pro" | "business",
@@ -179,16 +133,19 @@ function PlanCard({
   plan,
   annual,
   isAuthenticated,
+  getStartedLabel,
   trackEvent,
 }: {
   plan: PricingPlan;
   annual: boolean;
   isAuthenticated: boolean;
+  getStartedLabel: string;
   trackEvent: (event: string, data?: Record<string, unknown>) => void;
 }) {
-  const isFree = plan.name === "Free";
+  const { t } = useTranslation("pricing");
+  const isFree = plan.id === "free";
   const displayPrice = annual ? plan.annualPrice : plan.monthlyPrice;
-  const planId = `plan-${plan.name.toLowerCase()}`;
+  const planId = `plan-${plan.id}`;
 
   const buttonClass = `mt-8 block w-full rounded-[calc(var(--radius-control)-0.1rem)] border px-6 py-3 text-center text-sm font-semibold transition ${
     plan.highlighted
@@ -204,7 +161,7 @@ function PlanCard({
       className={`flex h-full flex-col p-6 ${plan.highlighted ? "rubik-panel-strong" : "rubik-panel"}`}
     >
       {plan.highlighted && (
-        <span className="rubik-chip rubik-chip-accent mb-4 self-start">Most Popular</span>
+        <span className="rubik-chip rubik-chip-accent mb-4 self-start">{t("mostPopular")}</span>
       )}
 
       <h2 id={planId} className="text-xl font-semibold tracking-[-0.03em] text-foreground">
@@ -219,14 +176,14 @@ function PlanCard({
         {plan.period && <span className="text-base text-muted-foreground">{plan.period}</span>}
         {annual && !isFree && (
           <p className="mt-1 text-xs uppercase tracking-[0.12em] text-muted-foreground">
-            {plan.annualTotal} billed annually
+            {t("billedAnnually", { total: plan.annualTotal })}
           </p>
         )}
       </div>
 
       {annual && !isFree && (
         <span className="mt-3 inline-flex self-start rounded-full border border-success/20 bg-success/70 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-success-foreground">
-          Save 20%
+          {t("saveAmount")}
         </span>
       )}
 
@@ -258,7 +215,7 @@ function PlanCard({
           onClick={() => handleCheckout(plan.tier!, annual, isAuthenticated, trackEvent)}
           className={buttonClass}
         >
-          {!isAuthenticated && plan.tier ? "Get Started" : plan.cta}
+          {!isAuthenticated && plan.tier ? getStartedLabel : plan.cta}
         </button>
       ) : (
         <a
@@ -307,10 +264,12 @@ function FaqItem({ question, answer }: { question: string; answer: string }) {
 }
 
 export function PricingPage() {
+  const { t } = useTranslation("pricing");
   const [annual, setAnnual] = useState(false);
   const { isAuthenticated } = useAuth();
   const { pricing } = usePricing();
-  const PLANS = makePlans(pricing);
+  const plans = useMemo(() => makePlans(pricing, t), [pricing, t]);
+  const faqItems = useMemo(() => makeFaqItems(t), [t]);
 
   return (
     <div className="rubik-container rubik-page rubik-stack">
@@ -318,27 +277,23 @@ export function PricingPage() {
         <div className="space-y-4">
           <span className="rubik-eyebrow">
             <span className="h-2 w-2 rounded-full bg-primary" />
-            Pricing
+            {t("eyebrow")}
           </span>
           <div className="space-y-3">
             <h1 className="text-4xl font-semibold tracking-[-0.06em] text-foreground sm:text-5xl">
-              Transparent pricing for shipping MCP-native software.
+              {t("title")}
             </h1>
-            <p className="rubik-lede mx-auto">
-              Start free, scale into pro workflows, and keep enterprise controls available when your
-              product surface becomes infrastructure.
-            </p>
+            <p className="rubik-lede mx-auto">{t("subtitle")}</p>
           </div>
         </div>
 
         <div className="inline-flex items-center gap-2 rounded-full border border-success/20 bg-success/70 px-4 py-2 text-sm font-medium text-success-foreground">
-          Launch pricing: £1/mo with code <span className="font-mono font-bold">LAUNCH97</span> —
-          14-day free trial included
+          {t("launchPromo")}
         </div>
 
         <div
           role="radiogroup"
-          aria-label="Billing frequency"
+          aria-label={t("billingFrequency")}
           className="mx-auto inline-flex items-center gap-3 rounded-full border border-border bg-muted p-1"
           onKeyDown={(e) => {
             if (e.key === "ArrowLeft" || e.key === "ArrowUp") {
@@ -361,7 +316,7 @@ export function PricingPage() {
               !annual ? "bg-background text-foreground shadow-sm" : "text-muted-foreground"
             }`}
           >
-            Monthly
+            {t("monthly")}
           </button>
           <button
             type="button"
@@ -373,49 +328,50 @@ export function PricingPage() {
               annual ? "bg-background text-foreground shadow-sm" : "text-muted-foreground"
             }`}
           >
-            Annual
+            {t("annual")}
             <span className="ml-1.5 rounded-full bg-green-100 px-1.5 py-0.5 text-xs font-semibold text-green-700 dark:bg-green-900/30 dark:text-green-400">
-              -20%
+              {t("annualSavings")}
             </span>
           </button>
         </div>
       </section>
 
       <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-4">
-        {PLANS.map((plan) => (
+        {plans.map((plan) => (
           <PlanCard
             key={plan.name}
             plan={plan}
             annual={annual}
             isAuthenticated={isAuthenticated}
+            getStartedLabel={t("getStarted")}
             trackEvent={trackAnalyticsEvent}
           />
         ))}
       </div>
 
       <p className="text-center text-sm text-muted-foreground">
-        Need a custom plan?{" "}
+        {t("customPlanPrefix")}{" "}
         <a
           href="mailto:zoltan.erdos@spike.land"
           className="text-primary underline hover:text-primary/80"
         >
-          Talk to our team
+          {t("customPlanLink")}
         </a>
       </p>
 
       <p className="text-center text-sm text-muted-foreground">
-        Pricing and limits are subject to change.{" "}
+        {t("pricingDisclaimer")}{" "}
         {pricing.billedInUsd
-          ? `Prices shown in ${pricing.currency}. Billed in USD.`
-          : "Prices in USD."}{" "}
-        VAT may apply.
+          ? t("priceDisplayUsd", { currency: pricing.currency })
+          : t("priceDisplayDefault")}{" "}
+        {t("vatNotice")}
         <br />
-        Students and educators:{" "}
+        {t("academicPrefix")}{" "}
         <a
           href="mailto:zoltan.erdos@spike.land"
           className="text-primary underline hover:text-primary/80"
         >
-          Contact us for academic pricing
+          {t("academicLink")}
         </a>
         .
       </p>
@@ -423,10 +379,10 @@ export function PricingPage() {
       {/* FAQ */}
       <div className="rubik-panel mx-auto max-w-3xl p-6 sm:p-8">
         <h2 className="mb-6 text-center text-2xl font-semibold tracking-[-0.04em] text-foreground">
-          Frequently Asked Questions
+          {t("faq.title")}
         </h2>
         <div>
-          {FAQ_ITEMS.map((item) => (
+          {faqItems.map((item) => (
             <FaqItem key={item.question} question={item.question} answer={item.answer} />
           ))}
         </div>
@@ -438,7 +394,7 @@ export function PricingPage() {
           __html: JSON.stringify({
             "@context": "https://schema.org",
             "@type": "FAQPage",
-            mainEntity: FAQ_ITEMS.map((item) => ({
+            mainEntity: faqItems.map((item) => ({
               "@type": "Question",
               name: item.question,
               acceptedAnswer: {

@@ -1,0 +1,31 @@
+{
+  "welcomeUser": "Üdvözlünk, {{name}}!",
+  "welcomeGeneric": "Üdvözlünk!",
+  "introDescription": "A spike.land a tökéletes AI fejlesztői játszótér. Építs, tesztelj és telepíts 80+ specializált eszközzel.",
+  "features": {
+    "buildDeploy": "Építs és telepíts AI-alapú alkalmazásokat",
+    "browseMcp": "Böngéssz 80+ MCP eszközt egyetlen registryben",
+    "collaborate": "Működj együtt valós idejű előnézettel"
+  },
+  "mcpInstall": {
+    "heading": "Add hozzá a Claude-hoz egyetlen paranccsal",
+    "viewDocs": "Telepítési útmutató megtekintése"
+  },
+  "getStarted": "Kezdjük el",
+  "skipIntro": "Bevezető kihagyása",
+  "interestsTitle": "Mi a fókuszod?",
+  "interestsSubtitle": "Válaszd ki az érdeklődési körödet személyre szabott eszközajánlásokhoz.",
+  "interests": {
+    "aiChat": "AI Chat és asszisztensek",
+    "codeGen": "Kódgenerálás",
+    "imageMedia": "Kép és média",
+    "dataAnalysis": "Adatelemzés",
+    "automation": "Automatizálás és munkafolyamatok",
+    "mcpTools": "MCP eszközök",
+    "apis": "API-k és integrációk",
+    "devops": "DevOps és CI/CD"
+  },
+  "topToolsTitle": "Legjobb eszközök neked",
+  "topToolsSubtitle": "Az érdeklődésed alapján ezeket ajánljuk kezdésnek:",
+  "startExploring": "Felfedezés indítása"
+}

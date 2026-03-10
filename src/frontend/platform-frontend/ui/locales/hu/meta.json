@@ -1,0 +1,82 @@
+{
+  "defaultTitle": "spike.land - MCP-első AI fejlesztői platform",
+  "defaultDescription": "Építs, telepíts és kezelj AI-alapú alkalmazásokat 80+ MCP eszközzel, valós idejű együttműködéssel és Cloudflare Workers éles telepítéssel.",
+  "routes": {
+    "apps": {
+      "title": "Alkalmazás bolt - spike.land",
+      "description": "Fedezd fel és telepítsd az AI-alapú alkalmazásokat a spike.land boltból. Sakkmotorok, QA stúdió, adatvizualizáció és még sok más."
+    },
+    "packages": {
+      "title": "MCP csomagok - spike.land",
+      "description": "Vizsgáld meg az MCP csomag részleteit, terminálokat és implementációs felületeket a spike.land alkalmazások mögött."
+    },
+    "messages": {
+      "title": "Üzenetek - spike.land",
+      "description": "Valós idejű üzenetküldés és együttműködés a spike.land-on. Chatelj csapattagokkal, ossz meg kódot és koordinálj AI munkafolyamatokat."
+    },
+    "analytics": {
+      "title": "Analitika - spike.land",
+      "description": "Tekintsd meg a használati analitikát és elemzéseket a spike.land alkalmazásaidhoz. Kövesd nyomon az eszköz meghívásokat, üzenet mennyiségeket és teljesítmény metrikákat."
+    },
+    "status": {
+      "title": "Rendszer állapot - spike.land",
+      "description": "A spike.land szolgáltatások történeti rendszer állapota. Percenkénti kérésszám, minimum és maximum kérési idő, átlagos késleltetés és eltérés."
+    },
+    "learn": {
+      "title": "Tanulás és igazolás - spike.land",
+      "description": "Tanulj bármilyen tartalomból és igazold a tudásod interaktív AI-alapú kvízekkel. Szerezz ellenőrizhető kitűzőket."
+    },
+    "bugbook": {
+      "title": "Bugbook - spike.land",
+      "description": "Nyilvános hibakövető ELO rangsorolással a spike.land-on. Jelents, kövess és javíts hibákat közösségi prioritizálással."
+    },
+    "pricing": {
+      "title": "Árazás - spike.land | Ingyenes, Pro $29, Business $99",
+      "description": "Egyszerű, átlátható árazás a spike.land-hoz. Ingyenes csomag egyéneknek, Pro $29/hó, Business $99/hó korlátlan hozzáféréssel és elsőbbségi támogatással."
+    },
+    "about": {
+      "title": "A spike.land-ról - MCP-első AI platform",
+      "description": "Ismerd meg a spike.land-ot — kik vagyunk, mi a küldetésünk, és hogyan építünk nyílt platformot AI eszközöknek."
+    },
+    "security": {
+      "title": "Biztonság - spike.land",
+      "description": "Biztonsági gyakorlatok, közzétételi szabályzat és platform megerősítési részletek a spike.land-hoz."
+    },
+    "terms": {
+      "title": "Felhasználási feltételek - spike.land",
+      "description": "Olvasd el a spike.land Felhasználási feltételeit. Tájékozódj az elfogadható használatról, előfizetéses számlázásról, szellemi tulajdonjogokról és a SaaS megállapodásunkról."
+    },
+    "privacy": {
+      "title": "Adatvédelmi szabályzat - spike.land",
+      "description": "spike.land Adatvédelmi szabályzat. GDPR-tudatos adatkezelés, sütik, harmadik fél szolgáltatások (Stripe, Cloudflare) és a felhasználói jogaid."
+    },
+    "blog": {
+      "title": "Blog - spike.land",
+      "description": "Cikkek, útmutatók és mérnöki betekintések a spike.land csapattól. Tanulj az MCP-ről, AI fejlesztésről és edge computingról."
+    },
+    "docs": {
+      "title": "Dokumentáció - spike.land",
+      "description": "Technikai dokumentáció, API referencia, MCP eszközök útmutató és architektúra áttekintés a spike.land-hoz."
+    },
+    "settings": {
+      "title": "Beállítások - spike.land",
+      "description": "Konfiguráld a spike.land fiókodat, számlázást, API kulcsokat és beállításokat."
+    },
+    "vibeCode": {
+      "title": "vibe-code - Chat-natív MCP alkalmazás építő | spike.land",
+      "description": "Nézd meg, hogyan alakít a vibe-code minden MCP alkalmazást chat-natív termék felületté spike-chat-tel, terminál végrehajtással, MDX alkalmazás nézetekkel és MCP szerver szerkesztéssel."
+    },
+    "login": {
+      "title": "Bejelentkezés - spike.land",
+      "description": "Jelentkezz be a spike.land-ra GitHub-bal vagy Google-lel az AI fejlesztői platformod eléréséhez."
+    },
+    "version": {
+      "title": "Verzió - spike.land",
+      "description": "Build verzió, telepített eszközök és letöltési linkek megtekintése a spike.land-hoz."
+    },
+    "whatWeDo": {
+      "title": "Amit csinálunk - spike.land | MCP-első AI platform",
+      "description": "Fedezd fel a spike.land 80+ MCP eszközét 11 területen. Kód intelligencia, kép stúdió, analitika, hitelesítés és még sok más — mind éles telepítéssel."
+    }
+  }
+}

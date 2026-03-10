@@ -1,0 +1,16 @@
+{
+  "title": "Analitika",
+  "uniqueVisitors": "Egyedi látogatók",
+  "toolInvocations": "Eszköz meghívások",
+  "eventTypes": "Esemény típusok",
+  "totalEvents": "Összes esemény",
+  "topArticles": "Legnépszerűbb cikkek",
+  "topToolsByUsage": "Legtöbbet használt eszközök",
+  "recentActivity": "Legutóbbi tevékenység",
+  "eventsByType": "Események típus szerint",
+  "eventType": "Esemény típus",
+  "count": "Darab",
+  "noBlogViews": "Még nincsenek blog megtekintések",
+  "noToolUsage": "Még nincsenek eszköz használati adatok",
+  "noRecentEvents": "Nincsenek legutóbbi események"
+}

@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useAuth } from "../hooks/useAuth";
 import { Link, Navigate } from "@tanstack/react-router";
 
@@ -33,6 +34,7 @@ function GoogleIcon() {
 }
 
 export function LoginPage() {
+  const { t } = useTranslation("auth");
   const { isAuthenticated, login, isLoading, error } = useAuth();
 
   if (isAuthenticated) {
@@ -46,8 +48,8 @@ export function LoginPage() {
           <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-primary text-xl font-bold text-primary-foreground shadow-lg shadow-primary/20">
             S
           </div>
-          <h1 className="text-2xl font-bold text-foreground">Sign in to Spike Platform</h1>
-          <p className="mt-2 text-sm text-muted-foreground">Choose your preferred sign-in method</p>
+          <h1 className="text-2xl font-bold text-foreground">{t("signInTitle")}</h1>
+          <p className="mt-2 text-sm text-muted-foreground">{t("signInSubtitle")}</p>
         </div>
 
         {error && (
@@ -61,25 +63,29 @@ export function LoginPage() {
 
         <div className="space-y-3">
           <button
-            onClick={() => login("github")}
+            onClick={() => {
+              sessionStorage.setItem("signup_flow", "1");
+              login("github");
+            }}
             disabled={isLoading}
             className="flex w-full items-center justify-center gap-2 rounded-lg bg-foreground px-4 py-2.5 text-sm font-medium text-background hover:bg-foreground/90 disabled:opacity-50 transition-colors"
           >
             <GitHubIcon />
-            Continue with GitHub
+            {t("continueWithGithub")}
           </button>
           <button
-            onClick={() => login("google")}
+            onClick={() => {
+              sessionStorage.setItem("signup_flow", "1");
+              login("google");
+            }}
             disabled={isLoading}
             className="flex w-full items-center justify-center gap-2 rounded-lg border border-border bg-card px-4 py-2.5 text-sm font-medium text-foreground hover:bg-muted disabled:opacity-50 transition-colors"
           >
             <GoogleIcon />
-            Continue with Google
+            {t("continueWithGoogle")}
           </button>
         </div>
-        <p className="mt-3 text-center text-xs text-muted-foreground">
-          Email and password sign-in is coming soon.
-        </p>
+        <p className="mt-3 text-center text-xs text-muted-foreground">{t("emailPasswordSoon")}</p>
 
         <div className="relative">
           <div className="absolute inset-0 flex items-center">
@@ -95,11 +101,9 @@ export function LoginPage() {
             to="/"
             className="text-sm text-muted-foreground hover:text-foreground hover:underline"
           >
-            Continue as guest
+            {t("continueAsGuest")}
           </Link>
-          <p className="mt-1 text-xs text-muted-foreground">
-            Browse 80+ tools, read docs, and view pricing without signing in
-          </p>
+          <p className="mt-1 text-xs text-muted-foreground">{t("guestDescription")}</p>
         </div>
       </div>
     </div>

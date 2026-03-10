@@ -1,5 +1,6 @@
 import { Link, Outlet, useRouterState } from "@tanstack/react-router";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useAnalytics } from "../hooks/useAnalytics";
 import { useDarkMode } from "../hooks/useDarkMode";
 import { useAuth } from "../hooks/useAuth";
@@ -7,173 +8,99 @@ import { useFocusTrap } from "../hooks/useFocusTrap";
 import { usePageLoadCounter } from "../hooks/usePageLoadCounter";
 import { useDevMode } from "@spike-land-ai/block-website/core";
 import { LoginButton } from "../components/LoginButton";
+import { LanguageSwitcher } from "../components/LanguageSwitcher";
 import { AppFooter } from "../components/AppFooter";
 import { CookieConsent } from "../components/CookieConsent";
 import { ThemeSwitcher } from "../components/ThemeSwitcher";
 import { WelcomeModal } from "../components/WelcomeModal";
 import { apiUrl } from "../../core-logic/api";
 import { initGoogleAds } from "../../core-logic/google-ads";
+import { resolveSupportedLanguage } from "../i18n";
 
-const DEFAULT_TITLE = "spike.land - MCP-First AI Development Platform";
-const DEFAULT_DESCRIPTION =
-  "Build, deploy, and manage AI-powered applications with 80+ MCP tools, real-time collaboration, and edge deployment on Cloudflare Workers.";
 const DEFAULT_OG_IMAGE = "https://spike.land/og-image.png";
 const SITE_URL = "https://spike.land";
 
-const ROUTE_META: Record<string, { title: string; description: string; ogImage?: string }> = {
-  "/": {
-    title: DEFAULT_TITLE,
-    description: DEFAULT_DESCRIPTION,
-  },
-  "/apps": {
-    title: "App Store - spike.land",
-    description:
-      "Discover and install AI-powered applications from the spike.land store. Chess engines, QA studio, data visualization, and more.",
-  },
-  "/packages": {
-    title: "MCP Packages - spike.land",
-    description:
-      "Inspect MCP package details, terminals, and implementation surfaces behind spike.land apps.",
-  },
-  "/store": {
-    title: "App Store - spike.land",
-    description:
-      "Discover and install AI-powered applications from the spike.land store. Chess engines, QA studio, data visualization, and more.",
-  },
-  "/messages": {
-    title: "Messages - spike.land",
-    description:
-      "Real-time messaging and collaboration on spike.land. Chat with teammates, share code, and coordinate AI workflows.",
-  },
-  "/analytics": {
-    title: "Analytics - spike.land",
-    description:
-      "View usage analytics and insights for your spike.land apps. Track tool invocations, message volume, and performance metrics.",
-  },
-  "/status": {
-    title: "System Status - spike.land",
-    description:
-      "Historical system status for spike.land services. Review requests per minute, min and max request time, mean latency, and deviation from the mean.",
-  },
-  "/learn": {
-    title: "Learn & Verify - spike.land",
-    description:
-      "Learn from any content and prove your understanding through interactive AI-powered quizzes. Earn verifiable badges.",
-  },
-  "/bugbook": {
-    title: "Bugbook - spike.land",
-    description:
-      "Public bug tracker with ELO ranking on spike.land. Report, track, and fix bugs with community-driven prioritization.",
-  },
-  "/pricing": {
-    title: "Pricing - spike.land | Free, Pro $29, Business $99",
-    description:
-      "Simple, transparent pricing for spike.land. Free plan for individuals, Pro at $29/mo, Business at $99/mo with unlimited access and priority support.",
-  },
-  "/about": {
-    title: "About spike.land - MCP-First AI Platform",
-    description:
-      "Learn about spike.land — who we are, our mission, and how we're building an open platform for AI tools.",
-  },
-  "/security": {
-    title: "Security - spike.land",
-    description:
-      "Security practices, disclosure policy, and platform hardening details for spike.land.",
-  },
-  "/terms": {
-    title: "Terms of Service - spike.land",
-    description:
-      "Read the spike.land Terms of Service. Learn about acceptable use, subscription billing, intellectual property rights, and our SaaS agreement.",
-  },
-  "/privacy": {
-    title: "Privacy Policy - spike.land",
-    description:
-      "spike.land Privacy Policy. GDPR-aware data handling, cookies, third-party services (Stripe, Cloudflare), and your rights as a user.",
-  },
-  "/blog": {
-    title: "Blog - spike.land",
-    description:
-      "Articles, tutorials, and engineering insights from the spike.land team. Learn about MCP, AI development, and edge computing.",
-  },
-  "/docs": {
-    title: "Documentation - spike.land",
-    description:
-      "Technical documentation, API reference, MCP tools guide, and architecture overview for spike.land.",
-  },
-  "/settings": {
-    title: "Settings - spike.land",
-    description: "Configure your spike.land account, billing, API keys, and preferences.",
-  },
-  "/build": {
-    title: "vibe-code - Chat-Native MCP App Builder | spike.land",
-    description:
-      "See how vibe-code turns every MCP app into a chat-native product surface with spike-chat, terminal execution, MDX app views, and MCP server editing.",
-  },
-  "/vibe-code": {
-    title: "vibe-code - Chat-Native MCP App Builder | spike.land",
-    description:
-      "See how vibe-code turns every MCP app into a chat-native product surface with spike-chat, terminal execution, MDX app views, and MCP server editing.",
-  },
-  "/login": {
-    title: "Sign In - spike.land",
-    description:
-      "Sign in to spike.land with GitHub or Google to access your AI development platform.",
-  },
-  "/version": {
-    title: "Version - spike.land",
-    description: "View build version, deployed assets, and download links for spike.land.",
-  },
-  "/what-we-do": {
-    title: "What We Do - spike.land | MCP-First AI Platform",
-    description:
-      "Explore spike.land's 80+ MCP tools across 11 domains. Code intelligence, image studio, analytics, authentication, and more — all edge-deployed.",
-  },
-};
+type RouteMeta = { title: string; description: string; ogImage?: string };
 
-const ORGANIZATION_JSON_LD = JSON.stringify({
-  "@context": "https://schema.org",
-  "@type": "Organization",
-  name: "spike.land",
-  url: SITE_URL,
-  logo: `${SITE_URL}/og-image.png`,
-  description: DEFAULT_DESCRIPTION,
-  sameAs: ["https://github.com/spike-land-ai"],
-});
+function buildRouteMeta(t: (key: string) => string): Record<string, RouteMeta> {
+  const defaultTitle = t("meta:defaultTitle");
+  const defaultDescription = t("meta:defaultDescription");
+  const r = (key: string) => t(`meta:routes.${key}.title`);
+  const d = (key: string) => t(`meta:routes.${key}.description`);
+  return {
+    "/": { title: defaultTitle, description: defaultDescription },
+    "/apps": { title: r("apps"), description: d("apps") },
+    "/packages": { title: r("packages"), description: d("packages") },
+    "/store": { title: r("apps"), description: d("apps") },
+    "/messages": { title: r("messages"), description: d("messages") },
+    "/analytics": { title: r("analytics"), description: d("analytics") },
+    "/status": { title: r("status"), description: d("status") },
+    "/learn": { title: r("learn"), description: d("learn") },
+    "/bugbook": { title: r("bugbook"), description: d("bugbook") },
+    "/pricing": { title: r("pricing"), description: d("pricing") },
+    "/about": { title: r("about"), description: d("about") },
+    "/security": { title: r("security"), description: d("security") },
+    "/terms": { title: r("terms"), description: d("terms") },
+    "/privacy": { title: r("privacy"), description: d("privacy") },
+    "/blog": { title: r("blog"), description: d("blog") },
+    "/docs": { title: r("docs"), description: d("docs") },
+    "/settings": { title: r("settings"), description: d("settings") },
+    "/build": { title: r("vibeCode"), description: d("vibeCode") },
+    "/vibe-code": { title: r("vibeCode"), description: d("vibeCode") },
+    "/login": { title: r("login"), description: d("login") },
+    "/version": { title: r("version"), description: d("version") },
+    "/what-we-do": { title: r("whatWeDo"), description: d("whatWeDo") },
+  };
+}
 
-const WEB_APP_JSON_LD = JSON.stringify({
-  "@context": "https://schema.org",
-  "@type": "WebApplication",
-  name: "spike.land",
-  url: SITE_URL,
-  description: DEFAULT_DESCRIPTION,
-  applicationCategory: "DeveloperApplication",
-  operatingSystem: "Any",
-  offers: [
-    {
-      "@type": "Offer",
-      name: "Free",
-      price: "0",
-      priceCurrency: "USD",
-      description: "50 requests per day, free-tier tools, bug reporting, community support",
-    },
-    {
-      "@type": "Offer",
-      name: "Pro",
-      price: "29",
-      priceCurrency: "USD",
-      description:
-        "500 requests per day, pro tools, BYOK support, natural language chat, priority bug reporting",
-    },
-    {
-      "@type": "Offer",
-      name: "Business",
-      price: "99",
-      priceCurrency: "USD",
-      description:
-        "Unlimited requests, all tools, priority support, early access, bug bounty eligibility",
-    },
-  ],
-});
+function buildOrganizationJsonLd(description: string) {
+  return JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: "spike.land",
+    url: SITE_URL,
+    logo: `${SITE_URL}/og-image.png`,
+    description,
+    sameAs: ["https://github.com/spike-land-ai"],
+  });
+}
+
+function buildWebAppJsonLd(description: string) {
+  return JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    name: "spike.land",
+    url: SITE_URL,
+    description,
+    applicationCategory: "DeveloperApplication",
+    operatingSystem: "Any",
+    offers: [
+      {
+        "@type": "Offer",
+        name: "Free",
+        price: "0",
+        priceCurrency: "USD",
+        description: "50 requests per day, free-tier tools, bug reporting, community support",
+      },
+      {
+        "@type": "Offer",
+        name: "Pro",
+        price: "29",
+        priceCurrency: "USD",
+        description:
+          "500 requests per day, pro tools, BYOK support, natural language chat, priority bug reporting",
+      },
+      {
+        "@type": "Offer",
+        name: "Business",
+        price: "99",
+        priceCurrency: "USD",
+        description:
+          "Unlimited requests, all tools, priority support, early access, bug bounty eligibility",
+      },
+    ],
+  });
+}
 
 function injectJsonLd(id: string, content: string) {
   let el = document.getElementById(id) as HTMLScriptElement | null;
@@ -186,14 +113,14 @@ function injectJsonLd(id: string, content: string) {
   el.textContent = content;
 }
 
-const BASE_NAV_LINKS = [
-  { to: "/apps", label: "Apps" },
-  { to: "/vibe-code", label: "Vibe Code" },
-  { to: "/pricing", label: "Pricing" },
-  { to: "/docs", label: "Docs" },
-  { to: "/status", label: "Status" },
-  { to: "/blog", label: "Blog" },
-  { to: "/about", label: "About" },
+const NAV_LINK_ROUTES = [
+  { to: "/apps", key: "apps" },
+  { to: "/vibe-code", key: "vibeCode" },
+  { to: "/pricing", key: "pricing" },
+  { to: "/docs", key: "docs" },
+  { to: "/status", key: "status" },
+  { to: "/blog", key: "blog" },
+  { to: "/about", key: "about" },
 ] as const;
 
 export function RootLayout() {
@@ -202,8 +129,13 @@ export function RootLayout() {
   const { theme, setTheme } = useDarkMode();
   useAuth();
   const { isDeveloper } = useDevMode();
+  const { t, i18n } = useTranslation(["common", "nav", "meta"]);
+  const resolvedLanguage = resolveSupportedLanguage(i18n.resolvedLanguage ?? i18n.language);
 
-  const navLinks = useMemo(() => [...BASE_NAV_LINKS], []);
+  const navLinks = useMemo(
+    () => NAV_LINK_ROUTES.map(({ to, key }) => ({ to, label: t(`nav:${key}`) })),
+    [t],
+  );
 
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const closeMobileNav = useCallback(() => setMobileNavOpen(false), []);
@@ -216,10 +148,7 @@ export function RootLayout() {
     setMobileNavOpen(false);
   }, [pathname]);
 
-  // Inject JSON-LD structured data and RSS link once on mount
   useEffect(() => {
-    injectJsonLd("jsonld-organization", ORGANIZATION_JSON_LD);
-    injectJsonLd("jsonld-webapp", WEB_APP_JSON_LD);
     initGoogleAds();
 
     if (!document.querySelector('link[type="application/rss+xml"]')) {
@@ -233,11 +162,18 @@ export function RootLayout() {
   }, []);
 
   useEffect(() => {
+    const defaultDescription = t("meta:defaultDescription");
+    injectJsonLd("jsonld-organization", buildOrganizationJsonLd(defaultDescription));
+    injectJsonLd("jsonld-webapp", buildWebAppJsonLd(defaultDescription));
+  }, [t]);
+
+  useEffect(() => {
+    const ROUTE_META = buildRouteMeta(t);
     // Match exact path first, then strip dynamic segments for a best-effort match
     let meta = ROUTE_META[pathname] ??
       ROUTE_META[pathname.replace(/\/[^/]+$/, "")] ?? {
-        title: DEFAULT_TITLE,
-        description: DEFAULT_DESCRIPTION,
+        title: t("meta:defaultTitle"),
+        description: t("meta:defaultDescription"),
       };
 
     // Special handling for dynamic MCP app pages
@@ -307,9 +243,10 @@ export function RootLayout() {
     if (!ogLocale) {
       ogLocale = document.createElement("meta");
       ogLocale.setAttribute("property", "og:locale");
-      ogLocale.content = "en_US";
       document.head.appendChild(ogLocale);
     }
+    ogLocale.content = resolvedLanguage === "hu" ? "hu_HU" : "en_US";
+    document.documentElement.lang = resolvedLanguage;
 
     // BreadcrumbList structured data
     const segments = pathname.split("/").filter(Boolean);
@@ -336,7 +273,7 @@ export function RootLayout() {
       const existing = document.getElementById("jsonld-breadcrumb");
       if (existing) existing.remove();
     }
-  }, [pathname, searchStr]);
+  }, [pathname, resolvedLanguage, searchStr, t]);
 
   return (
     <div className="app-shell relative flex min-h-screen overflow-x-hidden bg-background text-foreground">
@@ -345,7 +282,7 @@ export function RootLayout() {
         href="#main-content"
         className="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:bg-primary focus:text-primary-foreground focus:p-2 focus:m-2 focus:rounded"
       >
-        Skip to main content
+        {t("common:skipToContent")}
       </a>
 
       <div className="flex flex-1 flex-col min-w-0">
@@ -361,11 +298,11 @@ export function RootLayout() {
                     spike.land
                   </p>
                   <p className="hidden text-[0.72rem] uppercase tracking-[0.16em] text-muted-foreground md:block">
-                    MCP-native platform
+                    {t("common:mcpNativePlatform")}
                   </p>
                 </div>
               </Link>
-              <nav className="hidden lg:flex items-center gap-1.5" aria-label="Main navigation">
+              <nav className="hidden lg:flex items-center gap-1.5" aria-label={t("common:mainNav")}>
                 {navLinks.map(({ to, label }) => (
                   <Link
                     key={to}
@@ -385,15 +322,16 @@ export function RootLayout() {
             <div className="flex items-center gap-2.5">
               <div className="hidden items-center gap-2 rounded-full border border-border bg-card px-3 py-1.5 text-[0.72rem] font-semibold uppercase tracking-[0.14em] text-muted-foreground xl:inline-flex">
                 <span className="h-2 w-2 rounded-full bg-primary" />
-                80+ tools online
+                {t("common:toolsOnline")}
               </div>
               {isDeveloper && <ThemeSwitcher theme={theme} setTheme={setTheme} />}
+              <LanguageSwitcher />
               <LoginButton />
               {/* Mobile hamburger */}
               <button
                 type="button"
                 className="flex items-center justify-center rounded-2xl border border-border bg-card p-3 text-muted-foreground transition-colors hover:text-foreground lg:hidden"
-                aria-label={mobileNavOpen ? "Close navigation menu" : "Open navigation menu"}
+                aria-label={mobileNavOpen ? t("common:closeNavMenu") : t("common:openNavMenu")}
                 aria-expanded={mobileNavOpen}
                 aria-controls="mobile-nav"
                 onClick={() => setMobileNavOpen(!mobileNavOpen)}
@@ -442,9 +380,9 @@ export function RootLayout() {
             className="fixed inset-0 z-40 flex flex-col gap-4 bg-background/95 px-6 pt-20 backdrop-blur-xl lg:hidden"
             role="dialog"
             aria-modal="true"
-            aria-label="Mobile navigation"
+            aria-label={t("common:mobileNav")}
           >
-            <nav aria-label="Mobile navigation links" className="rubik-panel p-4">
+            <nav aria-label={t("common:mobileNavLinks")} className="rubik-panel p-4">
               {navLinks.map(({ to, label }) => (
                 <Link
                   key={to}
@@ -466,11 +404,8 @@ export function RootLayout() {
         <main id="main-content" className="flex-1 overflow-x-hidden pb-8">
           <noscript>
             <div className="p-8 text-center">
-              <h1>JavaScript Required</h1>
-              <p>
-                spike.land requires JavaScript to run. Please enable JavaScript in your browser
-                settings.
-              </p>
+              <h1>{t("common:jsRequired")}</h1>
+              <p>{t("common:jsRequiredDesc")}</p>
             </div>
           </noscript>
           <Outlet />

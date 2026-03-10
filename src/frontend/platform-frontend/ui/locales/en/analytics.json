@@ -1,0 +1,16 @@
+{
+  "title": "Analytics",
+  "uniqueVisitors": "Unique Visitors",
+  "toolInvocations": "Tool Invocations",
+  "eventTypes": "Event Types",
+  "totalEvents": "Total Events",
+  "topArticles": "Top Articles",
+  "topToolsByUsage": "Top Tools by Usage",
+  "recentActivity": "Recent Activity",
+  "eventsByType": "Events by Type",
+  "eventType": "Event Type",
+  "count": "Count",
+  "noBlogViews": "No blog views yet",
+  "noToolUsage": "No tool usage data yet",
+  "noRecentEvents": "No recent events"
+}

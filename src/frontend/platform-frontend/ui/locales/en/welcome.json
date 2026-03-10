@@ -1,0 +1,31 @@
+{
+  "welcomeUser": "Welcome, {{name}}!",
+  "welcomeGeneric": "Welcome!",
+  "introDescription": "spike.land is your ultimate AI development playground. Build, test, and deploy with 80+ specialized tools.",
+  "features": {
+    "buildDeploy": "Build and deploy AI-powered apps",
+    "browseMcp": "Browse 80+ MCP tools in one registry",
+    "collaborate": "Collaborate with real-time preview"
+  },
+  "mcpInstall": {
+    "heading": "Add to Claude in one command",
+    "viewDocs": "View setup docs"
+  },
+  "getStarted": "Get started",
+  "skipIntro": "Skip intro",
+  "interestsTitle": "What's your focus?",
+  "interestsSubtitle": "Select your interests for personalized tool recommendations.",
+  "interests": {
+    "aiChat": "AI Chat & Assistants",
+    "codeGen": "Code Generation",
+    "imageMedia": "Image & Media",
+    "dataAnalysis": "Data Analysis",
+    "automation": "Automation & Workflows",
+    "mcpTools": "MCP Tools",
+    "apis": "APIs & Integrations",
+    "devops": "DevOps & CI/CD"
+  },
+  "topToolsTitle": "Top tools for you",
+  "topToolsSubtitle": "Based on your interests, we recommend starting here:",
+  "startExploring": "Start exploring"
+}

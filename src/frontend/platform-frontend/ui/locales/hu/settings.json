@@ -1,0 +1,91 @@
+{
+  "loading": "Betöltés...",
+  "title": "Beállítások",
+  "sectionsLabel": "Beállítási szakaszok",
+  "errors": {
+    "unknown": "Ismeretlen hiba",
+    "deleteKeyFailed": "Az API kulcs törlése nem sikerült",
+    "checkoutFailed": "A fizetés indítása nem sikerült",
+    "openPortalFailed": "A számlázási portál megnyitása nem sikerült"
+  },
+  "tabs": {
+    "profile": "Profil",
+    "whatsapp": "WhatsApp",
+    "apiKeys": "API kulcsok",
+    "billing": "Számlázás",
+    "access": "Hozzáférés"
+  },
+  "profile": {
+    "displayName": "Megjelenítési név",
+    "email": "E-mail",
+    "namePlaceholder": "A neved",
+    "emailPlaceholder": "te@pelda.hu",
+    "saveChanges": "Módosítások mentése",
+    "saving": "Mentés...",
+    "savedSuccess": "Sikeresen mentve.",
+    "nameRequired": "A megjelenítési név megadása kötelező.",
+    "emailRequired": "Érvényes e-mail cím megadása szükséges."
+  },
+  "whatsapp": {
+    "statusLabel": "Állapot",
+    "statusLinked": "Összekapcsolva",
+    "statusNotLinked": "Nincs összekapcsolva",
+    "otpTitle": "Az OTP kódod",
+    "otpExpires": "Lejár: {{time}}",
+    "otpInstructions": "Küldd el ezt a kódot a spike.land botnak WhatsApp-on az összekapcsolás befejezéséhez.",
+    "linkButton": "WhatsApp összekapcsolása",
+    "linking": "Összekapcsolás...",
+    "unlinkButton": "Leválasztás",
+    "unlinking": "Leválasztás..."
+  },
+  "apiKeys": {
+    "addKey": "API kulcs hozzáadása",
+    "provider": "Szolgáltató",
+    "apiKeyLabel": "API kulcs",
+    "pastePlaceholder": "Illeszd be az API kulcsot",
+    "loadingKeys": "Kulcsok betöltése...",
+    "noKeysYet": "Még nincsenek API kulcsok tárolva.",
+    "addedOn": "Hozzáadva: {{date}}",
+    "test": "Teszt",
+    "testing": "Tesztelés...",
+    "delete": "Törlés",
+    "save": "Mentés",
+    "saving": "Mentés...",
+    "statusOk": "OK",
+    "statusFailed": "Sikertelen ({{code}})",
+    "statusError": "Hiba"
+  },
+  "billing": {
+    "currentPlan": "Jelenlegi csomag",
+    "planFree": "Ingyenes",
+    "planPro": "Pro",
+    "planBusiness": "Business",
+    "statusActive": "Aktív",
+    "statusCanceled": "Lemondva",
+    "statusPastDue": "Lejárt fizetés",
+    "loadingInfo": "Számlázási adatok betöltése...",
+    "activated": "Az előfizetés aktiválva lett!",
+    "canceledToast": "A fizetés megszakítva",
+    "accessUntil": "Hozzáférés eddig",
+    "renews": "Megújul",
+    "pastDueWarning": "Fizetés lejárt — kérjük, frissítsd a fizetési módot a szolgáltatás megszakadásának elkerüléséhez.",
+    "canceledWarning": "Az előfizetésed lemondásra került. Az újbóli hozzáféréshez iratkozz fel újra.",
+    "manageSubscription": "Előfizetés kezelése",
+    "openingPortal": "Portál megnyitása...",
+    "upgradeToPro": "Váltás Pro-ra — ${{price}}/hó",
+    "upgradeToBusiness": "Váltás Business-re — ${{price}}/hó",
+    "redirecting": "Átirányítás..."
+  },
+  "access": {
+    "eloScore": "ELO pontszám",
+    "tierThresholds": "Szint küszöbértékek",
+    "freeTier": "Ingyenes 0-999",
+    "proTier": "Pro 1000-1499",
+    "eliteTier": "Elit 1500+",
+    "bugBountyEligibility": "Bug Bounty jogosultság",
+    "eligible": "Jogosult",
+    "notEligible": "Nem jogosult (1000+ szükséges)",
+    "recentEvents": "Legutóbbi ELO események",
+    "noRecentEvents": "Nincsenek legutóbbi események."
+  }
+}

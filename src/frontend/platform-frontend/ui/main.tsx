@@ -8,6 +8,7 @@ import { ErrorBoundary } from "./components/ErrorBoundary";
 import { reportError } from "../core-logic/reportError";
 import { beginBootstrapPageLoad } from "../core-logic/lib/pageLoadCounter";
 import { disableServiceWorkerCacheController } from "../core-logic/lib/serviceWorkerCache";
+import "./i18n";
 import "./app.css";
 
 // Report unhandled promise rejections to backend
@@ -39,7 +40,8 @@ createRoot(rootEl).render(
 );
 
 void disableServiceWorkerCacheController().catch((error) => {
-  const serviceWorkerError = error instanceof Error ? error : new Error(String(error ?? "Service worker disable failed"));
+  const serviceWorkerError =
+    error instanceof Error ? error : new Error(String(error ?? "Service worker disable failed"));
   reportError(serviceWorkerError, {
     code: "SERVICE_WORKER_CACHE_DISABLE_FAILED",
   });

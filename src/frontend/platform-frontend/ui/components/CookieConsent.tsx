@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Link } from "@tanstack/react-router";
 import { useCookieConsent } from "../hooks/useCookieConsent";
 import { Button } from "../shared/ui/button";
@@ -6,6 +7,7 @@ import { Cookie, X } from "lucide-react";
 import { cn } from "../../styling/cn";
 
 export function CookieConsent() {
+  const { t } = useTranslation("common");
   const { consentGiven, accept, reject } = useCookieConsent();
   const [visible, setVisible] = useState(false);
 
@@ -36,16 +38,14 @@ export function CookieConsent() {
         </div>
 
         <div className="flex-1 space-y-1">
-          <h3 className="text-sm font-bold text-foreground">We use cookies</h3>
+          <h3 className="text-sm font-bold text-foreground">{t("cookieHeading")}</h3>
           <p className="text-xs text-muted-foreground leading-relaxed max-w-2xl">
-            We use essential cookies to make our platform work, analytics cookies to understand how
-            you use it, and advertising cookies to measure campaign effectiveness. By clicking
-            &ldquo;Accept All&rdquo;, you agree to our use of all cookies.{" "}
+            {t("cookieDescription")}{" "}
             <Link
               to="/privacy"
               className="font-semibold text-primary hover:underline underline-offset-4"
             >
-              Cookie Policy
+              {t("cookiePolicy")}
             </Link>
           </p>
         </div>
@@ -57,14 +57,14 @@ export function CookieConsent() {
             onClick={reject}
             className="flex-1 md:flex-none rounded-xl font-bold"
           >
-            Necessary Only
+            {t("cookieNecessaryOnly")}
           </Button>
           <Button
             size="sm"
             onClick={accept}
             className="flex-1 md:flex-none rounded-xl font-bold shadow-lg shadow-primary/20"
           >
-            Accept All
+            {t("cookieAcceptAll")}
           </Button>
           <Button
             variant="ghost"

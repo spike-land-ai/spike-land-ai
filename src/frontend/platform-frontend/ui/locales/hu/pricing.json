@@ -1,0 +1,97 @@
+{
+  "eyebrow": "Árazás",
+  "title": "Átlátható árazás MCP-natív szoftverek fejlesztéséhez.",
+  "subtitle": "Kezdj ingyen, válts pro munkafolyamatokra, és tartsd kéznél a vállalati vezérlőket, amikor a terméked infrastruktúrává válik.",
+  "launchPromo": "Indulási ár: £1/hó a LAUNCH97 kóddal — 14 napos ingyenes próbaidőszakkal",
+  "monthly": "Havi",
+  "annual": "Éves",
+  "annualSavings": "-20%",
+  "billingFrequency": "Számlázási gyakoriság",
+  "periodMonthly": "/hó",
+  "billedAnnually": "{{total}} éves számlázással",
+  "saveAmount": "20% megtakarítás",
+  "mostPopular": "Legnépszerűbb",
+  "getStarted": "Kezdés",
+  "plans": {
+    "free": {
+      "name": "Ingyenes",
+      "description": "Kezdd el az AI-alapú fejlesztői eszközökkel.",
+      "features": [
+        "50 AI kérés/nap",
+        "10 MCP (Model Context Protocol) eszköz",
+        "Közösségi támogatás",
+        "Alap irányítópult"
+      ],
+      "cta": "Kezdd ingyen"
+    },
+    "pro": {
+      "name": "Pro",
+      "description": "Nyisd meg a professzionális eszközöket és a magasabb limiteket.",
+      "features": [
+        "500 AI kérés/nap",
+        "Minden 250+ MCP eszköz",
+        "Elsőbbségi támogatás",
+        "API kulcs tároló — Saját kulcsok (BYOK)",
+        "Haladó analitika"
+      ],
+      "cta": "Váltás Pro-ra"
+    },
+    "business": {
+      "name": "Business",
+      "description": "Korlátlan hozzáférés és dedikált támogatás csapatoknak.",
+      "features": [
+        "Korlátlan AI kérés",
+        "Minden 250+ MCP eszköz",
+        "Dedikált támogatás",
+        "Csapatkezelés",
+        "Egyedi integrációk",
+        "Piactéri bevételmegosztás"
+      ],
+      "cta": "Váltás Business-re"
+    },
+    "enterprise": {
+      "name": "Enterprise",
+      "customPrice": "Egyedi",
+      "description": "SSO, RBAC és dedikált támogatás nagy csapatoknak.",
+      "features": [
+        "Minden, ami a Business-ben van",
+        "SSO / SAML hitelesítés",
+        "Egyedi RBAC és jogosultságok",
+        "SLA garancia (99,9%)",
+        "Dedikált támogatási mérnök",
+        "Audit naplók és megfelelőség",
+        "Egyedi integrációk"
+      ],
+      "cta": "Kapcsolat az értékesítéssel"
+    }
+  },
+  "customPlanPrefix": "Egyedi csomagra van szükséged?",
+  "customPlanLink": "Beszélj a csapatunkkal",
+  "pricingDisclaimer": "Az árak és a limitek változhatnak.",
+  "priceDisplayUsd": "A megjelenített árak {{currency}} pénznemben vannak, a számlázás USD-ben történik.",
+  "priceDisplayDefault": "Az árak USD-ben értendők.",
+  "vatNotice": "Az áfa felszámításra kerülhet.",
+  "academicPrefix": "Diákok és oktatók:",
+  "academicLink": "Keressetek minket akadémiai árazásért",
+  "faq": {
+    "title": "Gyakran ismételt kérdések",
+    "q1": "Mit tudok építeni? Kell hozzá programozni?",
+    "a1": "Építhetsz AI asszisztenseket, amelyek adatbázisokkal dolgoznak, weboldalakat olvasnak, képeket dolgoznak fel és még sok mást. Némi technikai jártasság hasznos, de az előre elkészített MCP eszközök miatt az integrációs logikát nem neked kell megírnod.",
+    "q2": "Mit tartalmaz az ingyenes csomag?",
+    "a2": "Az ingyenes csomag napi 50 AI kérést, 10 MCP eszközhöz való hozzáférést, alap irányítópultot és közösségi támogatást ad. Jó belépési pont a platform kipróbálásához.",
+    "q3": "Hogyan működnek az AI kérések?",
+    "a3": "Minden eszközhasználat, például képgenerálás, kódellenőrzés vagy kérdésfeltevés egy AI kérésnek számít. A napi limit éjfélkor, UTC szerint nullázódik, a fel nem használt kérések nem vihetők tovább.",
+    "q4": "Használhatom a saját API kulcsaimat?",
+    "a4": "Igen. A Pro és Business csomag tartalmazza a BYOK API kulcstárolót. Hozzáadhatod a saját OpenAI, Anthropic vagy más szolgáltatói kulcsaidat, és a rendszer automatikusan azokat használja.",
+    "q5": "Milyen MCP eszközök érhetők el?",
+    "a5": "A platform jelenleg több mint 250 MCP eszközt kínál kódgeneráláshoz, képfeldolgozáshoz, adatelemzéshez, böngészőautomatizáláshoz és sok más feladathoz. Az ingyenes csomag 10 alap eszközt ad, a Pro és Business pedig a teljes katalógust.",
+    "q6": "Hogyan működik a piactéri bevételmegosztás?",
+    "a6": "Azok a Business előfizetők, akik eszközöket vagy integrációkat publikálnak a spike.land piacterén, részesedést kapnak az általuk termelt bevételből. A kereskedelmi feltételek a regisztráció során kerülnek rögzítésre.",
+    "q7": "Mi történik, ha elérem a napi limitet?",
+    "a7": "Amikor eléred a napi AI kéréslimitedet, az új kérések nem állnak le teljesen, hanem sorba kerülnek és csökkentett sebességgel dolgozódnak fel. A limitek minden nap UTC éjfélkor nullázódnak.",
+    "q8": "Van visszatérítési szabályzat?",
+    "a8": "Igen. Ha a fizetős csomag első 14 napjában nem vagy elégedett, vedd fel velünk a kapcsolatot és teljes visszatérítést adunk. Ezután bármikor lemondhatod az előfizetést, és a hozzáférésed a számlázási időszak végéig megmarad.",
+    "q9": "Bármikor lemondhatom?",
+    "a9": "Igen. Az előfizetésedet bármikor lemondhatod a számlázási beállítások oldalon. A csomag a jelenlegi számlázási időszak végéig aktív marad, utána az ingyenes szintre kerülsz vissza."
+  }
+}

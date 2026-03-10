@@ -1,8 +1,9 @@
 import { Link } from "@tanstack/react-router";
 import { Github, Twitter, Mail, ExternalLink, ShieldCheck } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 export function AppFooter() {
-  const currentYear = new Date().getFullYear();
+  const { t } = useTranslation("footer");
 
   return (
     <footer
@@ -14,7 +15,7 @@ export function AppFooter() {
           <div className="max-w-2xl space-y-4">
             <span className="rubik-eyebrow">
               <span className="h-2 w-2 rounded-full bg-primary" />
-              Ship enterprise-ready app surfaces
+              {t("heroHeading")}
             </span>
             <div className="space-y-3">
               <h2 className="text-3xl font-semibold tracking-[-0.05em] text-foreground sm:text-4xl">
@@ -32,13 +33,13 @@ export function AppFooter() {
               to="/store"
               className="inline-flex items-center justify-center rounded-[calc(var(--radius-control)-0.1rem)] border border-transparent bg-foreground px-5 py-3 text-sm font-semibold text-background shadow-[0_18px_40px_color-mix(in_srgb,var(--fg)_12%,transparent)] transition-colors hover:bg-foreground/92"
             >
-              Browse apps
+              {t("browseApps")}
             </Link>
             <Link
               to="/docs"
               className="inline-flex items-center justify-center rounded-[calc(var(--radius-control)-0.1rem)] border border-border bg-background/85 px-5 py-3 text-sm font-semibold text-foreground transition-colors hover:border-primary/28 hover:text-primary"
             >
-              Read docs
+              {t("readDocs")}
             </Link>
           </div>
         </div>
@@ -55,14 +56,13 @@ export function AppFooter() {
                     spike.land
                   </p>
                   <p className="text-xs uppercase tracking-[0.16em] text-muted-foreground">
-                    MCP-native AI platform
+                    {t("brandTagline")}
                   </p>
                 </div>
               </Link>
 
               <p className="max-w-sm text-sm leading-7 text-muted-foreground">
-                Build apps, tools, and operational workflows with one design system and one runtime
-                model.
+                {t("brandDescription")}
               </p>
 
               <div className="flex items-center gap-3">
@@ -99,7 +99,7 @@ export function AppFooter() {
 
             <div className="space-y-4">
               <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
-                Product
+                {t("product")}
               </p>
               <ul className="space-y-3 text-sm">
                 <li>
@@ -107,7 +107,7 @@ export function AppFooter() {
                     to="/apps"
                     className="text-muted-foreground transition-colors hover:text-primary"
                   >
-                    Packages
+                    {t("packages")}
                   </Link>
                 </li>
                 <li>
@@ -115,7 +115,7 @@ export function AppFooter() {
                     to="/store"
                     className="text-muted-foreground transition-colors hover:text-primary"
                   >
-                    App Store
+                    {t("appStore")}
                   </Link>
                 </li>
                 <li>
@@ -123,7 +123,7 @@ export function AppFooter() {
                     to="/pricing"
                     className="text-muted-foreground transition-colors hover:text-primary"
                   >
-                    Pricing
+                    {t("pricing")}
                   </Link>
                 </li>
                 <li>
@@ -131,7 +131,7 @@ export function AppFooter() {
                     to="/vibe-code"
                     className="text-muted-foreground transition-colors hover:text-primary"
                   >
-                    Vibe Code
+                    {t("vibeCode")}
                   </Link>
                 </li>
               </ul>
@@ -139,7 +139,7 @@ export function AppFooter() {
 
             <div className="space-y-4">
               <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
-                Resources
+                {t("resources")}
               </p>
               <ul className="space-y-3 text-sm">
                 <li>
@@ -147,7 +147,7 @@ export function AppFooter() {
                     to="/docs"
                     className="text-muted-foreground transition-colors hover:text-primary"
                   >
-                    Documentation
+                    {t("documentation")}
                   </Link>
                 </li>
                 <li>
@@ -155,7 +155,7 @@ export function AppFooter() {
                     to="/blog"
                     className="text-muted-foreground transition-colors hover:text-primary"
                   >
-                    Blog
+                    {t("blog")}
                   </Link>
                 </li>
                 <li>
@@ -163,7 +163,7 @@ export function AppFooter() {
                     to="/about"
                     className="text-muted-foreground transition-colors hover:text-primary"
                   >
-                    About
+                    {t("about")}
                   </Link>
                 </li>
                 <li>
@@ -171,7 +171,7 @@ export function AppFooter() {
                     to="/status"
                     className="text-muted-foreground transition-colors hover:text-primary"
                   >
-                    System Status
+                    {t("systemStatus")}
                   </Link>
                 </li>
               </ul>
@@ -179,7 +179,7 @@ export function AppFooter() {
 
             <div className="space-y-4">
               <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
-                Trust
+                {t("trust")}
               </p>
               <ul className="space-y-3 text-sm">
                 <li>
@@ -187,7 +187,7 @@ export function AppFooter() {
                     to="/privacy"
                     className="text-muted-foreground transition-colors hover:text-primary"
                   >
-                    Privacy Policy
+                    {t("privacyPolicy")}
                   </Link>
                 </li>
                 <li>
@@ -195,7 +195,7 @@ export function AppFooter() {
                     to="/terms"
                     className="text-muted-foreground transition-colors hover:text-primary"
                   >
-                    Terms of Service
+                    {t("termsOfService")}
                   </Link>
                 </li>
                 <li>
@@ -204,7 +204,7 @@ export function AppFooter() {
                     className="inline-flex items-center gap-1.5 text-muted-foreground transition-colors hover:text-primary"
                   >
                     <ShieldCheck className="size-3.5" />
-                    Security
+                    {t("security")}
                   </Link>
                 </li>
                 <li>
@@ -215,7 +215,7 @@ export function AppFooter() {
                     className="inline-flex items-center gap-1.5 text-muted-foreground transition-colors hover:text-primary"
                   >
                     <ExternalLink className="size-3.5" />
-                    Changelog
+                    {t("changelog")}
                   </a>
                 </li>
               </ul>
@@ -227,9 +227,9 @@ export function AppFooter() {
           <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
             <div className="space-y-1">
               <p className="text-xs font-semibold tracking-[0.04em] text-muted-foreground">
-                &copy; {currentYear} SPIKE LAND LTD. Built for edge-native AI product surfaces.
+                {t("copyright", { year: new Date().getFullYear() })}
               </p>
-              <p className="text-xs text-muted-foreground/80">Brighton-built. Global by default.</p>
+              <p className="text-xs text-muted-foreground/80">{t("tagline")}</p>
             </div>
 
             <div className="flex flex-wrap items-center gap-3">
@@ -242,7 +242,7 @@ export function AppFooter() {
                   <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-success/40 opacity-75"></span>
                   <span className="relative inline-flex h-2 w-2 rounded-full bg-success"></span>
                 </span>
-                Status healthy
+                {t("statusHealthy")}
               </a>
             </div>
           </div>

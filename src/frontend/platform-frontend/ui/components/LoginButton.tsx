@@ -1,18 +1,14 @@
 import { useAuth } from "../hooks/useAuth";
 import { useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Link } from "@tanstack/react-router";
-import {
-  Settings,
-  LogOut,
-  ChevronDown,
-  CreditCard,
-  Loader2,
-} from "lucide-react";
+import { Settings, LogOut, ChevronDown, CreditCard, Loader2 } from "lucide-react";
 import { Button } from "../shared/ui/button";
 import { cn } from "../../styling/cn";
 
 export function LoginButton() {
   const { user, isAuthenticated, isLoading, login, logout } = useAuth();
+  const { t } = useTranslation(["auth", "common"]);
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -38,7 +34,10 @@ export function LoginButton() {
   if (isLoading) {
     return (
       <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-border bg-card/88 shadow-[var(--panel-shadow)] animate-pulse">
-        <Loader2 className="size-4 animate-spin text-muted-foreground/50" />
+        <Loader2
+          className="size-4 animate-spin text-muted-foreground/50"
+          aria-label={t("common:loading")}
+        />
       </div>
     );
   }
@@ -52,7 +51,7 @@ export function LoginButton() {
           "shadow-[0_18px_40px_color-mix(in_srgb,var(--primary-color)_18%,transparent)]",
         )}
       >
-        Sign in
+        {t("auth:signIn")}
       </Button>
     );
   }
@@ -80,11 +79,7 @@ export function LoginButton() {
       >
         <div className="relative">
           {user.picture ? (
-            <img
-              src={user.picture}
-              alt=""
-              className="h-8 w-8 rounded-xl object-cover shadow-sm"
-            />
+            <img src={user.picture} alt="" className="h-8 w-8 rounded-xl object-cover shadow-sm" />
           ) : (
             <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-primary text-[0.68rem] font-semibold tracking-[0.08em] text-primary-foreground shadow-[0_10px_24px_color-mix(in_srgb,var(--primary-color)_24%,transparent)]">
               {initials}
@@ -97,7 +92,7 @@ export function LoginButton() {
             {user.name ?? user.preferred_username ?? "User"}
           </span>
           <span className="text-[10px] font-medium text-muted-foreground">
-            Pro Member
+            {t("auth:proMember")}
           </span>
         </div>
         <ChevronDown
@@ -136,7 +131,7 @@ export function LoginButton() {
               )}
             >
               <Settings className="size-4" />
-              Account Settings
+              {t("auth:accountSettings")}
             </Link>
             <Link
               to="/settings"
@@ -148,7 +143,7 @@ export function LoginButton() {
               )}
             >
               <CreditCard className="size-4" />
-              Billing & Credits
+              {t("auth:billingCredits")}
             </Link>
             <div className="h-px bg-border/50 dark:bg-white/10 my-1 mx-2" />
             <button
@@ -162,7 +157,7 @@ export function LoginButton() {
               )}
             >
               <LogOut className="size-4" />
-              Log out
+              {t("auth:logOut")}
             </button>
           </div>
         </div>

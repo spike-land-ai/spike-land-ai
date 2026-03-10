@@ -1,4 +1,5 @@
 import "@testing-library/jest-dom";
+import i18n from "../../src/frontend/platform-frontend/ui/i18n";
 
 // Mock window.matchMedia
 Object.defineProperty(window, "matchMedia", {
@@ -50,4 +51,9 @@ global.fetch = vi.fn().mockResolvedValue({
 Object.defineProperty(navigator, "sendBeacon", {
   writable: true,
   value: vi.fn().mockReturnValue(true),
+});
+
+beforeEach(async () => {
+  localStorage.setItem("spike-lang", "en");
+  await i18n.changeLanguage("en");
 });

@@ -1,0 +1,82 @@
+{
+  "defaultTitle": "spike.land - MCP-First AI Development Platform",
+  "defaultDescription": "Build, deploy, and manage AI-powered applications with 80+ MCP tools, real-time collaboration, and edge deployment on Cloudflare Workers.",
+  "routes": {
+    "apps": {
+      "title": "App Store - spike.land",
+      "description": "Discover and install AI-powered applications from the spike.land store. Chess engines, QA studio, data visualization, and more."
+    },
+    "packages": {
+      "title": "MCP Packages - spike.land",
+      "description": "Inspect MCP package details, terminals, and implementation surfaces behind spike.land apps."
+    },
+    "messages": {
+      "title": "Messages - spike.land",
+      "description": "Real-time messaging and collaboration on spike.land. Chat with teammates, share code, and coordinate AI workflows."
+    },
+    "analytics": {
+      "title": "Analytics - spike.land",
+      "description": "View usage analytics and insights for your spike.land apps. Track tool invocations, message volume, and performance metrics."
+    },
+    "status": {
+      "title": "System Status - spike.land",
+      "description": "Historical system status for spike.land services. Review requests per minute, min and max request time, mean latency, and deviation from the mean."
+    },
+    "learn": {
+      "title": "Learn & Verify - spike.land",
+      "description": "Learn from any content and prove your understanding through interactive AI-powered quizzes. Earn verifiable badges."
+    },
+    "bugbook": {
+      "title": "Bugbook - spike.land",
+      "description": "Public bug tracker with ELO ranking on spike.land. Report, track, and fix bugs with community-driven prioritization."
+    },
+    "pricing": {
+      "title": "Pricing - spike.land | Free, Pro $29, Business $99",
+      "description": "Simple, transparent pricing for spike.land. Free plan for individuals, Pro at $29/mo, Business at $99/mo with unlimited access and priority support."
+    },
+    "about": {
+      "title": "About spike.land - MCP-First AI Platform",
+      "description": "Learn about spike.land — who we are, our mission, and how we're building an open platform for AI tools."
+    },
+    "security": {
+      "title": "Security - spike.land",
+      "description": "Security practices, disclosure policy, and platform hardening details for spike.land."
+    },
+    "terms": {
+      "title": "Terms of Service - spike.land",
+      "description": "Read the spike.land Terms of Service. Learn about acceptable use, subscription billing, intellectual property rights, and our SaaS agreement."
+    },
+    "privacy": {
+      "title": "Privacy Policy - spike.land",
+      "description": "spike.land Privacy Policy. GDPR-aware data handling, cookies, third-party services (Stripe, Cloudflare), and your rights as a user."
+    },
+    "blog": {
+      "title": "Blog - spike.land",
+      "description": "Articles, tutorials, and engineering insights from the spike.land team. Learn about MCP, AI development, and edge computing."
+    },
+    "docs": {
+      "title": "Documentation - spike.land",
+      "description": "Technical documentation, API reference, MCP tools guide, and architecture overview for spike.land."
+    },
+    "settings": {
+      "title": "Settings - spike.land",
+      "description": "Configure your spike.land account, billing, API keys, and preferences."
+    },
+    "vibeCode": {
+      "title": "vibe-code - Chat-Native MCP App Builder | spike.land",
+      "description": "See how vibe-code turns every MCP app into a chat-native product surface with spike-chat, terminal execution, MDX app views, and MCP server editing."
+    },
+    "login": {
+      "title": "Sign In - spike.land",
+      "description": "Sign in to spike.land with GitHub or Google to access your AI development platform."
+    },
+    "version": {
+      "title": "Version - spike.land",
+      "description": "View build version, deployed assets, and download links for spike.land."
+    },
+    "whatWeDo": {
+      "title": "What We Do - spike.land | MCP-First AI Platform",
+      "description": "Explore spike.land's 80+ MCP tools across 11 domains. Code intelligence, image studio, analytics, authentication, and more — all edge-deployed."
+    }
+  }
+}

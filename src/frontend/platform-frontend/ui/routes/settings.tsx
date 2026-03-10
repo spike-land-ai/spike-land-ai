@@ -1,5 +1,6 @@
 import { useNavigate, useSearch } from "@tanstack/react-router";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useAuth } from "../hooks/useAuth";
 import { trackAnalyticsEvent } from "../hooks/useAnalytics";
 import { useToast } from "../components/Toast";
@@ -7,17 +8,17 @@ import { usePricing } from "../hooks/usePricing";
 import { AuthGuard } from "../components/AuthGuard";
 import { CreditWidget } from "../components/CreditWidget";
 import { apiUrl } from "../../core-logic/api";
-import { trackPurchaseConversion } from "../../core-logic/google-ads";
+import { trackPurchaseConversion, getStoredGclid } from "../../core-logic/google-ads";
 import { UI_ANIMATIONS } from "@spike-land-ai/shared/constants";
 
 type SettingsTab = "profile" | "whatsapp" | "keys" | "billing" | "access";
 
-const TABS: { id: SettingsTab; label: string }[] = [
-  { id: "profile", label: "Profile" },
-  { id: "whatsapp", label: "WhatsApp" },
-  { id: "keys", label: "API Keys" },
-  { id: "billing", label: "Billing" },
-  { id: "access", label: "Access" },
+const TABS: { id: SettingsTab }[] = [
+  { id: "profile" },
+  { id: "whatsapp" },
+  { id: "keys" },
+  { id: "billing" },
+  { id: "access" },
 ];
 
 type Provider = "openai" | "anthropic" | "google" | "mistral";
@@ -34,6 +35,7 @@ const PROVIDERS: Provider[] = ["openai", "anthropic", "google", "mistral"];
 // ---------- Profile Tab ----------
 
 function ProfileTab() {
+  const { t } = useTranslation("settings");
   const { user, isAuthenticated } = useAuth();
   const nameRef = useRef<HTMLInputElement>(null);
   const emailRef = useRef<HTMLInputElement>(null);
@@ -45,11 +47,11 @@ function ProfileTab() {
     const name = nameRef.current?.value.trim() ?? "";
     const email = emailRef.current?.value.trim() ?? "";
     if (!name) {
-      setError("Display name is required.");
+      setError(t("profile.nameRequired"));
       return;
     }
     if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      setError("A valid email is required.");
+      setError(t("profile.emailRequired"));
       return;
     }
     setSaving(true);
@@ -64,7 +66,7 @@ function ProfileTab() {
       setSaved(true);
       setTimeout(() => setSaved(false), UI_ANIMATIONS.LONG_FEEDBACK_MS);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Unknown error");
+      setError(err instanceof Error ? err.message : t("errors.unknown"));
     } finally {
       setSaving(false);
     }
@@ -74,7 +76,7 @@ function ProfileTab() {
     <div className="space-y-4">
       <div>
         <label htmlFor="displayName" className="mb-1 block text-sm font-medium text-foreground">
-          Display Name
+          {t("profile.displayName")}
         </label>
         <input
           ref={nameRef}
@@ -82,12 +84,12 @@ function ProfileTab() {
           type="text"
           defaultValue={isAuthenticated ? (user?.name ?? "") : ""}
           className="w-full rounded-lg border border-border bg-background px-4 py-2 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
-          placeholder="Your name"
+          placeholder={t("profile.namePlaceholder")}
         />
       </div>
       <div>
         <label htmlFor="email" className="mb-1 block text-sm font-medium text-foreground">
-          Email
+          {t("profile.email")}
         </label>
         <input
           ref={emailRef}
@@ -95,7 +97,7 @@ function ProfileTab() {
           type="email"
           defaultValue={isAuthenticated ? (user?.email ?? "") : ""}
           className="w-full rounded-lg border border-border bg-background px-4 py-2 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
-          placeholder="you@example.com"
+          placeholder={t("profile.emailPlaceholder")}
         />
       </div>
       {error && <p className="text-sm text-destructive">{error}</p>}
@@ -105,9 +107,11 @@ function ProfileTab() {
           disabled={saving}
           className="rounded-lg bg-primary px-6 py-2 text-sm text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
         >
-          {saving ? "Saving..." : "Save Changes"}
+          {saving ? t("profile.saving") : t("profile.saveChanges")}
         </button>
-        {saved && <span className="text-sm text-muted-foreground">Saved successfully.</span>}
+        {saved && (
+          <span className="text-sm text-muted-foreground">{t("profile.savedSuccess")}</span>
+        )}
       </div>
     </div>
   );
@@ -118,6 +122,7 @@ function ProfileTab() {
 const OTP_TTL_SECONDS = 300;
 
 function WhatsAppTab() {
+  const { t } = useTranslation("settings");
   const [linked, setLinked] = useState(false);
   const [phone] = useState("+1 *** *** 4291");
   const [otp, setOtp] = useState<string | null>(null);
@@ -150,7 +155,7 @@ function WhatsAppTab() {
       const data = (await res.json()) as { otp: string };
       setOtp(data.otp);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Unknown error");
+      setError(err instanceof Error ? err.message : t("errors.unknown"));
     } finally {
       setLoading(false);
     }
@@ -165,18 +170,21 @@ function WhatsAppTab() {
       setLinked(false);
       setOtp(null);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Unknown error");
+      setError(err instanceof Error ? err.message : t("errors.unknown"));
     } finally {
       setLoading(false);
     }
   }
+
+  const otpTime = `${Math.floor(otpSecondsLeft / 60)}:${String(otpSecondsLeft % 60).padStart(2, "0")}`;
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between rounded-lg border border-border bg-background px-4 py-3">
         <div>
           <p className="text-sm font-medium text-foreground">
-            Status: {linked ? "Linked" : "Not linked"}
+            {t("whatsapp.statusLabel")}:{" "}
+            {linked ? t("whatsapp.statusLinked") : t("whatsapp.statusNotLinked")}
           </p>
           {linked && <p className="text-xs text-muted-foreground">{phone}</p>}
         </div>
@@ -187,23 +195,20 @@ function WhatsAppTab() {
               : "bg-muted text-muted-foreground"
           }`}
         >
-          {linked ? "Linked" : "Unlinked"}
+          {linked ? t("whatsapp.statusLinked") : t("whatsapp.statusNotLinked")}
         </span>
       </div>
 
       {otp && (
         <div className="rounded-lg border border-border bg-muted p-4">
           <div className="mb-1 flex items-center justify-between">
-            <p className="text-sm font-medium text-foreground">Your OTP Code</p>
+            <p className="text-sm font-medium text-foreground">{t("whatsapp.otpTitle")}</p>
             <span className="text-xs text-muted-foreground">
-              Expires in {Math.floor(otpSecondsLeft / 60)}:
-              {String(otpSecondsLeft % 60).padStart(2, "0")}
+              {t("whatsapp.otpExpires", { time: otpTime })}
             </span>
           </div>
           <p className="font-mono text-2xl tracking-widest text-primary">{otp}</p>
-          <p className="mt-2 text-xs text-muted-foreground">
-            Text this code to the spike.land bot on WhatsApp to complete linking.
-          </p>
+          <p className="mt-2 text-xs text-muted-foreground">{t("whatsapp.otpInstructions")}</p>
         </div>
       )}
 
@@ -216,7 +221,7 @@ function WhatsAppTab() {
             disabled={loading}
             className="rounded-lg bg-primary px-5 py-2 text-sm text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
           >
-            {loading ? "Initiating..." : "Link WhatsApp"}
+            {loading ? t("whatsapp.linking") : t("whatsapp.linkButton")}
           </button>
         )}
         {linked && (
@@ -225,7 +230,7 @@ function WhatsAppTab() {
             disabled={loading}
             className="rounded-lg border border-destructive/30 px-5 py-2 text-sm text-destructive hover:bg-destructive/10 disabled:opacity-50"
           >
-            {loading ? "Unlinking..." : "Unlink"}
+            {loading ? t("whatsapp.unlinking") : t("whatsapp.unlinkButton")}
           </button>
         )}
       </div>
@@ -236,6 +241,7 @@ function WhatsAppTab() {
 // ---------- API Keys Tab ----------
 
 function ApiKeysTab() {
+  const { t } = useTranslation("settings");
   const [keys, setKeys] = useState<ApiKey[]>([]);
   const [selectedProvider, setSelectedProvider] = useState<Provider>("openai");
   const [newKeyValue, setNewKeyValue] = useState("");
@@ -279,7 +285,7 @@ function ApiKeysTab() {
       ]);
       setNewKeyValue("");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Unknown error");
+      setError(err instanceof Error ? err.message : t("errors.unknown"));
     } finally {
       setSaving(false);
     }
@@ -292,10 +298,12 @@ function ApiKeysTab() {
       const data = (await res.json()) as { valid: boolean; status?: number };
       setTestResults((prev) => ({
         ...prev,
-        [key.id]: data.valid ? "OK" : `Failed (${data.status ?? "unknown"})`,
+        [key.id]: data.valid
+          ? t("apiKeys.statusOk")
+          : t("apiKeys.statusFailed", { code: data.status ?? "unknown" }),
       }));
     } catch {
-      setTestResults((prev) => ({ ...prev, [key.id]: "Error" }));
+      setTestResults((prev) => ({ ...prev, [key.id]: t("apiKeys.statusError") }));
     } finally {
       setTestingId(null);
     }
@@ -312,7 +320,7 @@ function ApiKeysTab() {
         return next;
       });
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to delete key");
+      setError(err instanceof Error ? err.message : t("errors.deleteKeyFailed"));
     }
   }
 
@@ -320,9 +328,9 @@ function ApiKeysTab() {
     <div className="space-y-6">
       {/* Existing keys */}
       {loadingKeys ? (
-        <p className="text-sm text-muted-foreground">Loading keys...</p>
+        <p className="text-sm text-muted-foreground">{t("apiKeys.loadingKeys")}</p>
       ) : keys.length === 0 ? (
-        <p className="text-sm text-muted-foreground">No API keys stored yet.</p>
+        <p className="text-sm text-muted-foreground">{t("apiKeys.noKeysYet")}</p>
       ) : (
         <div className="space-y-2">
           {keys.map((key) => (
@@ -335,13 +343,15 @@ function ApiKeysTab() {
                 <p className="font-mono text-xs text-muted-foreground">{key.key}</p>
                 {key.createdAt && (
                   <p className="text-xs text-muted-foreground">
-                    Added {new Date(key.createdAt).toLocaleDateString()}
+                    {t("apiKeys.addedOn", { date: new Date(key.createdAt).toLocaleDateString() })}
                   </p>
                 )}
                 {testResults[key.id] && (
                   <p
                     className={`text-xs ${
-                      testResults[key.id] === "OK" ? "text-green-600" : "text-destructive"
+                      testResults[key.id] === t("apiKeys.statusOk")
+                        ? "text-green-600"
+                        : "text-destructive"
                     }`}
                   >
                     {testResults[key.id]}
@@ -354,13 +364,13 @@ function ApiKeysTab() {
                   disabled={testingId === key.id}
                   className="rounded-lg border border-border px-3 py-1 text-xs text-muted-foreground hover:bg-muted disabled:opacity-50"
                 >
-                  {testingId === key.id ? "Testing..." : "Test"}
+                  {testingId === key.id ? t("apiKeys.testing") : t("apiKeys.test")}
                 </button>
                 <button
                   onClick={() => handleDelete(key.id)}
                   className="rounded-lg border border-destructive/30 px-3 py-1 text-xs text-destructive hover:bg-destructive/10"
                 >
-                  Delete
+                  {t("apiKeys.delete")}
                 </button>
               </div>
             </div>
@@ -370,10 +380,10 @@ function ApiKeysTab() {
 
       {/* Add key form */}
       <div className="rounded-lg border border-border bg-background p-4 space-y-3">
-        <p className="text-sm font-medium text-foreground">Add API Key</p>
+        <p className="text-sm font-medium text-foreground">{t("apiKeys.addKey")}</p>
         <div className="flex gap-2">
           <label htmlFor="apiKeyProvider" className="sr-only">
-            Provider
+            {t("apiKeys.provider")}
           </label>
           <select
             id="apiKeyProvider"
@@ -388,14 +398,14 @@ function ApiKeysTab() {
             ))}
           </select>
           <label htmlFor="apiKeyValue" className="sr-only">
-            API Key
+            {t("apiKeys.apiKeyLabel")}
           </label>
           <input
             id="apiKeyValue"
             type="password"
             value={newKeyValue}
             onChange={(e) => setNewKeyValue(e.target.value)}
-            placeholder="Paste your API key"
+            placeholder={t("apiKeys.pastePlaceholder")}
             className="flex-1 rounded-lg border border-border bg-background px-4 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
           />
           <button
@@ -403,7 +413,7 @@ function ApiKeysTab() {
             disabled={saving || !newKeyValue.trim()}
             className="rounded-lg bg-primary px-4 py-2 text-sm text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
           >
-            {saving ? "Saving..." : "Save"}
+            {saving ? t("apiKeys.saving") : t("apiKeys.save")}
           </button>
         </div>
         {error && <p className="text-sm text-destructive">{error}</p>}
@@ -431,6 +441,7 @@ const planColors: Record<Plan, string> = {
 };
 
 function BillingTab() {
+  const { t } = useTranslation("settings");
   const { showToast } = useToast();
   const { pricing } = usePricing();
   const search = useSearch({ strict: false }) as { success?: string; canceled?: string };
@@ -463,24 +474,25 @@ function BillingTab() {
       toastShownRef.current = true;
       trackAnalyticsEvent("checkout_success", { source: "stripe_redirect" });
       trackPurchaseConversion();
-      showToast("Subscription activated!", "success");
+      showToast(t("billing.activated"), "success");
     } else if (search.canceled === "1") {
       toastShownRef.current = true;
-      showToast("Checkout canceled", "info");
+      showToast(t("billing.canceledToast"), "info");
     }
-  }, [search.success, search.canceled, showToast]);
+  }, [search.success, search.canceled, showToast, t]);
 
   async function handleUpgrade(tier: "pro" | "business") {
     setUpgrading(true);
     try {
+      const gclid = getStoredGclid();
       const res = await fetch(apiUrl("/checkout"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ tier }),
+        body: JSON.stringify({ tier, ...(gclid && { gclid }) }),
       });
       if (!res.ok) {
         const err = (await res.json()) as { error?: string };
-        showToast(err.error ?? "Checkout failed", "error");
+        showToast(err.error ?? t("errors.checkoutFailed"), "error");
         return;
       }
       const data = (await res.json()) as { url: string };
@@ -496,7 +508,7 @@ function BillingTab() {
       const res = await fetch(apiUrl("/billing/portal"), { method: "POST" });
       if (!res.ok) {
         const err = (await res.json()) as { error?: string };
-        showToast(err.error ?? "Failed to open billing portal", "error");
+        showToast(err.error ?? t("errors.openPortalFailed"), "error");
         return;
       }
       const data = (await res.json()) as { url: string };
@@ -507,14 +519,27 @@ function BillingTab() {
   }
 
   if (loadingBilling) {
-    return <p className="text-sm text-muted-foreground">Loading billing info...</p>;
+    return <p className="text-sm text-muted-foreground">{t("billing.loadingInfo")}</p>;
   }
 
   const plan = billing?.plan ?? "free";
   const status = billing?.status ?? "active";
+  const planLabel =
+    plan === "free"
+      ? t("billing.planFree")
+      : plan === "pro"
+        ? t("billing.planPro")
+        : t("billing.planBusiness");
   const periodEnd = billing?.currentPeriodEnd
     ? new Date(billing.currentPeriodEnd * 1000).toLocaleDateString()
     : null;
+
+  const statusLabel =
+    status === "active"
+      ? t("billing.statusActive")
+      : status === "canceled"
+        ? t("billing.statusCanceled")
+        : t("billing.statusPastDue");
 
   return (
     <div className="space-y-6">
@@ -522,7 +547,7 @@ function BillingTab() {
       {status === "past_due" && (
         <div className="rounded-lg border border-yellow-500/40 bg-yellow-50 px-4 py-3 dark:bg-yellow-900/10">
           <p className="text-sm font-medium text-yellow-800 dark:text-yellow-400">
-            Payment past due — please update your payment method to avoid service interruption.
+            {t("billing.pastDueWarning")}
           </p>
         </div>
       )}
@@ -530,28 +555,24 @@ function BillingTab() {
       {/* Canceled notice */}
       {status === "canceled" && (
         <div className="rounded-lg border border-destructive/30 bg-destructive/5 px-4 py-3">
-          <p className="text-sm font-medium text-destructive">
-            Your subscription has been canceled. Resubscribe below to regain access.
-          </p>
+          <p className="text-sm font-medium text-destructive">{t("billing.canceledWarning")}</p>
         </div>
       )}
 
       {/* Current plan */}
       <div className="flex items-center justify-between rounded-lg border border-border bg-background px-4 py-4">
         <div>
-          <p className="text-sm text-muted-foreground">Current Plan</p>
-          <p className="mt-1 text-lg font-semibold capitalize text-foreground">{plan}</p>
+          <p className="text-sm text-muted-foreground">{t("billing.currentPlan")}</p>
+          <p className="mt-1 text-lg font-semibold text-foreground">{planLabel}</p>
           {periodEnd && (
             <p className="text-xs text-muted-foreground mt-0.5">
-              {status === "canceled" ? "Access until" : "Renews"} {periodEnd}
+              {status === "canceled" ? t("billing.accessUntil") : t("billing.renews")} {periodEnd}
             </p>
           )}
         </div>
         <div className="flex flex-col items-end gap-2">
-          <span
-            className={`rounded-full px-3 py-1 text-xs font-semibold capitalize ${planColors[plan]}`}
-          >
-            {plan}
+          <span className={`rounded-full px-3 py-1 text-xs font-semibold ${planColors[plan]}`}>
+            {planLabel}
           </span>
           <span
             className={`rounded-full px-2 py-0.5 text-xs font-medium capitalize ${
@@ -562,7 +583,7 @@ function BillingTab() {
                   : "bg-muted text-muted-foreground"
             }`}
           >
-            {status.replace("_", " ")}
+            {statusLabel}
           </span>
         </div>
       </div>
@@ -578,7 +599,7 @@ function BillingTab() {
           disabled={managingPortal}
           className="w-full rounded-lg border border-border px-6 py-2.5 text-center text-sm font-medium text-foreground hover:bg-muted disabled:opacity-50"
         >
-          {managingPortal ? "Opening portal..." : "Manage Subscription"}
+          {managingPortal ? t("billing.openingPortal") : t("billing.manageSubscription")}
         </button>
       )}
 
@@ -592,7 +613,7 @@ function BillingTab() {
               disabled={upgrading}
               className="flex-1 rounded-lg bg-blue-600 px-6 py-2.5 text-center text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50"
             >
-              {upgrading ? "Redirecting..." : `Upgrade to Pro — ${pricing.pro.monthly}/mo`}
+              {upgrading ? t("billing.redirecting") : t("billing.upgradeToPro", { price: 29 })}
             </button>
           )}
           {plan !== "business" && (
@@ -602,9 +623,7 @@ function BillingTab() {
               disabled={upgrading}
               className="flex-1 rounded-lg bg-purple-600 px-6 py-2.5 text-center text-sm font-medium text-white hover:bg-purple-700 disabled:opacity-50"
             >
-              {upgrading
-                ? "Redirecting..."
-                : `Upgrade to Business — ${pricing.business.monthly}/mo`}
+              {upgrading ? t("billing.redirecting") : t("billing.upgradeToBusiness", { price: 99 })}
             </button>
           )}
         </div>
@@ -622,53 +641,52 @@ interface EloEvent {
   createdAt: string;
 }
 
-function getTier(score: number): { label: string; color: string } {
+function getTierColor(score: number): string {
   if (score >= 1500)
-    return {
-      label: "Elite",
-      color: "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400",
-    };
-  if (score >= 1000)
-    return {
-      label: "Pro",
-      color: "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400",
-    };
-  return { label: "Free", color: "bg-muted text-muted-foreground" };
+    return "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400";
+  if (score >= 1000) return "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400";
+  return "bg-muted text-muted-foreground";
 }
 
 function AccessTab() {
+  const { t } = useTranslation("settings");
   const eloScore = 850;
   const eloHistory: EloEvent[] = [];
   const bugBountyEligible = eloScore >= 1000;
 
-  const tier = getTier(eloScore);
+  const tierColor = getTierColor(eloScore);
+  const tierLabel =
+    eloScore >= 1500
+      ? t("access.eliteTier")
+      : eloScore >= 1000
+        ? t("access.proTier")
+        : t("access.freeTier");
 
   return (
     <div className="space-y-6">
       {/* ELO score */}
       <div className="flex items-center gap-4 rounded-lg border border-border bg-background px-5 py-4">
         <div>
-          <p className="text-sm text-muted-foreground">ELO Score</p>
+          <p className="text-sm text-muted-foreground">{t("access.eloScore")}</p>
           <p className="mt-1 text-3xl font-bold text-foreground">{eloScore}</p>
         </div>
-        <span className={`ml-auto rounded-full px-3 py-1 text-sm font-semibold ${tier.color}`}>
-          {tier.label}
+        <span className={`ml-auto rounded-full px-3 py-1 text-sm font-semibold ${tierColor}`}>
+          {tierLabel}
         </span>
       </div>
 
       {/* Tier thresholds */}
       <div className="rounded-lg border border-border bg-background p-4 space-y-3">
-        <p className="text-sm font-medium text-foreground">Tier Thresholds</p>
+        <p className="text-sm font-medium text-foreground">{t("access.tierThresholds")}</p>
         <div className="space-y-2">
           {[
-            { label: "Free", range: "0 – 999", color: "bg-muted" },
-            { label: "Pro", range: "1000 – 1499", color: "bg-blue-500" },
-            { label: "Elite", range: "1500+", color: "bg-purple-500" },
-          ].map((t) => (
-            <div key={t.label} className="flex items-center gap-3">
-              <span className={`h-2.5 w-2.5 rounded-full ${t.color}`} />
-              <span className="text-sm font-medium text-foreground w-12">{t.label}</span>
-              <span className="text-sm text-muted-foreground">{t.range}</span>
+            { label: t("access.freeTier"), color: "bg-muted" },
+            { label: t("access.proTier"), color: "bg-blue-500" },
+            { label: t("access.eliteTier"), color: "bg-purple-500" },
+          ].map((tier) => (
+            <div key={tier.label} className="flex items-center gap-3">
+              <span className={`h-2.5 w-2.5 rounded-full ${tier.color}`} />
+              <span className="text-sm font-medium text-foreground">{tier.label}</span>
             </div>
           ))}
         </div>
@@ -676,7 +694,7 @@ function AccessTab() {
 
       {/* Bug bounty */}
       <div className="rounded-lg border border-border bg-background px-4 py-3 flex items-center justify-between">
-        <span className="text-sm text-foreground">Bug Bounty Eligibility</span>
+        <span className="text-sm text-foreground">{t("access.bugBountyEligibility")}</span>
         <span
           className={`rounded-full px-2 py-0.5 text-xs font-semibold ${
             bugBountyEligible
@@ -684,15 +702,15 @@ function AccessTab() {
               : "bg-muted text-muted-foreground"
           }`}
         >
-          {bugBountyEligible ? "Eligible" : "Not eligible (need 1000+)"}
+          {bugBountyEligible ? t("access.eligible") : t("access.notEligible")}
         </span>
       </div>
 
       {/* ELO history */}
       <div className="space-y-2">
-        <p className="text-sm font-medium text-foreground">Recent ELO Events</p>
+        <p className="text-sm font-medium text-foreground">{t("access.recentEvents")}</p>
         {eloHistory.length === 0 ? (
-          <p className="text-sm text-muted-foreground">No recent events.</p>
+          <p className="text-sm text-muted-foreground">{t("access.noRecentEvents")}</p>
         ) : (
           <div className="space-y-1">
             {eloHistory.map((event) => (
@@ -726,10 +744,11 @@ function AccessTab() {
 // ---------- Settings Page ----------
 
 export function SettingsPage() {
+  const { t } = useTranslation("settings");
   const search = useSearch({ strict: false }) as { tab?: string };
   const navigate = useNavigate();
 
-  const validTabs = TABS.map((t) => t.id);
+  const validTabs = TABS.map((tab) => tab.id);
   const activeTab: SettingsTab = validTabs.includes(search.tab as SettingsTab)
     ? (search.tab as SettingsTab)
     : "profile";
@@ -741,15 +760,23 @@ export function SettingsPage() {
     [navigate],
   );
 
+  const tabLabels: Record<SettingsTab, string> = {
+    profile: t("tabs.profile"),
+    whatsapp: t("tabs.whatsapp"),
+    keys: t("tabs.apiKeys"),
+    billing: t("tabs.billing"),
+    access: t("tabs.access"),
+  };
+
   return (
     <AuthGuard>
       <div className="mx-auto max-w-3xl space-y-6">
-        <h1 className="text-2xl font-bold text-foreground">Settings</h1>
+        <h1 className="text-2xl font-bold text-foreground">{t("title")}</h1>
 
         {/* Tab bar */}
         <div
           role="tablist"
-          aria-label="Settings sections"
+          aria-label={t("sectionsLabel")}
           className="flex gap-1 border-b border-border overflow-x-auto"
         >
           {TABS.map((tab) => (
@@ -766,7 +793,7 @@ export function SettingsPage() {
                   : "border-transparent text-muted-foreground hover:text-foreground"
               }`}
             >
-              {tab.label}
+              {tabLabels[tab.id]}
             </button>
           ))}
         </div>

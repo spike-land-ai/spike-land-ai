@@ -1,0 +1,91 @@
+{
+  "loading": "Loading...",
+  "title": "Settings",
+  "sectionsLabel": "Settings sections",
+  "errors": {
+    "unknown": "Unknown error",
+    "deleteKeyFailed": "Failed to delete key",
+    "checkoutFailed": "Checkout failed",
+    "openPortalFailed": "Failed to open billing portal"
+  },
+  "tabs": {
+    "profile": "Profile",
+    "whatsapp": "WhatsApp",
+    "apiKeys": "API Keys",
+    "billing": "Billing",
+    "access": "Access"
+  },
+  "profile": {
+    "displayName": "Display Name",
+    "email": "Email",
+    "namePlaceholder": "Your name",
+    "emailPlaceholder": "you@example.com",
+    "saveChanges": "Save Changes",
+    "saving": "Saving...",
+    "savedSuccess": "Saved successfully.",
+    "nameRequired": "Display name is required.",
+    "emailRequired": "A valid email is required."
+  },
+  "whatsapp": {
+    "statusLabel": "Status",
+    "statusLinked": "Linked",
+    "statusNotLinked": "Not linked",
+    "otpTitle": "Your OTP Code",
+    "otpExpires": "Expires in {{time}}",
+    "otpInstructions": "Text this code to the spike.land bot on WhatsApp to complete linking.",
+    "linkButton": "Link WhatsApp",
+    "linking": "Linking...",
+    "unlinkButton": "Unlink",
+    "unlinking": "Unlinking..."
+  },
+  "apiKeys": {
+    "addKey": "Add API Key",
+    "provider": "Provider",
+    "apiKeyLabel": "API Key",
+    "pastePlaceholder": "Paste your API key",
+    "loadingKeys": "Loading keys...",
+    "noKeysYet": "No API keys stored yet.",
+    "addedOn": "Added {{date}}",
+    "test": "Test",
+    "testing": "Testing...",
+    "delete": "Delete",
+    "save": "Save",
+    "saving": "Saving...",
+    "statusOk": "OK",
+    "statusFailed": "Failed ({{code}})",
+    "statusError": "Error"
+  },
+  "billing": {
+    "currentPlan": "Current Plan",
+    "planFree": "Free",
+    "planPro": "Pro",
+    "planBusiness": "Business",
+    "statusActive": "Active",
+    "statusCanceled": "Canceled",
+    "statusPastDue": "Past due",
+    "loadingInfo": "Loading billing info...",
+    "activated": "Subscription activated!",
+    "canceledToast": "Checkout canceled",
+    "accessUntil": "Access until",
+    "renews": "Renews",
+    "pastDueWarning": "Payment past due — please update your payment method to avoid service interruption.",
+    "canceledWarning": "Your subscription has been canceled. Resubscribe below to regain access.",
+    "manageSubscription": "Manage Subscription",
+    "openingPortal": "Opening portal...",
+    "upgradeToPro": "Upgrade to Pro — ${{price}}/mo",
+    "upgradeToBusiness": "Upgrade to Business — ${{price}}/mo",
+    "redirecting": "Redirecting..."
+  },
+  "access": {
+    "eloScore": "ELO Score",
+    "tierThresholds": "Tier Thresholds",
+    "freeTier": "Free 0-999",
+    "proTier": "Pro 1000-1499",
+    "eliteTier": "Elite 1500+",
+    "bugBountyEligibility": "Bug Bounty Eligibility",
+    "eligible": "Eligible",
+    "notEligible": "Not eligible (need 1000+)",
+    "recentEvents": "Recent ELO Events",
+    "noRecentEvents": "No recent events."
+  }
+}
