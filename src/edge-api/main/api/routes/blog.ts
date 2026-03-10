@@ -1,5 +1,8 @@
 import { Hono } from "hono";
-import { extractHeroMedia } from "../../../../core/block-website/core-logic/blog-source.js";
+import {
+  extractHeroMedia,
+  findImagePrompt,
+} from "../../../../core/block-website/core-logic/blog-source.js";
 import { hashImagePrompt } from "../../../../core/block-website/core-logic/blog-image-policy.js";
 import type { Env } from "../../core-logic/env.js";
 import { getClientId, sendGA4Events } from "../../lazy-imports/ga4.js";
@@ -329,6 +332,8 @@ const CONTENT_TYPES: Record<string, string> = {
 };
 
 const IMAGE_STUDIO_URL = "https://image-studio-mcp.spike.land/api/tool";
+const HERO_GENERATION_POLL_ATTEMPTS = 15;
+const HERO_GENERATION_POLL_DELAY_MS = 1_000;
 
 function buildImageResponse(
   object: R2ObjectBody,
@@ -346,6 +351,15 @@ function buildImageResponse(
 function normalizePrompt(value: string | null | undefined): string | null {
   const trimmed = value?.trim() ?? "";
   return trimmed ? trimmed : null;
+}
+
+function inferPromptFromRow(row: BlogPostRow | null | undefined, imagePath: string): string | null {
+  if (!row) return null;
+
+  const directPrompt = normalizePrompt(row.hero_prompt);
+  if (directPrompt) return directPrompt;
+
+  return findImagePrompt(row.content, imagePath);
 }
 
 function inferHeroOutputFormat(ext: string): "png" | "jpeg" | "webp" {
@@ -413,7 +427,7 @@ async function generateHeroImageAsset(
   }
 
   let outputUrl: string | null = null;
-  for (let attempt = 0; attempt < 6; attempt++) {
+  for (let attempt = 0; attempt < HERO_GENERATION_POLL_ATTEMPTS; attempt++) {
     const status = await callImageStudioTool<{
       outputUrl?: string;
       status?: string;
@@ -432,7 +446,7 @@ async function generateHeroImageAsset(
       throw new Error(status.error || "Hero image generation failed");
     }
 
-    await new Promise((resolve) => setTimeout(resolve, 900));
+    await new Promise((resolve) => setTimeout(resolve, HERO_GENERATION_POLL_DELAY_MS));
   }
 
   if (!outputUrl) {
@@ -471,12 +485,12 @@ async function resolveHeroPrompt(
     return null;
   }
 
-  let prompt = normalizePrompt(row.hero_prompt);
+  let prompt = inferPromptFromRow(row, requestedPath);
 
   if (!prompt) {
     const sourceRow = await fetchBlogPostSource(slug);
     if (sourceRow?.hero_image === requestedPath) {
-      prompt = normalizePrompt(sourceRow.hero_prompt);
+      prompt = inferPromptFromRow(sourceRow, requestedPath);
     }
   }
 
@@ -604,9 +618,19 @@ async function getBlogPostRow(db: D1Database, slug: string): Promise<BlogPostRow
 
     if (row) {
       if (!normalizePrompt(row.hero_prompt) && row.hero_image) {
+        const inlinePrompt = inferPromptFromRow(row, row.hero_image);
+        if (inlinePrompt) {
+          row.hero_prompt = inlinePrompt;
+        }
+      }
+
+      if (!normalizePrompt(row.hero_prompt) && row.hero_image) {
         const sourceRow = await fetchBlogPostSource(normalizedSlug);
-        if (sourceRow?.hero_image === row.hero_image && normalizePrompt(sourceRow.hero_prompt)) {
-          row.hero_prompt = sourceRow.hero_prompt;
+        if (sourceRow?.hero_image === row.hero_image) {
+          const sourcePrompt = inferPromptFromRow(sourceRow, row.hero_image);
+          if (sourcePrompt) {
+            row.hero_prompt = sourcePrompt;
+          }
         }
       }
 

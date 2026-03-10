@@ -9,6 +9,7 @@ import {
   buildPromptDrivenBlogImageSrc,
   sanitizeBlogImageSrc,
 } from "../core-logic/blog-image-policy";
+import { extractHeroMedia } from "../core-logic/blog-source";
 import { BlogListView } from "./BlogList";
 import { ImageLoader } from "./ImageLoader";
 import { ExperimentProvider, useExperiment } from "./useExperiment";
@@ -193,6 +194,21 @@ const COMPONENT_MAP: Record<string, React.ComponentType<Record<string, unknown>>
   },
 };
 
+function normalizeBlogPost(post: BlogPost): BlogPost {
+  const { heroImage, heroPrompt, body } = extractHeroMedia(
+    post.content,
+    post.heroImage,
+    post.heroPrompt,
+  );
+
+  return {
+    ...post,
+    heroImage,
+    heroPrompt,
+    content: body,
+  };
+}
+
 export function BlogPostView({
   slug,
   linkComponent,
@@ -209,7 +225,8 @@ export function BlogPostView({
   skipFetch?: boolean;
   loadingOverride?: boolean;
 }) {
-  const [post, setPost] = useState<BlogPost | null>(postOverride);
+  const normalizedPostOverride = postOverride ? normalizeBlogPost(postOverride) : null;
+  const [post, setPost] = useState<BlogPost | null>(normalizedPostOverride);
   const [loading, setLoading] = useState(!postOverride && !skipFetch);
   const [error, setError] = useState(false);
   const [scrollProgress, setScrollProgress] = useState(0);
@@ -227,8 +244,8 @@ export function BlogPostView({
   }, []);
 
   useEffect(() => {
-    if (postOverride) {
-      setPost(postOverride);
+    if (normalizedPostOverride) {
+      setPost(normalizedPostOverride);
       setLoading(false);
       setError(false);
       return;
@@ -248,12 +265,12 @@ export function BlogPostView({
         if (!r.ok) throw new Error("Not found");
         return r.json() as Promise<BlogPost>;
       })
-      .then(setPost)
+      .then((data) => setPost(normalizeBlogPost(data)))
       .catch(() => setError(true))
       .finally(() => setLoading(false));
-  }, [postOverride, skipFetch, slug]);
+  }, [normalizedPostOverride, skipFetch, slug]);
 
-  const resolvedPost = postOverride ?? post;
+  const resolvedPost = normalizedPostOverride ?? post;
 
   useEffect(() => {
     const existing = document.querySelector<HTMLMetaElement>('meta[name="robots"]');

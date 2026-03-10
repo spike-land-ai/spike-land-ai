@@ -363,6 +363,27 @@ Recovered body.`,
     expect(row?.tags).toBe('["chat"]');
     expect(row?.unlisted).toBe(1);
   });
+
+  it("recovers hero_prompt from inline hero markdown when D1 content is stale", async () => {
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(new Response(null, { status: 404 })));
+
+    const prompt =
+      "A conceptual digital illustration showing a heavy framework and a fast glowing path";
+    const row = await getBlogPostRow(
+      mockDB(
+        [],
+        makeRow({
+          slug: "nextjs-vs-tanstack-start",
+          hero_image: "/blog/nextjs-vs-tanstack-start/hero.jpg",
+          hero_prompt: null,
+          content: `![${prompt}](/blog/nextjs-vs-tanstack-start/hero.jpg)\n\nBody from stale D1 content.`,
+        }),
+      ),
+      "nextjs-vs-tanstack-start",
+    );
+
+    expect(row?.hero_prompt).toBe(prompt);
+  });
 });
 
 // ---------- GET /api/blog-images/:slug/:filename ----------
@@ -455,6 +476,95 @@ describe("GET /api/blog-images/:slug/:filename", () => {
     expect((r2.put as unknown as ReturnType<typeof vi.fn>).mock.calls[0]?.[2]).toMatchObject({
       customMetadata: { promptHash: hashImagePrompt(prompt), source: "prompt-driven-hero" },
     });
+  });
+
+  it("recovers prompt text from stale markdown content and tolerates slower generation jobs", async () => {
+    vi.useFakeTimers();
+    try {
+      const prompt =
+        "A conceptual digital illustration showing a heavy, expensive framework contrasted with a fast glowing path";
+      const db = mockDB(
+        [],
+        makeRow({
+          slug: "nextjs-vs-tanstack-start",
+          hero_image: "/blog/nextjs-vs-tanstack-start/hero.jpg",
+          hero_prompt: null,
+          content: `![${prompt}](/blog/nextjs-vs-tanstack-start/hero.jpg)\n\nBody from stale D1 content.`,
+        }),
+      );
+      const r2 = mockR2(null);
+      const fetchMock = vi.fn().mockResolvedValueOnce(
+        new Response(
+          JSON.stringify({
+            result: {
+              content: [{ type: "text", text: JSON.stringify({ jobId: "job-456" }) }],
+            },
+          }),
+          { status: 200, headers: { "Content-Type": "application/json" } },
+        ),
+      );
+
+      for (let attempt = 0; attempt < 7; attempt++) {
+        fetchMock.mockResolvedValueOnce(
+          new Response(
+            JSON.stringify({
+              result: {
+                content: [{ type: "text", text: JSON.stringify({ status: "PENDING" }) }],
+              },
+            }),
+            { status: 200, headers: { "Content-Type": "application/json" } },
+          ),
+        );
+      }
+
+      fetchMock
+        .mockResolvedValueOnce(
+          new Response(
+            JSON.stringify({
+              result: {
+                content: [
+                  {
+                    type: "text",
+                    text: JSON.stringify({
+                      status: "COMPLETED",
+                      outputUrl: "https://images.example/next-vs-start.jpg",
+                    }),
+                  },
+                ],
+              },
+            }),
+            { status: 200, headers: { "Content-Type": "application/json" } },
+          ),
+        )
+        .mockResolvedValueOnce(
+          new Response("NEW_JPEG_DATA", {
+            status: 200,
+            headers: { "Content-Type": "image/jpeg" },
+          }),
+        );
+
+      vi.stubGlobal("fetch", fetchMock);
+
+      const testApp = app(db);
+      const responsePromise = testApp.request(
+        "/api/blog-images/nextjs-vs-tanstack-start/hero.jpg",
+        undefined,
+        {
+          DB: db,
+          SPA_ASSETS: r2,
+        } as unknown as Env,
+      );
+      await vi.runAllTimersAsync();
+      const res = await responsePromise;
+
+      expect(res.status).toBe(200);
+      expect(res.headers.get("Content-Type")).toBe("image/jpeg");
+      expect((r2.put as unknown as ReturnType<typeof vi.fn>).mock.calls[0]?.[2]).toMatchObject({
+        customMetadata: { promptHash: hashImagePrompt(prompt), source: "prompt-driven-hero" },
+      });
+    } finally {
+      vi.useRealTimers();
+    }
   });
 
   it("returns 404 for missing non-hero images", async () => {
