@@ -29,9 +29,9 @@ const ROUTE_META: Record<
     description: DEFAULT_DESCRIPTION,
   },
   "/apps": {
-    title: "MCP Apps - spike.land",
+    title: "App Store - spike.land",
     description:
-      "Browse MCP apps on spike.land by category. Open each app in chat, terminal, MDX, or overview mode.",
+      "Discover and install AI-powered applications from the spike.land store. Chess engines, QA studio, data visualization, and more.",
   },
   "/packages": {
     title: "MCP Packages - spike.land",
@@ -190,7 +190,6 @@ function injectJsonLd(id: string, content: string) {
 const BASE_NAV_LINKS = [
   { to: "/apps", label: "Apps" },
   { to: "/vibe-code", label: "Vibe Code" },
-  { to: "/store", label: "Store" },
   { to: "/pricing", label: "Pricing" },
   { to: "/docs", label: "Docs" },
   { to: "/blog", label: "Blog" },

@@ -106,7 +106,9 @@ const pricingRoute = createRoute({
 const storeRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/store",
-  component: withSuspense(() => import("./routes/store"), "StorePage"),
+  beforeLoad: ({ search }) => {
+    throw redirect({ to: "/apps", search });
+  },
 });
 
 const versionRoute = createRoute({
@@ -116,31 +118,31 @@ const versionRoute = createRoute({
 });
 
 // Package routes
-const appsRoute = createRoute({
+const packagesRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/packages",
 });
 
-const appsIndexRoute = createRoute({
-  getParentRoute: () => appsRoute,
+const packagesIndexRoute = createRoute({
+  getParentRoute: () => packagesRoute,
   path: "/",
   component: withSuspense(() => import("./routes/apps/apps-index.tsx"), "AppsIndexPage"),
 });
 
-const appsNewRoute = createRoute({
-  getParentRoute: () => appsRoute,
+const packagesNewRoute = createRoute({
+  getParentRoute: () => packagesRoute,
   path: "new",
   component: withSuspense(() => import("./routes/apps/new"), "AppsNewPage"),
 });
 
-const appsQaStudioRoute = createRoute({
-  getParentRoute: () => appsRoute,
+const packagesQaStudioRoute = createRoute({
+  getParentRoute: () => packagesRoute,
   path: "qa-studio/ui",
   component: withSuspense(() => import("./routes/apps/qa-studio"), "QaStudioPage"),
 });
 
-const appDetailRoute = createRoute({
-  getParentRoute: () => appsRoute,
+const packageDetailRoute = createRoute({
+  getParentRoute: () => packagesRoute,
   path: "$appId",
   component: withSuspense(() => import("./routes/apps/$appId"), "AppDetailPage"),
 });
@@ -277,19 +279,19 @@ const messageThreadRoute = createRoute({
 });
 
 // MCP app routes
-const toolsRoute = createRoute({
+const appsRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/apps",
 });
 
-const toolsIndexRoute = createRoute({
-  getParentRoute: () => toolsRoute,
+const appsIndexRoute = createRoute({
+  getParentRoute: () => appsRoute,
   path: "/",
-  component: withSuspense(() => import("./routes/tools/tools-index.tsx"), "ToolsIndexPage"),
+  component: withSuspense(() => import("./routes/store"), "StorePage"),
 });
 
 const appSessionRoute = createRoute({
-  getParentRoute: () => toolsRoute,
+  getParentRoute: () => appsRoute,
   path: "$appSlug",
   component: withSuspense(() => import("./routes/tools/$appSlug"), "AppSessionPage"),
 });
@@ -413,7 +415,12 @@ const routeTree = rootRoute.addChildren([
   pricingRoute,
   storeRoute,
   versionRoute,
-  appsRoute.addChildren([appsIndexRoute, appsNewRoute, appsQaStudioRoute, appDetailRoute]),
+  packagesRoute.addChildren([
+    packagesIndexRoute,
+    packagesNewRoute,
+    packagesQaStudioRoute,
+    packageDetailRoute,
+  ]),
   docsRoute.addChildren([docsIndexRoute, docsSlugRoute]),
   blogRoute.addChildren([blogIndexRoute, blogPostRoute]),
   bugbookRoute.addChildren([
@@ -425,7 +432,7 @@ const routeTree = rootRoute.addChildren([
   dashboardRoute.addChildren([dashboardIndexRoute, bazdmegDashboardRoute]),
   learnRoute.addChildren([learnIndexRoute, learnSessionRoute, learnBadgeRoute]),
   messagesRoute.addChildren([messagesIndexRoute, messageThreadRoute]),
-  toolsRoute.addChildren([toolsIndexRoute, appSessionRoute]),
+  appsRoute.addChildren([appsIndexRoute, appSessionRoute]),
   mcpRoute.addChildren([mcpIndexRoute, mcpAuthorizeRoute]),
   agencyRoute.addChildren([agencyPortfolioRoute]),
 ]);
