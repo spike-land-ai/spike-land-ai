@@ -11,6 +11,7 @@ const EXACT_SPA_ROUTES = new Set([
   "/login",
   "/mcp",
   "/mcp/authorize",
+  "/migrate",
   "/packages",
   "/packages/new",
   "/packages/qa-studio/ui",
@@ -38,17 +39,26 @@ const PREFIXED_SPA_ROUTES = [
   "/packages",
 ];
 const API_PREFIXES = ["/oauth/", "/api/"];
+const CONTROL_PLANE_ASSET_KEYS = new Set([
+  "spike-cache-worker.js",
+  "service-worker/cache-policy.json",
+  "manifest.webmanifest",
+  "site.webmanifest",
+  "about.txt",
+]);
 
 const HTML_RESPONSE_CACHE_CONTROL = "private, no-cache, no-store, must-revalidate";
 const DIRECT_ASSET_CACHE_CONTROL = "public, max-age=3600";
 const IMMUTABLE_ASSET_CACHE_CONTROL = "public, max-age=31536000, immutable";
 const REVALIDATING_ASSET_CACHE_CONTROL = "public, max-age=3600, stale-while-revalidate=3600";
+const CONTROL_PLANE_ASSET_CACHE_CONTROL = "public, max-age=0, must-revalidate";
 
 export interface SpaStaticAssetPolicy {
   cacheControl: string;
   immutable: boolean;
   ttl: number;
   swr?: number;
+  bypassEdgeCache?: boolean;
 }
 
 export interface SpaStaticAssetEdgeCacheSettings {
@@ -76,6 +86,15 @@ export function getSpaStaticAssetPolicy(key: string): SpaStaticAssetPolicy | nul
     return null;
   }
 
+  if (CONTROL_PLANE_ASSET_KEYS.has(key)) {
+    return {
+      cacheControl: CONTROL_PLANE_ASSET_CACHE_CONTROL,
+      immutable: false,
+      ttl: 0,
+      bypassEdgeCache: true,
+    };
+  }
+
   const extension = key.slice(key.lastIndexOf("."));
   const immutable = IMMUTABLE_EXTENSIONS.has(extension) && isHashedAssetKey(key);
   if (immutable) {
@@ -100,7 +119,7 @@ export function getSpaStaticAssetEdgeCacheSettings(
   cacheVersion: string,
 ): SpaStaticAssetEdgeCacheSettings | null {
   const policy = getSpaStaticAssetPolicy(key);
-  if (!policy) {
+  if (!policy || policy.bypassEdgeCache) {
     return null;
   }
 
@@ -126,7 +145,10 @@ export function resolveSpaFallbackKeys(pathname: string): string[] {
 }
 
 export function isKnownSpaRoute(path: string): boolean {
-  return EXACT_SPA_ROUTES.has(path) || PREFIXED_SPA_ROUTES.some((prefix) => path.startsWith(`${prefix}/`));
+  return (
+    EXACT_SPA_ROUTES.has(path) ||
+    PREFIXED_SPA_ROUTES.some((prefix) => path.startsWith(`${prefix}/`))
+  );
 }
 
 export function isApiLikeSpaPath(path: string): boolean {
