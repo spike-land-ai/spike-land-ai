@@ -1,287 +1,338 @@
 ---
-title: "Next.js vs TanStack Start: Why the £5 Deployment Changes the Decision"
+title: "Next.js vs TanStack Start: Why Next.js Became Tech Debt for Me"
 slug: "nextjs-vs-tanstack-start"
-description: "A side-by-side DX comparison for AI agent developers, indie hackers, and platform engineers. Next.js is still powerful, but its portability, edge story, and caching model now come with real operational cost."
-date: "2026-03-09"
+description: "An honest account from a solo open-source developer: expensive build minutes, slow deployments, flaky pipelines, and why Next.js stopped feeling like leverage."
+date: "2026-03-10"
 author: "Zoltan Erdos"
 category: "Developer Experience"
-tags: ["nextjs", "tanstack-start", "cloudflare", "vite", "react", "developer-experience"]
+tags: ["nextjs", "tanstack-start", "vercel", "vite", "react", "developer-experience"]
 featured: false
-draft: true
-primer: "Next.js is still good. It is just optimizing for the wrong center of gravity."
+draft: false
+primer: "The framework stopped feeling like leverage and started feeling like rent."
 ---
 
 <Tldr>
 
-- If your product is browser-only and happily Vercel-shaped, Next.js is still a strong choice.
-- If your product is browser + agent + CLI + embed + edge runtime, Next.js starts to feel like the wrong center of gravity.
-- The biggest problems are no longer aesthetics. They are deployment portability, edge limitations, self-hosting overhead, and a caching model that keeps expanding.
-- TanStack Start is not as mature yet. It is still in [Release Candidate](https://tanstack.com/start/community/docs/framework/react/overview). But for the teams that care most about runtime control and DX, it is already the cleaner bet.
-- Cloudflare changes the economics too: [Workers Paid starts at $5/month](https://developers.cloudflare.com/workers/platform/pricing/), and [Pages markets unlimited sites, seats, requests, and bandwidth](https://www.cloudflare.com/developer-platform/products/pages/). For a lot of companies, that is the only platform tax they are willing to tolerate.
+- I am a solo developer working on an open source project, so I optimize for fast feedback, low cost, and low ceremony.
+- In January 2026, my Vercel invoice hit $105.40, and $92.26 of that was build minutes alone.
+- That bill was only part of the problem. The site was slow to wake up and too prone to rendering bugs.
+- Next.js is still fine if you want the Vercel-shaped path.
+- I started moving toward TanStack Start because Vite and a simpler hosting story fit my constraints much better.
 
 </Tldr>
 
-## The Real Question Changed
+## The Invoice That Ended the Debate
 
-The question is not whether Next.js can build serious software.
+I did not leave Next.js because of a hot take on X.
 
-Obviously it can.
+I left because of an invoice.
 
-The real question in 2026 is this:
+In January 2026, Vercel showed me this:
 
-**What is your product centered on?**
+- total due: $105.40
+- build minutes: 12h 46m
+- build minute cost: $92.26
 
-If your product is a website with some full-stack behavior attached to it, Next.js still makes sense.
+Read that again.
 
-If your product is a multi-surface system, where the browser is only one surface among many, the answer changes. That is the core point in our internal architecture notes too: apps are no longer just frontends. They are browser UIs, CLI entrypoints, chat surfaces, embedded widgets, tool contracts, and edge-executed workflows. The web shell is one expression of the app, not the app itself.
+Not traffic.
+Not database usage.
+Not some happy problem caused by explosive growth.
 
-That shift is exactly where Next.js starts to feel too opinionated about the wrong thing.
+Build minutes.
 
-TanStack Start feels better because it is easier to treat the web app as a consumer of your runtime instead of the center of your runtime.
+And this was just the building part.
 
-## The DX Personas That Make This Obvious
+The page did not even have real traffic.
 
-These are the three developer personas that make the tradeoff very clear.
+That is what made it absurd.
 
-| DX Persona | What they actually care about | Where Next.js starts fighting them | Why TanStack Start feels cleaner |
-|---|---|---|---|
-| **AI Agent Developer** | Typed contracts, reusable business logic, browser + agent + API surfaces | Too much of the stack wants to stay framework-native: Route Handlers, Proxy, Server Actions, RSC caching, adapter-specific deploy paths | TanStack Start keeps the router strongly typed, gives you [server functions](https://tanstack.com/start/latest/docs/framework/react/guide/server-functions), and makes it easier to treat the frontend as one client of a broader system |
-| **Indie Hacker / Solo Founder** | Fast feedback loops, cheap hosting, low platform tax, fewer moving parts | Full feature support still points you toward [Node.js, Docker, or platform adapters](https://nextjs.org/docs/app/getting-started/deploying). Static export has a real feature cliff | TanStack Start is [powered by Vite](https://tanstack.com/start/community/docs/framework/react/overview), so local DX is faster, and Cloudflare lets you start around a [$5/month Workers base price](https://developers.cloudflare.com/workers/platform/pricing/) |
-| **Platform Engineer** | Runtime control, portability, predictable operations, less framework magic | [Self-hosting](https://nextjs.org/docs/app/guides/self-hosting) means thinking about cache handlers, build IDs, buffering, version skew, and deployment topology. Adapters are still [platform-specific](https://nextjs.org/docs/app/getting-started/deploying) | TanStack Start has an [official Cloudflare guide](https://developers.cloudflare.com/workers/framework-guides/web-apps/tanstack-start/) and the [Cloudflare Vite plugin](https://developers.cloudflare.com/workers/vite-plugin/) runs code in `workerd`, close to production behavior |
+Over the last two months, the build cost alone still cleared $100 for a page
+that basically nobody was visiting. I was paying platform rent on an empty
+room.
 
-That is the whole article in one table.
+For a solo developer working on an open source project, that is not a minor
+line item. That is the whole stack tapping me on the shoulder and asking if I
+have confused framework convenience with actual leverage.
 
-Next.js is strongest when your team accepts its worldview.
+By the time I saw "Downgrade complete," the emotional decision was already
+made.
 
-TanStack Start is strongest when your team wants to keep the worldview open.
+I was done paying to wait.
 
-## Next.js vs TanStack Start, Side by Side
+## Next.js Starts Smooth and Ends Heavy
 
-Here is the side-by-side comparison that matters more than benchmark screenshots.
+This is what makes Next.js hard to talk about honestly.
 
-| Category | Next.js | TanStack Start |
-|---|---|---|
-| **Framework posture** | Full-stack React framework with strong conventions around App Router, RSC, Server Actions, and framework-managed caching | Full-stack React framework [powered by TanStack Router and Vite](https://tanstack.com/start/community/docs/framework/react/overview) |
-| **Local dev loop** | Good, but more framework-owned and more opaque | Vite gives [instant server start and consistently fast HMR](https://vite.dev/guide/comparisons/) |
-| **Routing** | File-based routing with App Router conventions | File-based routing with [type-safe params and search params](https://tanstack.com/router/docs/search-params) |
-| **Server calls** | Server Actions and Route Handlers | [Server functions](https://tanstack.com/start/latest/docs/framework/react/guide/server-functions) that compile into RPC stubs when imported from clients |
-| **Deployment story** | Full feature support on [Node.js server or Docker](https://nextjs.org/docs/app/getting-started/deploying); adapters are platform-specific | Docs position it as ready for [any hosting provider or runtime](https://tanstack.com/start/community/docs/framework/react/overview) |
-| **Cloudflare story** | Usually means [OpenNext transforming the Next.js build output](https://opennext.js.org/cloudflare) | [First-party Cloudflare framework guide](https://developers.cloudflare.com/workers/framework-guides/web-apps/tanstack-start/) plus [official Vite plugin support](https://developers.cloudflare.com/workers/vite-plugin/) |
-| **Edge runtime** | [Limited](https://nextjs.org/docs/pages/api-reference/edge): no full Node API surface, some packages break, ISR unsupported in Edge runtime | Cleaner fit when you already want Workers-native execution and bindings |
-| **Static mode** | [Static export drops a long list of features](https://nextjs.org/docs/app/guides/static-exports), including cookies, headers, redirects, middleware/proxy, and ISR | Easier to keep static, server, and client concerns less framework-entangled |
-| **Operational model** | More framework-owned caching and deployment semantics | More composable, easier to pair with your own runtime boundaries |
+The first impression is excellent.
 
-If you read that table and still prefer Next.js, that is fine.
+You get routing, React, server rendering, a huge ecosystem, sensible defaults,
+and a polished happy path. If your product fits that path and you are happy to
+stay inside the Vercel world, I still think Next.js can be a good choice.
 
-But at least you are making a real decision now, not repeating the default from 2023.
+But I am not a big team.
 
-## The Shortcomings of Next.js That Actually Matter
+I am one developer. I care about how quickly I can ship, how cheaply I can run
+the project, and how much framework-specific knowledge I have to carry in my
+head just to keep the app alive.
 
-Not every complaint about Next.js matters. Some are just people getting mad at abstraction.
+That is where the story changed for me.
 
-These are the shortcomings that materially affect developer experience.
+The deeper I got into Next.js, the more it stopped feeling like leverage and
+started feeling like ceremony. Builds got heavier. The deployment story felt
+more platform-shaped. The moment I looked outside the default hosting path, the
+developer experience got uglier fast.
 
-## 1. Portability is still adapter land
+Not impossible.
 
-The biggest issue is not that Next.js cannot run outside Vercel.
+Just expensive in exactly the way solo developers cannot afford.
 
-It can.
+## The Real Cost Was Not Only Money
 
-The issue is that even the [current Next.js deployment docs](https://nextjs.org/docs/app/getting-started/deploying) still frame adapters as **platform-specific**, and explicitly say the Deployment Adapters API is still being worked on. That is not “run anywhere” confidence. That is “bring an adapter and read the footnotes.”
+The invoice made the problem visible. It did not create the problem.
 
-The [OpenNext project](https://opennext.js.org/) is even more revealing. Its entire reason for existing is that Next.js does not self-host cleanly across different platforms the way Remix, Astro, and other modern frameworks do. When your portability story depends on a separate compatibility layer maintained by a community coalition, that is not nothing. That is the architecture telling on itself.
+The bigger issue was that the stack kept asking me to debug things I did not
+want to think about.
 
-If you deploy to Cloudflare with Next.js, you are usually not deploying “plain Next.js.” You are deploying a transformed artifact through [OpenNext for Cloudflare](https://opennext.js.org/cloudflare).
+I even had to upgrade.
 
-That is workable.
+Not for product reasons.
+Not because users were overwhelming the system.
+Because otherwise the build was so slow that it would sometimes time out on its
+own.
 
-It is also extra surface area.
+The site was slow to wake up. Cold starts took seconds.
 
-## 2. The Edge story is still constrained
+I kept running into rendering issues.
+I kept running into hydration issues.
+Every fix felt local. The exhaustion felt systemic.
 
-Next.js absolutely supports an Edge runtime.
+That combination is poisonous for solo work.
 
-But read the [official Edge runtime docs](https://nextjs.org/docs/pages/api-reference/edge), not the conference summary:
+A framework is supposed to remove uncertainty.
 
-- it does not support all Node.js APIs
-- some packages may not work
-- ISR is not supported in the Edge runtime
+This stack was adding it.
 
-That is a serious limitation if your whole pitch is edge-native software.
+At some point it starts undermining the whole workflow.
 
-In practice, this means you keep asking the same question:
+One build passes. The next times out. The third fails somewhere else. You start
+doubting code that was never the real problem.
 
-**Can this code run here, or do I have to bounce back to the Node runtime?**
+It hijacks your attention. It hijacks your agents' attention too.
 
-That question is already friction.
+And when you build with agents, that matters even more. Slow, flaky pipelines do
+not just waste time. They actively poison the context. Days disappear into the
+toolchain instead of the product.
 
-And if your product direction is multi-surface, tool-driven, and increasingly portable, runtime ambiguity is exactly what you want less of, not more.
+Sometimes that means an agent retries the same flaky build path three times,
+hands me a long transcript full of deployment noise, and leaves both of us
+staring at the wrong problem.
 
-## 3. Static export still has a feature cliff
+When I changed something, I was no longer asking only, "Did the feature work?"
 
-Next.js likes to present static export as a nice escape hatch.
+I was also asking:
 
-It is. But it is a steep cliff too.
+- will this render the same way locally and in production?
+- will hydration break again?
+- is this slow because of my code, the hosting setup, or the build pipeline?
+- if I self-host this, am I about to spend my week rebuilding platform plumbing?
 
-The [static export docs](https://nextjs.org/docs/app/guides/static-exports) still list unsupported features such as:
+Once those questions become normal, the framework has started to own too much
+of your time.
 
-- cookies
-- rewrites
-- redirects
-- headers
-- middleware/proxy
-- ISR
-- route handlers that rely on `Request`
+## Self-Hosting Was the Breaking Point
 
-That means the “we can always fall back to static” story is only true if your app can afford to lose a lot of the framework’s interesting features.
+People say Next.js is not locked to Vercel.
 
-So the real choice in Next.js is often:
+Technically, yes.
 
-**stay static and give up power, or stay dynamic and inherit more platform/runtime complexity**
+Practically, the path gets worse the moment you leave the default.
 
-That is not fake friction. That is product-shaping friction.
+You can self-host. You can set up your own CI. You can own the deploy process,
+the build caching, the artifacts, the testing setup, and the runtime behavior.
 
-## 4. Self-hosting is not low-ceremony
+But that is exactly my point.
 
-The [self-hosting guide](https://nextjs.org/docs/app/guides/self-hosting) is useful. It is also a map of the operational tax.
+As soon as you try to reclaim control, the framework makes you earn it.
 
-It talks about:
+And I do not want to spend my open source time babysitting build pipelines just
+to prove that my app can live outside the company town. I want portability to
+be the default posture, not an operations side quest.
 
-- shared cache configuration
-- custom cache handlers
-- consistent build IDs between containers
-- version skew
-- hard navigations when deployments mismatch
-- buffering configuration for streaming behind proxies
+That was the moment the whole thing flipped in my head.
 
-None of this is impossible.
+Next.js was no longer helping me avoid complexity.
 
-But this is exactly the kind of hidden operational work teams forget when they say “we are not locked in.”
+It was relocating complexity into places I would eventually have to own.
 
-Technically, you are not locked in.
+That is tech debt, even when the abstraction is popular.
 
-Operationally, you are carrying around a framework with a fairly elaborate opinion about how rendering, caching, and deployment should cooperate.
+## Next.js vs TanStack Start in Plain English
 
-## 5. The caching model got more powerful and more complex
+This is the simplest way I can explain the difference now.
 
-This is the one Next.js fans most often understate.
+| What I need | What Next.js felt like | What TanStack Start feels like |
+| --- | --- | --- |
+| Fast feedback loops | Heavy builds and expensive build minutes | Vite-first, faster iteration |
+| Portable hosting | Best experience on the blessed platform | Easier to treat hosting as a separate decision |
+| Predictable rendering | Too many rendering and hydration surprises | A simpler mental model |
+| Solo-dev operations | More CI and deploy ceremony than I want | Less framework surface to carry |
 
-The modern cache stack is not simple anymore. You now have to reason about:
+That is the whole decision for me.
 
-- [`cacheComponents`](https://nextjs.org/docs/app/api-reference/config/next-config-js/useCache)
-- [`use cache`](https://nextjs.org/docs/app/api-reference/directives/use-cache)
-- [`use cache: remote`](https://nextjs.org/docs/app/api-reference/directives/use-cache-remote)
-- [`cacheTag`](https://nextjs.org/docs/app/api-reference/functions/cacheTag)
-- [`revalidateTag`](https://nextjs.org/docs/app/api-reference/functions/revalidateTag)
-- [`updateTag`](https://nextjs.org/docs/app/api-reference/functions/updateTag)
+Not benchmarks.
+Not hype.
+Not ecosystem tribalism.
 
-And the [remote cache docs](https://nextjs.org/docs/app/api-reference/directives/use-cache-remote) explicitly call out the tradeoffs: infrastructure cost and network latency during cache lookups.
+Just the day-to-day cost of staying productive.
 
-That is the moment the abstraction stops feeling magical and starts feeling like a control plane.
+## Why TanStack Start Feels Like Relief
 
-Again, this is not me saying Next.js is bad.
+TanStack Start is not interesting to me because it is new.
 
-This is me saying the framework has grown into a system you have to actively operate.
+It is interesting because it feels lighter.
 
-## 6. Even Next.js is telling you not to lean on Proxy
+It feels closer to the stack I actually want:
 
-This is a small point, but it says a lot.
+- Vite for a faster and more honest dev loop
+- TanStack Router for navigation, without the rest of the architecture becoming framework ceremony
+- a full-stack model that does not try to own every part of the system
+- a cleaner path to hosting the app where I want
 
-Next.js 16 renamed Middleware to [Proxy](https://nextjs.org/docs/app/getting-started/proxy), and the docs explicitly say teams should avoid relying on it unless no other option exists. They also limit you to a single root `proxy.ts`.
+That last point matters most.
 
-That is a signal.
+I do not want my application architecture to quietly become a billing
+architecture.
 
-When a framework keeps a powerful escape hatch around, but keeps clarifying that you should avoid it, you are looking at an API surface that the framework itself is trying to narrow.
+I want a web app I can deploy cheaply, reason about clearly, and move when I
+need to. I want the frontend to be one surface of the system, not the center of
+an increasingly expensive worldview.
 
-That is fine.
+TanStack Start feels much closer to that.
 
-But it means the “just use middleware” answer has become much less convincing.
+The first concrete win was immediate: the dev loop felt cheap again.
 
-## Why TanStack Start Wins the DX Argument
+Change a route. Save a file. See the result.
 
-TanStack Start wins the argument for one simple reason:
+That sounds small until you are the only person on the project. Fast local
+feedback is not comfort. It is throughput.
 
-It gives you a full-stack React framework without demanding that your whole architecture become framework-shaped.
+I also do not have a clean "here is the new monthly bill" screenshot yet, and I
+am not going to invent one. The move is still in progress.
 
-The official docs describe it as a full-stack React framework powered by [TanStack Router and Vite](https://tanstack.com/start/community/docs/framework/react/overview). That matters because the pieces are legible.
+But I already know what I prefer: paying for actual runtime usage on simpler
+infrastructure instead of paying $92.26 in build minutes before the real work
+even starts.
 
-The router gives you first-class, [type-safe search params](https://tanstack.com/router/docs/search-params).
+It is not that TanStack Start does more.
 
-The server side gives you [server functions](https://tanstack.com/start/latest/docs/framework/react/guide/server-functions) that can be imported safely from client code because the build strips the implementation out and turns the callsite into an RPC stub.
+It is that it assumes less.
 
-The dev loop sits on [Vite](https://vite.dev/guide/comparisons/), which still has the most honest DX promise in frontend tooling: instant server start and HMR that stays fast as the app grows.
+For a solo developer, that is often the better trade.
 
-And if Cloudflare is your target, the path is refreshingly direct:
+## Forty Minutes to Four Seconds
 
-- [official TanStack Start guide for Workers](https://developers.cloudflare.com/workers/framework-guides/web-apps/tanstack-start/)
-- [official Cloudflare Vite plugin](https://developers.cloudflare.com/workers/vite-plugin/)
-- local execution in `workerd`, which Cloudflare says matches production behavior closely
+Before this shift, when I pushed to `main`, getting a bug fix to production took
+around 40 minutes.
 
-That stack feels better because it is easier to reason about.
+Not because the bug was hard.
 
-Not because it has fewer features.
+Because the build was slow enough, and flaky enough, that the deployment
+pipeline became the product bottleneck.
 
-Because the features are less entangled with deployment mythology.
+Getting rid of Next.js changed that immediately.
 
-## The £5 Point Matters More Than People Admit
+Four seconds. Not minutes.
 
-This is where a lot of framework debates get fake.
+"Do not be ridiculous, Zoltan, that is not possible."
 
-Developers argue about abstractions.
-Founders and platform teams argue about the monthly bill.
+Actually, it is.
 
-Cloudflare’s [Workers Paid plan starts at $5/month](https://developers.cloudflare.com/workers/platform/pricing/). Their [Pages pricing page](https://www.cloudflare.com/developer-platform/products/pages/) markets unlimited sites, seats, requests, and bandwidth.
+```text
+commit lands on main
+yarn zero-install (deps already in repo)              0s
+incremental check (TypeScript + ESLint, unchanged)    0s
+incremental unit tests (yarn vitest run --changed main) 1s
+incremental coverage tests (unchanged)                0s
+incremental build (unchanged)                         0s
+deploy changed assets to R2                            2s
+deploy metadata JSON to R2                             1s
+----------------------------------------------------------
+total                                                  4s
+```
 
-No, that does not mean every serious app costs exactly £5 forever. Overages exist. Databases cost money. Durable systems cost money.
+That is the whole point.
 
-But it does change the default posture.
+Once deployment drops back into seconds, bug fixes stop hijacking your day. You
+can think about the software again.
 
-For a huge class of company sites, internal tools, prototypes, early SaaS surfaces, dashboards, docs, and edge-first APIs, the mental model becomes:
+If you want the product-facing version of the stack I am building on top of
+this, start with [Getting Started with spike.land](/blog/getting-started-spike-land).
 
-**the platform bill starts near a fiver, not near a platform commitment**
+## The Honest Tradeoff
 
-That matters because most companies do not want to pay a big framework tax just for existing.
+TanStack Start is younger.
 
-They will pay for usage.
-They will pay for revenue.
-They will pay for scale.
+The ecosystem is smaller. The docs are thinner in places. There are fewer
+battle-tested answers lying around when something weird happens.
 
-They do not want to pay for ceremony.
+I accept that tradeoff because those problems live at the edges.
 
-## The Honest Caveat
+The Next.js problems were showing up in my daily loop: builds, bills, rendering
+issues, and deployment ceremony.
 
-There is one important caveat, and it should be said plainly:
+For a solo developer, I would rather work around a younger framework's rough
+edges than pay a mature framework's ongoing tax.
 
-[TanStack Start is still Release Candidate](https://tanstack.com/start/community/docs/framework/react/overview).
+## This Is Really a Solo-Dev Story
 
-If your organization optimizes for the safest possible hiring market, the largest installed base, and the most conservative framework choice, Next.js still wins that category today.
+If you are at a larger company, you may read this and disagree.
 
-So this is not a “Next.js is dead” argument.
+Fair enough.
 
-It is a sharper argument:
+A team with platform engineers, bigger budgets, and a strong Vercel workflow can
+absorb these tradeoffs much more easily than I can.
 
-**Next.js is mature, but increasingly heavy. TanStack Start is younger, but better aligned with where modern DX is going.**
+That is not my situation.
 
-## The Bottom Line
+I am a solo dev.
+I am building in the open.
+Every extra moving part lands on my desk.
+Every slow build interrupts my feedback loop.
+Every rendering bug steals time from product work.
+Every fixed monthly cost has to justify itself.
 
-If I were building a Vercel-native marketing site with a standard web SaaS shape, I would still consider Next.js.
+That is why this decision feels obvious to me now.
 
-If I were building an AI-native, multi-surface product that wants browser UI, tool contracts, API surfaces, edge execution, and portable deployment targets, I would pick TanStack Start on Cloudflare.
+I do not need the most powerful framework story.
 
-Not because Next.js is incapable.
+I need the least wasteful one.
 
-Because its shortcomings are now structural:
+## The Verdict
 
-- portability depends on adapters
-- the Edge runtime is constrained
-- static export gives up too much
-- self-hosting carries operational ceremony
-- caching has become a subsystem
+Next.js did not become a problem for me because it is bad.
 
-That is the real decision.
+It became a problem because it no longer matched my constraints.
 
-The problem with Next.js in 2026 is not that it is bad.
+The bill was too high.
+The daily loop was too heavy.
+The runtime behavior was too unpredictable.
+The self-hosting path asked for too much ceremony.
 
-It is that it is optimizing for a world where the web app is still the center of the product.
+At some point you have to call a thing by its name.
 
-For a growing class of teams, that world is already over.
+If a framework makes you pay more, wait more, and debug more while giving you
+less confidence, it is no longer leverage.
+
+It is overhead.
+
+For me, Next.js crossed that line.
+
+So the real question is not "Is Next.js still good?"
+
+**Good for whom?**
+
+If you are a solo developer trying to keep an open source project fast, cheap,
+portable, and sane, ask yourself:
+
+**Has Next.js become tech debt for you too?**
