@@ -151,8 +151,7 @@ support.post("/api/support/donate", async (c) => {
     submit_type: "donate",
     "line_items[0][price_data][currency]": SUPPORT_CURRENCY_CODE,
     "line_items[0][price_data][unit_amount]": amountCents.toString(),
-    "line_items[0][price_data][product_data][name]":
-      `Support spike.land — ${SUPPORT_CURRENCY_SYMBOL}${formatSupportAmount(amount)}`,
+    "line_items[0][price_data][product_data][name]": `Support spike.land — ${SUPPORT_CURRENCY_SYMBOL}${formatSupportAmount(amount)}`,
     "line_items[0][price_data][product_data][description]":
       "One-time support for independent open-source development",
     "line_items[0][quantity]": "1",
@@ -169,6 +168,7 @@ support.post("/api/support/donate", async (c) => {
     headers: {
       Authorization: `Bearer ${stripeKey}`,
       "Content-Type": "application/x-www-form-urlencoded",
+      "Stripe-Version": "2024-06-20",
     },
     body: params.toString(),
   });

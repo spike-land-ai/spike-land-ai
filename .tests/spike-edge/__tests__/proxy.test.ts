@@ -134,6 +134,7 @@ describe("POST /proxy/stripe", () => {
     const [[url, options]] = mockFetch.mock.calls;
     expect(url).toBe("https://api.stripe.com/v1/payment_intents");
     expect(options.headers.Authorization).toContain("sk_test_xxx");
+    expect(options.headers["Stripe-Version"]).toBe("2024-06-20");
   });
 
   it("sanitizes caller headers — only allows safe headers", async () => {
@@ -178,7 +179,7 @@ describe("POST /proxy/stripe", () => {
       env,
     );
     const [[, options]] = mockFetch.mock.calls;
-    expect(options.body).toContain("amount");
+    expect(options.body).toBe("amount=100&currency=usd");
   });
 });
 

@@ -1,10 +1,29 @@
 import { Hono } from "hono";
-import type { Env } from "../../core-logic/env.js";
+import type { Env, Variables } from "../../core-logic/env.js";
 import { getClientId, sendGA4Events } from "../../lazy-imports/ga4.js";
 import type { GA4Event } from "../../lazy-imports/ga4.js";
 import { createRateLimiter } from "../../core-logic/in-memory-rate-limiter.js";
 
-const analytics = new Hono<{ Bindings: Env }>();
+const analytics = new Hono<{ Bindings: Env; Variables: Variables }>();
+
+/**
+ * Require X-Internal-Secret for all analytics read endpoints.
+ * These endpoints expose event metadata and client_ids and must not be
+ * publicly accessible — OWASP API7 (Security Misconfiguration).
+ */
+function requireInternalSecret(
+  env: { INTERNAL_SERVICE_SECRET?: string },
+  req: { header: (name: string) => string | undefined },
+): boolean {
+  const secret = req.header("x-internal-secret");
+  return (
+    typeof secret === "string" &&
+    secret.length > 0 &&
+    typeof env.INTERNAL_SERVICE_SECRET === "string" &&
+    env.INTERNAL_SERVICE_SECRET.length > 0 &&
+    secret === env.INTERNAL_SERVICE_SECRET
+  );
+}
 
 const isRateLimited = createRateLimiter({ windowMs: 60_000, maxRequests: 10 });
 
@@ -117,6 +136,12 @@ analytics.post("/analytics/ingest", async (c) => {
 });
 
 analytics.get("/analytics/events", async (c) => {
+  // SECURITY: This endpoint returns raw event rows including client_ids.
+  // Require internal secret — do not expose to unauthenticated callers.
+  if (!requireInternalSecret(c.env, c.req)) {
+    return c.json({ error: "Unauthorized" }, 401);
+  }
+
   const range = c.req.query("range") ?? "24h";
   const type = c.req.query("type");
   const limit = Math.min(parseInt(c.req.query("limit") ?? "50", 10), 200);
@@ -147,6 +172,11 @@ analytics.get("/analytics/events", async (c) => {
 });
 
 analytics.get("/analytics/summary", async (c) => {
+  // SECURITY: Aggregate metrics still leak signup/tool-use cadence to competitors.
+  if (!requireInternalSecret(c.env, c.req)) {
+    return c.json({ error: "Unauthorized" }, 401);
+  }
+
   const range = c.req.query("range") ?? "24h";
 
   const rangeMs = VALID_RANGES[range];
@@ -187,6 +217,11 @@ analytics.get("/analytics/summary", async (c) => {
 });
 
 analytics.get("/analytics/funnel", async (c) => {
+  // SECURITY: Funnel data reveals signup and conversion rates — internal only.
+  if (!requireInternalSecret(c.env, c.req)) {
+    return c.json({ error: "Unauthorized" }, 401);
+  }
+
   const cutoffMs = Date.now() - 30 * 24 * 60 * 60 * 1000;
 
   const result = await c.env.DB.prepare(
@@ -213,6 +248,9 @@ analytics.get("/analytics/funnel", async (c) => {
 // ─── MCP Analytics Proxy (to spike-land-mcp internal API) ────────────────────
 
 analytics.get("/analytics/mcp/tools", async (c) => {
+  if (!requireInternalSecret(c.env, c.req)) {
+    return c.json({ error: "Unauthorized" }, 401);
+  }
   const url = new URL("https://mcp.spike.land/internal/analytics/tools");
   if (c.req.query("range")) url.searchParams.set("range", c.req.query("range")!);
   if (c.req.query("limit")) url.searchParams.set("limit", c.req.query("limit")!);
@@ -222,6 +260,10 @@ analytics.get("/analytics/mcp/tools", async (c) => {
 });
 
 analytics.get("/analytics/mcp/users", async (c) => {
+  if (!requireInternalSecret(c.env, c.req)) {
+    return c.json({ error: "Unauthorized" }, 401);
+  }
+
   const url = new URL("https://mcp.spike.land/internal/analytics/users");
   if (c.req.query("range")) url.searchParams.set("range", c.req.query("range")!);
   if (c.req.query("tool")) url.searchParams.set("tool", c.req.query("tool")!);
@@ -231,6 +273,10 @@ analytics.get("/analytics/mcp/users", async (c) => {
 });
 
 analytics.get("/analytics/mcp/summary", async (c) => {
+  if (!requireInternalSecret(c.env, c.req)) {
+    return c.json({ error: "Unauthorized" }, 401);
+  }
+
   const url = new URL("https://mcp.spike.land/internal/analytics/summary");
   if (c.req.query("range")) url.searchParams.set("range", c.req.query("range")!);
 

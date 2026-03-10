@@ -240,7 +240,9 @@ export class WebSocketManager implements IWebSocketManager {
       this.retryCount++;
       this.state = WebSocketState.RECONNECTING;
       setTimeout(() => {
-        this.init().catch(() => {});
+        this.init().catch((retryError: unknown) => {
+          this.handleError(retryError);
+        });
       }, this.config.retryDelay);
     }
   };

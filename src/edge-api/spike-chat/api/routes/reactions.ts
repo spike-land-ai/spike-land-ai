@@ -5,5 +5,5 @@ import type { Variables } from "../middleware";
 export const reactionsRouter = new Hono<{ Bindings: Env; Variables: Variables }>();
 
 reactionsRouter.post("/:id/reactions", async (c) => {
-  return c.json({ success: true }); // TODO
+  return c.json({ error: "Not implemented" }, 501);
 });

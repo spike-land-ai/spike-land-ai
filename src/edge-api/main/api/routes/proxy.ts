@@ -110,14 +110,27 @@ proxy.post("/proxy/stripe", async (c) => {
   }
 
   const start = Date.now();
+
+  // Stripe requires application/x-www-form-urlencoded bodies.
+  // Convert the caller-supplied body object to URL-encoded form data.
+  let stripeBody: string | null = null;
+  if (body.body !== undefined && body.body !== null) {
+    if (typeof body.body === "object" && !Array.isArray(body.body)) {
+      stripeBody = new URLSearchParams(body.body as Record<string, string>).toString();
+    } else {
+      return c.json({ error: "Stripe proxy body must be a flat key-value object" }, 400);
+    }
+  }
+
   const response = await fetch(body.url, {
     method,
     headers: {
       ...sanitizeCallerHeaders(body.headers),
       Authorization: `Bearer ${c.env.STRIPE_SECRET_KEY}`,
       "Content-Type": "application/x-www-form-urlencoded",
+      "Stripe-Version": "2024-06-20",
     },
-    body: body.body ? JSON.stringify(body.body) : null,
+    body: stripeBody,
   });
 
   try {

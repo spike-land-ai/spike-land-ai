@@ -3,14 +3,16 @@
   "version": "0.1.0",
   "description": "MCP server for Google Analytics 4 read access",
   "type": "module",
-  "bin": "dist/index.js",
-  "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
+  "bin": {
+    "google-analytics-mcp": "dist/src/mcp-tools/google-analytics/mcp/server.js"
+  },
+  "main": "./dist/packages/google-analytics-mcp/index.js",
+  "types": "./dist/packages/google-analytics-mcp/index.d.ts",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
-      "default": "./dist/index.js"
+      "types": "./dist/packages/google-analytics-mcp/index.d.ts",
+      "import": "./dist/packages/google-analytics-mcp/index.js",
+      "default": "./dist/packages/google-analytics-mcp/index.js"
     }
   },
   "files": [
@@ -33,7 +35,7 @@
     "test:coverage": "vitest run --coverage",
     "typecheck": "tsc --noEmit",
     "lint": "eslint --quiet .",
-    "start": "node dist/index.js"
+    "start": "node dist/src/mcp-tools/google-analytics/mcp/server.js"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "1.27.1",

@@ -1,9 +1,10 @@
 import type { Env } from "./env";
+import { STATUS_PROBE_HEADER } from "../../common/core-logic/service-metrics";
 
 export interface ServiceProbe {
   label: string;
   url: string;
-  binding: keyof Env;
+  binding: Exclude<keyof Env, "STATUS_DB">;
   path: string;
 }
 
@@ -29,10 +30,30 @@ export interface StatusSnapshot {
 
 export const SERVICES: ServiceProbe[] = [
   { label: "Main Site", url: "https://spike.land/health", binding: "SPIKE_EDGE", path: "/health" },
-  { label: "Edge API", url: "https://api.spike.land/health", binding: "SPIKE_EDGE", path: "/api/health" },
-  { label: "Transpile", url: "https://js.spike.land/health", binding: "TRANSPILE", path: "/health" },
-  { label: "MCP Registry", url: "https://mcp.spike.land/health", binding: "MCP_REGISTRY", path: "/health" },
-  { label: "Auth MCP", url: "https://auth-mcp.spike.land/health", binding: "AUTH_MCP", path: "/health" },
+  {
+    label: "Edge API",
+    url: "https://api.spike.land/health",
+    binding: "SPIKE_EDGE",
+    path: "/api/health",
+  },
+  {
+    label: "Transpile",
+    url: "https://js.spike.land/health",
+    binding: "TRANSPILE",
+    path: "/health",
+  },
+  {
+    label: "MCP Registry",
+    url: "https://mcp.spike.land/health",
+    binding: "MCP_REGISTRY",
+    path: "/health",
+  },
+  {
+    label: "Auth MCP",
+    url: "https://auth-mcp.spike.land/health",
+    binding: "AUTH_MCP",
+    path: "/health",
+  },
   {
     label: "Image Studio",
     url: "https://image-studio-mcp.spike.land/health",
@@ -68,6 +89,9 @@ export async function probeService(service: ServiceProbe, env: Env): Promise<Pro
   try {
     const request = new Request(`https://internal${service.path}`, {
       method: "GET",
+      headers: {
+        [STATUS_PROBE_HEADER]: "1",
+      },
       signal: controller.signal,
     });
     const response = await env[service.binding].fetch(request);

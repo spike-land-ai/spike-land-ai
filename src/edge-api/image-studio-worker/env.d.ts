@@ -1,5 +1,6 @@
 export interface Env {
   IMAGE_DB: D1Database;
+  STATUS_DB: D1Database;
   IMAGE_R2: R2Bucket;
   GEMINI_API_KEY: string;
   CF_AIG_TOKEN: string;

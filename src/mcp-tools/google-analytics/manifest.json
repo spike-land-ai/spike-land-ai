@@ -7,6 +7,7 @@
     "mcp/index.ts",
     "mcp/metadata.ts",
     "mcp/realtime.ts",
-    "mcp/reports.ts"
+    "mcp/reports.ts",
+    "mcp/server.ts"
   ]
 }

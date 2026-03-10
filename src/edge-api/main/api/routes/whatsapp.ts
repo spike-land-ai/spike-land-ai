@@ -19,7 +19,12 @@ async function hashPhone(phone: string): Promise<string> {
   return hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
 }
 
+const HEX_ONLY = /^[0-9a-f]+$/i;
+
 async function verifyHmac(body: string, signature: string, secret: string): Promise<boolean> {
+  // Validate signature is hex-only before comparison (prevent unicode bypass)
+  if (!HEX_ONLY.test(signature)) return false;
+
   const key = await crypto.subtle.importKey(
     "raw",
     new TextEncoder().encode(secret),
@@ -28,10 +33,19 @@ async function verifyHmac(body: string, signature: string, secret: string): Prom
     ["sign"],
   );
   const sig = await crypto.subtle.sign("HMAC", key, new TextEncoder().encode(body));
+
+  // Constant-time comparison (OWASP A02, CWE-208)
   const expected = Array.from(new Uint8Array(sig))
     .map((b) => b.toString(16).padStart(2, "0"))
     .join("");
-  return expected === signature;
+
+  if (expected.length !== signature.length) return false;
+
+  let diff = 0;
+  for (let i = 0; i < expected.length; i++) {
+    diff |= expected.charCodeAt(i) ^ signature.charCodeAt(i);
+  }
+  return diff === 0;
 }
 
 function generateOtp(): string {

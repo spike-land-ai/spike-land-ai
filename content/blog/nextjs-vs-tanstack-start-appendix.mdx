@@ -72,11 +72,23 @@ live, and that is the path I optimized for.
 The Build Adapters API exists. It is a step in the right direction. I am glad
 it shipped.
 
-But when I was making this decision in January 2026, that API was alpha. At the
-time of writing, it is still alpha.
+But when I was making this decision in January 2026, that API was alpha. As of
+March 10, 2026, it is still alpha.
 
 I do not make infrastructure decisions based on direction of travel. I make
 them based on what works today. Roadmaps are promises. My invoice was a fact.
+
+And lock-in is not only about where code runs. It is also about how easy it is
+to leave.
+
+On March 10, 2026, when I tried to close the account and stop billing, I could
+not remove my card without adding another payment method first, and the billing
+feedback form failed when I tried to report it. That is not a framework API
+issue. It is platform exit friction. It still counts.
+
+This was the actual billing feedback flow I hit while trying to leave:
+
+![Vercel billing feedback dialog failing to submit while requesting account deletion on March 10, 2026.](/blog/nextjs-vs-tanstack-start-appendix/vercel-billing-feedback-failure.png)
 
 When Build Adapters are stable and the self-hosting story is genuinely
 first-class across providers, I will happily update this post. But "it is
@@ -166,5 +178,3 @@ That is fine.
 
 The original post is here:
 [Next.js vs TanStack Start: Why Next.js Became Tech Debt for Me](/blog/nextjs-vs-tanstack-start).
-
-If you really read it till now and you're not fist-bumping, I will add your user ID to the naughty list. :)

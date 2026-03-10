@@ -32,14 +32,23 @@ export class KVLogger {
 
     try {
       const { keys } = await kv.list<string>({ prefix: pattern });
-      const logEntries = await Promise.all(
-        keys.map(async (key) => {
-          const value = await kv.get(key.name);
-          const [, , hours, minutes, seconds] = key.name.split(/[:.]/);
-          const timeString = `${hours}:${minutes}:${seconds}`;
-          const { level, message } = JSON.parse(value as string);
-          return { timestamp: `${date}T${timeString}`, level, message };
-        }),
+      const logEntries = (
+        await Promise.all(
+          keys.map(async (key) => {
+            const value = await kv.get(key.name);
+            if (value === null) return null;
+            const [, , hours, minutes, seconds] = key.name.split(/[:.]/);
+            const timeString = `${hours}:${minutes}:${seconds}`;
+            try {
+              const { level, message } = JSON.parse(value) as { level: string; message: string };
+              return { timestamp: `${date}T${timeString}`, level, message };
+            } catch {
+              return null;
+            }
+          }),
+        )
+      ).filter(
+        (entry): entry is { timestamp: string; level: string; message: string } => entry !== null,
       );
 
       return logEntries.sort((a, b) => a.timestamp.localeCompare(b.timestamp));

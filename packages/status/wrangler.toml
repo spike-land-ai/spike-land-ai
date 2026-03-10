@@ -7,6 +7,11 @@ compatibility_date = "2025-07-12"
 compatibility_flags = ["nodejs_compat"]
 workers_dev = true
 
+[[d1_databases]]
+binding = "STATUS_DB"
+database_name = "spike-edge-analytics"
+database_id = "f7219e86-7dc6-4627-92ad-17fce49ae35a"
+
 [[services]]
 binding = "SPIKE_EDGE"
 service = "spike-edge"

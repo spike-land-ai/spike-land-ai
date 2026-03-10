@@ -5,5 +5,5 @@ import type { Variables } from "../middleware";
 export const threadsRouter = new Hono<{ Bindings: Env; Variables: Variables }>();
 
 threadsRouter.get("/:id/replies", async (c) => {
-  return c.json([]); // TODO
+  return c.json({ error: "Not implemented" }, 501);
 });

@@ -8,6 +8,7 @@ import * as schema from "../db/schema";
 
 export interface Env {
   AUTH_DB: D1Database;
+  STATUS_DB: D1Database;
   BETTER_AUTH_SECRET: string;
   MCP_INTERNAL_SECRET: string;
   APP_URL?: string;
@@ -90,6 +91,10 @@ export function createAuth(env: Env) {
         create: {
           after: async (user) => {
             const appUrl = env.APP_URL ?? "https://spike.land";
+            // SECURITY: Never forward raw email to the analytics pipeline —
+            // userId alone is sufficient for funnel attribution.
+            // Sending email would violate GDPR Art. 5(1)(c) data minimisation
+            // and could expose PII if the analytics store is ever breached.
             fetch(`${appUrl}/analytics/ingest`, {
               method: "POST",
               headers: { "Content-Type": "application/json" },
@@ -97,7 +102,7 @@ export function createAuth(env: Env) {
                 {
                   source: "auth",
                   eventType: "signup_completed",
-                  metadata: { userId: user.id, email: user.email },
+                  metadata: { userId: user.id },
                 },
               ]),
             }).catch(() => {});

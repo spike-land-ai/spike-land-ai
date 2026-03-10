@@ -4,6 +4,10 @@ import { z } from "zod";
 import { drizzle } from "drizzle-orm/d1";
 import * as schema from "./schema";
 import { createAuth, type Env } from "../db-auth/auth";
+import {
+  recordServiceRequestMetric,
+  shouldTrackServiceMetricRequest,
+} from "../../common/core-logic/service-metrics";
 
 // CORS configuration for Better Auth and MCP
 const ALLOWED_ORIGINS = [
@@ -39,178 +43,197 @@ function withCors(response: Response, request: Request): Response {
 }
 
 export default {
-  async fetch(request: Request, env: Env): Promise<Response> {
-    if (request.method === "OPTIONS") {
-      const corsOrigin = getCorsOrigin(request);
-      return new Response(null, {
-        status: 204,
-        headers: { ...CORS_HEADERS, "Access-Control-Allow-Origin": corsOrigin },
-      });
-    }
+  async fetch(request: Request, env: Env, ctx?: ExecutionContext): Promise<Response> {
+    const startedAt = Date.now();
+    const shouldTrack = shouldTrackServiceMetricRequest(request);
 
-    const url = new URL(request.url);
-
-    // Health endpoint
-    if (url.pathname === "/health") {
-      const deep = url.searchParams.get("deep") === "true";
-      let d1Status = "ok";
-
-      if (deep) {
-        try {
-          await env.AUTH_DB.prepare("SELECT 1").first();
-        } catch {
-          d1Status = "degraded";
-        }
+    try {
+      if (request.method === "OPTIONS") {
+        const corsOrigin = getCorsOrigin(request);
+        return new Response(null, {
+          status: 204,
+          headers: { ...CORS_HEADERS, "Access-Control-Allow-Origin": corsOrigin },
+        });
       }
 
-      const overall = d1Status === "ok" ? "ok" : "degraded";
-      return withCors(
-        new Response(
-          JSON.stringify({
-            status: overall,
-            service: "mcp-auth",
-            timestamp: new Date().toISOString(),
-            ...(deep ? { d1: d1Status } : {}),
+      const url = new URL(request.url);
+
+      // Health endpoint
+      if (url.pathname === "/health") {
+        const deep = url.searchParams.get("deep") === "true";
+        let d1Status = "ok";
+
+        if (deep) {
+          try {
+            await env.AUTH_DB.prepare("SELECT 1").first();
+          } catch {
+            d1Status = "degraded";
+          }
+        }
+
+        const overall = d1Status === "ok" ? "ok" : "degraded";
+        return withCors(
+          new Response(
+            JSON.stringify({
+              status: overall,
+              service: "mcp-auth",
+              timestamp: new Date().toISOString(),
+              ...(deep ? { d1: d1Status } : {}),
+            }),
+            {
+              status: overall === "ok" ? 200 : 503,
+              headers: { "Content-Type": "application/json" },
+            },
+          ),
+          request,
+        );
+      }
+
+      // Root redirect
+      if (url.pathname === "/") {
+        return withCors(
+          new Response(null, {
+            status: 302,
+            headers: { Location: "https://spike.land" },
           }),
-          {
-            status: overall === "ok" ? 200 : 503,
-            headers: { "Content-Type": "application/json" },
-          },
-        ),
-        request,
-      );
-    }
+          request,
+        );
+      }
 
-    // Root redirect
-    if (url.pathname === "/") {
-      return withCors(
-        new Response(null, {
-          status: 302,
-          headers: { Location: "https://spike.land" },
-        }),
-        request,
-      );
-    }
+      // Suppress favicon noise
+      if (url.pathname === "/favicon.ico") {
+        return new Response(null, { status: 204 });
+      }
 
-    // Suppress favicon noise
-    if (url.pathname === "/favicon.ico") {
-      return new Response(null, { status: 204 });
-    }
-
-    // 1. Better Auth catch-all API routes (OAuth, Magic Links, Session queries)
-    if (url.pathname.startsWith("/api/auth/")) {
-      const auth = createAuth(env);
-      const authResponse = await auth.handler(request);
-      return withCors(authResponse, request);
-    }
-
-    // 2. MCP Server Configuration
-    const mcpServer = new McpServer(
-      { name: "Spike Auth Data Service", version: "1.0.0" },
-      { capabilities: { tools: {} } },
-    );
-
-    // MCP Tools (Secure access for AI Agents & internal spikes)
-    mcpServer.tool(
-      "verify-session",
-      "Verify if a user session token is valid and returns user ID and roles",
-      { sessionToken: z.string() },
-      async ({ sessionToken }) => {
+      // 1. Better Auth catch-all API routes (OAuth, Magic Links, Session queries)
+      if (url.pathname.startsWith("/api/auth/")) {
         const auth = createAuth(env);
-        // We simulate a request since better-auth typically extracts the token from headers
-        const req = new Request(url.href, {
-          headers: {
-            cookie: `better-auth.session_token=${sessionToken}`,
-          },
-        });
-        const sessionResult = await auth.api.getSession({
-          headers: req.headers,
-        });
-        if (!sessionResult?.session) {
-          return {
-            content: [{ type: "text", text: JSON.stringify({ valid: false }) }],
-          };
-        }
-        return {
-          content: [
-            {
-              type: "text",
-              text: JSON.stringify(
-                {
-                  valid: true,
-                  user: sessionResult.user,
-                  session: sessionResult.session,
-                },
-                null,
-                2,
-              ),
-            },
-          ],
-        };
-      },
-    );
+        const authResponse = await auth.handler(request);
+        return withCors(authResponse, request);
+      }
 
-    mcpServer.tool(
-      "get-user-by-email",
-      "Lookup a user's ID by their email address",
-      { email: z.string().email() },
-      async ({ email }) => {
-        const db = drizzle(env.AUTH_DB, { schema });
-        const result = await db.query.user.findFirst({
-          where: (u, { eq }) => eq(u.email, email),
-        });
-        if (!result) {
-          return {
-            content: [{ type: "text", text: JSON.stringify({ found: false }) }],
-          };
-        }
-        return {
-          content: [
-            {
-              type: "text",
-              text: JSON.stringify(
-                {
-                  found: true,
-                  user: {
-                    id: result.id,
-                    email: result.email,
-                    name: result.name,
-                    role: result.role,
-                  },
-                },
-                null,
-                2,
-              ),
-            },
-          ],
-        };
-      },
-    );
-
-    // 3. Setup standard MCP WebTransport Endpoint
-    if (url.pathname !== "/mcp") {
-      return withCors(new Response("Not found", { status: 404 }), request);
-    }
-
-    // Gate MCP endpoint with internal secret to prevent user enumeration
-    const internalSecret = request.headers.get("X-Internal-Secret");
-    if (!internalSecret || internalSecret !== env.MCP_INTERNAL_SECRET) {
-      return withCors(
-        new Response(JSON.stringify({ error: "Unauthorized" }), {
-          status: 401,
-          headers: { "Content-Type": "application/json" },
-        }),
-        request,
+      // 2. MCP Server Configuration
+      const mcpServer = new McpServer(
+        { name: "Spike Auth Data Service", version: "1.0.0" },
+        { capabilities: { tools: {} } },
       );
+
+      // MCP Tools (Secure access for AI Agents & internal spikes)
+      mcpServer.tool(
+        "verify-session",
+        "Verify if a user session token is valid and returns user ID and roles",
+        { sessionToken: z.string() },
+        async ({ sessionToken }) => {
+          const auth = createAuth(env);
+          // We simulate a request since better-auth typically extracts the token from headers
+          const req = new Request(url.href, {
+            headers: {
+              cookie: `better-auth.session_token=${sessionToken}`,
+            },
+          });
+          const sessionResult = await auth.api.getSession({
+            headers: req.headers,
+          });
+          if (!sessionResult?.session) {
+            return {
+              content: [{ type: "text", text: JSON.stringify({ valid: false }) }],
+            };
+          }
+          return {
+            content: [
+              {
+                type: "text",
+                text: JSON.stringify(
+                  {
+                    valid: true,
+                    user: sessionResult.user,
+                    session: sessionResult.session,
+                  },
+                  null,
+                  2,
+                ),
+              },
+            ],
+          };
+        },
+      );
+
+      mcpServer.tool(
+        "get-user-by-email",
+        "Lookup a user's ID by their email address",
+        { email: z.string().email() },
+        async ({ email }) => {
+          const db = drizzle(env.AUTH_DB, { schema });
+          const result = await db.query.user.findFirst({
+            where: (u, { eq }) => eq(u.email, email),
+          });
+          if (!result) {
+            return {
+              content: [{ type: "text", text: JSON.stringify({ found: false }) }],
+            };
+          }
+          return {
+            content: [
+              {
+                type: "text",
+                text: JSON.stringify(
+                  {
+                    found: true,
+                    user: {
+                      id: result.id,
+                      email: result.email,
+                      name: result.name,
+                      role: result.role,
+                    },
+                  },
+                  null,
+                  2,
+                ),
+              },
+            ],
+          };
+        },
+      );
+
+      // 3. Setup standard MCP WebTransport Endpoint
+      if (url.pathname !== "/mcp") {
+        return withCors(new Response("Not found", { status: 404 }), request);
+      }
+
+      // Gate MCP endpoint with internal secret to prevent user enumeration
+      const internalSecret = request.headers.get("X-Internal-Secret");
+      if (!internalSecret || internalSecret !== env.MCP_INTERNAL_SECRET) {
+        return withCors(
+          new Response(JSON.stringify({ error: "Unauthorized" }), {
+            status: 401,
+            headers: { "Content-Type": "application/json" },
+          }),
+          request,
+        );
+      }
+
+      const transport = new WebStandardStreamableHTTPServerTransport({
+        enableJsonResponse: true,
+      });
+
+      await mcpServer.connect(transport);
+
+      const response = await transport.handleRequest(request);
+      return withCors(response, request);
+    } finally {
+      if (shouldTrack) {
+        try {
+          ctx?.waitUntil(
+            recordServiceRequestMetric(env.STATUS_DB, "Auth MCP", Date.now() - startedAt).catch(
+              (error) => {
+                console.error("[service-metrics] failed to record auth request", error);
+              },
+            ),
+          );
+        } catch {
+          /* no ExecutionContext outside Workers runtime */
+        }
+      }
     }
-
-    const transport = new WebStandardStreamableHTTPServerTransport({
-      enableJsonResponse: true,
-    });
-
-    await mcpServer.connect(transport);
-
-    const response = await transport.handleRequest(request);
-    return withCors(response, request);
   },
 };

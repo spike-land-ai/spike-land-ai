@@ -57,7 +57,7 @@ function createMockDb(firstResultOverride?: Record<string, unknown> | null) {
 // ── App Factory ───────────────────────────────────────────────────────────────
 
 function createApp(envOverrides: Partial<Env> = {}) {
-  const _app = new Hono<{ Bindings: Env }>();
+  const app = new Hono<{ Bindings: Env }>();
 
   app.use("*", async (c, next) => {
     Object.assign(c.env, envOverrides);
@@ -105,7 +105,7 @@ describe("POST /stripe/webhook", () => {
   describe("signature verification", () => {
     it("returns 400 when stripe-signature header is missing", async () => {
       const { db } = createMockDb();
-      const _app = createApp({ STRIPE_WEBHOOK_SECRET: WEBHOOK_SECRET, DB: db });
+      const app = createApp({ STRIPE_WEBHOOK_SECRET: WEBHOOK_SECRET, DB: db });
 
       const res = await app.request("/stripe/webhook", { method: "POST", body: "{}" }, {
         STRIPE_WEBHOOK_SECRET: WEBHOOK_SECRET,
@@ -119,7 +119,7 @@ describe("POST /stripe/webhook", () => {
 
     it("returns 503 when STRIPE_WEBHOOK_SECRET is not configured", async () => {
       const { db } = createMockDb();
-      const _app = createApp({ DB: db });
+      const app = createApp({ DB: db });
       const payload = JSON.stringify({ id: "evt_1", type: "test" });
 
       const res = await app.request(
@@ -137,7 +137,7 @@ describe("POST /stripe/webhook", () => {
 
     it("returns 400 for invalid signature", async () => {
       const { db } = createMockDb();
-      const _app = createApp({ STRIPE_WEBHOOK_SECRET: WEBHOOK_SECRET, DB: db });
+      const app = createApp({ STRIPE_WEBHOOK_SECRET: WEBHOOK_SECRET, DB: db });
       const payload = JSON.stringify({ id: "evt_1", type: "test" });
       const ts = Math.floor(Date.now() / 1000);
 
@@ -161,7 +161,7 @@ describe("POST /stripe/webhook", () => {
 
     it("returns 400 for expired timestamp (older than 5 minutes)", async () => {
       const { db } = createMockDb();
-      const _app = createApp({ STRIPE_WEBHOOK_SECRET: WEBHOOK_SECRET, DB: db });
+      const app = createApp({ STRIPE_WEBHOOK_SECRET: WEBHOOK_SECRET, DB: db });
       const payload = JSON.stringify({ id: "evt_old", type: "test" });
       const oldTimestamp = Math.floor(Date.now() / 1000) - 400; // 400 seconds ago
       const signature = await buildStripeSignature(payload, WEBHOOK_SECRET, oldTimestamp);
@@ -186,7 +186,7 @@ describe("POST /stripe/webhook", () => {
 
     it("accepts valid signature with recent timestamp", async () => {
       const { db } = createMockDb();
-      const _app = createApp({ STRIPE_WEBHOOK_SECRET: WEBHOOK_SECRET, DB: db });
+      const app = createApp({ STRIPE_WEBHOOK_SECRET: WEBHOOK_SECRET, DB: db });
       const event = { id: "evt_valid", type: "unknown.event", data: { object: {} } };
 
       const res = await postWebhook(app, event, { env: { DB: db } });
@@ -200,7 +200,7 @@ describe("POST /stripe/webhook", () => {
   describe("idempotency", () => {
     it("skips duplicate event IDs and returns duplicate:true", async () => {
       const { db } = createMockDb();
-      const _app = createApp({ STRIPE_WEBHOOK_SECRET: WEBHOOK_SECRET, DB: db });
+      const app = createApp({ STRIPE_WEBHOOK_SECRET: WEBHOOK_SECRET, DB: db });
 
       // Make the first() call return an existing event record
       const { mockPrepare } = createMockDb({ id: "evt_dup" });
@@ -230,7 +230,7 @@ describe("POST /stripe/webhook", () => {
 
     it("processes non-duplicate events normally", async () => {
       const { db } = createMockDb(null); // no existing event
-      const _app = createApp({ STRIPE_WEBHOOK_SECRET: WEBHOOK_SECRET, DB: db });
+      const app = createApp({ STRIPE_WEBHOOK_SECRET: WEBHOOK_SECRET, DB: db });
 
       const event = {
         id: "evt_new",
@@ -263,7 +263,7 @@ describe("POST /stripe/webhook", () => {
         };
       });
       const db = { prepare: mockPrepare } as unknown as D1Database;
-      const _app = createApp({ STRIPE_WEBHOOK_SECRET: WEBHOOK_SECRET, DB: db });
+      const app = createApp({ STRIPE_WEBHOOK_SECRET: WEBHOOK_SECRET, DB: db });
 
       const event = {
         id: "evt_checkout_new",
@@ -303,7 +303,7 @@ describe("POST /stripe/webhook", () => {
         };
       });
       const db = { prepare: mockPrepare } as unknown as D1Database;
-      const _app = createApp({ STRIPE_WEBHOOK_SECRET: WEBHOOK_SECRET, DB: db });
+      const app = createApp({ STRIPE_WEBHOOK_SECRET: WEBHOOK_SECRET, DB: db });
 
       const event = {
         id: "evt_checkout_existing",
@@ -337,7 +337,7 @@ describe("POST /stripe/webhook", () => {
         run: vi.fn().mockResolvedValue({ success: true }),
       }));
       const db = { prepare: mockPrepare } as unknown as D1Database;
-      const _app = createApp({ STRIPE_WEBHOOK_SECRET: WEBHOOK_SECRET, DB: db });
+      const app = createApp({ STRIPE_WEBHOOK_SECRET: WEBHOOK_SECRET, DB: db });
 
       const event = {
         id: "evt_checkout_biz",
@@ -370,7 +370,7 @@ describe("POST /stripe/webhook", () => {
         run: vi.fn().mockResolvedValue({ success: true }),
       }));
       const db = { prepare: mockPrepare } as unknown as D1Database;
-      const _app = createApp({ STRIPE_WEBHOOK_SECRET: WEBHOOK_SECRET, DB: db });
+      const app = createApp({ STRIPE_WEBHOOK_SECRET: WEBHOOK_SECRET, DB: db });
 
       const event = {
         id: "evt_checkout_unknown_tier",
@@ -405,7 +405,7 @@ describe("POST /stripe/webhook", () => {
         };
       });
       const db = { prepare: mockPrepare } as unknown as D1Database;
-      const _app = createApp({ STRIPE_WEBHOOK_SECRET: WEBHOOK_SECRET, DB: db });
+      const app = createApp({ STRIPE_WEBHOOK_SECRET: WEBHOOK_SECRET, DB: db });
 
       const event = {
         id: "evt_checkout_email",
@@ -440,7 +440,7 @@ describe("POST /stripe/webhook", () => {
         };
       });
       const db = { prepare: mockPrepare } as unknown as D1Database;
-      const _app = createApp({ STRIPE_WEBHOOK_SECRET: WEBHOOK_SECRET, DB: db });
+      const app = createApp({ STRIPE_WEBHOOK_SECRET: WEBHOOK_SECRET, DB: db });
 
       const event = {
         id: "evt_checkout_noemail",
@@ -474,7 +474,7 @@ describe("POST /stripe/webhook", () => {
         };
       });
       const db = { prepare: mockPrepare } as unknown as D1Database;
-      const _app = createApp({ STRIPE_WEBHOOK_SECRET: WEBHOOK_SECRET, DB: db });
+      const app = createApp({ STRIPE_WEBHOOK_SECRET: WEBHOOK_SECRET, DB: db });
 
       const event = {
         id: "evt_checkout_nouserid",
@@ -511,7 +511,7 @@ describe("POST /stripe/webhook", () => {
         run: vi.fn().mockResolvedValue({ success: true }),
       }));
       const db = { prepare: mockPrepare } as unknown as D1Database;
-      const _app = createApp({ STRIPE_WEBHOOK_SECRET: WEBHOOK_SECRET, DB: db });
+      const app = createApp({ STRIPE_WEBHOOK_SECRET: WEBHOOK_SECRET, DB: db });
 
       const event = {
         id: "evt_sub_updated",
@@ -549,7 +549,7 @@ describe("POST /stripe/webhook", () => {
         run: vi.fn().mockResolvedValue({ success: true }),
       }));
       const db = { prepare: mockPrepare } as unknown as D1Database;
-      const _app = createApp({ STRIPE_WEBHOOK_SECRET: WEBHOOK_SECRET, DB: db });
+      const app = createApp({ STRIPE_WEBHOOK_SECRET: WEBHOOK_SECRET, DB: db });
 
       const event = {
         id: "evt_past_due",
@@ -590,7 +590,7 @@ describe("POST /stripe/webhook", () => {
         run: vi.fn().mockResolvedValue({ success: true }),
       }));
       const db = { prepare: mockPrepare } as unknown as D1Database;
-      const _app = createApp({ STRIPE_WEBHOOK_SECRET: WEBHOOK_SECRET, DB: db });
+      const app = createApp({ STRIPE_WEBHOOK_SECRET: WEBHOOK_SECRET, DB: db });
 
       const event = {
         id: "evt_sub_deleted",
@@ -631,7 +631,7 @@ describe("POST /stripe/webhook", () => {
         run: vi.fn().mockResolvedValue({ success: true }),
       }));
       const db = { prepare: mockPrepare } as unknown as D1Database;
-      const _app = createApp({ STRIPE_WEBHOOK_SECRET: WEBHOOK_SECRET, DB: db });
+      const app = createApp({ STRIPE_WEBHOOK_SECRET: WEBHOOK_SECRET, DB: db });
 
       const event = {
         id: "evt_invoice_failed",
@@ -665,7 +665,7 @@ describe("POST /stripe/webhook", () => {
         run: vi.fn().mockResolvedValue({ success: true }),
       }));
       const db = { prepare: mockPrepare } as unknown as D1Database;
-      const _app = createApp({ STRIPE_WEBHOOK_SECRET: WEBHOOK_SECRET, DB: db });
+      const app = createApp({ STRIPE_WEBHOOK_SECRET: WEBHOOK_SECRET, DB: db });
 
       const event = {
         id: "evt_invoice_no_sub",
@@ -705,7 +705,7 @@ describe("POST /stripe/webhook", () => {
         run: vi.fn().mockResolvedValue({ success: true }),
       }));
       const db = { prepare: mockPrepare } as unknown as D1Database;
-      const _app = createApp({ STRIPE_WEBHOOK_SECRET: WEBHOOK_SECRET, DB: db });
+      const app = createApp({ STRIPE_WEBHOOK_SECRET: WEBHOOK_SECRET, DB: db });
 
       const event = {
         id: "evt_invoice_paid",
@@ -731,7 +731,7 @@ describe("POST /stripe/webhook", () => {
   describe("unhandled event types", () => {
     it("returns 200 received:true for unknown event types", async () => {
       const { db } = createMockDb();
-      const _app = createApp({ STRIPE_WEBHOOK_SECRET: WEBHOOK_SECRET, DB: db });
+      const app = createApp({ STRIPE_WEBHOOK_SECRET: WEBHOOK_SECRET, DB: db });
 
       const event = {
         id: "evt_unknown",
@@ -768,7 +768,7 @@ describe("POST /stripe/webhook", () => {
         prepare: mockPrepare,
         batch: vi.fn().mockResolvedValue([]),
       } as unknown as D1Database;
-      const _app = createApp({ STRIPE_WEBHOOK_SECRET: WEBHOOK_SECRET, DB: db });
+      const app = createApp({ STRIPE_WEBHOOK_SECRET: WEBHOOK_SECRET, DB: db });
 
       const event = {
         id: "evt_blog_support",
@@ -812,7 +812,7 @@ describe("POST /stripe/webhook", () => {
         prepare: mockPrepare,
         batch: vi.fn().mockResolvedValue([]),
       } as unknown as D1Database;
-      const _app = createApp({ STRIPE_WEBHOOK_SECRET: WEBHOOK_SECRET, DB: db });
+      const app = createApp({ STRIPE_WEBHOOK_SECRET: WEBHOOK_SECRET, DB: db });
 
       const event = {
         id: "evt_blog_support_insert",
@@ -855,7 +855,7 @@ describe("POST /stripe/webhook", () => {
         }),
       }));
       const db = { prepare: mockPrepare, batch: batchMock } as unknown as D1Database;
-      const _app = createApp({ STRIPE_WEBHOOK_SECRET: WEBHOOK_SECRET, DB: db });
+      const app = createApp({ STRIPE_WEBHOOK_SECRET: WEBHOOK_SECRET, DB: db });
 
       const event = {
         id: "evt_blog_exp_track",
@@ -893,7 +893,7 @@ describe("POST /stripe/webhook", () => {
         };
       });
       const db = { prepare: mockPrepare } as unknown as D1Database;
-      const _app = createApp({ STRIPE_WEBHOOK_SECRET: WEBHOOK_SECRET, DB: db });
+      const app = createApp({ STRIPE_WEBHOOK_SECRET: WEBHOOK_SECRET, DB: db });
 
       const event = {
         id: "evt_invoice_no_period",
@@ -918,7 +918,7 @@ describe("POST /stripe/webhook", () => {
   describe("signature format edge cases", () => {
     it("returns 400 when stripe-signature has no timestamp (t= missing)", async () => {
       const { db } = createMockDb();
-      const _app = createApp({ STRIPE_WEBHOOK_SECRET: WEBHOOK_SECRET, DB: db });
+      const app = createApp({ STRIPE_WEBHOOK_SECRET: WEBHOOK_SECRET, DB: db });
       const res = await app.request(
         "/stripe/webhook",
         {
@@ -936,7 +936,7 @@ describe("POST /stripe/webhook", () => {
 
     it("returns 400 when signature length mismatch (covers constant-time compare)", async () => {
       const { db } = createMockDb();
-      const _app = createApp({ STRIPE_WEBHOOK_SECRET: WEBHOOK_SECRET, DB: db });
+      const app = createApp({ STRIPE_WEBHOOK_SECRET: WEBHOOK_SECRET, DB: db });
       const ts = Math.floor(Date.now() / 1000);
       const res = await app.request(
         "/stripe/webhook",

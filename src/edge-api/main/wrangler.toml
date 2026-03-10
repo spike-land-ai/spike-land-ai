@@ -30,6 +30,10 @@ database_name = "spike-edge-analytics"
 database_id = "f7219e86-7dc6-4627-92ad-17fce49ae35a"
 migrations_dir = "db/migrations"
 
+[[analytics_engine_datasets]]
+binding = "ANALYTICS"
+dataset = "spike_analytics"
+
 [vars]
 GA_MEASUREMENT_ID = "G-9WNEM9ZHE7"
 

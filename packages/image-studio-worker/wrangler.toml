@@ -13,6 +13,11 @@ database_name = "pixel-studio"
 database_id = "74991261-c270-45d2-ab40-e8955e43f93f"
 migrations_dir = "migrations"
 
+[[d1_databases]]
+binding = "STATUS_DB"
+database_name = "spike-edge-analytics"
+database_id = "f7219e86-7dc6-4627-92ad-17fce49ae35a"
+
 [[r2_buckets]]
 binding = "IMAGE_R2"
 bucket_name = "pixel-studio"

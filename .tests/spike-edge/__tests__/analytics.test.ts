@@ -62,6 +62,8 @@ function makeExecutionCtx(): ExecutionContext {
   } as unknown as ExecutionContext;
 }
 
+const INTERNAL_HEADERS = { "x-internal-secret": "internal" };
+
 describe("analytics ingest endpoint", () => {
   let mockFetch: ReturnType<typeof vi.fn>;
 
@@ -320,7 +322,11 @@ describe("GET /analytics/events", () => {
   it("returns 400 for invalid range", async () => {
     const app = makeApp();
     const env = createMockEnv();
-    const res = await app.request("/analytics/events?range=invalid", {}, env);
+    const res = await app.request(
+      "/analytics/events?range=invalid",
+      { headers: INTERNAL_HEADERS },
+      env,
+    );
     expect(res.status).toBe(400);
     const body = await res.json<{ error: string }>();
     expect(body.error).toContain("Invalid range");
@@ -333,28 +339,44 @@ describe("GET /analytics/events", () => {
     ).all;
     allMock.mockResolvedValue({ results: [{ id: "1", source: "web" }] });
     const app = makeApp();
-    const res = await app.request("/analytics/events", {}, createMockEnv({ DB: db }));
+    const res = await app.request(
+      "/analytics/events",
+      { headers: INTERNAL_HEADERS },
+      createMockEnv({ DB: db }),
+    );
     expect(res.status).toBe(200);
   });
 
   it("accepts 7d range with type filter and custom limit", async () => {
     const app = makeApp();
     const env = createMockEnv();
-    const res = await app.request("/analytics/events?range=7d&type=page_view&limit=100", {}, env);
+    const res = await app.request(
+      "/analytics/events?range=7d&type=page_view&limit=100",
+      { headers: INTERNAL_HEADERS },
+      env,
+    );
     expect(res.status).toBe(200);
   });
 
   it("accepts 30d range", async () => {
     const app = makeApp();
     const env = createMockEnv();
-    const res = await app.request("/analytics/events?range=30d", {}, env);
+    const res = await app.request(
+      "/analytics/events?range=30d",
+      { headers: INTERNAL_HEADERS },
+      env,
+    );
     expect(res.status).toBe(200);
   });
 
   it("caps limit at 200", async () => {
     const app = makeApp();
     const env = createMockEnv();
-    const res = await app.request("/analytics/events?range=24h&limit=99999", {}, env);
+    const res = await app.request(
+      "/analytics/events?range=24h&limit=99999",
+      { headers: INTERNAL_HEADERS },
+      env,
+    );
     expect(res.status).toBe(200);
   });
 });
@@ -365,7 +387,11 @@ describe("GET /analytics/summary", () => {
   it("returns 400 for invalid range", async () => {
     const app = makeApp();
     const env = createMockEnv();
-    const res = await app.request("/analytics/summary?range=invalid", {}, env);
+    const res = await app.request(
+      "/analytics/summary?range=invalid",
+      { headers: INTERNAL_HEADERS },
+      env,
+    );
     expect(res.status).toBe(400);
   });
 
@@ -387,7 +413,11 @@ describe("GET /analytics/summary", () => {
         ]),
     } as unknown as D1Database;
     const app = makeApp();
-    const res = await app.request("/analytics/summary?range=7d", {}, createMockEnv({ DB: db }));
+    const res = await app.request(
+      "/analytics/summary?range=7d",
+      { headers: INTERNAL_HEADERS },
+      createMockEnv({ DB: db }),
+    );
     expect(res.status).toBe(200);
     const body = await res.json<{
       totalEvents: number;
@@ -412,7 +442,11 @@ describe("GET /analytics/summary", () => {
       batch: vi.fn().mockResolvedValue([null, null, null, null]),
     } as unknown as D1Database;
     const app = makeApp();
-    const res = await app.request("/analytics/summary", {}, createMockEnv({ DB: db }));
+    const res = await app.request(
+      "/analytics/summary",
+      { headers: INTERNAL_HEADERS },
+      createMockEnv({ DB: db }),
+    );
     expect(res.status).toBe(200);
     const body = await res.json<{ totalEvents: number }>();
     expect(body.totalEvents).toBe(0);
@@ -429,7 +463,7 @@ describe("GET /analytics/mcp/tools", () => {
     const app = makeApp();
     const res = await app.request(
       "/analytics/mcp/tools?range=7d&limit=20",
-      {},
+      { headers: INTERNAL_HEADERS },
       createMockEnv({ MCP_SERVICE: { fetch: mcpFetch } as unknown as Fetcher }),
     );
     expect(res.status).toBe(200);
@@ -441,7 +475,7 @@ describe("GET /analytics/mcp/tools", () => {
     const app = makeApp();
     const res = await app.request(
       "/analytics/mcp/tools",
-      {},
+      { headers: INTERNAL_HEADERS },
       createMockEnv({ MCP_SERVICE: { fetch: mcpFetch } as unknown as Fetcher }),
     );
     expect(res.status).toBe(200);
@@ -454,7 +488,7 @@ describe("GET /analytics/mcp/users", () => {
     const app = makeApp();
     const res = await app.request(
       "/analytics/mcp/users?range=24h&tool=my-tool",
-      {},
+      { headers: INTERNAL_HEADERS },
       createMockEnv({ MCP_SERVICE: { fetch: mcpFetch } as unknown as Fetcher }),
     );
     expect(res.status).toBe(200);
@@ -466,7 +500,7 @@ describe("GET /analytics/mcp/users", () => {
     const app = makeApp();
     const res = await app.request(
       "/analytics/mcp/users",
-      {},
+      { headers: INTERNAL_HEADERS },
       createMockEnv({ MCP_SERVICE: { fetch: mcpFetch } as unknown as Fetcher }),
     );
     expect(res.status).toBe(200);
@@ -479,7 +513,7 @@ describe("GET /analytics/mcp/summary", () => {
     const app = makeApp();
     const res = await app.request(
       "/analytics/mcp/summary?range=30d",
-      {},
+      { headers: INTERNAL_HEADERS },
       createMockEnv({ MCP_SERVICE: { fetch: mcpFetch } as unknown as Fetcher }),
     );
     expect(res.status).toBe(200);
@@ -490,7 +524,7 @@ describe("GET /analytics/mcp/summary", () => {
     const app = makeApp();
     const res = await app.request(
       "/analytics/mcp/summary",
-      {},
+      { headers: INTERNAL_HEADERS },
       createMockEnv({ MCP_SERVICE: { fetch: mcpFetch } as unknown as Fetcher }),
     );
     expect(res.status).toBe(200);

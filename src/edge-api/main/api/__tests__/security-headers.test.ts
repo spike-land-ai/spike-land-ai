@@ -17,12 +17,19 @@ describe("security header policy", () => {
 
     applySecurityHeaders(headers);
 
+    const contentSecurityPolicy = headers.get("content-security-policy");
+
     expect(headers.get("x-content-type-options")).toBe("nosniff");
-    expect(headers.get("permissions-policy")).toBe("camera=(), microphone=(), geolocation=(), payment=()");
+    expect(headers.get("permissions-policy")).toBe(
+      "camera=(), microphone=(), geolocation=(), payment=()",
+    );
     expect(headers.get("referrer-policy")).toBe("strict-origin-when-cross-origin");
     expect(headers.get("strict-transport-security")).toContain("max-age=63072000");
-    expect(headers.get("content-security-policy")).toContain("default-src 'self'");
-    expect(headers.get("content-security-policy")).toContain("frame-ancestors *");
-    expect(headers.get("content-security-policy")).toContain("wss://chat.spike.land");
+    expect(contentSecurityPolicy).toContain("default-src 'self'");
+    // frame-ancestors must restrict to spike.land family, never "*"
+    expect(contentSecurityPolicy).toContain("frame-ancestors 'self' https://*.spike.land");
+    expect(contentSecurityPolicy).not.toContain("frame-ancestors *");
+    expect(contentSecurityPolicy).toContain("wss://chat.spike.land");
+    expect(contentSecurityPolicy).toContain("https://*.google.co.uk");
   });
 });

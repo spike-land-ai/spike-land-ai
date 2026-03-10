@@ -34,7 +34,14 @@ export function registerBazdmegTelemetryTools(
       .handler(async ({ input, ctx }) => {
         const { days, limit } = input;
 
-        const sinceDay = Math.floor((Date.now() - days * 24 * 60 * 60 * 1000) / 86400000);
+        // tool_call_daily.day stores a UTC midnight millisecond epoch (via Date.UTC).
+        // Compute the cutoff as a ms epoch, not a day-index.
+        const cutoffDate = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
+        const sinceDay = Date.UTC(
+          cutoffDate.getUTCFullYear(),
+          cutoffDate.getUTCMonth(),
+          cutoffDate.getUTCDate(),
+        );
 
         const rows = await ctx.db
           .select({

@@ -5,5 +5,5 @@ import type { Variables } from "../middleware";
 export const presenceRouter = new Hono<{ Bindings: Env; Variables: Variables }>();
 
 presenceRouter.get("/", async (c) => {
-  return c.json({}); // TODO
+  return c.json({ error: "Not implemented" }, 501);
 });

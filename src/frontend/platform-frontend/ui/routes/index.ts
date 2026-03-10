@@ -8,6 +8,7 @@ export * from "./learn";
 export * from "./login";
 export * from "./pricing";
 export * from "./settings";
+export * from "./status";
 export * from "./store";
 export * from "./version";
 export * from "./what-we-do";

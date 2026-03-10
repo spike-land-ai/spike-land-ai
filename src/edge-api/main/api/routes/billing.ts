@@ -79,6 +79,7 @@ async function handleBillingPortal(c: Context<{ Bindings: Env; Variables: Variab
     headers: {
       Authorization: `Bearer ${stripeKey}`,
       "Content-Type": "application/x-www-form-urlencoded",
+      "Stripe-Version": "2024-06-20",
     },
     body: new URLSearchParams({
       customer: row.stripe_customer_id,

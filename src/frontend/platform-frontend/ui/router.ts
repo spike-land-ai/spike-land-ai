@@ -67,6 +67,12 @@ const analyticsRoute = createRoute({
   component: withSuspense(() => import("./routes/analytics"), "AnalyticsPage"),
 });
 
+const statusRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/status",
+  component: withSuspense(() => import("./routes/status"), "StatusPage"),
+});
+
 const callbackRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/callback",
@@ -407,6 +413,7 @@ const routeTree = rootRoute.addChildren([
   aboutRoute,
   securityRoute,
   analyticsRoute,
+  statusRoute,
   callbackRoute,
   loginRoute,
   privacyRoute,

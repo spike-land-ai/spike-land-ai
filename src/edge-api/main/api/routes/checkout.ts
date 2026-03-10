@@ -158,9 +158,13 @@ checkout.post("/api/checkout/service", async (c) => {
     sessionParams["metadata[userId]"] = userId;
   }
 
-  // Allow pre-filling email for guest checkout
-  if (body.email) {
-    sessionParams.customer_email = body.email;
+  // Allow pre-filling email for guest checkout.
+  // Basic validation: must be a non-empty string containing exactly one '@'
+  // and a dot after it. Stripe validates fully server-side; this prevents
+  // excessively long or malformed strings reaching the Stripe API (OWASP A03).
+  const EMAIL_RE = /^[^\s@]{1,254}@[^\s@]+\.[^\s@]{2,}$/;
+  if (body.email && typeof body.email === "string" && EMAIL_RE.test(body.email)) {
+    sessionParams.customer_email = body.email.slice(0, 254);
   }
 
   const sessionRes = await stripePost(stripeKey, "/v1/checkout/sessions", sessionParams);

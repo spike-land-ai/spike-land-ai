@@ -25,8 +25,10 @@ export class ChannelDurableObject extends DurableObject {
       const [client, server] = Object.values(pair);
 
       // Authenticate via attachment? We can pass userId in headers or URL during upgrade
-      const userId = request.headers.get("x-user-id") || url.searchParams.get("userId") || "anonymous";
-      const displayName = request.headers.get("x-display-name") || url.searchParams.get("displayName") || "Unknown";
+      const userId =
+        request.headers.get("x-user-id") || url.searchParams.get("userId") || "anonymous";
+      const displayName =
+        request.headers.get("x-display-name") || url.searchParams.get("displayName") || "Unknown";
       const channelId = url.searchParams.get("channelId") || "unknown";
 
       const attachment: WsAttachment = {
@@ -38,7 +40,7 @@ export class ChannelDurableObject extends DurableObject {
 
       // Accept the connection using Hibernation API
       this.ctx.acceptWebSocket(server!, [channelId]);
-      
+
       // Store attachment
       server!.serializeAttachment(attachment);
 
@@ -90,9 +92,9 @@ export class ChannelDurableObject extends DurableObject {
 
           this.typingTimeouts.set(
             attachment.userId,
-            setTimeout(() => this.clearTyping(attachment.userId), 5000) as unknown as number
+            setTimeout(() => this.clearTyping(attachment.userId), 5000) as unknown as number,
           );
-          
+
           this.broadcast(JSON.stringify({ type: "typing", users: Array.from(this.typingUsers) }));
           break;
         case "typing_stop":
@@ -117,7 +119,8 @@ export class ChannelDurableObject extends DurableObject {
     }
   }
 
-  override async webSocketError(ws: WebSocket, _error: unknown) {
+  override async webSocketError(ws: WebSocket, error: unknown) {
+    console.error("[ChannelDurableObject] WebSocket error:", error);
     const attachment = ws.deserializeAttachment() as WsAttachment | null;
     if (attachment) {
       this.clearTyping(attachment.userId);

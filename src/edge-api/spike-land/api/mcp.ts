@@ -19,6 +19,7 @@ import type { GA4Event } from "../core-logic/lib/ga4";
 import { trackPlatformEvents } from "../core-logic/lib/analytics";
 import type { AnalyticsEvent } from "../core-logic/lib/analytics";
 import { recordSkillCall } from "../core-logic/lib/skill-tracker";
+import { trackMcpToolCall } from "../core-logic/analytics";
 import { detectAbuse } from "../core-logic/middleware/abuse-detector";
 import { toolCallDaily, subscriptions } from "../db/db/schema";
 
@@ -397,7 +398,10 @@ mcpRoute.post("/", async (c) => {
       }
 
       const ga4Events: GA4Event[] = [
-        { name: "mcp_request", params: { method: rpcMethod, user_id: userId, duration_ms: durationMs } },
+        {
+          name: "mcp_request",
+          params: { method: rpcMethod, user_id: userId, duration_ms: durationMs },
+        },
       ];
       if (isToolCall && toolName) {
         ga4Events.push({
@@ -418,6 +422,9 @@ mcpRoute.post("/", async (c) => {
       );
 
       if (isToolCall && toolName) {
+        // Analytics Engine write (fire-and-forget, cheap, no D1 quota used)
+        trackMcpToolCall(c.env.ANALYTICS, toolName, durationMs, outcome === "success");
+
         c.executionCtx.waitUntil(
           recordSkillCall(
             c.env.DB,
@@ -540,7 +547,10 @@ mcpRoute.post("/", async (c) => {
 
     // 1. Send to GA4
     const ga4Events: GA4Event[] = [
-      { name: "mcp_request", params: { method: rpcMethod, user_id: userId, duration_ms: durationMs } },
+      {
+        name: "mcp_request",
+        params: { method: rpcMethod, user_id: userId, duration_ms: durationMs },
+      },
     ];
     if (isToolCall && toolName) {
       ga4Events.push({
@@ -560,8 +570,11 @@ mcpRoute.post("/", async (c) => {
         .catch((err) => console.error("[GA4] Failed to send events:", err)),
     );
 
-    // 2. Record skill call in D1 rollup tables
+    // 2. Analytics Engine write + D1 rollup tables
     if (isToolCall && toolName) {
+      // Analytics Engine write (fire-and-forget, synchronous CF binding call)
+      trackMcpToolCall(c.env.ANALYTICS, toolName, durationMs, outcome === "success");
+
       c.executionCtx.waitUntil(
         recordSkillCall(
           c.env.DB,

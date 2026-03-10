@@ -4,6 +4,7 @@ import { BlogPostView } from "@spike-land-ai/block-website/ui";
 import type { BlogPost } from "@spike-land-ai/block-website/core";
 import { extractHeroMedia } from "../../../../../core/block-website/core-logic/blog-source.js";
 import { apiUrl } from "../../../core-logic/api";
+import { trackAnalyticsEvent } from "../../hooks/useAnalytics";
 
 const SITE_URL = "https://spike.land";
 const localBlogModules = import.meta.env.DEV
@@ -150,6 +151,16 @@ export function BlogPostPage() {
       })
       .catch(() => {});
   }, [localLookupDone, localPost, normalizedSlug]);
+
+  // Track blog post view once we have a resolved title (or fall back to slug)
+  useEffect(() => {
+    if (!normalizedSlug) return;
+    trackAnalyticsEvent("blog_post_view", {
+      slug: normalizedSlug,
+      title: postTitle ?? normalizedSlug,
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [normalizedSlug]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (!normalizedSlug) return;

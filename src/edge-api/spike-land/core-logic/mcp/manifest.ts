@@ -131,7 +131,7 @@ export async function registerAllTools(
   );
   safeRegister(registerAuthTools, "registerAuthTools", registry, userId, db);
   safeRegister(registerWorkspacesTools, "registerWorkspacesTools", registry, userId, db);
-  safeRegister(registerBillingTools, "registerBillingTools", registry, userId, db);
+  safeRegister(registerBillingTools, "registerBillingTools", registry, userId, db, env?.spikeEdge);
   safeRegister(
     registerVaultTools,
     "registerVaultTools",
@@ -159,7 +159,13 @@ export async function registerAllTools(
   safeRegister(registerStoreSearchTools, "registerStoreSearchTools", registry, userId, db);
   safeRegister(registerStoreSkillsTools, "registerStoreSkillsTools", registry, userId, db);
   safeRegister(registerStoreAbTools, "registerStoreAbTools", registry, userId, db);
-  safeRegister(registerExperimentEvaluatorTools, "registerExperimentEvaluatorTools", registry, userId, db);
+  safeRegister(
+    registerExperimentEvaluatorTools,
+    "registerExperimentEvaluatorTools",
+    registry,
+    userId,
+    db,
+  );
   safeRegister(registerAgentManagementTools, "registerAgentManagementTools", registry, userId, db);
   safeRegister(registerAgentInboxTools, "registerAgentInboxTools", registry, userId, db);
   safeRegister(registerCapabilitiesTools, "registerCapabilitiesTools", registry, userId, db);

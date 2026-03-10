@@ -21,8 +21,8 @@ export function AppFooter() {
                 One product layer for chat, tools, docs, and deployment.
               </h2>
               <p className="rubik-lede">
-                spike.land turns MCP capability into real software surfaces with
-                shared auth, observability, and edge-native runtime defaults.
+                spike.land turns MCP capability into real software surfaces with shared auth,
+                observability, and edge-native runtime defaults.
               </p>
             </div>
           </div>
@@ -61,8 +61,8 @@ export function AppFooter() {
               </Link>
 
               <p className="max-w-sm text-sm leading-7 text-muted-foreground">
-                Build apps, tools, and operational workflows with one design
-                system and one runtime model.
+                Build apps, tools, and operational workflows with one design system and one runtime
+                model.
               </p>
 
               <div className="flex items-center gap-3">
@@ -167,12 +167,12 @@ export function AppFooter() {
                   </Link>
                 </li>
                 <li>
-                  <a
-                    href="https://status.spike.land"
+                  <Link
+                    to="/status"
                     className="text-muted-foreground transition-colors hover:text-primary"
                   >
                     System Status
-                  </a>
+                  </Link>
                 </li>
               </ul>
             </div>
@@ -227,17 +227,14 @@ export function AppFooter() {
           <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
             <div className="space-y-1">
               <p className="text-xs font-semibold tracking-[0.04em] text-muted-foreground">
-                &copy; {currentYear} SPIKE LAND LTD. Built for edge-native AI
-                product surfaces.
+                &copy; {currentYear} SPIKE LAND LTD. Built for edge-native AI product surfaces.
               </p>
-              <p className="text-xs text-muted-foreground/80">
-                Brighton-built. Global by default.
-              </p>
+              <p className="text-xs text-muted-foreground/80">Brighton-built. Global by default.</p>
             </div>
 
             <div className="flex flex-wrap items-center gap-3">
               <a
-                href="https://status.spike.land"
+                href="/status"
                 role="status"
                 className="inline-flex items-center gap-2 rounded-full border border-success/20 bg-success/70 px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.12em] text-success-foreground"
               >

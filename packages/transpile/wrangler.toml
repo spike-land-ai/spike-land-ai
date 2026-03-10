@@ -13,6 +13,11 @@ workers_dev = true
 main = "index.ts"
 routes = [{ pattern = "js.spike.land", custom_domain = true }]
 
+[[d1_databases]]
+binding = "STATUS_DB"
+database_name = "spike-edge-analytics"
+database_id = "f7219e86-7dc6-4627-92ad-17fce49ae35a"
+
 # Redirect Vite-specific ?url WASM import to worker-compatible version
 [alias]
 "esbuild-wasm/esbuild.wasm?url" = "../../src/edge-api/transpile/lazy-imports/esbuild-wasm-cf.ts"

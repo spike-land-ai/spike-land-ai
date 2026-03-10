@@ -46,26 +46,15 @@ jobs:
               process.exit(1);
             }
             
-            let processGuidelines = '';
-            try {
-              processGuidelines = fs.readFileSync('docs/archive/JULES_PROCESS_OBSERVATIONS_AND_FUTURE_IMPROVEMENTS.md', 'utf8');
-            } catch (e) {
-              console.log('Could not read guidelines file:', e.message);
-            }
-
             const prompt = `You are an expert AI code reviewer.
-          Review the following PR diff.
-          You must verify if the PR addresses or respects the guidelines and observations in this document:
-          <document>
-          ${processGuidelines}
-          </document>
-          
+          Review the following PR diff for code quality, correctness, and adherence to project conventions (TypeScript strict mode, no \`any\`, no eslint-disable, Vitest for tests).
+
           <diff>
           ${diff}
           </diff>
-          
-          If the PR looks good, requires no changes, and aligns with the document, output exactly "APPROVE".
-          Otherwise, provide a detailed review commenting on what needs to be changed. Refer explicitly to the provided document.`;
+
+          If the PR looks good and requires no changes, output exactly "APPROVE".
+          Otherwise, provide a detailed review commenting on what needs to be changed.`;
 
             const response = await fetch("https://api.anthropic.com/v1/messages", {
               method: "POST",
@@ -92,7 +81,7 @@ jobs:
 
             if (reply === 'APPROVE') {
               console.log('Approving and merging PR...');
-              execSync(`gh pr review ${process.env.PR_NUMBER} --approve --body "LGTM! The code respects the Jules process observations."`);
+              execSync(`gh pr review ${process.env.PR_NUMBER} --approve --body "LGTM! Code quality and conventions look good."`);
               try {
                 // Try to merge the PR
                 execSync(`gh pr merge ${process.env.PR_NUMBER} --squash`);

@@ -330,17 +330,22 @@ export function CodeCategorizerQuiz() {
                       </span>
                     );
                   }
-                  // Highlight string literals
+                  // Highlight string literals — use React children instead of
+                  // dangerouslySetInnerHTML to prevent XSS if question data
+                  // is ever sourced dynamically (OWASP A03, CWE-79).
+                  const segments = part.split(/("[^"]*")/g);
                   return (
-                    <span
-                      key={partIdx}
-                      dangerouslySetInnerHTML={{
-                        __html: part.replace(
-                          /("([^"]*)")/g,
-                          '<span class="text-emerald-400">$1</span>',
+                    <span key={partIdx}>
+                      {segments.map((seg, segIdx) =>
+                        seg.startsWith('"') && seg.endsWith('"') ? (
+                          <span key={segIdx} className="text-emerald-400">
+                            {seg}
+                          </span>
+                        ) : (
+                          seg
                         ),
-                      }}
-                    />
+                      )}
+                    </span>
                   );
                 })}
             </span>

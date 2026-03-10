@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { useAuth } from "../hooks/useAuth";
-import { useAnalytics } from "../hooks/useAnalytics";
+import { trackAnalyticsEvent } from "../hooks/useAnalytics";
 import { usePricing } from "../hooks/usePricing";
 import { apiFetch } from "../../core-logic/api";
+import { trackGoogleAdsEvent } from "../../core-logic/google-ads";
 
 interface PricingFeature {
   text: string;
@@ -158,6 +159,7 @@ async function handleCheckout(
     return;
   }
   trackEvent("checkout_started", { tier, billing: annual ? "annual" : "monthly" });
+  trackGoogleAdsEvent("begin_checkout", { tier, billing: annual ? "annual" : "monthly" });
   const lookupKey = annual ? `${tier}_annual` : `${tier}_monthly`;
   const res = await apiFetch("/checkout", {
     method: "POST",
@@ -188,12 +190,13 @@ function PlanCard({
   const displayPrice = annual ? plan.annualPrice : plan.monthlyPrice;
   const planId = `plan-${plan.name.toLowerCase()}`;
 
-  const buttonClass = `mt-8 block w-full rounded-[calc(var(--radius-control)-0.1rem)] border px-6 py-3 text-center text-sm font-semibold transition ${plan.highlighted
-    ? "border-transparent bg-foreground text-background hover:bg-foreground/92"
-    : isFree
-      ? "border-border bg-background text-foreground hover:border-primary/24 hover:text-primary"
-      : "border-border bg-secondary text-foreground hover:border-primary/24 hover:bg-secondary/88"
-    }`;
+  const buttonClass = `mt-8 block w-full rounded-[calc(var(--radius-control)-0.1rem)] border px-6 py-3 text-center text-sm font-semibold transition ${
+    plan.highlighted
+      ? "border-transparent bg-foreground text-background hover:bg-foreground/92"
+      : isFree
+        ? "border-border bg-background text-foreground hover:border-primary/24 hover:text-primary"
+        : "border-border bg-secondary text-foreground hover:border-primary/24 hover:bg-secondary/88"
+  }`;
 
   return (
     <div
@@ -201,9 +204,7 @@ function PlanCard({
       className={`flex h-full flex-col p-6 ${plan.highlighted ? "rubik-panel-strong" : "rubik-panel"}`}
     >
       {plan.highlighted && (
-        <span className="rubik-chip rubik-chip-accent mb-4 self-start">
-          Most Popular
-        </span>
+        <span className="rubik-chip rubik-chip-accent mb-4 self-start">Most Popular</span>
       )}
 
       <h2 id={planId} className="text-xl font-semibold tracking-[-0.03em] text-foreground">
@@ -212,7 +213,9 @@ function PlanCard({
       <p className="mt-2 text-sm leading-7 text-muted-foreground">{plan.description}</p>
 
       <div className="mt-4">
-        <span className="text-3xl font-semibold tracking-[-0.05em] text-foreground">{displayPrice}</span>
+        <span className="text-3xl font-semibold tracking-[-0.05em] text-foreground">
+          {displayPrice}
+        </span>
         {plan.period && <span className="text-base text-muted-foreground">{plan.period}</span>}
         {annual && !isFree && (
           <p className="mt-1 text-xs uppercase tracking-[0.12em] text-muted-foreground">
@@ -306,7 +309,6 @@ function FaqItem({ question, answer }: { question: string; answer: string }) {
 export function PricingPage() {
   const [annual, setAnnual] = useState(false);
   const { isAuthenticated } = useAuth();
-  const { trackEvent } = useAnalytics();
   const { pricing } = usePricing();
   const PLANS = makePlans(pricing);
 
@@ -323,8 +325,8 @@ export function PricingPage() {
               Transparent pricing for shipping MCP-native software.
             </h1>
             <p className="rubik-lede mx-auto">
-              Start free, scale into pro workflows, and keep enterprise controls available when
-              your product surface becomes infrastructure.
+              Start free, scale into pro workflows, and keep enterprise controls available when your
+              product surface becomes infrastructure.
             </p>
           </div>
         </div>
@@ -355,8 +357,9 @@ export function PricingPage() {
             aria-checked={!annual}
             tabIndex={!annual ? 0 : -1}
             onClick={() => setAnnual(false)}
-            className={`rounded-full px-4 py-2 text-sm font-medium transition ${!annual ? "bg-background text-foreground shadow-sm" : "text-muted-foreground"
-              }`}
+            className={`rounded-full px-4 py-2 text-sm font-medium transition ${
+              !annual ? "bg-background text-foreground shadow-sm" : "text-muted-foreground"
+            }`}
           >
             Monthly
           </button>
@@ -366,8 +369,9 @@ export function PricingPage() {
             aria-checked={annual}
             tabIndex={annual ? 0 : -1}
             onClick={() => setAnnual(true)}
-            className={`rounded-full px-4 py-2 text-sm font-medium transition ${annual ? "bg-background text-foreground shadow-sm" : "text-muted-foreground"
-              }`}
+            className={`rounded-full px-4 py-2 text-sm font-medium transition ${
+              annual ? "bg-background text-foreground shadow-sm" : "text-muted-foreground"
+            }`}
           >
             Annual
             <span className="ml-1.5 rounded-full bg-green-100 px-1.5 py-0.5 text-xs font-semibold text-green-700 dark:bg-green-900/30 dark:text-green-400">
@@ -384,7 +388,7 @@ export function PricingPage() {
             plan={plan}
             annual={annual}
             isAuthenticated={isAuthenticated}
-            trackEvent={trackEvent}
+            trackEvent={trackAnalyticsEvent}
           />
         ))}
       </div>

@@ -111,13 +111,17 @@ export async function recordSkillCall(
     }
 
     if (events.length > 0) {
+      // Use the SPIKE_EDGE service binding — must use a real hostname so CF can
+      // route the request to spike-edge internally.  https://spike.land is correct.
       spikeEdge
         .fetch("https://spike.land/analytics/ingest", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(events),
         })
-        .catch(() => {});
+        .catch((err: unknown) => {
+          console.error("[skill-tracker] Failed to forward lifecycle events:", err);
+        });
     }
   }
 }

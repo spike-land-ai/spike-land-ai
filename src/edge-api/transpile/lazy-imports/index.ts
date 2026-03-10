@@ -1,4 +1,8 @@
 import { build, transpile } from "../../../frontend/monaco-editor/concurrency/transpile";
+import {
+  recordServiceRequestMetric,
+  shouldTrackServiceMetricRequest,
+} from "../../common/core-logic/service-metrics";
 // Import WASM directly for Cloudflare Workers (wrangler CompiledWasm rule).
 // The Vite ?url import in the code package doesn't work in wrangler's bundler.
 import wasmModule from "esbuild-wasm/esbuild.wasm";
@@ -13,7 +17,10 @@ const getCorsHeaders = (requestOrigin?: string | null) => {
   // Restrict the CORS origin to our app or specific subdomains for safety,
   // falling back to the default spike.land origin if there is no match.
   let origin = "https://spike.land";
-  if (requestOrigin && (requestOrigin.endsWith(".spike.land") || requestOrigin.startsWith("http://localhost:"))) {
+  if (
+    requestOrigin &&
+    (requestOrigin.endsWith(".spike.land") || requestOrigin.startsWith("http://localhost:"))
+  ) {
     origin = requestOrigin;
   }
 
@@ -89,7 +96,11 @@ const handlePostRequest = async (request: Request, ctx?: ExecutionContext) => {
       const headers = new Headers(cached.headers);
       headers.set("Access-Control-Allow-Origin", corsHeaders["Access-Control-Allow-Origin"]);
       headers.set("Access-Control-Allow-Headers", corsHeaders["Access-Control-Allow-Headers"]);
-      return new Response(cached.body, { status: cached.status, statusText: cached.statusText, headers });
+      return new Response(cached.body, {
+        status: cached.status,
+        statusText: cached.statusText,
+        headers,
+      });
     }
 
     const respText = await initAndTransform(code, origin);
@@ -117,49 +128,73 @@ const handlePostRequest = async (request: Request, ctx?: ExecutionContext) => {
 };
 
 export default {
-  async fetch(request: Request, _env: unknown, ctx: ExecutionContext) {
-    const url = new URL(request.url);
+  async fetch(request: Request, env: { STATUS_DB: D1Database }, ctx?: ExecutionContext) {
+    const startedAt = Date.now();
+    const shouldTrack = shouldTrackServiceMetricRequest(request);
 
-    if (url.pathname === "/health" && request.method === "GET") {
-      return new Response(
-        JSON.stringify({ status: "ok", service: "transpile", timestamp: new Date().toISOString() }),
-        { status: 200, headers: { "Content-Type": "application/json" } },
-      );
-    }
+    try {
+      const url = new URL(request.url);
 
-    const params = url.searchParams;
-    const codeSpace = params.get("codeSpace") || "empty";
-    const originParam = params.get("origin");
-    const origin = originParam === "testing" ? "https://testing.spike.land" : "https://spike.land";
+      if (url.pathname === "/health" && request.method === "GET") {
+        return new Response(
+          JSON.stringify({
+            status: "ok",
+            service: "transpile",
+            timestamp: new Date().toISOString(),
+          }),
+          { status: 200, headers: { "Content-Type": "application/json" } },
+        );
+      }
 
-    if (request.method === "OPTIONS") {
-      const requestOrigin = request.headers.get("Origin");
-      const allowOrigin = requestOrigin || "*";
+      const params = url.searchParams;
+      const codeSpace = params.get("codeSpace") || "empty";
+      const originParam = params.get("origin");
+      const origin =
+        originParam === "testing" ? "https://testing.spike.land" : "https://spike.land";
 
-      return new Response(null, {
-        status: 204,
+      if (request.method === "OPTIONS") {
+        const requestOrigin = request.headers.get("Origin");
+        const allowOrigin = requestOrigin || "*";
+
+        return new Response(null, {
+          status: 204,
+          headers: {
+            "Access-Control-Allow-Origin": allowOrigin,
+            "Access-Control-Allow-Headers": "*",
+            "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+            "cache-control": "no-cache",
+          },
+        });
+      }
+
+      if (request.method === "GET") {
+        return handleGetRequest(codeSpace, origin);
+      }
+
+      if (request.method === "POST") {
+        return handlePostRequest(request, ctx);
+      }
+
+      return new Response("Method not allowed. Try POST or GET.", {
+        status: 405,
         headers: {
-          "Access-Control-Allow-Origin": allowOrigin,
-          "Access-Control-Allow-Headers": "*",
-          "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-          "cache-control": "no-cache",
+          ...getCorsHeaders(request.headers.get("Origin")),
         },
       });
+    } finally {
+      if (shouldTrack) {
+        try {
+          ctx?.waitUntil(
+            recordServiceRequestMetric(env.STATUS_DB, "Transpile", Date.now() - startedAt).catch(
+              (error) => {
+                console.error("[service-metrics] failed to record transpile request", error);
+              },
+            ),
+          );
+        } catch {
+          /* no ExecutionContext outside Workers runtime */
+        }
+      }
     }
-
-    if (request.method === "GET") {
-      return handleGetRequest(codeSpace, origin);
-    }
-
-    if (request.method === "POST") {
-      return handlePostRequest(request, ctx);
-    }
-
-    return new Response("Method not allowed. Try POST or GET.", {
-      status: 405,
-      headers: {
-        ...getCorsHeaders(request.headers.get("Origin")),
-      },
-    });
   },
 };

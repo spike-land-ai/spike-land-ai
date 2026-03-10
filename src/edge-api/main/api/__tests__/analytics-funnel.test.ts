@@ -24,12 +24,15 @@ function createApp(db: D1Database) {
   return { app, db };
 }
 
+const TEST_INTERNAL_SECRET = "test-internal-secret";
+
 function makeEnv(db: D1Database): Env {
   return {
     DB: db,
     // Stub remaining Env fields to satisfy TypeScript — not exercised by these tests
     GA_MEASUREMENT_ID: "",
     GA_API_SECRET: "",
+    INTERNAL_SERVICE_SECRET: TEST_INTERNAL_SECRET,
   } as unknown as Env;
 }
 
@@ -59,7 +62,11 @@ describe("GET /analytics/funnel", () => {
     const db = mockDb(fakeRows);
     const { app } = createApp(db);
 
-    const res = await app.request("/analytics/funnel", { method: "GET" }, makeEnv(db));
+    const res = await app.request(
+      "/analytics/funnel",
+      { method: "GET", headers: { "x-internal-secret": TEST_INTERNAL_SECRET } },
+      makeEnv(db),
+    );
 
     expect(res.status).toBe(200);
 
@@ -76,12 +83,25 @@ describe("GET /analytics/funnel", () => {
     const db = mockDb([]);
     const { app } = createApp(db);
 
-    const res = await app.request("/analytics/funnel", { method: "GET" }, makeEnv(db));
+    const res = await app.request(
+      "/analytics/funnel",
+      { method: "GET", headers: { "x-internal-secret": TEST_INTERNAL_SECRET } },
+      makeEnv(db),
+    );
 
     expect(res.status).toBe(200);
 
     const body = await res.json<unknown[]>();
     expect(Array.isArray(body)).toBe(true);
     expect(body).toHaveLength(0);
+  });
+
+  it("returns 401 without internal secret", async () => {
+    const db = mockDb([]);
+    const { app } = createApp(db);
+
+    const res = await app.request("/analytics/funnel", { method: "GET" }, makeEnv(db));
+
+    expect(res.status).toBe(401);
   });
 });

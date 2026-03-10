@@ -21,7 +21,12 @@ import {
   formatCancellationConfirm,
 } from "../lib/billing-service";
 
-export function registerBillingTools(registry: ToolRegistry, userId: string, db: DrizzleDB): void {
+export function registerBillingTools(
+  registry: ToolRegistry,
+  userId: string,
+  db: DrizzleDB,
+  spikeEdge?: Fetcher,
+): void {
   const t = freeTool(userId, db);
 
   registry.registerBuilt(
@@ -123,6 +128,27 @@ export function registerBillingTools(registry: ToolRegistry, userId: string, db:
           return textResult(
             "**Cannot Cancel**\n\nYour subscription has no associated Stripe subscription. Contact support.",
           );
+        }
+
+        // Delegate the Stripe API call to spike-edge, which holds the Stripe secret key.
+        // We set cancel_at_period_end=true so the user retains access until period end.
+        if (spikeEdge) {
+          const stripeRes = await spikeEdge.fetch(
+            new Request("https://edge.spike.land/proxy/stripe", {
+              method: "POST",
+              headers: { "content-type": "application/json" },
+              body: JSON.stringify({
+                url: `https://api.stripe.com/v1/subscriptions/${sub.stripeSubscriptionId}`,
+                method: "POST",
+                body: { cancel_at_period_end: "true" },
+              }),
+            }),
+          );
+          if (!stripeRes.ok) {
+            return textResult(
+              "**Cancellation Failed**\n\nUnable to reach the billing service. Please try again or contact support.",
+            );
+          }
         }
 
         const now = Date.now();

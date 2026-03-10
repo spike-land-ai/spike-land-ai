@@ -1,6 +1,10 @@
 import type { FetchFn, StripeListResponse } from "./types.js";
 import { STRIPE_API_BASE } from "./types.js";
 
+// Pin to a known stable Stripe API version.
+// Update this intentionally after reviewing the Stripe changelog.
+const STRIPE_API_VERSION = "2024-06-20";
+
 export class StripeClient {
   private readonly apiKey: string;
   private readonly fetchFn: FetchFn;
@@ -22,6 +26,7 @@ export class StripeClient {
       method: "GET",
       headers: {
         Authorization: `Bearer ${this.apiKey}`,
+        "Stripe-Version": STRIPE_API_VERSION,
       },
     });
 

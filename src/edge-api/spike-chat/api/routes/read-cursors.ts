@@ -5,5 +5,5 @@ import type { Variables } from "../middleware";
 export const readCursorsRouter = new Hono<{ Bindings: Env; Variables: Variables }>();
 
 readCursorsRouter.post("/read", async (c) => {
-  return c.json({ success: true }); // TODO
+  return c.json({ error: "Not implemented" }, 501);
 });

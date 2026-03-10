@@ -4,6 +4,7 @@
 export interface Env {
   // Cloudflare bindings
   DB: D1Database;
+  STATUS_DB: D1Database;
   KV: KVNamespace;
   SPA_ASSETS: R2Bucket;
 

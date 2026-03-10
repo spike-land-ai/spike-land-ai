@@ -5,5 +5,5 @@ import type { Variables } from "../middleware";
 export const pinsRouter = new Hono<{ Bindings: Env; Variables: Variables }>();
 
 pinsRouter.get("/", async (c) => {
-  return c.json([]); // TODO
+  return c.json({ error: "Not implemented" }, 501);
 });

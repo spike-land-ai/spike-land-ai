@@ -1,7 +1,8 @@
-import { useState, useCallback, lazy, Suspense } from "react";
+import { useState, useCallback, lazy, Suspense, useEffect } from "react";
 import { useParams, Link, useNavigate, useSearch } from "@tanstack/react-router";
 import { useApp } from "../../hooks/useApps";
 import { useAppSession } from "../../hooks/useAppSession";
+import { trackAnalyticsEvent } from "../../hooks/useAnalytics";
 import { AppMarkdownRenderer } from "../../src/components/tools/AppMarkdownRenderer";
 import { SpikeChatPanel } from "../../components/SpikeChatPanel";
 import { TerminalSurface } from "../../components/TerminalSurface";
@@ -43,6 +44,17 @@ export function AppSessionPage() {
   const { data: app, isLoading, isError, error } = useApp(appSlug as string);
   const [refreshKey, setRefreshKey] = useState(0);
 
+  // Track app view once the app data has loaded
+  useEffect(() => {
+    if (!app || !appSlug) return;
+    trackAnalyticsEvent("app_view", {
+      appSlug,
+      appName: app.name,
+      category: app.category ?? "",
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [appSlug, app?.name]); // eslint-disable-line react-hooks/exhaustive-deps
+
   const { session, recordToolResult, resetSession, isToolAvailable } = useAppSession(
     appSlug as string,
     app?.graph || {},
@@ -50,7 +62,8 @@ export function AppSessionPage() {
   );
 
   const channelId = `app-${appSlug}`;
-  const isHackerNews = appSlug === "hackernews" || appSlug === "hn-reader" || appSlug === "hackernews-reader";
+  const isHackerNews =
+    appSlug === "hackernews" || appSlug === "hn-reader" || appSlug === "hackernews-reader";
   const isPagesTemplateChooser = appSlug === "pages-template-chooser";
   const isChessArena = appSlug === "chess-arena";
   const isShowcaseApp = isHackerNews || isPagesTemplateChooser || isChessArena;
@@ -157,7 +170,11 @@ export function AppSessionPage() {
       {/* Surface panels */}
       <div className="flex-1 min-h-0 flex">
         {/* Main surface content */}
-        <div className="flex-1 min-w-0 overflow-hidden" role="tabpanel" id={`panel-${activeSurface}`}>
+        <div
+          className="flex-1 min-w-0 overflow-hidden"
+          role="tabpanel"
+          id={`panel-${activeSurface}`}
+        >
           {activeSurface === "overview" && (
             <div className="flex flex-col lg:flex-row gap-8 p-4 overflow-y-auto h-full">
               <div className="flex-1 min-w-0" key={refreshKey}>
@@ -207,10 +224,7 @@ export function AppSessionPage() {
               {!isShowcaseApp && (
                 <div className="w-full lg:w-72 shrink-0">
                   <div className="sticky top-4 space-y-4">
-                    <SessionPanel
-                      session={session}
-                      onReset={resetSession}
-                    />
+                    <SessionPanel session={session} onReset={resetSession} />
                   </div>
                 </div>
               )}
@@ -234,11 +248,7 @@ export function AppSessionPage() {
           )}
 
           {activeSurface === "mdx" && (
-            <MdxSurface
-              appSlug={appSlug as string}
-              content={app.markdown}
-              className="h-full"
-            />
+            <MdxSurface appSlug={appSlug as string} content={app.markdown} className="h-full" />
           )}
         </div>
       </div>
@@ -251,7 +261,10 @@ function SessionPanel({
   session,
   onReset,
 }: {
-  session: { outputs: Record<string, unknown>; history: Array<{ tool: string; timestamp: number }> };
+  session: {
+    outputs: Record<string, unknown>;
+    history: Array<{ tool: string; timestamp: number }>;
+  };
   onReset: () => void;
 }) {
   return (

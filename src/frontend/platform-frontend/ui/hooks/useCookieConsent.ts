@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { flushAnalyticsQueue } from "./useAnalytics";
 
 type ConsentState = boolean | null;
 
@@ -34,18 +35,28 @@ export function useCookieConsent(): CookieConsentHook {
     setConsentGiven(true);
     if (typeof window.gtag === "function") {
       window.gtag("consent", "update", {
-        "ad_storage": "granted",
-        "ad_user_data": "granted",
-        "ad_personalization": "granted",
-        "analytics_storage": "granted",
+        ad_storage: "granted",
+        ad_user_data: "granted",
+        ad_personalization: "granted",
+        analytics_storage: "granted",
       });
     }
+    // Flush any events that were queued before consent was granted
+    flushAnalyticsQueue();
   };
 
   const reject = (): void => {
     localStorage.setItem(STORAGE_KEY, "rejected");
     setConsentCookie("rejected");
     setConsentGiven(false);
+    if (typeof window.gtag === "function") {
+      window.gtag("consent", "update", {
+        ad_storage: "denied",
+        ad_user_data: "denied",
+        ad_personalization: "denied",
+        analytics_storage: "denied",
+      });
+    }
   };
 
   return { consentGiven, accept, reject };

@@ -972,7 +972,8 @@ describe("proxy route — body forwarding", () => {
 
     const fetchCall = mockFetch.mock.calls[0]!;
     expect(fetchCall[1]!.method).toBe("POST");
-    expect(fetchCall[1]!.body).toBe(JSON.stringify({ amount: 1000, currency: "usd" }));
+    expect(fetchCall[1]!.body).toBe("amount=1000&currency=usd");
+    expect(fetchCall[1]!.headers["Stripe-Version"]).toBe("2024-06-20");
 
     vi.unstubAllGlobals();
   });
@@ -1239,7 +1240,9 @@ describe("app middleware (index.ts)", () => {
     expect(res.headers.get("Permissions-Policy")).toBe(
       "camera=(), microphone=(), geolocation=(), payment=()",
     );
-    expect(res.headers.get("X-Frame-Options")).toBe("DENY");
+    expect(res.headers.get("Content-Security-Policy")).toContain(
+      "frame-ancestors 'self' https://*.spike.land",
+    );
   });
 
   it("handles CORS preflight for allowed origin", async () => {

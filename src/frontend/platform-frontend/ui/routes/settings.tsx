@@ -1,12 +1,13 @@
 import { useNavigate, useSearch } from "@tanstack/react-router";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useAuth } from "../hooks/useAuth";
-import { useAnalytics } from "../hooks/useAnalytics";
+import { trackAnalyticsEvent } from "../hooks/useAnalytics";
 import { useToast } from "../components/Toast";
 import { usePricing } from "../hooks/usePricing";
 import { AuthGuard } from "../components/AuthGuard";
 import { CreditWidget } from "../components/CreditWidget";
 import { apiUrl } from "../../core-logic/api";
+import { trackPurchaseConversion } from "../../core-logic/google-ads";
 import { UI_ANIMATIONS } from "@spike-land-ai/shared/constants";
 
 type SettingsTab = "profile" | "whatsapp" | "keys" | "billing" | "access";
@@ -431,7 +432,6 @@ const planColors: Record<Plan, string> = {
 
 function BillingTab() {
   const { showToast } = useToast();
-  const { trackEvent } = useAnalytics();
   const { pricing } = usePricing();
   const search = useSearch({ strict: false }) as { success?: string; canceled?: string };
 
@@ -461,13 +461,14 @@ function BillingTab() {
     if (toastShownRef.current) return;
     if (search.success === "1") {
       toastShownRef.current = true;
-      trackEvent("checkout_success", { source: "stripe_redirect" });
+      trackAnalyticsEvent("checkout_success", { source: "stripe_redirect" });
+      trackPurchaseConversion();
       showToast("Subscription activated!", "success");
     } else if (search.canceled === "1") {
       toastShownRef.current = true;
       showToast("Checkout canceled", "info");
     }
-  }, [search.success, search.canceled, showToast, trackEvent]);
+  }, [search.success, search.canceled, showToast]);
 
   async function handleUpgrade(tier: "pro" | "business") {
     setUpgrading(true);

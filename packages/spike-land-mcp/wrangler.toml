@@ -19,6 +19,11 @@ database_name = "spike-land-mcp"
 database_id = "52b72b0a-c0f8-4d7f-aaec-4f014594d0c1"
 migrations_dir = "../../src/edge-api/spike-land/db/migrations"
 
+[[d1_databases]]
+binding = "STATUS_DB"
+database_name = "spike-edge-analytics"
+database_id = "f7219e86-7dc6-4627-92ad-17fce49ae35a"
+
 [[r2_buckets]]
 binding = "SPA_ASSETS"
 bucket_name = "spike-app-assets"

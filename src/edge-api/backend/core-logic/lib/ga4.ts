@@ -41,7 +41,7 @@ export async function sendGA4Events(
 
   const url = `${GA4_ENDPOINT}?measurement_id=${encodeURIComponent(measurementId)}&api_secret=${encodeURIComponent(apiSecret)}`;
 
-  await fetch(url, {
+  const response = await fetch(url, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
@@ -49,4 +49,7 @@ export async function sendGA4Events(
       events: truncatedEvents,
     }),
   });
+  if (!response.ok) {
+    console.error(`[ga4] send failed: ${response.status} ${response.statusText}`);
+  }
 }

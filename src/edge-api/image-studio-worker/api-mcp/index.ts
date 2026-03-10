@@ -18,6 +18,10 @@ import { buildMcpServer } from "../mcp/server.ts";
 import { createToolRegistry } from "../mcp/tool-registry.ts";
 import { validateSession } from "../core-logic/auth.ts";
 import { handleChatStream } from "../ai/chat-handler.ts";
+import {
+  recordServiceRequestMetric,
+  shouldTrackServiceMetricRequest,
+} from "../../common/core-logic/service-metrics";
 
 declare const __BUILD_SHA__: string;
 declare const __BUILD_TIME__: string;
@@ -518,4 +522,26 @@ app.all("*", (c) => {
   return c.env.ASSETS.fetch(c.req.raw);
 });
 
-export default app;
+export default {
+  async fetch(request: Request, env: Env, ctx?: ExecutionContext): Promise<Response> {
+    const startedAt = Date.now();
+
+    try {
+      return await app.fetch(request, env, ctx);
+    } finally {
+      if (shouldTrackServiceMetricRequest(request)) {
+        try {
+          ctx?.waitUntil(
+            recordServiceRequestMetric(env.STATUS_DB, "Image Studio", Date.now() - startedAt).catch(
+              (error) => {
+                console.error("[service-metrics] failed to record image studio request", error);
+              },
+            ),
+          );
+        } catch {
+          /* no ExecutionContext outside Workers runtime */
+        }
+      }
+    }
+  },
+};

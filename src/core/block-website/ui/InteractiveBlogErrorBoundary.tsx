@@ -29,14 +29,12 @@ export class InteractiveBlogErrorBoundary extends Component<Props, State> {
   }
 
   override componentDidCatch(error: Error, info: ErrorInfo) {
-    // Log to console in development; in production a real error reporter would go here
-    if (process.env.NODE_ENV !== "production") {
-      console.error(
-        `[InteractiveBlogErrorBoundary] Component "${this.props.componentName ?? "unknown"}" threw:`,
-        error,
-        info.componentStack,
-      );
-    }
+    // Always log — component name + stack aids diagnosis in production logs too
+    console.error(
+      `[InteractiveBlogErrorBoundary] Component "${this.props.componentName ?? "unknown"}" threw:`,
+      error,
+      info.componentStack,
+    );
   }
 
   override render() {

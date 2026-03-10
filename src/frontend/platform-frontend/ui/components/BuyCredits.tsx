@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { apiUrl } from "../../core-logic/api";
 import { usePricing } from "../hooks/usePricing";
+import { trackAnalyticsEvent } from "../hooks/useAnalytics";
 import { Button } from "../shared/ui/button";
 import { Zap, Coins, Trophy, CreditCard, Sparkles, Check } from "lucide-react";
 import { cn } from "../../styling/cn";
@@ -43,6 +44,12 @@ function PackCard({ pack }: { pack: CreditPack }) {
   async function handleBuy() {
     setLoading(true);
     setError(null);
+    trackAnalyticsEvent("credit_purchase_started", {
+      packId: pack.id,
+      packLabel: pack.label,
+      credits: pack.credits,
+      price: pack.price,
+    });
     try {
       await purchaseCredits(pack.credits);
     } catch (e: unknown) {

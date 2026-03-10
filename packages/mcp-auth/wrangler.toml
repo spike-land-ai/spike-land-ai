@@ -14,6 +14,11 @@ binding = "AUTH_DB"
 database_name = "spike-auth-production"
 database_id = "2afd3ffd-0e4e-4b2d-b395-7510d54af8dc"
 
+[[d1_databases]]
+binding = "STATUS_DB"
+database_name = "spike-edge-analytics"
+database_id = "f7219e86-7dc6-4627-92ad-17fce49ae35a"
+
 [[r2_buckets]]
 binding = "AUTH_R2"
 bucket_name = "spike-auth-assets"

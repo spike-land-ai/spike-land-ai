@@ -88,7 +88,13 @@ export function registerMcpObservabilityTools(
       .meta({ category: "mcp-observability", tier: "free" })
       .handler(async ({ input, ctx }) => {
         const { days, tool_name } = input;
-        const sinceDay = Math.floor((Date.now() - days * 24 * 60 * 60 * 1000) / 86400000);
+        // tool_call_daily.day stores a UTC midnight millisecond epoch (via Date.UTC).
+        const cutoffDate = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
+        const sinceDay = Date.UTC(
+          cutoffDate.getUTCFullYear(),
+          cutoffDate.getUTCMonth(),
+          cutoffDate.getUTCDate(),
+        );
 
         const conditions = [gte(toolCallDaily.day, sinceDay)];
         if (tool_name) conditions.push(eq(toolCallDaily.toolName, tool_name));

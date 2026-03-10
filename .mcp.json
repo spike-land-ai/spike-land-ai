@@ -6,7 +6,7 @@
     },
     "google-analytics-mcp": {
       "command": "npx",
-      "args": ["tsx", "./src/mcp-tools/google-analytics/mcp/index.ts"]
+      "args": ["tsx", "./src/mcp-tools/google-analytics/mcp/server.ts"]
     },
     "stripe-analytics-mcp": {
       "command": "npx",

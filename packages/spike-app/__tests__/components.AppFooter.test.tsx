@@ -69,6 +69,12 @@ describe("AppFooter", () => {
     expect(screen.getByRole("status")).toHaveTextContent("Status healthy");
   });
 
+  it("links status surfaces to the internal status page", () => {
+    render(<AppFooter />);
+    expect(screen.getByText("System Status").closest("a")).toHaveAttribute("href", "/status");
+    expect(screen.getByRole("status").closest("a")).toHaveAttribute("href", "/status");
+  });
+
   it("renders section headings", () => {
     render(<AppFooter />);
     expect(screen.getByText("Product")).toBeInTheDocument();

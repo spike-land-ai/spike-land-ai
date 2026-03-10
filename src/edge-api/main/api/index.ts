@@ -39,10 +39,39 @@ import { githubStars } from "./routes/github-stars.js";
 import { docsApi } from "./routes/docs-api.js";
 import { handleScheduled } from "../lazy-imports/scheduled.js";
 import { applySecurityHeaders, isAllowedBrowserOrigin } from "./lib/security-headers.js";
+import {
+  recordServiceRequestMetric,
+  shouldTrackServiceMetricRequest,
+} from "../../common/core-logic/service-metrics.js";
 
 const log = createLogger("spike-edge");
 
 const app = new Hono<{ Bindings: Env; Variables: Variables }>();
+
+function getSpikeEdgeMetricService(request: Request): "Main Site" | "Edge API" | null {
+  const url = new URL(request.url);
+  const host = (request.headers.get("host") ?? url.host).toLowerCase();
+
+  if (host.startsWith("api.spike.land") || host.startsWith("edge.spike.land")) {
+    return "Edge API";
+  }
+
+  if (host === "internal") {
+    if (url.pathname.startsWith("/api/")) {
+      return "Edge API";
+    }
+
+    if (url.pathname === "/health") {
+      return "Main Site";
+    }
+  }
+
+  if (host.startsWith("spike.land") || host.startsWith("www.spike.land")) {
+    return url.pathname.startsWith("/api/") ? "Edge API" : "Main Site";
+  }
+
+  return null;
+}
 // Request ID middleware (must run before everything else)
 app.use("*", requestIdMiddleware);
 
@@ -68,7 +97,9 @@ app.use("*", async (c, next) => {
     origin: (requestOrigin) => {
       const fallbackOrigin = configuredOrigins[0] ?? "https://spike.land";
       if (!requestOrigin) return fallbackOrigin;
-      return isAllowedBrowserOrigin(requestOrigin, configuredOrigins) ? requestOrigin : fallbackOrigin;
+      return isAllowedBrowserOrigin(requestOrigin, configuredOrigins)
+        ? requestOrigin
+        : fallbackOrigin;
     },
     allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowHeaders: [
@@ -491,7 +522,29 @@ app.route("/", spa);
 
 export { RateLimiter, app };
 export default {
-  fetch: app.fetch,
+  async fetch(request: Request, env: Env, ctx?: ExecutionContext): Promise<Response> {
+    const startedAt = Date.now();
+    const metricService = shouldTrackServiceMetricRequest(request)
+      ? getSpikeEdgeMetricService(request)
+      : null;
+    const response = await app.fetch(request, env, ctx);
+
+    if (metricService) {
+      try {
+        ctx?.waitUntil(
+          recordServiceRequestMetric(env.DB, metricService, Date.now() - startedAt).catch(
+            (error) => {
+              console.error("[service-metrics] failed to record spike-edge request", error);
+            },
+          ),
+        );
+      } catch {
+        /* no ExecutionContext outside Workers runtime */
+      }
+    }
+
+    return response;
+  },
   scheduled: (_event: ScheduledEvent, env: Env, ctx: ExecutionContext) => {
     ctx.waitUntil(handleScheduled(env));
   },

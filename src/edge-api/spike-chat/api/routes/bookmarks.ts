@@ -5,5 +5,5 @@ import type { Variables } from "../middleware";
 export const bookmarksRouter = new Hono<{ Bindings: Env; Variables: Variables }>();
 
 bookmarksRouter.get("/", async (c) => {
-  return c.json([]); // TODO
+  return c.json({ error: "Not implemented" }, 501);
 });
