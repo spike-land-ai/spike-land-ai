@@ -23,6 +23,9 @@ const HackerNewsApp = lazy(() =>
 const PagesTemplateChooserApp = lazy(() =>
   import("../../apps/pages-template-chooser").then((m) => ({ default: m.PagesTemplateChooserApp })),
 );
+const ChessArenaApp = lazy(() =>
+  import("../../apps/chess-arena").then((m) => ({ default: m.ChessArenaApp })),
+);
 
 type SurfaceType = "overview" | "chat" | "terminal" | "mdx";
 
@@ -49,7 +52,8 @@ export function AppSessionPage() {
   const channelId = `app-${appSlug}`;
   const isHackerNews = appSlug === "hackernews" || appSlug === "hn-reader" || appSlug === "hackernews-reader";
   const isPagesTemplateChooser = appSlug === "pages-template-chooser";
-  const isShowcaseApp = isHackerNews || isPagesTemplateChooser;
+  const isChessArena = appSlug === "chess-arena";
+  const isShowcaseApp = isHackerNews || isPagesTemplateChooser || isChessArena;
   const availableSurfaces = app?.tools.length
     ? SURFACES
     : SURFACES.filter((surface) => surface.id !== "terminal");
@@ -176,6 +180,16 @@ export function AppSessionPage() {
                     }
                   >
                     <PagesTemplateChooserApp />
+                  </Suspense>
+                ) : isChessArena ? (
+                  <Suspense
+                    fallback={
+                      <div className="flex items-center justify-center py-16">
+                        <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
+                      </div>
+                    }
+                  >
+                    <ChessArenaApp />
                   </Suspense>
                 ) : (
                   <AppMarkdownRenderer
