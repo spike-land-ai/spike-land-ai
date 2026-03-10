@@ -54,6 +54,7 @@ terraform.tfvars
 
 # Local dev certs
 .dev-certs/
+packages/spike-app/local.spike.land*.pem
 
 # Reorganize backup and artifacts
 src-old/
