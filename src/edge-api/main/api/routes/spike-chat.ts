@@ -15,6 +15,12 @@ import {
 } from "../../core-logic/aether-memory.js";
 
 const spikeChat = new Hono<{ Bindings: Env; Variables: Variables }>();
+type SpikeChatRole = "system" | "user" | "assistant";
+
+interface SpikeChatMessage {
+  role: SpikeChatRole;
+  content: string;
+}
 
 /** Call Grok (xAI) with OpenAI-compatible format. Non-streaming. */
 async function callGrok(
@@ -53,10 +59,34 @@ async function callGrok(
 }
 
 /** Stream Grok response as SSE to the client. Returns the full collected text. */
+export function buildSpikeChatMessages(
+  systemPrompt: string,
+  history: Array<{ role: string; content: string }> | undefined,
+  userMessage: string,
+): SpikeChatMessage[] {
+  const messages: SpikeChatMessage[] = [{ role: "system", content: systemPrompt }];
+
+  if (Array.isArray(history)) {
+    for (const entry of history) {
+      if (
+        (entry.role === "user" || entry.role === "assistant") &&
+        typeof entry.content === "string"
+      ) {
+        const content = entry.content.trim();
+        if (content) {
+          messages.push({ role: entry.role, content });
+        }
+      }
+    }
+  }
+
+  messages.push({ role: "user", content: userMessage });
+  return messages;
+}
+
 async function streamGrokResponse(
   apiKey: string,
-  systemPrompt: string,
-  userMessage: string,
+  messages: SpikeChatMessage[],
   sendEvent: (data: unknown) => Promise<void>,
   opts: {
     temperature?: number;
@@ -69,10 +99,7 @@ async function streamGrokResponse(
 ): Promise<string> {
   const body: Record<string, unknown> = {
     model: "grok-4-1",
-    messages: [
-      { role: "system", content: systemPrompt },
-      { role: "user", content: userMessage },
-    ],
+    messages,
     temperature: opts.temperature ?? 0.2,
     max_tokens: opts.maxTokens ?? 4096,
     stream: true,
@@ -182,12 +209,14 @@ spikeChat.post("/api/spike-chat", async (c) => {
     return c.json({ error: "XAI_API_KEY not configured" }, 503);
   }
 
-  const userId = c.get("userId");
+  const userId = c.get("userId") as string | undefined;
   const userMessage = body.message.trim();
   const requestId = (c.get("requestId") as string | undefined) ?? crypto.randomUUID();
 
   // Load user memory
-  let userNotes = await fetchUserNotes(c.env.DB, userId).catch(() => [] as never[]);
+  const userNotes: UserMemory["notes"] = userId
+    ? await fetchUserNotes(c.env.DB, userId).catch((): UserMemory["notes"] => [])
+    : [];
   const selectedNotes = selectNotes(userNotes);
   const userMemory: UserMemory = {
     lifeSummary: "",
@@ -279,17 +308,15 @@ spikeChat.post("/api/spike-chat", async (c) => {
 
       // --- Stage 3: EXECUTE (streamed) ---
       await sendEvent({ type: "stage_update", stage: "execute" });
-      const assistantResponse = await streamGrokResponse(
-        apiKey,
+      const executionMessages = buildSpikeChatMessages(
         fullSystemPrompt,
+        body.history,
         planArtifact,
-        sendEvent,
-        {
-          temperature: 0.2,
-          maxTokens: 4096,
-          tools: grokTools,
-        },
       );
+      const assistantResponse = await streamGrokResponse(apiKey, executionMessages, sendEvent, {
+        temperature: 0.2,
+        maxTokens: 4096,
+      });
 
       // --- Stage 4: EXTRACT (background) ---
       await sendEvent({ type: "stage_update", stage: "extract" });
@@ -302,7 +329,7 @@ spikeChat.post("/api/spike-chat", async (c) => {
             { temperature: 0.2, maxTokens: 256 },
           );
           const extracted = parseExtractedNote(extractResult);
-          if (extracted) {
+          if (extracted && userId) {
             await saveNote(c.env.DB, userId, {
               id: crypto.randomUUID(),
               trigger: extracted.trigger,

@@ -178,4 +178,84 @@ describe("publicToolsRoute GET /", () => {
     const body = (await res.json()) as { tools: unknown[] };
     expect(body.tools).toHaveLength(3);
   });
+
+  it("preserves optional, enum, nested object, and array schema details under Zod v4", async () => {
+    mockRegisterAllTools.mockImplementationOnce(async (registry: ToolRegistry) => {
+      registry.register({
+        name: "schema_tool",
+        description: "Schema-heavy tool",
+        category: "ai",
+        tier: "free",
+        stability: "stable",
+        inputSchema: {
+          audience: z.enum(["investor", "operator"]).describe("Target audience"),
+          notes: z.string().optional().describe("Optional notes"),
+          settings: z
+            .object({
+              retries: z.number().describe("Retry count"),
+              dry_run: z.boolean().optional().describe("Dry-run mode"),
+            })
+            .describe("Execution settings"),
+          files: z
+            .array(
+              z.object({
+                path: z.string().describe("File path"),
+                content: z.string().optional().describe("File contents"),
+              }),
+            )
+            .describe("Files to process"),
+        },
+        handler: async () => ({ content: [{ type: "text" as const, text: "ok" }] }),
+      });
+    });
+
+    const { app, env } = buildApp();
+    const res = await app.request("/tools", {}, env);
+
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as {
+      tools: Array<{
+        name: string;
+        inputSchema: {
+          properties: Record<
+            string,
+            {
+              type: string;
+              enum?: string[];
+              properties?: Record<string, { type: string }>;
+              required?: string[];
+              items?: {
+                type: string;
+                properties?: Record<string, { type: string }>;
+                required?: string[];
+              };
+            }
+          >;
+          required?: string[];
+        };
+      }>;
+    };
+
+    const schemaTool = body.tools.find((tool) => tool.name === "schema_tool");
+    expect(schemaTool).toBeDefined();
+    expect(schemaTool?.inputSchema.required).toEqual(["audience", "settings", "files"]);
+    expect(schemaTool?.inputSchema.properties.audience).toMatchObject({
+      type: "string",
+      enum: ["investor", "operator"],
+    });
+    expect(schemaTool?.inputSchema.properties.notes.type).toBe("string");
+    expect(schemaTool?.inputSchema.properties.settings).toMatchObject({
+      type: "object",
+      required: ["retries"],
+    });
+    expect(schemaTool?.inputSchema.properties.settings.properties?.dry_run.type).toBe("boolean");
+    expect(schemaTool?.inputSchema.properties.files).toMatchObject({
+      type: "array",
+      items: {
+        type: "object",
+        required: ["path"],
+      },
+    });
+    expect(schemaTool?.inputSchema.properties.files.items?.properties?.content.type).toBe("string");
+  });
 });

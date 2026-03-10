@@ -13,6 +13,7 @@ import {
   pruneNotes,
   parseExtractedNote,
 } from "../../core-logic/aether-memory";
+import { buildSpikeChatMessages } from "../routes/spike-chat";
 
 // --- Prompt Builder Tests ---
 
@@ -94,6 +95,44 @@ describe("buildPlanPrompt", () => {
 describe("buildExtractPrompt", () => {
   it("returns a prompt mentioning extraction", () => {
     expect(buildExtractPrompt()).toContain("memory extraction");
+  });
+});
+
+describe("buildSpikeChatMessages", () => {
+  it("includes prior user and assistant turns before the current user message", () => {
+    const result = buildSpikeChatMessages(
+      "System",
+      [
+        { role: "user", content: "Earlier question" },
+        { role: "assistant", content: "Earlier answer" },
+      ],
+      "Latest question",
+    );
+
+    expect(result).toEqual([
+      { role: "system", content: "System" },
+      { role: "user", content: "Earlier question" },
+      { role: "assistant", content: "Earlier answer" },
+      { role: "user", content: "Latest question" },
+    ]);
+  });
+
+  it("drops empty content and unsupported history roles", () => {
+    const result = buildSpikeChatMessages(
+      "System",
+      [
+        { role: "system", content: "ignore me" },
+        { role: "user", content: "   " },
+        { role: "assistant", content: "Kept answer" },
+      ],
+      "Latest question",
+    );
+
+    expect(result).toEqual([
+      { role: "system", content: "System" },
+      { role: "assistant", content: "Kept answer" },
+      { role: "user", content: "Latest question" },
+    ]);
   });
 });
 

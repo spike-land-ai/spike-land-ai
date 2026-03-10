@@ -768,10 +768,12 @@ export function registerArborTools(
         const mapped = mapArborContext({
           regionContext: input.region_context,
           targetUser: input.target_user,
-          localAssets: input.local_assets,
-          constraints: input.constraints,
-          currentSkills: input.current_skills,
-          connectivityProfile: input.connectivity_profile,
+          ...(input.local_assets !== undefined ? { localAssets: input.local_assets } : {}),
+          ...(input.constraints !== undefined ? { constraints: input.constraints } : {}),
+          ...(input.current_skills !== undefined ? { currentSkills: input.current_skills } : {}),
+          ...(input.connectivity_profile !== undefined
+            ? { connectivityProfile: input.connectivity_profile }
+            : {}),
         });
 
         return jsonResult(mapped.summary, mapped);
@@ -818,8 +820,10 @@ export function registerArborTools(
           targetUser: input.target_user,
           pilotGoal: input.pilot_goal,
           partnerModel: input.partner_model,
-          timeHorizonDays: input.time_horizon_days,
-          localAssets: input.local_assets,
+          ...(input.time_horizon_days !== undefined
+            ? { timeHorizonDays: input.time_horizon_days }
+            : {}),
+          ...(input.local_assets !== undefined ? { localAssets: input.local_assets } : {}),
         });
 
         return jsonResult(plan.summary, plan);
@@ -868,7 +872,9 @@ export function registerArborTools(
           paymentReliability: input.payment_reliability,
           identityRequirements: input.identity_requirements,
           partnerModel: input.partner_model,
-          sensitiveActivities: input.sensitive_activities,
+          ...(input.sensitive_activities !== undefined
+            ? { sensitiveActivities: input.sensitive_activities }
+            : {}),
         });
 
         return jsonResult(riskRegister.summary, riskRegister);
@@ -912,9 +918,9 @@ export function registerArborTools(
         const pitch = buildArborPitch({
           audience: input.audience,
           format: input.format,
-          region: input.region,
-          targetUser: input.target_user,
-          ask: input.ask,
+          ...(input.region !== undefined ? { region: input.region } : {}),
+          ...(input.target_user !== undefined ? { targetUser: input.target_user } : {}),
+          ...(input.ask !== undefined ? { ask: input.ask } : {}),
         });
 
         return jsonResult(pitch.pitch, pitch);

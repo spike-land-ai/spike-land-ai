@@ -5,6 +5,7 @@
  * without requiring authentication. Read-only endpoint for the tools explorer UI.
  */
 import { Hono } from "hono";
+import { z } from "zod";
 import type { Env } from "../core-logic/env";
 import type { AuthVariables } from "./middleware";
 import { ToolRegistry } from "../lazy-imports/registry";
@@ -23,68 +24,73 @@ interface JsonSchemaProperty {
 
 /** Map a Zod type to a JSON Schema property, unwrapping Optional/Default wrappers. */
 function resolveZodProperty(zodField: unknown): { prop: JsonSchemaProperty; optional: boolean } {
-  let field = zodField as {
-    description?: string;
-    _def?: { typeName?: string; innerType?: unknown; values?: string[]; type?: unknown };
-  };
+  let field = zodField as z.ZodTypeAny;
   let optional = false;
 
-  // Unwrap ZodOptional / ZodDefault
-  while (field._def?.typeName === "ZodOptional" || field._def?.typeName === "ZodDefault") {
+  while (field instanceof z.ZodOptional || field instanceof z.ZodDefault) {
     optional = true;
-    field = (field._def.innerType ?? field) as typeof field;
+    field =
+      field instanceof z.ZodOptional
+        ? (field.unwrap() as z.ZodTypeAny)
+        : (field.removeDefault() as z.ZodTypeAny);
   }
 
-  const description = (zodField as { description?: string }).description ?? "";
-  const typeName = field._def?.typeName ?? "";
+  const originalField = zodField as z.ZodTypeAny;
+  const description = originalField.description ?? field.description ?? "";
 
-  if (typeName === "ZodEnum") {
-    const values = field._def?.values as string[] | undefined;
-    return { prop: { type: "string", description, ...(values ? { enum: values } : {}) }, optional };
+  if (field instanceof z.ZodEnum) {
+    return {
+      prop: {
+        type: "string",
+        description,
+        ...(field.options.length > 0 ? { enum: field.options.map((value) => String(value)) } : {}),
+      },
+      optional,
+    };
   }
 
-  // For ZodObject: recurse into shape
-  if (typeName === "ZodObject") {
-    const shapeDef = field._def as { shape?: unknown };
-    const shape =
-      typeof shapeDef.shape === "function"
-        ? (shapeDef.shape as () => Record<string, unknown>)()
-        : shapeDef.shape;
-    if (shape && typeof shape === "object") {
-      const nestedProps: Record<string, JsonSchemaProperty> = {};
-      const nestedRequired: string[] = [];
-      for (const [k, v] of Object.entries(shape as Record<string, unknown>)) {
-        const { prop: nestedProp, optional: nestedOptional } = resolveZodProperty(v);
-        nestedProps[k] = nestedProp;
-        if (!nestedOptional) nestedRequired.push(k);
+  if (field instanceof z.ZodObject) {
+    const nestedProps: Record<string, JsonSchemaProperty> = {};
+    const nestedRequired: string[] = [];
+
+    for (const [key, nestedField] of Object.entries(field.shape)) {
+      const { prop: nestedProp, optional: nestedOptional } = resolveZodProperty(nestedField);
+      nestedProps[key] = nestedProp;
+      if (!nestedOptional) {
+        nestedRequired.push(key);
       }
-      return {
-        prop: {
-          type: "object",
-          description,
-          properties: nestedProps,
-          ...(nestedRequired.length > 0 ? { required: nestedRequired } : {}),
-        },
-        optional,
-      };
     }
+
+    return {
+      prop: {
+        type: "object",
+        description,
+        properties: nestedProps,
+        ...(nestedRequired.length > 0 ? { required: nestedRequired } : {}),
+      },
+      optional,
+    };
   }
 
-  const typeMap: Record<string, string> = {
-    ZodString: "string",
-    ZodNumber: "number",
-    ZodBoolean: "boolean",
-    ZodArray: "array",
-    ZodObject: "object",
-  };
+  if (field instanceof z.ZodArray) {
+    const { prop: itemProp } = resolveZodProperty(field.element);
+    return {
+      prop: {
+        type: "array",
+        description,
+        items: itemProp,
+      },
+      optional,
+    };
+  }
 
-  const jsonType = typeMap[typeName] ?? "string";
+  let jsonType = "string";
+  if (field instanceof z.ZodNumber) {
+    jsonType = "number";
+  } else if (field instanceof z.ZodBoolean) {
+    jsonType = "boolean";
+  }
   const prop: JsonSchemaProperty = { type: jsonType, description };
-
-  if (jsonType === "array" && field._def?.type) {
-    const { prop: itemProp } = resolveZodProperty(field._def.type);
-    prop.items = itemProp;
-  }
 
   return { prop, optional };
 }
