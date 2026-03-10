@@ -1,11 +1,12 @@
 name = "spike-status"
 main = "../../src/edge-api/status/api/app.ts"
 
-[dev]
-port = 8792
 compatibility_date = "2025-07-12"
 compatibility_flags = ["nodejs_compat"]
 workers_dev = true
+
+[dev]
+port = 8792
 
 [[d1_databases]]
 binding = "STATUS_DB"
