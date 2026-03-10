@@ -1,10 +1,7 @@
+import { contentApps } from "../apps/content-manifest";
 import { useQuery } from "@tanstack/react-query";
 import { apiUrl, mcpUrl } from "../../core-logic/api";
-import {
-  getShowcaseAppDetail,
-  getShowcaseAppSummaries,
-  mergeShowcaseApps,
-} from "../apps/showcase-apps";
+import { getShowcaseAppDetail, getShowcaseAppSummaries } from "../apps/showcase-apps";
 
 export interface McpAppSummary {
   slug: string;
@@ -291,7 +288,26 @@ function buildFallbackAppsFromTools(data: StoreToolsResponse): McpAppSummary[] {
     .sort((left, right) => left.sort_order - right.sort_order);
 }
 
+const CATALOG_VISIBLE_STATUSES = new Set(["beta", "live"]);
+
 const showcaseAppSummaries = getShowcaseAppSummaries().map(normalizeAppSummary);
+const visibleContentAppSummaries = contentApps
+  .filter((app) => CATALOG_VISIBLE_STATUSES.has(app.status.toLowerCase()))
+  .map((app) => normalizeAppSummary(app));
+
+function mergeCatalogApps(...sources: McpAppSummary[][]): McpAppSummary[] {
+  const deduped = new Map<string, McpAppSummary>();
+
+  for (const source of sources) {
+    for (const app of source) {
+      deduped.set(app.slug, app);
+    }
+  }
+
+  return Array.from(deduped.values()).sort(
+    (left, right) => left.sort_order - right.sort_order || left.slug.localeCompare(right.slug),
+  );
+}
 
 async function fetchPublicApps(): Promise<McpAppSummary[]> {
   const response = await fetch(mcpUrl("/apps"));
@@ -318,15 +334,19 @@ export function useApps() {
     queryFn: async (): Promise<McpAppSummary[]> => {
       try {
         const apps = await fetchPublicApps();
-        const mergedApps = mergeShowcaseApps(apps, showcaseAppSummaries);
-        if (mergedApps.length > 0) {
-          return mergedApps;
-        }
+        return mergeCatalogApps(visibleContentAppSummaries, showcaseAppSummaries, apps);
       } catch {
         // Fall back to inferred app grouping when the public apps endpoint is unavailable.
       }
 
-      return mergeShowcaseApps(buildFallbackAppsFromTools(await fetchStoreTools()), showcaseAppSummaries);
+      let inferredApps: McpAppSummary[] = [];
+      try {
+        inferredApps = buildFallbackAppsFromTools(await fetchStoreTools());
+      } catch {
+        // Fall back completely to static catalog data.
+      }
+
+      return mergeCatalogApps(inferredApps, visibleContentAppSummaries, showcaseAppSummaries);
     },
   });
 }
@@ -374,7 +394,7 @@ export function useApp(slug: string) {
           };
         }
       } catch {
-        // Fall through to inferred app reconstruction from the tool registry.
+        // Fall through to local showcase and content app fallbacks.
       }
 
       const showcaseApp = getShowcaseAppDetail(slug);
@@ -393,6 +413,25 @@ export function useApp(slug: string) {
           pricing: showcaseApp.pricing ?? "free",
           is_featured: showcaseApp.is_featured ?? false,
           is_new: showcaseApp.is_new ?? false,
+        };
+      }
+
+      const contentApp = contentApps.find((app) => app.slug === slug);
+      if (contentApp) {
+        return {
+          ...contentApp,
+          category: inferAppCategory([
+            contentApp.category,
+            contentApp.slug,
+            contentApp.name,
+            contentApp.description,
+            ...contentApp.tools,
+          ]),
+          tags: contentApp.tags ?? [],
+          tagline: contentApp.tagline ?? "",
+          pricing: contentApp.pricing ?? "free",
+          is_featured: contentApp.is_featured ?? false,
+          is_new: contentApp.is_new ?? false,
         };
       }
 

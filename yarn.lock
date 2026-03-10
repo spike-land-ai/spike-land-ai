@@ -4562,6 +4562,7 @@ __metadata:
     vite: "npm:^7.3.1"
     vitest: "npm:^4.0.18"
     wrangler: "npm:^4.71.0"
+    yaml: "npm:^2.8.2"
   languageName: unknown
   linkType: soft
 
