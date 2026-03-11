@@ -342,7 +342,7 @@ describe("HTTP server — POST /mcp session creation and GET", () => {
     // Delete the session
     const delRes = await fetch(`${baseUrl}/mcp`, {
       method: "DELETE",
-      headers: { "mcp-session-id": sessionId! },
+      headers: { "mcp-session-id": sessionId ?? "" },
     });
     expect(delRes.status).toBe(200);
   });
@@ -419,7 +419,7 @@ describe("HTTP server — tools/call invokes manager.callTool", () => {
       headers: {
         "Content-Type": "application/json",
         Accept: "application/json, text/event-stream",
-        "mcp-session-id": sessionId!,
+        "mcp-session-id": sessionId ?? "",
       },
       body: JSON.stringify({
         jsonrpc: "2.0",
@@ -434,7 +434,7 @@ describe("HTTP server — tools/call invokes manager.callTool", () => {
       headers: {
         "Content-Type": "application/json",
         Accept: "application/json, text/event-stream",
-        "mcp-session-id": sessionId!,
+        "mcp-session-id": sessionId ?? "",
       },
       body: JSON.stringify({
         jsonrpc: "2.0",
@@ -476,7 +476,7 @@ describe("HTTP server — tools/call invokes manager.callTool", () => {
     const ac = new AbortController();
     const getPromise = fetch(`${baseUrl}/mcp`, {
       method: "GET",
-      headers: { "mcp-session-id": sessionId! },
+      headers: { "mcp-session-id": sessionId ?? "" },
       signal: ac.signal,
     }).catch(() => ({ status: -1 }));
 
@@ -532,7 +532,7 @@ describe("HTTP server — POST /mcp reuses existing session", () => {
       headers: {
         "Content-Type": "application/json",
         Accept: "application/json, text/event-stream",
-        "mcp-session-id": sessionId!,
+        "mcp-session-id": sessionId ?? "",
       },
       body: JSON.stringify({
         jsonrpc: "2.0",

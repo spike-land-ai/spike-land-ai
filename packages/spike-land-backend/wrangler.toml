@@ -10,12 +10,12 @@ compatibility_flags = ["nodejs_compat"]
 [alias]
 "./staticContent.mjs" = "./staticContent.mjs"
 
-[dev]
-port = 8788
-
 kv_namespaces = [
   { binding = "KV", id = "e05276b573af4afd905bc6ac1ed371d5", preview_id = "9db106837d4d437a962612dd04197581" },
 ]
+
+[dev]
+port = 8788
 
 [vars]
 GA_MEASUREMENT_ID = "G-9WNEM9ZHE7"

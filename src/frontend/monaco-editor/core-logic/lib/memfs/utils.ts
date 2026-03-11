@@ -96,7 +96,11 @@ export const getDirectoryEntriesRecursive = async (
     const entries: Record<string, FileSystemEntry> = {};
     // The for await...of itself can throw if directoryHandle.entries() is invalid or fails.
     // We wrap the iteration part.
-    for await (const [_, handle] of directoryHandle.entries()) {
+    for await (const [_, handle] of (
+      directoryHandle as FileSystemDirectoryHandle & {
+        entries(): AsyncIterableIterator<[string, FileSystemHandle]>;
+      }
+    ).entries()) {
       const nestedPath = `${relativePath}/${handle.name}`;
       if (handle.kind === "file") {
         const fileHandle = handle as FileSystemFileHandle;

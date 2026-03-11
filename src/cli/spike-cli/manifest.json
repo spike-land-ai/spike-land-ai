@@ -21,6 +21,7 @@
     "core-logic/alias/resolver.ts",
     "core-logic/alias/types.ts",
     "core-logic/chat/app-registry.ts",
+    "core-logic/chat/assertion-runtime.ts",
     "core-logic/chat/loop.ts",
     "core-logic/chat/session-state.ts",
     "core-logic/chat/slash-commands.ts",

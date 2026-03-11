@@ -85,8 +85,8 @@ describe("TokenTracker", () => {
     tracker.recordTurn({ input_tokens: 2000, output_tokens: 200 });
     const turns = tracker.getTurns();
     expect(turns).toHaveLength(2);
-    expect(turns[0]!.turn).toBe(1);
-    expect(turns[1]!.turn).toBe(2);
+    expect(turns[0]?.turn).toBe(1);
+    expect(turns[1]?.turn).toBe(2);
   });
 
   it("handles cache token fields", () => {
@@ -98,7 +98,7 @@ describe("TokenTracker", () => {
     });
     expect(tracker.currentContextUsage).toBe(5000);
     const turns = tracker.getTurns();
-    expect(turns[0]!.usage.cache_creation_input_tokens).toBe(1000);
+    expect(turns[0]?.usage.cache_creation_input_tokens).toBe(1000);
   });
 
   it("uses custom context limit", () => {

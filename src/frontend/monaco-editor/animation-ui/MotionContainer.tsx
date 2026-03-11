@@ -1,15 +1,16 @@
+/** @jsxImportSource @emotion/react */
 import { css } from "@emotion/react";
 import { motion, useAnimation } from "framer-motion";
-import { useEffect, useRef } from "react";
+import { type ReactElement, useEffect, useRef } from "react";
 
 const rgba = (r: number, g: number, b: number, a: number) =>
-  `rgba(${r || 1}, ${g || 1}, ${b || 1}, ${a || 0.7})`;
+  `rgba(${r ?? 1}, ${g ?? 1}, ${b ?? 1}, ${a ?? 0.7})`;
 
 export const MotionContainer = ({
   children,
   bgColor,
 }: {
-  children: React.ReactElement;
+  children: ReactElement;
   bgColor: number[];
 }) => {
   const controls = useAnimation();

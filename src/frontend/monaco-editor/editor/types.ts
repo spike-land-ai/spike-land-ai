@@ -23,7 +23,8 @@ export interface EditorModel {
   dispose?: () => void;
 }
 
-export interface EditorState {
+/** Internal state refs used by the Monaco editor model. */
+export interface MonacoEditorInternalState {
   isUpdating: { current: boolean };
   pendingUpdate: { current: string | null };
   previousContent: { current: string };

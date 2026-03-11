@@ -1,7 +1,8 @@
+import type { FC } from "react";
 import { getCodeSpace } from "./hooks/use-code-space";
 import { getCodeSession } from "../concurrency/code-session";
 import type { ICode } from "../ui/@/lib/interfaces";
-import { init } from "@/lib/tw-dev-setup";
+import { init } from "./lib/tw-dev-setup";
 import { tryCatch } from "../lazy-imports/try-catch";
 import { main } from "./lib/ws";
 import { SessionSynchronizer } from "./services/SessionSynchronizer";
@@ -10,7 +11,7 @@ import { SessionSynchronizer } from "./services/SessionSynchronizer";
 export interface AppContext {
   codeSpace: string;
   cSess: ICode;
-  AppComponent: React.FC<AppComponentProps>;
+  AppComponent: FC<AppComponentProps>;
 }
 
 export interface AppComponentProps {

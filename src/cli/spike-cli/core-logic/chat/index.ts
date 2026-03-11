@@ -1,4 +1,5 @@
 export * from "./app-registry";
+export * from "./assertion-runtime";
 export * from "./context-manager";
 export * from "./loop";
 export * from "./retry";

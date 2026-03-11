@@ -45,7 +45,7 @@ describe("AppRegistryImpl", () => {
       const registry = new AppRegistryImpl(TEST_APPS);
       const app = registry.getAppForTool("chess_create_game");
       expect(app).toBeDefined();
-      expect(app!.slug).toBe("chess-arena");
+      expect(app?.slug).toBe("chess-arena");
     });
 
     it("returns undefined for unknown tool name", () => {
@@ -65,7 +65,7 @@ describe("AppRegistryImpl", () => {
       const registry = new AppRegistryImpl(TEST_APPS);
       const app = registry.getApp("chess-arena");
       expect(app).toBeDefined();
-      expect(app!.name).toBe("Chess Arena");
+      expect(app?.name).toBe("Chess Arena");
     });
 
     it("returns undefined for unknown slug", () => {
@@ -89,7 +89,7 @@ describe("AppRegistryImpl", () => {
       const registry = new AppRegistryImpl();
       const app = registry.getApp("chess-arena");
       expect(app).toBeDefined();
-      expect(app!.toolNames).toContain("chess_create_game");
+      expect(app?.toolNames).toContain("chess_create_game");
     });
 
     it("maps chess tools correctly", () => {

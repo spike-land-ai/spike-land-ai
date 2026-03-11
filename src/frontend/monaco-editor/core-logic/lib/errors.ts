@@ -1,16 +1,17 @@
 /**
  * Error codes for categorizing application errors
  */
-export enum ErrorCode {
-  WEBSOCKET_ERROR = "WEBSOCKET_ERROR",
-  DOM_ERROR = "DOM_ERROR",
-  ROUTER_ERROR = "ROUTER_ERROR",
-  MESSAGE_ERROR = "MESSAGE_ERROR",
-  NETWORK_ERROR = "NETWORK_ERROR",
-  VALIDATION_ERROR = "VALIDATION_ERROR",
-  CACHE_ERROR = "CACHE_ERROR",
-  UNKNOWN_ERROR = "UNKNOWN_ERROR",
-}
+export const ErrorCode = {
+  WEBSOCKET_ERROR: "WEBSOCKET_ERROR",
+  DOM_ERROR: "DOM_ERROR",
+  ROUTER_ERROR: "ROUTER_ERROR",
+  MESSAGE_ERROR: "MESSAGE_ERROR",
+  NETWORK_ERROR: "NETWORK_ERROR",
+  VALIDATION_ERROR: "VALIDATION_ERROR",
+  CACHE_ERROR: "CACHE_ERROR",
+  UNKNOWN_ERROR: "UNKNOWN_ERROR",
+} as const;
+export type ErrorCode = (typeof ErrorCode)[keyof typeof ErrorCode];
 
 /**
  * Base error class for application-specific errors

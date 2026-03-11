@@ -10,6 +10,8 @@ import { log } from "../util/logger";
 import type { TokenTracker, TokenUsage } from "./token-tracker";
 import type { DynamicToolRegistry } from "./tool-registry";
 import type { ContextManager } from "./context-manager";
+import type { AssertionReport, AssertionRuntime } from "./assertion-runtime";
+import { stripAssertionMetadata } from "./assertion-runtime";
 
 export interface AgentLoopContext {
   client: ChatClient;
@@ -41,6 +43,12 @@ export interface AgentLoopContext {
   contextManager?: ContextManager;
   /** Execute tool calls in parallel. Default: true */
   parallelExecution?: boolean;
+  /** Assertion-grounded runtime state kept outside chat history. */
+  assertionRuntime?: AssertionRuntime;
+  /** Called when assertion evidence changes. */
+  onAssertionUpdate?: (runtime: AssertionRuntime) => void;
+  /** Called once when the run completes. */
+  onRunComplete?: (report?: AssertionReport) => void;
 }
 
 /**
@@ -72,12 +80,20 @@ export async function runAgentLoop(
       : mcpToolsToClaude(ctx.manager.getAllTools());
 
     // Build system prompt with catalog if registry is active
-    let systemOverride: string | undefined;
+    const promptParts: string[] = [];
+    if (ctx.client.systemPrompt) {
+      promptParts.push(ctx.client.systemPrompt);
+    }
+    if (ctx.assertionRuntime?.hasCanonicalCore()) {
+      promptParts.push(ctx.assertionRuntime.buildSystemPrompt());
+    }
     if (ctx.registry) {
       const catalog = ctx.registry.buildCatalog();
-      const base = ctx.client.systemPrompt ?? "";
-      systemOverride = `${base}\n\n## Available Tools\n\nBelow is a catalog of all available tools. Use the spike__tool_search tool to load any tool before calling it.\n\n${catalog}`;
+      promptParts.push(
+        `## Available Tools\n\nBelow is a catalog of all available tools. Use the spike__tool_search tool to load any tool before calling it.\n\n${catalog}`,
+      );
     }
+    const systemOverride = promptParts.length > 0 ? promptParts.join("\n\n") : undefined;
 
     const stream = ctx.client.createStream(ctx.messages, tools, systemOverride);
     const response = await streamResponse(stream, ctx.onTextDelta);
@@ -99,6 +115,7 @@ export async function runAgentLoop(
     if (toolUseBlocks.length === 0) {
       // Text-only response — done
       ctx.onTurnEnd?.();
+      ctx.onRunComplete?.(ctx.assertionRuntime?.buildReport());
       return;
     }
 
@@ -131,6 +148,7 @@ export async function runAgentLoop(
   // Reached maxTurns — call onTurnEnd to avoid leaking UI spinners
   ctx.onTurnEnd?.();
   ctx.onTextDelta?.("\n[Reached maximum turns]\n");
+  ctx.onRunComplete?.(ctx.assertionRuntime?.buildReport());
 }
 
 async function executeToolsSequential(
@@ -139,12 +157,23 @@ async function executeToolsSequential(
 ): Promise<Message["content"]> {
   const toolResults: Message["content"] = [];
   for (const toolUse of toolUseBlocks) {
-    const input = toolUse.input as Record<string, unknown>;
+    const rawInput = toolUse.input as Record<string, unknown>;
+    const { cleanInput, assertionIds } = stripAssertionMetadata(rawInput);
     const serverName = resolveServerName(ctx.manager, toolUse.name);
     ctx.onToolCall?.(toolUse.name);
-    ctx.onToolCallStart?.(toolUse.id, toolUse.name, serverName, input);
+    ctx.onToolCallStart?.(toolUse.id, toolUse.name, serverName, cleanInput);
 
-    const { result, isError } = await executeToolCall(ctx.manager, toolUse.name, input);
+    const { result, isError } = await executeToolCall(ctx.manager, toolUse.name, cleanInput);
+
+    if (ctx.assertionRuntime) {
+      ctx.assertionRuntime.recordToolEvidence({
+        toolName: toolUse.name,
+        result,
+        isError,
+        assertionIds,
+      });
+      ctx.onAssertionUpdate?.(ctx.assertionRuntime);
+    }
 
     ctx.onToolCallEnd?.(toolUse.id, result, isError);
 
@@ -163,12 +192,23 @@ async function executeToolsParallel(
   ctx: AgentLoopContext,
 ): Promise<Message["content"]> {
   const executions = toolUseBlocks.map(async (toolUse) => {
-    const input = toolUse.input as Record<string, unknown>;
+    const rawInput = toolUse.input as Record<string, unknown>;
+    const { cleanInput, assertionIds } = stripAssertionMetadata(rawInput);
     const serverName = resolveServerName(ctx.manager, toolUse.name);
     ctx.onToolCall?.(toolUse.name);
-    ctx.onToolCallStart?.(toolUse.id, toolUse.name, serverName, input);
+    ctx.onToolCallStart?.(toolUse.id, toolUse.name, serverName, cleanInput);
 
-    const { result, isError } = await executeToolCall(ctx.manager, toolUse.name, input);
+    const { result, isError } = await executeToolCall(ctx.manager, toolUse.name, cleanInput);
+
+    if (ctx.assertionRuntime) {
+      ctx.assertionRuntime.recordToolEvidence({
+        toolName: toolUse.name,
+        result,
+        isError,
+        assertionIds,
+      });
+      ctx.onAssertionUpdate?.(ctx.assertionRuntime);
+    }
 
     ctx.onToolCallEnd?.(toolUse.id, result, isError);
 
@@ -185,12 +225,13 @@ async function executeToolsParallel(
     if (s.status === "fulfilled") return s.value;
     // On rejection, log full error before serializing to preserve stack trace
     const error = s.reason;
+    const block = toolUseBlocks[i];
     log(
-      `Tool "${toolUseBlocks[i]!.name}" rejected: ${error instanceof Error ? (error.stack ?? error.message) : String(error)}`,
+      `Tool "${block?.name ?? "unknown"}" rejected: ${error instanceof Error ? (error.stack ?? error.message) : String(error)}`,
     );
     return {
       type: "tool_result" as const,
-      tool_use_id: toolUseBlocks[i]!.id,
+      tool_use_id: block?.id ?? "",
       content: `Tool execution failed: ${error instanceof Error ? error.message : String(error)}`,
       is_error: true,
     };

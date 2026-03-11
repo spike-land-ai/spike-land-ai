@@ -5,8 +5,6 @@ interface ResourceLoader {
 }
 
 class ResourceLoaderImpl implements ResourceLoader {
-  private static readonly IFRAME_PATH = "/";
-
   private static initialized = false;
 
   async init(): Promise<boolean> {
@@ -34,8 +32,6 @@ class ResourceLoaderImpl implements ResourceLoader {
   }
 
   private shouldLoadResources(): boolean {
-    const _pathname = location.pathname;
-
     return true;
   }
 

@@ -21,6 +21,8 @@ import {
   loadConversation,
   listConversations,
 } from "../../node-sys/conversation-store";
+import type { AssertionRuntime } from "./assertion-runtime";
+import { stripAssertionMetadata } from "./assertion-runtime";
 
 // Re-export types and utilities used by consumers
 export type { AppToolGroup, ToolGroup } from "./tool-grouping";
@@ -51,6 +53,7 @@ export interface SlashCommandContext {
   rl?: ReadlineInterface;
   usageTracker?: TokenTracker;
   registry?: DynamicToolRegistry;
+  assertionRuntime?: AssertionRuntime;
 }
 
 /** Result of handling a slash command. */
@@ -91,6 +94,10 @@ const BUILTIN_COMMANDS = new Set([
   "model",
   "usage",
   "search",
+  "core",
+  "assertions",
+  "evidence",
+  "report",
   "save",
   "load",
   "sessions",
@@ -177,7 +184,13 @@ function handleBuiltinCommand(
       if (ctx.registry) {
         ctx.registry.resetToAlwaysOn();
       }
-      return { output: "Conversation cleared.", exit: false, cleared: true };
+      return {
+        output: ctx.assertionRuntime
+          ? "Conversation cleared. Canonical core preserved."
+          : "Conversation cleared.",
+        exit: false,
+        cleared: true,
+      };
 
     case "model":
       if (argsRaw) {
@@ -221,8 +234,97 @@ function handleBuiltinCommand(
       };
     }
 
+    case "core": {
+      const runtime = ctx.assertionRuntime;
+      if (!runtime) {
+        return { output: "Assertion runtime not enabled.", exit: false, cleared: false };
+      }
+
+      if (!argsRaw) {
+        const core = runtime.getCanonicalCore();
+        if (!core) {
+          return {
+            output: `${yellow("Usage:")} /core set <canonical core text>`,
+            exit: false,
+            cleared: false,
+          };
+        }
+        return {
+          output: `${bold(`Canonical core ${core.version}`)}\n${core.text}`,
+          exit: false,
+          cleared: false,
+        };
+      }
+
+      if (argsRaw === "clear") {
+        runtime.clear();
+        return { output: "Canonical core cleared.", exit: false, cleared: false };
+      }
+
+      if (!argsRaw.startsWith("set ")) {
+        return {
+          output: `${yellow("Usage:")} /core set <canonical core text>`,
+          exit: false,
+          cleared: false,
+        };
+      }
+
+      const coreText = argsRaw.slice(4).trim();
+      if (!coreText) {
+        return {
+          output: `${yellow("Usage:")} /core set <canonical core text>`,
+          exit: false,
+          cleared: false,
+        };
+      }
+
+      const core = runtime.setCanonicalCore(coreText);
+      return {
+        output: `${green("Canonical core updated")} ${bold(core.version)} (${runtime.getAssertions().length} assertions)`,
+        exit: false,
+        cleared: false,
+      };
+    }
+
+    case "assertions": {
+      if (!ctx.assertionRuntime) {
+        return { output: "Assertion runtime not enabled.", exit: false, cleared: false };
+      }
+
+      return {
+        output: ctx.assertionRuntime.formatAssertions(),
+        exit: false,
+        cleared: false,
+      };
+    }
+
+    case "evidence": {
+      if (!ctx.assertionRuntime) {
+        return { output: "Assertion runtime not enabled.", exit: false, cleared: false };
+      }
+
+      const assertionId = argsRaw || undefined;
+      return {
+        output: ctx.assertionRuntime.formatEvidence(assertionId),
+        exit: false,
+        cleared: false,
+      };
+    }
+
+    case "report": {
+      if (!ctx.assertionRuntime) {
+        return { output: "Assertion runtime not enabled.", exit: false, cleared: false };
+      }
+
+      return {
+        output: ctx.assertionRuntime.formatReport(),
+        exit: false,
+        cleared: false,
+      };
+    }
+
     case "save": {
-      const meta = saveConversation(messages);
+      const meta = saveConversation(messages, undefined, ctx.assertionRuntime?.getSnapshot());
       return {
         output: `${green("Saved")} conversation ${bold(meta.id)} (${meta.messageCount} messages)`,
         exit: false,
@@ -244,6 +346,7 @@ function handleBuiltinCommand(
       }
       messages.length = 0;
       messages.push(...conv.messages);
+      ctx.assertionRuntime?.loadSnapshot(conv.runtime);
       return {
         output: `${green("Loaded")} conversation ${bold(conv.id)} (${conv.messages.length} messages)`,
         exit: false,
@@ -277,6 +380,10 @@ function handleBuiltinCommand(
   ${cyan("/model")}         Show current model
   ${cyan("/usage")}         Show token usage and context health
   ${cyan("/search")}${dim(" <query>")}  Search and activate tools by keyword
+  ${cyan("/core")}${dim(" [set <text>|clear]")}  Manage canonical core
+  ${cyan("/assertions")}    Show extracted assertions and statuses
+  ${cyan("/evidence")}${dim(" [assertion-id]")}  Show recorded evidence
+  ${cyan("/report")}        Show assertion report
   ${cyan("/save")}          Save current conversation
   ${cyan("/load")}${dim(" <id>")}     Load a saved conversation
   ${cyan("/sessions")}      List saved conversations
@@ -395,7 +502,7 @@ async function handleDirectToolCall(
       .join("\n");
     return {
       output: `${yellow("Missing required parameters:")}\n${paramList}\n\nUsage: /${command} {"${
-        missingParams[0]!.name
+        missingParams[0]?.name ?? "param"
       }": "value"}`,
       exit: false,
       cleared: false,
@@ -403,8 +510,10 @@ async function handleDirectToolCall(
   }
 
   // Execute the tool
+  const { cleanInput, assertionIds } = stripAssertionMetadata(mergedArgs);
+
   console.error(dim(`\n[calling ${tool.namespacedName}...]`));
-  const { result, isError } = await executeToolCall(manager, tool.namespacedName, mergedArgs);
+  const { result, isError } = await executeToolCall(manager, tool.namespacedName, cleanInput);
 
   // Track IDs in session state from result
   if (!isError) {
@@ -427,6 +536,15 @@ async function handleDirectToolCall(
       // Even without IDs, record that a create was called
       sessionState.recordCreate(prefix, ["_created"]);
     }
+  }
+
+  if (ctx.assertionRuntime) {
+    ctx.assertionRuntime.recordToolEvidence({
+      toolName: tool.namespacedName,
+      result,
+      isError,
+      assertionIds,
+    });
   }
 
   // Format output
@@ -478,14 +596,14 @@ function resolveToolName(command: string, tools: NamespacedTool[]): NamespacedTo
   if (fuzzyResults.length === 1) return fuzzyResults[0] ?? null;
 
   // Auto-execute if best match is significantly better (2x score gap)
-  const bestScore = fuzzyScore(
-    command,
-    stripNamespace(fuzzyResults[0]!.namespacedName, fuzzyResults[0]!.serverName),
-  );
-  const runnerUpScore = fuzzyScore(
-    command,
-    stripNamespace(fuzzyResults[1]!.namespacedName, fuzzyResults[1]!.serverName),
-  );
+  const first = fuzzyResults[0];
+  const second = fuzzyResults[1];
+  const bestScore = first
+    ? fuzzyScore(command, stripNamespace(first.namespacedName, first.serverName))
+    : 0;
+  const runnerUpScore = second
+    ? fuzzyScore(command, stripNamespace(second.namespacedName, second.serverName))
+    : 0;
 
   if (bestScore >= runnerUpScore * 2) {
     return fuzzyResults[0] ?? null;

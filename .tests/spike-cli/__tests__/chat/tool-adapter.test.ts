@@ -33,7 +33,15 @@ describe("mcpToolsToClaude", () => {
       description: "Run vitest tests",
       input_schema: {
         type: "object",
-        properties: { filter: { type: "string" } },
+        properties: {
+          filter: { type: "string" },
+          __assertion_ids: {
+            type: "array",
+            items: { type: "string" },
+            description:
+              "Optional runtime metadata. Assertion IDs that this tool call is gathering evidence for. The runtime strips this field before execution.",
+          },
+        },
       },
     });
   });

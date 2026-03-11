@@ -39,7 +39,7 @@ export class TokenTracker {
   /** Latest input_tokens represents current context size */
   get currentContextUsage(): number {
     if (this.turns.length === 0) return 0;
-    return this.turns[this.turns.length - 1]!.usage.input_tokens;
+    return this.turns[this.turns.length - 1]?.usage.input_tokens ?? 0;
   }
 
   /** Total output tokens generated across all turns */

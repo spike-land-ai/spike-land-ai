@@ -12,7 +12,6 @@ export * from "./get-parts";
 export * from "./idb-cache";
 export * from "./importmap-utils";
 export * from "./lru-cache";
-export * from "./make-sess";
 export * from "./memfs";
 export * from "./process-image";
 export * from "./routes";

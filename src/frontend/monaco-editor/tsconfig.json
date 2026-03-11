@@ -5,11 +5,11 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["./*"],
-      "monaco-editor": ["../../src/monaco-editor/src/index.ts"],
-      "monaco-editor/*": ["../../src/monaco-editor/*"]
+      "monaco-editor": ["../../monaco-editor/src/index.ts"],
+      "monaco-editor/*": ["../../monaco-editor/*"]
     }
   },
-  "include": ["**/*.ts", "**/*.tsx", "**/*.d.ts"],
+  "include": ["**/*.ts", "**/*.tsx", "**/*.d.ts", "../../global-typings.d.ts"],
   "exclude": [
     "node_modules",
     "dist",

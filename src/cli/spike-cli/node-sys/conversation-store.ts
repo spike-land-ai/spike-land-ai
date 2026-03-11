@@ -3,9 +3,10 @@
  */
 
 import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
-import { join } from "node:path";
+import { join, normalize, resolve } from "node:path";
 import { homedir } from "node:os";
 import type { Message } from "../ai/client.js";
+import type { AssertionRuntimeSnapshot } from "../core-logic/chat/assertion-runtime.js";
 
 export interface ConversationMeta {
   id: string;
@@ -20,6 +21,7 @@ export interface SavedConversation {
   createdAt: string;
   updatedAt: string;
   messages: Message[];
+  runtime?: AssertionRuntimeSnapshot | null;
 }
 
 const CONVERSATIONS_DIR = join(homedir(), ".spike", "conversations");
@@ -28,6 +30,27 @@ function ensureDir(): void {
   if (!existsSync(CONVERSATIONS_DIR)) {
     mkdirSync(CONVERSATIONS_DIR, { recursive: true });
   }
+}
+
+/**
+ * Validate that a user-supplied conversation ID is safe to use as a filename.
+ * Rejects IDs containing path separators or other traversal sequences.
+ * Returns the resolved absolute path, or null if the ID is invalid.
+ */
+function safeConversationPath(id: string): string | null {
+  // Reject empty, overly long, or obviously dangerous IDs
+  if (!id || id.length > 128) return null;
+
+  // Only allow alphanumeric, hyphens, and underscores — no slashes, dots, etc.
+  if (!/^[a-zA-Z0-9_-]+$/.test(id)) return null;
+
+  const filePath = resolve(join(CONVERSATIONS_DIR, `${id}.json`));
+
+  // Confirm the resolved path stays within the conversations directory
+  const resolvedDir = resolve(CONVERSATIONS_DIR);
+  if (!filePath.startsWith(`${resolvedDir}${normalize("/")}`)) return null;
+
+  return filePath;
 }
 
 function generateId(): string {
@@ -50,12 +73,21 @@ function extractPreview(messages: Message[]): string {
 /**
  * Save a conversation to disk.
  */
-export function saveConversation(messages: Message[], id?: string): ConversationMeta {
+export function saveConversation(
+  messages: Message[],
+  id?: string,
+  runtime?: AssertionRuntimeSnapshot | null,
+): ConversationMeta {
   ensureDir();
 
   const conversationId = id ?? generateId();
   const now = new Date().toISOString();
-  const filePath = join(CONVERSATIONS_DIR, `${conversationId}.json`);
+
+  // Validate the ID to prevent path traversal (CWE-22)
+  const filePath = safeConversationPath(conversationId);
+  if (!filePath) {
+    throw new Error(`Invalid conversation ID: "${conversationId}"`);
+  }
 
   // Check if updating existing
   let createdAt = now;
@@ -73,6 +105,7 @@ export function saveConversation(messages: Message[], id?: string): Conversation
     createdAt,
     updatedAt: now,
     messages,
+    runtime: runtime ?? null,
   };
 
   writeFileSync(filePath, JSON.stringify(conversation, null, 2), "utf-8");
@@ -91,7 +124,10 @@ export function saveConversation(messages: Message[], id?: string): Conversation
  */
 export function loadConversation(id: string): SavedConversation | null {
   ensureDir();
-  const filePath = join(CONVERSATIONS_DIR, `${id}.json`);
+
+  // Validate the ID to prevent path traversal (CWE-22)
+  const filePath = safeConversationPath(id);
+  if (!filePath) return null;
 
   if (!existsSync(filePath)) return null;
 

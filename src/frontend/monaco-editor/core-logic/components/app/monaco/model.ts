@@ -4,7 +4,11 @@ import { editor, Range, typescript, Uri } from "../../../../editor/monaco-editor
 import { getEditorOptions } from "../../../../editor/config";
 import { originToUse } from "../../../../editor/config";
 import { configureJsxSupport, registerLanguages } from "./language";
-import type { EditorConfig, EditorModel, EditorState } from "../../../../editor/types";
+import type {
+  EditorConfig,
+  EditorModel,
+  MonacoEditorInternalState,
+} from "../../../../editor/types";
 import {
   checkTypeScriptErrors,
   fetchAndCreateExtraModels,
@@ -342,7 +346,7 @@ async function createEditorModel(
   };
 
   // Set up state for tracking content updates
-  const editorState: EditorState = {
+  const editorState: MonacoEditorInternalState = {
     isUpdating: { current: false },
     pendingUpdate: { current: null },
     previousContent: { current: model.getValue() },

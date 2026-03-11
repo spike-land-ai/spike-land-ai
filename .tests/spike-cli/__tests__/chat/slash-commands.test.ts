@@ -11,12 +11,13 @@ import {
   trackToolCallForSession,
 } from "../../../../src/cli/spike-cli/core-logic/chat/slash-commands.js";
 import { SessionState } from "../../../../src/cli/spike-cli/core-logic/chat/session-state.js";
+import { AssertionRuntime } from "../../../../src/cli/spike-cli/core-logic/chat/assertion-runtime.js";
 import type { SlashCommandContext } from "../../../../src/cli/spike-cli/core-logic/chat/slash-commands.js";
 import type {
   NamespacedTool,
   ServerManager,
 } from "../../../../src/cli/spike-cli/core-logic/multiplexer/server-manager.js";
-import type { ChatClient, Message } from "../../../../src/cli/spike-cli/core-logic/chat/client.js";
+import type { ChatClient, Message } from "../../../../src/cli/spike-cli/ai/client.js";
 import { AppRegistryImpl } from "../../../../src/cli/spike-cli/core-logic/chat/app-registry.js";
 import type { AppInfo } from "../../../../src/cli/spike-cli/core-logic/chat/app-registry.js";
 
@@ -627,7 +628,39 @@ describe("handleSlashCommand built-in commands", () => {
     expect(result.output).toContain("/servers");
     expect(result.output).toContain("/quit");
     expect(result.output).toContain("/apps");
+    expect(result.output).toContain("/core");
     expect(result.output).toContain("Direct tool invocation");
+  });
+
+  it("handles /core set and /assertions", async () => {
+    const manager = createMockManager();
+    const client = createMockClient();
+    const assertionRuntime = new AssertionRuntime();
+
+    const setResult = await handleSlashCommand(
+      "/core set - assertion is satisfied only with enough evidence",
+      {
+        manager,
+        client,
+        messages: [],
+        sessionState: new SessionState(),
+        appRegistry: new AppRegistryImpl([]),
+        assertionRuntime,
+      },
+    );
+
+    const assertionsResult = await handleSlashCommand("/assertions", {
+      manager,
+      client,
+      messages: [],
+      sessionState: new SessionState(),
+      appRegistry: new AppRegistryImpl([]),
+      assertionRuntime,
+    });
+
+    expect(setResult.output).toContain("Canonical core updated");
+    expect(assertionsResult.output).toContain("[unresolved]");
+    expect(assertionsResult.output).toContain("enough evidence");
   });
 });
 
@@ -897,6 +930,44 @@ describe("auto-fill from session state", () => {
     // The mock returns '{"id":"game_123"}', so "id" should be tracked
     expect(sessionState.hasId("id")).toBe(true);
     expect(sessionState.getLatestId("id")).toBe("game_123");
+  });
+
+  it("records assertion evidence and strips metadata during direct tool calls", async () => {
+    const tools = [
+      mockTool({
+        namespacedName: "s__run_tests",
+        serverName: "s",
+        originalName: "run_tests",
+        inputSchema: {
+          type: "object",
+          properties: {
+            filter: { type: "string" },
+          },
+        },
+      }),
+    ];
+    const manager = createMockManager(tools);
+    const client = createMockClient();
+    const assertionRuntime = new AssertionRuntime();
+    assertionRuntime.setCanonicalCore(
+      "- workflow result is valid only if supported by sufficient evidence",
+    );
+    const assertionId = assertionRuntime.getAssertions()[0]?.id;
+
+    await handleSlashCommand(`/run_tests {"filter":"*.ts","__assertion_ids":["${assertionId}"]}`, {
+      manager,
+      client,
+      messages: [],
+      sessionState: new SessionState(),
+      appRegistry: new AppRegistryImpl([]),
+      assertionRuntime,
+    });
+
+    expect(manager.callTool).toHaveBeenCalledWith("s__run_tests", {
+      filter: "*.ts",
+    });
+    expect(assertionRuntime.getAssertions()[0]?.status).toBe("unresolved");
+    expect(assertionRuntime.getEvidence(assertionId).length).toBe(1);
   });
 });
 

@@ -69,13 +69,16 @@ function clamp(value: number, min: number, max: number): number {
 }
 
 function parseHslTriplet(value: string, fallback: HslColor): HslColor {
-  const parts = value.match(/-?\d*\.?\d+/g)?.slice(0, 3).map(Number);
+  const parts = value
+    .match(/-?\d*\.?\d+/g)
+    ?.slice(0, 3)
+    .map(Number);
 
   if (!parts || parts.length < 3 || parts.some((part) => Number.isNaN(part))) {
     return fallback;
   }
 
-  const [h, s, l] = parts;
+  const [h, s, l] = parts as [number, number, number];
 
   return {
     h,
@@ -88,7 +91,7 @@ function hslToRgb({ h, s, l }: HslColor): RgbColor {
   const saturation = s / 100;
   const lightness = l / 100;
   const chroma = (1 - Math.abs(2 * lightness - 1)) * saturation;
-  const hueSection = ((h % 360) + 360) % 360 / 60;
+  const hueSection = (((h % 360) + 360) % 360) / 60;
   const match = chroma * (1 - Math.abs((hueSection % 2) - 1));
 
   let red = 0;
@@ -153,9 +156,7 @@ export function getSpikeLandThemeSignature(styles: StyleReader): string {
   return THEME_TOKENS.map((token) => styles.getPropertyValue(token).trim()).join("|");
 }
 
-export function createSpikeLandMonacoTheme(
-  styles: StyleReader,
-): MonacoEditor.IStandaloneThemeData {
+export function createSpikeLandMonacoTheme(styles: StyleReader): MonacoEditor.IStandaloneThemeData {
   const background = readThemeColor(styles, "--background");
   const foreground = readThemeColor(styles, "--foreground");
   const card = readThemeColor(styles, "--card");
@@ -227,7 +228,7 @@ export function createSpikeLandMonacoTheme(
       "editor.findMatchBorder": accent.hex,
       "editor.findMatchHighlightBackground": primary.alpha(isDark ? 0.16 : 0.12),
       "editor.findRangeHighlightBackground": muted.alpha(isDark ? 0.4 : 0.6),
-      "editorRangeHighlightBackground": muted.alpha(isDark ? 0.28 : 0.2),
+      editorRangeHighlightBackground: muted.alpha(isDark ? 0.28 : 0.2),
       "editorLink.activeForeground": primary.hex,
       "editorInfo.foreground": accent.hex,
       "editorWarning.foreground": primary.hex,
@@ -239,7 +240,7 @@ export function createSpikeLandMonacoTheme(
       "input.background": input.hex,
       "input.border": border.hex,
       "input.foreground": foreground.hex,
-      "focusBorder": accent.hex,
+      focusBorder: accent.hex,
       "dropdown.background": popover.hex,
       "dropdown.border": border.hex,
       "dropdown.foreground": foreground.hex,

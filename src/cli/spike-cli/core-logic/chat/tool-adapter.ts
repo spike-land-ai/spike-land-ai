@@ -6,6 +6,7 @@
 import type { NamespacedTool, ServerManager } from "../multiplexer/server-manager";
 import type { Tool } from "../../ai/client";
 import { log } from "../util/logger";
+import { ASSERTION_METADATA_FIELD } from "./assertion-runtime";
 import {
   createToolPipeline,
   type ToolExecutorOptions,
@@ -33,6 +34,16 @@ function normalizeInputSchema(schema: Record<string, unknown>): Record<string, u
   if (!normalized["type"]) {
     normalized["type"] = "object";
   }
+  const properties = (normalized["properties"] as Record<string, unknown> | undefined) ?? {};
+  normalized["properties"] = {
+    ...properties,
+    [ASSERTION_METADATA_FIELD]: {
+      type: "array",
+      items: { type: "string" },
+      description:
+        "Optional runtime metadata. Assertion IDs that this tool call is gathering evidence for. The runtime strips this field before execution.",
+    },
+  };
   return normalized;
 }
 

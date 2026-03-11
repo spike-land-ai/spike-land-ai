@@ -5,6 +5,7 @@ import {
   listConversations,
 } from "../../../../src/cli/spike-cli/node-sys/conversation-store.js";
 import type { Message } from "../../../../src/cli/spike-cli/ai/client.js";
+import { AssertionRuntime } from "../../../../src/cli/spike-cli/core-logic/chat/assertion-runtime.js";
 
 // Mock fs and os modules
 vi.mock("node:fs", () => {
@@ -24,7 +25,8 @@ vi.mock("node:fs", () => {
       const files: string[] = [];
       for (const key of store.keys()) {
         if (key.endsWith(".json")) {
-          files.push(key.split("/").pop()!);
+          const fileName = key.split("/").pop();
+          if (fileName) files.push(fileName);
         }
       }
       return files;
@@ -37,8 +39,11 @@ vi.mock("node:os", () => ({
   homedir: vi.fn(() => "/tmp/test-home"),
 }));
 
-afterEach(() => {
+afterEach(async () => {
   vi.clearAllMocks();
+  // Clear the in-memory store so tests don't bleed state into each other
+  const fsMod = await import("node:fs");
+  (fsMod as unknown as { __store: Map<string, string> }).__store.clear();
 });
 
 describe("saveConversation", () => {
@@ -52,6 +57,18 @@ describe("saveConversation", () => {
     expect(meta.id).toBe("test-id");
     expect(meta.messageCount).toBe(2);
     expect(meta.preview).toBe("Hello");
+  });
+
+  it("persists assertion runtime snapshots alongside messages", () => {
+    const messages: Message[] = [{ role: "user", content: "Hello" }];
+    const runtime = new AssertionRuntime();
+    runtime.setCanonicalCore("- assertion is satisfied only with enough evidence");
+
+    saveConversation(messages, "runtime-id", runtime.getSnapshot());
+    const loaded = loadConversation("runtime-id");
+
+    expect(loaded?.runtime?.core?.text).toContain("enough evidence");
+    expect(loaded?.runtime?.assertions).toHaveLength(1);
   });
 });
 

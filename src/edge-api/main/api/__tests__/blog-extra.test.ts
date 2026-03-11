@@ -220,7 +220,7 @@ describe("GET /blog/rss", () => {
 
     const xml = await res.text();
     expect(xml).toContain("Author Name");
-    expect(xml).toContain("<category>Engineering</category>");
+    expect(xml).toContain("<category><![CDATA[Engineering]]></category>");
   });
 });
 
@@ -244,14 +244,15 @@ describe("GET /api/blog — draft visibility", () => {
     expect(query).toContain("draft = 0");
   });
 
-  it("excludes draft filter when request is from local.spike.land", async () => {
+  it("excludes draft filter when ENVIRONMENT is development", async () => {
     const rows = [makeRow({ slug: "published", draft: 0 })];
     const db = mockDBList(rows);
     const app = createApp();
 
-    await app.request("/api/blog", { headers: { origin: "https://local.spike.land" } }, {
+    await app.request("/api/blog", undefined, {
       DB: db,
       SPA_ASSETS: mockR2(),
+      ENVIRONMENT: "development",
     } as unknown as Env);
 
     const query = (db.prepare as ReturnType<typeof vi.fn>).mock.calls[0]?.[0] as string;
@@ -259,14 +260,15 @@ describe("GET /api/blog — draft visibility", () => {
     expect(query).not.toContain("draft = 0");
   });
 
-  it("shows drafts when referer is from local.spike.land", async () => {
+  it("shows drafts when ENVIRONMENT is local", async () => {
     const rows = [makeRow({ slug: "published", draft: 0 })];
     const db = mockDBList(rows);
     const app = createApp();
 
-    await app.request("/api/blog", { headers: { referer: "https://local.spike.land/some-page" } }, {
+    await app.request("/api/blog", undefined, {
       DB: db,
       SPA_ASSETS: mockR2(),
+      ENVIRONMENT: "local",
     } as unknown as Env);
 
     const query = (db.prepare as ReturnType<typeof vi.fn>).mock.calls[0]?.[0] as string;

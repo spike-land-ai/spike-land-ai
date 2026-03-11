@@ -80,7 +80,7 @@ export function registerShellCommand(program: Command): void {
         }
 
         const parts = trimmed.split(/\s+/);
-        const command = parts[0]!;
+        const command = parts[0] ?? "";
         const rest = parts.slice(1);
 
         let output: string | undefined;

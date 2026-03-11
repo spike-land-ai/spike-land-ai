@@ -81,7 +81,7 @@ describe("DynamicToolRegistry", () => {
     it("finds tools by name", () => {
       const result = registry.search("create_game");
       expect(result.tools.length).toBeGreaterThan(0);
-      expect(result.tools[0]!.namespacedName).toBe("chess__create_game");
+      expect(result.tools[0]?.namespacedName).toBe("chess__create_game");
     });
 
     it("activates found tools", () => {

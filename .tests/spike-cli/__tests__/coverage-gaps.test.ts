@@ -8,7 +8,7 @@
  * - index.ts: all exports are accessible
  */
 
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 // ─── util/logger.ts: isVerbose() (line 13) ────────────────────────────────────
 
@@ -63,15 +63,7 @@ describe("spike-cli index exports", () => {
   });
 });
 
-// ─── commands/agent.ts: response.text falsy (line 46) ─────────────────────────
-
-const mockGenerateContent = vi.hoisted(() => vi.fn().mockResolvedValue({ text: null }));
-
-vi.mock("@google/genai", () => ({
-  GoogleGenAI: class {
-    models = { generateContent: mockGenerateContent };
-  },
-}));
+// ─── commands/agent.ts: empty candidates response (fetch-based implementation) ─
 
 const capturedPostHandlers = vi.hoisted(
   () => new Map<string, (req: unknown, res: unknown) => Promise<void>>(),
@@ -83,7 +75,9 @@ vi.mock("express", () => {
     post: vi.fn((path: string, handler: (req: unknown, res: unknown) => Promise<void>) => {
       capturedPostHandlers.set(path, handler);
     }),
-    listen: vi.fn((_port: number, cb: () => void) => {
+    // Express listen can be called as (port, cb) or (port, hostname, cb)
+    listen: vi.fn((...args: unknown[]) => {
+      const cb = args.find((a) => typeof a === "function") as (() => void) | undefined;
       cb?.();
     }),
   };
@@ -98,24 +92,19 @@ vi.mock("cors", () => ({
   default: vi.fn(() => (_req: unknown, _res: unknown, next: () => void) => next()),
 }));
 
-vi.mock("../../../src/cli/spike-cli/core-logic/commands/auth.js", () => ({
-  registerAuthCommand: vi.fn(),
-}));
-vi.mock("../../../src/cli/spike-cli/core-logic/commands/alias.js", () => ({
-  registerAliasCommand: vi.fn(),
-}));
-vi.mock("../../../src/cli/spike-cli/core-logic/commands/completions.js", () => ({
-  registerCompletionsCommand: vi.fn(),
-}));
-vi.mock("../../../src/cli/spike-cli/core-logic/commands/registry.js", () => ({
-  registerRegistryCommand: vi.fn(),
-}));
-vi.mock("../../../src/cli/spike-cli/node-sys/store.js", () => ({
-  loadAliases: vi.fn().mockResolvedValue({ commands: {} }),
-}));
+describe("agent — empty candidates response (fetch-based)", () => {
+  let mockFetch: ReturnType<typeof vi.fn>;
 
-describe("agent — response.text falsy (line 46)", () => {
-  it("returns empty string completion when response.text is null", async () => {
+  beforeEach(() => {
+    mockFetch = vi.fn();
+    vi.stubGlobal("fetch", mockFetch);
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it("returns empty string completion when candidates parts text is null", async () => {
     process.env.GEMINI_API_KEY = "test-key";
     capturedPostHandlers.clear();
 
@@ -126,8 +115,17 @@ describe("agent — response.text falsy (line 46)", () => {
     vi.spyOn(console, "error").mockImplementation(() => {});
     vi.spyOn(process, "exit").mockImplementation(() => undefined as never);
 
+    // Mock fetch to return a response with no text in candidates
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({
+        candidates: [{ content: { parts: [{ text: null }] } }],
+      }),
+    });
+
     registerAgentCommand(program);
-    const agentCmd = program.commands.find((c) => c.name() === "agent")!;
+    const agentCmd = program.commands.find((c) => c.name() === "agent");
+    if (!agentCmd) throw new Error("agent command not registered");
     await (agentCmd as Record<string, unknown>)._actionHandler([{ port: "3099" }, []]);
 
     const handler = capturedPostHandlers.get("/completion");
@@ -139,14 +137,14 @@ describe("agent — response.text falsy (line 46)", () => {
     const req = { body: { prefix: "const x =" } };
     const res = { json: vi.fn(), status: vi.fn().mockReturnThis() };
 
-    mockGenerateContent.mockResolvedValueOnce({ text: null });
     await handler(req, res);
     // (null || "").trim() = ""
     expect(res.json).toHaveBeenCalledWith({ completion: "" });
   });
 
-  it("returns empty string completion when response.text is empty string", async () => {
+  it("returns empty string completion when candidates parts text is empty string", async () => {
     process.env.GEMINI_API_KEY = "test-key";
+    capturedPostHandlers.clear();
 
     const { registerAgentCommand } = await import("../../../src/cli/spike-cli/ai-cli/agent.js");
     const { Command } = await import("commander");
@@ -154,9 +152,17 @@ describe("agent — response.text falsy (line 46)", () => {
     vi.spyOn(console, "log").mockImplementation(() => {});
     vi.spyOn(console, "error").mockImplementation(() => {});
 
+    // Mock fetch to return a response with empty text in candidates
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({
+        candidates: [{ content: { parts: [{ text: "" }] } }],
+      }),
+    });
+
     registerAgentCommand(program);
-    const agentCmd = program.commands.find((c) => c.name() === "agent")!;
-    capturedPostHandlers.clear();
+    const agentCmd = program.commands.find((c) => c.name() === "agent");
+    if (!agentCmd) throw new Error("agent command not registered");
     await (agentCmd as Record<string, unknown>)._actionHandler([{ port: "3100" }, []]);
 
     const handler = capturedPostHandlers.get("/completion");
@@ -165,7 +171,6 @@ describe("agent — response.text falsy (line 46)", () => {
     const req = { body: { prefix: "const x =" } };
     const res = { json: vi.fn(), status: vi.fn().mockReturnThis() };
 
-    mockGenerateContent.mockResolvedValueOnce({ text: "" });
     await handler(req, res);
     expect(res.json).toHaveBeenCalledWith({ completion: "" });
   });

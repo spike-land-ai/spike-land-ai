@@ -3,11 +3,8 @@ import {
   type AgentLoopContext,
   runAgentLoop,
 } from "../../../../src/cli/spike-cli/core-logic/chat/loop.js";
-import type {
-  ChatClient,
-  ContentBlock,
-  Message,
-} from "../../../../src/cli/spike-cli/core-logic/chat/client.js";
+import { AssertionRuntime } from "../../../../src/cli/spike-cli/core-logic/chat/assertion-runtime.js";
+import type { ChatClient, ContentBlock, Message } from "../../../../src/cli/spike-cli/ai/client.js";
 import type {
   NamespacedTool,
   ServerManager,
@@ -173,5 +170,42 @@ describe("runAgentLoop", () => {
 
     // onToolCallStart should have been called with serverName = "unknown"
     expect(onToolCallStart).toHaveBeenCalledWith("t1", "unknown__mystery_tool", "unknown", {});
+  });
+
+  it("strips assertion metadata from tool input and records evidence", async () => {
+    const runtime = new AssertionRuntime();
+    runtime.setCanonicalCore("- tool execution must remain anchored to source logic");
+    const assertionId = runtime.getAssertions()[0]?.id;
+    if (!assertionId) {
+      throw new Error("Expected extracted assertion");
+    }
+
+    const stream1 = createMockStream([
+      toolUseBlock("t1", "vitest__run_tests", {
+        __assertion_ids: [assertionId],
+        filter: "*.ts",
+      }),
+    ]);
+    const stream2 = createMockStream([textBlock("All tests passed!")]);
+
+    mockClient = {
+      createStream: vi.fn().mockReturnValueOnce(stream1).mockReturnValueOnce(stream2),
+      model: "claude-sonnet-4-6",
+    } as unknown as ChatClient;
+
+    const onRunComplete = vi.fn();
+    await runAgentLoop(
+      "run tests",
+      makeCtx({
+        assertionRuntime: runtime,
+        onRunComplete,
+      }),
+    );
+
+    expect(mockManager.callTool).toHaveBeenCalledWith("vitest__run_tests", {
+      filter: "*.ts",
+    });
+    expect(runtime.getAssertions()[0]?.status).toBe("satisfied");
+    expect(onRunComplete).toHaveBeenCalled();
   });
 });

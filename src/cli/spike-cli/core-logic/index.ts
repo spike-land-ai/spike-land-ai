@@ -14,4 +14,5 @@ export type {
 export { setVerbose } from "./util/logger";
 export { ChatClient, type ChatClientOptions } from "../ai/client";
 export { runAgentLoop, type AgentLoopContext } from "./chat/loop";
+export { AssertionRuntime, type AssertionRuntimeSnapshot } from "./chat/assertion-runtime";
 export { ServerManager, type ServerManagerOptions } from "./multiplexer/server-manager";

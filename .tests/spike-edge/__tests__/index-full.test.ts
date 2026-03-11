@@ -151,13 +151,14 @@ describe("GET /api/store/tools (inline route)", () => {
     expect(body.categories.length).toBeGreaterThan(0);
     const otherCat = (body.categories as Array<{ name: string }>).find((c) => c.name === "other");
     expect(otherCat).toBeTruthy();
-    expect(res.headers.get("cache-control")).toContain("max-age=300");
+    expect(res.headers.get("cache-control")).toContain("max-age=1800");
   });
 
-  it("returns 502 when MCP_SERVICE returns non-ok", async () => {
+  it("returns 502 when MCP_SERVICE returns non-ok (non-503)", async () => {
+    // 503 triggers fallback to direct fetch; use 500 to test the !response.ok path
     const env = createMockEnv({
       MCP_SERVICE: {
-        fetch: vi.fn().mockResolvedValue(new Response("{}", { status: 503 })),
+        fetch: vi.fn().mockResolvedValue(new Response("{}", { status: 500 })),
       } as unknown as Fetcher,
     });
 
@@ -351,15 +352,19 @@ describe("POST /oauth/device/approve", () => {
 // ── ALL /mcp (MCP Streamable HTTP proxy) ─────────────────────────────────────
 
 describe("ALL /mcp (MCP proxy)", () => {
-  it("proxies GET /mcp to MCP_SERVICE", async () => {
+  it("proxies GET /mcp to MCP_SERVICE when Accept: text/event-stream (SSE)", async () => {
     const env = createMockEnv({
       MCP_SERVICE: {
         fetch: vi.fn().mockResolvedValue(new Response("mcp-data", { status: 200 })),
       } as unknown as Fetcher,
     });
 
+    // GET /mcp only proxies when client requests SSE (text/event-stream)
     const res = await appFetch(
-      new Request("https://spike.land/mcp", { method: "GET" }),
+      new Request("https://spike.land/mcp", {
+        method: "GET",
+        headers: { accept: "text/event-stream" },
+      }),
       env,
       makeCtx() as unknown as ExecutionContext,
     );

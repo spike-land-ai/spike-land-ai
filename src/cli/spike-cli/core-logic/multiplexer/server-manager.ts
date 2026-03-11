@@ -203,7 +203,9 @@ export class ServerManager {
       if (!oldNames.has(name)) {
         // New server
         try {
-          const client = new UpstreamClient(name, newConfig.servers[name]!);
+          const serverConfig = newConfig.servers[name];
+          if (!serverConfig) continue;
+          const client = new UpstreamClient(name, serverConfig);
           await client.connect();
           this.clients.set(name, client);
           added.push(name);

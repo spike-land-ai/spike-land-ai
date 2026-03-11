@@ -33,19 +33,13 @@ export function composeMiddleware(
   handler: ToolHandler,
 ): ToolHandler {
   return (ctx: ToolCallCtx) => {
-    let index = -1;
-
     function dispatch(i: number): Promise<ToolExecResult> {
-      if (i <= index) {
-        return Promise.reject(new Error("next() called multiple times"));
-      }
-      index = i;
-
       if (i >= middlewares.length) {
         return handler(ctx);
       }
 
-      const middleware = middlewares[i]!;
+      const middleware = middlewares[i];
+      if (!middleware) return handler(ctx);
       return middleware(ctx, () => dispatch(i + 1));
     }
 
@@ -187,7 +181,7 @@ export function retryMiddleware(maxRetries: number = 2): ToolMiddleware {
       }
     }
 
-    return lastResult!;
+    return lastResult ?? { result: "", isError: false };
   };
 }
 

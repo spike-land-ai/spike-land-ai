@@ -1,4 +1,5 @@
-import { describe, it, expect } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
+import { Hono } from "hono";
 import {
   buildAetherSystemPrompt,
   buildClassifyPrompt,
@@ -13,7 +14,12 @@ import {
   pruneNotes,
   parseExtractedNote,
 } from "../../core-logic/aether-memory";
-import { buildSpikeChatMessages } from "../routes/spike-chat";
+import { spikeChat, buildSpikeChatMessages } from "../routes/spike-chat";
+import type { Env, Variables } from "../../core-logic/env";
+
+afterEach(() => {
+  vi.restoreAllMocks();
+});
 
 // --- Prompt Builder Tests ---
 
@@ -133,6 +139,114 @@ describe("buildSpikeChatMessages", () => {
       { role: "assistant", content: "Kept answer" },
       { role: "user", content: "Latest question" },
     ]);
+  });
+});
+
+describe("spikeChat route", () => {
+  it("passes MCP tools into the execute stage and streams tool-call events", async () => {
+    const app = new Hono<{ Bindings: Env; Variables: Variables }>();
+    app.route("/", spikeChat);
+
+    const fetchBodies: Array<Record<string, unknown>> = [];
+    const fetchMock = vi.fn(async (_input: string | URL | Request, init?: RequestInit) => {
+      const body = init?.body ? (JSON.parse(String(init.body)) as Record<string, unknown>) : {};
+      fetchBodies.push(body);
+
+      const stream = body["stream"] === true;
+      if (!stream) {
+        return new Response(
+          JSON.stringify({
+            choices: [
+              {
+                message: {
+                  content:
+                    body["max_tokens"] === 200 ? '{"intent":"task"}' : "Use the pricing tool.",
+                },
+              },
+            ],
+          }),
+          {
+            headers: { "Content-Type": "application/json" },
+          },
+        );
+      }
+
+      const sse = [
+        'data: {"choices":[{"delta":{"tool_calls":[{"function":{"name":"pricing_lookup"}}]}}]}\n',
+        'data: {"choices":[{"delta":{"tool_calls":[{"function":{"arguments":"{\\"page\\":\\"pricing\\"}"}}]}}]}\n',
+        'data: {"choices":[{"delta":{},"finish_reason":"tool_calls"}]}\n',
+        'data: {"choices":[{"delta":{"content":"Done."}}]}\n',
+        "data: [DONE]\n",
+      ].join("\n");
+
+      return new Response(sse, {
+        headers: { "Content-Type": "text/event-stream" },
+      });
+    });
+
+    vi.stubGlobal("fetch", fetchMock);
+
+    const env = {
+      XAI_API_KEY: "test-key",
+      MCP_SERVICE: {
+        fetch: vi.fn().mockResolvedValue(
+          new Response(
+            JSON.stringify({
+              tools: [
+                {
+                  name: "pricing_lookup",
+                  description: "Look up pricing information",
+                  inputSchema: {
+                    type: "object",
+                    properties: {
+                      page: { type: "string" },
+                    },
+                  },
+                },
+              ],
+            }),
+            { headers: { "Content-Type": "application/json" } },
+          ),
+        ),
+      },
+    } as unknown as Env;
+
+    const res = await app.request(
+      "/api/spike-chat",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          message: "Inspect the pricing page",
+          history: [{ role: "assistant", content: "Earlier answer" }],
+        }),
+      },
+      env,
+    );
+
+    expect(res.status).toBe(200);
+    const text = await res.text();
+
+    expect(fetchBodies).toHaveLength(4);
+    expect(fetchBodies[2]?.["tools"]).toEqual([
+      {
+        type: "function",
+        function: {
+          name: "pricing_lookup",
+          description: "Look up pricing information",
+          parameters: {
+            type: "object",
+            properties: {
+              page: { type: "string" },
+            },
+          },
+        },
+      },
+    ]);
+    expect(text).toContain('"type":"tool_call_start"');
+    expect(text).toContain('"name":"pricing_lookup"');
+    expect(text).toContain('"type":"tool_call_end"');
+    expect(text).toContain('\\"page\\":\\"pricing\\"');
   });
 });
 

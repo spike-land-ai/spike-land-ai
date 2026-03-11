@@ -9,7 +9,7 @@
 export type {
   EditorConfig,
   EditorModel,
-  EditorState,
+  MonacoEditorInternalState,
   ExtraLib,
   ResponsiveSettings,
 } from "../../../../editor/types";

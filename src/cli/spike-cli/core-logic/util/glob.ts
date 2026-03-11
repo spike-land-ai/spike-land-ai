@@ -6,7 +6,7 @@
 export function matchesGlob(name: string, pattern: string): boolean {
   // Convert glob pattern to regex: escape special chars, replace * with .*
   const escaped = pattern.replace(/[.+^${}()|[\]\\]/g, "\\$&");
-  const regex = new RegExp(`^${escaped.replace(/\*/g, ".*")}$`);
+  const regex = new RegExp(`^${escaped.replace(/\*/g, ".*").replace(/\?/g, ".")}$`);
   return regex.test(name);
 }
 
@@ -34,11 +34,11 @@ export function filterTools<T extends { name: string }>(
   let result = tools;
 
   if (config.allowed && config.allowed.length > 0) {
-    result = result.filter((t) => matchesAnyGlob(t.name, config.allowed!));
+    result = result.filter((t) => matchesAnyGlob(t.name, config.allowed ?? []));
   }
 
   if (config.blocked && config.blocked.length > 0) {
-    result = result.filter((t) => !matchesAnyGlob(t.name, config.blocked!));
+    result = result.filter((t) => !matchesAnyGlob(t.name, config.blocked ?? []));
   }
 
   return result;

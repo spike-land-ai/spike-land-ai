@@ -2,19 +2,15 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { Command } from "commander";
 import { registerAgentCommand } from "../../../src/cli/spike-cli/ai-cli/agent";
 
-vi.mock("@google/genai", () => ({
-  GoogleGenAI: class {
-    models = {
-      generateContent: vi.fn().mockResolvedValue({ text: "mock response" }),
-    };
-  },
-}));
-
 vi.mock("express", () => {
   const mockApp = {
     use: vi.fn(),
     post: vi.fn(),
-    listen: vi.fn((port: number, cb: () => void) => cb?.()),
+    // Express listen can be called as (port, cb) or (port, hostname, cb)
+    listen: vi.fn((...args: unknown[]) => {
+      const cb = args.find((a) => typeof a === "function") as (() => void) | undefined;
+      cb?.();
+    }),
   };
   const express: unknown = () => mockApp;
   (express as Record<string, unknown>).json = vi.fn(
@@ -29,6 +25,8 @@ vi.mock("cors", () => ({
   default: vi.fn(() => (req: unknown, res: unknown, next: () => void) => next()),
 }));
 
+const mockFetch = vi.fn();
+
 describe("agent command", () => {
   let program: Command;
 
@@ -38,10 +36,13 @@ describe("agent command", () => {
     vi.clearAllMocks();
     vi.spyOn(console, "log").mockImplementation(() => {});
     vi.spyOn(process, "exit").mockImplementation(() => undefined as never);
+    // Replace global fetch
+    vi.stubGlobal("fetch", mockFetch);
   });
 
   afterEach(() => {
     vi.useRealTimers();
+    vi.unstubAllGlobals();
   });
 
   it("registers the agent command", () => {
@@ -49,19 +50,19 @@ describe("agent command", () => {
     expect(program.commands.find((c) => c.name() === "agent")).toBeDefined();
   });
 
-  it("errors and exits if no API key set", async () => {
-    const origKey = process.env.GEMINI_API_KEY;
+  it("errors and exits if GEMINI_API_KEY is not set", async () => {
+    const origGemini = process.env.GEMINI_API_KEY;
     delete process.env.GEMINI_API_KEY;
-    delete process.env.CLAUDE_CODE_OAUTH_TOKEN;
 
     registerAgentCommand(program);
-    const agentCmd = program.commands.find((c) => c.name() === "agent")!;
+    const agentCmd = program.commands.find((c) => c.name() === "agent");
+    if (!agentCmd) throw new Error("agent command not registered");
 
     vi.spyOn(console, "error").mockImplementation(() => {});
     await (agentCmd as Record<string, unknown>)._actionHandler([{}, []]);
 
     expect(process.exit).toHaveBeenCalledWith(1);
-    process.env.GEMINI_API_KEY = origKey;
+    if (origGemini !== undefined) process.env.GEMINI_API_KEY = origGemini;
   });
 
   it("handles completion POST request", async () => {
@@ -71,8 +72,16 @@ describe("agent command", () => {
       express.default as unknown as () => Record<string, { mock: { calls: Array<Array<unknown>> } }>
     )();
 
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({
+        candidates: [{ content: { parts: [{ text: "mock response" }] } }],
+      }),
+    });
+
     registerAgentCommand(program);
-    const agentCmd = program.commands.find((c) => c.name() === "agent")!;
+    const agentCmd = program.commands.find((c) => c.name() === "agent");
+    if (!agentCmd) throw new Error("agent command not registered");
     await (agentCmd as Record<string, unknown>)._actionHandler([
       {
         port: "3005",
@@ -82,8 +91,9 @@ describe("agent command", () => {
 
     const postCall = app.post.mock.calls.find((c: Array<unknown>) => c[0] === "/completion");
     expect(postCall).toBeDefined();
+    if (!postCall) throw new Error("/completion handler not registered");
 
-    const handler = postCall![1] as (req: unknown, res: unknown) => Promise<void>;
+    const handler = postCall[1] as (req: unknown, res: unknown) => Promise<void>;
     const req = { body: { prefix: "const x =" } };
     const res = { json: vi.fn(), status: vi.fn().mockReturnThis() };
 
@@ -99,11 +109,13 @@ describe("agent command", () => {
     )();
 
     registerAgentCommand(program);
-    const agentCmd = program.commands.find((c) => c.name() === "agent")!;
+    const agentCmd = program.commands.find((c) => c.name() === "agent");
+    if (!agentCmd) throw new Error("agent command not registered");
     await (agentCmd as Record<string, unknown>)._actionHandler([{ port: "3005" }, []]);
 
     const postCall = app.post.mock.calls.find((c: Array<unknown>) => c[0] === "/completion");
-    const handler = postCall![1] as (req: unknown, res: unknown) => Promise<void>;
+    if (!postCall) throw new Error("/completion handler not registered");
+    const handler = postCall[1] as (req: unknown, res: unknown) => Promise<void>;
     const req = { body: {} }; // no prefix
     const res = { json: vi.fn(), status: vi.fn().mockReturnThis() };
 
@@ -115,7 +127,8 @@ describe("agent command", () => {
   it("keeps process alive via setInterval (covers the empty callback)", async () => {
     process.env.GEMINI_API_KEY = "test-key";
     registerAgentCommand(program);
-    const agentCmd = program.commands.find((c) => c.name() === "agent")!;
+    const agentCmd = program.commands.find((c) => c.name() === "agent");
+    if (!agentCmd) throw new Error("agent command not registered");
     await (agentCmd as Record<string, unknown>)._actionHandler([{ port: "3006" }, []]);
     // Advance fake timers past the 1-hour interval to invoke the empty callback
     vi.advanceTimersByTime(1000 * 60 * 60 + 1);
@@ -132,15 +145,16 @@ describe("agent command", () => {
     )();
 
     registerAgentCommand(program);
-    const agentCmd = program.commands.find((c) => c.name() === "agent")!;
+    const agentCmd = program.commands.find((c) => c.name() === "agent");
+    if (!agentCmd) throw new Error("agent command not registered");
     await (agentCmd as Record<string, unknown>)._actionHandler([{ port: "3005" }, []]);
 
     const postCall = app.post.mock.calls.find((c: Array<unknown>) => c[0] === "/completion");
-    const handler = postCall![1] as (req: unknown, res: unknown) => Promise<void>;
+    if (!postCall) throw new Error("/completion handler not registered");
+    const handler = postCall[1] as (req: unknown, res: unknown) => Promise<void>;
 
-    // Use the ai module's generateContent and make it throw
-    const { ai } = await import("../../../src/cli/spike-cli/ai-cli/agent");
-    vi.mocked(ai.models.generateContent).mockRejectedValueOnce(new Error("AI failed"));
+    // Make fetch throw so the catch block runs
+    mockFetch.mockRejectedValueOnce(new Error("Network error"));
 
     const req = { body: { prefix: "const x =" } };
     const res = { json: vi.fn(), status: vi.fn().mockReturnThis() };

@@ -2,6 +2,7 @@
 
 import type { ICodeSession } from "../../ui/@/lib/interfaces";
 import type { SessionDelta } from "./make-sess";
+export type { SessionDelta } from "./make-sess";
 import {
   applySessionDelta as originalApplySessionPatch,
   computeSessionHash as originalComputeSessionHash,

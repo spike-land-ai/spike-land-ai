@@ -1,6 +1,15 @@
-import type RecordRTC from "../../../media-capture/record-rtc";
 import { tryCatch } from "../../../lazy-imports/try-catch";
 import { useCallback, useEffect, useRef, useState } from "react";
+
+// RecordRTC instance type (from ambient declaration in global-typings.d.ts)
+interface RecordRTCInstance {
+  startRecording(): void;
+  stopRecording(callback?: (blobURL: string) => void): void;
+  getBlob(): Blob;
+  reset(): void;
+  destroy(): void;
+  [key: string]: unknown;
+}
 
 interface UseDictationOptions {
   silenceThreshold?: number;
@@ -13,7 +22,7 @@ export function useDictation(defaultValue = "", options: UseDictationOptions = {
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState("");
 
-  const mediaRecorderRef = useRef<RecordRTC | null>(null);
+  const mediaRecorderRef = useRef<RecordRTCInstance | null>(null);
   const mediaStreamRef = useRef<MediaStream | null>(null);
 
   const { silenceThreshold = 0.02, maxSilenceDuration = 1500 } = options;
@@ -155,9 +164,10 @@ export function useDictation(defaultValue = "", options: UseDictationOptions = {
   useEffect(() => {
     if (!isRecording) return;
 
+    if (!mediaStreamRef.current) return;
+
     const audioContext = new AudioContext();
     const analyser = audioContext.createAnalyser();
-    if (!mediaStreamRef.current) return;
     const microphone = audioContext.createMediaStreamSource(mediaStreamRef.current);
     microphone.connect(analyser);
     analyser.fftSize = 2048;

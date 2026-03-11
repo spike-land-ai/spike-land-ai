@@ -137,8 +137,8 @@ export async function runOnboardingWizard(): Promise<OnboardingResult> {
 
     return {
       personaId,
-      personaSlug: persona!.slug,
-      personaName: persona!.name,
+      personaSlug: persona?.slug ?? String(personaId),
+      personaName: persona?.name ?? String(personaId),
       answers,
       completedAt: new Date().toISOString(),
     };

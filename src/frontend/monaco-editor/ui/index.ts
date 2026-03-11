@@ -3,12 +3,10 @@ export * from "./AppToRender";
 export * from "./ChatInterface";
 export * from "./LandingPage";
 export * from "./components";
-export * from "./emotion";
-export * from "./emotionJsxRuntime";
+// emotion, emotionJsxRuntime, jsx, reactMod intentionally omitted from barrel:
+// these are Vite code-splitting entry points that export overlapping JSX runtime
+// names (jsx, Fragment, jsxs, JSX, version). Import them directly when needed.
 export * from "./emotionStyled";
 export * from "./hooks";
-export * from "./jsx";
-export * from "./reactDom";
 export * from "./reactDomClient";
 export * from "./reactDomServer";
-export * from "./reactMod";

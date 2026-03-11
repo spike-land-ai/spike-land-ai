@@ -2,10 +2,28 @@ import type { Command } from "commander";
 import express from "express";
 import cors from "cors";
 
+// Completion server is localhost-only; restrict CORS to same origin to prevent
+// cross-origin requests from other browser tabs (CWE-942 / OWASP A05:2021).
+const LOCALHOST_CORS_OPTIONS: cors.CorsOptions = {
+  origin: (origin, callback) => {
+    // Allow requests with no Origin header (curl, MCP clients) or explicit localhost origins
+    if (!origin || /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("CORS: origin not allowed"));
+    }
+  },
+  methods: ["POST"],
+  allowedHeaders: ["Content-Type"],
+};
+
+// 64 KiB body cap — code snippets don't need more; prevents memory exhaustion (CWE-770)
+const MAX_BODY_SIZE = "64kb";
+
 export function startCompletionServer(port: number) {
   const app = express();
-  app.use(cors());
-  app.use(express.json());
+  app.use(cors(LOCALHOST_CORS_OPTIONS));
+  app.use(express.json({ limit: MAX_BODY_SIZE }));
 
   app.post("/completion", async (req, res) => {
     try {
@@ -16,7 +34,9 @@ export function startCompletionServer(port: number) {
         return;
       }
 
-      const apiKey = process.env["GEMINI_API_KEY"] || process.env["CLAUDE_CODE_OAUTH_TOKEN"];
+      // Only use GEMINI_API_KEY for the Google API call — do not fall back to
+      // CLAUDE_CODE_OAUTH_TOKEN which is a different credential for a different service.
+      const apiKey = process.env["GEMINI_API_KEY"];
       if (!apiKey) {
         res.status(500).json({ error: "GEMINI_API_KEY is not configured" });
         return;
@@ -72,8 +92,9 @@ export function startCompletionServer(port: number) {
     }
   });
 
-  return app.listen(port, () => {
-    console.log(`[Agent] Completion API server listening on port ${port}`);
+  // Bind explicitly to loopback only — no network exposure (defense in depth)
+  return app.listen(port, "127.0.0.1", () => {
+    console.log(`[Agent] Completion API server listening on 127.0.0.1:${port}`);
   });
 }
 
@@ -87,7 +108,7 @@ export function registerAgentCommand(program: Command): void {
     .description("Run the Spike CLI AI Agent that provides code completion")
     .option("--port <port>", "Port for local HTTP completion API", "3005")
     .action((options: AgentCommandOptions) => {
-      if (!process.env["GEMINI_API_KEY"] && !process.env["CLAUDE_CODE_OAUTH_TOKEN"]) {
+      if (!process.env["GEMINI_API_KEY"]) {
         console.error("Error: GEMINI_API_KEY is not set.");
         process.exit(1);
       }

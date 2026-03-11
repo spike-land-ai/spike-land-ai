@@ -27,7 +27,7 @@ export class WebSocketManager implements IWebSocketManager {
   private readonly codeSpace: string;
   private readonly dependencies: WebSocketDependencies;
   private readonly config: Required<WebSocketConfig>;
-  private state = WebSocketState.DISCONNECTED;
+  private state: WebSocketState = WebSocketState.DISCONNECTED;
   private retryCount = 0;
   private readonly subscriptions = new Set<WebSocketSubscription>();
 
@@ -40,6 +40,13 @@ export class WebSocketManager implements IWebSocketManager {
     setTimeout(() => {
       this.dependencies.serviceWorker.setup().catch(this.handleError);
     }, 0);
+  }
+
+  /**
+   * Returns the current connection state
+   */
+  public getState(): WebSocketState {
+    return this.state;
   }
 
   /**

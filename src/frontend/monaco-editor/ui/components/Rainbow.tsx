@@ -1,3 +1,4 @@
+/** @jsxImportSource @emotion/react */
 import { css, keyframes } from "@emotion/react";
 import styled from "@emotion/styled";
 import type { FC, ReactNode } from "react";
@@ -35,34 +36,33 @@ const gradientColors: GradientColor[] = [
   { color: "#e0d81d", percentage: 100 },
 ];
 
-const Rainbow = () => {
-  const rotateAnimation = keyframes`
-      0% { background-position: 0% 50%; } 
-      100% { background-position: 100% 50%; }
-    `;
+const rotateAnimation = keyframes`
+  0% { background-position: 0% 50%; }
+  100% { background-position: 100% 50%; }
+`;
 
-  const gradientStyle = css`
-    position: absolute;
-    top: 0;
-    left: 0;
-    height: 100dvh;
-    height: 100svh;
-    width: 100vw;
-    background-blend-mode: overlay;
-    background:
-      repeating-radial-gradient(
-        circle at bottom left,
-        ${createGradientString(gradientColors)}
-      ),
-      repeating-radial-gradient(
-      circle at bottom right,
+const gradientStyle = css`
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100svh;
+  width: 100vw;
+  background-blend-mode: overlay;
+  background:
+    repeating-radial-gradient(
+      circle at bottom left,
       ${createGradientString(gradientColors)}
-    );
-    background-size: 200% 200%;
-    animation: ${rotateAnimation} 10s forwards;
-    animation-delay: 2s;
-  `;
+    ),
+    repeating-radial-gradient(
+    circle at bottom right,
+    ${createGradientString(gradientColors)}
+  );
+  background-size: 200% 200%;
+  animation: ${rotateAnimation} 10s infinite;
+  animation-delay: 2s;
+`;
 
+const Rainbow = () => {
   return <div css={gradientStyle}></div>;
 };
 

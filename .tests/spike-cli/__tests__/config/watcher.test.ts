@@ -109,7 +109,7 @@ describe("ConfigWatcher", () => {
     });
 
     watcher.start();
-    const callback = mockWatcher._callback!;
+    const callback = mockWatcher._callback ?? (() => {});
     callback();
 
     await expect(vi.advanceTimersByTimeAsync(100)).resolves.not.toThrow();
@@ -129,7 +129,7 @@ describe("ConfigWatcher", () => {
     });
 
     watcher.start();
-    const callback = mockWatcher._callback!;
+    const callback = mockWatcher._callback ?? (() => {});
     callback();
 
     // Should not throw during reload failure
@@ -149,7 +149,7 @@ describe("ConfigWatcher", () => {
     watcher.start();
 
     // Simulate rapid file changes
-    const callback = mockWatcher._callback!;
+    const callback = mockWatcher._callback ?? (() => {});
     callback();
     callback();
     callback();

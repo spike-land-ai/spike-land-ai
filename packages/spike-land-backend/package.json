@@ -20,7 +20,7 @@
     "test:coverage": "vitest run --coverage",
     "test:watch": "vitest",
     "test:api": "npm run typecheck && npm run lint && npm run test",
-    "lint": "eslint --quiet src/",
+    "lint": "eslint --quiet ../../src/edge-api/backend/",
     "deploy": "wrangler deploy --minify",
     "deploy:dev": "wrangler deploy --env testing --minify",
     "__STATIC_CONTENT_MANIFEST": "./src/staticContent.mjs"

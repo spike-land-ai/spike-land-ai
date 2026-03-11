@@ -27,11 +27,11 @@ describe("auth command", () => {
 
   it("registers auth commands", () => {
     registerAuthCommand(program);
-    const auth = program.commands.find((c) => c.name() === "auth")!;
+    const auth = program.commands.find((c) => c.name() === "auth");
     expect(auth).toBeDefined();
-    expect(auth.commands.find((c) => c.name() === "login")).toBeDefined();
-    expect(auth.commands.find((c) => c.name() === "logout")).toBeDefined();
-    expect(auth.commands.find((c) => c.name() === "status")).toBeDefined();
+    expect(auth?.commands.find((c) => c.name() === "login")).toBeDefined();
+    expect(auth?.commands.find((c) => c.name() === "logout")).toBeDefined();
+    expect(auth?.commands.find((c) => c.name() === "status")).toBeDefined();
   });
 
   it("login handles successful device flow", async () => {
@@ -41,7 +41,8 @@ describe("auth command", () => {
     } as unknown as AuthTokens);
 
     registerAuthCommand(program);
-    const login = program.commands[0].commands.find((c) => c.name() === "login")!;
+    const login = program.commands[0].commands.find((c) => c.name() === "login");
+    if (!login) throw new Error("login command not registered");
     // @ts-expect-error - accessing private commander handler
     await login._actionHandler([{ baseUrl: "https://test" }, []]);
 
@@ -51,7 +52,8 @@ describe("auth command", () => {
 
   it("logout deletes tokens", async () => {
     registerAuthCommand(program);
-    const logout = program.commands[0].commands.find((c) => c.name() === "logout")!;
+    const logout = program.commands[0].commands.find((c) => c.name() === "logout");
+    if (!logout) throw new Error("logout command not registered");
     // @ts-expect-error - accessing private commander handler
     await logout._actionHandler([{}, []]);
     expect(store.deleteTokens).toHaveBeenCalled();
@@ -64,7 +66,8 @@ describe("auth command", () => {
     vi.mocked(store.isTokenExpired).mockReturnValue(false);
 
     registerAuthCommand(program);
-    const status = program.commands[0].commands.find((c) => c.name() === "status")!;
+    const status = program.commands[0].commands.find((c) => c.name() === "status");
+    if (!status) throw new Error("status command not registered");
     // @ts-expect-error - accessing private commander handler
     await status._actionHandler([{}, []]);
 
@@ -76,7 +79,8 @@ describe("auth command", () => {
   it("status handles not logged in", async () => {
     vi.mocked(store.loadTokens).mockResolvedValue(null);
     registerAuthCommand(program);
-    const status = program.commands[0].commands.find((c) => c.name() === "status")!;
+    const status = program.commands[0].commands.find((c) => c.name() === "status");
+    if (!status) throw new Error("status command not registered");
     // @ts-expect-error - accessing private commander handler
     await status._actionHandler([{}, []]);
     expect(console.error).toHaveBeenCalledWith(expect.stringContaining("Not logged in"));
@@ -91,7 +95,8 @@ describe("auth command", () => {
     vi.mocked(wizard.runOnboardingWizard).mockRejectedValue(new Error("skip"));
 
     registerAuthCommand(program);
-    const login = program.commands[0].commands.find((c) => c.name() === "login")!;
+    const login = program.commands[0].commands.find((c) => c.name() === "login");
+    if (!login) throw new Error("login command not registered");
     // @ts-expect-error - accessing private commander handler
     await login._actionHandler([{ baseUrl: "https://test" }, []]);
 
@@ -105,7 +110,8 @@ describe("auth command", () => {
     });
 
     registerAuthCommand(program);
-    const login = program.commands[0].commands.find((c) => c.name() === "login")!;
+    const login = program.commands[0].commands.find((c) => c.name() === "login");
+    if (!login) throw new Error("login command not registered");
     // @ts-expect-error - accessing private commander handler for testing
     await login._actionHandler([{ baseUrl: "https://test" }, []]);
 
@@ -130,7 +136,8 @@ describe("auth command", () => {
     vi.mocked(wizard.submitOnboarding).mockResolvedValue(undefined);
 
     registerAuthCommand(program);
-    const login = program.commands[0].commands.find((c) => c.name() === "login")!;
+    const login = program.commands[0].commands.find((c) => c.name() === "login");
+    if (!login) throw new Error("login command not registered");
     // @ts-expect-error - accessing private commander handler for testing
     await login._actionHandler([{ baseUrl: "https://test" }, []]);
 
@@ -145,7 +152,8 @@ describe("auth command", () => {
     vi.mocked(store.isTokenExpired).mockReturnValue(false);
 
     registerAuthCommand(program);
-    const status = program.commands[0].commands.find((c) => c.name() === "status")!;
+    const status = program.commands[0].commands.find((c) => c.name() === "status");
+    if (!status) throw new Error("status command not registered");
     // @ts-expect-error - accessing private commander handler for testing
     await status._actionHandler([{}, []]);
 

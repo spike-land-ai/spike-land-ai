@@ -102,7 +102,7 @@ describe("withRetry", () => {
     // Should have 2 delays (2 retries before success)
     expect(delays.length).toBeGreaterThanOrEqual(2);
     // Second delay should be larger than first (exponential)
-    expect(delays[1]!).toBeGreaterThan(delays[0]!);
+    expect(delays[1]).toBeGreaterThan(delays[0] ?? 0);
 
     vi.restoreAllMocks();
   });

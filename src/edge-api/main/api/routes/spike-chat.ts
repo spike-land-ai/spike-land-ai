@@ -322,6 +322,7 @@ spikeChat.post("/api/spike-chat", async (c) => {
       const assistantResponse = await streamGrokResponse(apiKey, executionMessages, sendEvent, {
         temperature: 0.2,
         maxTokens: 4096,
+        ...(grokTools.length > 0 ? { tools: grokTools } : {}),
       });
 
       // --- Stage 4: EXTRACT (background) ---
