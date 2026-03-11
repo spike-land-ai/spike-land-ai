@@ -2,7 +2,7 @@
 
 name = "spike-land-mcp"
 main = "./index.ts"
-compatibility_date = "2025-07-12"
+compatibility_date = "2026-03-01"
 
 [dev]
 port = 8790

@@ -1,7 +1,7 @@
 name = "spike-status"
 main = "../../src/edge-api/status/api/app.ts"
 
-compatibility_date = "2025-07-12"
+compatibility_date = "2026-03-01"
 compatibility_flags = ["nodejs_compat"]
 workers_dev = true
 

@@ -2,7 +2,7 @@
 
 name = "spike-land"
 main = "../../src/edge-api/backend/edge/chat.ts"
-compatibility_date = "2025-07-12"
+compatibility_date = "2026-03-01"
 compatibility_flags = ["nodejs_compat"]
 
 # chat.ts imports ./staticContent.mjs relative to its source location,
