@@ -10,6 +10,41 @@
 
 ### March 2026
 
+#### DEC-008: No Pre-Funding Equity Promises; Build The Bench Around Outputs
+
+**Decision Date**: March 11, 2026 **Decision Maker**: Zoltan Erdos (CEO)
+**Status**: ACTIVE
+
+**Decision**: The company shall not promise or distribute founder-scale equity
+to former colleagues, advisors, or future team members before initial funding is
+secured. Team formation after funding will be output-first: each person must
+enter through a defined lane, a defined scope, and vesting tied to real ongoing
+contribution.
+
+**Rationale**:
+
+- A clean pre-funding cap table is strategically stronger for SEIS investors and
+  future hires than broad equal allocations made on goodwill.
+- "I don't sell dreams" is a useful operating rule. The company should only ask
+  people to join once there is capital, runway, and a concrete role.
+- The problem to solve is not headcount. It is ownership of critical outputs:
+  design partners, platform hardening, enterprise trust, and operating cadence.
+- The right team will be formed by lane ownership, not by nostalgia or evenly
+  distributed shares.
+
+**Impact**:
+
+- No broad pre-funding equity distribution to former Investec colleagues.
+- Post-funding recruitment will use role scorecards and a 30/60/90-day output
+  plan.
+- The first post-funding team formation document is
+  `docs/business/FOUNDING_BENCH_PLAN.md`.
+
+**Related Files Updated**:
+
+- `docs/business/FOUNDING_BENCH_PLAN.md` - added post-funding team formation plan
+- `docs/business/gtm-devrel-job-description.md` - aligned with output-first role definition
+
 #### DEC-007: Agent AI Cost Optimization (Gemini / Claude Code OAuth)
 
 **Decision Date**: March 2, 2026 **Decision Maker**: Zoltan Erdos (CEO)

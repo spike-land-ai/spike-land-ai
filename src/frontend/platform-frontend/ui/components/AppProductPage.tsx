@@ -47,13 +47,13 @@ const toolMetadata: Record<
   "qa-studio": {
     name: "QA Studio",
     description:
-      "Browser automation utilities powered by Playwright. Navigate, click, type, capture screenshots, and automate browser workflows visually or through MCP tool calls.",
+      "Tool-first QA surface for Playwright-heavy teams. Navigate, inspect, capture evidence, and progressively move critical verification below the browser while keeping smoke coverage intact.",
     capabilities: [
-      "Visual Web UI without registration",
-      "Screen-reader style narration of web pages",
-      "Page interaction automation (click, type, navigate)",
-      "Screenshot capture and element inspection",
-      "Form extraction and tab management",
+      "Visual browser control for smoke checks and exploratory QA",
+      "Screen-reader style narration and DOM inspection for faster debugging",
+      "Repeatable interaction primitives (click, type, navigate, select)",
+      "Screenshot capture and evidence gathering for CI and incident review",
+      "A bridge into a thinner, tool-first verification stack",
     ],
     toolNames: [
       "web_navigate",
@@ -122,14 +122,14 @@ export function AppProductPage({ appId }: AppProductPageProps) {
             <h1 className="text-4xl font-semibold leading-none tracking-[-0.06em] text-foreground sm:text-6xl">
               {meta.name}
             </h1>
-            <p className="rubik-lede text-base sm:text-lg">
-              {meta.description}
-            </p>
+            <p className="rubik-lede text-base sm:text-lg">{meta.description}</p>
           </div>
 
           <div className="flex flex-wrap items-center gap-3 text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">
             <span className="rubik-chip">Cloudflare runtime</span>
-            <span className="rubik-chip rubik-chip-accent">{meta.toolNames.length || 4} tool methods</span>
+            <span className="rubik-chip rubik-chip-accent">
+              {meta.toolNames.length || 4} tool methods
+            </span>
             <span className="rubik-chip">{meta.packagePath}</span>
           </div>
         </div>

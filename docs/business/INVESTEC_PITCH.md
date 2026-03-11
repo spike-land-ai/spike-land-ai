@@ -1,159 +1,175 @@
-# SPIKE LAND LTD: Investec Brief
+# SPIKE LAND LTD — Investec Brief
 
 > **Prepared For**: Investec
 > **Date**: March 2026
 > **Classification**: Confidential
 > **Stage**: Public beta, pre-revenue
-> **Purpose**: Pre-meeting brief
-> **Appendix**: [INVESTEC_PITCH_APPENDIX.md](./INVESTEC_PITCH_APPENDIX.md)
 
 ---
 
 ## Thesis
 
-spike.land is the npm for AI tools and the USB-C for AI integrations.
+Spike Land is the platform business.
 
-Category: the App Store for the agent internet.
+More specifically, it is the managed runtime, registry, and control layer for
+typed AI-callable tools. The first commercial wedge is not "all developers." It
+is QA-heavy software agencies and AI consultancies that already live with slow,
+flaky Playwright or Cypress suites.
 
-If AI makes apps cheaper, value moves to runtime, deployment, and orchestration. That is the layer spike.land occupies.
-
-The model is open: accept all tools that pass automated quality gates, scale through volume and trust signals. Developers publish tools. Agents discover and compose them. The platform sits in the middle, handling execution, versioning, and runtime boundaries.
+COMPASS is not a second company. It is the flagship proof point built on the
+same platform.
 
 ---
 
-## Where It Is Now
+## What Exists Today
 
-This is already live.
+This is not a concept deck. The product base already exists:
 
 | Area | Current state |
-|------|---------------|
-| **Runtime** | Cloudflare Workers, Durable Objects, D1, R2, edge transpilation |
-| **Product** | Web platform, `spike-cli`, MCP registry, open app store |
-| **Tools** | 80+ native tools plus wider access through the multiplexer |
-| **Apps** | Full-stack React apps with live edit, preview, and publish |
-| **Execution** | Edge-hosted, embeddable, browser-capable, offline-first path |
-| **COMPASS** | 12 MCP-native engines, 28,042 LOC, 4 countries (DE/IN/US/KE) |
-| **Open Source** | Core platform components open-sourced; commercial layer proprietary |
-| **Commercial** | Public beta, pre-revenue |
+| --- | --- |
+| Runtime | Cloudflare Workers, Durable Objects, D1, R2, edge-native deployment |
+| Product | web platform, `spike-cli`, hosted runtime, MCP registry |
+| Tools | 80+ natively hosted tools plus broader tool access via multiplexer |
+| QA wedge assets | QA Studio, browser automation surface, tool-first testing model |
+| Commercial | public beta, Stripe checkout and onboarding layer nearing completion |
+| Proof point | COMPASS running on the same platform architecture |
 
-Build risk is largely behind us. The platform exists. The question is whether this is the right layer to back.
-
----
-
-## COMPASS as Proof Point
-
-COMPASS is the flagship app running on spike.land's MCP runtime. It is a universal bureaucracy navigator built to address $2.1T per year in unclaimed benefits and services worldwide — welfare payments, healthcare entitlements, legal aid, tax credits — that eligible people never access because the systems are too complex to navigate.
-
-The numbers are not the proof of concept. The architecture is.
-
-COMPASS runs 12 MCP-native engines on the same infrastructure any developer can deploy to:
-
-- Knowledge Engine, Conversation Engine, Eligibility Matcher, Document Processor, Offline Core, Feedback Loop — plus six supporting engines
-
-Deployed as a PWA (offline-capable) and as WhatsApp and Telegram bots. Targeting approximately 4 billion people who miss services they are entitled to. Free for end users, funded by institutional partnerships.
-
-Why it matters for this conversation: COMPASS is operating in a regulated, compliance-heavy domain with multi-jurisdiction requirements. If the platform works there, it works for financial services, healthcare, and government integration at the same level of rigour.
-
-If COMPASS works on spike.land's MCP runtime, any tool can.
+Build risk is not zero, but it is not the primary open question anymore. The
+primary question is whether the company can convert technical leverage into a
+narrow, repeatable commercial wedge.
 
 ---
 
-## Revenue Model
+## The First Paying Customer
 
-Two separate revenue streams that reinforce each other.
+The first customer is not buying generic AI infrastructure.
 
-### Platform SaaS
+They are buying relief from a specific pain:
 
-Subscriptions, API add-ons, and marketplace take rate.
+- slow CI
+- flaky browser tests
+- repeated setup across projects
 
-| Tier | Price | Year 1 target |
-|------|-------|---------------|
-| Free | £0 | Acquisition layer |
-| Pro | £29/month | 150 customers |
-| Business | £99/month | 78 customers |
-| Marketplace | 30% take rate | Volume-driven |
+Spike Land should be sold as:
 
-- Year 1 revenue target: £42,832 (228 paying customers)
-- Year 3 revenue target: £400,000
+> take one brittle billing, auth, permissions, or state-transition flow and
+> move the critical verification below the browser into typed tool contracts
 
-### COMPASS
-
-Government partnerships, international organisation licensing, NGO tooling, and systemic intelligence reports.
-
-| Milestone | Revenue | Users |
-|-----------|---------|-------|
-| Year 1 | $8M | 5M active |
-| Year 5 | $340M+ | 1B+ |
-
-COMPASS is free for end users. Revenue comes from the institutions — governments, development banks, international NGOs — that want to deploy it at scale or access the aggregated intelligence it generates.
+Playwright or Cypress remains in place as a smoke and visual layer. The first
+adoption path is not rip-and-replace.
 
 ---
 
-## Why Investec
+## Why Teams Pay Instead of Using Workers Directly
 
-I spent four years at Investec. I know the engineering bar, and I know how much waste still sits in delivery: deploy glue, integration glue, test glue, process built around complexity rather than capability.
+Cloudflare Workers is the compute primitive.
 
-spike.land reduces that waste directly.
+It does not by itself provide:
 
-Business logic exposed as typed MCP tools can be tested at function speed. The browser becomes a thin smoke layer. Faster feedback, less flaky CI, lower cost per deployment cycle.
+- typed tool contracts
+- registry and discovery
+- auth and governance above raw compute
+- metering
+- auditability
+- multi-surface execution
+- a workflow model for tool-first verification
 
-COMPASS demonstrates this in a regulated, compliance-heavy domain with real jurisdictional constraints. That is directly relevant to financial services.
-
-The platform itself is proof of leverage: one developer, a modest AI-tool budget, a working product deployed across four countries. That is the point of the architecture. Strong tools plus tight feedback loops beat raw headcount or model spend.
-
----
-
-## Why Now
-
-The platform layer is strategic again. This is not AI hype — it is a structural shift in where value accumulates.
-
-MCP (Model Context Protocol) adoption is accelerating. Anthropic created it. GitHub is building a registry around it. Major ecosystem players are endorsing it as the standard for agent-tool integration.
-
-No incumbent currently occupies the agent-first, live-runtime quadrant. The closest players — Vercel, Replit, Cloudflare — each solve adjacent problems but none owns the full stack: tool publication, discovery, runtime, and agent-native execution in one surface.
-
-COMPASS addresses a $2.1T per year market that no technology company is solving at scale.
-
-The window to define the category is open now.
+If Spike Land were only "managed Workers plus MCP registry," that would be too
+thin. The bet is that the workflow layer above the primitives is valuable and
+defensible if it wins a specific use case before the platform vendors care.
 
 ---
 
-## Risks
+## Why COMPASS Is Included
 
-1. **MCP Adoption**: The protocol may not achieve widespread adoption at the pace assumed. Mitigation: tools can be exposed via standard REST API as a fallback, so the platform delivers value regardless of protocol dominance.
+COMPASS is included because it is a hard proof point, not because the current
+raise depends on underwriting government-scale revenue projections.
 
-2. **Competition**: Vercel, Replit, or Cloudflare could enter the space. Mitigation: replicating the full stack — tool registry, runtime, live editing, agent-native execution — would take any of them 18 to 36 months minimum.
+What it proves:
 
-3. **Founder Risk**: A significant portion of current velocity runs through one person. Mitigation: AI-assisted development reduces the headcount floor; the SEIS raise enables the first two hires.
+- regulated workflow handling
+- multilingual product surface
+- offline-capable interaction
+- ability to run a higher-trust use case on the same runtime
 
-4. **COMPASS Regulatory**: Government partnerships require navigating complex procurement cycles. Mitigation: Tier 1 countries chosen for procurement accessibility; NGO and international organisation partnerships are the initial channel.
+What it does not justify:
 
-5. **Category Creation**: The market may be slow to adopt the "App Store for the agent internet" framing. Mitigation: the platform delivers value to developers and agents regardless of how the category label lands. Framing is secondary to function.
+- treating speculative Year 1 institutional revenue as part of the base case
+  for this SEIS round
 
 ---
 
-## Use of Capital
+## The 90-Day Plan
 
-SEIS raise of £250,000. This round buys proof, not optics.
+The next 90 days are about proving the QA wedge:
 
-1. **Finish the commercial layer** — billing, metering, onboarding, support infrastructure
-2. **Win design partners** — agencies, consultancies, and engineering teams using the tool-first build model
-3. **Add regulated controls** — auditability, governance, runtime boundaries for enterprise and regulated-sector buyers
-4. **COMPASS pilot deployment** — Tier 1 country deployments with institutional partners
+1. unify deck, site, and outreach around the wedge
+2. build a target-account list, starting with Brighton and London agencies
+3. run discovery on painful browser-heavy workflows
+4. close 3 design partners
+5. convert the strongest result into a paid reference customer
+
+This is the shortest path from "architecturally interesting" to "investable."
+
+---
+
+## Strategic Risks
+
+### 1. GTM risk
+
+The company is still founder-carried commercially. That is the largest near-term
+risk after bus factor.
+
+### 2. Cloudflare risk
+
+If Cloudflare ships more MCP surface area, the company only survives if the
+workflow layer above the primitives is real and valued.
+
+### 3. MCP risk
+
+MCP may not become universal. The platform must remain capable of exposing the
+same tool layer through other interfaces if needed.
+
+### 4. Founder risk
+
+The codebase and product decisions are highly concentrated in one person. This
+round must reduce that risk quickly.
+
+---
+
+## 18-Month Success And Kill Criteria
+
+By **30 September 2027**, three things must be true:
+
+1. at least 3 paid reference customers exist in the QA/agency wedge
+2. the business is no longer fully founder-carried commercially
+3. customers are adopting the managed runtime as a product, not simply buying
+   founder effort
+
+If those conditions are not met, the current thesis should be treated as
+broken.
+
+---
+
+## Use Of Capital
+
+The raise buys proof and resilience:
+
+1. finish commercial onboarding and metering
+2. close and support the first design partners
+3. hire founding Head of Growth/DevRel
+4. hire senior engineer
+5. improve docs, runbooks, governance, and enterprise controls
 
 ---
 
 ## Closing
 
-spike.land should be judged as a bet on the layer below the app, plus the flagship app proving that layer works at real scale.
+The strongest version of Spike Land is straightforward:
 
-If AI adoption is slow, the platform layer still matters. If fast, it matters more.
+- one platform business
+- one narrow commercial wedge
+- one flagship proof point
+- one honest 18-month scorecard
 
-COMPASS adds a second dimension. If platform tools work for bureaucracy navigation across four countries in a compliance-heavy domain, they work for everything.
-
-That is why this is strategically interesting. That is why it fits Investec.
-
----
-
-*Document Version: 6.0*
-*Prepared: March 2026*
-*Founder: Zoltan Erdos, SPIKE LAND LTD*
+That is the version worth taking into diligence.

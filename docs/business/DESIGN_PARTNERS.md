@@ -1,72 +1,136 @@
 # Design Partners
 
-Target: **3 signed design partners by M3** (end of month 3).
+> **Target**: 3 onboarded design partners in the next 90 days
+> **Primary wedge**: QA-heavy software agencies and AI consultancies
 
-Design partners validate that spike.land's MCP-native testing approach delivers
-measurable value in real engineering workflows before general availability.
+---
 
-## Partner Tracker
+## 1. What A Design Partner Means Here
 
-| Company | Contact | Status    | Success Criteria                                          | Weekly Call Day |
-| ------- | ------- | --------- | --------------------------------------------------------- | --------------- |
-| TBD     | TBD     | prospect  | TBD                                                       | TBD             |
-| TBD     | TBD     | prospect  | TBD                                                       | TBD             |
-| TBD     | TBD     | prospect  | TBD                                                       | TBD             |
+A design partner is not a casual beta user.
 
-**Status values:** `prospect` / `intro-scheduled` / `nda-signed` / `onboarded` / `active`
+It is a team willing to:
 
-## Success Metric Examples
+- give Spike Land one real workflow that hurts today
+- share a baseline
+- test a tool-first verification approach against that workflow
+- meet weekly
+- convert to paid if the agreed outcome is achieved
 
-These are concrete, measurable outcomes that make a design partner engagement
-successful. Agree on one per partner before onboarding:
+---
 
-- "Reduces Playwright CI test time by 30%"
-- "Enables AI-powered code review in CI pipeline"
-- "Replaces 200 lines of test scaffolding with 3 MCP tool calls"
-- "Cuts time-to-first-failing-test from 8 s to under 300 ms"
-- "Eliminates flaky browser tests for billing and subscription flows"
+## 2. Offer Structure
 
-## Onboarding Checklist
+### What Spike Land offers
 
-Run this checklist for each new design partner. All boxes must be checked before
-marking status as `active`.
+- 6-8 week scoped pilot
+- direct founder support
+- weekly 30-minute operating review
+- help modelling one or two high-friction flows below the browser
+- access to new tooling before general release
 
-- [ ] Intro call completed
-- [ ] NDA signed
-- [ ] Spike.land account created
-- [ ] MCP server connected (`claude mcp add spike-land --transport http https://spike.land/mcp`)
-- [ ] First tool call made
+### What the partner gives
+
+- a real workflow
+- a named sponsor
+- baseline metrics
+- honest written feedback at day 30 and day 60
+- permission for an anonymized or attributed case study if successful
+
+### Commercial structure
+
+- discounted pilot fee or fixed setup fee
+- pre-agreed paid conversion path if success criteria are met
+
+---
+
+## 3. Success Metrics
+
+Each partner must agree one primary success metric before onboarding.
+
+Examples:
+
+- reduce Playwright or Cypress CI time by 30%+
+- eliminate flakiness in a billing or auth flow
+- replace repetitive setup across client accounts with a reusable contract
+- cut time-to-diagnose for a failing flow from minutes to seconds
+- move one critical state transition below the browser without breaking smoke coverage
+
+---
+
+## 4. Onboarding Checklist
+
+- [ ] Discovery call completed
+- [ ] Pain statement written down
+- [ ] Workflow selected
+- [ ] Baseline captured
 - [ ] Success criteria agreed
-- [ ] Weekly sync cadence set
+- [ ] Commercial structure agreed
+- [ ] MCP connection established
+- [ ] Weekly cadence scheduled
 
-## Engagement Model
+---
 
-Each design partner gets:
+## 5. 90-Day Cadence
 
-1. **Dedicated Slack channel** — async support and bug triage
-2. **Weekly 30-minute sync** — progress against success criteria, blockers
-3. **Early access** — new MCP tools before public release
-4. **Co-authorship credit** — case study and launch blog post (opt-in)
+### Week 1
 
-In return, partners commit to:
+- run discovery
+- agree sponsor and workflow
+- capture baseline
 
-1. Integrating spike.land MCP tools into at least one real CI workflow
-2. Sharing anonymised timing and line-count metrics
-3. Providing honest written feedback at 30-day and 90-day marks
+### Week 2
 
-## Target Partner Profiles
+- connect tooling
+- map the workflow into typed tool contracts
 
-Ideal design partners share these traits:
+### Weeks 3-4
 
-- Engineering team of 5–50 with an active CI pipeline
-- Existing Playwright or Cypress test suite (pain point is clear)
-- Decision-maker is reachable at the IC or Staff Engineer level
-- Comfortable with early-stage tooling and direct feedback loops
+- implement and test the first version
+- compare against current browser-heavy path
 
-## Candidate Pipeline
+### Weeks 5-6
 
-Use this section to track warm leads before they enter the formal tracker above.
+- refine based on feedback
+- instrument time, flakiness, and operator effort
 
-| Company | Source         | Notes               | Next Action         |
-| ------- | -------------- | ------------------- | ------------------- |
-| TBD     | —              | —                   | —                   |
+### Weeks 7-8
+
+- decide on paid conversion
+- draft case study
+
+---
+
+## 6. Active Tracker
+
+| Company | Type | Why it fits | Status | Sponsor | Success metric |
+| --- | --- | --- | --- | --- | --- |
+| DabApps | Agency | AI-enabled web/mobile builds and legacy modernisation imply repeated release and QA burden across client work | prospect | TBD | reduce CI time on one client workflow |
+| HARE.digital | Consultancy | custom software and digital transformation projects create repeated browser-heavy regression risk | prospect | TBD | cut flaky smoke-test failures |
+| Cogapp | Digital agency | content-rich accessible platforms mean brittle end-to-end checks around navigation, auth, and publishing flows | prospect | TBD | thin browser coverage on one publishing flow |
+| BrightMinded | Software development company | bespoke applications for membership organisations likely carry auth, entitlement, and admin-flow regressions | prospect | TBD | move one member/admin flow below the browser |
+| Brighton Bytes | Software & AI agency | bespoke applications and AI tooling suggest repeated setup and QA cost across projects | prospect | TBD | reuse one contract across client work |
+
+Status values:
+
+- `prospect`
+- `intro-scheduled`
+- `qualified`
+- `pilot-agreed`
+- `active`
+- `paid`
+
+---
+
+## 7. Disqualification Rules
+
+Do not force a design-partner deal if:
+
+- there is no real workflow
+- the buyer cannot name a pain owner
+- the team wants a full replacement of their existing test estate immediately
+- the partner will not share before/after metrics
+- there is no credible path to paid conversion
+
+The goal is not to maximize pilot count. The goal is to find the wedge that can
+actually become a business.

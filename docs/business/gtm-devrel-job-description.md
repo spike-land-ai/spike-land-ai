@@ -4,13 +4,25 @@
 **Compensation:** £3,500 - £5,000 / month + significant early-stage equity
 
 ## The Role
-As the Founding Head of Growth/DevRel, you will not be writing production backend code—you will be building the community, the content, and the pipeline. You will be the bridge between our edge infrastructure and the developers building the next wave of AI.
+As the Founding Head of Growth/DevRel, you are not joining to do vague
+"marketing for a platform." You are joining to help turn a technically strong
+pre-revenue product into a business by winning the first design partners and
+turning that motion into repeatable distribution.
 
 ## What You Will Do
-- **Own the Design Partner Pipeline:** Identify, outreach, and onboard early developer teams to build on spike.land.
-- **Community & Content:** Write technical tutorials and build open-source reference implementations.
-- **Developer Advocacy:** Synthesize developer feedback into actionable product insights.
+- **Own the design-partner pipeline:** Build target-account lists, run outbound,
+  support founder-led discovery, and help close the first design partners.
+- **Translate product into buyer language:** Help frame the tool-first QA wedge
+  clearly for agencies, consultancies, and adjacent small product teams.
+- **Turn learning into distribution:** Extract case studies, proof assets,
+  technical content, and references from early customer work.
+- **Developer advocacy:** Synthesize developer and buyer feedback into actionable
+  product insight.
 
 ## What We’re Looking For
-- 3-5 years of experience in Developer Relations, Growth, or Technical Sales within the developer tools space.
-- Strong technical literacy: You must understand APIs, JSON, AI agents, and how developers think.
+- 3-5 years of experience in DevRel, technical growth, or technical sales in
+  developer tools.
+- Strong technical literacy: APIs, JSON, CI, QA workflows, and how engineering
+  buyers think.
+- Comfortable with messy zero-to-one work. This role is part pipeline-building,
+  part positioning, part founder-extension.

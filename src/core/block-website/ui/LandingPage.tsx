@@ -19,25 +19,22 @@ import { useDevModeCopy } from "./useDevModeCopy";
 
 export function LandingPage() {
   const platformRhythmHeading = useDevModeCopy(
-    "A homepage that explains the system before it asks for trust.",
-    "The interface retunes itself as if an agent is actively rebuilding it for developers.",
+    "A narrower story that matches how the company actually gets paid.",
+    "The page switches from company framing into implementation framing without changing the runtime underneath.",
   );
   const platformRhythmBody = useDevModeCopy(
-    "spike.land is strongest when it feels like one coherent operating layer for agentic work. This section turns the message into a simple sequence: connect, compose, deploy.",
-    "The same page pivots into implementation language in place: connect the endpoint, compose the toolchain, deploy the runtime. No route swap, no new screen.",
+    "The product is broad, but the first commercial wedge is not. Start with one high-friction billing, auth, or permissions flow, prove the CI and reliability gain, then expand from there.",
+    "Model one brittle journey as typed tool contracts, verify it below the browser, and reuse the same contract across CI, internal tooling, and agent workflows.",
   );
   const howHeading = useDevModeCopy(
-    "How it actually works",
-    "What the runtime is patching",
+    "How the first wedge works",
+    "What the runtime is actually changing",
   );
   const howBody = useDevModeCopy(
-    "spike.land connects your AI assistant to real-world tools using the Model Context Protocol.",
-    "spike.land is swapping from explorer copy into builder copy while keeping the same MCP-backed surface live.",
+    "Start with a flaky browser flow, extract the business logic into typed tool contracts, and keep the browser as a thin confidence layer around it.",
+    "The same typed contract can stay live across CI, the product, the CLI, and agents while the browser remains a thin smoke layer.",
   );
-  const updatesHeading = useDevModeCopy(
-    "Latest Intelligence",
-    "Latest implementation notes",
-  );
+  const updatesHeading = useDevModeCopy("Latest Intelligence", "Latest implementation notes");
   const updatesBody = useDevModeCopy(
     "Insights from the edge of AI development.",
     "Signals from the edge runtime, product experiments, and shipping notes.",
@@ -78,33 +75,26 @@ export function LandingPage() {
               {[
                 {
                   icon: Search,
-                  title: "Connect",
-                  copy: "Attach Claude, Cursor, or VS Code to a single MCP endpoint.",
+                  title: "Model",
+                  copy: "Choose one high-friction billing, auth, permissions, or state-transition flow instead of trying to replace the entire suite.",
                 },
                 {
                   icon: Workflow,
-                  title: "Compose",
-                  copy: "Mix built-in tools, custom logic, and generated flows without glue code.",
+                  title: "Verify",
+                  copy: "Run the important logic as typed tool contracts at function speed and keep the browser for smoke coverage and evidence.",
                 },
                 {
                   icon: Layers3,
-                  title: "Deploy",
-                  copy: "Ship globally with edge-native hosting, auth, and runtime primitives.",
+                  title: "Ship",
+                  copy: "Expose the same contract to CI, the product surface, the CLI, and agents without rebuilding the flow per channel.",
                 },
               ].map((step) => (
-                <div
-                  key={step.title}
-                  className="rubik-panel rubik-panel-muted p-6"
-                >
+                <div key={step.title} className="rubik-panel rubik-panel-muted p-6">
                   <div className="rubik-icon-badge size-12 rounded-2xl">
                     <step.icon className="size-5" />
                   </div>
-                  <h3 className="mt-5 text-xl font-semibold tracking-[-0.03em]">
-                    {step.title}
-                  </h3>
-                  <p className="mt-3 text-sm leading-7 text-muted-foreground">
-                    {step.copy}
-                  </p>
+                  <h3 className="mt-5 text-xl font-semibold tracking-[-0.03em]">{step.title}</h3>
+                  <p className="mt-3 text-sm leading-7 text-muted-foreground">{step.copy}</p>
                 </div>
               ))}
             </div>
@@ -138,10 +128,7 @@ export function LandingPage() {
                   <>
                     {howHeading.text.split("actually")[0]}
                     <span className="text-primary italic">actually</span>
-                    {howHeading.text
-                      .split("actually")
-                      .slice(1)
-                      .join("actually")}
+                    {howHeading.text.split("actually").slice(1).join("actually")}
                   </>
                 ) : (
                   howHeading.text
@@ -158,20 +145,20 @@ export function LandingPage() {
             <div className="grid gap-8 md:grid-cols-3">
               {[
                 {
-                  title: "Browse & connect",
-                  desc: "Pick from our library of ready-made tools. Each one connects to your AI assistant in seconds — no coding required.",
+                  title: "Start with one brittle flow",
+                  desc: "The right first sale is not a platform migration. It is one painful journey where browser-heavy verification is costing time and confidence every week.",
                   icon: Search,
                   color: "text-blue-500 dark:text-primary-light",
                 },
                 {
-                  title: "Works everywhere",
-                  desc: "Built on an open standard supported by Claude, ChatGPT, and Cursor. Connect once, use anywhere in your workflow.",
+                  title: "Keep Playwright, but thin it down",
+                  desc: "spike.land is not asking teams to rip out their browser estate. It keeps smoke coverage in place while moving the important logic below the UI.",
                   icon: Globe,
                   color: "text-emerald-500 dark:text-primary",
                 },
                 {
-                  title: "Build your own",
-                  desc: "Need something custom? Describe it, and our builder creates it for you. We handle hosting, security, and scaling.",
+                  title: "Reuse the contract everywhere",
+                  desc: "A typed tool contract can be exercised in CI, internal tools, the CLI, and by AI agents with the same semantics and audit trail.",
                   icon: Code2,
                   color: "text-primary dark:text-primary-light",
                 },
@@ -188,9 +175,7 @@ export function LandingPage() {
                   >
                     <feature.icon size={28} aria-hidden="true" />
                   </div>
-                  <h3 className="mb-4 text-xl font-semibold tracking-[-0.03em]">
-                    {feature.title}
-                  </h3>
+                  <h3 className="mb-4 text-xl font-semibold tracking-[-0.03em]">{feature.title}</h3>
                   <p className="text-muted-foreground leading-relaxed font-medium text-sm">
                     {feature.desc}
                   </p>
@@ -202,13 +187,13 @@ export function LandingPage() {
               {[
                 {
                   icon: ShieldCheck,
-                  title: "Hosted security posture",
-                  desc: "Account flows, auth boundaries, and platform runtime concerns are already part of the product surface.",
+                  title: "Governed execution",
+                  desc: "Hosted auth, metering, and runtime boundaries are part of the product layer, so teams do not have to hand-roll them above raw edge compute.",
                 },
                 {
                   icon: Globe,
-                  title: "Portable by design",
-                  desc: "The core value proposition stays legible whether someone arrives from open-source, app discovery, or enterprise deployment.",
+                  title: "Flagship proof point",
+                  desc: "COMPASS stays in the story as the hard proof that the same runtime can support a regulated, multilingual, offline-capable workflow.",
                 },
               ].map((item) => (
                 <div key={item.title} className="rubik-panel p-6">
@@ -216,13 +201,9 @@ export function LandingPage() {
                     <div className="rubik-icon-badge size-10 rounded-xl">
                       <item.icon className="size-4" />
                     </div>
-                    <h3 className="text-lg font-semibold tracking-[-0.03em]">
-                      {item.title}
-                    </h3>
+                    <h3 className="text-lg font-semibold tracking-[-0.03em]">{item.title}</h3>
                   </div>
-                  <p className="mt-4 text-sm leading-7 text-muted-foreground">
-                    {item.desc}
-                  </p>
+                  <p className="mt-4 text-sm leading-7 text-muted-foreground">{item.desc}</p>
                 </div>
               ))}
             </div>
@@ -235,18 +216,18 @@ export function LandingPage() {
                 </div>
                 <div>
                   <p className="font-semibold tracking-[-0.03em] text-foreground">
-                    Ready to start building?
+                    Ready to cut one red build loop down to size?
                   </p>
                   <p className="text-sm text-muted-foreground font-medium">
-                    Join 5,000+ developers building on the edge.
+                    Best fit for teams already carrying Playwright or Cypress pain.
                   </p>
                 </div>
               </div>
               <Link
-                href="/apps/new"
+                href="/apps/qa-studio"
                 className="rounded-[calc(var(--radius-control)-0.1rem)] bg-foreground px-6 py-3 text-xs font-semibold uppercase tracking-[0.16em] text-background transition-colors hover:bg-foreground/92 dark:bg-primary dark:text-primary-foreground dark:hover:bg-primary-light glow-primary"
               >
-                Create your first tool
+                Inspect QA Studio
               </Link>
             </div>
           </div>
@@ -265,9 +246,7 @@ export function LandingPage() {
                 >
                   {updatesHeading.text}
                 </h2>
-                <p className="text-lg text-muted-foreground font-medium">
-                  {updatesBody.text}
-                </p>
+                <p className="text-lg text-muted-foreground font-medium">{updatesBody.text}</p>
               </div>
               <Link
                 href="/blog"

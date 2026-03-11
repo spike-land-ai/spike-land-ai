@@ -21,25 +21,28 @@ export function LandingHero() {
   const { isTransitioning, targetMode } = useDevModeTransition();
   const devButtonRef = useRef<HTMLButtonElement>(null);
   const [showVibeButton, setShowVibeButton] = useState(isDeveloper);
-  const badgeCopy = useDevModeCopy("OPEN MCP PLATFORM", "DEVELOPER MODE ACTIVE");
+  const badgeCopy = useDevModeCopy(
+    "MCP RUNTIME FOR HIGH-TRUST FLOWS",
+    "DEVELOPER MODE: TOOL-FIRST QA",
+  );
   const headingCopy = useDevModeCopy(
-    "Give your AI agents a real operating surface, not just another prompt box.",
-    "Ship MCP servers with the feel of a design tool and the reach of the edge.",
+    "Move critical verification below the browser.",
+    "Ship typed tools your CI, agents, and product can call the same way.",
   );
   const bodyCopy = useDevModeCopy(
-    "spike.land connects AI assistants to real tools through MCP, so models can browse data, run workflows, and take action inside a system built for production.",
-    "Deploy TypeScript tools instantly with hot reload, hosted auth, and global edge delivery. Focus on capability design while spike.land handles the runtime.",
+    "spike.land is the managed runtime for teams drowning in slow, flaky end-to-end tests. Start with one brittle Playwright or Cypress flow, keep the browser as a thin smoke layer, and run the important logic at function speed.",
+    "Model billing, auth, permissions, and state transitions as typed MCP contracts. Keep Playwright for smoke coverage while spike.land handles hosting, auth, metering, and edge execution.",
   );
-  const runtimeLabel = useDevModeCopy("Runtime", "Agent patch stream");
-  const inventoryLabel = useDevModeCopy("Tool inventory", "Deployment surface");
+  const runtimeLabel = useDevModeCopy("Reference flow", "Contract surface");
+  const inventoryLabel = useDevModeCopy("Starting wedge", "Execution plane");
   const inventoryBody = useDevModeCopy(
-    "Ready-to-run capabilities across coding, media, research, auth, and ops.",
-    "Tooling, auth, storage, and edge execution bundled into a single builder-facing layer.",
+    "QA-heavy agencies and AI consultancies are the first commercial focus. The wider platform stays visible, but not as the first sales motion.",
+    "One typed contract can power CI checks, internal tooling, CLI actions, and agent calls without changing the underlying semantics.",
   );
-  const modeLabel = useDevModeCopy("Dev mode", "Agent rewrite");
+  const modeLabel = useDevModeCopy("Commercial thesis", "Builder shift");
   const modeBody = useDevModeCopy(
-    "One page that speaks to explorers and builders without fragmenting the brand.",
-    "The copy retunes itself as if an agent is actively swapping in the implementation for builders.",
+    "Platform business first. COMPASS stays as a proof point, not the thing investors are being asked to underwrite directly.",
+    "The page pivots from fundraising-safe framing into implementation language without changing the runtime beneath it.",
   );
 
   useEffect(() => {
@@ -235,11 +238,11 @@ export function LandingHero() {
                     className="inset-0 w-full"
                   >
                     <Link
-                      href="/blog"
+                      href="/what-we-do"
                       onClick={() => setThemeDirectly("light")}
                       className="flex w-full items-center justify-center gap-2 rounded-[calc(var(--radius-control)-0.1rem)] border border-border bg-background px-6 py-3 text-base font-semibold transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 hover:border-primary/24 hover:text-primary focus:ring-foreground sm:w-auto dark:bg-white/10 dark:border-white/20 dark:text-white dark:hover:bg-white/15 dark:backdrop-blur-md dark:focus:ring-white/30"
                     >
-                      I&apos;m exploring
+                      See the wedge
                       <ArrowRight className="size-4" />
                     </Link>
                   </motion.div>
@@ -253,11 +256,11 @@ export function LandingHero() {
                     className="inset-0 w-full"
                   >
                     <Link
-                      href="/vibe-code"
+                      href="/apps/qa-studio"
                       className="block w-full rounded-[calc(var(--radius-control)-0.1rem)] bg-primary px-6 py-3 text-center text-base font-semibold text-primary-foreground transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary sm:w-auto hover:bg-primary-light glow-primary"
                       style={{ fontVariationSettings: '"wght" 720' }}
                     >
-                      Vibe Code Online Now
+                      Inspect QA Studio
                     </Link>
                   </motion.div>
                 )}
@@ -277,16 +280,18 @@ export function LandingHero() {
                   <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-75" />
                   <span className="relative inline-flex h-2 w-2 rounded-full bg-primary" />
                 </span>
-                {targetMode ? "Agent rewriting builder surface" : "Agent restoring explorer surface"}
+                {targetMode
+                  ? "Agent rewriting builder surface"
+                  : "Agent restoring explorer surface"}
               </motion.div>
             )}
           </AnimatePresence>
 
           <div className="mt-10 grid gap-3 sm:grid-cols-3">
             {[
-              { icon: TerminalSquare, label: "Command-first setup", value: "1 command to connect" },
-              { icon: Code2, label: "Custom tools", value: "Build or generate your own" },
-              { icon: Globe2, label: "Edge runtime", value: "Deploy globally by default" },
+              { icon: TerminalSquare, label: "Commercial wedge", value: "QA-heavy teams first" },
+              { icon: Code2, label: "Verification model", value: "Function-speed tool checks" },
+              { icon: Globe2, label: "Adoption path", value: "Keep browser smoke thin" },
             ].map((item) => (
               <div key={item.label} className="rubik-panel p-4">
                 <div className="rubik-icon-badge mb-3 size-10 rounded-xl">
@@ -309,11 +314,11 @@ export function LandingHero() {
                 <p className="text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">
                   Live surface
                 </p>
-                <p className="mt-2 text-2xl font-semibold tracking-[-0.04em]">Agent system console</p>
+                <p className="mt-2 text-2xl font-semibold tracking-[-0.04em]">
+                  Tool-first QA console
+                </p>
               </div>
-              <div className="rubik-chip rubik-chip-accent">
-                MCP online
-              </div>
+              <div className="rubik-chip rubik-chip-accent">MCP online</div>
             </div>
 
             <div className="grid gap-4">
@@ -324,16 +329,20 @@ export function LandingHero() {
                 </div>
                 <div className="space-y-3 font-mono text-sm text-foreground">
                   <div className="rubik-signal-rail flex items-center justify-between rounded-2xl px-3 py-2">
-                    <span>registry.connect()</span>
-                    <span className="text-primary">{isDeveloper ? "patched" : "ready"}</span>
+                    <span>flow.contract()</span>
+                    <span className="text-primary">{isDeveloper ? "typed" : "selected"}</span>
                   </div>
                   <div className="rubik-signal-rail flex items-center justify-between rounded-2xl px-3 py-2">
-                    <span>edge.deploy()</span>
-                    <span className="text-primary">{isDeveloper ? "live build" : "4 regions"}</span>
+                    <span>ci.verify()</span>
+                    <span className="text-primary">
+                      {isDeveloper ? "function speed" : "green path"}
+                    </span>
                   </div>
                   <div className="rubik-signal-rail flex items-center justify-between rounded-2xl px-3 py-2">
-                    <span>agent.invoke("qa-studio")</span>
-                    <span className="text-primary">{isDeveloper ? "mutating" : "live"}</span>
+                    <span>browser.smoke()</span>
+                    <span className="text-primary">
+                      {isDeveloper ? "thin layer" : "kept intact"}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -344,11 +353,9 @@ export function LandingHero() {
                     {inventoryLabel.text}
                   </p>
                   <p className="mt-3 text-4xl font-semibold tracking-[-0.05em] text-foreground">
-                    {isDeveloper ? "Edge+" : `${TOTAL_TOOL_COUNT}+`}
+                    {isDeveloper ? "Typed" : "QA first"}
                   </p>
-                  <p className="mt-2 text-sm text-muted-foreground">
-                    {inventoryBody.text}
-                  </p>
+                  <p className="mt-2 text-sm text-muted-foreground">{inventoryBody.text}</p>
                 </div>
 
                 <div className="rubik-panel rubik-panel-muted p-4">
@@ -356,13 +363,9 @@ export function LandingHero() {
                     {modeLabel.text}
                   </p>
                   <p className="mt-3 text-lg font-semibold tracking-[-0.03em] text-foreground">
-                    {isDeveloper
-                      ? "Enabled for builder workflows"
-                      : "Toggle for deeper product surface"}
+                    {isDeveloper ? "Builder language enabled" : "Platform story, narrowed"}
                   </p>
-                  <p className="mt-2 text-sm text-muted-foreground">
-                    {modeBody.text}
-                  </p>
+                  <p className="mt-2 text-sm text-muted-foreground">{modeBody.text}</p>
                 </div>
               </div>
             </div>
@@ -390,21 +393,21 @@ export function LandingHero() {
           </>
         )}
         <div className="flex items-baseline gap-1.5">
-          <dt className="sr-only">Available Apps</dt>
+          <dt className="sr-only">Hosted tools</dt>
           <dd className="font-semibold text-foreground text-base">{TOTAL_TOOL_COUNT}+</dd>
-          <dd>Ready-to-use Apps</dd>
+          <dd>hosted tools</dd>
         </div>
         <div className="hidden sm:block w-1 h-1 rounded-full bg-border" aria-hidden="true" />
         <div className="flex items-baseline gap-1.5">
-          <dt className="sr-only">Performance</dt>
+          <dt className="sr-only">Runtime</dt>
           <dd className="font-semibold text-foreground text-base">Global</dd>
-          <dd>edge network</dd>
+          <dd>edge runtime</dd>
         </div>
         <div className="hidden sm:block w-1 h-1 rounded-full bg-border" aria-hidden="true" />
         <div className="flex items-baseline gap-1.5">
-          <dt className="sr-only">Setup</dt>
-          <dd className="font-semibold text-foreground text-base">Zero</dd>
-          <dd>config required</dd>
+          <dt className="sr-only">Starting scope</dt>
+          <dd className="font-semibold text-foreground text-base">1</dd>
+          <dd>flow to start</dd>
         </div>
         <div className="hidden sm:block w-1 h-1 rounded-full bg-border" aria-hidden="true" />
         <div className="flex items-baseline gap-1.5">

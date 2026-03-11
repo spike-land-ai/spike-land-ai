@@ -1,10 +1,10 @@
 {
-  "defaultTitle": "spike.land - MCP-First AI Development Platform",
-  "defaultDescription": "Build, deploy, and manage AI-powered applications with 80+ MCP tools, real-time collaboration, and edge deployment on Cloudflare Workers.",
+  "defaultTitle": "spike.land - Managed MCP Runtime for Tool-First QA",
+  "defaultDescription": "Move critical verification below the browser with a managed MCP runtime for typed tools, QA workflows, and edge-native execution.",
   "routes": {
     "apps": {
       "title": "App Store - spike.land",
-      "description": "Discover and install AI-powered applications from the spike.land store. Chess engines, QA studio, data visualization, and more."
+      "description": "Explore spike.land apps and tool packages, including QA Studio and the wider hosted MCP runtime surface."
     },
     "packages": {
       "title": "MCP Packages - spike.land",
@@ -35,8 +35,8 @@
       "description": "Simple, transparent pricing for spike.land. Free plan for individuals, Pro at $29/mo, Business at $99/mo with unlimited access and priority support."
     },
     "about": {
-      "title": "About spike.land - MCP-First AI Platform",
-      "description": "Learn about spike.land — who we are, our mission, and how we're building an open platform for AI tools."
+      "title": "About spike.land - Managed Runtime for Typed AI Tools",
+      "description": "Learn how spike.land helps teams move high-friction verification below the browser while exposing the same typed tools to CI, products, and agents."
     },
     "security": {
       "title": "Security - spike.land",
@@ -56,7 +56,7 @@
     },
     "docs": {
       "title": "Documentation - spike.land",
-      "description": "Technical documentation, API reference, MCP tools guide, and architecture overview for spike.land."
+      "description": "Technical documentation, MCP tool guides, runtime architecture, and QA workflow patterns for spike.land."
     },
     "settings": {
       "title": "Settings - spike.land",
@@ -75,8 +75,8 @@
       "description": "View build version, deployed assets, and download links for spike.land."
     },
     "whatWeDo": {
-      "title": "What We Do - spike.land | MCP-First AI Platform",
-      "description": "Explore spike.land's 80+ MCP tools across 11 domains. Code intelligence, image studio, analytics, authentication, and more — all edge-deployed."
+      "title": "What We Do - spike.land | Tool-First QA and Managed MCP Runtime",
+      "description": "See how spike.land helps teams move critical verification below the browser while running 80+ hosted tools across a broader edge-native runtime."
     }
   }
 }

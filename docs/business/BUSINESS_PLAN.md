@@ -2,343 +2,386 @@
 
 > **Company**: SPIKE LAND LTD (UK Company #16906682)
 > **Date**: March 2026
-> **Classification**: Confidential — For Investor & HMRC Use
-> **Stage**: Pre-Revenue, Public Beta / Commercialization Stage
-> **Prepared For**: SEIS Advance Assurance (Part 5, Item 3)
-> **Currency**: GBP Primary (USD Secondary at £1 = $1.27)
+> **Classification**: Confidential
+> **Stage**: Public beta, pre-revenue
+> **Primary ask**: SEIS round of up to £250,000
 
 ---
 
 ## 1. Executive Summary
 
-SPIKE LAND LTD is a UK-incorporated technology company building an open MCP
-(Model Context Protocol) app store and managed runtime platform. The platform
-enables developers and AI-native teams to discover, run, publish, and monetize
-AI apps through one hosted system rather than stitching together separate MCP
-servers and services.
+Spike Land is the managed runtime, registry, and control layer for typed
+AI-callable tools. The company is not two businesses. `spike.land` is the
+business. `COMPASS` is the flagship proof point built on top of the platform.
 
-The product is live in public beta at spike.land, featuring a working CLI
-(`spike-cli`), a web dashboard, a public app-store surface, and a managed
-hosted tool layer deployed on a global edge network. The company remains
-pre-revenue while it completes billing, onboarding, and commercialization
-workflows ahead of full launch.
+The immediate commercial wedge is narrow by design:
 
-The SEIS raise of up to £250,000 will be used to accelerate go-to-market, expand the hosted tool ecosystem, and fund early hiring in growth and customer success.
+- QA-heavy software agencies
+- AI consultancies
+- small AI product teams with an existing Playwright or Cypress burden
 
-The company's flagship application, COMPASS (Universal Bureaucracy Navigator), demonstrates the platform's capabilities at global scale. COMPASS is a suite of 12 MCP-native engines (28,042 lines of code) designed to help ~4 billion people navigate bureaucratic systems and access $2.1 trillion per year in unclaimed benefits across healthcare, social protection, education, and more. COMPASS runs entirely on the Spike Land MCP runtime, proving that the same infrastructure available to any developer can power mission-critical, compliance-heavy, multi-country applications.
+These teams already feel an acute, budgeted pain: slow CI, flaky browser tests,
+and repeated per-client setup. Spike Land does not ask them to replace their
+entire browser estate on day one. It asks them to start with one or two brittle,
+high-friction flows and move the critical business logic below the browser into
+typed tool contracts that can be exercised at function speed.
 
-*\*Note: The beta platform currently includes 86 natively hosted MCP tools, with 533+ total tools accessible through its MCP Multiplexer architecture — an industry-first lazy-loading system that reduces AI agent context window usage by up to 100x.*
+The company is pre-revenue and public beta. What is already built materially
+de-risks technical execution:
 
-**Based on the company's current facts, management believes it appears to meet the core SEIS conditions: incorporated December 2025, no prior risk-finance investment, fewer than 25 employees, gross assets under £350,000, and carrying on or preparing to carry on a qualifying software development trade. Advance Assurance is being sought on that basis.**
+- hosted MCP runtime and registry
+- `spike-cli`
+- 80+ natively hosted tools, with a broader tool surface available through the
+  multiplexer architecture
+- QA Studio and adjacent tool-first testing surfaces
+- Stripe checkout and core commercial plumbing in progress
+
+The next 12 months are not about serving four customer segments at once or
+proving a marketplace thesis prematurely. They are about validating one paid
+wedge, turning three customers into reference accounts, and reducing the
+single-founder risk fast enough for the platform thesis to remain financeable.
 
 ---
 
 ## 2. Company Overview
 
 | Field | Value |
-|-------|-------|
+| --- | --- |
 | Legal Name | SPIKE LAND LTD |
 | Company Number | 16906682 |
 | Incorporation Date | 12 December 2025 |
 | Registered Office | 42 Mighell Street, Apartment 70, Brighton BN2 0AU |
-| SIC Codes | 62090 (IT consultancy), 63120 (Web portals) |
-| Director | Zoltan Erdos (sole director) |
-| Shareholders | Zoltan Erdos — 1 ordinary share at £1 (100%) |
-| Corporation Tax Ref | BRCT00003618256 |
-| Corporate Structure | Independent entity; no subsidiaries |
-| Funding History | No prior fundraising; no shares issued under SEIS/EIS |
+| SIC Codes | 62090, 63120 |
+| Director | Zoltan Erdos |
+| Current ownership | Founder-owned, no prior fundraise |
+| Employees | 1 |
 
-**Founder background**: Zoltan Erdos is a full-stack engineer with 10+ years of experience, bringing rigorous enterprise engineering background (formerly at VMO2) to his work. What began as a highly technical open-source side project is now architecturally ready to scale into a commercial platform. He built the initial platform end-to-end using AI-assisted development, demonstrating both technical execution capability and deep familiarity with developer tooling, platform architecture, and emerging AI workflows.
+Founder context:
 
----
+- Zoltan Erdos is a full-stack engineer with enterprise delivery experience,
+  including four years at Investec.
+- The initial platform was built end-to-end with AI assistance, proving unusual
+  technical leverage, but also creating a real bus-factor risk that must be
+  reduced during this round.
 
-## 3. Product Readiness & Technical Status
+SEIS note:
 
-While the company is pre-revenue and still completing commercialization work, the technical execution model is materially de-risked relative to a typical first-time infrastructure startup.
-
-- **Product Status**: Public beta launched in March 2026. Core infrastructure and the edge database are operational in beta; current work is focused on product hardening, onboarding, billing workflows, and enterprise controls ahead of commercial launch.
-- **Tool Ecosystem**: 86 natively hosted MCP tools are integrated and functional on the platform, with multiplexer support extending access to 450+ third-party tools (533+ total tools reachable across the ecosystem).
-- **Access Channels**: `spike-cli` is published and functional; web dashboard is live.
-- **Open Source Foundation**: Selected core platform components and architecture are open-sourced to support developer adoption, transparency, and ecosystem trust. The company retains ownership of its commercial platform, product integration layer, hosting infrastructure, billing workflows, and go-to-market execution.
-- **Commercial Readiness**: Stripe subscription checkout is implemented; webhook provisioning, metering, and self-serve onboarding are being completed ahead of commercial launch.
-
----
-
-## 4. Problem & Solution
-
-### 4.1 Problem
-
-Developers building with AI face two compounding problems:
-
-1. **Fragmented tooling** — The average developer uses 8+ SaaS tools daily (deployment, monitoring, QA, etc.). Each requires separate authentication, billing, and integration work.
-2. **No managed MCP registry** — The Model Context Protocol (Anthropic, 2024) is emerging as a standard for AI-tool interaction. Developers currently have limited options for a managed MCP platform that combines hosted tools, authentication, rate limiting, and billing in one offering, so many teams still end up building, hosting, and securing their own MCP servers.
-3. **No open-source, community-driven MCP platform** — While proprietary AI tool ecosystems are emerging (OpenAI, Anthropic), there is no open-source, permissionless MCP platform where any developer can publish tools that pass automated quality gates. The market lacks the equivalent of npm for AI tools — a platform that scales through community contribution and trust signals rather than corporate curation.
-4. **Context window waste** — AI agents load all available tool descriptions (often 47,000+ tokens) at the start of every session, consuming 70-95% of their cognitive capacity before doing any useful work. As tool ecosystems grow, this problem compounds exponentially.
-
-### 4.2 Solution
-
-Spike Land provides a unified platform to solve this:
-
-- **Open MCP App Store** — developers can package MCP-native apps for
-  discovery, installation, recommendation, and future revenue share rather than
-  shipping isolated private integrations.
-- **Managed MCP Registry** — 86 natively hosted tools (533+ total via
-  multiplexer), with lazy-loading toolsets that reduce agent context overhead
-  from ~47,000 tokens to ~400 tokens, plus authentication, rate limiting, and
-  metering handled by the platform.
-- **Unified Access** — tools and apps can be invoked identically via the
-  `spike-cli`, the web dashboard, or external cross-origin integrations.
-- **Edge-Native Infrastructure** — deployed primarily on Cloudflare
-  infrastructure, designed for low-latency global access and highly efficient
-  unit economics.
+- Based on current company facts, management believes the business appears to
+  meet the core SEIS conditions.
+- Advance Assurance and external accountant/counsel confirmation should be
+  treated as diligence items, not as marketing claims.
 
 ---
 
-## 5. Market Opportunity
+## 3. What The Business Is
 
-Our initial Year 1-2 go-to-market is built around a focused **bottom-up milestone**:
-Targeting a niche of 5,000 highly active AI agent developers and indie hackers. Converting 5% (250 users) to a blended paid plan of ~£35/month implies an ARR milestone of ~£105,000 once the paid base is fully ramped. This is used here as a product-market-fit milestone, not as recognized Year 1 revenue.
+### 3.1 Core product
 
----
+Spike Land is the managed product layer above raw edge compute. Cloudflare
+Workers answers where code runs. Spike Land answers how AI-callable software is:
 
-## 6. Target Personas (Primary Beachhead)
+- packaged
+- typed
+- governed
+- tested
+- metered
+- discovered
+- operated across more than one surface
 
-Rather than targeting the entire market from day one, Spike Land is focusing on a sharp initial wedge of early adopters. Customer Acquisition Cost (CAC) and Lifetime Value (LTV) figures are currently planning hypotheses to be tested and validated in Year 1.
+### 3.2 What customers buy first
 
-1. **AI Agent Developer**: Builds AI agents using MCP. Discovers tools via npm and GitHub. Pain point: managing fragmented MCP server connections. Target: API PRO ($49/mo). Expected low CAC due to organic technical channels.
-2. **Indie Hacker / Solo Founder**: Solo SaaS builders who need AI leverage. Pain point: tool sprawl and limited budget. Target: PRO ($29/mo). 
-3. **AI Consultancy / Agency**: Small teams building AI solutions for clients. Needs multi-workspace management and per-client isolation. Target: BUSINESS ($99/mo) + API add-ons.
-4. **DevOps / QA Team Lead**: Evaluates tools for team rollout. Needs audit logs, CI/CD integrations, and permission management. Target: BUSINESS ($99/mo).
+Customers do not buy "an open app store" first.
 
----
+They buy a way to reduce pain in a specific workflow:
 
-## 7. Revenue Model & Pricing
+- take a brittle Playwright or Cypress flow
+- express the business logic as typed tools
+- keep the browser as a thin smoke and visual layer
+- gain faster tests, fewer false reds, and a reusable runtime surface
 
-The commercial model focuses on subscription recurring revenue (SaaS) and
-usage-based API add-ons.
+### 3.3 What COMPASS is
 
-The app store adds a second structural revenue layer: marketplace distribution.
-Developers publish into the catalog, users install through the shared runtime,
-and the platform captures marketplace take rate while increasing the value of
-the core subscription and API products.
-
-### 7.1 Current vs. Planned Revenue Streams
-
-| Revenue Stream | Status | Timing |
-|---|---|---|
-| **Platform Subscriptions** | Planned for commercial launch | Y1 |
-| **API Add-ons (PRO / SCALE)** | Planned for commercial launch | Y1 |
-| **Credit Overages** | Planned after initial usage baseline | Y1 H2 |
-| **Marketplace Take Rate (30%)** | Planned | Y2 |
-| **App Builder Services** | Opportunistic / Founder-led | As needed |
-
-### 7.2 Core Pricing Tiers
-
-| Tier | Price | Deployments | AI Credits/mo | Team Members |
-|------|-------|-------------|---------------|--------------|
-| FREE | $0/mo | 3 | 100 | 1 |
-| PRO | $29/mo | 10 | 1,000 | 3 |
-| BUSINESS | $99/mo | Unlimited | 5,000 | 10 |
-
-*\*Note: All USD prices convert at £1 = $1.27. The financial model conservatively assumes a blended ARPU of ~£33/mo.*
-
-### 7.3 MCP API Access (Add-Ons)
-
-For heavy programmatic usage (e.g., AI Agent Developers running large workloads):
-- **Included in BUSINESS**: 1,000 API calls/mo (Read-only)
-- **API PRO**: $49/mo (10,000 calls, full read/write)
-- **API SCALE**: $149/mo (100,000 calls, webhooks, batch operations)
+COMPASS is a flagship application built on the platform. It proves that the
+same runtime can support a regulated, multilingual, offline-capable workflow.
+It should be presented as a proof point and product stress-test, not as the
+base-case revenue engine for this fundraise.
 
 ---
 
-## 8. Go-to-Market Strategy
+## 4. Problem
 
-As a developer-first tool, acquisition relies heavily on Product-Led Growth
-(PLG) rather than expensive paid media.
+The initial customer does not have a generic "AI tooling" problem. They have a
+delivery and QA problem:
 
-1. **npm / CLI Distribution**: `npx @spike-land-ai/spike-cli` provides zero-install evaluation. This is the primary top-of-funnel engine.
-2. **One-Liner Activation**: Adding spike.land as an MCP server to an AI IDE (like Claude Code) takes one terminal command.
-3. **GitHub & Docs SEO**: Creating high-quality technical content, tutorials, and a strong open-source presence to capture developer search intent.
-4. **App Store Distribution**: Store listings, installs, public metadata, and
-   cross-origin embeddability create a second acquisition loop beyond the CLI.
-5. **Direct Outreach**: Targeting MCP tool authors with a compelling
-   revenue-share proposition to rapidly populate the platform's marketplace.
-6. **Community**: Leveraging Discord and developer communities (Hacker News,
-   Indie Hackers) for organic word-of-mouth.
+1. Browser suites are slow and flaky.
+2. High-value journeys such as auth, billing, permissions, and state
+   transitions are often verified at the wrong layer.
+3. Agencies repeat the same scaffolding across client accounts.
+4. Teams can buy Playwright infrastructure, but they still have to design the
+   runtime contracts, auth boundaries, metering, and auditability around it.
 
----
-
-## 9. Competitive Landscape
-
-The company believes its current combination of hosted MCP tooling, CLI access, and edge-native infrastructure is differentiated from existing point solutions and directories. The market remains underserved by managed MCP platforms that combine hosted tools, authentication, rate limiting, and billing in one offering.
-
-OpenAI’s December 18, 2025 app directory update validates the broader trend toward AI tool and application marketplaces. Spike Land remains differentiated by focusing on model-agnostic, granular MCP tool access for developers and small teams rather than model-specific app ecosystems.
-
-| Competitor | Core Focus | Managed MCP Hosting? | CLI Access? | Tool Marketplace? |
-|------------|-------------|------|------|--------------|
-| **Vercel** | Web deployment | No | Yes | No |
-| **Replit** | Cloud IDE | No | No | Limited |
-| **Smithery/Glama** | MCP Directories | Directory only (No hosting) | No | No |
-| **Anthropic Claude Marketplace** | Enterprise AI app procurement | No (apps, not MCP tools) | No | Yes (enterprise procurement layer) |
-| **Self-Hosted MCP (DIY)** | Infrastructure | No | No | No |
-| **spike.land** | **MCP Multiplexer Platform** | **Yes (86 native, 533+ total)** | **Yes (`spike-cli`)** | **Yes (70/30 rev share)** |
-
-**Potential Defensibility**: Spike Land's differentiation is audience and access model. Developers and small teams can onboard via CLI and API in minutes, invoke granular tools rather than buy complete SaaS suites, and avoid model lock-in. The planned marketplace is designed to introduce **network effects**: a rich library of tools attracts developers, which in turn attracts more tool authors seeking distribution and monetization.
+This creates a market opening between test frameworks and cloud primitives.
 
 ---
 
-## 9.5 COMPASS Revenue Layer
+## 5. Initial Customer and Beachhead
 
-COMPASS is positioned as the flagship application built on the Spike Land platform, demonstrating platform capabilities while generating an independent revenue stream through institutional partnerships.
+### 5.1 First paid wedge
 
-| Revenue Stream | Value Proposition | Y1 Target | Y5 Target |
-|---|---|---|---|
-| Government partnerships | Reduced processing costs, higher program uptake, policy data | $3M | $200M+ |
-| International org licensing | Amplified program reach (UNHCR, ILO, World Bank) | $2M | $80M+ |
-| NGO/legal aid suite | Case management, batch processing (freemium model) | $2M | $40M+ |
-| Systemic intelligence reports | Anonymized aggregate bureaucratic performance data | $1M | $20M+ |
-| **Total** | | **$8M** | **$340M+** |
+The first paid segment is:
 
-COMPASS is free for end users. Revenue derives from institutional partnerships that benefit from reduced processing costs, higher program uptake, and anonymized systemic intelligence. This revenue layer is additive to the core platform SaaS revenue and is presented separately to maintain SEIS-compliant conservative framing for the platform business.
+- QA-heavy software agencies and AI consultancies with 5-50 engineers
 
-COMPASS technical footprint: 12 MCP-native engines, 28,042 LOC, targeting 4 Tier 1 countries in Year 1 (Germany, India, US, Kenya), scaling to 150+ countries by Year 5.
+Why this segment first:
 
----
+- pain is acute and already budgeted
+- value is measurable in CI time, flaky-build reduction, and reduced setup
+- buyer is reachable through founder-led sales
+- design-partner motion is credible at this stage
 
-## 10. Three-Year Financial Forecasts
+### 5.2 Adjacent segments, not first segments
 
-### 10.1 Key Assumptions
-- Year 1 focuses on controlled growth, product hardening, and establishing baseline retention.
-- Core hosting infrastructure uses Cloudflare, offering a highly capital-efficient baseline with predictable scaling costs as usage grows.
-- **Important Note on Capital Use**: The £250,000 SEIS raise is explicitly intended to *accelerate growth*. The Year 1 model assumes approximately £102.7k of gross cash outflows (COGS plus OpEx), primarily into product hardening, GTM, and early hires. After £42.8k of forecast revenue, year-end cash is forecast at approximately £190.1k, leaving roughly £147.3k of undeployed raise capital plus revenue-generated cash available entering Year 2.
-- **Sensitivity / Downside Scenario**: If customer acquisition tracks at roughly half the base case, ending Year 1 at approximately 114 paying customers rather than 228, Year 1 revenue would be roughly £21k-22k. In that case the company would still retain material runway into Year 2 to continue iterating on product-market fit.
+These remain valid later but are not the first commercial motion:
 
-### 10.2 Year 1 Profit & Loss — Monthly Detail (M1-M12)
+- small AI product teams
+- internal innovation teams in regulated firms
+- broader developer PLG audience
 
-| Month | Paying Customers | Revenue (£) | COGS (£) | Gross Profit (£) | Opex (£) | EBIT (£) |
-|-------|-----------------|-------------|----------|-----------------|----------|----------|
-| M1 | 5 | 165 | 30 | 135 | 4,000 | -3,865 |
-| M2 | 12 | 396 | 71 | 325 | 4,000 | -3,675 |
-| M3 | 22 | 726 | 131 | 595 | 4,500 | -3,905 |
-| M4 | 35 | 1,155 | 208 | 947 | 4,500 | -3,553 |
-| M5 | 55 | 1,815 | 327 | 1,488 | 5,000 | -3,512 |
-| M6 | 80 | 2,640 | 475 | 2,165 | 8,500 | -6,335 |
-| M7 | 110 | 3,630 | 653 | 2,977 | 8,500 | -5,523 |
-| M8 | 140 | 4,900 | 882 | 4,018 | 9,000 | -4,982 |
-| M9 | 160 | 5,600 | 1,008 | 4,592 | 11,500 | -6,908 |
-| M10 | 185 | 6,475 | 1,166 | 5,309 | 11,500 | -6,191 |
-| M11 | 210 | 7,350 | 1,323 | 6,027 | 12,000 | -5,973 |
-| M12 | 228 | 7,980 | 1,436 | 6,544 | 12,000 | -5,456 |
-| **Total**| | **£42,832** | **£7,710** | **£35,122** | **£95,000** | **-£59,878** |
+### 5.3 Target buyer
 
-*\*Notes on Y1 P&L:* 
-- *COGS (modeled at 18% of revenue) includes Stripe processing fees (2.9%), third-party API pass-through costs, and LLM inference costs for AI credits.*
-- *OpEx reflects the founder, infrastructure, and SaaS tooling in M1-M5. The ramp from M6+ reflects the introduction of a dedicated Growth Lead hire and increased GTM spend.*
+Likely first buyers:
 
-### 10.3 Post-Raise Multi-Year Financial Summary
-
-To demonstrate the path from SEIS-funded strategic burn to eventual profitability, the following table summarizes the three-year P&L trajectory feeding the balance sheet.
-
-| Metric | Year 1 | Year 2 (Forecast) | Year 3 (Forecast) |
-|---|---|---|---|
-| **Revenue** | £42,832 | £150,000 | £400,000 |
-| **COGS** (18%) | £7,710 | £27,000 | £72,000 |
-| **Gross Profit** | £35,122 | £123,000 | £328,000 |
-| **OpEx** | £95,000 | £143,000 | £218,000 |
-| **EBIT / Net Income** | **-£59,878** | **-£20,000** | **£110,000** |
-
-*\*Note on Year 3 Revenue: Year 3 revenue growth reflects the combined effect of continued subscription growth, the launch of the marketplace revenue-share model, and the introduction of API SCALE tier adoption.*
-
-### 10.4 Year-End Balance Sheet & Cash Summary
-
-| Item | Year 1 | Year 2 (Forecast) | Year 3 (Forecast) |
-|------|--------|-------------------|-------------------|
-| **Cash at Bank** | £190,123 | £170,123 | £260,123 |
-| Other Assets | £3,000 | £10,000 | £28,000 |
-| **Total Assets** | **£193,123** | **£180,123** | **£288,123** |
-| | | | |
-| Liabilities* | £3,000 | £10,000 | £8,000 |
-| **Net Assets** | **£190,123** | **£170,123** | **£280,123** |
-| | | | |
-| **Equity** | | | |
-| Share Capital | £1 | £1 | £1 |
-| Share Premium | £250,000 | £250,000 | £250,000 |
-| Retained Earnings | -£59,878 | -£79,878 | £30,122 |
-| **Total Equity** | **£190,123** | **£170,123** | **£280,123** |
-
-*\*Note: Liabilities consist primarily of accrued expenses and short-term trade creditors. Share Premium figure represents the forecast position post-SEIS raise.*
-
-### 10.5 Combined Revenue Scenarios
-
-The following scenarios illustrate the combined potential of the platform SaaS business and the COMPASS revenue layer. The SEIS-compliant forecasts in Sections 10.2–10.4 represent the Platform Only scenario.
-
-| Scenario | Y1 Revenue | Y2 Revenue | Y3 Revenue | Notes |
-|---|---|---|---|---|
-| **Platform Only** (Base Case) | £42,832 | £150,000 | £400,000 | SEIS-compliant forecasts above |
-| **Platform + COMPASS Pilot** | £42,832 + $2M | £150,000 + $12M | £400,000 + $45M | COMPASS pilot in 2 Tier 1 countries |
-| **Platform + COMPASS Scale** | £42,832 + $8M | £150,000 + $45M | £400,000 + $140M | Full COMPASS rollout per PRD |
-
-*Note: COMPASS revenue is denominated in USD as institutional partnerships are predominantly USD-denominated. Platform revenue remains GBP. Scenarios are not additive to the SEIS-compliant P&L forecasts, which reflect platform revenue only.*
+- Head of Engineering
+- Head of QA / QA lead
+- CTO at boutique software consultancies
+- senior IC who owns the test pain and can sponsor a pilot
 
 ---
 
-## 11. Use of Funds & Milestones
+## 6. Product Wedge
 
-The maximum £250,000 SEIS raise will be deployed over 18-24 months for qualifying trade purposes to achieve specific growth milestones.
+### 6.1 What Spike Land offers the wedge
 
-| Milestone / Objective | Estimated Spend | Intended Outcome |
-|-----------------------|-----------------|------------------|
-| **Commercial Launch & Billing** | £25,000 | Stripe live, paid plans activated, self-serve onboarding. |
-| **Platform Hardening & Docs** | £35,000 | Comprehensive developer documentation, analytics, and robust APIs. |
-| **Tool Registry Expansion** | £40,000 | Scale platform to 120+ hosted tools; implement marketplace revenue share. |
-| **GTM & Content Marketing** | £50,000 | Founder-led demos, SEO content, initial push to first 100 paying customers. |
-| **Growth & Engineering Hires** | £80,000 | Hire Growth Lead & CS/Engineering support to lower churn and drive acquisition. |
-| **COMPASS Pilot Deployment** | £15,000 | Knowledge Engine for 2 Tier 1 countries; WhatsApp/PWA deployment; initial gov partnerships. |
-| **Working Capital / Contingency** | £5,000 | Professional fees, legal, accounting, and buffer. |
-| **Total** | **£250,000** | |
+The platform offers:
 
----
+- typed MCP contracts for high-value business flows
+- direct tool-level testing at function speed
+- hosted runtime, auth, and metering
+- CLI, dashboard, and agent access to the same underlying contract
+- browser automation retained as a thin smoke layer through QA Studio
 
-## 12. SEIS Risk-to-Capital Statement
+### 6.2 What it does not claim
 
-The company is structured to satisfy the HMRC Risk-to-Capital condition:
-- **Long-term growth:** SPIKE LAND LTD is a genuine commercial software business seeking to build long-term value, increase its customer base, and expand its team.
-- **Capital at Risk:** The company is pre-revenue. Success is highly uncertain in a competitive and rapidly evolving AI market.
-- **No capital protection:** There are no asset backings, downside protections, or capital preservation arrangements in place. 
-- **Return profile:** Investor returns depend entirely on the commercial success and future enterprise value of the company, not on tax relief alone. The company is not structured to provide low-risk returns or early extraction of capital.
+The product should not be sold as:
 
----
+- a complete Playwright replacement
+- a generic "better QA Wolf"
+- a company serving four GTM motions simultaneously
 
-## 13. Risk Factors
+The correct framing is:
 
-1. **Market Risk (MCP Adoption):** The Model Context Protocol may not achieve widespread industry adoption. *Mitigation:* MCP is backed by major ecosystem participants, and platform tools can also be exposed through standard API channels rather than relying exclusively on one protocol surface.
-2. **Competition Risk (Developer Platforms):** Established platforms such as Vercel, Replit, or hosted MCP providers could add overlapping managed-tool functionality. *Mitigation:* Spike Land is targeting a narrow initial wedge, using CLI-led developer distribution and tool-level workflows rather than generic hosting positioning.
-3. **Platform Marketplace Risk (Model Providers):** Major model providers are beginning to launch proprietary app marketplaces, including Anthropic's March 2026 Claude Marketplace and OpenAI's expanding app ecosystem. *Mitigation:* Spike Land is model-agnostic, focused on granular tool access rather than full SaaS procurement, and oriented toward developers and small teams rather than enterprise committed-spend budgets.
-4. **Concentration Risk (AI Providers):** Core user workflows depend heavily on Anthropic/OpenAI/Google APIs. Pricing or policy changes by these providers could affect margins or product behavior. *Mitigation:* The platform architecture is model-agnostic, allowing developers to route requests to alternative open-source or proprietary LLMs.
-5. **Execution Risk:** A single founder creates a key-person dependency. *Mitigation:* AI-assisted development enables the founder to ship quickly and operate efficiently at the current stage, while the raise provides capital to reduce single-founder execution risk through targeted hiring (Growth Lead and CS support in Y1 H2).
+> start with one brittle flow, prove the improvement, then expand
 
 ---
 
-## 14. 18–24 Month Milestones
+## 7. Go-To-Market
 
-Rather than engineering speculative exit scenarios at this pre-revenue stage, the company is entirely focused on achieving the following operational and commercial milestones over the next 18 to 24 months to maximize enterprise value:
+### 7.1 Revenue motion
 
-1. **Commercial Launch Completed:** Transition from public beta to full Stripe-integrated billing with self-serve onboarding.
-2. **First 100 Paying Customers:** Achieve initial product-market fit within the core developer/indie hacker beachhead.
-3. **Marketplace Launched:** Open the platform to third-party MCP tool publishers with a 70/30 revenue share model.
-4. **First Agency/Team Customers Onboarded:** Validate the higher-LTV "BUSINESS" tier through multi-workspace usage.
-5. **Enterprise-Ready Access Controls:** Deploy robust audit logs, RBAC, and SSO to unlock larger organizational deployments.
-6. **ARR Target:** Reach a baseline of £105k+ ARR to establish strong momentum for a potential Series A or secondary EIS round.
+The first revenue motion is founder-led design partners, not self-serve PLG.
+
+PLG remains important for:
+
+- awareness
+- developer trust
+- open-source distribution
+- long-term top-of-funnel
+
+But the first customers should come from direct conversations and scoped pilot
+engagements.
+
+### 7.2 First ten customers
+
+The realistic path to the first ten paying customers is:
+
+1. 3-5 design partners in agencies and consultancies
+2. 3 paid reference customers with quantified outcomes
+3. 5-7 adjacent teams reached through case studies, referrals, and founder-led
+   outbound
+
+### 7.3 90-day commercial objective
+
+By the end of the initial 90-day validation window, the company should have:
+
+- 20-30 qualified agency/consultancy conversations
+- 6-8 serious discovery calls
+- 3 design partners onboarded
+- at least 1 customer paying or committed to paid conversion if success
+  criteria are met
 
 ---
 
-## 15. Related Documents
+## 8. Revenue Model
 
-For growth-scenario projections beyond the SEIS-compliant forecasts in this document, see:
-- **INVESTEC_PITCH.md** — Moonshot growth projections for institutional investors
-- **GEMINI_MARKET_VALIDATION.md** — Independent third-party market validation
-- **VALUATION_ANALYSIS.md** — Eight-method valuation framework
+### 8.1 Near-term revenue
+
+The honest near-term model is a mix of:
+
+- design-partner pilot fees
+- team subscription revenue
+- usage / API add-ons once workflows are live
+
+Illustrative early monetization:
+
+| Revenue Stream | Price Logic | Timing |
+| --- | --- | --- |
+| Design partner pilot | £2,000-£5,000 for a scoped 6-8 week engagement | Immediate |
+| Team plan | from $99/month plus usage | After pilot |
+| API / usage add-ons | metered where relevant | After workflow adoption |
+| Marketplace take rate | deferred until platform adoption is real | Later |
+
+### 8.2 Why the model is more credible now
+
+This structure matches the stage of the company:
+
+- low-volume, high-learning engagements first
+- productized subscription second
+- marketplace third
+
+It avoids pretending that an unvalidated pre-revenue platform will jump
+straight to broad self-serve scale.
 
 ---
-*Document Version: 2.4 (SEIS Advance Assurance Edition)*
-*Prepared: March 2026*
+
+## 9. Competition and Strategic Risks
+
+### 9.1 Purpose-built QA tools
+
+Playwright, QA Wolf, Checkly, and Reflect all address real pain.
+
+Their strength:
+
+- they improve browser testing directly
+
+Spike Land's difference:
+
+- it moves part of the verification model below the browser into reusable typed
+  tool contracts
+
+This is a harder behaviour change. It only works if the company can prove a
+clear, quantified improvement on a narrow set of flows.
+
+### 9.2 Cloudflare risk
+
+If Spike Land were only "managed Workers plus an MCP registry", it would be too
+thin. Cloudflare can ship primitives and may ship more MCP support. The
+defensible layer is the workflow product above those primitives:
+
+- tool contracts
+- testing surface
+- auth and governance
+- metering
+- auditability
+- multi-surface execution
+
+### 9.3 MCP standard risk
+
+MCP is a useful tailwind, not the only pillar of the business.
+
+If the market fragments, the platform still needs to expose the same underlying
+tool layer through whichever interfaces matter: MCP, REST, or adapters for
+other standards.
+
+---
+
+## 10. 18-Month Success Criteria
+
+The business should be judged against three concrete tests by **30 September
+2027**:
+
+1. **Wedge validation**: at least 3 paid reference customers in the QA/agency
+   wedge with measured improvement in CI time, flaky-build reduction, or
+   browser-suite simplification.
+2. **Distribution validation**: a repeatable pipeline exists beyond founder-only
+   outbound, with a functioning Growth/DevRel motion and clear path from
+   activation to paid.
+3. **Platform validation**: customers are buying the managed runtime as a
+   product, not just founder effort, and the company is no longer
+   operationally bus-factor-one.
+
+### Kill criteria
+
+If those three things have not happened by **30 September 2027**, the current
+platform thesis should be treated as broken.
+
+---
+
+## 11. Use of Funds
+
+The SEIS round buys proof and resilience, not vanity scale.
+
+Use of proceeds:
+
+1. finish the commercial layer and design-partner onboarding
+2. close and support the first three design partners
+3. hire a founding Head of Growth/DevRel with technical credibility
+4. hire a senior engineer to reduce bus-factor risk
+5. harden documentation, runbooks, auditability, and enterprise controls
+
+### Initial hiring plan
+
+| Hire | Why now |
+| --- | --- |
+| Founding Head of Growth/DevRel | Needed to source and close design partners and build repeatable distribution |
+| Senior engineer | Needed to remove single-founder execution risk and improve onboarding capacity |
+
+---
+
+## 12. Milestone-Based Financial View
+
+Precision beyond this stage is misleading. The company should be measured
+against milestones and revenue ranges, not false month-by-month certainty.
+
+| Horizon | Commercial objective | Indicative revenue view |
+| --- | --- | --- |
+| Next 12 months | 3 paid reference customers, 3-5 design partners, early subscriptions | £20k-£60k revenue |
+| 12-24 months | 10-15 paying teams, clearer land-and-expand motion | £120k-£250k ARR |
+| 24-36 months | productized wedge, broader adjacent adoption | £300k-£600k ARR |
+
+These ranges are deliberately conservative. The business case should improve by
+evidence, not by spreadsheet optimism.
+
+---
+
+## 13. COMPASS As Proof Point
+
+COMPASS remains strategically useful because it demonstrates that the platform
+can support:
+
+- regulated workflows
+- multilingual interaction
+- offline-capable product surfaces
+- high-trust user journeys
+
+The correct 12-month COMPASS objective is:
+
+- one or two narrowly scoped institutional pilots
+- evidence that the platform can support compliance-heavy use cases
+
+The incorrect framing is:
+
+- presenting COMPASS as the base-case source of multi-million dollar Year 1
+  revenue in a £250k SEIS deck
+
+---
+
+## 14. Summary
+
+The strongest version of Spike Land is not "two big ideas in one deck". It is:
+
+- one platform business
+- one narrow commercial wedge
+- one flagship proof point
+- one honest plan to prove or kill the thesis quickly
+
+That is the business case investors can underwrite.

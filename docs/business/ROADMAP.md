@@ -1,507 +1,239 @@
-# Spike Land - Development Roadmap
+# Spike Land Roadmap
 
-> **Last Updated**: 2026-03-09 **Current Phase**: Platform Launch & Growth
-> **Business Structure**: UK Limited Company (SPIKE LAND LTD - Company
-> #16906682)
-
----
-
-## Vision: The Open MCP App Store With Managed Runtime
-
-**Spike Land is an open MCP app store where developers vibe code full-stack
-apps, publish them, and run them across edge-hosted, cross-origin, and offline
-surfaces -- powered by Spike, your personalized AI assistant with 533+ tools
-accessible today via CLI and web chat, with WhatsApp in beta and Telegram
-planned.**
-
-spike-cli lets you build, deploy, and manage applications from the command line.
-The web platform provides a visual dashboard. Every capability is exposed as an
-MCP tool. Every workflow can be automated by AI agents through the Model Context
-Protocol.
-
-Apps are organized into categories for discovery, but they are not limited to a
-single frontend. The same app can increasingly be expressed through multiple
-surfaces: browser UI, CLI, chat, embedded cross-origin views, and local/offline
-bundles. One path under active development is a typed-to-MDX rendering model
-where strong TypeScript tool contracts can be turned programmatically into
-session-aware frontend surfaces.
-
-The platform is also being built as a feedback system rather than a one-shot
-generator:
-
-`intent -> select tools/skills -> generate -> transpile -> render -> review -> observe -> improve`
-
-That loop matters because the more the platform is used, the more traces,
-feedback, and failure data it can use to improve the next run.
-
-The core equation is simple:
-
-`Spike Land = tools + agents`
-
-The moat is not the tools alone, and it is not the agents alone. The strength
-comes from running high-quality tools and agents in the same observable loop,
-then using that loop to improve spike.land itself.
-
-**The moat is four things no competitor has together:**
-
-1. **MCP-native architecture with multi-channel access** - 533+ tools callable
-   by any AI agent via standard protocol, accessible through spike-cli (CLI),
-   web chat, and an in-progress channel expansion that already includes
-   WhatsApp building blocks. No competitor offers this breadth of access
-   channels.
-2. **Open app-store distribution with multi-surface apps** - Build full-stack
-   apps with AI assistance, publish them into the catalog, and distribute them
-   as callable MCP software with more than one frontend over time.
-3. **Feedback-driven self-improvement loop** - Generation, transpilation,
-   rendering, review, observability, and prompt/skill improvement are designed
-   as one system rather than separate tools.
-4. **Quality tools + intelligent agents** - QA, review, browser automation,
-   deployment, and bug-detection tools are used by agents inside the platform
-   itself, including ELO-guided prioritization and remediation loops.
-5. **UK Ltd with Stripe-first billing** - Global payments, VAT handling,
-   SEIS/EIS eligible
-
-**Positioning**: Open MCP app store with managed runtime **Core Product**:
-spike-cli (MCP multiplexer CLI), Spike web chat, WhatsApp beta integration, and
-Telegram on the roadmap
-**Supporting Tools**: App Store, vibe coding, real-time code editor,
-feedback-driven QA/review, offline bundling, Cloudflare deployment guides
-**Target Market**: Developers, AI agent builders, solo founders, small teams
+> **Last updated**: 11 March 2026
+> **Current phase**: Wedge validation
+> **Company**: SPIKE LAND LTD
 
 ---
 
-## Current State (March 2026)
+## 1. Roadmap Thesis
 
-### What's Built
+The product is broad. The business cannot be.
 
-| Area                   | Status     | Details                                                                                                |
-| ---------------------- | ---------- | ------------------------------------------------------------------------------------------------------ |
-| **MCP Server**         | Production | 147 tool files, 150 test files (100% file coverage)                                                    |
-| **spike-cli**          | Production | MCP multiplexer CLI (`@spike-land-ai/spike-cli`), 46 TS source files, auth, chat REPL, shell, registry |
-| **App Store**          | Production | 18 store app listings, 19 first-party app dirs, 6 categories, 180 declared MCP tools                   |
-| **Chess Arena**        | Production | 21 MCP tools, ELO ratings, time controls, profiles, game replay                                        |
-| **State Machine**      | Production | Engine, types, visualizer template, 14 MCP tools                                                       |
-| **QA Studio**          | Production | Browser automation, WCAG a11y audits, test runner, coverage                                            |
-| **CleanSweep**         | Production | ADHD-friendly gamified cleaning, 14 MCP tools                                                          |
-| **Career Navigator**   | Production | Skills assessment, ESCO taxonomy, salary data                                                          |
-| **Auth**               | Production | Better Auth (GitHub, Google, Facebook, Apple)                                                          |
-| **Stripe**             | 85%        | Subscriptions, annual billing, and one-time credit purchases live; API usage billing still pending     |
-| **Dev Workflow Tools** | Production | 5 MCP tools for local development                                                                      |
-| **Security**           | Hardened   | Durable Object rate limiting, command injection prevention                                               |
-| **Feedback Loop**      | Beta       | Generate -> transpile -> render -> review loop with structured failure handling and learning-note direction |
-| **Experimentation & Bug Detection** | Beta | Deterministic variant assignment, impression/error tracking, Bayesian winner selection, and anomaly monitoring used as reliability tooling |
-| **Observability**      | Production | Tool-call logging, feedback tools, and bug reporting surfaces across MCP services                       |
-| **Agent Bridges**      | Beta       | OpenClaw MCP bridge live; WhatsApp MCP utility exists; unified routing expansion planned                |
-| **Browser Handoff**    | In Progress| Browser automation is live; shared remote browser/session handoff surfaces are being integrated         |
+For the next 12 months, the roadmap is built around one commercial wedge:
 
-### Tech Stack
+- QA-heavy software agencies
+- AI consultancies
+- adjacent small AI product teams with an existing Playwright or Cypress burden
 
-- **Frontend**: spike-app (Vite + React + TanStack Router)
-- **Edge API**: spike-edge, spike-land-mcp, mcp-auth (Cloudflare Workers + Hono)
-- **Database**: D1 (SQLite at edge) + Drizzle ORM
-- **Auth**: Better Auth (sessions, OAuth, device flow)
-- **AI**: Google Gemini (gemini-3-flash), Anthropic Claude (Agent SDK)
-- **Testing**: Vitest 4.0 (80% line/function coverage enforced in CI)
-- **Payments**: Stripe | **Email**: Resend
-- **Infra**: Cloudflare Workers (8 total) — zero AWS
-
-### Scale
-
-- 29 packages in `src/` (monorepo)
-- 8 Cloudflare Workers (spike-edge, spike-land-mcp, mcp-auth, spike-land-backend, transpile, code, spike-review, image-studio-worker)
-- 533+ MCP tools (86 native + multiplexer ecosystem)
-- D1 database with 17 tables in spike-land-mcp (Drizzle-managed)
-- block-sdk for composable storage blocks
-
-### Platform Characteristics
-
-- **Apps are callable products**: not just pages, but typed tool surfaces that
-  can be expressed through multiple frontends.
-- **Command plane over UI-only flows**: `/create`, `/test`, `/deploy`, and
-  `/vibe-code` are the intended control-plane verbs across cloud and local
-  execution paths.
-- **Feedback is first-class**: tool calls, failures, review output, and user
-  reports are part of the product loop rather than post-hoc instrumentation.
-- **Experimentation is also a quality system**: A/B testing, variant error
-  tracking, and anomaly detection are treated as reliability inputs, not just
-  growth tooling.
-- **Observability compounds quality**: as usage grows, the platform should gain
-  better traces, better skill routing, and better next-run performance.
-- **Tools and agents reinforce each other**: the platform's QA, review, deploy,
-  and bug-detection tools are used by agents to improve the platform itself.
+The job is not to prove that spike.land can theoretically serve every developer
+workflow. The job is to prove that one repeatable customer will pay for a tool-
+first verification model and that the company can support that customer without
+remaining structurally founder-only.
 
 ---
 
-## Monetization Strategy
+## 2. What Is Already Built
 
-### Tier 1: Platform Subscriptions (Commercial Launch)
+These assets are real and should be used as leverage, not as excuses to stay
+unfocused:
 
-Public beta access is live. Paid subscriptions and recurring billing activate at commercial launch.
-
-| Tier     | Price | Deployments | AI Credits/mo | Team Members |
-| -------- | ----- | ----------- | ------------- | ------------ |
-| FREE     | $0    | 3           | 100           | 1            |
-| PRO      | $29   | 10          | 1,000         | 3            |
-| BUSINESS | $99   | Unlimited   | 5,000         | 10           |
-
-### Tier 2: MCP API Access (Q1-Q2 2026) - THE DIFFERENTIATOR
-
-No competitor offers this. Package the MCP server as a paid API product for AI
-agents.
-
-| Access Level         | Price    | API Calls/mo | Capabilities                   |
-| -------------------- | -------- | ------------ | ------------------------------ |
-| Included in BUSINESS | $0 extra | 1,000        | Read-only (reports, analytics) |
-| API PRO add-on       | $49/mo   | 10,000       | Full read/write                |
-| API SCALE add-on     | $149/mo  | 100,000      | Webhooks, batch operations     |
-
-**Call weighting**: Read = 1 call, Write = 5, AI operation = 10, Batch = 25
-
-### Tier 3: Tool Marketplace (Q2-Q3 2026)
-
-Third-party developers can publish MCP tools to the Spike registry. Revenue
-share: 70% developer / 30% platform.
-
-### Tier 4: Unified Credit Economy (Ongoing)
-
-Merge all credits into "Spike Credits":
-
-| Tier     | Included Credits | Overage Rate  |
-| -------- | ---------------- | ------------- |
-| FREE     | 100              | N/A           |
-| PRO      | 1,000            | $0.008/credit |
-| BUSINESS | 5,000            | $0.006/credit |
-| SCALE    | 50,000           | $0.004/credit |
+- hosted MCP runtime and registry
+- `spike-cli`
+- 80+ natively hosted tools
+- QA Studio and browser automation surfaces
+- web dashboard and public beta infrastructure
+- Stripe checkout and core commercial plumbing nearing completion
+- COMPASS as a proof point for regulated, multilingual, offline-capable flows
 
 ---
 
-## UK Tax Advantages & Funding
+## 3. What We Are Not Doing
 
-### Available Now
+The roadmap explicitly does **not** optimize for:
 
-| Scheme                 | Benefit                                         | Estimated Value            |
-| ---------------------- | ----------------------------------------------- | -------------------------- |
-| R&D Tax Credits (RDEC) | 20% credit on qualifying AI/ML R&D spend        | $6,000-8,100 on $30K spend |
-| SEIS                   | 50% investor tax relief, $250K lifetime         | First funding round        |
-| EIS                    | 30% investor tax relief, $5M annual             | Follow-on rounds           |
-| Patent Box             | Reduces Corporation Tax to 10% on qualifying IP | When profitable            |
-
-### Grants to Apply For
-
-| Grant                              | Amount           | Timeline                   |
-| ---------------------------------- | ---------------- | -------------------------- |
-| Sovereign AI PoC Grant             | $50-84K          | Applications open Aug 2025 |
-| British Business Bank Startup Loan | $25K at 6% fixed | Apply anytime              |
-| Innovate UK Smart Grant            | $25-500K         | Rolling applications       |
+- serving four GTM segments at once
+- launching a broad marketplace before a paid wedge exists
+- pitching COMPASS revenue as the reason to fund the company
+- asking teams to rip out all browser testing immediately
 
 ---
 
-## Development Phases
+## 4. Next 90 Days
 
-### Completed Phases
+### Weeks 1-2: sharpen the offer
 
-| Phase | Name                   | Status | Notes                                                      |
-| ----- | ---------------------- | ------ | ---------------------------------------------------------- |
-| 0     | Business Foundation    | Done   | UK Ltd incorporated Dec 2025, Monzo Business, UTR received |
-| 1     | Database Schema        | Done   | PostgreSQL + Prisma, 233 models                            |
-| 2     | Backend Infrastructure | Done   | Auth, MCP server, AI integration                           |
-| 3     | Frontend Development   | Done   | UI, ~557 routes, shadcn/ui                                 |
-| 4     | Testing & QA           | Done   | Vitest, 80% coverage enforced                              |
+Goals:
 
-### In Progress
+- unify the business case, deck, website, and outreach around the QA wedge
+- finish instrumentation for activation and design-partner metrics
+- finalize the design-partner offer, success criteria, and onboarding materials
 
-#### Phase 5: Stripe Integration (85%)
+Outputs:
 
-- [x] Payment intent creation
-- [x] Webhook handling
-- [x] Subscription management
-- [x] Annual billing with 20% discount
-- [ ] Metered billing for API usage
-- [x] Credit pack one-time purchases ($5/$20/$50 packs)
+- refreshed business materials
+- live analytics for `signup_completed`, `mcp_server_connected`,
+  `first_tool_call`, and design-partner milestones
+- one proof asset showing tool-first verification against a browser-heavy flow
 
-#### Phase 10: Recent Feature Completions (February 2026)
+### Weeks 3-4: build the target-account list and start founder-led outreach
 
-- [x] TikTok social integration (4 API routes: connect, callback, metrics,
-      posts)
-- [x] 12 app storybook pages with components and unit tests (46 storybooks
-      total)
-- [x] Error boundaries across the app (16 error.tsx, 23 loading.tsx)
-- [x] Dead code removal (~420 files removed)
-- [x] Logger refactoring (~300 files)
-- [x] 51 CATEGORY_DESCRIPTIONS added to tool-registry.ts
-- [x] CSS XSS fix (sanitization)
-- [x] State machine guard conditions and action handlers
-- [x] AnimationPerformanceProvider
-- [x] cron-auth module
-- [x] Device detection
-- [x] Cache system tests
-- [x] Social engagement fetcher tests
+Goals:
 
-#### Phase 11: Tech Debt Reduction (100%)
+- prioritize 30-40 reachable accounts, starting with Brighton and London
+  agencies/consultancies
+- secure 6-8 discovery calls
 
-- [x] Full repo audit
-- [x] 8 stale smoke test issues closed
-- [x] Root-level unused deps removed
-- [x] 6 critical security bugs fixed (command injection prevention)
-- [x] Dev workflow MCP tools added (5 tools, 25 tests)
-- [x] Dead code removal (~420 files removed)
-- [x] Logger refactoring (~300 files)
-- [x] Remove unused deps from src/code (extracted to external repo)
-- [x] Increase test coverage to 80% (from ~30%)
+Outputs:
 
-### Upcoming
+- target-account list with pain hypotheses
+- outreach scripts and follow-up cadence
+- first batch of discovery calls booked
 
-#### Phase 12: Open App Store Expansion (Q1-Q2 2026)
+### Weeks 5-6: run discovery and qualify design partners
 
-**Goal**: Turn the current store into the default distribution layer for
-spike.land apps and skills
+Goals:
 
-| Task | Priority | Status |
-| --- | --- | --- |
-| Open submissions with review gates | Critical | In progress |
-| Shared SDK v1 documentation | Critical | In progress |
-| Cross-origin MCP integration guides | High | Done |
-| Multi-surface app metadata and frontend contracts | High | In progress |
-| Typed tool contract -> surface compiler | Critical | In progress |
-| Offline browser bundle path | High | In progress |
-| Typed-to-MDX universal runner | High | In progress |
-| Session-aware generated app surfaces | Medium | In progress |
-| Render primitives for forms, tables, media, links, and action bars | High | Planned |
-| Store security and sandbox docs | High | Done |
-| Performance budgets per store surface | Medium | Planned |
+- validate which flows are painful enough to buy around
+- find accounts willing to commit time, data, and a real workflow
 
-#### Phase 13: Multi-Channel Assistant Surfaces (Q1-Q2 2026)
+Outputs:
 
-**Goal**: Multi-channel access to Spike AI assistant with unified routing
+- 5+ completed discovery calls
+- 3 shortlisted design partners
+- baseline metrics captured for candidate workflows
 
-| Task                                                        | Priority | Status      |
-| ----------------------------------------------------------- | -------- | ----------- |
-| WhatsApp Business API integration                           | Critical | In progress |
-| Telegram Bot API integration                                | Critical | Planned     |
-| Unified message routing (web chat, WhatsApp, Telegram, CLI) | Critical | Planned     |
-| Web chat deepening toward Slack-like workspace utility      | High     | Planned     |
-| OpenClaw/local-agent bridge handoff                         | High     | In progress |
-| Channel-specific formatting (markdown, rich cards)          | High     | Planned     |
-| Media support (images, files) across channels               | High     | Planned     |
-| Session persistence across channels                         | Medium   | Planned     |
-| Additional channel adapters (email/voice-style surfaces)    | Low      | Exploratory |
+### Weeks 7-8: onboard the first design partners
 
-**Exit criteria**: Users can interact with Spike via WhatsApp and Telegram with
-the same capabilities as web chat and spike-cli, with unified session routing
-across surfaces.
+Goals:
 
-#### Phase 14: Expanded MCP Registry And Marketplace (Q2 2026)
+- implement one or two high-friction flows per partner
+- keep Playwright/Cypress in place as smoke coverage
+- instrument before/after results
 
-**Goal**: Package MCP server as paid API product, open tool marketplace
+Outputs:
 
-| Task                                                | Priority | Status          |
-| --------------------------------------------------- | -------- | --------------- |
-| API rate limiting per account                       | Critical | Done            |
-| API key management UI                               | Critical | Done            |
-| Usage metering (calls tracked in DB)                | Critical | Done            |
-| Developer documentation                             | High     | In progress     |
-| MCP marketplace listings (Smithery, Glama, LobeHub) | High     | Planned         |
-| Third-party tool submission workflow                | High     | Planned         |
-| Tool review and approval pipeline                   | Medium   | Planned         |
-| Webhook subscriptions for API SCALE                 | Medium   | Planned         |
+- partner environments connected
+- success criteria signed off
+- weekly operating cadence live
 
-**Exit criteria**: API PRO add-on purchasable, rate-limited, metered,
-documented. Third-party developers can submit tools.
+### Weeks 9-10: prove measurable value
 
-#### Phase 15: Managed Deployments & Command Plane (Q3 2026)
+Goals:
 
-**Goal**: One-command execution and deployment for vibe-coded apps
+- reduce CI time
+- reduce flaky browser dependence
+- show that the same contract can power CI, CLI, and agent invocation
 
-| Task                                             | Priority | Status      |
-| ------------------------------------------------ | -------- | ----------- |
-| `spike deploy` CLI command                       | Critical | Planned     |
-| Slash-command execution (`/create`, `/test`, `/deploy`, `/vibe-code`) | Critical | Planned     |
-| Cloud vs local execution routing                 | High     | In progress |
-| Managed hosting infrastructure                   | Critical | Planned     |
-| Review/test/deploy pipeline orchestration        | High     | Planned     |
-| Custom domain support                            | High     | Planned     |
-| Environment variable management                  | High     | Planned     |
-| Deployment logs and monitoring                   | High     | Planned     |
-| Rollback support                                 | Medium   | Planned     |
+Outputs:
 
-**Exit criteria**: Users can deploy full-stack apps from spike-cli with
-`spike deploy`, and the golden-path command loop can take a narrow app request
-from intent to running deployed surface in under 60 seconds.
+- partner-specific benchmark results
+- objections log
+- pricing feedback
 
-#### Phase 16: MCP Multiplexer Expansion (Q4 2026)
+### Weeks 11-12: convert proof into sales assets
 
-**Goal**: Scale the multiplexer ecosystem to 1,000+ community tools
+Goals:
 
-| Task | Priority | Status |
-|------|----------|--------|
-| Community tool submission pipeline | Critical | Planned |
-| Automated tool testing and validation | Critical | Planned |
-| Tool versioning and dependency management | High | Planned |
-| Community tool author dashboard | High | Planned |
-| Tool usage analytics for authors | Medium | Planned |
-| Curated toolset collections | Medium | Planned |
+- convert at least one partner into a paying reference account or paid pilot
+- turn results into reusable case-study material
+- decide whether the wedge is strong enough to double down on
 
-**Exit criteria**: 1,000+ tools in the registry, 100+ community-contributed tools, automated quality gates for submissions.
+Outputs:
 
-#### Phase 17: Enterprise, Browser Handoff & Self-Improving Agents (Q1 2027)
-
-**Goal**: Enable AI agents to discover, create, improve, and publish tools autonomously
-
-| Task | Priority | Status |
-|------|----------|--------|
-| Agent-driven tool creation workflow | Critical | Planned |
-| Browser-session handoff for user-auth steps | Critical | Planned |
-| Shared remote browser/noVNC session surface | High | Planned |
-| Agent observability and replay dashboards | High | Planned |
-| Prompt history and trace capture per agent | High | In progress |
-| Prompt/skill improvement loop from traces | High | Planned |
-| MCP agent router using ELO + trust + latency + cost | High | Planned |
-| ELO-guided agent selection for issue remediation | High | Planned |
-| Bug severity / trust scoring integrated into auto-fix routing | High | Planned |
-| Experiment-detected regressions routed into agent remediation | High | Planned |
-| Enterprise SSO and RBAC | Critical | Planned |
-| Private tool registries for organizations | High | Planned |
-| Cross-organization tool sharing | High | Planned |
-| Agent session state persistence | Medium | Planned |
-| Compliance and audit logging | Medium | Planned |
-
-**Exit criteria**: Enterprise customers with private registries, AI agents
-autonomously publishing tools, browser-session handoff for human-auth
-boundaries, measured improvement loops from real agent traces, and ELO-informed
-automatic routing of remediation work to the right agents, including
-experiment-detected regressions and variant failures.
+- 1 paid or committed-to-paid account
+- case-study draft
+- updated pipeline assumptions
+- hire brief for Founding Head of Growth/DevRel
 
 ---
 
-## Revenue Projections
+## 5. Twelve-Month Roadmap
 
-### Year 1 Targets (2026)
+### Q2 2026
 
-| Revenue Stream         | Q1        | Q2      | Q3       | Q4       | Annual     |
-| ---------------------- | --------- | ------- | -------- | -------- | ---------- |
-| Platform subscriptions | $2K       | $5K     | $10K     | $18K     | $35K       |
-| MCP API access         | -         | $2K     | $5K      | $8K      | $15K       |
-| Tool marketplace       | -         | -       | $3K      | $8K      | $11K       |
-| Credit overages        | $500      | $1K     | $3K      | $5K      | $9.5K      |
-| UK tax benefits        | -         | -       | -        | $15K     | $15K       |
-| **Total**              | **$2.5K** | **$8K** | **$21K** | **$54K** | **$85.5K** |
+- complete commercial onboarding and metering
+- close first design partners
+- instrument activation and outcome metrics
+- publish benchmark and case-study material
 
-### Key Metrics to Track
+### Q3 2026
 
-- **Credit utilization rate** by tier (hitting limits? too much headroom?)
-- **Overage conversion rate** (% who hit limits and buy more vs. churn)
-- **MCP API adoption rate** (% of BUSINESS users enabling API access)
-- **Multi-channel usage** (% of users engaging via WhatsApp/Telegram vs. web)
-- **Time-to-running-app** (golden-path intent -> deployed surface time)
-- **Feedback-loop lift** (success rate improvement after review/repair cycle)
-- **Tool-call observability coverage** (% of important tool paths traced/reviewable)
-- **Tool marketplace submissions** (third-party developer engagement)
-- **Net Revenue Retention** (target: >110%)
+- convert first partners into paid reference customers
+- hire founding Head of Growth/DevRel
+- systematize founder-led outbound into a repeatable account pipeline
+- tighten docs, runbooks, and package-level onboarding
 
----
+### Q4 2026
 
-## Competitive Landscape
+- hire senior engineer
+- reduce bus-factor risk
+- improve auditability, auth, and governance features needed by agency and
+  regulated buyers
+- expand from first wedge into adjacent small AI product teams only if the
+  original wedge is proving repeatable
 
-| Competitor     | Price    | MCP?    | CLI?                | Multi-Channel?               | Our Advantage             |
-| -------------- | -------- | ------- | ------------------- | ---------------------------- | ------------------------- |
-| Vercel         | $20+/mo  | No      | Yes                 | No                           | MCP-native + AI assistant |
-| Railway        | $5+/mo   | No      | Yes                 | No                           | 533+ tools + vibe coding  |
-| Render         | $7+/mo   | No      | Yes                 | No                           | AI-first deployment       |
-| Replit         | $25+/mo  | No      | No                  | No                           | MCP registry + CLI        |
-| **Spike Land** | $0-99/mo | **Yes** | **Yes (spike-cli)** | **Partial (web, CLI, WhatsApp beta)** | Full platform + self-improving loop |
+### Q1-Q2 2027
 
-**No deployment platform offers a programmable AI agent with 533+ MCP tools,
-multi-surface apps, and a feedback-driven loop already accessible via CLI and
-web, with WhatsApp in beta and further channels on the roadmap.** This is the
-differentiator.
+- reach 10-15 paying teams if wedge validation is holding
+- decide whether marketplace and broader registry monetization deserve focused
+  investment
+- decide whether COMPASS should remain a proof point, become a pilot program, or
+  be ring-fenced from the core fundraising narrative
 
 ---
 
-## Growth Playbook (First 90 Days)
+## 6. Metrics That Matter
 
-### Month 1: Foundation
+### Commercial metrics
 
-- [ ] List MCP server on Smithery, Glama.ai, LobeHub
-- [ ] Publish spike-cli to npm (`@spike-land-ai/spike-cli`) and list on MCP
-      registries
-- [ ] Create "Build and deploy an app in 5 minutes" tutorial (using spike-cli)
-- [ ] Launch on Product Hunt (managed deployment + AI assistant angle)
+- target accounts contacted
+- discovery calls completed
+- design partners onboarded
+- paid reference customers
+- conversion from design partner to paid
 
-### Month 2: Multi-Channel Launch
+### Product metrics
 
-- [ ] Launch WhatsApp integration (beta)
-- [ ] Launch Telegram integration (beta)
-- [ ] Publish weekly "Vibe Coding" blog series
-- [ ] Create MCP tool development template for third-party devs
-- [ ] Partner with 3-5 AI tool creators for cross-promotion
+- time to first tool call
+- time to onboard a design partner
+- CI time reduction
+- flaky-build reduction
+- number of high-friction flows moved below the browser
 
-### Month 3: Marketplace
+### Company health metrics
 
-- [ ] Launch MCP tool marketplace (third-party submissions)
-- [ ] Run first paid ads (target: developers, AI builders)
-- [ ] Apply for Sovereign AI PoC Grant
-- [ ] Begin SEIS funding round (target: $150K)
-
----
-
-## MCP Ecosystem
-
-### Current MCP Tool Categories (147 files)
-
-| Category            | Files | Examples                                                        |
-| ------------------- | ----- | --------------------------------------------------------------- |
-| Chess               | 4     | chess-game, chess-player, chess-challenge, chess-replay         |
-| Clean (CleanSweep)  | 7     | clean-photo, clean-scanner, clean-tasks, clean-streaks          |
-| Content & Media     | 9     | image, audio, gallery, blog, newsletter, pages                  |
-| Admin & Auth        | 5     | admin, auth, permissions, settings, audit                       |
-| AI & Orchestration  | 8     | creative, orchestrator, swarm, sandbox, architect               |
-| Dev & Infra         | 10    | dev, environment, vercel-bridge, sentry-bridge, github-admin    |
-| Social              | 3+    | social-engagement, tiktok integration                           |
-| EC2 / Boxes         | 3+    | box provisioning, sync-box-status, VNC sessions                 |
-| Billing & Credits   | 4     | billing, credits, merch, skill-store                            |
-| State Machine       | 1     | state-machine (with guard conditions & action handlers)         |
-| QA Studio           | 1     | qa-studio                                                       |
-| Workspace & Apps    | 4     | workspaces, apps, codespace, create                             |
-| Distributed Systems | 4     | bft, crdt, netsim, raft                                         |
-| Templates & Helpers | 4     | crud-template, permission-gated, workspace-scoped, index        |
-| Other               | 80+   | career, chat, dashboard, email, filesystem, notifications, etc. |
-
-### Planned Additions
-
-| Tool                      | Priority | Phase    |
-| ------------------------- | -------- | -------- |
-| `deploy_app`              | Critical | Phase 15 |
-| `manage_deployment`       | Critical | Phase 15 |
-| `whatsapp_send`           | High     | Phase 13 |
-| `telegram_send`           | High     | Phase 13 |
-| `surface_render_mdx`      | High     | Phase 12 |
-| `browser_handoff_session` | High     | Phase 17 |
-| `observe_agent_run`       | High     | Phase 17 |
-| `marketplace_submit_tool` | High     | Phase 14 |
-| `marketplace_review_tool` | Medium   | Phase 14 |
+- percentage of production-critical areas with written runbooks
+- time for a second engineer to ship a bounded feature
+- number of non-founder people able to support customer workflows
 
 ---
 
-## Legacy Phases (Historical Reference)
+## 7. Hiring Roadmap
 
-The following phases represent earlier roadmap iterations, now superseded:
+### Hire 1: Founding Head of Growth/DevRel
 
-| Phase                         | Name       | Status                                                                               |
-| ----------------------------- | ---------- | ------------------------------------------------------------------------------------ |
-| Pixel App & Token Economy     | Superseded | Image enhancement app; token system remains as platform credits                      |
-| Orbit Social Media Management | Superseded | Social media command center; MCP tools remain, repositioned as platform capabilities |
-| Agency SCALE Tier             | Superseded | Multi-workspace volume pricing; may be revisited for deployment teams                |
-| Autopilot (outcome-based AI)  | Deferred   | Outcome-based automation; concept may evolve into deployment automation              |
+When:
+
+- as soon as the company has enough evidence to support a repeatable design-
+  partner motion
+
+Why:
+
+- founder-only sales does not scale
+- the company needs someone who can both sell and earn trust with technical
+  teams
+
+### Hire 2: Senior Engineer
+
+When:
+
+- immediately after the first commercial hire or in parallel if capital allows
+
+Why:
+
+- the codebase cannot remain bus-factor-one
+- customer onboarding, documentation, and runtime hardening need a second owner
 
 ---
 
-## How to Contribute
+## 8. September 2027 Kill Criteria
 
-1. Pick a task from "In Progress" or "Upcoming" phases
-2. Create a feature branch: `git checkout -b feature/task-name`
-3. Implement with tests (must satisfy CI coverage thresholds: 80%
-   lines/functions, 75% branches)
-4. Submit PR with detailed description
-5. Wait for CI checks and code review
+By **30 September 2027**, the thesis is broken if all three are not true:
 
-See [CLAUDE.md](../CLAUDE.md) for detailed development guidelines.
+1. at least 3 paid reference customers exist in the QA/agency wedge
+2. commercial motion is no longer fully founder-carried
+3. customers are adopting the product, not simply buying founder effort
+
+These criteria are part of the roadmap on purpose. They define what success
+looks like and when to stop pretending.

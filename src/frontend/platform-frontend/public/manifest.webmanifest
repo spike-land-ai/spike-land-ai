@@ -1,7 +1,7 @@
 {
   "name": "spike.land",
   "short_name": "spike.land",
-  "description": "MCP-First AI Development Platform — Build, deploy, and manage AI-powered applications with 80+ MCP tools.",
+  "description": "Managed MCP runtime for tool-first QA, typed AI-callable tools, and edge-native execution.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#0a0a0a",

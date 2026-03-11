@@ -50,9 +50,9 @@ const DOMAINS: Domain[] = [
     icon: Code2,
     name: "Code Intelligence",
     toolCount: 12,
-    description: "Code review, linting, transpilation",
+    description: "Contract tests, review, transpilation",
     detail:
-      "AI-powered code review, static analysis, esbuild-wasm transpilation at the edge, and Monaco-based live editing.",
+      "AI-powered code review, static analysis, contract-adjacent testing helpers, and esbuild-wasm transpilation at the edge.",
   },
   {
     id: "image-studio",
@@ -86,9 +86,9 @@ const DOMAINS: Domain[] = [
     icon: Globe,
     name: "Browser Automation",
     toolCount: 5,
-    description: "QA studio, Playwright",
+    description: "QA Studio, smoke tests, evidence capture",
     detail:
-      "End-to-end test generation, Playwright script execution, screenshot capture, performance audits, and visual diffing.",
+      "Keep browser coverage where it is useful, but move critical state transitions below the UI. QA Studio handles smoke checks, screenshots, and operator evidence.",
   },
   {
     id: "state-machines",
@@ -113,9 +113,9 @@ const DOMAINS: Domain[] = [
     icon: ShieldCheck,
     name: "Authentication",
     toolCount: 8,
-    description: "OAuth, sessions, organizations",
+    description: "OAuth, sessions, orgs, permission surfaces",
     detail:
-      "Better Auth integration: OAuth providers, session management, organization RBAC, API key vault, and BYOK support.",
+      "Better Auth integration for OAuth providers, session management, organization RBAC, API key vaulting, and the permission boundaries that usually make browser tests brittle.",
   },
   {
     id: "storage-cdn",
@@ -131,9 +131,9 @@ const DOMAINS: Domain[] = [
     icon: Wrench,
     name: "Developer Tools",
     toolCount: 10,
-    description: "CLI, Docker, deployment",
+    description: "CLI, Docker, deployment, CI handoff",
     detail:
-      "Vibe-dev Docker workflows, Wrangler deploy automation, CLI multiplexer, dependency graph management, and CI tooling.",
+      "CLI multiplexer, Docker workflows, deploy automation, dependency graph management, and the handoff points needed to move one workflow from browser-heavy to contract-first verification.",
   },
   {
     id: "ai-llm",
@@ -147,10 +147,10 @@ const DOMAINS: Domain[] = [
 ];
 
 const STATS: StatItem[] = [
-  { value: 80, suffix: "+", label: "MCP Tools", icon: Zap },
-  { value: 11, suffix: "", label: "Domains", icon: Layers },
+  { value: 80, suffix: "+", label: "Hosted Tools", icon: Zap },
+  { value: 1, suffix: "", label: "Paid Wedge", icon: Layers },
   { value: 100, suffix: "%", label: "Edge-Deployed", icon: Server },
-  { value: 0, suffix: "", label: "Lock-in", icon: Sparkles },
+  { value: 0, suffix: "", label: "Forced Rip-And-Replace", icon: Sparkles },
 ];
 
 // ---------------------------------------------------------------------------
@@ -419,7 +419,7 @@ export function WhatWeDoPage() {
           )}
         >
           <span className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse" aria-hidden="true" />
-          MCP-First Platform
+          Platform business. Narrow first wedge.
           <span
             className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse"
             style={{ animationDelay: "0.5s" }}
@@ -436,9 +436,9 @@ export function WhatWeDoPage() {
             heroRevealed ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6",
           )}
         >
-          <span className="block text-foreground">The AI Development</span>
-          <span className="block text-primary">Platform That Does</span>
-          <span className="block text-foreground">Everything.</span>
+          <span className="block text-foreground">Move critical verification</span>
+          <span className="block text-primary">below the browser</span>
+          <span className="block text-foreground">without ripping everything out.</span>
         </h1>
 
         {/* Sub-headline */}
@@ -449,8 +449,9 @@ export function WhatWeDoPage() {
             heroRevealed ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6",
           )}
         >
-          80+ production-ready MCP tools across 11 domains — deployed globally on Cloudflare Workers
-          with zero cold starts and full TypeScript safety.
+          spike.land is the managed runtime for typed AI-callable tools. The first commercial motion
+          is QA-heavy agencies and AI consultancies that need fewer flaky Playwright or Cypress
+          builds, faster CI, and governed execution.
         </p>
 
         {/* Hero CTA buttons */}
@@ -470,7 +471,7 @@ export function WhatWeDoPage() {
             )}
           >
             <Zap className="h-4 w-4" aria-hidden="true" />
-            Explore All Apps
+            See QA Studio
           </a>
         </div>
 
@@ -529,11 +530,11 @@ export function WhatWeDoPage() {
               id="domains-heading"
               className="text-3xl font-display font-bold tracking-tight text-foreground sm:text-4xl"
             >
-              11 Domains. <span className="text-primary">Endless Possibilities.</span>
+              Platform breadth. <span className="text-primary">Focused first sale.</span>
             </h2>
             <p className="mt-3 text-muted-foreground max-w-xl mx-auto">
-              Each domain is a fully-equipped toolkit. Hover a card to see what the tools actually
-              do.
+              The platform spans multiple domains, but the first paid motion is tool-first QA. Hover
+              a card to see the broader runtime surface behind that wedge.
             </p>
           </div>
 
@@ -586,18 +587,18 @@ export function WhatWeDoPage() {
           {[
             {
               icon: Zap,
-              title: "Zero Cold Starts",
-              body: "Every tool runs on Cloudflare Workers — globally distributed with sub-millisecond startup times.",
+              title: "Function-Speed Verification",
+              body: "The first value is not another dashboard. It is moving critical checks out of brittle browser flows and into fast, typed contracts.",
             },
             {
               icon: Code2,
-              title: "TypeScript Native",
-              body: "Strict types end-to-end. Zod validation at every boundary. No `any`, no surprises.",
+              title: "Typed Contracts",
+              body: "Strict types and validated inputs create a reusable surface that CI, internal tooling, the CLI, and agents can all call consistently.",
             },
             {
               icon: Layers,
-              title: "Composable by Design",
-              body: "Mix and match tools across domains. Chain them in workflows. Build your own orchestration layer.",
+              title: "Managed Runtime Above Cloudflare",
+              body: "Cloudflare supplies the primitives. spike.land adds registry, auth, metering, governance, and a workflow model teams can actually buy.",
             },
           ].map(({ icon: Icon, title, body }) => (
             <div
@@ -629,15 +630,16 @@ export function WhatWeDoPage() {
             id="cta-heading"
             className="relative text-3xl font-display font-bold tracking-tight text-foreground sm:text-4xl"
           >
-            Ready to build with <span className="text-primary">80+ tools</span>?
+            Start with <span className="text-primary">one flow that keeps going red</span>.
           </h2>
           <p className="relative mt-4 text-muted-foreground max-w-lg mx-auto">
-            Browse every tool in the registry and start building AI-assisted apps in seconds.
+            Best fit for teams with an existing Playwright or Cypress suite and a willingness to
+            move billing, auth, or permissions checks below the browser.
           </p>
 
           <div className="relative mt-8 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
             <a
-              href="/apps"
+              href="/apps/qa-studio"
               className={cn(
                 "inline-flex items-center gap-2 rounded-xl bg-primary px-8 py-3.5 text-sm font-bold text-primary-foreground",
                 "hover:bg-primary/90 active:scale-[0.97] transition-all duration-200 shadow-lg",
@@ -645,15 +647,15 @@ export function WhatWeDoPage() {
               )}
             >
               <Layers className="h-4 w-4" aria-hidden="true" />
-              Browse All Apps
+              Open QA Studio
               <ArrowRight className="h-4 w-4" aria-hidden="true" />
             </a>
           </div>
 
           {/* Micro-trust signals */}
           <p className="relative mt-6 text-xs text-muted-foreground">
-            No credit card required &nbsp;&middot;&nbsp; Free plan available &nbsp;&middot;&nbsp;
-            Edge-deployed globally
+            Keep existing browser coverage &nbsp;&middot;&nbsp; No forced rip-and-replace
+            &nbsp;&middot;&nbsp; Edge-deployed globally
           </p>
         </div>
       </section>

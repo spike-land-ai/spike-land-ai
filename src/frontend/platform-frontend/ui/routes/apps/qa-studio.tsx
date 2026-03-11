@@ -147,8 +147,9 @@ export function QaStudioPage() {
             </div>
             <div className="text-2xl font-bold text-foreground mb-2">Connect to QA Studio</div>
             <div className="text-base text-muted-foreground mb-8 max-w-md text-center">
-              Control browser automation visually without writing any code. Connect to a local MCP
-              server to begin.
+              Use browser automation as the thin smoke layer around a tool-first test stack. Connect
+              to a local MCP server to inspect flows, capture evidence, and exercise high-friction
+              journeys.
             </div>
 
             <div className="w-full text-left space-y-6">

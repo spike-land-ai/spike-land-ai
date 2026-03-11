@@ -35,7 +35,7 @@ Risk scores are the product of severity (1-5) and likelihood (1-5), giving a max
 
 **FT-02 Mitigation:** Open-source codebase partially mitigates this (community can fork), but commercial continuity requires a second senior engineer with architectural context. Timeline: 3-6 months.
 
-**FT-03 Mitigation:** Earliest commercial hire should be a Head of Developer Relations / GTM, not a pure sales role. Developer platforms are sold through community and developer advocacy first. Timeline: 6-12 months post-seed.
+**FT-03 Mitigation:** Earliest commercial hire should be a Founding Head of Growth/DevRel with technical credibility, not a generic seller. The role exists to source and close design partners, then translate that learning into repeatable distribution. Timeline: immediately after the first design-partner proof points, not 6-12 months post-seed.
 
 **FT-04 Mitigation:** Structured founder time-boxing — fixed days per week on product, business development, and hiring. External fractional COO for 3-6 months to absorb operational load. Timeline: Immediate.
 
@@ -51,7 +51,7 @@ Risk scores are the product of severity (1-5) and likelihood (1-5), giving a max
 | MK-04 | Developer platform spend freezes in macro downturn | 3 | 2 | 6 | Low |
 | MK-05 | Anthropic, OpenAI, or Google ship a competing MCP registry | 5 | 3 | 15 | High |
 
-**MK-01 Mitigation:** Differentiation must be specific and defensible. The combination of edge-native + MCP runtime + open AI app store is not replicated by the named incumbents as of this date. Positioning must be sharpened before commercial launch. The risk is that without customers, the differentiation thesis is unproven. Timeline: Validate differentiation with 20+ developer interviews within 90 days.
+**MK-01 Mitigation:** Differentiation must be specific and defensible. The combination that matters commercially is tool-first verification plus the managed runtime above raw edge compute, not a broad "app store" claim. The risk is that without customers, that workflow-layer thesis remains unproven. Timeline: validate it with 20+ targeted conversations and 3 design partners within 90 days.
 
 **MK-03 Mitigation:** MCP (Model Context Protocol) is an Anthropic-led standard with growing ecosystem adoption. The risk is real but partially mitigated by the company's early positioning. Hedge by ensuring the platform is protocol-layer agnostic where possible. Timeline: Monitor quarterly.
 
@@ -83,7 +83,7 @@ Risk scores are the product of severity (1-5) and likelihood (1-5), giving a max
 | CM-02 | No disclosed pricing model | 4 | 5 | 20 | High |
 | CM-03 | Open-source model may prevent monetisation of core product | 4 | 3 | 12 | Medium |
 | CM-04 | Developer-first GTM requires long sales cycles for enterprise | 3 | 4 | 12 | Medium |
-| CM-05 | No customer success or support infrastructure | 3 | 5 | 15 | High |
+| CM-05 | No design-partner success or support infrastructure | 3 | 5 | 15 | High |
 
 **CM-01 / CM-02 Mitigation:** This is the highest-priority risk after key-person. The company cannot convert beta users to paying customers without billing infrastructure. Stripe + usage metering can be stood up within 6-8 weeks by a single engineer once pricing is decided. The pricing model decision should be made before any commercial hire. Timeline: 60 days.
 
@@ -162,11 +162,11 @@ The objective of this phase is to ensure the company could survive a 4-week foun
 
 The hiring priority order is not arbitrary. Each hire removes a specific single point of failure.
 
-**Hire 1 — Senior Full-Stack Engineer (months 3-5):**
-Must have Cloudflare Workers experience or edge computing background. Primary purpose is to absorb architectural context, not to build new features. This person becomes the second person who understands the system end-to-end. Budget: Senior UK engineer, £80-100k base plus equity.
+**Hire 1 — Founding Head of Growth/DevRel (months 3-5):**
+This is the commercial unlock. The company needs someone who can run technical discovery, close design partners, and build a repeatable account pipeline without losing credibility with engineering teams. They are not a generic marketer. Budget: Senior UK commercial operator with developer-tools credibility, £70-90k base plus equity.
 
-**Hire 2 — Head of Developer Relations (months 6-9):**
-This is the commercial unlock. Developer platforms grow through community, documentation, and technical content. This person owns GitHub presence, Discord or Slack community, developer blog, and conference presence. They are not a salesperson — they are a credible developer who communicates. Budget: £70-90k base plus equity.
+**Hire 2 — Senior Full-Stack Engineer (months 4-7):**
+Must have Cloudflare Workers experience or adjacent edge background. Primary purpose is to absorb architectural context, improve onboarding capacity, and remove the bus-factor-one risk from customer support and runtime hardening. Budget: Senior UK engineer, £80-100k base plus equity.
 
 **Advisory board (months 1-3):**
 Recruit 2-3 advisors with specific gaps to fill: one enterprise SaaS commercial operator, one Cloudflare ecosystem insider, one UK/EU legal counsel specialising in technology companies. Advisors cost equity (typically 0.1-0.25% each with a 2-year vest) and provide accountability, warm introductions, and pattern-matching.
@@ -236,7 +236,7 @@ Scores are 0-10. 0 = absent, 5 = partially in place, 10 = production-ready.
 | Contract / legal readiness | 1/10 | No disclosed ToS, privacy policy, or DPA template. | Published ToS, privacy policy, DPA template, enterprise MSA, and software licence terms |
 | Compliance posture | 2/10 | UK-incorporated. ICO registration status unknown. GDPR readiness unknown. | ICO registered, GDPR-compliant data flows documented, SOC 2 Type I in progress |
 | Sales materials | 0/10 | No pitch deck, one-pager, or case studies visible. | Pitch deck, 1-page leave-behind, customer case studies, ROI calculator |
-| Customer success process | 0/10 | No disclosed process. Pre-revenue means no customers. | Named CSM for enterprise accounts, health score model, QBR process, churn monitoring |
+| Design-partner success process | 1/10 | Pre-revenue and no formal design-partner operating cadence documented in product systems yet. | Named owner, weekly operating review, shared success criteria, renewal path, and a documented conversion process from pilot to paid |
 
 **Composite Commercial Readiness Score: 8/80 (10%)**
 
