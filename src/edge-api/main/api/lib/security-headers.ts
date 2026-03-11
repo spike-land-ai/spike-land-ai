@@ -14,11 +14,11 @@ const CONTENT_SECURITY_POLICY = [
   "default-src 'self'",
   "script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' blob: https://static.cloudflareinsights.com https://esm.sh https://esm.spike.land https://unpkg.com https://www.googletagmanager.com https://www.googleadservices.com https://googleads.g.doubleclick.net",
   "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://esm.spike.land https://unpkg.com",
-  "img-src 'self' https://*.r2.dev https://*.r2.cloudflarestorage.com https://avatars.githubusercontent.com https://*.googleusercontent.com https://*.basemaps.cartocdn.com https://image-studio-mcp.spike.land https://www.googleadservices.com https://googleads.g.doubleclick.net https://www.google.com https://*.google.co.uk data: blob:",
+  "img-src 'self' https://*.r2.dev https://*.r2.cloudflarestorage.com https://avatars.githubusercontent.com https://*.googleusercontent.com https://*.basemaps.cartocdn.com https://image-studio-mcp.spike.land https://www.googleadservices.com https://googleads.g.doubleclick.net https://www.google.com https://*.google.co.uk https://www.googletagmanager.com data: blob:",
   "font-src 'self' https://fonts.gstatic.com https://esm.spike.land data:",
   "connect-src 'self' https://api.spike.land https://edge.spike.land https://auth-mcp.spike.land https://mcp.spike.land https://js.spike.land https://image-studio-mcp.spike.land https://chat.spike.land https://checkout.stripe.com wss://spike.land wss://chat.spike.land https://esm.sh https://esm.spike.land https://unpkg.com https://local.spike.land:5173 https://www.google-analytics.com https://region1.google-analytics.com https://www.googletagmanager.com https://www.google.com https://*.google.co.uk https://googleads.g.doubleclick.net https://td.doubleclick.net blob: data:",
   "worker-src 'self' blob: https://esm.sh https://esm.spike.land",
-  "frame-src 'self' https://edge.spike.land https://chat.spike.land https://checkout.stripe.com https://js.stripe.com",
+  "frame-src 'self' https://edge.spike.land https://chat.spike.land https://checkout.stripe.com https://js.stripe.com https://www.youtube.com https://www.youtube-nocookie.com",
   "object-src 'none'",
   "base-uri 'self'",
   // Restrict form-action to known targets; prevent exfiltration via form POST
