@@ -109,7 +109,7 @@ export function ToolSurface({
     if (Object.keys(prefill).length > 0) {
       setFormData((prev) => ({ ...prev, ...prefill }));
     }
-  }, [session?.outputs, graph, toolName, setFormData]);
+  }, [session, graph, toolName, setFormData]);
 
   // Record result to session
   useEffect(() => {

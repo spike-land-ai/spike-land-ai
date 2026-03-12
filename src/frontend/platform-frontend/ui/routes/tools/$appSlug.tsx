@@ -58,7 +58,7 @@ export function AppSessionPage() {
       appName: app.name,
       category: app.category ?? "",
     });
-  }, [appSlug, app?.name, app?.category]);
+  }, [appSlug, app]);
 
   const { session, recordToolResult, resetSession, isToolAvailable } = useAppSession(
     appSlug as string,
