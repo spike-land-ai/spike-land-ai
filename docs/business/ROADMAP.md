@@ -1,6 +1,6 @@
 # Spike Land Roadmap
 
-> **Last updated**: 11 March 2026
+> **Last updated**: 12 March 2026
 > **Current phase**: Wedge validation
 > **Company**: SPIKE LAND LTD
 
@@ -29,9 +29,15 @@ These assets are real and should be used as leverage, not as excuses to stay
 unfocused:
 
 - hosted MCP runtime and registry
-- `spike-cli`
+- `spike-cli` (security-hardened, with enhanced chat pipeline and type safety)
+- `spike-chat` with aether memory for persistent conversational context
 - 80+ natively hosted tools
+- OpenAI-compatible API endpoint (agents can call spike.land tools via chat
+  completions format)
 - QA Studio and browser automation surfaces
+- Astro SPA frontend (migrated from Vite + TanStack Router, March 2026)
+- analytics MCP servers (stripe-analytics-mcp, google-analytics-mcp)
+- strict TypeScript (ES2024 target, type-aware ESLint, enum-to-const migration)
 - web dashboard and public beta infrastructure
 - Stripe checkout and core commercial plumbing nearing completion
 - COMPASS as a proof point for regulated, multilingual, offline-capable flows
@@ -51,7 +57,7 @@ The roadmap explicitly does **not** optimize for:
 
 ## 4. Next 90 Days
 
-### Weeks 1-2: sharpen the offer
+### Weeks 1-2: sharpen the offer — **in progress** (started ~11 March 2026)
 
 Goals:
 

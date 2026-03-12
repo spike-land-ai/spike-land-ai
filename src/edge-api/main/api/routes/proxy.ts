@@ -1,9 +1,7 @@
 import { Hono } from "hono";
 import type { Env, Variables } from "../../core-logic/env.js";
 import { getClientId, sendGA4Events } from "../../lazy-imports/ga4.js";
-import { createLogger } from "@spike-land-ai/shared";
-
-const log = createLogger("spike-edge");
+import { resolveByokKey, type ByokProvider } from "../../core-logic/byok.js";
 
 const proxy = new Hono<{ Bindings: Env; Variables: Variables }>();
 
@@ -52,7 +50,7 @@ const AI_PROVIDERS: Array<{
   prefix: string;
   envKey: keyof Env;
   headerName: string;
-  byokProvider: string;
+  byokProvider: ByokProvider;
 }> = [
   {
     prefix: "https://api.anthropic.com/",
@@ -67,32 +65,6 @@ const AI_PROVIDERS: Array<{
     byokProvider: "google",
   },
 ];
-
-/**
- * Attempt to resolve a BYOK key for the given user and provider via MCP_SERVICE.
- * Returns the decrypted API key or null if none stored.
- */
-async function resolveByokKey(
-  mcpService: Fetcher,
-  userId: string,
-  provider: string,
-): Promise<string | null> {
-  try {
-    const res = await mcpService.fetch(
-      new Request("https://mcp/internal/byok/get", {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({ userId, provider }),
-      }),
-    );
-    if (!res.ok) return null;
-    const data = await res.json<{ key?: string }>();
-    return data.key ?? null;
-  } catch (err) {
-    log.error("BYOK key resolution failed", { error: String(err) });
-    return null;
-  }
-}
 
 proxy.post("/proxy/stripe", async (c) => {
   const body = await c.req.json<unknown>();
@@ -177,7 +149,12 @@ proxy.post("/proxy/ai", async (c) => {
   let usingByok = false;
 
   if (userId) {
-    apiKey = await resolveByokKey(c.env.MCP_SERVICE, userId, provider.byokProvider);
+    apiKey = await resolveByokKey(
+      c.env.MCP_SERVICE,
+      userId,
+      provider.byokProvider,
+      c.env.MCP_INTERNAL_SECRET,
+    );
     if (apiKey) usingByok = true;
   }
 

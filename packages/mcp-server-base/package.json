@@ -25,8 +25,7 @@
     "url": "git+https://github.com/spike-land-ai/spike-land-ai.git"
   },
   "publishConfig": {
-    "access": "public",
-    "registry": "https://npm.pkg.github.com"
+    "access": "public"
   },
   "scripts": {
     "build": "tsc",

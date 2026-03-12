@@ -21,4 +21,6 @@ export default interface Env {
   GA_MEASUREMENT_ID: string;
   GA_API_SECRET: string;
   ERROR_INGEST_ENDPOINT?: string;
+  SENTRY_DSN?: string;
+  SENTRY_TRACES_SAMPLE_RATE?: string;
 }

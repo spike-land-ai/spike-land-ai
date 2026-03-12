@@ -106,6 +106,21 @@ build tooling also support fully local browser deployments:
 
 Read more: [../develop/OFFLINE_BUNDLE_GUIDE.md](../develop/OFFLINE_BUNDLE_GUIDE.md)
 
+### OpenAI-Compatible API
+
+Agents and external clients can call spike.land MCP tools using the standard
+OpenAI chat completions format (`POST /v1/chat/completions`). This means any
+tool or agent that already speaks the OpenAI API can use spike.land as a drop-in
+backend — no custom SDK required.
+
+The endpoint supports:
+
+- streaming and non-streaming responses
+- tool/function calling mapped to MCP tools
+- model routing (Claude, Gemini) behind a single interface
+
+Source: `src/edge-api/main/api/routes/openai-compatible.ts`
+
 ### AI-Powered A/B Bug Detection
 
 The platform ships both app-specific variant tooling and a generic experiments

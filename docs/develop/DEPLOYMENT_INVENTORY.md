@@ -97,6 +97,11 @@ These packages are published to npm but not deployed as services:
 - **vibe-dev** — Docker-based dev workflow tool
 - **video** — Educational video compositions (Remotion)
 - **bazdmeg-mcp** — Quality gates and workspace tooling
+- **spike-chat** — Chat interface with aether memory
+- **spike-web** — Web deployment package
+- **stripe-analytics-mcp** — Stripe analytics MCP server
+- **google-analytics-mcp** — Google Analytics MCP server
+- **status** — Status monitoring package
 
 ## D1 Databases
 
@@ -144,13 +149,14 @@ All secrets are set via `wrangler secret put <NAME>` per worker.
 
 ## Frontend Deployment
 
-### spike-app (Vite + TanStack Router)
+### spike-app (Astro SPA)
 
-**Status**: In development, replacing spike.land UI
+**Status**: Active — migrated from Vite + TanStack Router to Astro (March 2026).
+Old code archived to `packages/spike-app-old/`.
 
 - **Built output**: `src/spike-app/dist/`
 - **Served via**: spike-edge (Cloudflare Workers)
-- **Development**: `npm run dev` (Vite dev server on localhost:5173)
+- **Development**: `npm run dev` (Astro dev server)
 - **Build**: `npm run build` (production build to dist/)
 - **Deployment**: Automatic via CI when merged to main
 
@@ -213,7 +219,7 @@ bash .github/scripts/verify-deps.sh
 | ---------------------------- | -------------------- | ------------------------------------------------------ | -------------- |
 | Auth in mcp-image-studio     | Embedded Better Auth | Delegated to auth-mcp.spike.land                       | In progress    |
 | Domain data (images, albums) | D1 in CF Worker      | Keep D1 (CF Worker path)                                | Done           |
-| Frontend                     | (deleted)            | spike-app (Vite + TanStack Router)                     | Done           |
+| Frontend                     | Astro SPA            | spike-app (Astro, migrated from Vite + TanStack Router) | Done          |
 | Edge API                     | spike-land-backend   | spike-edge                                             | In progress    |
 
 ## Quick Reference

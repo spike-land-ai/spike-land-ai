@@ -1,4 +1,5 @@
 import { serverFetchUrl } from "@spike-land-ai/code";
+import * as Sentry from "@sentry/cloudflare";
 import { handleAnthropicRequest } from "../core-logic/anthropicHandler.js";
 import { KVLogger } from "../core-logic/Logs.js";
 import { handleMainFetch } from "../lazy-imports/mainFetchHandler.js";
@@ -9,6 +10,10 @@ import { getAssetFromKV } from "@cloudflare/kv-asset-handler";
 import { serveWithCache } from "@spike-land-ai/code";
 import type Env from "../core-logic/env.js";
 import { makeResponse } from "../core-logic/makeResponse.js";
+import {
+  captureWorkerException,
+  createWorkerSentryOptions,
+} from "../../common/core-logic/sentry.js";
 // @ts-expect-error no type declarations for generated mjs asset manifest
 import { ASSET_HASH, ASSET_MANIFEST, files } from "./staticContent.mjs";
 
@@ -123,6 +128,11 @@ const main = {
       try {
         return await fetch(optionsParam.url, optionsParam);
       } catch (error) {
+        captureWorkerException("spike-land-backend", error, {
+          request,
+          tags: { operation: "server-fetch-url" },
+          extras: { targetUrl: optionsParam.url },
+        });
         console.error("serverFetchUrl fetch failed:", error);
         return new Response(JSON.stringify({ error: "Fetch failed" }), {
           status: 502,
@@ -230,7 +240,10 @@ const main = {
 export { Code } from "../lazy-imports/chatRoom.js";
 export { CodeRateLimiter } from "../core-logic/rateLimiter.js";
 
-export default main;
+export default Sentry.withSentry(
+  (env: Env) => createWorkerSentryOptions("spike-land-backend", env),
+  main satisfies ExportedHandler<Env>,
+);
 
 async function generateTURNCredentials(turnToken: string): Promise<Response> {
   const url =
@@ -255,6 +268,10 @@ async function generateTURNCredentials(turnToken: string): Promise<Response> {
       headers: { "Content-Type": "application/json" },
     });
   } catch (error) {
+    captureWorkerException("spike-land-backend", error, {
+      request: new Request(url, { method: "POST" }),
+      tags: { operation: "generate-turn-credentials" },
+    });
     console.error("Error generating TURN credentials:", error);
     return new Response(JSON.stringify({ error: "Failed to generate TURN credentials" }), {
       status: 500,

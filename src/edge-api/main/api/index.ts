@@ -1,5 +1,6 @@
 import { Hono } from "hono";
 import { cors } from "hono/cors";
+import * as Sentry from "@sentry/cloudflare";
 import type { Env, Variables } from "../core-logic/env.js";
 import { createLogger } from "@spike-land-ai/shared";
 import { RateLimiter } from "../edge/rate-limiter.js";
@@ -46,6 +47,11 @@ import {
   recordServiceRequestMetric,
   shouldTrackServiceMetricRequest,
 } from "../../common/core-logic/service-metrics.js";
+import {
+  captureWorkerException,
+  createWorkerSentryOptions,
+  instrumentD1Bindings,
+} from "../../common/core-logic/sentry.js";
 
 const log = createLogger("spike-edge");
 
@@ -195,6 +201,12 @@ app.use("/api/spike-chat", creditMeterMiddleware);
 
 // Error handling middleware
 app.onError((err, c) => {
+  captureWorkerException("spike-edge", err, {
+    request: c.req.raw,
+    extras: {
+      requestId: (c.get("requestId") as string | undefined) ?? c.req.header("x-request-id") ?? null,
+    },
+  });
   log.error(`${c.req.method} ${c.req.path}: ${err.message}`);
   try {
     const metadata = JSON.stringify({
@@ -554,22 +566,25 @@ app.all("/api/*", (c) => {
 app.route("/", spa);
 
 export { RateLimiter, app };
-export default {
+export default Sentry.withSentry((env: Env) => createWorkerSentryOptions("spike-edge", env), {
   async fetch(request: Request, env: Env, ctx?: ExecutionContext): Promise<Response> {
+    const instrumentedEnv = instrumentD1Bindings(env, ["DB"]);
     const startedAt = Date.now();
     const metricService = shouldTrackServiceMetricRequest(request)
       ? getSpikeEdgeMetricService(request)
       : null;
-    const response = await app.fetch(request, env, ctx);
+    const response = await app.fetch(request, instrumentedEnv, ctx);
 
     if (metricService) {
       try {
         ctx?.waitUntil(
-          recordServiceRequestMetric(env.DB, metricService, Date.now() - startedAt).catch(
-            (error) => {
-              console.error("[service-metrics] failed to record spike-edge request", error);
-            },
-          ),
+          recordServiceRequestMetric(
+            instrumentedEnv.DB,
+            metricService,
+            Date.now() - startedAt,
+          ).catch((error) => {
+            console.error("[service-metrics] failed to record spike-edge request", error);
+          }),
         );
       } catch {
         /* no ExecutionContext outside Workers runtime */
@@ -578,7 +593,7 @@ export default {
 
     return response;
   },
-  scheduled: (_event: ScheduledEvent, env: Env, ctx: ExecutionContext) => {
-    ctx.waitUntil(handleScheduled(env));
+  scheduled: (_controller: ScheduledController, env: Env, ctx: ExecutionContext) => {
+    ctx.waitUntil(handleScheduled(instrumentD1Bindings(env, ["DB"])));
   },
-};
+} satisfies ExportedHandler<Env>);

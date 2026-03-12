@@ -17,6 +17,7 @@
     "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
+    "@sentry/cloudflare": "^10.43.0",
     "hono": "^4.12.7"
   },
   "devDependencies": {

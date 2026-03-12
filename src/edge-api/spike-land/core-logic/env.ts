@@ -24,6 +24,8 @@ export interface Env {
   // Analytics
   GA_MEASUREMENT_ID: string;
   GA_API_SECRET: string;
+  SENTRY_DSN?: string;
+  SENTRY_TRACES_SAMPLE_RATE?: string;
 
   // Service bindings
   SPIKE_EDGE: Fetcher; // Bugbook + ELO service

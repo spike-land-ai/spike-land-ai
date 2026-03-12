@@ -820,8 +820,9 @@ _Submit product listing with:_
 | 1.0     | Dec 10, 2025 | Initial launch plan                                                                                                  | Security Audit Agent |
 | 1.1     | Feb 26, 2026 | Updated metrics, completed features (error boundaries, storybooks, CSS XSS fix, EC2 provisioning, dead code removal) | Claude Code Agent    |
 | 2.0     | Mar 08, 2026 | Modernized for Cloudflare-only infrastructure, MCP Multiplexer positioning, removed AWS references | Claude Code Agent |
+| 2.1     | Mar 12, 2026 | Updated dates; noted Astro SPA migration, OpenAI-compatible API, spike-chat, analytics MCP servers as completed milestones | Claude Code Agent |
 
 ---
 
-**Document Owner:** Platform Owner (zerdos) **Last Updated:** February 26, 2026
+**Document Owner:** Platform Owner (zerdos) **Last Updated:** March 12, 2026
 **Next Review:** Pre-Launch (T-3)

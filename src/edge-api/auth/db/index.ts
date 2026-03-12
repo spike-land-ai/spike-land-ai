@@ -1,5 +1,6 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { WebStandardStreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/webStandardStreamableHttp.js";
+import * as Sentry from "@sentry/cloudflare";
 import { z } from "zod";
 import { drizzle } from "drizzle-orm/d1";
 import * as schema from "./schema";
@@ -8,6 +9,11 @@ import {
   recordServiceRequestMetric,
   shouldTrackServiceMetricRequest,
 } from "../../common/core-logic/service-metrics";
+import {
+  captureWorkerException,
+  createWorkerSentryOptions,
+  instrumentD1Bindings,
+} from "../../common/core-logic/sentry";
 
 // CORS configuration for Better Auth and MCP
 const ALLOWED_ORIGINS = [
@@ -42,8 +48,9 @@ function withCors(response: Response, request: Request): Response {
   });
 }
 
-export default {
+export default Sentry.withSentry((env: Env) => createWorkerSentryOptions("mcp-auth", env), {
   async fetch(request: Request, env: Env, ctx?: ExecutionContext): Promise<Response> {
+    const instrumentedEnv = instrumentD1Bindings(env, ["AUTH_DB", "STATUS_DB"]);
     const startedAt = Date.now();
     const shouldTrack = shouldTrackServiceMetricRequest(request);
 
@@ -65,7 +72,7 @@ export default {
 
         if (deep) {
           try {
-            await env.AUTH_DB.prepare("SELECT 1").first();
+            await instrumentedEnv.AUTH_DB.prepare("SELECT 1").first();
           } catch {
             d1Status = "degraded";
           }
@@ -107,7 +114,7 @@ export default {
 
       // 1. Better Auth catch-all API routes (OAuth, Magic Links, Session queries)
       if (url.pathname.startsWith("/api/auth/")) {
-        const auth = createAuth(env);
+        const auth = createAuth(instrumentedEnv);
         const authResponse = await auth.handler(request);
         return withCors(authResponse, request);
       }
@@ -125,7 +132,7 @@ export default {
         { sessionToken: z.string() },
         async ({ sessionToken }) => {
           try {
-            const auth = createAuth(env);
+            const auth = createAuth(instrumentedEnv);
             // We simulate a request since better-auth typically extracts the token from headers
             const req = new Request(url.href, {
               headers: {
@@ -157,6 +164,10 @@ export default {
               ],
             };
           } catch (err) {
+            captureWorkerException("mcp-auth", err, {
+              request,
+              tags: { tool: "verify-session" },
+            });
             console.error("[mcp-auth] verify-session error:", err);
             return {
               content: [
@@ -174,7 +185,7 @@ export default {
         { email: z.string().email() },
         async ({ email }) => {
           try {
-            const db = drizzle(env.AUTH_DB, { schema });
+            const db = drizzle(instrumentedEnv.AUTH_DB, { schema });
             const result = await db.query.user.findFirst({
               where: (u, { eq }) => eq(u.email, email),
             });
@@ -204,6 +215,11 @@ export default {
               ],
             };
           } catch (err) {
+            captureWorkerException("mcp-auth", err, {
+              request,
+              tags: { tool: "get-user-by-email" },
+              extras: { email },
+            });
             console.error("[mcp-auth] get-user-by-email error:", err);
             return {
               content: [
@@ -222,7 +238,7 @@ export default {
 
       // Gate MCP endpoint with internal secret to prevent user enumeration
       const internalSecret = request.headers.get("X-Internal-Secret");
-      if (!internalSecret || internalSecret !== env.MCP_INTERNAL_SECRET) {
+      if (!internalSecret || internalSecret !== instrumentedEnv.MCP_INTERNAL_SECRET) {
         return withCors(
           new Response(JSON.stringify({ error: "Unauthorized" }), {
             status: 401,
@@ -239,6 +255,10 @@ export default {
       try {
         await mcpServer.connect(transport);
       } catch (connectError) {
+        captureWorkerException("mcp-auth", connectError, {
+          request,
+          tags: { operation: "connect-mcp-transport" },
+        });
         console.error("[mcp-auth] Failed to connect MCP transport:", connectError);
         return withCors(
           new Response(
@@ -256,6 +276,7 @@ export default {
       const response = await transport.handleRequest(request);
       return withCors(response, request);
     } catch (error) {
+      captureWorkerException("mcp-auth", error, { request });
       console.error("[mcp-auth] Unhandled error:", error);
       return withCors(
         new Response(
@@ -272,11 +293,13 @@ export default {
       if (shouldTrack) {
         try {
           ctx?.waitUntil(
-            recordServiceRequestMetric(env.STATUS_DB, "Auth MCP", Date.now() - startedAt).catch(
-              (error) => {
-                console.error("[service-metrics] failed to record auth request", error);
-              },
-            ),
+            recordServiceRequestMetric(
+              instrumentedEnv.STATUS_DB,
+              "Auth MCP",
+              Date.now() - startedAt,
+            ).catch((error) => {
+              console.error("[service-metrics] failed to record auth request", error);
+            }),
           );
         } catch {
           /* no ExecutionContext outside Workers runtime */
@@ -284,4 +307,4 @@ export default {
       }
     }
   },
-};
+} satisfies ExportedHandler<Env>);

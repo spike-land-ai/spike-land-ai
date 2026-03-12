@@ -55,7 +55,7 @@ this binding on protected routes (`/proxy/*` and R2 mutations).
 
 Workers without service bindings communicate over HTTPS when needed:
 
-- **spike-app** (browser SPA) calls `spike-edge` as its primary API gateway.
+- **spike-app** (Astro SPA) calls `spike-edge` as its primary API gateway.
 - **spike-edge** proxies authenticated requests to external APIs (Stripe,
   Anthropic, Google Gemini, GitHub) via `/proxy/*` routes.
 - **spike-land-mcp** is accessed directly by MCP clients at `mcp.spike.land`.
@@ -100,12 +100,15 @@ spike-edge  (edge.spike.land / spike.land/*)
   ├─── POST /proxy/github ──────> https://api.github.com/*
   │                                (injects GITHUB_TOKEN)
   │
+  ├─── POST /v1/chat/completions ─> OpenAI-compatible API
+  │                                (proxies to MCP tools via chat completions format)
+  │
   ├─── /live/* ──────────────────> Live update endpoints
   │
   ├─── /analytics ───────────────> Analytics ingestion
   │
   └─── /* (catch-all) ──────────> SPA_ASSETS R2 bucket
-                                   (serves spike-app build artifacts)
+                                   (serves Astro SPA build artifacts)
 ```
 
 Auth validation on protected routes:

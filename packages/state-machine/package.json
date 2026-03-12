@@ -36,7 +36,6 @@
     "vitest": "4.0.18"
   },
   "publishConfig": {
-    "registry": "https://npm.pkg.github.com",
     "access": "public"
   },
   "source": "./index.ts"

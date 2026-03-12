@@ -108,10 +108,10 @@ npm run dev
 npm run deploy
 ```
 
-### Frontend App
+### Frontend App (Astro SPA)
 
 ```bash
-cd packages/spike-app
+cd src/spike-app
 npm run dev
 npm run build
 ```

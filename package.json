@@ -38,6 +38,7 @@
     "bazdmeg:dry-run": "node --import tsx scripts/bazdmeg.ts dry-run",
     "COVERAGE:INCREMENTAL": "node --import tsx scripts/incremental-coverage.ts",
     "generate:apple-secret": "node --import tsx scripts/generate-apple-secret.ts",
+    "sentry:setup": "node --import tsx scripts/setup-sentry.ts",
     "seed:apps": "node --import tsx scripts/seed-apps.ts",
     "seed:apps:remote": "node --import tsx scripts/seed-apps.ts --remote",
     "seed:blog": "node --import tsx scripts/seed-blog.ts",

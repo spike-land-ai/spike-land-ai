@@ -1,6 +1,7 @@
 import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { logger } from "hono/logger";
+import { captureWorkerException } from "../../common/core-logic/sentry";
 import type { Env } from "../core-logic/env";
 import type { AuthVariables } from "./middleware";
 import { authMiddleware } from "./middleware";
@@ -55,6 +56,7 @@ export function createApp(): Hono<{ Bindings: Env; Variables: AuthVariables }> {
   app.route("/mcp", mcpRoute);
 
   app.onError((err, c) => {
+    captureWorkerException("spike-land-mcp", err, { request: c.req.raw });
     console.error("[spike-land-mcp] Unhandled error:", err);
     if (c.env.SPIKE_EDGE) {
       c.executionCtx.waitUntil(

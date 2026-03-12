@@ -41,6 +41,7 @@
   "dependencies": {
     "@cloudflare/kv-asset-handler": "0.4.2",
     "@modelcontextprotocol/sdk": "1.27.1",
+    "@sentry/cloudflare": "^10.43.0",
     "@spike-land-ai/code": "^0.9.58",
     "@types/node": "25.3.5",
     "hono": "^4.12.7",

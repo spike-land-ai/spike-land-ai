@@ -1,6 +1,6 @@
 # Accelerator Application Roadmap for SPIKE LAND LTD
 
-> **Last Updated**: February 2026 **Status**: Pre-Launch Stage - Product Ready,
+> **Last Updated**: March 2026 **Status**: Pre-Launch Stage - Product Ready,
 > Marketing Gap **Issue**:
 > [#1027](https://github.com/spike-land-ai/spike.land/issues/1027)
 
@@ -28,13 +28,13 @@
 | **Product**      | Spike Land - Managed Deployment Platform with MCP Registry (web dashboard + spike-cli) |
 | **Stage**        | Pre-launch (product ready, marketing gap)                                              |
 
-### Current Status (February 2026)
+### Current Status (March 2026)
 
 | Aspect         | Status                                                                                                                |
 | -------------- | --------------------------------------------------------------------------------------------------------------------- |
-| Product        | Live at spike.land (web dashboard) + spike-cli on npm (CLI)                                                           |
-| Features       | Full platform with 533+ MCP tools, managed deployments, vibe coding, AI assistant + CLI/agent interface via spike-cli |
-| Infrastructure | Production-ready, 99.9% uptime target                                                                                 |
+| Product        | Live at spike.land (Astro SPA) + spike-cli on npm (CLI) + spike-chat with aether memory                              |
+| Features       | Full platform with 533+ MCP tools, managed deployments, vibe coding, AI assistant + CLI/agent interface via spike-cli, OpenAI-compatible API, analytics MCP servers (Stripe, Google Analytics) |
+| Infrastructure | Production-ready on Cloudflare Workers, strict TypeScript (ES2024), security-hardened                                 |
 | Users          | Pre-launch (friends/family testing)                                                                                   |
 | Revenue        | Pre-revenue                                                                                                           |
 | Gap            | Marketing and go-to-market                                                                                            |
@@ -366,5 +366,5 @@ Copy.ai" **Goal**: Understand competitive positioning
 
 ---
 
-**Document Version**: 1.1 **Last Updated**: 2026-02-26 **Issue**:
+**Document Version**: 1.2 **Last Updated**: 2026-03-12 **Issue**:
 [#1027](https://github.com/spike-land-ai/spike.land/issues/1027)

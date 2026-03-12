@@ -23,6 +23,7 @@
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.27.1",
+    "@sentry/cloudflare": "^10.43.0",
     "@spike-land-ai/mcp-server-base": "workspace:*",
     "@spike-land-ai/shared": "workspace:*",
     "drizzle-orm": "^0.45.1",

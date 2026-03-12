@@ -2,15 +2,27 @@ import { Hono } from "hono";
 import type { Context, Next } from "hono";
 import type { Env, Variables } from "../../core-logic/env.js";
 import { DOCS_MANIFEST, type DocEntry } from "../../core-logic/docs-catalog.js";
+import { resolveByokKey, type ByokProvider } from "../../core-logic/byok.js";
 import { authMiddleware } from "../middleware/auth.js";
 
 const openAiCompatible = new Hono<{ Bindings: Env; Variables: Variables }>();
 
 const PUBLIC_MODEL_ID = "spike-agent-v1";
-const SYNTHESIZER_MODEL_ID = "grok-4-1"; // internal — never expose to callers
 const MODEL_CREATED_AT = 1_741_651_200;
 const MAX_SELECTED_DOCS = 3;
 const MAX_SELECTED_TOOLS = 6;
+const AUTO_BYOK_PRIORITY: ByokProvider[] = ["openai", "anthropic", "google"];
+const AUTO_PLATFORM_PRIORITY: ProviderId[] = ["xai", "anthropic", "google", "openai"];
+
+const DEFAULT_PROVIDER_MODELS: Record<ProviderId, string> = {
+  openai: "gpt-4.1",
+  anthropic: "claude-sonnet-4-20250514",
+  google: "gemini-2.5-flash",
+  xai: "grok-4-1",
+};
+
+type ProviderId = "openai" | "anthropic" | "google" | "xai";
+type ProviderSelection = ProviderId | "auto";
 type OpenAiErrorStatus = 400 | 401 | 402 | 403 | 404 | 409 | 422 | 429 | 500 | 502 | 503;
 
 interface OpenAiMessagePart {
@@ -31,6 +43,7 @@ interface OpenAiChatCompletionRequest {
   temperature?: number;
   max_tokens?: number;
   user?: string;
+  provider?: string;
 }
 
 interface ToolCatalogItem {
@@ -46,9 +59,48 @@ interface UsageShape {
   total_tokens?: number;
 }
 
-interface XaiChatResponse {
-  choices?: Array<{ message?: { content?: string } }>;
+interface OpenAiCompatibleResponse {
+  choices?: Array<{ message?: { content?: string | OpenAiMessagePart[] | null } }>;
   usage?: UsageShape;
+}
+
+interface AnthropicResponse {
+  content?: Array<{ type?: string; text?: string }>;
+  usage?: {
+    input_tokens?: number;
+    output_tokens?: number;
+  };
+}
+
+interface GoogleResponse {
+  candidates?: Array<{
+    content?: {
+      parts?: Array<{ text?: string }>;
+    };
+  }>;
+  usageMetadata?: {
+    promptTokenCount?: number;
+    candidatesTokenCount?: number;
+    totalTokenCount?: number;
+  };
+}
+
+interface ProviderMessage {
+  role: "system" | "user" | "assistant";
+  content: string;
+}
+
+interface ParsedModelSelection {
+  publicModel: string;
+  provider: ProviderSelection;
+  upstreamModel: string | undefined;
+}
+
+interface ResolvedSynthesisTarget {
+  provider: ProviderId;
+  upstreamModel: string;
+  apiKey: string;
+  keySource: "byok" | "platform";
 }
 
 function openAiError(
@@ -80,23 +132,13 @@ async function openAiCompatibleAuthMiddleware(
 ): Promise<Response | void> {
   const authHeader = c.req.header("authorization");
 
-  if (authHeader?.startsWith("Bearer ")) {
-    if (!c.env.INTERNAL_SERVICE_SECRET) {
-      return openAiError(c, 503, "Bearer authentication is not configured.", {
-        type: "service_unavailable_error",
-        code: "auth_not_configured",
-      });
-    }
+  if (authHeader?.startsWith("Bearer ") && c.env.INTERNAL_SERVICE_SECRET) {
     const token = authHeader.slice(7).trim();
     if (token === c.env.INTERNAL_SERVICE_SECRET) {
       const userId = c.req.header("x-user-id") ?? "openai-compatible-client";
       c.set("userId", userId);
       return next();
     }
-    return openAiError(c, 401, "Invalid bearer token.", {
-      type: "authentication_error",
-      code: "invalid_api_key",
-    });
   }
 
   return authMiddleware(c, next);
@@ -317,22 +359,20 @@ ${toolSection}`;
 function buildProviderMessages(
   requestMessages: OpenAiChatMessage[],
   knowledgePrompt: string,
-): Array<{ role: "system" | "user" | "assistant"; content: string }> {
-  // Merge caller system messages into the primary system prompt (single system message)
-  // to avoid issues with providers that don't handle multiple system messages well.
+): ProviderMessage[] {
+  const providerMessages: ProviderMessage[] = [{ role: "system", content: knowledgePrompt }];
+
   const callerSystemMessages = requestMessages
     .filter((message) => message.role === "system")
     .map((message) => normalizeMessageContent(message.content).trim())
     .filter(Boolean);
 
-  const systemContent =
-    callerSystemMessages.length > 0
-      ? `${knowledgePrompt}\n\nCaller instructions:\n${callerSystemMessages.join("\n\n")}`
-      : knowledgePrompt;
-
-  const providerMessages: Array<{ role: "system" | "user" | "assistant"; content: string }> = [
-    { role: "system", content: systemContent },
-  ];
+  if (callerSystemMessages.length > 0) {
+    providerMessages.push({
+      role: "system",
+      content: `Caller instructions:\n${callerSystemMessages.join("\n\n")}`,
+    });
+  }
 
   for (const message of requestMessages) {
     const content = normalizeMessageContent(message.content).trim();
@@ -382,19 +422,290 @@ function finalizeUsage(
   };
 }
 
-async function synthesizeCompletion(
+function compactUsage(values: {
+  prompt_tokens: number | undefined;
+  completion_tokens: number | undefined;
+  total_tokens: number | undefined;
+}): UsageShape | undefined {
+  const usage: UsageShape = {};
+
+  if (values.prompt_tokens !== undefined) {
+    usage.prompt_tokens = values.prompt_tokens;
+  }
+  if (values.completion_tokens !== undefined) {
+    usage.completion_tokens = values.completion_tokens;
+  }
+  if (values.total_tokens !== undefined) {
+    usage.total_tokens = values.total_tokens;
+  }
+
+  return Object.keys(usage).length > 0 ? usage : undefined;
+}
+
+function normalizeProviderName(value: string): ProviderId | undefined {
+  const normalized = value.trim().toLowerCase();
+  if (normalized === "openai") return "openai";
+  if (normalized === "anthropic") return "anthropic";
+  if (normalized === "google" || normalized === "gemini") return "google";
+  if (normalized === "xai" || normalized === "grok") return "xai";
+  return undefined;
+}
+
+function inferProviderFromRawModel(model: string): ProviderId | undefined {
+  const normalized = model.trim().toLowerCase();
+  if (
+    /^(gpt|o1|o3|o4|o5|chatgpt|codex|computer-use|gpt-oss)/.test(normalized) ||
+    normalized.includes("openai")
+  ) {
+    return "openai";
+  }
+  if (normalized.startsWith("claude") || normalized.includes("anthropic")) {
+    return "anthropic";
+  }
+  if (normalized.startsWith("gemini") || normalized.includes("google")) {
+    return "google";
+  }
+  if (normalized.startsWith("grok") || normalized.includes("xai")) {
+    return "xai";
+  }
+  return undefined;
+}
+
+function parseModelSelection(
+  body: OpenAiChatCompletionRequest,
+):
+  | { ok: true; value: ParsedModelSelection }
+  | { ok: false; message: string; param?: string; code?: string } {
+  const publicModel = body.model?.trim() || PUBLIC_MODEL_ID;
+  const providerHint =
+    typeof body.provider === "string" && body.provider.trim()
+      ? normalizeProviderName(body.provider)
+      : undefined;
+
+  if (typeof body.provider === "string" && body.provider.trim() && !providerHint) {
+    return {
+      ok: false,
+      message: `Unsupported provider "${body.provider}".`,
+      param: "provider",
+      code: "provider_not_supported",
+    };
+  }
+
+  if (publicModel === PUBLIC_MODEL_ID) {
+    if (providerHint) {
+      return {
+        ok: true,
+        value: {
+          publicModel,
+          provider: providerHint,
+          upstreamModel: DEFAULT_PROVIDER_MODELS[providerHint],
+        },
+      };
+    }
+
+    return {
+      ok: true,
+      value: {
+        publicModel,
+        provider: "auto",
+        upstreamModel: undefined,
+      },
+    };
+  }
+
+  if (publicModel.includes("/")) {
+    const slashIndex = publicModel.indexOf("/");
+    const prefix = publicModel.slice(0, slashIndex);
+    const normalizedProvider = normalizeProviderName(prefix);
+    if (!normalizedProvider) {
+      return {
+        ok: false,
+        message: `Unsupported model "${publicModel}".`,
+        param: "model",
+        code: "model_not_found",
+      };
+    }
+
+    if (providerHint && providerHint !== normalizedProvider) {
+      return {
+        ok: false,
+        message: `provider "${body.provider}" does not match model "${publicModel}".`,
+        param: "provider",
+        code: "provider_model_mismatch",
+      };
+    }
+
+    const suffix = publicModel.slice(slashIndex + 1).trim();
+    return {
+      ok: true,
+      value: {
+        publicModel,
+        provider: normalizedProvider,
+        upstreamModel: suffix || DEFAULT_PROVIDER_MODELS[normalizedProvider],
+      },
+    };
+  }
+
+  if (providerHint) {
+    const inferred = inferProviderFromRawModel(publicModel);
+    if (inferred && inferred !== providerHint) {
+      return {
+        ok: false,
+        message: `provider "${body.provider}" does not match model "${publicModel}".`,
+        param: "provider",
+        code: "provider_model_mismatch",
+      };
+    }
+
+    return {
+      ok: true,
+      value: {
+        publicModel,
+        provider: providerHint,
+        upstreamModel: publicModel,
+      },
+    };
+  }
+
+  const inferred = inferProviderFromRawModel(publicModel);
+  if (!inferred) {
+    return {
+      ok: false,
+      message: `Unsupported model "${publicModel}". Use "${PUBLIC_MODEL_ID}" or a provider model like "openai/gpt-4.1".`,
+      param: "model",
+      code: "model_not_found",
+    };
+  }
+
+  return {
+    ok: true,
+    value: {
+      publicModel,
+      provider: inferred,
+      upstreamModel: publicModel,
+    },
+  };
+}
+
+function getPlatformKey(env: Env, provider: ProviderId): string | null {
+  if (provider === "openai") {
+    return env.OPENAI_API_KEY ?? null;
+  }
+  if (provider === "anthropic") {
+    return env.CLAUDE_OAUTH_TOKEN ?? null;
+  }
+  if (provider === "google") {
+    return env.GEMINI_API_KEY ?? null;
+  }
+  return env.XAI_API_KEY ?? null;
+}
+
+async function resolveExplicitSynthesisTarget(
+  env: Env,
+  userId: string | undefined,
+  provider: ProviderId,
+  upstreamModel: string,
+): Promise<ResolvedSynthesisTarget | null> {
+  if (provider !== "xai" && userId) {
+    const byokKey = await resolveByokKey(
+      env.MCP_SERVICE,
+      userId,
+      provider,
+      env.MCP_INTERNAL_SECRET,
+    );
+    if (byokKey) {
+      return {
+        provider,
+        upstreamModel,
+        apiKey: byokKey,
+        keySource: "byok",
+      };
+    }
+  }
+
+  const platformKey = getPlatformKey(env, provider);
+  if (!platformKey) {
+    return null;
+  }
+
+  return {
+    provider,
+    upstreamModel,
+    apiKey: platformKey,
+    keySource: "platform",
+  };
+}
+
+async function resolveAutoSynthesisTarget(
+  env: Env,
+  userId: string | undefined,
+): Promise<ResolvedSynthesisTarget | null> {
+  if (userId) {
+    const byokResults = await Promise.all(
+      AUTO_BYOK_PRIORITY.map(async (provider) => ({
+        provider,
+        key: await resolveByokKey(env.MCP_SERVICE, userId, provider, env.MCP_INTERNAL_SECRET),
+      })),
+    );
+
+    const match = byokResults.find((entry) => entry.key);
+    if (match?.key) {
+      return {
+        provider: match.provider,
+        upstreamModel: DEFAULT_PROVIDER_MODELS[match.provider],
+        apiKey: match.key,
+        keySource: "byok",
+      };
+    }
+  }
+
+  for (const provider of AUTO_PLATFORM_PRIORITY) {
+    const platformKey = getPlatformKey(env, provider);
+    if (platformKey) {
+      return {
+        provider,
+        upstreamModel: DEFAULT_PROVIDER_MODELS[provider],
+        apiKey: platformKey,
+        keySource: "platform",
+      };
+    }
+  }
+
+  return null;
+}
+
+async function resolveSynthesisTarget(
+  env: Env,
+  userId: string | undefined,
+  selection: ParsedModelSelection,
+): Promise<ResolvedSynthesisTarget | null> {
+  if (selection.provider === "auto") {
+    return resolveAutoSynthesisTarget(env, userId);
+  }
+
+  return resolveExplicitSynthesisTarget(
+    env,
+    userId,
+    selection.provider,
+    selection.upstreamModel ?? DEFAULT_PROVIDER_MODELS[selection.provider],
+  );
+}
+
+async function callOpenAiStyleProvider(
+  endpoint: string,
   apiKey: string,
-  messages: Array<{ role: "system" | "user" | "assistant"; content: string }>,
+  model: string,
+  messages: ProviderMessage[],
   options: { temperature: number | undefined; maxTokens: number | undefined },
-) {
-  const res = await fetch("https://api.x.ai/v1/chat/completions", {
+): Promise<{ content: string; usage: UsageShape | undefined }> {
+  const res = await fetch(endpoint, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${apiKey}`,
     },
     body: JSON.stringify({
-      model: SYNTHESIZER_MODEL_ID,
+      model,
       messages,
       temperature: options.temperature ?? 0.2,
       max_tokens: options.maxTokens ?? 768,
@@ -403,17 +714,175 @@ async function synthesizeCompletion(
   });
 
   if (!res.ok) {
-    // Log upstream details server-side only — never expose vendor identity or error body to callers
-    const errorText = await res.text();
-    console.error(`Synthesis upstream error (${res.status}):`, errorText);
-    throw new Error("Synthesis provider returned an error.");
+    console.error("[openai-compatible] openai-style synthesis failed", {
+      endpoint,
+      status: res.status,
+    });
+    throw new Error(`Synthesis provider request failed with status ${res.status}.`);
   }
 
-  const data = await res.json<XaiChatResponse>();
+  const data = await res.json<OpenAiCompatibleResponse>();
   return {
-    content: data.choices?.[0]?.message?.content ?? "",
+    content: normalizeMessageContent(data.choices?.[0]?.message?.content ?? ""),
     usage: data.usage,
   };
+}
+
+async function callAnthropicProvider(
+  apiKey: string,
+  model: string,
+  messages: ProviderMessage[],
+  options: { temperature: number | undefined; maxTokens: number | undefined },
+): Promise<{ content: string; usage: UsageShape | undefined }> {
+  const system = messages
+    .filter((message) => message.role === "system")
+    .map((message) => message.content)
+    .join("\n\n")
+    .trim();
+  const nonSystemMessages = messages
+    .filter((message) => message.role !== "system")
+    .map((message) => ({
+      role: message.role,
+      content: message.content,
+    }));
+
+  const res = await fetch("https://api.anthropic.com/v1/messages", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "x-api-key": apiKey,
+      "anthropic-version": "2023-06-01",
+    },
+    body: JSON.stringify({
+      model,
+      max_tokens: options.maxTokens ?? 768,
+      temperature: options.temperature ?? 0.2,
+      ...(system ? { system } : {}),
+      messages: nonSystemMessages,
+    }),
+  });
+
+  if (!res.ok) {
+    console.error("[openai-compatible] anthropic synthesis failed", {
+      status: res.status,
+    });
+    throw new Error(`Anthropic synthesis request failed with status ${res.status}.`);
+  }
+
+  const data = await res.json<AnthropicResponse>();
+  const content = (data.content ?? [])
+    .map((entry) => (entry.type === "text" ? (entry.text ?? "") : ""))
+    .join("");
+
+  return {
+    content,
+    usage: data.usage
+      ? compactUsage({
+          prompt_tokens: data.usage.input_tokens,
+          completion_tokens: data.usage.output_tokens,
+          total_tokens:
+            data.usage.input_tokens !== undefined || data.usage.output_tokens !== undefined
+              ? (data.usage.input_tokens ?? 0) + (data.usage.output_tokens ?? 0)
+              : undefined,
+        })
+      : undefined,
+  };
+}
+
+async function callGoogleProvider(
+  apiKey: string,
+  model: string,
+  messages: ProviderMessage[],
+  options: { temperature: number | undefined; maxTokens: number | undefined },
+): Promise<{ content: string; usage: UsageShape | undefined }> {
+  const system = messages
+    .filter((message) => message.role === "system")
+    .map((message) => message.content)
+    .join("\n\n")
+    .trim();
+  const contents = messages
+    .filter((message) => message.role !== "system")
+    .map((message) => ({
+      role: message.role === "assistant" ? "model" : "user",
+      parts: [{ text: message.content }],
+    }));
+
+  const res = await fetch(
+    `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-goog-api-key": apiKey,
+      },
+      body: JSON.stringify({
+        ...(system ? { systemInstruction: { parts: [{ text: system }] } } : {}),
+        contents,
+        generationConfig: {
+          temperature: options.temperature ?? 0.2,
+          maxOutputTokens: options.maxTokens ?? 768,
+        },
+      }),
+    },
+  );
+
+  if (!res.ok) {
+    console.error("[openai-compatible] google synthesis failed", {
+      status: res.status,
+      model,
+    });
+    throw new Error(`Google synthesis request failed with status ${res.status}.`);
+  }
+
+  const data = await res.json<GoogleResponse>();
+  const content =
+    data.candidates?.[0]?.content?.parts
+      ?.map((part) => part.text ?? "")
+      .filter(Boolean)
+      .join("") ?? "";
+
+  return {
+    content,
+    usage: data.usageMetadata
+      ? compactUsage({
+          prompt_tokens: data.usageMetadata.promptTokenCount,
+          completion_tokens: data.usageMetadata.candidatesTokenCount,
+          total_tokens: data.usageMetadata.totalTokenCount,
+        })
+      : undefined,
+  };
+}
+
+async function synthesizeCompletion(
+  target: ResolvedSynthesisTarget,
+  messages: ProviderMessage[],
+  options: { temperature: number | undefined; maxTokens: number | undefined },
+) {
+  if (target.provider === "openai") {
+    return callOpenAiStyleProvider(
+      "https://api.openai.com/v1/chat/completions",
+      target.apiKey,
+      target.upstreamModel,
+      messages,
+      options,
+    );
+  }
+
+  if (target.provider === "anthropic") {
+    return callAnthropicProvider(target.apiKey, target.upstreamModel, messages, options);
+  }
+
+  if (target.provider === "google") {
+    return callGoogleProvider(target.apiKey, target.upstreamModel, messages, options);
+  }
+
+  return callOpenAiStyleProvider(
+    "https://api.x.ai/v1/chat/completions",
+    target.apiKey,
+    target.upstreamModel,
+    messages,
+    options,
+  );
 }
 
 function splitStreamingChunks(text: string): string[] {
@@ -443,12 +912,7 @@ function splitStreamingChunks(text: string): string[] {
   return chunks;
 }
 
-function buildStreamResponse(
-  id: string,
-  model: string,
-  content: string,
-  usage?: { prompt_tokens: number; completion_tokens: number; total_tokens: number },
-) {
+function buildStreamResponse(id: string, model: string, content: string) {
   const created = Math.floor(Date.now() / 1000);
   const encoder = new TextEncoder();
   const chunks = splitStreamingChunks(content);
@@ -477,14 +941,12 @@ function buildStreamResponse(
         });
       }
 
-      // Include usage in the final chunk per OpenAI streaming spec
       send({
         id,
         object: "chat.completion.chunk",
         created,
         model,
         choices: [{ index: 0, delta: {}, finish_reason: "stop" }],
-        ...(usage ? { usage } : {}),
       });
 
       controller.enqueue(encoder.encode("data: [DONE]\n\n"));
@@ -501,35 +963,7 @@ function buildStreamResponse(
   });
 }
 
-async function checkRateLimit(
-  env: Env,
-  userId: string,
-): Promise<{ allowed: boolean; retryAfterMs: number }> {
-  try {
-    const key = `oai:${userId}`;
-    const id = env.LIMITERS.idFromName(key);
-    const stub = env.LIMITERS.get(id);
-    const resp = await stub.fetch(new Request("https://limiter.internal/", { method: "POST" }));
-    const cooldown = Number(await resp.text());
-    return { allowed: cooldown === 0, retryAfterMs: cooldown };
-  } catch {
-    // If rate limiter is unavailable, allow the request but log
-    console.error("Rate limiter unavailable for OpenAI-compatible endpoint");
-    return { allowed: true, retryAfterMs: 0 };
-  }
-}
-
 async function handleChatCompletion(c: Context<{ Bindings: Env; Variables: Variables }>) {
-  // Rate limit before parsing body
-  const userId = (c.get("userId") as string | undefined) ?? "anonymous";
-  const rateCheck = await checkRateLimit(c.env, userId);
-  if (!rateCheck.allowed) {
-    return openAiError(c, 429, "Rate limit exceeded. Please retry after a short cooldown.", {
-      type: "rate_limit_error",
-      code: "rate_limit_exceeded",
-    });
-  }
-
   let body: OpenAiChatCompletionRequest;
 
   try {
@@ -538,17 +972,17 @@ async function handleChatCompletion(c: Context<{ Bindings: Env; Variables: Varia
     return openAiError(c, 400, "Request body must be valid JSON.");
   }
 
-  const model = body.model ?? PUBLIC_MODEL_ID;
-  if (model !== PUBLIC_MODEL_ID) {
-    return openAiError(c, 400, `Unsupported model "${model}".`, {
-      param: "model",
-      code: "model_not_found",
-    });
-  }
-
   if (!Array.isArray(body.messages) || body.messages.length === 0) {
     return openAiError(c, 400, "messages must be a non-empty array.", {
       param: "messages",
+    });
+  }
+
+  const parsedModel = parseModelSelection(body);
+  if (!parsedModel.ok) {
+    return openAiError(c, 400, parsedModel.message, {
+      ...(parsedModel.param ? { param: parsedModel.param } : {}),
+      ...(parsedModel.code ? { code: parsedModel.code } : {}),
     });
   }
 
@@ -559,14 +993,8 @@ async function handleChatCompletion(c: Context<{ Bindings: Env; Variables: Varia
     });
   }
 
-  if (!c.env.XAI_API_KEY) {
-    return openAiError(c, 503, "XAI_API_KEY is not configured for local synthesis.", {
-      type: "service_unavailable_error",
-      code: "provider_unavailable",
-    });
-  }
-
   const requestId = (c.get("requestId") as string | undefined) ?? crypto.randomUUID();
+  const userId = c.get("userId") as string | undefined;
   const toolCatalog = await fetchToolCatalog(c.env, requestId);
   const selectedDocs = selectRelevantDocs(latestUserPrompt);
   const selectedTools = searchToolCatalog(latestUserPrompt, toolCatalog);
@@ -575,8 +1003,21 @@ async function handleChatCompletion(c: Context<{ Bindings: Env; Variables: Varia
     buildKnowledgePrompt(latestUserPrompt, selectedDocs, selectedTools),
   );
 
+  const synthesisTarget = await resolveSynthesisTarget(c.env, userId, parsedModel.value);
+  if (!synthesisTarget) {
+    return openAiError(
+      c,
+      503,
+      "No matching synthesis provider is configured. Add a BYOK key or configure a platform provider.",
+      {
+        type: "service_unavailable_error",
+        code: "provider_unavailable",
+      },
+    );
+  }
+
   try {
-    const synthesized = await synthesizeCompletion(c.env.XAI_API_KEY, providerMessages, {
+    const synthesized = await synthesizeCompletion(synthesisTarget, providerMessages, {
       temperature: body.temperature,
       maxTokens: body.max_tokens,
     });
@@ -584,15 +1025,14 @@ async function handleChatCompletion(c: Context<{ Bindings: Env; Variables: Varia
     const id = `chatcmpl_${crypto.randomUUID().replace(/-/g, "")}`;
 
     if (body.stream) {
-      const streamUsage = finalizeUsage(synthesized.usage, body.messages, content);
-      return buildStreamResponse(id, model, content, streamUsage);
+      return buildStreamResponse(id, parsedModel.value.publicModel, content);
     }
 
     return c.json({
       id,
       object: "chat.completion",
       created: Math.floor(Date.now() / 1000),
-      model,
+      model: parsedModel.value.publicModel,
       choices: [
         {
           index: 0,
@@ -622,6 +1062,24 @@ function modelsResponse() {
     data: [
       {
         id: PUBLIC_MODEL_ID,
+        object: "model",
+        created: MODEL_CREATED_AT,
+        owned_by: "spike.land",
+      },
+      {
+        id: `openai/${DEFAULT_PROVIDER_MODELS.openai}`,
+        object: "model",
+        created: MODEL_CREATED_AT,
+        owned_by: "spike.land",
+      },
+      {
+        id: `anthropic/${DEFAULT_PROVIDER_MODELS.anthropic}`,
+        object: "model",
+        created: MODEL_CREATED_AT,
+        owned_by: "spike.land",
+      },
+      {
+        id: `google/${DEFAULT_PROVIDER_MODELS.google}`,
         object: "model",
         created: MODEL_CREATED_AT,
         owned_by: "spike.land",

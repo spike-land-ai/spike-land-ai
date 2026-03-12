@@ -51,7 +51,7 @@ if get_changed_files | grep -qE '^(scripts/|package\.json$)'; then
 fi
 
 echo "==> Detecting changed packages..." >&2
-PACKAGES=$(bash "$SCRIPT_DIR/detect-changed-packages.sh" "${ARGS[@]}") || {
+PACKAGES=$(bash "$SCRIPT_DIR/detect-changed-packages.sh" ${ARGS[@]+"${ARGS[@]}"}) || {
   echo "ERROR: detect-changed-packages.sh failed" >&2
   exit 1
 }

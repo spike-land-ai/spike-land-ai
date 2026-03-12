@@ -5,7 +5,7 @@
   "type": "module",
   "main": "./index.ts",
   "publishConfig": {
-    "registry": "https://npm.pkg.github.com"
+    "access": "public"
   },
   "scripts": {
     "build": "npx remotion bundle index.ts dist/bundle.js",

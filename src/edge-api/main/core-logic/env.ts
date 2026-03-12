@@ -14,6 +14,7 @@ export interface Env {
   MCP_SERVICE: Fetcher;
   STRIPE_SECRET_KEY: string;
   STRIPE_WEBHOOK_SECRET: string;
+  OPENAI_API_KEY?: string;
   GEMINI_API_KEY: string;
   CLAUDE_OAUTH_TOKEN: string;
   LLM_CONTEXT_WINDOW?: string;
@@ -31,6 +32,8 @@ export interface Env {
   CF_ZONE_ID: string;
   CF_CACHE_PURGE_TOKEN: string;
   XAI_API_KEY: string;
+  SENTRY_DSN?: string;
+  SENTRY_TRACES_SAMPLE_RATE?: string;
   ANALYTICS: AnalyticsEngineDataset;
   /** Set to "development" or "local" in dev wrangler config to enable draft posts */
   ENVIRONMENT?: string;

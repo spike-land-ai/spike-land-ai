@@ -1,7 +1,7 @@
 ---
 title: "Why Spike Chat Stays Sharp While Transcript-First AI Chats Go Soft"
 slug: "why-spike-chat-stays-sharp"
-description: "Most AI chats solve problems by throwing more transcript at the model. spike-chat does the opposite: split prompts, scored memory, staged execution, compressed working memory, and bounded tool calling."
+description: "Most AI chats solve problems by throwing more transcript at the model. spike-chat does the opposite: split prompts, scored memory, staged execution, compressed working memory, bounded tool calling, and enough focus that a single gemini-3-flash agent rewrote our frontend to Astro from one PRD."
 date: "2026-03-11"
 author: "Zoltan Erdos"
 category: "Developer Experience"
@@ -9,11 +9,11 @@ tags: ["spike-chat", "context-engineering", "ai", "tool-calling", "memory", "llm
 featured: false
 draft: false
 primer: "The smartest chat system is not the one with the most context. It is the one with the cleanest context."
-heroImage: "/blog/why-your-claude-agent-wastes-context-on-tool-descriptions/hero.png"
+heroImage: "/blog/why-spike-chat-stays-sharp/hero.jpg"
 heroPrompt: "A razor-sharp glowing chat interface cutting through a fog of cluttered transcript windows and noisy tool panels, cinematic tech illustration, steel blue and amber accents, crisp focus on the central system"
 ---
 
-![A razor-sharp glowing chat interface cutting through a fog of cluttered transcript windows and noisy tool panels, cinematic tech illustration, steel blue and amber accents, crisp focus on the central system](/blog/why-your-claude-agent-wastes-context-on-tool-descriptions/hero.png)
+![A razor-sharp glowing chat interface cutting through a fog of cluttered transcript windows and noisy tool panels, cinematic tech illustration, steel blue and amber accents, crisp focus on the central system](/blog/why-spike-chat-stays-sharp/hero.jpg)
 
 <Tldr>
 
@@ -23,6 +23,7 @@ heroPrompt: "A razor-sharp glowing chat interface cutting through a fog of clutt
 - We split work into four stages: classify, plan, execute, extract. Each stage gets the artifact it needs, not the whole chat log.
 - We compress older turns and tool work into bounded stage memory instead of replaying raw transcripts, raw JSON, and full browser surfaces forever.
 - We also keep tool calling bounded: the execute stage receives a compact MCP tool catalog and now actually gets that catalog wired into the model call.
+- The proof point is real: we just migrated the whole site to Astro with a single `gemini-3-flash` agent, one PRD document, continuous context compression, and no errors.
 
 </Tldr>
 
@@ -37,6 +38,30 @@ It does not just mean you spent more tokens.
 It means the model has to search through a messy working set where signal and noise are mixed together. When that happens, even a strong model starts acting weak.
 
 This is the problem we set out to solve in spike-chat.
+
+## The Proof Point: One Agent Rewrote The Whole Frontend
+
+This is not a theory post.
+
+We just migrated the whole site to Astro with a single agent.
+
+Not a swarm. Not a human manually chunking the work into fifty tickets. Not a stronger model with an absurdly large prompt.
+
+One agent.
+One PRD.
+`gemini-3-flash`.
+Continuous context compression.
+One full frontend rewrite.
+
+And it did not make errors.
+
+That is the point of this architecture.
+
+When the context stays sharp, a fast model can do work that transcript-first systems would bungle even with a more expensive model. If the representation is right, the model spends its attention on the actual product logic instead of re-reading a decaying wall of chat history.
+
+This is the commercial message as much as the technical one:
+
+**better context discipline beats bigger transcript budgets.**
 
 ## Transcript-First Chat Is The Wrong Primitive
 
@@ -229,6 +254,17 @@ The better rule is:
 
 That same principle is how spike-chat avoids becoming just another smooth-talking transcript machine.
 
+It is also why the Astro migration mattered so much internally.
+
+The frontend rewrite was not "magic." It was what happens when a model gets:
+
+- one canonical source document
+- a focused tool surface
+- compact working memory between steps
+- continuous context compression instead of transcript sprawl
+
+That is what let one agent stay coherent across a whole-site migration.
+
 ## Why Spike Chat Stays Sharp
 
 Here is the simplest way to describe the difference.
@@ -250,11 +286,19 @@ Not because it uses a magical model.
 
 Because it is more disciplined about what deserves to stay in memory.
 
+That discipline is what let a single `gemini-3-flash` agent take one PRD and rewrite the whole frontend into Astro without drifting off the rails.
+
 ## The Bigger Point
 
 The future of good AI chat is not "larger transcript windows."
 
 It is better representation.
+
+The strongest marketing claim we can make here is also the truest engineering claim:
+
+spike-chat is not sharp because it hoards context.
+
+spike-chat is sharp because it refuses to.
 
 The model does not need your entire conversation history. It needs the smallest truthful artifact that preserves:
 

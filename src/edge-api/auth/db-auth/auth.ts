@@ -11,6 +11,8 @@ export interface Env {
   STATUS_DB: D1Database;
   BETTER_AUTH_SECRET: string;
   MCP_INTERNAL_SECRET: string;
+  SENTRY_DSN?: string;
+  SENTRY_TRACES_SAMPLE_RATE?: string;
   APP_URL?: string;
   GOOGLE_CLIENT_ID?: string;
   GOOGLE_CLIENT_SECRET?: string;

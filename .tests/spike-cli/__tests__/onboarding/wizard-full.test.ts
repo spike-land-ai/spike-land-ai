@@ -38,7 +38,7 @@ describe("runOnboardingWizard", () => {
 
   /**
    * Helper: sets up readline mock to respond to each question in order.
-   * The answers array maps to ONBOARDING_QUESTIONS by index.
+   * The wizard asks branching questions — answers are consumed sequentially.
    */
   function setupAnswers(answers: string[]): void {
     let callIndex = 0;
@@ -47,26 +47,28 @@ describe("runOnboardingWizard", () => {
     });
   }
 
-  it("returns all-false persona (id 0) when all answers are no", async () => {
+  // All-no path: q1(n) → q2-nontech(n) → q3-personal(n) → q4-casual(n) → persona 16 (Solo Explorer)
+  it("returns Solo Explorer when all answers are no", async () => {
     setupAnswers(["n", "n", "n", "n"]);
 
     const result = await runOnboardingWizard();
 
-    expect(result.personaId).toBe(0);
-    expect(result.personaSlug).toBe("curious-explorer");
-    expect(result.personaName).toBe("Curious Explorer");
+    expect(result.personaId).toBe(16);
+    expect(result.personaSlug).toBe("solo-explorer");
+    expect(result.personaName).toBe("Solo Explorer");
     expect(result.answers).toEqual([false, false, false, false]);
     expect(result.completedAt).toMatch(/^\d{4}-\d{2}-\d{2}T/);
   });
 
-  it("returns all-true persona (id 15) when all answers are yes", async () => {
+  // All-yes path: q1(y) → q2-tech(y) → q3-product(y) → q4-indie(y) → persona 1 (AI Indie)
+  it("returns AI Indie when all answers are yes", async () => {
     setupAnswers(["y", "y", "y", "y"]);
 
     const result = await runOnboardingWizard();
 
-    expect(result.personaId).toBe(15);
-    expect(result.personaSlug).toBe("ai-engineering-lead");
-    expect(result.personaName).toBe("AI Engineering Lead");
+    expect(result.personaId).toBe(1);
+    expect(result.personaSlug).toBe("ai-indie");
+    expect(result.personaName).toBe("AI Indie");
     expect(result.answers).toEqual([true, true, true, true]);
   });
 
@@ -86,24 +88,34 @@ describe("runOnboardingWizard", () => {
     expect(result.answers).toEqual([false, false, false, false]);
   });
 
-  it("produces the hobbyist coder persona (id 8) for coder-only", async () => {
-    // [true, false, false, false] → id 8
+  // q1(y) → q2-tech(n) → q3-platform(n) → q4-devops(n) → persona 8 (Startup DevOps)
+  it("follows branching path to Startup DevOps for [y, n, n, n]", async () => {
     setupAnswers(["y", "n", "n", "n"]);
 
     const result = await runOnboardingWizard();
 
     expect(result.personaId).toBe(8);
-    expect(result.personaSlug).toBe("hobbyist-coder");
+    expect(result.personaSlug).toBe("startup-devops");
   });
 
-  it("produces the indie-shipper persona (id 5) for [false, true, false, true]", async () => {
-    // [false, true, false, true] → 0 + 4 + 0 + 1 = 5
-    setupAnswers(["n", "y", "n", "y"]);
+  // q1(n) → q2-nontech(y) → q3-business(y) → q4-solofound(n) → persona 10 (Non-technical Founder)
+  it("follows branching path to Non-technical Founder for [n, y, y, n]", async () => {
+    setupAnswers(["n", "y", "y", "n"]);
 
     const result = await runOnboardingWizard();
 
-    expect(result.personaId).toBe(5);
-    expect(result.personaSlug).toBe("indie-shipper");
+    expect(result.personaId).toBe(10);
+    expect(result.personaSlug).toBe("nontechnical-founder");
+  });
+
+  // q1(n) → q2-nontech(n) → q3-personal(y) → q4-creative(y) → persona 13 (Content Creator)
+  it("follows branching path to Content Creator for [n, n, y, y]", async () => {
+    setupAnswers(["n", "n", "y", "y"]);
+
+    const result = await runOnboardingWizard();
+
+    expect(result.personaId).toBe(13);
+    expect(result.personaSlug).toBe("content-creator");
   });
 
   it("closes the readline interface after wizard completes", async () => {
@@ -137,12 +149,41 @@ describe("runOnboardingWizard", () => {
     expect(output).toContain("personalize");
   });
 
-  it("asks exactly 4 questions", async () => {
+  it("asks exactly 4 questions (one per tree level)", async () => {
     setupAnswers(["n", "n", "n", "n"]);
 
     await runOnboardingWizard();
 
     expect(mockRlQuestion).toHaveBeenCalledTimes(4);
+  });
+
+  it("question prompts include yes/no labels", async () => {
+    setupAnswers(["y", "y", "y", "y"]);
+
+    await runOnboardingWizard();
+
+    // First question should mention the yes/no labels
+    const firstPrompt = mockRlQuestion.mock.calls[0][0] as string;
+    expect(firstPrompt).toContain("Yes, I code");
+    expect(firstPrompt).toContain("No, I don't");
+  });
+
+  it("second question depends on first answer (branching)", async () => {
+    // Path 1: q1(y) → q2-tech
+    setupAnswers(["y", "y", "y", "y"]);
+    await runOnboardingWizard();
+    const secondPromptYes = mockRlQuestion.mock.calls[1][0] as string;
+
+    vi.clearAllMocks();
+
+    // Path 2: q1(n) → q2-nontech
+    setupAnswers(["n", "n", "n", "n"]);
+    await runOnboardingWizard();
+    const secondPromptNo = mockRlQuestion.mock.calls[1][0] as string;
+
+    // The second questions should differ based on branching
+    expect(secondPromptYes).toContain("What do you mainly build?");
+    expect(secondPromptNo).toContain("What's your primary goal?");
   });
 });
 
@@ -153,9 +194,9 @@ describe("submitOnboarding", () => {
   });
 
   const sampleResult = {
-    personaId: 15,
-    personaSlug: "ai-engineering-lead",
-    personaName: "AI Engineering Lead",
+    personaId: 1,
+    personaSlug: "ai-indie",
+    personaName: "AI Indie",
     answers: [true, true, true, true],
     completedAt: "2024-01-01T00:00:00.000Z",
   };
@@ -188,8 +229,8 @@ describe("submitOnboarding", () => {
 
     const [, init] = mockFetch.mock.calls[0] as [string, RequestInit];
     const body = JSON.parse(init.body as string) as typeof sampleResult;
-    expect(body.personaId).toBe(15);
-    expect(body.personaSlug).toBe("ai-engineering-lead");
+    expect(body.personaId).toBe(1);
+    expect(body.personaSlug).toBe("ai-indie");
   });
 
   it("uses the provided baseUrl in the request", async () => {
