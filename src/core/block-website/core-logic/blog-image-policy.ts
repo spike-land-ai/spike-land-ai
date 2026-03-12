@@ -60,33 +60,26 @@ export function hashImagePrompt(prompt: string): string {
   return (hash >>> 0).toString(36);
 }
 
+/** Image Studio origin for prompt-driven generation */
+const IMAGE_STUDIO_ORIGIN = "https://image-studio-mcp.spike.land";
+
 export function buildPromptDrivenBlogImageSrc(
   src?: string | null,
   prompt?: string | null,
 ): string | null {
   const safeSrc = sanitizeBlogImageSrc(src);
-  if (!safeSrc) return null;
 
   const normalizedPrompt = prompt?.trim();
+
+  // No prompt → return the plain image source (or null)
   if (!normalizedPrompt) return safeSrc;
 
   const version = hashImagePrompt(normalizedPrompt);
 
-  try {
-    const base =
-      safeSrc.startsWith("http://") || safeSrc.startsWith("https://")
-        ? new URL(safeSrc)
-        : new URL(safeSrc, "https://spike.land");
+  // Prompt-driven: route to the Image Studio generate-image endpoint
+  const url = new URL("/api/generate-image", IMAGE_STUDIO_ORIGIN);
+  url.searchParams.set("prompt", normalizedPrompt);
+  url.searchParams.set("v", version);
 
-    base.searchParams.set("prompt", normalizedPrompt);
-    base.searchParams.set("v", version);
-
-    if (safeSrc.startsWith("http://") || safeSrc.startsWith("https://")) {
-      return base.toString();
-    }
-
-    return `${base.pathname}${base.search}${base.hash}`;
-  } catch {
-    return safeSrc;
-  }
+  return url.toString();
 }

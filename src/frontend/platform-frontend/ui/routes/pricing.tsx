@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { useAuth } from "../hooks/useAuth";
 import { trackAnalyticsEvent } from "../hooks/useAnalytics";
 import { usePricing } from "../hooks/usePricing";
+import { useToast } from "../components/Toast";
 import { apiFetch } from "../../core-logic/api";
 import { trackGoogleAdsEvent } from "../../core-logic/google-ads";
 
@@ -107,6 +108,7 @@ async function handleCheckout(
   annual: boolean,
   isAuthenticated: boolean,
   trackEvent: (event: string, data?: Record<string, unknown>) => void,
+  showToast: (message: string, variant?: "success" | "error" | "info") => void,
 ) {
   if (!isAuthenticated) {
     window.location.href = "/login";
@@ -122,7 +124,7 @@ async function handleCheckout(
   });
   if (!res.ok) {
     const err = (await res.json()) as { error?: string };
-    alert(err.error ?? "Checkout failed");
+    showToast(err.error ?? "Checkout failed", "error");
     return;
   }
   const data = (await res.json()) as { url: string };
@@ -135,12 +137,14 @@ function PlanCard({
   isAuthenticated,
   getStartedLabel,
   trackEvent,
+  showToast,
 }: {
   plan: PricingPlan;
   annual: boolean;
   isAuthenticated: boolean;
   getStartedLabel: string;
   trackEvent: (event: string, data?: Record<string, unknown>) => void;
+  showToast: (message: string, variant?: "success" | "error" | "info") => void;
 }) {
   const { t } = useTranslation("pricing");
   const isFree = plan.id === "free";
@@ -157,6 +161,7 @@ function PlanCard({
 
   return (
     <div
+      role="region"
       aria-labelledby={planId}
       className={`flex h-full flex-col p-6 ${plan.highlighted ? "rubik-panel-strong" : "rubik-panel"}`}
     >
@@ -212,7 +217,7 @@ function PlanCard({
       {plan.tier ? (
         <button
           type="button"
-          onClick={() => handleCheckout(plan.tier!, annual, isAuthenticated, trackEvent)}
+          onClick={() => handleCheckout(plan.tier!, annual, isAuthenticated, trackEvent, showToast)}
           className={buttonClass}
         >
           {!isAuthenticated && plan.tier ? getStartedLabel : plan.cta}
@@ -231,21 +236,12 @@ function PlanCard({
 }
 
 function FaqItem({ question, answer }: { question: string; answer: string }) {
-  const [open, setOpen] = useState(false);
-  const panelId = `faq-${question.slice(0, 20).replace(/\W+/g, "-").toLowerCase()}`;
-
   return (
-    <div className="border-b border-border py-4 last:border-b-0">
-      <button
-        type="button"
-        onClick={() => setOpen(!open)}
-        className="flex w-full items-start justify-between text-left gap-4"
-        aria-expanded={open}
-        aria-controls={panelId}
-      >
+    <details className="group border-b border-border py-4 last:border-b-0">
+      <summary className="flex cursor-pointer list-none items-start justify-between gap-4 text-left [&::-webkit-details-marker]:hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded-sm">
         <span className="text-sm font-semibold text-foreground">{question}</span>
         <svg
-          className={`mt-0.5 h-4 w-4 shrink-0 text-muted-foreground transition-transform ${open ? "rotate-180" : ""}`}
+          className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground transition-transform group-open:rotate-180"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
@@ -253,13 +249,9 @@ function FaqItem({ question, answer }: { question: string; answer: string }) {
         >
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
         </svg>
-      </button>
-      {open && (
-        <p id={panelId} className="mt-3 text-sm text-muted-foreground leading-relaxed">
-          {answer}
-        </p>
-      )}
-    </div>
+      </summary>
+      <p className="mt-3 text-sm text-muted-foreground leading-relaxed">{answer}</p>
+    </details>
   );
 }
 
@@ -267,7 +259,8 @@ export function PricingPage() {
   const { t } = useTranslation("pricing");
   const [annual, setAnnual] = useState(false);
   const { isAuthenticated } = useAuth();
-  const { pricing } = usePricing();
+  const { data: pricing } = usePricing();
+  const { showToast } = useToast();
   const plans = useMemo(() => makePlans(pricing, t), [pricing, t]);
   const faqItems = useMemo(() => makeFaqItems(t), [t]);
 
@@ -293,7 +286,7 @@ export function PricingPage() {
 
         <div
           role="radiogroup"
-          aria-label={t("billingFrequency")}
+          aria-label={t("billingFrequency") as string}
           className="mx-auto inline-flex items-center gap-3 rounded-full border border-border bg-muted p-1"
           onKeyDown={(e) => {
             if (e.key === "ArrowLeft" || e.key === "ArrowUp") {
@@ -312,7 +305,7 @@ export function PricingPage() {
             aria-checked={!annual}
             tabIndex={!annual ? 0 : -1}
             onClick={() => setAnnual(false)}
-            className={`rounded-full px-4 py-2 text-sm font-medium transition ${
+            className={`rounded-full px-4 py-2 text-sm font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ${
               !annual ? "bg-background text-foreground shadow-sm" : "text-muted-foreground"
             }`}
           >
@@ -324,7 +317,7 @@ export function PricingPage() {
             aria-checked={annual}
             tabIndex={annual ? 0 : -1}
             onClick={() => setAnnual(true)}
-            className={`rounded-full px-4 py-2 text-sm font-medium transition ${
+            className={`rounded-full px-4 py-2 text-sm font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ${
               annual ? "bg-background text-foreground shadow-sm" : "text-muted-foreground"
             }`}
           >
@@ -343,8 +336,9 @@ export function PricingPage() {
             plan={plan}
             annual={annual}
             isAuthenticated={isAuthenticated}
-            getStartedLabel={t("getStarted")}
+            getStartedLabel={t("getStarted") as string}
             trackEvent={trackAnalyticsEvent}
+            showToast={showToast}
           />
         ))}
       </div>

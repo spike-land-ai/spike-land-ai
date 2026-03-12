@@ -4,8 +4,12 @@ import { useAuth } from "../hooks/useAuth";
 import { useChat } from "../hooks/useChat";
 import type { ConversationItem } from "../hooks/useChat";
 import { apiUrl } from "../../core-logic/api";
+import {
+  PERSONAS,
+  type OnboardingPersona,
+} from "../../../monaco-editor/core-logic/lib/onboarding/personas";
 
-const PERSONA = "rubik-3";
+const DEFAULT_PERSONA = "rubik-3";
 
 interface DesignVariant {
   id: string;
@@ -14,22 +18,62 @@ interface DesignVariant {
 }
 
 const VARIANT_COLORS: Record<string, string> = {
-  "dense-grid": "bg-emerald-500/10 text-emerald-600",
-  editorial: "bg-rose-500/10 text-rose-600",
-  terminal: "bg-green-500/10 text-green-500",
-  glassmorphism: "bg-blue-500/10 text-blue-400",
-  obsidian: "bg-purple-500/10 text-purple-400",
-  "phone-compact": "bg-orange-500/10 text-orange-500",
-  "4k-expanse": "bg-cyan-500/10 text-cyan-500",
-  "kinetic-type": "bg-pink-500/10 text-pink-500",
-  "card-world": "bg-amber-500/10 text-amber-600",
-  "command-first": "bg-slate-500/10 text-slate-400",
-  "store-forward": "bg-indigo-500/10 text-indigo-500",
-  "blog-forward": "bg-teal-500/10 text-teal-500",
-  "chat-forward": "bg-violet-500/10 text-violet-500",
-  "dashboard-pro": "bg-sky-500/10 text-sky-500",
-  enterprise: "bg-gray-500/10 text-gray-500",
-  playful: "bg-yellow-500/10 text-yellow-600",
+  "dense-grid": "bg-success/10 text-success-foreground",
+  editorial: "bg-destructive/10 text-destructive-foreground",
+  terminal: "bg-success/10 text-success-foreground",
+  glassmorphism: "bg-info/10 text-info-foreground",
+  obsidian: "bg-primary/10 text-primary",
+  "phone-compact": "bg-warning/10 text-warning-foreground",
+  "4k-expanse": "bg-accent/10 text-accent-foreground",
+  "kinetic-type": "bg-secondary/10 text-secondary-foreground",
+  "card-world": "bg-warning/10 text-warning-foreground",
+  "command-first": "bg-muted text-muted-foreground",
+  "store-forward": "bg-primary/10 text-primary",
+  "blog-forward": "bg-success/10 text-success-foreground",
+  "chat-forward": "bg-info/10 text-info-foreground",
+  "dashboard-pro": "bg-info/10 text-info-foreground",
+  enterprise: "bg-muted text-muted-foreground",
+  playful: "bg-warning/10 text-warning-foreground",
+};
+
+/** Color accent per persona slug for the persona selector grid */
+const PERSONA_COLORS: Record<string, string> = {
+  "ai-indie": "bg-primary/10 text-primary border-primary/20",
+  "classic-indie": "bg-info/10 text-info-foreground border-info/20",
+  "agency-dev": "bg-success/10 text-success-foreground border-success/20",
+  "in-house-dev": "bg-accent/10 text-accent-foreground border-accent/20",
+  "ml-engineer": "bg-primary/10 text-primary border-primary/20",
+  "ai-hobbyist": "bg-info/10 text-info-foreground border-info/20",
+  "enterprise-devops": "bg-muted text-muted-foreground border-border",
+  "startup-devops": "bg-success/10 text-success-foreground border-success/20",
+  "technical-founder": "bg-warning/10 text-warning-foreground border-warning/20",
+  "nontechnical-founder": "bg-secondary/10 text-secondary-foreground border-secondary/20",
+  "growth-leader": "bg-success/10 text-success-foreground border-success/20",
+  "ops-leader": "bg-info/10 text-info-foreground border-info/20",
+  "content-creator": "bg-warning/10 text-warning-foreground border-warning/20",
+  "hobbyist-creator": "bg-secondary/10 text-secondary-foreground border-secondary/20",
+  "social-gamer": "bg-destructive/10 text-destructive-foreground border-destructive/20",
+  "solo-explorer": "bg-accent/10 text-accent-foreground border-accent/20",
+};
+
+/** Emoji per persona for quick visual identification */
+const PERSONA_EMOJI: Record<string, string> = {
+  "ai-indie": "\u{1F916}",
+  "classic-indie": "\u{1F6E0}\u{FE0F}",
+  "agency-dev": "\u{1F4BC}",
+  "in-house-dev": "\u{1F3E2}",
+  "ml-engineer": "\u{1F9EA}",
+  "ai-hobbyist": "\u{1F52C}",
+  "enterprise-devops": "\u{2699}\u{FE0F}",
+  "startup-devops": "\u{1F680}",
+  "technical-founder": "\u{1F4BB}",
+  "nontechnical-founder": "\u{1F4A1}",
+  "growth-leader": "\u{1F4C8}",
+  "ops-leader": "\u{1F3AF}",
+  "content-creator": "\u{1F3A8}",
+  "hobbyist-creator": "\u{2728}",
+  "social-gamer": "\u{1F3AE}",
+  "solo-explorer": "\u{1F30D}",
 };
 
 function RubikChatMessage({ item }: { item: ConversationItem }) {
@@ -97,6 +141,10 @@ function RubikChatMessage({ item }: { item: ConversationItem }) {
 
 export function RubikChatPage() {
   const { isAuthenticated, isLoading: authLoading } = useAuth();
+  const [selectedPersona, setSelectedPersona] = useState<OnboardingPersona | null>(null);
+
+  const activePersona = selectedPersona?.slug ?? DEFAULT_PERSONA;
+
   const {
     threads,
     currentThreadId,
@@ -109,11 +157,21 @@ export function RubikChatPage() {
     selectThread,
     newThread,
     clearError,
-  } = useChat({ enabled: isAuthenticated, persona: PERSONA });
+  } = useChat({ enabled: isAuthenticated, persona: activePersona });
 
   const [input, setInput] = useState("");
   const [variants, setVariants] = useState<DesignVariant[]>([]);
   const [isSeeding, setIsSeeding] = useState(false);
+
+  const handlePersonaSelect = useCallback(
+    (persona: OnboardingPersona) => {
+      setSelectedPersona(persona);
+      void sendMessage(
+        `I'm a "${persona.name}" — ${persona.description}. ${persona.heroText} Help me get started with what spike.land offers for my profile.`,
+      );
+    },
+    [sendMessage],
+  );
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
@@ -236,7 +294,9 @@ export function RubikChatPage() {
             <div>
               <h1 className="text-sm font-semibold tracking-tight text-foreground">Rubik 3.0</h1>
               <p className="text-xs text-muted-foreground">
-                Design + Quality + Product Intelligence
+                {selectedPersona
+                  ? `${PERSONA_EMOJI[selectedPersona.slug] ?? ""} ${selectedPersona.name}`
+                  : "Design + Quality + Product Intelligence"}
               </p>
             </div>
           </div>
@@ -268,6 +328,49 @@ export function RubikChatPage() {
                   the design system, quality methodology, platform architecture, or let me review
                   your work.
                 </p>
+              </div>
+
+              {/* Persona selector — all 16 personas */}
+              <div className="space-y-4">
+                <div className="text-center">
+                  <h3 className="text-sm font-semibold text-foreground">Who are you?</h3>
+                  <p className="text-xs text-muted-foreground">
+                    Select your persona for a personalized experience
+                  </p>
+                </div>
+                <div
+                  className="grid gap-2.5 grid-cols-2 sm:grid-cols-4 lg:grid-cols-4"
+                  role="radiogroup"
+                  aria-label="Select your persona"
+                >
+                  {PERSONAS.map((persona) => (
+                    <button
+                      key={persona.id}
+                      type="button"
+                      role="radio"
+                      aria-checked={selectedPersona?.id === persona.id}
+                      onClick={() => handlePersonaSelect(persona)}
+                      disabled={isStreaming}
+                      className={`group rounded-xl border p-3 text-left transition-all hover:shadow-[var(--panel-shadow)] disabled:opacity-50 ${
+                        selectedPersona?.id === persona.id
+                          ? `${PERSONA_COLORS[persona.slug] ?? "bg-primary/10 text-primary border-primary/20"} ring-2 ring-primary`
+                          : "border-border bg-card hover:border-primary/20"
+                      }`}
+                    >
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="text-lg" aria-hidden="true">
+                          {PERSONA_EMOJI[persona.slug] ?? "\u26A1"}
+                        </span>
+                        <span className="text-xs font-semibold text-foreground truncate">
+                          {persona.name}
+                        </span>
+                      </div>
+                      <p className="line-clamp-2 text-[0.65rem] leading-relaxed text-muted-foreground">
+                        {persona.description}
+                      </p>
+                    </button>
+                  ))}
+                </div>
               </div>
 
               {variants.length > 0 && (

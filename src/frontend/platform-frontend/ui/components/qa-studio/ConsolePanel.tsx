@@ -90,11 +90,11 @@ export function ConsolePanel({ history }: { history: HistoryItem[] }) {
                       ERROR
                     </span>
                   ) : item.result ? (
-                    <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-green-500/10 text-green-600 dark:text-green-400 border border-green-500/20">
+                    <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-success/10 text-success-foreground border border-success/20">
                       SUCCESS
                     </span>
                   ) : (
-                    <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-yellow-500/10 text-yellow-600 dark:text-yellow-400 border border-yellow-500/20 animate-pulse">
+                    <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-warning/10 text-warning-foreground border border-warning/20 animate-pulse">
                       PENDING
                     </span>
                   )}
@@ -128,7 +128,7 @@ export function ConsolePanel({ history }: { history: HistoryItem[] }) {
                   </div>
                 ) : item.result ? (
                   <div>
-                    <div className="text-[10px] font-bold text-green-600/70 dark:text-green-400/70 uppercase tracking-wider mb-1">
+                    <div className="text-[10px] font-bold text-success-foreground/70 uppercase tracking-wider mb-1">
                       Result
                     </div>
                     <div className="text-foreground/80 p-2.5 bg-green-500/5 rounded-lg border border-green-500/20 break-all leading-normal max-h-32 overflow-auto scrollbar-thin scrollbar-thumb-border">

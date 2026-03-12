@@ -91,6 +91,44 @@ function slugifyHeading(children: ReactNode) {
     .replace(/\s+/g, "-");
 }
 
+function DocBreadcrumb({ doc }: { doc: DocDetail | null }) {
+  return (
+    <nav aria-label="Breadcrumb">
+      <ol className="flex flex-wrap items-center gap-1.5 text-sm text-[var(--muted-fg)]">
+        <li>
+          <Link to="/" className="transition-colors hover:text-[var(--fg)]">
+            Home
+          </Link>
+        </li>
+        <li aria-hidden="true" className="opacity-40 select-none">
+          /
+        </li>
+        <li>
+          <Link to="/docs" className="transition-colors hover:text-[var(--fg)]">
+            Docs
+          </Link>
+        </li>
+        {doc && (
+          <>
+            <li aria-hidden="true" className="opacity-40 select-none">
+              /
+            </li>
+            <li>
+              <span className="text-[var(--muted-fg)]">{doc.category}</span>
+            </li>
+            <li aria-hidden="true" className="opacity-40 select-none">
+              /
+            </li>
+            <li>
+              <span className="text-[var(--fg)] font-medium">{doc.title}</span>
+            </li>
+          </>
+        )}
+      </ol>
+    </nav>
+  );
+}
+
 export function DocPage() {
   const { slug } = useParams({ from: "/docs/$slug" });
   const [doc, setDoc] = useState<DocDetail | null>(null);
@@ -142,7 +180,7 @@ export function DocPage() {
             return (
               <h1
                 id={id || undefined}
-                className="scroll-mt-24 text-3xl font-bold tracking-tight text-foreground sm:text-4xl"
+                className="scroll-mt-24 text-3xl font-bold tracking-tight text-[var(--fg)] sm:text-4xl"
               >
                 {children}
               </h1>
@@ -153,7 +191,7 @@ export function DocPage() {
             return (
               <h2
                 id={id || undefined}
-                className="mt-10 scroll-mt-24 text-2xl font-semibold tracking-tight text-foreground"
+                className="mt-10 scroll-mt-24 text-2xl font-semibold tracking-tight text-[var(--fg)]"
               >
                 {children}
               </h2>
@@ -164,7 +202,7 @@ export function DocPage() {
             return (
               <h3
                 id={id || undefined}
-                className="mt-8 scroll-mt-24 text-xl font-semibold text-foreground"
+                className="mt-8 scroll-mt-24 text-xl font-semibold text-[var(--fg)]"
               >
                 {children}
               </h3>
@@ -175,29 +213,29 @@ export function DocPage() {
             return (
               <h4
                 id={id || undefined}
-                className="mt-6 scroll-mt-24 text-lg font-semibold text-foreground"
+                className="mt-6 scroll-mt-24 text-lg font-semibold text-[var(--fg)]"
               >
                 {children}
               </h4>
             );
           },
           p: ({ children }) => (
-            <p className="text-[0.98rem] leading-8 text-foreground/90">{children}</p>
+            <p className="text-[0.98rem] leading-8 text-[var(--fg)]/90">{children}</p>
           ),
           ul: ({ children }) => (
-            <ul className="list-disc space-y-2 pl-6 text-[0.98rem] leading-8 text-foreground/90">
+            <ul className="list-disc space-y-2 pl-6 text-[0.98rem] leading-8 text-[var(--fg)]/90">
               {children}
             </ul>
           ),
           ol: ({ children }) => (
-            <ol className="list-decimal space-y-2 pl-6 text-[0.98rem] leading-8 text-foreground/90">
+            <ol className="list-decimal space-y-2 pl-6 text-[0.98rem] leading-8 text-[var(--fg)]/90">
               {children}
             </ol>
           ),
           li: ({ children }) => <li className="pl-1">{children}</li>,
-          hr: () => <hr className="my-10 border-border" />,
+          hr: () => <hr className="my-10 border-[var(--border-color)]" />,
           blockquote: ({ children }) => (
-            <blockquote className="border-l-2 border-primary/40 pl-4 italic text-muted-foreground">
+            <blockquote className="border-l-2 border-[var(--primary-color)]/40 pl-4 italic text-[var(--muted-fg)]">
               {children}
             </blockquote>
           ),
@@ -209,7 +247,7 @@ export function DocPage() {
             return (
               <a
                 href={resolvedHref}
-                className="font-medium text-primary underline underline-offset-2 hover:text-primary/80"
+                className="font-medium text-[var(--primary-color)] underline underline-offset-2 hover:text-[var(--primary-light)]"
                 target={isExternal ? "_blank" : undefined}
                 rel={isExternal ? "noopener noreferrer" : undefined}
               >
@@ -221,33 +259,35 @@ export function DocPage() {
             <img
               src={resolveDocAssetSrc(src, doc.sourcePath)}
               alt={alt || ""}
-              className="my-6 rounded-xl border border-border"
+              className="my-6 rounded-xl border border-[var(--border-color)]"
               loading="lazy"
             />
           ),
           pre: ({ children }: { children?: React.ReactNode }) => children,
           code: CodeBlock as React.ComponentType<Record<string, unknown>>,
           table: ({ children }) => (
-            <div className="my-6 overflow-x-auto rounded-2xl border border-border">
+            <div className="my-6 overflow-x-auto rounded-2xl border border-[var(--border-color)]">
               <table className="min-w-full border-collapse text-left text-sm">{children}</table>
             </div>
           ),
-          thead: ({ children }) => <thead className="bg-muted/40">{children}</thead>,
-          tbody: ({ children }) => <tbody className="divide-y divide-border/70">{children}</tbody>,
+          thead: ({ children }) => <thead className="bg-[var(--muted-bg)]/40">{children}</thead>,
+          tbody: ({ children }) => (
+            <tbody className="divide-y divide-[var(--border-color)]/70">{children}</tbody>
+          ),
           tr: ({ children }) => <tr className="align-top">{children}</tr>,
           th: ({ children }) => (
-            <th className="px-4 py-3 text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground">
+            <th className="px-4 py-3 text-xs font-semibold uppercase tracking-[0.12em] text-[var(--muted-fg)]">
               {children}
             </th>
           ),
-          td: ({ children }) => <td className="px-4 py-3 text-foreground/90">{children}</td>,
+          td: ({ children }) => <td className="px-4 py-3 text-[var(--fg)]/90">{children}</td>,
           details: ({ children }) => (
-            <details className="rounded-2xl border border-border bg-card/70 px-4 py-3">
+            <details className="rounded-2xl border border-[var(--border-color)] bg-[var(--card-bg)]/70 px-4 py-3">
               {children}
             </details>
           ),
           summary: ({ children }) => (
-            <summary className="cursor-pointer font-medium text-foreground">{children}</summary>
+            <summary className="cursor-pointer font-medium text-[var(--fg)]">{children}</summary>
           ),
         }}
       >
@@ -258,52 +298,65 @@ export function DocPage() {
 
   if (loading) {
     return (
-      <div className="mx-auto max-w-3xl px-4 py-10">
-        <div className="text-sm text-muted-foreground">Loading...</div>
+      <div className="rubik-container rubik-page">
+        <div className="text-sm text-[var(--muted-fg)]">Loading...</div>
       </div>
     );
   }
 
   if (error || !doc) {
     return (
-      <div className="mx-auto max-w-3xl space-y-4 px-4 py-10">
-        <h1 className="text-2xl font-bold text-foreground">Document not found</h1>
-        <p className="text-muted-foreground">
-          The requested documentation page could not be found.
-        </p>
-        <Link to="/docs" className="text-primary underline hover:text-primary/80">
-          Back to Documentation
-        </Link>
+      <div className="rubik-container rubik-page rubik-stack">
+        <DocBreadcrumb doc={null} />
+        <div className="space-y-4">
+          <h1 className="text-2xl font-bold text-[var(--fg)]">Document not found</h1>
+          <p className="text-[var(--muted-fg)]">
+            The requested documentation page could not be found.
+          </p>
+          <Link
+            to="/docs"
+            className="text-[var(--primary-color)] underline hover:text-[var(--primary-light)]"
+          >
+            Back to Documentation
+          </Link>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="mx-auto max-w-4xl space-y-6 px-4 py-10">
-      <nav
-        className="flex items-center gap-2 text-sm text-muted-foreground"
-        aria-label="Breadcrumb"
-      >
-        <Link to="/docs" className="transition-colors hover:text-foreground">
-          Docs
-        </Link>
-        <span aria-hidden="true">/</span>
-        <span>{doc.category}</span>
-        <span aria-hidden="true">/</span>
-        <span className="text-foreground">{doc.title}</span>
-      </nav>
+    <div className="rubik-container rubik-page">
+      <div className="rubik-stack">
+        <DocBreadcrumb doc={doc} />
 
-      <article className="space-y-5 [&_.shiki-container]:bg-muted/50 [&_.shiki-container]:border [&_.shiki-container]:border-border [&_.shiki-container]:rounded-2xl [&_.shiki-container]:px-4 [&_.shiki-container]:py-4 [&_.shiki-container]:overflow-x-auto [&_.shiki-container]:my-4 [&_.shiki-container]:pt-10 [&_.shiki-container_code]:bg-transparent [&_.shiki-container_code]:p-0 [&_.shiki-container_code]:text-sm [&_.shiki-container_code]:border-0 [&_.shiki-container_.shiki]:!bg-transparent">
-        {renderedContent}
-      </article>
-
-      <div className="border-t border-border pt-8">
-        <Link
-          to="/docs"
-          className="text-sm text-muted-foreground transition-colors hover:text-foreground"
+        <article
+          className="max-w-prose w-full space-y-5
+            [&_.shiki-container]:bg-[var(--muted-bg)]/50
+            [&_.shiki-container]:border
+            [&_.shiki-container]:border-[var(--border-color)]
+            [&_.shiki-container]:rounded-2xl
+            [&_.shiki-container]:px-4
+            [&_.shiki-container]:py-4
+            [&_.shiki-container]:overflow-x-auto
+            [&_.shiki-container]:my-4
+            [&_.shiki-container]:pt-10
+            [&_.shiki-container_code]:bg-transparent
+            [&_.shiki-container_code]:p-0
+            [&_.shiki-container_code]:text-sm
+            [&_.shiki-container_code]:border-0
+            [&_.shiki-container_.shiki]:!bg-transparent"
         >
-          <span aria-hidden="true">&larr;</span> Back to Documentation
-        </Link>
+          {renderedContent}
+        </article>
+
+        <div className="border-t border-[var(--border-color)] pt-6">
+          <Link
+            to="/docs"
+            className="text-sm text-[var(--muted-fg)] transition-colors hover:text-[var(--fg)]"
+          >
+            <span aria-hidden="true">&larr;</span> Back to Documentation
+          </Link>
+        </div>
       </div>
     </div>
   );

@@ -27,7 +27,7 @@ export function ScreenshotViewer({ base64Data }: Props) {
         <div className="flex justify-end mb-6">
           <button
             onClick={() => setFullscreen(false)}
-            className="p-3 bg-card dark:glass-card border border-border rounded-full hover:bg-muted/80 transition-all hover:scale-110 active:scale-90 shadow-xl"
+            className="p-3 bg-card glass-card border border-border rounded-full hover:bg-muted/80 transition-all hover:scale-110 active:scale-90 shadow-xl"
           >
             <Minimize2 className="w-6 h-6" />
           </button>
@@ -47,7 +47,7 @@ export function ScreenshotViewer({ base64Data }: Props) {
     <div className="h-full relative bg-muted/5 flex items-center justify-center overflow-auto group p-4">
       <button
         onClick={() => setFullscreen(true)}
-        className="absolute top-6 right-6 z-10 p-2.5 bg-background/90 dark:glass-card backdrop-blur-md border border-border rounded-lg shadow-xl opacity-0 group-hover:opacity-100 transition-all duration-300 hover:scale-110 active:scale-95 translate-y-2 group-hover:translate-y-0"
+        className="absolute top-6 right-6 z-10 p-2.5 bg-background/90 glass-card backdrop-blur-md border border-border rounded-lg shadow-xl opacity-0 group-hover:opacity-100 transition-all duration-300 hover:scale-110 active:scale-95 translate-y-2 group-hover:translate-y-0"
       >
         <Maximize2 className="w-4 h-4" />
       </button>

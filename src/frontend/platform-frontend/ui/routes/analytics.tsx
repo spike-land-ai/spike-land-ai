@@ -87,7 +87,7 @@ function MetricCard({
   subtitle?: string;
 }) {
   return (
-    <div className="rounded-2xl border border-border bg-card p-5 shadow-sm">
+    <div className="rubik-panel p-5">
       <p className="text-sm text-muted-foreground">{label}</p>
       <p className="mt-1 text-2xl font-bold text-foreground">{value}</p>
       {subtitle && <p className="mt-1 text-xs text-muted-foreground">{subtitle}</p>}
@@ -140,10 +140,10 @@ function LiveIndicator({ lastUpdated }: { lastUpdated: number | null }) {
   return (
     <div className="flex items-center gap-2">
       <span className="relative flex h-2.5 w-2.5">
-        <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75" />
-        <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-green-500" />
+        <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-success opacity-75" />
+        <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-success" />
       </span>
-      <span className="text-xs font-medium text-green-600 dark:text-green-400">Live</span>
+      <span className="text-xs font-medium text-success-foreground">Live</span>
       {lastUpdated && (
         <span className="text-xs text-muted-foreground">Updated {relativeTime(lastUpdated)}</span>
       )}
@@ -347,13 +347,20 @@ export function AnalyticsPage() {
 
       <div className="grid gap-6 lg:grid-cols-2">
         {/* Blog Views */}
-        <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
-          <h3 className="mb-4 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+        <div className="rubik-panel p-6">
+          <h2 className="mb-4 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
             Top Articles
-          </h3>
+          </h2>
           {!summary?.blogViews?.length ? (
-            <div className="flex h-48 items-center justify-center rounded-2xl border-2 border-dashed border-border text-muted-foreground">
-              {loading ? "Loading..." : "No blog views yet"}
+            <div className="flex h-48 flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-border">
+              <p className="text-sm text-muted-foreground">
+                {loading ? "Loading..." : "No blog views yet"}
+              </p>
+              {!loading && (
+                <p className="max-w-48 text-center text-xs text-muted-foreground/70">
+                  Blog view events will appear once readers visit articles.
+                </p>
+              )}
             </div>
           ) : (
             <div className="space-y-2">
@@ -382,13 +389,20 @@ export function AnalyticsPage() {
         </div>
 
         {/* Tool Usage */}
-        <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
-          <h3 className="mb-4 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+        <div className="rubik-panel p-6">
+          <h2 className="mb-4 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
             Top Tools by Usage
-          </h3>
+          </h2>
           {!summary?.toolUsage.length ? (
-            <div className="flex h-48 items-center justify-center rounded-2xl border-2 border-dashed border-border text-muted-foreground">
-              {loading ? "Loading..." : "No tool usage data yet"}
+            <div className="flex h-48 flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-border">
+              <p className="text-sm text-muted-foreground">
+                {loading ? "Loading..." : "No tool usage data yet"}
+              </p>
+              {!loading && (
+                <p className="max-w-48 text-center text-xs text-muted-foreground/70">
+                  Tool invocations will be tracked as users connect MCP servers.
+                </p>
+              )}
             </div>
           ) : (
             <div className="space-y-2">
@@ -417,13 +431,20 @@ export function AnalyticsPage() {
         </div>
 
         {/* Recent Activity */}
-        <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
-          <h3 className="mb-4 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+        <div className="rubik-panel p-6">
+          <h2 className="mb-4 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
             Recent Activity
-          </h3>
+          </h2>
           {recentEvents.length === 0 ? (
-            <div className="flex h-48 items-center justify-center rounded-2xl border-2 border-dashed border-border text-muted-foreground">
-              {loading ? "Loading..." : "No recent events"}
+            <div className="flex h-48 flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-border">
+              <p className="text-sm text-muted-foreground">
+                {loading ? "Loading..." : "No recent events"}
+              </p>
+              {!loading && (
+                <p className="max-w-48 text-center text-xs text-muted-foreground/70">
+                  Platform events will stream here in near-real-time.
+                </p>
+              )}
             </div>
           ) : (
             <div className="max-h-80 space-y-1 overflow-y-auto">
@@ -451,21 +472,36 @@ export function AnalyticsPage() {
 
         {/* Conversion Funnel (only for >= 7d ranges) */}
         {showFunnel && data?.funnel && (
-          <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
-            <h3 className="mb-4 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+          <div className="rubik-panel p-6">
+            <h2 className="mb-4 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
               Conversion Funnel
-            </h3>
+            </h2>
             <ConversionFunnel data={data.funnel} />
+          </div>
+        )}
+
+        {/* Funnel placeholder for short ranges */}
+        {!showFunnel && !loading && (
+          <div className="rubik-panel p-6">
+            <h2 className="mb-4 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+              Conversion Funnel
+            </h2>
+            <div className="flex h-48 flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-border">
+              <p className="text-sm text-muted-foreground">Requires 7d+ range</p>
+              <p className="max-w-52 text-center text-xs text-muted-foreground/70">
+                Switch to a 7-day or longer time window to view the signup-to-upgrade funnel.
+              </p>
+            </div>
           </div>
         )}
       </div>
 
       {/* Events by Type */}
       {summary?.eventsByType && summary.eventsByType.length > 0 && (
-        <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
-          <h3 className="mb-4 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+        <div className="rubik-panel p-6">
+          <h2 className="mb-4 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
             Events by Type
-          </h3>
+          </h2>
           <div className="overflow-x-auto">
             <table className="w-full text-left text-sm">
               <thead>

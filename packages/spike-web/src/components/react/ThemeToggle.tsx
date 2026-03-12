@@ -79,10 +79,11 @@ function Moon({ sa }: { sa: number }) {
 }
 
 export default function ThemeToggle() {
-  const [isDark, setIsDark] = useState(() => {
-    if (typeof document === "undefined") return false;
-    return document.documentElement.classList.contains("dark");
-  });
+  const [isDark, setIsDark] = useState(false);
+
+  useEffect(() => {
+    setIsDark(document.documentElement.classList.contains("dark"));
+  }, []);
 
   useEffect(() => {
     const onStorage = (e: StorageEvent) => {

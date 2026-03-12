@@ -201,6 +201,14 @@ function normalizeAppSummary(app: PublicAppSummary): McpAppSummary {
   };
 }
 
+/**
+ * Derives a stable app slug from an MCP tool name by extracting the prefix
+ * before the first underscore separator.
+ *
+ * @param toolName - The full MCP tool name (e.g. `"qa-studio_take_screenshot"`).
+ * @returns The slug prefix (e.g. `"qa-studio"`), or the full name when no
+ *   underscore is present.
+ */
 export function appSlugFromToolName(toolName: string): string {
   const separatorIndex = toolName.indexOf("_");
   return separatorIndex > 0 ? toolName.slice(0, separatorIndex) : toolName;
@@ -370,6 +378,19 @@ async function fetchStoreTools(): Promise<StoreToolsResponse> {
   return (await response.json()) as StoreToolsResponse;
 }
 
+/**
+ * Fetches and merges the full catalog of MCP apps from the public registry,
+ * falling back to tool-inferred groupings and static content when the registry
+ * is unavailable.
+ *
+ * The query merges three sources in priority order:
+ * 1. Static content-manifest apps (always present)
+ * 2. Showcase app definitions (always present)
+ * 3. Remote public apps endpoint (preferred) or tool-inferred apps (fallback)
+ *
+ * @returns A TanStack Query result whose `data` is an array of
+ *   {@link McpAppSummary} sorted by `sort_order`.
+ */
 export function useApps() {
   return useQuery({
     queryKey: ["mcp-apps"],
@@ -393,6 +414,13 @@ export function useApps() {
   });
 }
 
+/**
+ * Groups a flat list of apps into category buckets, sorted by the canonical
+ * {@link APP_CATEGORY_ORDER} ordering.
+ *
+ * @param apps - The flat list of {@link McpAppSummary} to group.
+ * @returns An array of {@link AppCategoryGroup} objects sorted by category priority.
+ */
 export function groupAppsByCategory(apps: McpAppSummary[]): AppCategoryGroup[] {
   const grouped = new Map<string, McpAppSummary[]>();
 
@@ -422,6 +450,14 @@ export function groupAppsByCategory(apps: McpAppSummary[]): AppCategoryGroup[] {
     );
 }
 
+/**
+ * Fetches the full detail record for a single MCP app by slug, consulting
+ * local static data before hitting the remote registry.
+ *
+ * @param slug - The app slug to look up (e.g. `"qa-studio"`).
+ * @returns A TanStack Query result whose `data` is an {@link McpAppDetail}.
+ *   Throws when the app cannot be found in any source.
+ */
 export function useApp(slug: string) {
   return useQuery({
     queryKey: ["mcp-app", slug],

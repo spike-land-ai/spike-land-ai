@@ -92,12 +92,132 @@ function findLocalBlogLoader(slug: string) {
   return null;
 }
 
+interface BlogMeta {
+  slug: string;
+  title: string;
+  unlisted?: boolean;
+}
+
+interface SiblingPosts {
+  prev: BlogMeta | null;
+  next: BlogMeta | null;
+}
+
+function useSiblingPosts(currentSlug: string): SiblingPosts {
+  const [siblings, setSiblings] = useState<SiblingPosts>({ prev: null, next: null });
+
+  useEffect(() => {
+    if (!currentSlug) return;
+
+    fetch(apiUrl("/blog"))
+      .then((r) => (r.ok ? (r.json() as Promise<BlogMeta[]>) : Promise.reject()))
+      .then((posts) => {
+        const visible = posts.filter((p) => !p.unlisted);
+        const idx = visible.findIndex((p) => p.slug === currentSlug);
+        if (idx === -1) return;
+        setSiblings({
+          prev: idx > 0 ? (visible[idx - 1] ?? null) : null,
+          next: idx < visible.length - 1 ? (visible[idx + 1] ?? null) : null,
+        });
+      })
+      .catch(() => {});
+  }, [currentSlug]);
+
+  return siblings;
+}
+
+function PostBreadcrumb({ postTitle }: { postTitle: string | null }) {
+  return (
+    <nav className="rubik-container pt-6 pb-2" aria-label="Breadcrumb">
+      <ol className="flex flex-wrap items-center gap-1.5 text-sm text-[var(--muted-fg)]">
+        <li>
+          <Link to="/" className="transition-colors hover:text-[var(--fg)]">
+            Home
+          </Link>
+        </li>
+        <li aria-hidden="true" className="opacity-40 select-none">
+          /
+        </li>
+        <li>
+          <Link to="/blog" className="transition-colors hover:text-[var(--fg)]">
+            Blog
+          </Link>
+        </li>
+        {postTitle && (
+          <>
+            <li aria-hidden="true" className="opacity-40 select-none">
+              /
+            </li>
+            <li>
+              <span
+                className="text-[var(--fg)] font-medium line-clamp-1 max-w-[22rem]"
+                title={postTitle}
+              >
+                {postTitle}
+              </span>
+            </li>
+          </>
+        )}
+      </ol>
+    </nav>
+  );
+}
+
+function PostNavigation({ siblings }: { siblings: SiblingPosts }) {
+  const { prev, next } = siblings;
+  if (!prev && !next) return null;
+
+  return (
+    <nav
+      aria-label="Post navigation"
+      className="rubik-container border-t border-[var(--border-color)] py-8"
+    >
+      <div className="flex flex-col gap-4 sm:flex-row sm:justify-between">
+        {prev ? (
+          <Link
+            to="/blog/$slug"
+            params={{ slug: prev.slug }}
+            className="group flex flex-col gap-1 rounded-xl border border-[var(--border-color)] bg-[var(--card-bg)] px-5 py-4 transition-colors hover:border-[var(--primary-color)] hover:bg-[var(--accent-bg)] sm:max-w-[48%]"
+          >
+            <span className="text-[0.68rem] font-bold uppercase tracking-[0.14em] text-[var(--muted-fg)]">
+              ← Previous
+            </span>
+            <span className="line-clamp-2 text-sm font-semibold text-[var(--fg)] transition-colors group-hover:text-[var(--primary-color)]">
+              {prev.title}
+            </span>
+          </Link>
+        ) : (
+          <div />
+        )}
+
+        {next ? (
+          <Link
+            to="/blog/$slug"
+            params={{ slug: next.slug }}
+            className="group flex flex-col gap-1 rounded-xl border border-[var(--border-color)] bg-[var(--card-bg)] px-5 py-4 text-right transition-colors hover:border-[var(--primary-color)] hover:bg-[var(--accent-bg)] sm:max-w-[48%]"
+          >
+            <span className="text-[0.68rem] font-bold uppercase tracking-[0.14em] text-[var(--muted-fg)]">
+              Next →
+            </span>
+            <span className="line-clamp-2 text-sm font-semibold text-[var(--fg)] transition-colors group-hover:text-[var(--primary-color)]">
+              {next.title}
+            </span>
+          </Link>
+        ) : (
+          <div />
+        )}
+      </div>
+    </nav>
+  );
+}
+
 export function BlogPostPage() {
   const { slug } = useParams({ strict: false });
   const normalizedSlug = (slug ?? "").replace(/\.mdx$/i, "");
   const [postTitle, setPostTitle] = useState<string | null>(null);
   const [localPost, setLocalPost] = useState<BlogPost | null>(null);
   const [localLookupDone, setLocalLookupDone] = useState(!import.meta.env.DEV);
+  const siblings = useSiblingPosts(normalizedSlug);
 
   useEffect(() => {
     let cancelled = false;
@@ -159,7 +279,7 @@ export function BlogPostPage() {
       slug: normalizedSlug,
       title: postTitle ?? normalizedSlug,
     });
-  }, [normalizedSlug]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [normalizedSlug, postTitle]);
 
   useEffect(() => {
     if (!normalizedSlug) return;
@@ -183,8 +303,9 @@ export function BlogPostPage() {
   }, [normalizedSlug, postTitle]);
 
   return (
-    <div className="min-h-screen bg-background text-foreground font-sans selection:bg-primary/30 antialiased relative">
-      <main className="relative z-10 w-full">
+    <div className="min-h-screen font-sans antialiased">
+      <PostBreadcrumb postTitle={postTitle} />
+      <main>
         <BlogPostView
           slug={normalizedSlug}
           linkComponent={Link}
@@ -193,6 +314,7 @@ export function BlogPostPage() {
           loadingOverride={import.meta.env.DEV && !localLookupDone}
         />
       </main>
+      <PostNavigation siblings={siblings} />
     </div>
   );
 }

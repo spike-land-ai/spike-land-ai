@@ -80,7 +80,7 @@ export function ToolRunButton({
         </div>
         <div className="flex items-center gap-2">
           {isAvailable && (
-            <span className="text-xs font-medium px-2 py-1 rounded bg-green-500/10 text-green-600 dark:text-green-400">
+            <span className="text-xs font-medium px-2 py-1 rounded bg-success/10 text-success-foreground">
               Ready
             </span>
           )}

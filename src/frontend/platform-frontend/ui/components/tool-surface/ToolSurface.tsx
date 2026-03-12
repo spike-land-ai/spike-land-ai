@@ -109,8 +109,7 @@ export function ToolSurface({
     if (Object.keys(prefill).length > 0) {
       setFormData((prev) => ({ ...prev, ...prefill }));
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [session?.outputs, graph, toolName]);
+  }, [session?.outputs, graph, toolName, setFormData]);
 
   // Record result to session
   useEffect(() => {
@@ -118,8 +117,7 @@ export function ToolSurface({
       setLastResult(result);
       recordToolResult?.(toolName, formData, result);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [result]);
+  }, [result, toolName, formData, recordToolResult]);
 
   const handleFieldChange = useCallback((key: string, value: unknown) => {
     setFormData((prev) => ({ ...prev, [key]: value }));
@@ -177,7 +175,7 @@ export function ToolSurface({
         </div>
         <div className="flex items-center gap-2 shrink-0 ml-3">
           {isAvailable && (
-            <span className="rubik-chip px-2 py-0.5 text-[10px] bg-green-500/10 text-green-600 dark:text-green-400">
+            <span className="rubik-chip px-2 py-0.5 text-[10px] bg-success/10 text-success-foreground">
               Ready
             </span>
           )}
@@ -243,9 +241,13 @@ export function ToolSurface({
           </form>
 
           {(lastResult || error) && (
-            <div className="px-5 pb-5">
+            <output
+              htmlFor={toolName}
+              aria-label={`Result for ${toolName}`}
+              className="block px-5 pb-5"
+            >
               <ResultRenderer result={lastResult} error={error} />
-            </div>
+            </output>
           )}
         </div>
       )}

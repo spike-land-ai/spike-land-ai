@@ -15,6 +15,45 @@ export type HistoryItem = {
   duration?: number;
 };
 
+/** Pending promise callbacks keyed by JSON-RPC request ID. */
+type PendingEntry = {
+  resolve: (val: ToolCallResult) => void;
+  reject: (err: unknown) => void;
+};
+
+/** Parsed JSON-RPC response message from the MCP SSE stream. */
+interface JsonRpcResponse {
+  id?: number;
+  result?: ToolCallResult;
+  error?: unknown;
+}
+
+function parseJsonRpcMessage(raw: string): JsonRpcResponse | null {
+  try {
+    return JSON.parse(raw) as JsonRpcResponse;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Connects to a QA Studio MCP server over the SSE transport and exposes a
+ * typed `callTool` function for invoking browser-automation tools.
+ *
+ * The hook manages the full connection lifecycle:
+ * 1. Opens an `EventSource` to the MCP server's SSE endpoint.
+ * 2. On receiving the `"endpoint"` event, sends an MCP `initialize` handshake
+ *    via HTTP POST to the advertised message endpoint.
+ * 3. Once initialized, marks the connection as `connected` and routes incoming
+ *    JSON-RPC responses back to pending `callTool` callers.
+ * 4. Cleans up the `EventSource` on unmount via a `useEffect` teardown.
+ *
+ * The last-used server URL is persisted to `localStorage` under the key
+ * `"qa-studio-mcp-url"` so it survives page reloads.
+ *
+ * @returns State values (`url`, `connected`, `history`, `isCalling`) and
+ *   action callbacks (`connect`, `disconnect`, `callTool`).
+ */
 export function useQaStudioMcp() {
   const [url, setUrl] = useState(
     () => localStorage.getItem("qa-studio-mcp-url") || "http://localhost:3100/mcp",
@@ -25,11 +64,14 @@ export function useQaStudioMcp() {
 
   const eventSourceRef = useRef<EventSource | null>(null);
   const postUrlRef = useRef<string | null>(null);
-  const pendingRequestsRef = useRef<
-    Map<number, { resolve: (val: ToolCallResult) => void; reject: (err: unknown) => void }>
-  >(new Map());
+  const pendingRequestsRef = useRef<Map<number, PendingEntry>>(new Map());
   const nextIdRef = useRef(1);
 
+  /**
+   * Closes the active SSE connection and clears the stored POST endpoint URL.
+   * Any pending tool-call promises will remain unresolved (callers should not
+   * rely on them after a disconnect).
+   */
   const disconnect = useCallback(() => {
     if (eventSourceRef.current) {
       eventSourceRef.current.close();
@@ -39,6 +81,16 @@ export function useQaStudioMcp() {
     setConnected(false);
   }, []);
 
+  /**
+   * Establishes a new SSE connection to the given MCP server URL, persists the
+   * URL to `localStorage`, and performs the MCP `initialize` handshake once
+   * the server advertises its POST endpoint.
+   *
+   * Any existing connection is closed before the new one is opened.
+   *
+   * @param targetUrl - The full URL of the MCP SSE endpoint
+   *   (e.g. `"http://localhost:3100/mcp"`).
+   */
   const connect = useCallback(
     (targetUrl: string) => {
       disconnect();
@@ -49,29 +101,28 @@ export function useQaStudioMcp() {
         const es = new EventSource(targetUrl, { withCredentials: true });
         eventSourceRef.current = es;
 
-        es.onopen = () => {
-          // SSE connection opened, waiting for endpoint event to be fully connected
-        };
-
         es.onerror = () => {
           console.error("SSE connection error");
           disconnect();
         };
 
-        es.addEventListener("endpoint", (e: MessageEvent) => {
-          // The server sends the POST endpoint URL
-          postUrlRef.current = targetUrl.replace("/mcp", "") + e.data;
-          if (e.data.startsWith("http")) {
-            postUrlRef.current = e.data;
-          } else if (e.data.startsWith("/")) {
+        es.addEventListener("endpoint", (e: MessageEvent<string>) => {
+          // Resolve the absolute POST endpoint URL from the server-provided path.
+          const rawEndpoint: string = e.data;
+          if (rawEndpoint.startsWith("http")) {
+            postUrlRef.current = rawEndpoint;
+          } else if (rawEndpoint.startsWith("/")) {
             const urlObj = new URL(targetUrl);
-            postUrlRef.current = `${urlObj.origin}${e.data}`;
+            postUrlRef.current = `${urlObj.origin}${rawEndpoint}`;
+          } else {
+            postUrlRef.current = targetUrl.replace("/mcp", "") + rawEndpoint;
           }
 
-          // Initialize MCP connection
-          const initId = nextIdRef.current++;
           const postUrl = postUrlRef.current;
           if (!postUrl) return;
+
+          // Send MCP initialize request.
+          const initId = nextIdRef.current++;
           fetch(postUrl, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -89,7 +140,7 @@ export function useQaStudioMcp() {
 
           pendingRequestsRef.current.set(initId, {
             resolve: () => {
-              // Once initialized, send initialized notification
+              // Once initialized, send the `initialized` notification.
               fetch(postUrl, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -106,27 +157,44 @@ export function useQaStudioMcp() {
           });
         });
 
-        es.addEventListener("message", (e: MessageEvent) => {
-          try {
-            const msg = JSON.parse(e.data);
-            if (msg.id !== undefined && pendingRequestsRef.current.has(msg.id)) {
-              const { resolve, reject } = pendingRequestsRef.current.get(msg.id)!;
-              pendingRequestsRef.current.delete(msg.id);
-              if (msg.error) reject(msg.error);
-              else resolve(msg.result);
+        es.addEventListener("message", (e: MessageEvent<string>) => {
+          const msg = parseJsonRpcMessage(e.data);
+          if (msg === null) {
+            console.error("Error parsing message", e.data);
+            return;
+          }
+
+          if (msg.id !== undefined && pendingRequestsRef.current.has(msg.id)) {
+            const pending = pendingRequestsRef.current.get(msg.id);
+            pendingRequestsRef.current.delete(msg.id);
+            if (pending) {
+              if (msg.error !== undefined) {
+                pending.reject(msg.error);
+              } else {
+                pending.resolve(msg.result ?? { content: [] });
+              }
             }
-          } catch (err) {
-            console.error("Error parsing message", err);
           }
         });
-      } catch (error) {
-        console.error("Failed to connect", error);
+      } catch (err) {
+        console.error("Failed to connect", err);
         disconnect();
       }
     },
     [disconnect],
   );
 
+  /**
+   * Invokes a named MCP tool on the connected server and returns the result.
+   * The call is recorded in `history` with its duration; errors are also
+   * persisted in the history entry.
+   *
+   * @param name - The MCP tool name to invoke.
+   * @param args - A key-value map of arguments to pass to the tool.
+   * @returns A promise that resolves with the {@link ToolCallResult} when the
+   *   server responds, or rejects with the JSON-RPC error when the call fails.
+   * @throws {Error} When the hook is not connected to a server.
+   */
   const callTool = useCallback(
     async (name: string, args: Record<string, unknown>): Promise<ToolCallResult> => {
       if (!connected || !postUrlRef.current) {
@@ -151,14 +219,12 @@ export function useQaStudioMcp() {
           resolve: (result) => {
             const duration = Date.now() - startTime;
             setHistory((prev) =>
-              prev.map((item) =>
-                item.id === id ? { ...item, result: result as ToolCallResult, duration } : item,
-              ),
+              prev.map((item) => (item.id === id ? { ...item, result, duration } : item)),
             );
             setIsCalling(false);
-            resolve(result as ToolCallResult);
+            resolve(result);
           },
-          reject: (error) => {
+          reject: (err) => {
             const duration = Date.now() - startTime;
             setHistory((prev) =>
               prev.map((item) =>
@@ -166,10 +232,10 @@ export function useQaStudioMcp() {
                   ? {
                       ...item,
                       error:
-                        typeof error === "string"
-                          ? error
-                          : error instanceof Error
-                            ? error.message
+                        typeof err === "string"
+                          ? err
+                          : err instanceof Error
+                            ? err.message
                             : "Unknown error",
                       duration,
                     }
@@ -177,17 +243,18 @@ export function useQaStudioMcp() {
               ),
             );
             setIsCalling(false);
-            reject(error);
+            reject(err);
           },
         });
 
         const postUrl = postUrlRef.current;
         if (!postUrl) {
-          const p = pendingRequestsRef.current.get(id);
+          const pending = pendingRequestsRef.current.get(id);
           pendingRequestsRef.current.delete(id);
-          p?.reject(new Error("Not connected"));
+          pending?.reject(new Error("Not connected"));
           return;
         }
+
         fetch(postUrl, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -197,11 +264,11 @@ export function useQaStudioMcp() {
             method: "tools/call",
             params: { name, arguments: args },
           }),
-        }).catch((err) => {
+        }).catch((err: unknown) => {
           if (pendingRequestsRef.current.has(id)) {
-            const p = pendingRequestsRef.current.get(id);
+            const pending = pendingRequestsRef.current.get(id);
             pendingRequestsRef.current.delete(id);
-            p?.reject(err);
+            pending?.reject(err);
           }
         });
       });
@@ -209,6 +276,7 @@ export function useQaStudioMcp() {
     [connected],
   );
 
+  // Disconnect the SSE stream on unmount to release the network connection.
   useEffect(() => {
     return () => {
       disconnect();

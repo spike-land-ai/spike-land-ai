@@ -17,9 +17,9 @@ function getBarColor(pct: number): string {
 }
 
 function getTextColor(pct: number): string {
-  if (pct > 50) return "text-success-foreground dark:text-success";
-  if (pct > 20) return "text-warning-foreground dark:text-warning";
-  return "text-destructive-foreground dark:text-destructive";
+  if (pct > 50) return "text-success-foreground";
+  if (pct > 20) return "text-warning-foreground";
+  return "text-destructive-foreground";
 }
 
 function getResetHours(): number {
@@ -84,19 +84,17 @@ export function CreditWidget() {
   const usedPct = isUnlimited ? 0 : Math.min(100, (data.usedToday / data.dailyLimit) * 100);
   const remainingPct = 100 - usedPct;
   const barColor = isUnlimited ? "bg-success" : getBarColor(remainingPct);
-  const textColor = isUnlimited
-    ? "text-success-foreground dark:text-success"
-    : getTextColor(remainingPct);
+  const textColor = isUnlimited ? "text-success-foreground" : getTextColor(remainingPct);
   const resetHours = getResetHours();
 
   return (
-    <div className="rounded-2xl border border-border bg-card dark:glass-card p-6 shadow-sm">
+    <div className="rounded-2xl border border-border bg-card glass-card p-6 shadow-sm">
       <div className="mb-4 flex items-center justify-between">
         <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground flex items-center gap-2">
           <Zap className="size-3.5 fill-current" />
           Credit Balance
         </h3>
-        <span className="rounded-full bg-muted dark:bg-white/5 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-muted-foreground border border-border/50">
+        <span className="rounded-full bg-muted px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-muted-foreground border border-border/50">
           {data.tier}
         </span>
       </div>

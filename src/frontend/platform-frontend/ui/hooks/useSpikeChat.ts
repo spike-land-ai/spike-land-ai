@@ -29,6 +29,8 @@ interface UseSpikeChatOptions {
   channelId: string;
   enabled?: boolean;
   onAppUpdated?: (event: AppUpdatedEvent) => void;
+  /** Maximum number of reconnect attempts before giving up. Defaults to 10. */
+  maxReconnectAttempts?: number;
 }
 
 interface UseSpikeChatReturn {
@@ -36,22 +38,46 @@ interface UseSpikeChatReturn {
   isConnected: boolean;
   isLoading: boolean;
   typingUsers: string[];
-  sendMessage: (content: string, contentType?: string, metadata?: Record<string, unknown>) => Promise<void>;
+  sendMessage: (
+    content: string,
+    contentType?: string,
+    metadata?: Record<string, unknown>,
+  ) => Promise<void>;
   startTyping: () => void;
   stopTyping: () => void;
 }
 
+/** Minimum shape check before trusting a parsed WebSocket payload. */
+function isWsEvent(value: unknown): value is WsEvent {
+  if (value == null || typeof value !== "object") return false;
+  const obj = value as Record<string, unknown>;
+  return typeof obj["type"] === "string";
+}
+
+/**
+ * Subscribes to a spike.land chat channel over WebSocket and exposes
+ * the message list alongside send/typing helpers.
+ *
+ * Reconnection uses exponential backoff (1 s → 30 s cap) and stops after
+ * `maxReconnectAttempts` consecutive failures to prevent infinite loops.
+ *
+ * @param channelId - The channel to subscribe to.
+ * @param enabled - Whether the hook should be active. Defaults to `true`.
+ * @param onAppUpdated - Callback fired when an `app_updated` event arrives.
+ * @param maxReconnectAttempts - Hard cap on reconnect attempts. Defaults to 10.
+ */
 export function useSpikeChat({
   channelId,
   enabled = true,
   onAppUpdated,
+  maxReconnectAttempts = 10,
 }: UseSpikeChatOptions): UseSpikeChatReturn {
   const [messageList, setMessages] = useState<ChatMessage[]>([]);
   const [isConnected, setIsConnected] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [typingUsers, setTypingUsers] = useState<string[]>([]);
   const wsRef = useRef<WebSocket | null>(null);
-  const reconnectTimeoutRef = useRef<ReturnType<typeof setTimeout>>();
+  const reconnectTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const reconnectAttemptRef = useRef(0);
   const onAppUpdatedRef = useRef(onAppUpdated);
   onAppUpdatedRef.current = onAppUpdated;
@@ -69,15 +95,15 @@ export function useSpikeChat({
       credentials: "include",
       headers: { "x-guest-access": "true" },
     })
-      .then((r) => (r.ok ? r.json() : []))
-      .then((msgs: ChatMessage[]) => {
+      .then((r) => (r.ok ? (r.json() as Promise<ChatMessage[]>) : ([] as ChatMessage[])))
+      .then((msgs) => {
         setMessages(msgs);
         setIsLoading(false);
       })
       .catch(() => setIsLoading(false));
   }, [channelId, enabled]);
 
-  // WebSocket connection with exponential backoff
+  // WebSocket connection with exponential backoff and reconnect limit
   useEffect(() => {
     if (!enabled || !channelId || !CHAT_ENABLED) {
       setIsConnected(false);
@@ -85,6 +111,11 @@ export function useSpikeChat({
     }
 
     function connect() {
+      // Stop reconnecting once the attempt cap is reached
+      if (reconnectAttemptRef.current >= maxReconnectAttempts) {
+        return;
+      }
+
       const wsUrl = chatWsUrl(`/api/v1/channels/${encodeURIComponent(channelId)}/ws`);
       const ws = new WebSocket(wsUrl);
 
@@ -95,7 +126,10 @@ export function useSpikeChat({
 
       ws.onmessage = (ev) => {
         try {
-          const event = JSON.parse(ev.data) as WsEvent;
+          const parsed: unknown = JSON.parse(ev.data as string);
+          if (!isWsEvent(parsed)) return;
+
+          const event = parsed;
           switch (event.type) {
             case "message_new":
               setMessages((prev) => [...prev, event.message]);
@@ -118,9 +152,15 @@ export function useSpikeChat({
       ws.onclose = () => {
         setIsConnected(false);
         wsRef.current = null;
-        // Exponential backoff: 1s, 2s, 4s, 8s, ... capped at 30s
-        const delay = Math.min(1000 * 2 ** reconnectAttemptRef.current, 30_000);
         reconnectAttemptRef.current++;
+
+        if (reconnectAttemptRef.current >= maxReconnectAttempts) {
+          // Attempt cap reached — do not schedule another reconnect
+          return;
+        }
+
+        // Exponential backoff: 1s, 2s, 4s, 8s, ... capped at 30s
+        const delay = Math.min(1000 * 2 ** (reconnectAttemptRef.current - 1), 30_000);
         reconnectTimeoutRef.current = setTimeout(connect, delay);
       };
 
@@ -134,8 +174,10 @@ export function useSpikeChat({
       clearTimeout(reconnectTimeoutRef.current);
       wsRef.current?.close();
       wsRef.current = null;
+      // Reset attempt counter so the hook reconnects cleanly if re-enabled
+      reconnectAttemptRef.current = 0;
     };
-  }, [channelId, enabled]);
+  }, [channelId, enabled, maxReconnectAttempts]);
 
   const sendMessage = useCallback(
     async (content: string, contentType = "text", metadata?: Record<string, unknown>) => {
@@ -165,5 +207,13 @@ export function useSpikeChat({
     }
   }, []);
 
-  return { messages: messageList, isConnected, isLoading, typingUsers, sendMessage, startTyping, stopTyping };
+  return {
+    messages: messageList,
+    isConnected,
+    isLoading,
+    typingUsers,
+    sendMessage,
+    startTyping,
+    stopTyping,
+  };
 }

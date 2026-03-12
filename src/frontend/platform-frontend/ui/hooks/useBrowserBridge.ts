@@ -20,10 +20,10 @@ interface BrowserSurfaceElement {
   label: string;
   selectorHint: string;
   tag: string;
-  type?: string;
-  href?: string;
-  disabled?: boolean;
-  valuePreview?: string;
+  type?: string | undefined;
+  href?: string | undefined;
+  disabled?: boolean | undefined;
+  valuePreview?: string | undefined;
 }
 
 interface BrowserSurface {
@@ -51,6 +51,10 @@ const SPIKE_APP_SECTIONS = [
 const INTERACTIVE_SELECTOR =
   "button, a, input, select, textarea, [role='button'], [role='link'], [data-testid]";
 
+/**
+ * Trims and truncates a string to `maxLength`, appending `"..."` when cut.
+ * Returns an empty string for nullish / whitespace-only input.
+ */
 function normalizeText(value: string | null | undefined, maxLength: number) {
   const normalized = (value ?? "").replace(/\s+/g, " ").trim();
   if (!normalized) {
@@ -62,6 +66,10 @@ function normalizeText(value: string | null | undefined, maxLength: number) {
   return `${normalized.slice(0, Math.max(0, maxLength - 3)).trimEnd()}...`;
 }
 
+/**
+ * Returns the most specific CSS selector hint that identifies `element`
+ * (prefers `data-testid`, then `id`, then `name`, then `aria-label`, then `href`).
+ */
 function getSelectorHint(element: Element) {
   if (element instanceof HTMLElement && element.dataset.testid) {
     return `[data-testid="${element.dataset.testid}"]`;
@@ -88,6 +96,9 @@ function getSelectorHint(element: Element) {
   return element.tagName.toLowerCase();
 }
 
+/**
+ * Resolves the ARIA / implicit role for `element`.
+ */
 function getElementRole(element: Element) {
   const explicitRole = element.getAttribute("role");
   if (explicitRole) {
@@ -113,6 +124,10 @@ function getElementRole(element: Element) {
   return element.tagName.toLowerCase();
 }
 
+/**
+ * Derives a human-readable label for `element` (prefers `aria-label`, `title`,
+ * associated `<label>`, `placeholder`, `name`, `value`, then `textContent`).
+ */
 function getElementLabel(element: Element) {
   const ariaLabel = element.getAttribute("aria-label");
   if (ariaLabel) {
@@ -138,6 +153,10 @@ function getElementLabel(element: Element) {
   return normalizeText(element.textContent, 80);
 }
 
+/**
+ * Waits two animation frames so that any pending DOM mutations and React
+ * re-renders triggered by a prior command have settled before capturing state.
+ */
 async function waitForBrowserSettle() {
   await new Promise<void>((resolve) => {
     requestAnimationFrame(() => {
@@ -146,6 +165,24 @@ async function waitForBrowserSettle() {
   });
 }
 
+/**
+ * Listens for pending `browser`-transport tool calls in `items` and executes
+ * them against the live DOM. Results are reported back via `onResult`.
+ *
+ * Supported tools:
+ * - `browser_get_surface` — snapshot of interactive elements.
+ * - `browser_navigate` — router-aware navigation (internal) or `window.open` (external).
+ * - `browser_click` — click a resolved element.
+ * - `browser_fill` — set an input / textarea value via React-compatible events.
+ * - `browser_screenshot` — viewport metadata (no actual image capture in browser context).
+ * - `browser_read_text` — extract text content from a target or the full document body.
+ * - `browser_scroll` — scroll an element into view or to an absolute Y position.
+ * - `browser_get_elements` — alias for `browser_get_surface` returning the elements array.
+ *
+ * @param items - The full conversation item list from `useChat`.
+ * @param onResult - Callback invoked with `(toolCallId, result)` after execution.
+ * @param router - Optional TanStack Router instance for client-side navigation.
+ */
 export function useBrowserBridge({ items, onResult, router }: BrowserBridgeOptions) {
   const processedRef = useRef<Set<string>>(new Set());
   const surfaceMapRef = useRef<Map<string, SurfaceEntry[]>>(new Map());
@@ -206,9 +243,9 @@ export function useBrowserBridge({ items, onResult, router }: BrowserBridgeOptio
   }, []);
 
   const resolveElement = useCallback((args: Record<string, unknown>) => {
-    const surfaceId = typeof args.surfaceId === "string" ? args.surfaceId : "";
-    const targetId = typeof args.targetId === "string" ? args.targetId : "";
-    const selector = typeof args.selector === "string" ? args.selector : "";
+    const surfaceId = typeof args["surfaceId"] === "string" ? args["surfaceId"] : "";
+    const targetId = typeof args["targetId"] === "string" ? args["targetId"] : "";
+    const selector = typeof args["selector"] === "string" ? args["selector"] : "";
 
     if (surfaceId && targetId) {
       const surfaceEntries = surfaceMapRef.current.get(surfaceId) ?? [];
@@ -236,7 +273,7 @@ export function useBrowserBridge({ items, onResult, router }: BrowserBridgeOptio
         }
 
         case "browser_navigate": {
-          const url = typeof args.url === "string" ? args.url : "";
+          const url = typeof args["url"] === "string" ? args["url"] : "";
           if (!url) {
             return { success: false, error: "Navigation URL is required." };
           }
@@ -282,14 +319,14 @@ export function useBrowserBridge({ items, onResult, router }: BrowserBridgeOptio
           return {
             success: true,
             clicked:
-              (typeof args.targetId === "string" && args.targetId) ||
-              (typeof args.selector === "string" ? args.selector : getSelectorHint(element)),
+              (typeof args["targetId"] === "string" && args["targetId"]) ||
+              (typeof args["selector"] === "string" ? args["selector"] : getSelectorHint(element)),
             surface: buildSurface(),
           };
         }
 
         case "browser_fill": {
-          const value = typeof args.value === "string" ? args.value : "";
+          const value = typeof args["value"] === "string" ? args["value"] : "";
           const element = resolveElement(args);
 
           if (!(element instanceof HTMLInputElement || element instanceof HTMLTextAreaElement)) {
@@ -317,8 +354,8 @@ export function useBrowserBridge({ items, onResult, router }: BrowserBridgeOptio
           return {
             success: true,
             filled:
-              (typeof args.targetId === "string" && args.targetId) ||
-              (typeof args.selector === "string" ? args.selector : getSelectorHint(element)),
+              (typeof args["targetId"] === "string" && args["targetId"]) ||
+              (typeof args["selector"] === "string" ? args["selector"] : getSelectorHint(element)),
             surface: buildSurface(),
           };
         }
@@ -356,13 +393,15 @@ export function useBrowserBridge({ items, onResult, router }: BrowserBridgeOptio
             return {
               success: true,
               scrolledTo:
-                (typeof args.targetId === "string" && args.targetId) ||
-                (typeof args.selector === "string" ? args.selector : getSelectorHint(element)),
+                (typeof args["targetId"] === "string" && args["targetId"]) ||
+                (typeof args["selector"] === "string"
+                  ? args["selector"]
+                  : getSelectorHint(element)),
               surface: buildSurface(),
             };
           }
 
-          const y = typeof args.y === "number" ? args.y : Number(args.y) || 0;
+          const y = typeof args["y"] === "number" ? args["y"] : Number(args["y"]) || 0;
           window.scrollTo({ top: y, behavior: "smooth" });
           await waitForBrowserSettle();
 

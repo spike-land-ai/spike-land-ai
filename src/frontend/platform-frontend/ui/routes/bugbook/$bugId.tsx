@@ -15,25 +15,67 @@ const statusColor: Record<string, string> = {
   DEPRECATED: "bg-muted text-muted-foreground",
 };
 
+function DetailSkeleton() {
+  return (
+    <div className="space-y-6" aria-busy="true" aria-label="Loading bug details">
+      {/* Breadcrumb skeleton */}
+      <div className="flex items-center gap-2">
+        <div className="h-4 w-16 rounded bg-muted animate-pulse" />
+        <div className="h-4 w-2 rounded bg-muted animate-pulse" />
+        <div className="h-4 w-40 rounded bg-muted animate-pulse" />
+      </div>
+
+      {/* Header card skeleton */}
+      <div className="rounded-2xl border border-border bg-card p-6 shadow-sm animate-pulse">
+        <div className="flex items-start justify-between gap-4">
+          <div className="flex-1 space-y-2">
+            <div className="h-6 w-3/4 rounded bg-muted" />
+            <div className="h-4 w-full rounded bg-muted" />
+            <div className="h-4 w-2/3 rounded bg-muted" />
+          </div>
+          <div className="shrink-0 text-right space-y-1">
+            <div className="h-9 w-16 rounded bg-muted" />
+            <div className="h-3 w-14 rounded bg-muted" />
+          </div>
+        </div>
+        <div className="mt-4 flex gap-2">
+          <div className="h-5 w-20 rounded-full bg-muted" />
+          <div className="h-5 w-16 rounded-full bg-muted" />
+          <div className="h-5 w-24 rounded-full bg-muted" />
+        </div>
+      </div>
+
+      {/* Reports skeleton */}
+      <div className="rounded-2xl border border-border bg-card p-6 shadow-sm animate-pulse space-y-3">
+        <div className="h-4 w-24 rounded bg-muted" />
+        {Array.from({ length: 3 }).map((_, i) => (
+          <div key={i} className="rounded-lg border border-border p-4 space-y-2">
+            <div className="h-4 w-full rounded bg-muted" />
+            <div className="h-3 w-1/2 rounded bg-muted" />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export function BugbookDetailPage() {
   const { bugId } = useParams({ strict: false });
   const { data, isLoading, isError } = useBugbookDetail(bugId ?? "");
   const confirmBug = useConfirmBug();
 
   if (isLoading) {
-    return (
-      <div className="flex justify-center py-12">
-        <div className="h-8 w-8 animate-spin rounded-full border-2 border-border border-t-primary" />
-      </div>
-    );
+    return <DetailSkeleton />;
   }
 
   if (isError || !data?.bug) {
     return (
       <div className="space-y-4">
-        <Link to="/bugbook" className="text-primary hover:underline">
-          <span aria-hidden="true">&larr;</span> Back to Bugbook
-        </Link>
+        <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-sm">
+          <Link to="/bugbook" className="text-primary hover:underline">
+            Bugbook
+          </Link>
+        </nav>
         <div className="rounded-xl border border-destructive/30 bg-destructive/10 p-6 text-center text-destructive">
           Bug not found.
         </div>
@@ -45,17 +87,31 @@ export function BugbookDetailPage() {
 
   return (
     <div className="space-y-6">
-      {/* Breadcrumb */}
-      <div className="flex items-center gap-2 text-sm">
+      {/* Breadcrumb with cross-links */}
+      <nav aria-label="Breadcrumb" className="flex flex-wrap items-center gap-2 text-sm">
         <Link to="/bugbook" className="text-primary hover:underline">
           Bugbook
         </Link>
-        <span className="text-muted-foreground">/</span>
+        <span className="text-muted-foreground" aria-hidden="true">
+          /
+        </span>
         <span className="text-muted-foreground truncate max-w-xs">{bug.title}</span>
-      </div>
+        <span className="text-muted-foreground" aria-hidden="true">
+          |
+        </span>
+        <Link to="/bugbook/leaderboard" className="text-primary hover:underline text-xs">
+          Leaderboard
+        </Link>
+        <span className="text-muted-foreground" aria-hidden="true">
+          ·
+        </span>
+        <Link to="/bugbook/my-reports" className="text-primary hover:underline text-xs">
+          My Reports
+        </Link>
+      </nav>
 
       {/* Header */}
-      <div className="rounded-2xl border border-border bg-card dark:glass-card p-6 shadow-sm">
+      <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
         <div className="flex items-start justify-between gap-4">
           <div>
             <h1 className="text-xl font-bold text-foreground">{bug.title}</h1>
@@ -88,7 +144,7 @@ export function BugbookDetailPage() {
           </span>
         </div>
 
-        <div className="mt-4 flex gap-6 text-xs text-muted-foreground">
+        <div className="mt-4 flex flex-wrap gap-4 text-xs text-muted-foreground">
           <span>First seen: {new Date(bug.first_seen_at).toLocaleDateString()}</span>
           <span>Last seen: {new Date(bug.last_seen_at).toLocaleDateString()}</span>
           {bug.fixed_at && <span>Fixed: {new Date(bug.fixed_at).toLocaleDateString()}</span>}
@@ -98,7 +154,7 @@ export function BugbookDetailPage() {
           <button
             onClick={() => confirmBug.mutate(bugId ?? "")}
             disabled={confirmBug.isPending}
-            className="mt-4 rounded-lg bg-warning text-warning-foreground px-4 py-2 text-sm font-medium hover:bg-warning/90 disabled:opacity-50"
+            className="mt-4 rounded-lg bg-warning text-warning-foreground px-4 py-2 text-sm font-medium hover:bg-warning/90 disabled:opacity-50 transition-colors"
           >
             {confirmBug.isPending ? "Confirming..." : "I have this bug too"}
           </button>
@@ -111,7 +167,7 @@ export function BugbookDetailPage() {
 
       {/* ELO History */}
       {eloHistory.length > 0 && (
-        <div className="rounded-2xl border border-border bg-card dark:glass-card p-6 shadow-sm">
+        <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
           <h2 className="mb-4 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
             ELO History
           </h2>
@@ -143,7 +199,7 @@ export function BugbookDetailPage() {
       )}
 
       {/* Reports */}
-      <div className="rounded-2xl border border-border bg-card dark:glass-card p-6 shadow-sm">
+      <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
         <h2 className="mb-4 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
           Reports ({reports.length})
         </h2>
@@ -161,7 +217,7 @@ export function BugbookDetailPage() {
                     {report.severity}
                   </span>
                 </div>
-                <div className="mt-2 flex gap-4 text-xs text-muted-foreground">
+                <div className="mt-2 flex flex-wrap gap-4 text-xs text-muted-foreground">
                   <span>Service: {report.service_name}</span>
                   <span>{new Date(report.created_at).toLocaleString()}</span>
                 </div>

@@ -28,7 +28,7 @@ export function AppMarkdownRenderer({
   isToolAvailable,
 }: AppMarkdownRendererProps) {
   return (
-    <div className="prose dark:prose-invert max-w-none">
+    <div className="prose max-w-none">
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
         rehypePlugins={[rehypeRaw]}

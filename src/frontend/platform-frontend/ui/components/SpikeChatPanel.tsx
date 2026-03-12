@@ -17,6 +17,7 @@ export function SpikeChatPanel({ channelId, onAppUpdated, className = "" }: Spik
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const isAtBottomRef = useRef(true);
+  const initialScrollDoneRef = useRef(false);
 
   // Track if user is at bottom
   const handleScroll = useCallback(() => {
@@ -32,12 +33,13 @@ export function SpikeChatPanel({ channelId, onAppUpdated, className = "" }: Spik
     }
   }, [messages]);
 
-  // Scroll to bottom on initial load
+  // Scroll to bottom on initial load — runs once when loading finishes and messages are available
   useEffect(() => {
-    if (!isLoading && messages.length > 0) {
+    if (!isLoading && messages.length > 0 && !initialScrollDoneRef.current) {
+      initialScrollDoneRef.current = true;
       messagesEndRef.current?.scrollIntoView();
     }
-  }, [isLoading, messages.length > 0]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [isLoading, messages.length]);
 
   const handleSend = async () => {
     const text = input.trim();
@@ -72,15 +74,21 @@ export function SpikeChatPanel({ channelId, onAppUpdated, className = "" }: Spik
     return d.toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" });
   };
 
-  // Avatar color from userId
-  const avatarColor = (uid: string) => {
-    const colors = [
-      "bg-blue-500", "bg-emerald-500", "bg-amber-500", "bg-purple-500",
-      "bg-pink-500", "bg-cyan-500", "bg-red-500", "bg-indigo-500",
+  // Avatar background color derived from userId using CSS variable palette tokens
+  const avatarBgColor = (uid: string): string => {
+    const vars = [
+      "var(--color-blue-500)",
+      "var(--color-emerald-500)",
+      "var(--color-amber-500)",
+      "var(--color-purple-500)",
+      "var(--color-pink-500)",
+      "var(--color-cyan-500)",
+      "var(--color-red-500)",
+      "var(--color-indigo-500)",
     ];
     let hash = 0;
     for (let i = 0; i < uid.length; i++) hash = (hash * 31 + uid.charCodeAt(i)) | 0;
-    return colors[Math.abs(hash) % colors.length];
+    return vars[Math.abs(hash) % vars.length] ?? vars[0]!;
   };
 
   const isBot = (uid: string) => uid.startsWith("agent-") || uid === "system";
@@ -95,7 +103,7 @@ export function SpikeChatPanel({ channelId, onAppUpdated, className = "" }: Spik
         <span className="ml-auto flex items-center gap-1 text-xs text-muted-foreground">
           {isConnected ? (
             <>
-              <Wifi className="w-3 h-3 text-emerald-500" />
+              <Wifi className="w-3 h-3 text-[var(--success-color)]" />
               Connected
             </>
           ) : (
@@ -125,15 +133,21 @@ export function SpikeChatPanel({ channelId, onAppUpdated, className = "" }: Spik
           </p>
         ) : (
           messages.map((msg) => (
-            <div key={msg.id} className="flex gap-2.5 animate-in fade-in slide-in-from-bottom-1 duration-200">
+            <div
+              key={msg.id}
+              className="flex gap-2.5 animate-in fade-in slide-in-from-bottom-1 duration-200"
+            >
               <div
-                className={`w-7 h-7 rounded-full shrink-0 flex items-center justify-center text-xs font-bold text-white ${avatarColor(msg.userId)}`}
+                className="w-7 h-7 rounded-full shrink-0 flex items-center justify-center text-xs font-bold text-white"
+                style={{ backgroundColor: avatarBgColor(msg.userId) }}
               >
                 {msg.userId.charAt(0).toUpperCase()}
               </div>
               <div className="min-w-0 flex-1">
                 <div className="flex items-baseline gap-2">
-                  <span className={`text-sm font-semibold ${isBot(msg.userId) ? "text-primary" : "text-foreground"}`}>
+                  <span
+                    className={`text-sm font-semibold ${isBot(msg.userId) ? "text-primary" : "text-foreground"}`}
+                  >
                     {isBot(msg.userId) ? "Bot" : msg.userId.split("-")[0]}
                   </span>
                   <span className="text-[10px] text-muted-foreground">
@@ -170,6 +184,7 @@ export function SpikeChatPanel({ channelId, onAppUpdated, className = "" }: Spik
             onKeyDown={handleKeyDown}
             placeholder="Type a message..."
             rows={1}
+            aria-label="Chat message input"
             className="flex-1 resize-none rounded-lg border border-border bg-muted/30 px-3 py-2 text-sm
                        placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary
                        max-h-32"

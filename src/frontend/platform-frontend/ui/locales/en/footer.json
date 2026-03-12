@@ -1,5 +1,7 @@
 {
   "heroHeading": "Ship enterprise-ready app surfaces",
+  "heroTitle": "One product layer for chat, tools, docs, and deployment.",
+  "heroBody": "spike.land turns MCP capability into real software surfaces with shared auth, observability, and edge-native runtime defaults.",
   "browseApps": "Browse apps",
   "readDocs": "Read docs",
   "brandTagline": "MCP-native AI platform",
@@ -21,5 +23,8 @@
   "changelog": "Changelog",
   "copyright": "© {{year}} SPIKE LAND LTD. Built for edge-native AI product surfaces.",
   "tagline": "Brighton-built. Global by default.",
-  "statusHealthy": "Status healthy"
+  "statusHealthy": "Status healthy",
+  "ariaGitHub": "Visit our GitHub",
+  "ariaTwitter": "Follow us on Twitter",
+  "ariaEmail": "Email us"
 }

@@ -219,6 +219,20 @@ h4 {
   --tw-prose-td-borders: var(--border-color);
 }
 
+/* ── Article page base typography ──────────────────────────────────────── */
+.article-base {
+  font-size: 18px;
+}
+@media (min-width: 768px) {
+  .article-base {
+    font-size: 19px;
+  }
+}
+
+.small-caps {
+  font-variant-caps: small-caps;
+}
+
 /* ── Focus ring ─────────────────────────────────────────────────────────── */
 :focus-visible {
   outline: 2px solid var(--ring-color);

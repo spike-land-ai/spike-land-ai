@@ -22,9 +22,9 @@ describe("usePricing", () => {
     const { usePricing } = await import("../usePricing");
     const { result } = renderHook(() => usePricing());
 
-    expect(result.current.loading).toBe(true);
-    expect(result.current.pricing.currency).toBe("USD");
-    expect(result.current.pricing.pro.monthly).toBe("$29");
+    expect(result.current.isLoading).toBe(true);
+    expect(result.current.data.currency).toBe("USD");
+    expect(result.current.data.pro.monthly).toBe("$29");
   });
 
   it("updates pricing data after successful fetch", async () => {
@@ -56,13 +56,15 @@ describe("usePricing", () => {
     const { usePricing } = await import("../usePricing");
     const { result } = renderHook(() => usePricing());
 
-    await waitFor(() => expect(result.current.loading).toBe(false));
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
 
-    expect(result.current.pricing.currency).toBe("EUR");
-    expect(result.current.pricing.billedInUsd).toBe(true);
-    expect(result.current.pricing.pro.monthly).toBe("€29");
-    expect(result.current.pricing.business.annualTotal).toBe("€948/yr");
-    expect(result.current.pricing.credits.power).toBe("€50");
+    expect(result.current.data.currency).toBe("EUR");
+    expect(result.current.data.billedInUsd).toBe(true);
+    expect(result.current.data.pro.monthly).toBe("€29");
+    expect(result.current.data.business.annualTotal).toBe("€948/yr");
+    expect(result.current.data.credits.power).toBe("€50");
+    expect(result.current.isError).toBe(false);
+    expect(result.current.error).toBeNull();
   });
 
   it("stays on USD defaults if fetch fails", async () => {
@@ -73,10 +75,10 @@ describe("usePricing", () => {
     const { usePricing } = await import("../usePricing");
     const { result } = renderHook(() => usePricing());
 
-    await waitFor(() => expect(result.current.loading).toBe(false));
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
 
-    expect(result.current.pricing.currency).toBe("USD");
-    expect(result.current.pricing.pro.monthly).toBe("$29");
+    expect(result.current.data.currency).toBe("USD");
+    expect(result.current.data.pro.monthly).toBe("$29");
   });
 
   it("stays on USD defaults if fetch throws error", async () => {
@@ -85,9 +87,12 @@ describe("usePricing", () => {
     const { usePricing } = await import("../usePricing");
     const { result } = renderHook(() => usePricing());
 
-    await waitFor(() => expect(result.current.loading).toBe(false));
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
 
-    expect(result.current.pricing.currency).toBe("USD");
+    expect(result.current.data.currency).toBe("USD");
+    expect(result.current.isError).toBe(true);
+    expect(result.current.error).toBeInstanceOf(Error);
+    expect(result.current.error?.message).toBe("Network error");
   });
 
   it("uses cached data on subsequent hook calls", async () => {
@@ -120,14 +125,14 @@ describe("usePricing", () => {
 
     // First call to fetch data
     const { result: result1, unmount: unmount1 } = renderHook(() => usePricing());
-    await waitFor(() => expect(result1.current.loading).toBe(false));
-    expect(result1.current.pricing.currency).toBe("GBP");
+    await waitFor(() => expect(result1.current.isLoading).toBe(false));
+    expect(result1.current.data.currency).toBe("GBP");
     unmount1();
 
     // Second call should use cache and not be loading
     const { result: result2 } = renderHook(() => usePricing());
-    expect(result2.current.loading).toBe(false);
-    expect(result2.current.pricing.currency).toBe("GBP");
+    expect(result2.current.isLoading).toBe(false);
+    expect(result2.current.data.currency).toBe("GBP");
 
     // Should only have fetched once
     expect(mockFetch).toHaveBeenCalledTimes(1);

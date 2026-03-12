@@ -1,5 +1,7 @@
 {
   "heroHeading": "Szállíts vállalati szintű alkalmazás felületeket",
+  "heroTitle": "Egy termékréteg csevegéshez, eszközökhöz, dokumentációhoz és telepítéshez.",
+  "heroBody": "A spike.land az MCP képességeket valódi szoftverfelületekké alakítja, megosztott hitelesítéssel, megfigyelhetőséggel és edge-natív futtatókörnyezeti alapértékekkel.",
   "browseApps": "Alkalmazások böngészése",
   "readDocs": "Dokumentáció olvasása",
   "brandTagline": "MCP-natív AI platform",
@@ -21,5 +23,8 @@
   "changelog": "Változásnapló",
   "copyright": "© {{year}} SPIKE LAND LTD. Éles natív AI alkalmazás felületekhez építve.",
   "tagline": "Brightonban készült. Alapértelmezetten globális.",
-  "statusHealthy": "Állapot: egészséges"
+  "statusHealthy": "Állapot: egészséges",
+  "ariaGitHub": "Látogass el a GitHub oldalunkra",
+  "ariaTwitter": "Kövess minket a Twitteren",
+  "ariaEmail": "Írj nekünk e-mailt"
 }

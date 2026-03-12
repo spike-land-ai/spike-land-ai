@@ -1,7 +1,13 @@
 import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { WebStandardStreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/webStandardStreamableHttp.js";
-import type { AlbumHandle, ImageId, ImageStudioDeps } from "@spike-land-ai/mcp-image-studio";
+import type {
+  AlbumHandle,
+  AspectRatio,
+  ImageId,
+  ImageStudioDeps,
+  JobId,
+} from "@spike-land-ai/mcp-image-studio";
 import { createD1Credits } from "../mcp/credits.ts";
 import {
   addImageToDefaultAlbum,
@@ -82,6 +88,88 @@ app.get("/r2/:key", async (c) => {
       ETag: obj.etag,
     },
   });
+});
+
+// ─── Prompt-Driven Image Generation ───
+// Handles ?prompt=...&v=... requests from the ImageLoader component.
+// Flow: check R2 cache by hash → return cached → or generate via Gemini → store in R2 → return
+app.get("/api/generate-image", async (c) => {
+  const prompt = c.req.query("prompt");
+  const version = c.req.query("v");
+  const aspectRatio = (c.req.query("aspect") ?? "16:9") as AspectRatio;
+
+  if (!prompt) return c.json({ error: "Missing prompt parameter" }, 400);
+
+  // Deterministic R2 cache key from prompt hash + version
+  const slug = prompt
+    .slice(0, 80)
+    .replace(/[^a-z0-9]/gi, "-")
+    .toLowerCase();
+  const cacheKey = `generated/${version ?? "0"}/${slug}.png`;
+
+  // Check R2 cache first
+  const cached = await c.env.IMAGE_R2.get(cacheKey);
+  if (cached) {
+    return new Response(cached.body, {
+      headers: {
+        "Content-Type": cached.httpMetadata?.contentType ?? "image/png",
+        "Cache-Control": "public, max-age=31536000, immutable",
+        "Access-Control-Allow-Origin": "*",
+        ETag: cached.etag,
+      },
+    });
+  }
+
+  // Generate via Gemini and store in R2
+  try {
+    const { userId, deps } = await buildDeps(c);
+    const result = await deps.generation.createGenerationJob({
+      userId,
+      prompt,
+      tier: "FREE",
+      aspectRatio,
+    });
+
+    if (!result.success) {
+      return c.json({ error: result.error ?? "Generation failed" }, 502);
+    }
+
+    // The generation job stores the image in R2 via storage.upload().
+    // Fetch the completed job to get the output URL, then redirect.
+    if (result.jobId) {
+      const job = await deps.db.generationJobFindById(result.jobId as JobId);
+      if (job?.outputImageUrl) {
+        // Copy the generated image to our deterministic cache key for future hits
+        const outputKey = job.outputImageUrl.replace(/^.*\/r2\//, "");
+        const obj = await c.env.IMAGE_R2.get(outputKey);
+        if (obj) {
+          await c.env.IMAGE_R2.put(cacheKey, obj.body, {
+            httpMetadata: { contentType: "image/png" },
+            customMetadata: { prompt, aspectRatio },
+          });
+          // Fetch the cached copy to return
+          const cached2 = await c.env.IMAGE_R2.get(cacheKey);
+          if (cached2) {
+            return new Response(cached2.body, {
+              headers: {
+                "Content-Type": "image/png",
+                "Cache-Control": "public, max-age=31536000, immutable",
+                "Access-Control-Allow-Origin": "*",
+              },
+            });
+          }
+        }
+        // Fallback: redirect to the generated image URL
+        return c.redirect(job.outputImageUrl, 302);
+      }
+    }
+
+    return c.json({ error: "Generation completed but no output available" }, 502);
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : "Generation failed";
+    console.error("[generate-image]", msg);
+    return c.json({ error: msg }, 500);
+  }
 });
 
 app.get("/:userId/:filename{.+\\.\\w+$}", async (c) => {

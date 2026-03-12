@@ -128,7 +128,7 @@ export function McpPage() {
               <Link
                 key={category}
                 to="/apps"
-                className="group flex items-center gap-4 rounded-2xl border border-border bg-card dark:glass-card p-5 shadow-sm transition hover:shadow-md hover:scale-[1.01] hover:border-primary/30"
+                className="group flex items-center gap-4 rounded-2xl border border-border bg-card p-5 shadow-sm transition hover:shadow-md hover:scale-[1.01] hover:border-primary/30"
               >
                 <span className="text-2xl" aria-hidden="true">
                   {getCategoryIcon(category)}
@@ -160,7 +160,7 @@ export function McpPage() {
         <h2 className="text-2xl font-bold text-foreground">How to Connect</h2>
         <div className="grid gap-6 lg:grid-cols-3">
           {/* Device Flow */}
-          <div className="rounded-2xl border border-border bg-card dark:glass-card p-6 shadow-sm space-y-4">
+          <div className="rounded-2xl border border-border bg-card p-6 shadow-sm space-y-4">
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-lg font-bold text-primary">
               1
             </div>
@@ -181,7 +181,7 @@ export function McpPage() {
           </div>
 
           {/* API Keys */}
-          <div className="rounded-2xl border border-border bg-card dark:glass-card p-6 shadow-sm space-y-4">
+          <div className="rounded-2xl border border-border bg-card p-6 shadow-sm space-y-4">
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-lg font-bold text-primary">
               2
             </div>
@@ -199,7 +199,7 @@ export function McpPage() {
           </div>
 
           {/* SDK */}
-          <div className="rounded-2xl border border-border bg-card dark:glass-card p-6 shadow-sm space-y-4">
+          <div className="rounded-2xl border border-border bg-card p-6 shadow-sm space-y-4">
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-lg font-bold text-primary">
               3
             </div>

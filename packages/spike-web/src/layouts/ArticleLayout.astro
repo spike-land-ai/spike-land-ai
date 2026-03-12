@@ -1,0 +1,64 @@
+---
+import '../styles/global.css';
+
+interface Props {
+  title?: string;
+  description?: string;
+  ogImage?: string;
+  canonicalUrl?: string;
+  noindex?: boolean;
+}
+
+const {
+  title = 'Article - spike.land',
+  description = 'Read on spike.land',
+  ogImage = '/android-chrome-512x512.png',
+  canonicalUrl,
+  noindex = false,
+} = Astro.props;
+
+const resolvedCanonical = canonicalUrl ?? Astro.url.href;
+const resolvedOgImage = new URL(ogImage, Astro.site ?? Astro.url.origin).href;
+---
+
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={resolvedCanonical} />
+
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={resolvedOgImage} />
+    <meta property="og:url" content={Astro.url.href} />
+    <meta property="og:type" content="article" />
+    <meta property="og:site_name" content="spike.land" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content="@spike_land" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={resolvedOgImage} />
+
+    <link rel="icon" href="/favicon.ico" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+    <!-- Google Fonts: Rubik -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300..900;1,300..900&display=swap"
+      rel="stylesheet"
+    />
+
+    {noindex && <meta name="robots" content="noindex, nofollow" />}
+    <slot name="head" />
+  </head>
+  <body class="bg-amber-50 font-sans article-base">
+    <div class="container mx-auto max-w-screen-md px-4 my-12">
+      <slot />
+    </div>
+  </body>
+</html>

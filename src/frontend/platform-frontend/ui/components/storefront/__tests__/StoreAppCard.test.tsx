@@ -19,6 +19,20 @@ vi.mock("@tanstack/react-router", () => ({
   ),
 }));
 
+vi.mock("react-i18next", () => ({
+  useTranslation: () => ({
+    t: (key: string, options?: { count?: number }) => {
+      if (key === "tool_other") {
+        return `${options?.count ?? 0} tools`;
+      }
+      const map: Record<string, string> = {
+        get: "GET",
+      };
+      return map[key] ?? key;
+    },
+  }),
+}));
+
 describe("StoreAppCard", () => {
   const mockApp: McpAppSummary = {
     slug: "test-app",

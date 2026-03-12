@@ -26,7 +26,7 @@ export function NarrationPanel({ text, onRefClick, isCalling }: Props) {
             key={index}
             onClick={() => onRefClick(parseInt(refId, 10))}
             disabled={isCalling}
-            className="inline-block px-1.5 py-0.5 mx-0.5 my-1 text-xs font-mono bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-200 border border-blue-200 dark:border-blue-800 rounded hover:bg-blue-200 dark:hover:bg-blue-800/60 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+            className="inline-block px-1.5 py-0.5 mx-0.5 my-1 text-xs font-mono bg-info/15 text-info-foreground border border-info/25 rounded hover:bg-info/25 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
             title={`Click element #${refId}`}
           >
             {content?.trim()} <span className="opacity-50 text-[10px] ml-1">#{refId}</span>

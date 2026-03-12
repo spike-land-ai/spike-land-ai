@@ -1,6 +1,16 @@
 import { Link } from "@tanstack/react-router";
 import { type AppStatus, StatusBadge } from "./StatusBadge";
-import { Clock, User, Package, Zap, Boxes, Gamepad2, Info, MessageSquare } from "lucide-react";
+import {
+  Clock,
+  User,
+  Package,
+  Zap,
+  Boxes,
+  Gamepad2,
+  Info,
+  MessageSquare,
+  ArrowRight,
+} from "lucide-react";
 import { cn } from "../../styling/cn";
 
 interface AppCardProps {
@@ -59,6 +69,7 @@ export function AppCard({
       to="/packages/$appId"
       params={{ appId: id }}
       search={{ tab: "Overview" }}
+      aria-label={`View app: ${name}`}
       className="group block h-full rounded-[var(--radius-panel)] border border-border/90 bg-card/90 p-5 shadow-[var(--panel-shadow)] transition-[border-color,box-shadow,transform] duration-200 hover:border-primary/24 hover:shadow-[var(--panel-shadow-strong)]"
     >
       <div className="flex h-full flex-col gap-5">
@@ -73,9 +84,7 @@ export function AppCard({
                   <h3 className="truncate text-lg font-semibold tracking-[-0.03em] text-foreground transition-colors group-hover:text-primary">
                     {name}
                   </h3>
-                  <span className="rubik-chip rubik-chip-accent px-2.5 py-1 text-[10px]">
-                    MCP
-                  </span>
+                  <span className="rubik-chip rubik-chip-accent px-2.5 py-1 text-[10px]">MCP</span>
                 </div>
                 <p className="mt-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">
                   Package surface
@@ -97,9 +106,7 @@ export function AppCard({
         </div>
 
         {description && (
-          <p className="line-clamp-2 text-sm leading-7 text-muted-foreground">
-            {description}
-          </p>
+          <p className="line-clamp-2 text-sm leading-7 text-muted-foreground">{description}</p>
         )}
 
         <div className="mt-auto space-y-4">
@@ -109,7 +116,9 @@ export function AppCard({
               {toolCount !== undefined && toolCount > 0 && (
                 <div className="flex items-center gap-1.5" title={`${toolCount} tools available`}>
                   <Package className="size-3" />
-                  <span>{toolCount} {toolCount === 1 ? "tool" : "tools"}</span>
+                  <span>
+                    {toolCount} {toolCount === 1 ? "tool" : "tools"}
+                  </span>
                 </div>
               )}
               {ownerName && (
@@ -128,8 +137,11 @@ export function AppCard({
               )}
             </div>
 
-            <div className="flex h-9 w-9 items-center justify-center rounded-2xl border border-border bg-background text-muted-foreground transition-colors group-hover:border-primary/30 group-hover:text-primary">
-              <Zap className="size-4" />
+            <div
+              aria-hidden="true"
+              className="flex h-9 w-9 items-center justify-center rounded-2xl border border-border bg-background text-muted-foreground transition-colors group-hover:border-primary/30 group-hover:text-primary"
+            >
+              <ArrowRight className="size-4" />
             </div>
           </div>
         </div>

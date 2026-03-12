@@ -190,9 +190,7 @@ function WhatsAppTab() {
         </div>
         <span
           className={`rounded-full px-2 py-0.5 text-xs font-semibold ${
-            linked
-              ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400"
-              : "bg-muted text-muted-foreground"
+            linked ? "bg-success/15 text-success-foreground" : "bg-muted text-muted-foreground"
           }`}
         >
           {linked ? t("whatsapp.statusLinked") : t("whatsapp.statusNotLinked")}
@@ -350,7 +348,7 @@ function ApiKeysTab() {
                   <p
                     className={`text-xs ${
                       testResults[key.id] === t("apiKeys.statusOk")
-                        ? "text-green-600"
+                        ? "text-success-foreground"
                         : "text-destructive"
                     }`}
                   >
@@ -436,14 +434,14 @@ interface BillingStatus {
 
 const planColors: Record<Plan, string> = {
   free: "bg-muted text-muted-foreground",
-  pro: "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400",
-  business: "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400",
+  pro: "bg-info/15 text-info-foreground",
+  business: "bg-primary/15 text-primary",
 };
 
 function BillingTab() {
   const { t } = useTranslation("settings");
   const { showToast } = useToast();
-  const { pricing: _pricing } = usePricing();
+  const { data: _pricing } = usePricing();
   const search = useSearch({ strict: false }) as { success?: string; canceled?: string };
 
   const [billing, setBilling] = useState<BillingStatus | null>(null);
@@ -545,8 +543,8 @@ function BillingTab() {
     <div className="space-y-6">
       {/* Past due warning */}
       {status === "past_due" && (
-        <div className="rounded-lg border border-yellow-500/40 bg-yellow-50 px-4 py-3 dark:bg-yellow-900/10">
-          <p className="text-sm font-medium text-yellow-800 dark:text-yellow-400">
+        <div className="rounded-lg border border-warning/40 bg-warning/8 px-4 py-3">
+          <p className="text-sm font-medium text-warning-foreground">
             {t("billing.pastDueWarning")}
           </p>
         </div>
@@ -577,9 +575,9 @@ function BillingTab() {
           <span
             className={`rounded-full px-2 py-0.5 text-xs font-medium capitalize ${
               status === "active"
-                ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
+                ? "bg-success/15 text-success-foreground"
                 : status === "past_due"
-                  ? "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400"
+                  ? "bg-warning/20 text-warning-foreground"
                   : "bg-muted text-muted-foreground"
             }`}
           >
@@ -642,9 +640,8 @@ interface EloEvent {
 }
 
 function getTierColor(score: number): string {
-  if (score >= 1500)
-    return "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400";
-  if (score >= 1000) return "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400";
+  if (score >= 1500) return "bg-primary/15 text-primary";
+  if (score >= 1000) return "bg-info/15 text-info-foreground";
   return "bg-muted text-muted-foreground";
 }
 
@@ -698,7 +695,7 @@ function AccessTab() {
         <span
           className={`rounded-full px-2 py-0.5 text-xs font-semibold ${
             bugBountyEligible
-              ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400"
+              ? "bg-success/15 text-success-foreground"
               : "bg-muted text-muted-foreground"
           }`}
         >
@@ -803,7 +800,7 @@ export function SettingsPage() {
           role="tabpanel"
           id={`settings-panel-${activeTab}`}
           aria-labelledby={`settings-tab-${activeTab}`}
-          className="rounded-2xl border border-border bg-card dark:glass-card p-6 shadow-sm"
+          className="rubik-panel p-6"
         >
           {activeTab === "profile" && <ProfileTab />}
           {activeTab === "whatsapp" && <WhatsAppTab />}

@@ -145,7 +145,7 @@ export function LoginButton() {
               <CreditCard className="size-4" />
               {t("auth:billingCredits")}
             </Link>
-            <div className="h-px bg-border/50 dark:bg-white/10 my-1 mx-2" />
+            <div className="h-px bg-border/50 my-1 mx-2" />
             <button
               role="menuitem"
               onClick={() => {

@@ -290,7 +290,7 @@ export function RootLayout() {
       {/* Skip to main content link for keyboard/screen reader users */}
       <a
         href="#main-content"
-        className="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:bg-primary focus:text-primary-foreground focus:p-2 focus:m-2 focus:rounded"
+        className="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:bg-primary focus:text-primary-foreground focus:p-2 focus:m-2 focus:rounded focus:outline-none focus:ring-2 focus:ring-[var(--ring-color)]"
       >
         {t("common:skipToContent")}
       </a>
@@ -387,7 +387,7 @@ export function RootLayout() {
           <div
             ref={mobileNavRef}
             id="mobile-nav"
-            className="fixed inset-0 z-40 flex flex-col gap-4 bg-background/95 px-6 pt-20 backdrop-blur-xl lg:hidden"
+            className="glass-panel fixed inset-0 z-40 flex flex-col gap-4 px-6 pt-20 lg:hidden"
             role="dialog"
             aria-modal="true"
             aria-label={t("common:mobileNav")}
@@ -397,10 +397,11 @@ export function RootLayout() {
                 <Link
                   key={to}
                   to={to}
+                  aria-current={pathname === to ? "page" : undefined}
                   className={`block rounded-2xl px-4 py-3 text-base font-medium transition-colors ${
                     pathname === to
-                      ? "bg-background text-foreground shadow-[var(--panel-shadow)]"
-                      : "text-muted-foreground hover:bg-background hover:text-foreground"
+                      ? "bg-[var(--card-bg)] text-foreground shadow-[var(--panel-shadow)]"
+                      : "text-muted-foreground hover:bg-[var(--card-bg)] hover:text-foreground"
                   }`}
                   onClick={() => setMobileNavOpen(false)}
                 >

@@ -43,7 +43,7 @@ function MetricCard({
   color?: string;
 }) {
   return (
-    <div className="rounded-2xl border border-border bg-card dark:glass-card p-5 shadow-sm">
+    <div className="rubik-panel p-5">
       <p className="text-sm text-muted-foreground">{label}</p>
       <p className={`mt-1 text-2xl font-bold ${color ?? "text-foreground"}`}>{value}</p>
       {subtitle && <p className="mt-1 text-xs text-muted-foreground">{subtitle}</p>}
@@ -226,11 +226,11 @@ function ReplaySlider({
   if (events.length === 0) return null;
 
   return (
-    <div className="rounded-2xl border border-border bg-card dark:glass-card p-5 shadow-sm">
+    <div className="rubik-panel p-5">
       <div className="mb-3 flex items-center justify-between">
-        <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+        <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
           Workspace Replay
-        </h3>
+        </h2>
         <div className="flex items-center gap-3">
           <span className="text-xs text-muted-foreground">
             {new Date(current).toLocaleString()}
@@ -484,15 +484,43 @@ export function BazdmegDashboardPage() {
         />
       </div>
 
+      {/* Empty state placeholder when no data is available */}
+      {events.length === 0 && (
+        <div className="rubik-panel p-8">
+          <h2 className="mb-2 text-base font-semibold text-foreground">No events yet</h2>
+          <p className="text-sm text-muted-foreground">
+            BAZDMEG events will appear here once the MCP workspace starts emitting telemetry. Make
+            sure the{" "}
+            <code className="rounded bg-muted px-1 py-0.5 font-mono text-xs">bazdmeg-mcp</code>{" "}
+            source is active and within the selected time window.
+          </p>
+          <div className="mt-6 grid gap-4 sm:grid-cols-3">
+            {[
+              { label: "Workspace events", desc: "workspace_enter / workspace_exit signals" },
+              { label: "Gate checks", desc: "GREEN / YELLOW / RED gate evaluations" },
+              { label: "Stuck signals", desc: "agent_stuck and stuck_resolved pairs" },
+            ].map((item) => (
+              <div key={item.label} className="rounded-xl border border-border bg-muted/40 p-4">
+                <p className="text-sm font-medium text-foreground">{item.label}</p>
+                <p className="mt-1 text-xs text-muted-foreground">{item.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       <div className="grid gap-6 lg:grid-cols-2">
         {/* Gate Results */}
-        <div className="rounded-2xl border border-border bg-card dark:glass-card p-6 shadow-sm">
-          <h3 className="mb-4 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+        <div className="rubik-panel p-6">
+          <h2 className="mb-4 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
             Latest Gate Results
-          </h3>
+          </h2>
           {latestGateResults.length === 0 ? (
-            <div className="flex h-48 items-center justify-center rounded-lg border-2 border-dashed border-border text-muted-foreground">
-              No gate checks yet
+            <div className="flex h-48 flex-col items-center justify-center gap-3 rounded-lg border-2 border-dashed border-border">
+              <p className="text-sm text-muted-foreground">No gate checks yet</p>
+              <p className="max-w-48 text-center text-xs text-muted-foreground/70">
+                Gate results will populate as the agent evaluates access rules.
+              </p>
             </div>
           ) : (
             <div className="space-y-2">
@@ -515,13 +543,16 @@ export function BazdmegDashboardPage() {
         </div>
 
         {/* Stuck Signals */}
-        <div className="rounded-2xl border border-border bg-card dark:glass-card p-6 shadow-sm">
-          <h3 className="mb-4 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+        <div className="rubik-panel p-6">
+          <h2 className="mb-4 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
             Stuck Signals
-          </h3>
+          </h2>
           {stuckSignals.length === 0 ? (
-            <div className="flex h-48 items-center justify-center rounded-lg border-2 border-dashed border-border text-muted-foreground">
-              No stuck signals
+            <div className="flex h-48 flex-col items-center justify-center gap-3 rounded-lg border-2 border-dashed border-border">
+              <p className="text-sm font-medium text-success-foreground">All clear</p>
+              <p className="max-w-48 text-center text-xs text-muted-foreground">
+                No unresolved stuck signals in the selected time window.
+              </p>
             </div>
           ) : (
             <div className="max-h-80 space-y-2 overflow-y-auto">
@@ -555,11 +586,11 @@ export function BazdmegDashboardPage() {
       </div>
 
       {/* Event Log */}
-      <div className="rounded-2xl border border-border bg-card dark:glass-card p-6 shadow-sm">
+      <div className="rubik-panel p-6">
         <div className="mb-4 flex items-center justify-between">
-          <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
             Event Log
-          </h3>
+          </h2>
           <select
             value={eventTypeFilter}
             onChange={(e) => setEventTypeFilter(e.target.value)}
@@ -573,8 +604,11 @@ export function BazdmegDashboardPage() {
           </select>
         </div>
         {filteredEvents.length === 0 ? (
-          <div className="flex h-32 items-center justify-center rounded-lg border-2 border-dashed border-border text-muted-foreground">
-            No events found
+          <div className="flex h-32 flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed border-border">
+            <p className="text-sm text-muted-foreground">No events found</p>
+            <p className="text-xs text-muted-foreground/70">
+              Try expanding the time range or changing the event type filter.
+            </p>
           </div>
         ) : (
           <div className="max-h-96 space-y-1 overflow-y-auto">

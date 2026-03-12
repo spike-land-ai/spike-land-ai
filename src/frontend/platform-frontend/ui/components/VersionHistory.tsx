@@ -72,7 +72,7 @@ export function VersionHistory({ versions }: VersionHistoryProps) {
                     {v.changeDescription}
                   </h4>
                   {v.version === latest && (
-                    <span className="inline-flex items-center rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] font-black uppercase tracking-widest text-emerald-600 dark:text-emerald-400 border border-emerald-500/10">
+                    <span className="inline-flex items-center rounded-full bg-success/10 px-2 py-0.5 text-[10px] font-black uppercase tracking-widest text-success-foreground border border-success/10">
                       Active
                     </span>
                   )}

@@ -146,7 +146,7 @@ function PackCard({ pack }: { pack: CreditPack }) {
 }
 
 export function BuyCredits() {
-  const { pricing } = usePricing();
+  const { data: pricing } = usePricing();
 
   const PACKS: CreditPack[] = [
     {

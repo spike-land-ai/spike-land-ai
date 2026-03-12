@@ -98,12 +98,13 @@ const MILESTONES: Milestone[] = [
 const KANBAN_COLS: { id: KanbanStatus; label: string; dotClass: string }[] = [
   { id: "planned", label: "Planned", dotClass: "bg-muted-foreground" },
   { id: "in-progress", label: "In Progress", dotClass: "bg-amber-500" },
-  { id: "done", label: "Done", dotClass: "bg-green-500" },
+  { id: "done", label: "Done", dotClass: "bg-success" },
 ];
 
+// Priority badge uses design system semantic tokens — no raw color values
 const PRIORITY_BADGE: Record<string, string> = {
-  high: "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400",
-  medium: "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400",
+  high: "bg-destructive/10 text-destructive",
+  medium: "bg-warning/20 text-warning-foreground",
   low: "bg-muted text-muted-foreground",
 };
 
@@ -115,10 +116,7 @@ function RoadmapBoard() {
       {KANBAN_COLS.map((col) => {
         const items = MILESTONES.filter((m) => m.status === col.id);
         return (
-          <div
-            key={col.id}
-            className="rounded-2xl border border-border bg-card dark:glass-card p-4 space-y-3"
-          >
+          <div key={col.id} className="rubik-panel p-4 space-y-3">
             <div className="flex items-center gap-2">
               <span className={`h-2 w-2 rounded-full ${col.dotClass}`} />
               <h3 className="text-sm font-semibold text-foreground">{col.label}</h3>
@@ -229,10 +227,7 @@ function CockpitChat() {
   }
 
   return (
-    <div
-      className="rounded-2xl border border-border bg-card dark:glass-card overflow-hidden flex flex-col"
-      style={{ height: "480px" }}
-    >
+    <div className="rubik-panel overflow-hidden flex flex-col" style={{ height: "480px" }}>
       <div className="flex items-center justify-between border-b border-border px-4 py-3">
         <h3 className="text-sm font-semibold text-foreground">AI Chat</h3>
         <button
@@ -292,10 +287,11 @@ interface EvalResult {
   runtimeHours?: number;
 }
 
+// Status badge uses design system semantic tokens
 const STATUS_BADGE: Record<string, string> = {
-  active: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400",
-  graduated: "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400",
-  paused: "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400",
+  active: "bg-success/15 text-success-foreground",
+  graduated: "bg-info/15 text-info-foreground",
+  paused: "bg-warning/20 text-warning-foreground",
 };
 
 function ExperimentCard({ exp }: { exp: DashboardExperiment }) {
@@ -309,7 +305,7 @@ function ExperimentCard({ exp }: { exp: DashboardExperiment }) {
     fetch(apiUrl(`/experiments/${exp.id}/metrics`))
       .then((r) => r.json() as Promise<ExperimentMetrics>)
       .then(setMetrics)
-      .catch(() => { });
+      .catch(() => {});
   }, [expanded, exp.id]);
 
   const runEvaluation = async () => {
@@ -328,7 +324,7 @@ function ExperimentCard({ exp }: { exp: DashboardExperiment }) {
   const runtimeDays = Math.round((Date.now() - exp.createdAt) / 86400000);
 
   return (
-    <div className="rounded-2xl border border-border bg-card dark:glass-card overflow-hidden">
+    <div className="rubik-panel overflow-hidden">
       <button
         onClick={() => setExpanded(!expanded)}
         className="w-full flex items-center justify-between p-4 text-left hover:bg-muted/50 transition-colors"
@@ -366,16 +362,12 @@ function ExperimentCard({ exp }: { exp: DashboardExperiment }) {
               {metrics.variants.map((v) => (
                 <tr
                   key={v.variantId}
-                  className={
-                    metrics.winner === v.variantId ? "bg-green-50 dark:bg-green-900/10" : ""
-                  }
+                  className={metrics.winner === v.variantId ? "bg-success/10" : ""}
                 >
                   <td className="py-1.5 pr-2 font-medium text-foreground">
                     {v.variantId}
                     {metrics.winner === v.variantId && (
-                      <span className="ml-1 text-green-600 dark:text-green-400 text-[10px]">
-                        winner
-                      </span>
+                      <span className="ml-1 text-success-foreground text-[10px]">winner</span>
                     )}
                   </td>
                   <td className="text-right py-1.5 px-2 text-muted-foreground">
@@ -408,7 +400,7 @@ function ExperimentCard({ exp }: { exp: DashboardExperiment }) {
                 {!evalResult.ready ? (
                   <span>{evalResult.reason}</span>
                 ) : evalResult.graduated ? (
-                  <span className="text-green-600 dark:text-green-400 font-semibold">
+                  <span className="text-success-foreground font-semibold">
                     Graduated! Winner: {evalResult.winner} (+{evalResult.improvement}%)
                   </span>
                 ) : (
@@ -438,16 +430,20 @@ function ExperimentsDashboard() {
     fetch(apiUrl("/experiments/dashboard"))
       .then((r) => r.json() as Promise<{ experiments: DashboardExperiment[]; revenue24h: number }>)
       .then(setData)
-      .catch(() => { });
+      .catch(() => {});
   }, []);
 
   if (!data) {
-    return <p className="text-sm text-muted-foreground">Loading experiments...</p>;
+    return (
+      <div className="rubik-panel p-8 flex flex-col items-center justify-center gap-3 min-h-40">
+        <p className="text-sm text-muted-foreground">Loading experiments...</p>
+      </div>
+    );
   }
 
   return (
     <div className="space-y-4">
-      <div className="rounded-2xl border border-border bg-card dark:glass-card p-4 flex items-center justify-between">
+      <div className="rubik-panel p-4 flex items-center justify-between">
         <div>
           <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
             24h Experiment Revenue
@@ -457,9 +453,16 @@ function ExperimentsDashboard() {
         <span className="text-xs text-muted-foreground">{data.experiments.length} experiments</span>
       </div>
 
-      {data.experiments.map((exp) => (
-        <ExperimentCard key={exp.id} exp={exp} />
-      ))}
+      {data.experiments.length === 0 ? (
+        <div className="rubik-panel p-8 flex flex-col items-center justify-center gap-2 min-h-32">
+          <p className="text-sm text-muted-foreground">No active experiments</p>
+          <p className="text-xs text-muted-foreground/70">
+            Create an experiment via the experiments API to start tracking variants.
+          </p>
+        </div>
+      ) : (
+        data.experiments.map((exp) => <ExperimentCard key={exp.id} exp={exp} />)
+      )}
     </div>
   );
 }
@@ -484,16 +487,16 @@ function DevHealth() {
       .then((data) => {
         if (data) setErrorSummary(data);
       })
-      .catch(() => { });
+      .catch(() => {});
   }, []);
 
   const errorCount = errorSummary?.total ?? "--";
   const errorColor = errorSummary
     ? errorSummary.total === 0
-      ? "bg-green-500"
+      ? "bg-success"
       : errorSummary.total < 10
         ? "bg-amber-500"
-        : "bg-red-500"
+        : "bg-destructive"
     : "bg-muted";
   const topCode = errorSummary?.topCodes[0];
   const errorNote = topCode
@@ -512,7 +515,7 @@ function DevHealth() {
   return (
     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
       {panels.map((p) => (
-        <div key={p.label} className="rounded-2xl border border-border bg-card dark:glass-card p-4">
+        <div key={p.label} className="rubik-panel p-4">
           <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-2">
             {p.label}
           </p>
@@ -554,7 +557,7 @@ function MetricsDashboard() {
         return r.json() as Promise<CockpitMetrics>;
       })
       .then(setData)
-      .catch(() => { });
+      .catch(() => {});
   }, []);
 
   const fmt = (n: number) => n.toLocaleString();
@@ -570,10 +573,7 @@ function MetricsDashboard() {
     <div className="space-y-4">
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {metrics.map((m) => (
-          <div
-            key={m.label}
-            className="rounded-2xl border border-border bg-card dark:glass-card p-4"
-          >
+          <div key={m.label} className="rubik-panel p-4">
             <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-1">
               {m.label}
             </p>
@@ -583,7 +583,7 @@ function MetricsDashboard() {
       </div>
 
       {data && data.recentSignups.length > 0 && (
-        <div className="rounded-2xl border border-border bg-card dark:glass-card p-4">
+        <div className="rubik-panel p-4">
           <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-3">
             Recent Signups
           </p>
@@ -601,7 +601,7 @@ function MetricsDashboard() {
       )}
 
       {data && data.recentServicePurchases.length > 0 && (
-        <div className="rounded-2xl border border-border bg-card dark:glass-card p-4">
+        <div className="rubik-panel p-4">
           <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-3">
             Service Purchases
           </p>
@@ -609,7 +609,7 @@ function MetricsDashboard() {
             {data.recentServicePurchases.map((p, i) => (
               <div key={i} className="flex items-center justify-between text-sm">
                 <div className="flex items-center gap-2">
-                  <span className="rounded-full bg-green-100 px-2 py-0.5 text-[10px] font-semibold text-green-800 dark:bg-green-900/30 dark:text-green-400">
+                  <span className="rounded-full bg-success/15 px-2 py-0.5 text-[10px] font-semibold text-success-foreground">
                     {p.service.replace(/_/g, " ")}
                   </span>
                   <span className="text-foreground">{p.email ?? "guest"}</span>
@@ -620,6 +620,16 @@ function MetricsDashboard() {
               </div>
             ))}
           </div>
+        </div>
+      )}
+
+      {/* Placeholder when no data has loaded yet */}
+      {!data && (
+        <div className="rubik-panel p-8 flex flex-col items-center justify-center gap-3 min-h-40">
+          <p className="text-sm text-muted-foreground">Loading metrics...</p>
+          <p className="text-xs text-muted-foreground/70">
+            Fetching user counts, subscriptions, MRR, and tool stats.
+          </p>
         </div>
       )}
     </div>

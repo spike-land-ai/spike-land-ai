@@ -19,6 +19,20 @@ vi.mock("@tanstack/react-router", () => ({
   ),
 }));
 
+vi.mock("react-i18next", () => ({
+  useTranslation: () => ({
+    t: (key: string) => {
+      const map: Record<string, string> = {
+        featuredApp: "Featured App",
+        getApp: "Get App",
+        free: "Free",
+        premium: "Premium",
+      };
+      return map[key] ?? key;
+    },
+  }),
+}));
+
 describe("HeroShelf", () => {
   const mockApps: McpAppSummary[] = [
     {

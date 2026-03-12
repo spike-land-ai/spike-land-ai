@@ -128,6 +128,18 @@ function formatToolResult(value: unknown): string {
   }
 }
 
+/**
+ * Transforms a raw array of thread rounds (as stored on the server) into a
+ * flat, ordered array of {@link ConversationItem} objects suitable for
+ * rendering the chat UI.
+ *
+ * Each round may contribute a user item (when `inputRole === "user"`), one or
+ * more assistant text items, and zero or more tool-call items, in the order
+ * they appear in `assistantBlocks`.
+ *
+ * @param rounds - The raw thread rounds to convert.
+ * @returns A flat list of conversation items in chronological order.
+ */
 export function buildConversationItems(rounds: ThreadRound[]): ConversationItem[] {
   const items: ConversationItem[] = [];
 
@@ -173,6 +185,26 @@ export function buildConversationItems(rounds: ThreadRound[]): ConversationItem[
   return items;
 }
 
+/**
+ * Core chat hook that manages conversation threads, streaming SSE responses,
+ * and tool-call state for the Spike AI chat interface.
+ *
+ * Handles the full lifecycle of a chat session:
+ * - Initialises by loading existing threads from the API on first mount.
+ * - Streams assistant responses via Server-Sent Events, emitting incremental
+ *   text deltas and tool-call start/end events.
+ * - Persists the current thread ID in a ref so it is always up to date inside
+ *   callbacks without causing unnecessary re-renders.
+ * - Aborts any in-flight stream when the component unmounts or when `enabled`
+ *   transitions to `false`.
+ *
+ * @param options.enabled - When `false` the hook clears all state and stops
+ *   any active stream. Defaults to `true`.
+ * @param options.persona - Optional persona identifier forwarded to the chat
+ *   API endpoint to influence model behaviour.
+ * @returns A {@link UseChatReturn} object containing conversation state and
+ *   action callbacks.
+ */
 export function useChat({ enabled = true, persona }: UseChatOptions = {}): UseChatReturn {
   const [threads, setThreads] = useState<ChatThreadSummary[]>([]);
   const [currentThreadId, setCurrentThreadId] = useState<string | null>(null);
@@ -187,6 +219,14 @@ export function useChat({ enabled = true, persona }: UseChatOptions = {}): UseCh
   const currentThreadIdRef = useRef<string | null>(null);
   const activeAssistantTextIdRef = useRef<string | null>(null);
   const didInitRef = useRef(false);
+
+  // Abort any in-flight stream on unmount to prevent state updates on an
+  // unmounted component and to release the underlying network connection.
+  useEffect(() => {
+    return () => {
+      abortRef.current?.abort();
+    };
+  }, []);
 
   useEffect(() => {
     currentThreadIdRef.current = currentThreadId;

@@ -23,12 +23,32 @@ const statusColor: Record<string, string> = {
   DEPRECATED: "bg-muted text-muted-foreground",
 };
 
+function BugCardSkeleton() {
+  return (
+    <div className="rounded-2xl border border-border bg-card p-5 shadow-sm animate-pulse">
+      <div className="flex items-start justify-between gap-2">
+        <div className="h-4 w-3/4 rounded bg-muted" />
+        <div className="h-5 w-10 shrink-0 rounded-full bg-muted" />
+      </div>
+      <div className="mt-3 flex gap-1.5">
+        <div className="h-4 w-16 rounded-full bg-muted" />
+        <div className="h-4 w-14 rounded-full bg-muted" />
+        <div className="h-4 w-20 rounded-full bg-muted" />
+      </div>
+      <div className="mt-3 flex gap-4">
+        <div className="h-3 w-16 rounded bg-muted" />
+        <div className="h-3 w-24 rounded bg-muted" />
+      </div>
+    </div>
+  );
+}
+
 function BugCard({ bug }: { bug: Bug }) {
   return (
     <Link
       to="/bugbook/$bugId"
       params={{ bugId: bug.id }}
-      className="group block rounded-2xl border border-border bg-card dark:glass-card p-5 shadow-sm transition hover:shadow-md hover:bg-muted/50"
+      className="group block rounded-2xl border border-border bg-card p-5 shadow-sm transition hover:shadow-md hover:bg-muted/50"
     >
       <div className="flex items-start justify-between gap-2">
         <h3 className="font-semibold leading-tight text-foreground group-hover:text-primary">
@@ -85,28 +105,29 @@ export function BugbookIndexPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      {/* Page header with cross-links */}
+      <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h1 className="text-2xl font-bold text-foreground">Bugbook</h1>
           <p className="text-sm text-muted-foreground">Public bug tracker with ELO ranking</p>
         </div>
-        <div className="flex gap-2">
+        <nav aria-label="Bugbook navigation" className="flex flex-wrap gap-2">
           <Link
             to="/bugbook/my-reports"
-            className="rounded-lg bg-info text-info-foreground px-3 py-1.5 text-sm font-medium hover:bg-info/80"
+            className="rounded-lg bg-secondary text-secondary-foreground px-3 py-1.5 text-sm font-medium hover:bg-secondary/80 transition-colors"
           >
             My Reports
           </Link>
           <Link
             to="/bugbook/leaderboard"
-            className="rounded-lg bg-info text-info-foreground px-3 py-1.5 text-sm font-medium hover:bg-info/80"
+            className="rounded-lg bg-secondary text-secondary-foreground px-3 py-1.5 text-sm font-medium hover:bg-secondary/80 transition-colors"
           >
             Leaderboard
           </Link>
           <span className="rounded-lg bg-success text-success-foreground px-3 py-1.5 text-xs font-medium flex items-center">
             {data?.total ?? 0} bugs
           </span>
-        </div>
+        </nav>
       </div>
 
       <input
@@ -118,7 +139,7 @@ export function BugbookIndexPage() {
       />
 
       <div className="flex flex-wrap items-center gap-3">
-        <div className="flex flex-wrap gap-1.5">
+        <div className="flex flex-wrap gap-1.5" role="group" aria-label="Filter by status">
           {STATUSES.map((s) => (
             <button
               key={s}
@@ -134,7 +155,7 @@ export function BugbookIndexPage() {
           ))}
         </div>
 
-        <div className="ml-auto flex gap-1.5">
+        <div className="ml-auto flex gap-1.5" role="group" aria-label="Sort order">
           {SORTS.map((s) => (
             <button
               key={s.value}
@@ -152,8 +173,14 @@ export function BugbookIndexPage() {
       </div>
 
       {isLoading && (
-        <div className="flex justify-center py-12">
-          <div className="h-8 w-8 animate-spin rounded-full border-2 border-border border-t-primary" />
+        <div
+          className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
+          aria-busy="true"
+          aria-label="Loading bugs"
+        >
+          {Array.from({ length: 6 }).map((_, i) => (
+            <BugCardSkeleton key={i} />
+          ))}
         </div>
       )}
 
@@ -169,11 +196,13 @@ export function BugbookIndexPage() {
         </div>
       )}
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {filtered.map((bug) => (
-          <BugCard key={bug.id} bug={bug} />
-        ))}
-      </div>
+      {!isLoading && !isError && filtered.length > 0 && (
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {filtered.map((bug) => (
+            <BugCard key={bug.id} bug={bug} />
+          ))}
+        </div>
+      )}
     </div>
   );
 }

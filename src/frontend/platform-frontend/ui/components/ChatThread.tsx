@@ -53,10 +53,18 @@ const MessageItem = memo(function MessageItem({ msg }: { msg: Message }) {
         {msg.role === "assistant" && (
           <button
             onClick={handleCopy}
-            className="absolute -right-8 top-0 p-1.5 opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-primary"
+            aria-label="Copy message"
             title="Copy message"
+            className="absolute -right-8 top-0 p-1.5 opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-primary"
           >
-            {copied ? <Check className="size-3.5 text-green-500" /> : <Copy className="size-3.5" />}
+            <span aria-live="assertive" className="sr-only">
+              {copied ? "Copied" : ""}
+            </span>
+            {copied ? (
+              <Check className="size-3.5 text-[var(--success-color)]" />
+            ) : (
+              <Copy className="size-3.5" />
+            )}
           </button>
         )}
 
@@ -158,12 +166,14 @@ export function ChatThread({ messages, onSendMessage, isLoading }: ChatThreadPro
             onKeyDown={handleKeyDown}
             placeholder="Describe what you want to build..."
             rows={1}
+            aria-label="Chat message input"
             className="flex-1 resize-none rounded-xl border border-border bg-muted/50 px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:bg-card focus:outline-none focus:ring-4 focus:ring-primary/5 transition-all min-h-[46px]"
           />
           <Button
             onClick={handleSend}
             disabled={!input.trim() || isLoading}
             size="icon"
+            aria-label="Send message"
             className="shrink-0 size-[46px] rounded-xl shadow-lg shadow-primary/20"
           >
             <Send className="size-4" />

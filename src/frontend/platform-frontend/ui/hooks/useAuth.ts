@@ -9,10 +9,55 @@ export interface AppUser {
   preferred_username: string | null;
 }
 
+interface SessionUser {
+  id: string;
+  name: string | null;
+  email: string;
+  image: string | null;
+}
+
+interface SessionData {
+  user: SessionUser;
+}
+
 interface SessionResult {
-  data: { user: { id: string; name: string | null; email: string; image: string | null } } | null;
+  data: SessionData | null;
   isPending: boolean;
   error: Error | null;
+}
+
+type AuthProvider = "github" | "google";
+
+const VALID_PROVIDERS: ReadonlySet<string> = new Set<AuthProvider>(["github", "google"]);
+
+/**
+ * Narrows an unknown value to `Error`. Returns `null` if the value is nullish,
+ * wraps plain strings/objects in an `Error` otherwise.
+ */
+function toError(value: unknown): Error | null {
+  if (value == null) return null;
+  if (value instanceof Error) return value;
+  if (typeof value === "string") return new Error(value);
+  return new Error("Authentication error");
+}
+
+/**
+ * Checks whether a raw value from `authClient.useSession()` has the shape of
+ * `SessionData`. Avoids a blind `as` cast.
+ */
+function isSessionData(value: unknown): value is SessionData {
+  if (value == null || typeof value !== "object") return false;
+  const obj = value as Record<string, unknown>;
+  if (obj["user"] == null || typeof obj["user"] !== "object") return false;
+  const user = obj["user"] as Record<string, unknown>;
+  return typeof user["id"] === "string" && typeof user["email"] === "string";
+}
+
+/**
+ * Returns `true` when `provider` is one of the accepted OAuth providers.
+ */
+function isAuthProvider(provider: string): provider is AuthProvider {
+  return VALID_PROVIDERS.has(provider);
 }
 
 function useSafeSession(): SessionResult {
@@ -20,8 +65,9 @@ function useSafeSession(): SessionResult {
   const [authError, setAuthError] = useState<Error | null>(null);
 
   useEffect(() => {
-    if (result.error && !authError) {
-      setAuthError(result.error as Error);
+    const err = toError(result.error);
+    if (err && !authError) {
+      setAuthError(err);
     }
   }, [result.error, authError]);
 
@@ -30,27 +76,36 @@ function useSafeSession(): SessionResult {
   }
 
   return {
-    data: result.data as SessionResult["data"],
+    data: isSessionData(result.data) ? result.data : null,
     isPending: result.isPending,
-    error: result.error as Error | null,
+    error: toError(result.error),
   };
 }
 
+/**
+ * Provides authentication state and actions for the current user session.
+ *
+ * @returns `user` — mapped `AppUser` or `null` when unauthenticated.
+ * @returns `isAuthenticated` — `true` when a valid session exists.
+ * @returns `isLoading` — `true` while the session is being fetched.
+ * @returns `error` — any auth error surfaced from the session provider.
+ * @returns `login` — initiates an OAuth sign-in flow.
+ * @returns `logout` — signs the current user out.
+ */
 export function useAuth() {
   const { data: session, isPending, error } = useSafeSession();
 
   const isAuthenticated = !!session?.user;
 
   const login = useCallback((provider?: string) => {
-    if (!provider) {
-      // Default to github if no provider specified
-      provider = "github";
-    }
+    const resolvedProvider: AuthProvider =
+      provider && isAuthProvider(provider) ? provider : "github";
+
     // Validate returnUrl is a relative path to prevent open-redirect (CWE-601)
     const returnParam = new URLSearchParams(window.location.search).get("returnUrl");
     const callbackURL = returnParam && returnParam.startsWith("/") ? returnParam : "/";
     return authClient.signIn.social({
-      provider: provider as "github" | "google",
+      provider: resolvedProvider,
       callbackURL,
     });
   }, []);

@@ -3,6 +3,26 @@ import { useEffect, useRef } from "react";
 const FOCUSABLE =
   'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
+/**
+ * Returns `true` when `el` is an `HTMLElement` that can receive `.focus()`.
+ * Use this guard instead of a bare `as HTMLElement` cast when the source is
+ * `document.activeElement` (which has type `Element | null`).
+ */
+function isHTMLElement(el: Element | null): el is HTMLElement {
+  return el instanceof HTMLElement;
+}
+
+/**
+ * Traps keyboard focus within a container element when `active` is `true`.
+ *
+ * - Moves focus to the first focusable child on activation.
+ * - Cycles focus on Tab / Shift+Tab at the boundary.
+ * - Calls `onClose` and restores focus to the trigger element on Escape.
+ *
+ * @param active - Whether the focus trap should currently be active.
+ * @param onClose - Optional callback invoked when the Escape key is pressed.
+ * @returns A ref to attach to the container `<div>`.
+ */
 export function useFocusTrap(active: boolean, onClose?: () => void) {
   const containerRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLElement | null>(null);
@@ -10,7 +30,9 @@ export function useFocusTrap(active: boolean, onClose?: () => void) {
   useEffect(() => {
     if (!active) return;
 
-    triggerRef.current = document.activeElement as HTMLElement | null;
+    const activeEl = document.activeElement;
+    triggerRef.current = isHTMLElement(activeEl) ? activeEl : null;
+
     const container = containerRef.current;
     if (!container) return;
 

@@ -7,6 +7,7 @@ export function AppFooter() {
 
   return (
     <footer
+      role="contentinfo"
       className="mt-24 px-4 pb-8 pt-8"
       style={{ contentVisibility: "auto", containIntrinsicSize: "auto 500px" }}
     >
@@ -19,12 +20,9 @@ export function AppFooter() {
             </span>
             <div className="space-y-3">
               <h2 className="text-3xl font-semibold tracking-[-0.05em] text-foreground sm:text-4xl">
-                One product layer for chat, tools, docs, and deployment.
+                {t("heroTitle")}
               </h2>
-              <p className="rubik-lede">
-                spike.land turns MCP capability into real software surfaces with shared auth,
-                observability, and edge-native runtime defaults.
-              </p>
+              <p className="rubik-lede">{t("heroBody")}</p>
             </div>
           </div>
 
@@ -71,7 +69,7 @@ export function AppFooter() {
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex h-10 w-10 items-center justify-center rounded-2xl border border-border bg-card text-muted-foreground transition-colors hover:border-primary/30 hover:text-primary"
-                  aria-label="Visit our GitHub"
+                  aria-label={t("ariaGitHub")}
                 >
                   <Github className="size-4" />
                   <span className="sr-only">GitHub</span>
@@ -81,7 +79,7 @@ export function AppFooter() {
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex h-10 w-10 items-center justify-center rounded-2xl border border-border bg-card text-muted-foreground transition-colors hover:border-primary/30 hover:text-primary"
-                  aria-label="Follow us on Twitter"
+                  aria-label={t("ariaTwitter")}
                 >
                   <Twitter className="size-4" />
                   <span className="sr-only">Twitter</span>
@@ -89,7 +87,7 @@ export function AppFooter() {
                 <a
                   href="mailto:zoltan.erdos@spike.land"
                   className="flex h-10 w-10 items-center justify-center rounded-2xl border border-border bg-card text-muted-foreground transition-colors hover:border-primary/30 hover:text-primary"
-                  aria-label="Email us"
+                  aria-label={t("ariaEmail")}
                 >
                   <Mail className="size-4" />
                   <span className="sr-only">Email</span>

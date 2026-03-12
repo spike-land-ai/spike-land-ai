@@ -58,7 +58,7 @@ export function AppSessionPage() {
       appName: app.name,
       category: app.category ?? "",
     });
-  }, [appSlug, app?.name]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [appSlug, app?.name, app?.category]);
 
   const { session, recordToolResult, resetSession, isToolAvailable } = useAppSession(
     appSlug as string,

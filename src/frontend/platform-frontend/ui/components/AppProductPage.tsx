@@ -143,7 +143,7 @@ export function AppProductPage({ appId }: AppProductPageProps) {
       </nav>
 
       {/* Header Section */}
-      <section className="rubik-panel-strong flex flex-col gap-8 p-6 sm:p-8 lg:flex-row lg:items-end lg:justify-between">
+      <section className="rubik-panel rubik-panel-strong flex flex-col gap-8 p-6 sm:p-8 lg:flex-row lg:items-end lg:justify-between">
         <div className="max-w-3xl space-y-6">
           <div className="rubik-eyebrow">
             <Terminal className="h-3.5 w-3.5" />
@@ -237,7 +237,7 @@ export function AppProductPage({ appId }: AppProductPageProps) {
       )}
 
       {/* Main Content Grid */}
-      <div className="grid gap-8 lg:grid-cols-[minmax(0,1.35fr)_minmax(19rem,0.75fr)]">
+      <div className="grid gap-6 sm:gap-8 lg:grid-cols-[minmax(0,1.35fr)_minmax(19rem,0.75fr)]">
         <section className="space-y-6">
           <div className="space-y-2">
             <p className="text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground">
@@ -248,7 +248,7 @@ export function AppProductPage({ appId }: AppProductPageProps) {
             </h2>
           </div>
 
-          <div className="grid gap-4 sm:grid-cols-2">
+          <div className="grid gap-4 grid-cols-1 sm:grid-cols-2">
             {meta.capabilities.map((capability, i) => {
               const Icon = CAPABILITY_ICONS[i % CAPABILITY_ICONS.length] ?? Shield;
               return (
@@ -327,7 +327,7 @@ export function AppProductPage({ appId }: AppProductPageProps) {
             </div>
           </div>
 
-          <div className="rubik-panel-muted rubik-panel p-6 text-left">
+          <div className="rubik-panel rubik-panel-muted p-6 text-left">
             <div className="space-y-3">
               <div className="rubik-icon-badge h-12 w-12">
                 <Zap className="size-5" />

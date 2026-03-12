@@ -4,6 +4,9 @@ export type ThemePreference = "light" | "dark";
 
 const STORAGE_KEY = "theme-preference";
 
+/**
+ * Returns `true` when `value` is a valid `ThemePreference` string.
+ */
 function isThemePreference(value: string | null): value is ThemePreference {
   return value === "light" || value === "dark";
 }
@@ -34,6 +37,15 @@ const dispatchThemeChange = (theme: ThemePreference) => {
   );
 };
 
+/**
+ * Manages the user's dark/light theme preference with localStorage persistence
+ * and cross-tab synchronisation via the `storage` event.
+ *
+ * @returns `isDarkMode` — `true` when the active theme is dark.
+ * @returns `theme` — the current `ThemePreference` value.
+ * @returns `setTheme` — explicitly sets the theme and persists it.
+ * @returns `toggleTheme` — flips between light and dark.
+ */
 export const useDarkMode = () => {
   const [theme, setThemeState] = useState<ThemePreference>(getInitialTheme);
   const isDarkMode = theme === "dark";

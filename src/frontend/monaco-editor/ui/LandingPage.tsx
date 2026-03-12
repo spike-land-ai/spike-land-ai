@@ -22,7 +22,7 @@ export default function Home() {
       {/* Ambient mesh gradient layer — static, non-interactive */}
       <div
         aria-hidden="true"
-        className="pointer-events-none fixed inset-0 z-0 overflow-hidden opacity-50 dark:opacity-100"
+        className="pointer-events-none fixed inset-0 z-0 overflow-hidden opacity-100"
       >
         {/* Top-left violet orb */}
         <div className="absolute -top-40 -left-40 h-[700px] w-[700px] rounded-full bg-violet-600/10 blur-[180px]" />

@@ -43,7 +43,7 @@ export function LoginPage() {
 
   return (
     <div className="flex min-h-[60vh] items-center justify-center">
-      <div className="w-full max-w-sm space-y-6 rounded-2xl border border-border bg-card dark:glass-card p-8 shadow-sm">
+      <div className="w-full max-w-sm space-y-6 rounded-2xl border border-border bg-card p-8 shadow-[var(--panel-shadow)]">
         <div className="text-center">
           <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-primary text-xl font-bold text-primary-foreground shadow-lg shadow-primary/20">
             S
@@ -54,6 +54,7 @@ export function LoginPage() {
 
         {error && (
           <div
+            id="auth-error"
             role="alert"
             className="rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive"
           >
@@ -68,6 +69,7 @@ export function LoginPage() {
               login("github");
             }}
             disabled={isLoading}
+            aria-describedby={error ? "auth-error" : undefined}
             className="flex w-full items-center justify-center gap-2 rounded-lg bg-foreground px-4 py-2.5 text-sm font-medium text-background hover:bg-foreground/90 disabled:opacity-50 transition-colors"
           >
             <GitHubIcon />
@@ -79,6 +81,7 @@ export function LoginPage() {
               login("google");
             }}
             disabled={isLoading}
+            aria-describedby={error ? "auth-error" : undefined}
             className="flex w-full items-center justify-center gap-2 rounded-lg border border-border bg-card px-4 py-2.5 text-sm font-medium text-foreground hover:bg-muted disabled:opacity-50 transition-colors"
           >
             <GoogleIcon />

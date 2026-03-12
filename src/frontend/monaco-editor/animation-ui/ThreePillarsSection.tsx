@@ -2,7 +2,7 @@
 
 import { Link } from "../lazy-imports/link";
 import { ArrowRight, Blocks, Layout, Sparkles, Terminal } from "lucide-react";
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 
 const pillars = [
   {
@@ -12,15 +12,13 @@ const pillars = [
     icon: Terminal,
     cta: "Start Deploying",
     href: "/create",
-    accent: "cyan",
-    gradient: "from-cyan-500/10 to-transparent hover:from-cyan-500/15",
-    border: "border-white/[0.04] hover:border-cyan-500/40",
-    iconBg:
-      "bg-gradient-to-br from-cyan-400/20 to-cyan-600/30 backdrop-blur-md shadow-[0_0_30px_rgba(6,182,212,0.5)]",
-    iconColor: "text-cyan-300",
-    ctaColor: "text-cyan-400 group-hover:text-cyan-300",
+    gradient: "from-accent/10 to-transparent hover:from-accent/15",
+    border: "border-white/[0.04] hover:border-accent/40",
+    iconBg: "bg-gradient-to-br from-accent/20 to-accent/30 backdrop-blur-md shadow-glow-cyan",
+    iconColor: "text-accent",
+    ctaColor: "text-accent/80 group-hover:text-accent",
     shadow: "hover:shadow-[0_8px_40px_-12px_rgba(6,182,212,0.4)]",
-    pulseBg: "bg-cyan-400",
+    pulseBg: "bg-accent",
   },
   {
     title: "App Marketplace",
@@ -29,15 +27,13 @@ const pillars = [
     icon: Blocks,
     cta: "Browse Toolsets",
     href: "/mcp",
-    accent: "purple",
-    gradient: "from-purple-500/10 to-transparent hover:from-purple-500/15",
-    border: "border-white/[0.04] hover:border-purple-500/40",
-    iconBg:
-      "bg-gradient-to-br from-purple-400/20 to-purple-600/30 backdrop-blur-md shadow-[0_0_30px_rgba(168,85,247,0.5)]",
-    iconColor: "text-purple-300",
-    ctaColor: "text-purple-400 group-hover:text-purple-300",
+    gradient: "from-primary/10 to-transparent hover:from-primary/15",
+    border: "border-white/[0.04] hover:border-primary/40",
+    iconBg: "bg-gradient-to-br from-primary/20 to-primary/30 backdrop-blur-md shadow-glow-primary",
+    iconColor: "text-primary",
+    ctaColor: "text-primary/80 group-hover:text-primary",
     shadow: "hover:shadow-[0_8px_40px_-12px_rgba(168,85,247,0.4)]",
-    pulseBg: "bg-purple-400",
+    pulseBg: "bg-primary",
   },
   {
     title: "Meet Spike",
@@ -46,52 +42,53 @@ const pillars = [
     icon: Sparkles,
     cta: "Try Spike",
     href: "/chat",
-    accent: "emerald",
-    gradient: "from-emerald-500/10 to-transparent hover:from-emerald-500/15",
-    border: "border-white/[0.04] hover:border-emerald-500/40",
+    gradient: "from-aurora-green/10 to-transparent hover:from-aurora-green/15",
+    border: "border-white/[0.04] hover:border-aurora-green/40",
     iconBg:
-      "bg-gradient-to-br from-emerald-400/20 to-emerald-600/30 backdrop-blur-md shadow-[0_0_30px_rgba(16,185,129,0.5)]",
-    iconColor: "text-emerald-300",
-    ctaColor: "text-emerald-400 group-hover:text-emerald-300",
+      "bg-gradient-to-br from-aurora-green/20 to-aurora-green/30 backdrop-blur-md shadow-[0_0_30px_rgba(16,185,129,0.5)]",
+    iconColor: "text-aurora-green",
+    ctaColor: "text-aurora-green/80 group-hover:text-aurora-green",
     shadow: "hover:shadow-[0_8px_40px_-12px_rgba(16,185,129,0.4)]",
-    pulseBg: "bg-emerald-400",
+    pulseBg: "bg-aurora-green",
   },
 ];
 
-const containerVariants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: { staggerChildren: 0.15 },
-  },
-};
-
-const itemVariants = {
-  hidden: { opacity: 0, filter: "blur(10px)", y: 24 },
-  visible: {
-    opacity: 1,
-    filter: "blur(0px)",
-    y: 0,
-    transition: { duration: 0.6, ease: "easeOut" as const },
-  },
-};
-
-const headerVariants = {
-  hidden: { opacity: 0, y: 20 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.6, ease: "easeOut" as const },
-  },
-};
-
 export function ThreePillarsSection() {
+  const shouldReduceMotion = useReducedMotion();
+
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: { staggerChildren: shouldReduceMotion ? 0 : 0.15 },
+    },
+  };
+
+  const itemVariants = {
+    hidden: shouldReduceMotion ? { opacity: 0 } : { opacity: 0, filter: "blur(10px)", y: 24 },
+    visible: {
+      opacity: 1,
+      filter: "blur(0px)",
+      y: 0,
+      transition: { duration: shouldReduceMotion ? 0.2 : 0.6, ease: "easeOut" as const },
+    },
+  };
+
+  const headerVariants = {
+    hidden: shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: shouldReduceMotion ? 0.2 : 0.6, ease: "easeOut" as const },
+    },
+  };
+
   return (
     <section className="relative py-32 overflow-hidden bg-background">
       {/* Abstract blurred background mesh for the section */}
       <div className="absolute inset-0 bg-background">
-        <div className="absolute top-0 right-1/4 w-[500px] h-[500px] bg-purple-500/10 blur-[120px] rounded-full pointer-events-none mix-blend-multiply dark:mix-blend-screen" />
-        <div className="absolute bottom-1/4 left-1/4 w-[600px] h-[600px] bg-cyan-500/10 blur-[130px] rounded-full pointer-events-none mix-blend-multiply dark:mix-blend-screen" />
+        <div className="absolute top-0 right-1/4 w-[500px] h-[500px] bg-primary/10 blur-[120px] rounded-full pointer-events-none mix-blend-screen" />
+        <div className="absolute bottom-1/4 left-1/4 w-[600px] h-[600px] bg-accent/10 blur-[130px] rounded-full pointer-events-none mix-blend-screen" />
       </div>
 
       <div className="container relative mx-auto px-4 z-10">
@@ -126,13 +123,13 @@ export function ThreePillarsSection() {
             <motion.div
               key={pillar.title}
               variants={itemVariants}
-              whileHover={{ scale: 1.02 }}
+              {...(shouldReduceMotion ? {} : { whileHover: { scale: 1.02 } })}
               className="h-full"
               style={{ originY: 0.5 }}
             >
               <Link
                 href={pillar.href}
-                className="block h-full group focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500 rounded-[28px] relative"
+                className="block h-full group focus:outline-none focus-visible:ring-2 focus-visible:ring-accent rounded-[28px] relative"
               >
                 {/* Animated Hover Gradient Border */}
                 <div
@@ -142,7 +139,7 @@ export function ThreePillarsSection() {
                 />
 
                 <div
-                  className={`relative h-full flex flex-col p-7 sm:p-8 rounded-[32px] bg-card/80 bg-gradient-to-b ${pillar.gradient} border border-border backdrop-blur-3xl transition-all duration-500 hover:-translate-y-3 group-hover:bg-card/60 ${pillar.shadow} z-10 overflow-hidden shadow-2xl`}
+                  className={`relative h-full flex flex-col p-7 sm:p-8 rounded-[32px] glass-card bg-gradient-to-b ${pillar.gradient} border border-border transition-all duration-500 hover:-translate-y-3 group-hover:bg-card/60 ${pillar.shadow} z-10 overflow-hidden shadow-2xl`}
                 >
                   <div className="absolute inset-0 rounded-[28px] bg-card/60 -z-10" />
 

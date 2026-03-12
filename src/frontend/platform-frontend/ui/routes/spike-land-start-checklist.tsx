@@ -385,13 +385,12 @@ export function SpikeLandStartChecklistPage() {
                     let btnClass = "border-border hover:bg-muted/50";
                     if (showCorrectness) {
                       if (isSelected && isCorrectOption)
-                        btnClass =
-                          "border-emerald-500 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400";
+                        btnClass = "border-success bg-success/10 text-success-foreground";
                       else if (isSelected && !isCorrectOption)
-                        btnClass = "border-red-500 bg-red-500/10 text-red-600 dark:text-red-400";
-                      else if (isCorrectOption)
                         btnClass =
-                          "border-emerald-500/50 border-dashed text-emerald-600 dark:text-emerald-400";
+                          "border-destructive bg-destructive/10 text-destructive-foreground";
+                      else if (isCorrectOption)
+                        btnClass = "border-success/50 border-dashed text-success-foreground";
                     }
 
                     return (
@@ -413,7 +412,7 @@ export function SpikeLandStartChecklistPage() {
 
         {Object.keys(quizAnswers).length === QUIZ_QUESTIONS.length && (
           <div
-            className={`mt-8 rounded-xl p-6 text-center ${isQuizPassed ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400" : "bg-red-500/10 text-red-600 dark:text-red-400"}`}
+            className={`mt-8 rounded-xl p-6 text-center ${isQuizPassed ? "bg-success/10 text-success-foreground" : "bg-destructive/10 text-destructive-foreground"}`}
           >
             <div className="text-3xl font-bold mb-2">
               {quizScore} / {QUIZ_QUESTIONS.length}

@@ -187,7 +187,7 @@ export function WelcomeModal({ userName }: WelcomeModalProps) {
       aria-modal="true"
       aria-label="Welcome to spike.land"
     >
-      <div className="w-full max-w-lg rounded-3xl bg-card dark:glass-card border border-border shadow-2xl overflow-hidden animate-in zoom-in-95 slide-in-from-bottom-4 duration-300">
+      <div className="w-full max-w-lg rounded-3xl bg-card glass-card border border-border shadow-2xl overflow-hidden animate-in zoom-in-95 slide-in-from-bottom-4 duration-300">
         {/* Header */}
         <div className="border-b border-border/50 px-6 py-5 bg-muted/30">
           <div className="flex items-center justify-between">
