@@ -4,7 +4,6 @@
   "dependencies": [
     "@radix-ui/react-slot",
     "class-variance-authority",
-    "clsx",
     "lucide-react",
     "react",
     "tailwind-merge"

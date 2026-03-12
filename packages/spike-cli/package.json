@@ -18,8 +18,8 @@
     }
   },
   "scripts": {
-    "prepack": "tsup cli.ts index.ts --format esm,cjs --dts --clean",
-    "build": "tsup cli.ts index.ts --format esm,cjs --dts --clean",
+    "prepack": "tsup cli.ts index.ts --format esm,cjs --dts --clean && chmod +x dist/cli.js dist/cli.cjs && node ./scripts/verify-bin.mjs",
+    "build": "tsup cli.ts index.ts --format esm,cjs --dts --clean && chmod +x dist/cli.js dist/cli.cjs && node ./scripts/verify-bin.mjs",
     "dev": "tsx cli.ts",
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",

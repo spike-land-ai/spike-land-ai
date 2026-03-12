@@ -1,4 +1,28 @@
-import fetchBuilder from "fetch-retry";
+function createFetchWithRetry(
+  retries: number,
+  retryDelay: number,
+  retryOn: number[],
+): typeof fetch {
+  return async (input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
+    let lastError: unknown;
+    for (let attempt = 0; attempt <= retries; attempt++) {
+      try {
+        const response = await fetch(input, init);
+        if (retryOn.includes(response.status) && attempt < retries) {
+          await new Promise((r) => setTimeout(r, retryDelay));
+          continue;
+        }
+        return response;
+      } catch (error) {
+        lastError = error;
+        if (attempt < retries) {
+          await new Promise((r) => setTimeout(r, retryDelay));
+        }
+      }
+    }
+    throw lastError;
+  };
+}
 
 export class QueuedFetch {
   private queue: Array<() => Promise<void>> = [];
@@ -6,20 +30,16 @@ export class QueuedFetch {
   private maxConcurrent: number;
   private limitedNumberOfRequests = false;
   private maxNumberOfRequests: number;
-  private retries: number;
-  private retryDelay: number;
   private fetchWithRetry: typeof fetch;
 
   constructor(maxConcurrent = 5, maxNumberOfRequests = 0, _retries = 3, _retryDelay = 300) {
-    this.retries = _retries;
-    this.retryDelay = _retryDelay;
     this.maxNumberOfRequests = maxNumberOfRequests;
     this.maxConcurrent = maxConcurrent;
-    this.fetchWithRetry = fetchBuilder(fetch, {
-      retries: this.retries,
-      retryDelay: this.retryDelay,
-      retryOn: [429, 500, 503, 504, 408, 413, 431, 451, 502],
-    });
+    this.fetchWithRetry = createFetchWithRetry(
+      _retries,
+      _retryDelay,
+      [429, 500, 503, 504, 408, 413, 431, 451, 502],
+    );
     if (maxNumberOfRequests > 0) {
       this.limitedNumberOfRequests = true;
     }
@@ -35,7 +55,6 @@ export class QueuedFetch {
 
       const request = async () => {
         try {
-          // Directly use fetchWithRetry, as it handles the retries=0 case.
           const response = await this.fetchWithRetry(input, init);
           resolve(response);
         } catch (error) {
@@ -53,12 +72,9 @@ export class QueuedFetch {
 
   private processQueue() {
     while (this.ongoingRequests < this.maxConcurrent && this.queue.length > 0) {
-      // Array.shift() performance is generally acceptable in V8 for moderate queue sizes.
-      // Replacing it might add complexity without significant gains unless profiling proves otherwise.
       const request = this.queue.shift();
       if (request) {
         this.ongoingRequests++;
-        // No need to await here; the request function handles its own lifecycle.
         request();
       }
     }

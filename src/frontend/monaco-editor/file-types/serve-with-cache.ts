@@ -1,6 +1,44 @@
 import { md5 } from "../crypto-data-structures/md5";
 import { routes } from "../core-logic/lib/routes";
-import { lookup } from "mime-types";
+const MIME_TYPES: Record<string, string> = {
+  ".html": "text/html",
+  ".htm": "text/html",
+  ".css": "text/css",
+  ".js": "application/javascript",
+  ".mjs": "application/javascript",
+  ".cjs": "application/javascript",
+  ".json": "application/json",
+  ".ts": "application/typescript",
+  ".tsx": "application/typescript",
+  ".jsx": "application/javascript",
+  ".wasm": "application/wasm",
+  ".svg": "image/svg+xml",
+  ".png": "image/png",
+  ".jpg": "image/jpeg",
+  ".jpeg": "image/jpeg",
+  ".gif": "image/gif",
+  ".webp": "image/webp",
+  ".ico": "image/x-icon",
+  ".txt": "text/plain",
+  ".xml": "text/xml",
+  ".pdf": "application/pdf",
+  ".zip": "application/zip",
+  ".map": "application/json",
+  ".woff": "font/woff",
+  ".woff2": "font/woff2",
+  ".ttf": "font/ttf",
+  ".otf": "font/otf",
+  ".eot": "application/vnd.ms-fontobject",
+  ".mp4": "video/mp4",
+  ".webm": "video/webm",
+  ".mp3": "audio/mpeg",
+  ".wav": "audio/wav",
+};
+
+function lookup(path: string): string | false {
+  const ext = path.slice(path.lastIndexOf(".")).toLowerCase();
+  return MIME_TYPES[ext] || false;
+}
 
 // Simplified getContentType function
 function getContentType(path: string) {

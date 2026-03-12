@@ -1,4 +1,47 @@
-import { fnv1a, sampleBeta } from "@spike-land-ai/shared";
+/** FNV-1a hash — fast, non-cryptographic 32-bit hash. */
+function fnv1a(str: string): number {
+  let hash = 0x811c9dc5;
+  for (let i = 0; i < str.length; i++) {
+    hash ^= str.charCodeAt(i);
+    hash = (hash * 0x01000193) >>> 0;
+  }
+  return hash;
+}
+
+/** Standard normal variate via Box-Muller transform. */
+function randn(): number {
+  const u1 = Math.random();
+  const u2 = Math.random();
+  return Math.sqrt(-2 * Math.log(u1)) * Math.cos(2 * Math.PI * u2);
+}
+
+/** Gamma distribution sample using Marsaglia and Tsang's method. */
+function sampleGamma(shape: number): number {
+  if (shape < 1) {
+    return sampleGamma(shape + 1) * Math.pow(Math.random(), 1 / shape);
+  }
+  const d = shape - 1 / 3;
+  const c = 1 / Math.sqrt(9 * d);
+  for (;;) {
+    let x: number;
+    let v: number;
+    do {
+      x = randn();
+      v = 1 + c * x;
+    } while (v <= 0);
+    v = v * v * v;
+    const u = Math.random();
+    if (u < 1 - 0.0331 * (x * x) * (x * x)) return d * v;
+    if (Math.log(u) < 0.5 * x * x + d * (1 - v + Math.log(v))) return d * v;
+  }
+}
+
+/** Beta distribution sample via ratio of two Gamma samples. */
+function sampleBeta(alpha: number, beta: number): number {
+  const x = sampleGamma(alpha);
+  const y = sampleGamma(beta);
+  return x / (x + y);
+}
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 

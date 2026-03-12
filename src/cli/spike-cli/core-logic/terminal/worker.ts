@@ -79,7 +79,7 @@ class TerminalWorkerRuntime {
     this.sessionState.loadSnapshot(snapshot?.sessionState);
     this.assertionRuntime.loadSnapshot(snapshot?.runtime);
     this.registry.loadSnapshot(snapshot?.registry);
-    this.currentTurn = snapshot?.pendingTurn ?? null;
+    this.currentTurn = isResumablePendingTurn(snapshot?.pendingTurn) ? snapshot.pendingTurn : null;
 
     this.send({
       type: "child_ready",
@@ -88,13 +88,13 @@ class TerminalWorkerRuntime {
       resumed: !!snapshot,
     });
 
-    if (snapshot?.pendingTurn) {
+    if (this.currentTurn) {
       this.send({
         type: "child_restored",
         sessionId: options.sessionId,
-        pendingTurn: snapshot.pendingTurn,
+        pendingTurn: this.currentTurn,
       });
-      await this.resumePendingTurn(snapshot.pendingTurn);
+      await this.resumePendingTurn(this.currentTurn);
       return;
     }
 
@@ -159,9 +159,9 @@ class TerminalWorkerRuntime {
 
     try {
       await continueAgentLoop(this.buildAgentLoopContext());
-      this.completeTurn();
+      await this.completeTurn();
     } catch (error) {
-      this.failTurn(error);
+      await this.failTurn(error);
     }
   }
 
@@ -181,9 +181,9 @@ class TerminalWorkerRuntime {
 
     try {
       await runAgentLoop(input, this.buildAgentLoopContext());
-      this.completeTurn();
+      await this.completeTurn();
     } catch (error) {
-      this.failTurn(error);
+      await this.failTurn(error);
     }
   }
 
@@ -328,23 +328,16 @@ class TerminalWorkerRuntime {
     };
   }
 
-  private completeTurn(): void {
-    if (this.currentTurn) {
-      this.currentTurn.status = "completed";
-      this.currentTurn.lastUpdatedAt = new Date().toISOString();
-    }
-    void this.persistSnapshot();
+  private async completeTurn(): Promise<void> {
     this.currentTurn = null;
+    await this.persistSnapshot();
     this.busy = false;
     this.sendInputReady(false);
   }
 
-  private failTurn(error: unknown): void {
-    if (this.currentTurn) {
-      this.currentTurn.status = "failed";
-      this.currentTurn.lastUpdatedAt = new Date().toISOString();
-    }
-    void this.persistSnapshot();
+  private async failTurn(error: unknown): Promise<void> {
+    this.currentTurn = null;
+    await this.persistSnapshot();
     this.send({
       type: "fatal_error",
       message: error instanceof Error ? error.message : String(error),
@@ -368,6 +361,13 @@ class TerminalWorkerRuntime {
     const message: WorkerInputReadyMessage = { type: "input_ready", busy };
     this.send(message);
   }
+}
+
+export function isResumablePendingTurn(
+  pendingTurn: PendingTurnSnapshot | null | undefined,
+): pendingTurn is PendingTurnSnapshot {
+  if (!pendingTurn) return false;
+  return pendingTurn.status !== "completed" && pendingTurn.status !== "failed";
 }
 
 function extractAssistantText(content: ContentBlock[]): string {

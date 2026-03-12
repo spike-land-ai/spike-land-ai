@@ -1,4 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
+import { ASSERTION_METADATA_FIELD } from "../../../../src/cli/spike-cli/core-logic/chat/assertion-runtime.js";
 import {
   executeToolCall,
   extractDefaults,
@@ -35,7 +36,35 @@ describe("mcpToolsToClaude", () => {
         type: "object",
         properties: {
           filter: { type: "string" },
-          __assertion_ids: {
+        },
+      },
+    });
+  });
+
+  it("adds assertion metadata when assertion runtime is active", () => {
+    const mcpTools: NamespacedTool[] = [
+      {
+        namespacedName: "vitest__run_tests",
+        originalName: "run_tests",
+        serverName: "vitest",
+        description: "Run vitest tests",
+        inputSchema: {
+          type: "object",
+          properties: { filter: { type: "string" } },
+        },
+      },
+    ];
+
+    const result = mcpToolsToClaude(mcpTools, true);
+
+    expect(result[0]).toEqual({
+      name: "vitest__run_tests",
+      description: "Run vitest tests",
+      input_schema: {
+        type: "object",
+        properties: {
+          filter: { type: "string" },
+          [ASSERTION_METADATA_FIELD]: {
             type: "array",
             items: { type: "string" },
             description:

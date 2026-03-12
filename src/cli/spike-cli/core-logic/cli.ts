@@ -16,6 +16,7 @@
 
 import { config } from "dotenv";
 import { program } from "commander";
+import packageJson from "../../../../packages/spike-cli/package.json";
 import { registerAuthCommand } from "./commands/auth";
 import { registerAliasCommand } from "./commands/alias";
 import { registerCompletionsCommand } from "./commands/completions";
@@ -32,7 +33,7 @@ import { loadAliases } from "../node-sys/store";
 config({ path: ".env.local", quiet: true });
 config({ path: ".env", quiet: true });
 
-const VERSION = "0.1.0";
+const VERSION = packageJson.version;
 
 /**
  * Rewrite process.argv for command-level aliases.
