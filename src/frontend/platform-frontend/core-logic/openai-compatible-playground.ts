@@ -79,7 +79,7 @@ export function buildPathPrefix(pathFlavor: PlaygroundPathFlavor): string {
 }
 
 export function buildChatBody(config: PlaygroundConfig): Record<string, unknown> {
-  const messages = [];
+  const messages: Array<{ role: "system" | "user"; content: string }> = [];
 
   if (config.systemPrompt.trim()) {
     messages.push({ role: "system", content: config.systemPrompt.trim() });
@@ -114,9 +114,9 @@ export function buildHeaders(
   }
 
   const token = options?.bearerToken?.trim();
-  headers.Authorization = `Bearer ${
-    token || (options?.usePlaceholders ? INTERNAL_SECRET_PLACEHOLDER : "")
-  }`.trim();
+  if (token || options?.usePlaceholders) {
+    headers.Authorization = `Bearer ${token || INTERNAL_SECRET_PLACEHOLDER}`;
+  }
 
   const userId = options?.userId?.trim();
   if (userId || options?.usePlaceholders) {

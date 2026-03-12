@@ -1,7 +1,7 @@
 ---
 slug: "ai-gateway"
 name: "AI Gateway"
-description: "Chat with multiple AI models through a unified proxy. List available providers and models, then test a conversation."
+description: "OpenAI-compatible chat surface for spike.land. Keep the /v1 contract, add local docs and MCP capability context, then route to the right provider."
 emoji: "🧠"
 status: "live"
 sort_order: 2
@@ -31,7 +31,44 @@ graph:
 
 # AI Gateway
 
-The AI Gateway provides a unified interface to multiple LLM providers. Instead of integrating with OpenAI, Anthropic, and Gemini separately, you can use one tool.
+AI Gateway is now two things at once:
+
+- a tool surface for provider discovery and direct chat
+- an OpenAI-compatible HTTP endpoint that lets existing clients talk to spike.land without learning a new request format
+
+If you want the HTTP surface specifically, open the dedicated playground at
+[/packages/ai-gateway/ui](/packages/ai-gateway/ui). That route explains the endpoint, shows the live request shapes, and lets you try the local worker directly.
+
+## OpenAI-Compatible Surface
+
+The compatibility layer currently exposes:
+
+- `GET /v1/models`
+- `POST /v1/chat/completions`
+- `GET /api/v1/models`
+- `POST /api/v1/chat/completions`
+
+The `spike-agent-v1` model selector is virtual. The route first assembles local context from internal docs and MCP tool metadata, then resolves the actual synthesis provider with BYOK-first fallback logic.
+
+### Try it locally
+
+```bash
+bash scripts/dev-local.sh
+# then open:
+http://local.spike.land:5173/packages/ai-gateway/ui
+```
+
+### Direct local curl
+
+```bash
+curl -sS https://local.spike.land:8787/v1/models \
+  -H 'Authorization: Bearer <INTERNAL_SERVICE_SECRET>' \
+  -H 'X-User-Id: local-dev-user'
+```
+
+## MCP Tool Surface
+
+The MCP side still provides a unified interface to multiple LLM providers. Instead of integrating with OpenAI, Anthropic, and Gemini separately, you can use one tool family.
 
 ## 1. List Providers
 

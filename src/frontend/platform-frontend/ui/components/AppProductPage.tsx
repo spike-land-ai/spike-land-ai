@@ -28,6 +28,10 @@ const toolMetadata: Record<
     capabilities: string[];
     toolNames: string[];
     packagePath: string;
+    packageName?: string;
+    runtimeLabel?: string;
+    architectureLabel?: string;
+    surfaceLabel?: string;
   }
 > = {
   "chess-engine": {
@@ -69,6 +73,29 @@ const toolMetadata: Record<
     ],
     packagePath: "src/qa-studio",
   },
+  "ai-gateway": {
+    name: "AI Gateway",
+    description:
+      "OpenAI-compatible API surface for spike.land. Keep the standard /v1 request shape, but route prompts through local docs and MCP capability context before synthesis.",
+    capabilities: [
+      "Drop-in /v1/models and /v1/chat/completions compatibility routes",
+      "Virtual spike-agent-v1 selector that resolves providers automatically",
+      "BYOK-first provider resolution with platform fallback when no personal key exists",
+      "Local-agent prompt assembly from internal docs and MCP tool metadata",
+      "Synthetic streaming support without changing the caller contract",
+    ],
+    toolNames: [
+      "GET /v1/models",
+      "POST /v1/chat/completions",
+      "GET /api/v1/models",
+      "POST /api/v1/chat/completions",
+    ],
+    packagePath: "src/edge-api/main/api/routes/openai-compatible.ts",
+    packageName: "spike-edge openai-compatible route",
+    runtimeLabel: "Cloudflare Workers",
+    architectureLabel: "Compatibility edge route",
+    surfaceLabel: "AI Gateway Surface",
+  },
   "audio-mixer": {
     name: "Audio Mixer",
     description:
@@ -98,6 +125,10 @@ export function AppProductPage({ appId }: AppProductPageProps) {
     ],
     toolNames: [],
     packagePath: `src/${appId}`,
+    packageName: undefined,
+    runtimeLabel: undefined,
+    architectureLabel: undefined,
+    surfaceLabel: undefined,
   };
 
   return (
@@ -116,7 +147,7 @@ export function AppProductPage({ appId }: AppProductPageProps) {
         <div className="max-w-3xl space-y-6">
           <div className="rubik-eyebrow">
             <Terminal className="h-3.5 w-3.5" />
-            <span>MCP Tool Package</span>
+            <span>{meta.surfaceLabel ?? "MCP Tool Package"}</span>
           </div>
           <div className="space-y-4">
             <h1 className="text-4xl font-semibold leading-none tracking-[-0.06em] text-foreground sm:text-6xl">
@@ -158,6 +189,19 @@ export function AppProductPage({ appId }: AppProductPageProps) {
               </Link>
             </Button>
           )}
+          {appId === "ai-gateway" && (
+            <Button
+              variant="outline"
+              size="lg"
+              asChild
+              className="h-12 rounded-[calc(var(--radius-control)-0.1rem)] px-6"
+            >
+              <Link to="/packages/ai-gateway/ui">
+                <Layout className="mr-2 h-5 w-5" />
+                Launch Playground
+              </Link>
+            </Button>
+          )}
         </div>
       </section>
 
@@ -184,7 +228,7 @@ export function AppProductPage({ appId }: AppProductPageProps) {
                   key={name}
                   className="rounded-2xl border border-border bg-background/80 px-4 py-2 text-sm text-foreground shadow-[inset_0_1px_0_rgba(255,255,255,0.2)]"
                 >
-                  {name}()
+                  {/[\/\s:]/.test(name) ? name : `${name}()`}
                 </code>
               ))}
             </div>
@@ -206,7 +250,7 @@ export function AppProductPage({ appId }: AppProductPageProps) {
 
           <div className="grid gap-4 sm:grid-cols-2">
             {meta.capabilities.map((capability, i) => {
-              const Icon = CAPABILITY_ICONS[i % CAPABILITY_ICONS.length]!;
+              const Icon = CAPABILITY_ICONS[i % CAPABILITY_ICONS.length] ?? Shield;
               return (
                 <div key={i} className="rubik-panel p-5">
                   <div className="flex items-start gap-4">
@@ -235,7 +279,7 @@ export function AppProductPage({ appId }: AppProductPageProps) {
                   </span>
                   <div className="flex items-center gap-2 text-sm font-medium text-foreground break-all">
                     <Package className="size-3.5 text-primary" />
-                    @spike-land-ai/{appId}
+                    {meta.packageName ?? `@spike-land-ai/${appId}`}
                   </div>
                 </div>
 
@@ -255,7 +299,7 @@ export function AppProductPage({ appId }: AppProductPageProps) {
                   </span>
                   <div className="flex items-center gap-2 text-sm font-medium text-foreground">
                     <Globe className="size-3.5 text-primary" />
-                    MCP Edge Module
+                    {meta.architectureLabel ?? "MCP Edge Module"}
                   </div>
                 </div>
 
@@ -265,7 +309,7 @@ export function AppProductPage({ appId }: AppProductPageProps) {
                   </span>
                   <div className="flex items-center gap-2 text-sm font-medium text-foreground">
                     <Cpu className="size-3.5 text-primary" />
-                    Cloudflare Workers
+                    {meta.runtimeLabel ?? "Cloudflare Workers"}
                   </div>
                 </div>
               </div>

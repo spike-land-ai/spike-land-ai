@@ -1,0 +1,170 @@
+---
+title: "How the spike.land OpenAI-compatible endpoint works, and how to try it locally"
+slug: "openai-compatible-endpoint-local-playground"
+description: "The spike.land compatibility layer keeps the familiar /v1 shape, but it does not act like a thin passthrough. It resolves spike-agent-v1, injects local docs and MCP capability context, and still lets you test the whole flow locally."
+date: "2026-03-12"
+author: "Zoltan Erdos"
+category: "Developer Experience"
+tags: ["openai-compatible", "api", "ai-gateway", "local-development", "mcp", "spike-land"]
+featured: false
+draft: false
+primer: "OpenAI-compatible should reduce integration friction, not force you to give up your own runtime."
+---
+
+The useful definition of "OpenAI-compatible" is simple:
+
+your existing client should keep working, but your product should still be allowed to be itself.
+
+That is the job of the spike.land compatibility route.
+
+It accepts the familiar `/v1` request shape, but it does not behave like a blind proxy. Instead, it routes the request through local platform context before handing final synthesis to the upstream model provider.
+
+If you are reading the code, the implementation lives in:
+
+```ts
+src/edge-api/main/api/routes/openai-compatible.ts
+```
+
+If you want to try it instead of reading it, open:
+
+```text
+/packages/ai-gateway/ui
+```
+
+That new app explains the route and gives you a live playground for browser-proxy, local-worker, and production targets.
+
+## What the endpoint actually exposes
+
+Today the public shapes are:
+
+- `GET /v1/models`
+- `POST /v1/chat/completions`
+- `GET /api/v1/models`
+- `POST /api/v1/chat/completions`
+
+The `/api/v1/*` aliases exist because local frontend development already proxies `/api/*` into `spike-edge`. That means the same request body can work cleanly from the site itself during local development.
+
+## `spike-agent-v1` is a selector, not an upstream model
+
+This is the most important detail.
+
+`spike-agent-v1` is not just forwarded upstream unchanged.
+
+When that model is selected, the route:
+
+1. Looks at the latest user message.
+2. Scores local documentation that seems relevant.
+3. Searches the MCP tool catalog for capability matches.
+4. Builds a synthesis prompt that names those docs and tools explicitly.
+5. Resolves the actual provider and upstream model.
+
+That provider resolution is not random:
+
+- BYOK priority: OpenAI, Anthropic, Google
+- platform fallback priority: xAI, Anthropic, Google, OpenAI
+
+In other words, the public contract stays stable while the runtime keeps enough freedom to choose the best available path.
+
+## What happens before the upstream model sees anything
+
+The route builds a local prompt out of four stages:
+
+- `router-agent`
+- `docs-agent`
+- `capability-agent`
+- `synthesis-agent`
+
+That is why this endpoint matters.
+
+Compatibility on its own is not interesting. A raw passthrough is easy. The more important move is keeping a stable caller contract while still injecting the platform's own knowledge and tool surface.
+
+This is the difference between:
+
+- "we copied OpenAI's route names"
+- "we built our own runtime behind a familiar interface"
+
+## Local testing is supposed to be boring
+
+If an OpenAI-compatible endpoint is painful to test locally, the compatibility claim is weaker than it sounds.
+
+The local loop in this repo is straightforward:
+
+```bash
+bash scripts/dev-local.sh
+```
+
+That starts:
+
+- `spike-web` on `http://local.spike.land:5173`
+- `spike-edge` on `https://local.spike.land:8787`
+
+From there you can open the app:
+
+```text
+http://local.spike.land:5173/packages/ai-gateway/ui
+```
+
+The playground lets you switch between three targets:
+
+- browser proxy
+- local worker
+- production API
+
+The point is not visual polish for its own sake. The point is cutting out the dead time between "I think this route works" and "I just proved it against the real handler."
+
+## Direct local curl
+
+For direct worker checks, the route supports the same shape outside the app too:
+
+```bash
+curl -sS https://local.spike.land:8787/v1/chat/completions \
+  -H 'Content-Type: application/json' \
+  -H 'Authorization: Bearer <INTERNAL_SERVICE_SECRET>' \
+  -H 'X-User-Id: local-dev-user' \
+  --data-binary @- <<'JSON'
+{
+  "model": "spike-agent-v1",
+  "messages": [
+    {
+      "role": "user",
+      "content": "How do I deploy a Cloudflare Worker with spike.land?"
+    }
+  ],
+  "stream": false
+}
+JSON
+```
+
+If you prefer the frontend proxy, use the same body against:
+
+```text
+http://local.spike.land:5173/api/v1/chat/completions
+```
+
+## Why this shape matters
+
+Most teams who ask for "OpenAI-compatible" are really asking for one of three things:
+
+1. They want to reuse an SDK they already have.
+2. They want to switch providers without rewriting client code.
+3. They want to keep their own platform behavior behind a standard edge contract.
+
+The third case is the one worth caring about.
+
+If you only mirror route names, you get compatibility theater.
+
+If you keep the route shape but preserve your own context assembly, auth model, provider selection, and tool-aware runtime, you get a real integration surface.
+
+That is what this endpoint is for.
+
+## Where to start
+
+If you want the shortest path:
+
+1. Start the local stack with `bash scripts/dev-local.sh`.
+2. Open `/packages/ai-gateway/ui`.
+3. Run `/v1/models`.
+4. Send one `spike-agent-v1` completion.
+5. Flip from browser proxy to local worker and confirm nothing about the request body changes.
+
+That is the whole idea in one exercise.

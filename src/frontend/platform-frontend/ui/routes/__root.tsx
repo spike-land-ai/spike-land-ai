@@ -193,7 +193,8 @@ export function RootLayout() {
     if (
       pathname.startsWith("/packages/") &&
       pathname !== "/packages/new" &&
-      pathname !== "/packages/qa-studio/ui"
+      pathname !== "/packages/qa-studio/ui" &&
+      pathname !== "/packages/ai-gateway/ui"
     ) {
       const appId = pathname.split("/")[2];
       const search = new URLSearchParams(searchStr);

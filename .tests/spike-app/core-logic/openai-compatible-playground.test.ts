@@ -8,7 +8,7 @@ import {
   resolveDefaultBaseUrl,
   resolveDefaultPathFlavor,
   type PlaygroundConfig,
-} from "../openai-compatible-playground";
+} from "../../../src/frontend/platform-frontend/core-logic/openai-compatible-playground";
 
 function makeConfig(overrides: Partial<PlaygroundConfig> = {}): PlaygroundConfig {
   return {

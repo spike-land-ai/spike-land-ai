@@ -157,6 +157,12 @@ const packagesQaStudioRoute = createRoute({
   component: withSuspense(() => import("./routes/apps/qa-studio"), "QaStudioPage"),
 });
 
+const packagesAiGatewayRoute = createRoute({
+  getParentRoute: () => packagesRoute,
+  path: "ai-gateway/ui",
+  component: withSuspense(() => import("./routes/apps/ai-gateway"), "AiGatewayPage"),
+});
+
 const packageDetailRoute = createRoute({
   getParentRoute: () => packagesRoute,
   path: "$appId",
@@ -451,6 +457,7 @@ const routeTree = rootRoute.addChildren([
     packagesIndexRoute,
     packagesNewRoute,
     packagesQaStudioRoute,
+    packagesAiGatewayRoute,
     packageDetailRoute,
   ]),
   docsRoute.addChildren([docsIndexRoute, docsSlugRoute]),
