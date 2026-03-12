@@ -109,6 +109,7 @@ const faqs = [
       <!-- Plans grid -->
       <section class="plans-section">
         <div class="rubik-container">
+          <p id="pricing-feedback" class="pricing-feedback" role="status" aria-live="polite" hidden></p>
           <div class="plans-grid">
             {plans.map(plan => (
               <div class={`plan-card ${plan.highlighted ? 'plan-card--pro' : ''}`}>
@@ -141,12 +142,20 @@ const faqs = [
                     </a>
                   )}
                   {plan.id === 'pro' && (
-                    <button class="plan-cta plan-cta--primary" onclick="startCheckout('pro')">
+                    <button
+                      class="plan-cta plan-cta--primary"
+                      type="button"
+                      data-checkout-tier="pro"
+                    >
                       {plan.cta}
                     </button>
                   )}
                   {plan.id === 'business' && (
-                    <button class="plan-cta plan-cta--secondary" onclick="startCheckout('business')">
+                    <button
+                      class="plan-cta plan-cta--secondary"
+                      type="button"
+                      data-checkout-tier="business"
+                    >
                       {plan.cta}
                     </button>
                   )}
@@ -311,6 +320,17 @@ const faqs = [
     align-items: start;
   }
 
+  .pricing-feedback {
+    margin: 0 0 1rem;
+    padding: 0.875rem 1rem;
+    border-radius: var(--radius-lg);
+    border: 1px solid color-mix(in srgb, var(--primary-color) 25%, var(--border-color));
+    background: color-mix(in srgb, var(--primary-color) 8%, var(--card-bg));
+    color: var(--fg);
+    font-size: 0.875rem;
+    line-height: 1.5;
+  }
+
   .plan-card {
     position: relative;
     background: var(--card-bg);
@@ -450,6 +470,11 @@ const faqs = [
 
   .plan-cta:hover { opacity: 0.88; transform: translateY(-1px); }
   .plan-cta:active { transform: translateY(0); }
+  .plan-cta:disabled {
+    opacity: 0.65;
+    cursor: wait;
+    transform: none;
+  }
 
   /* Comparison table */
   .comparison-section {
@@ -599,29 +624,69 @@ const faqs = [
 </style>
 
 <script>
-  import { apiBaseURL } from '../lib/auth';
+  const feedback = document.getElementById('pricing-feedback');
+  const checkoutButtons = Array.from(document.querySelectorAll('[data-checkout-tier]'));
 
-  async function startCheckout(plan: string) {
+  function setFeedback(message: string | null) {
+    if (!feedback) return;
+    if (!message) {
+      feedback.hidden = true;
+      feedback.textContent = '';
+      return;
+    }
+
+    feedback.hidden = false;
+    feedback.textContent = message;
+  }
+
+  async function startCheckout(button: HTMLButtonElement) {
+    const tier = button.dataset.checkoutTier;
+    if (!tier) return;
+
+    const originalLabel = button.textContent?.trim() || 'Continue';
+    setFeedback(null);
+    button.disabled = true;
+    button.textContent = 'Redirecting…';
+
     try {
-      const res = await fetch(`${apiBaseURL}/api/checkout`, {
+      const res = await fetch('/api/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
-        body: JSON.stringify({ plan })
+        body: JSON.stringify({ tier })
       });
       if (res.status === 401) {
         window.location.href = '/login?redirect=/pricing';
         return;
       }
-      const data = await res.json();
-      if (data.url) {
-        window.location.href = data.url;
+
+      const data = await res.json().catch(() => null);
+      if (!res.ok) {
+        throw new Error(
+          typeof data?.error === 'string' ? data.error : `Unable to start checkout (${res.status})`,
+        );
       }
+
+      if (typeof data?.url !== 'string' || data.url.length === 0) {
+        throw new Error('No checkout URL returned.');
+      }
+
+      window.location.href = data.url;
     } catch (err) {
       console.error('Checkout error:', err);
+      setFeedback(
+        err instanceof Error ? err.message : 'Unable to start checkout right now. Please try again.',
+      );
+    } finally {
+      button.disabled = false;
+      button.textContent = originalLabel;
     }
   }
 
-  // Attach to window for inline onclick handlers
-  (window as unknown as Record<string, unknown>).startCheckout = startCheckout;
+  checkoutButtons.forEach((button) => {
+    if (!(button instanceof HTMLButtonElement)) return;
+    button.addEventListener('click', () => {
+      void startCheckout(button);
+    });
+  });
 </script>

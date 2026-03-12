@@ -1,0 +1,24 @@
+{
+  "name": "lucide-react",
+  "version": "0.0.0-use.local",
+  "private": true,
+  "type": "module",
+  "main": "./index.js",
+  "module": "./index.mjs",
+  "types": "./index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./index.d.ts",
+      "import": "./index.mjs",
+      "require": "./index.js",
+      "default": "./index.mjs"
+    }
+  },
+  "peerDependencies": {
+    "react": "^18.0.0 || ^19.0.0",
+    "react-dom": "^18.0.0 || ^19.0.0"
+  },
+  "dependencies": {
+    "real-lucide-react": "npm:lucide-react@^0.300.0"
+  }
+}

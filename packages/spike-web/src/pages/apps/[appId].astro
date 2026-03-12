@@ -65,7 +65,7 @@ const appName = app.name;
               </span>
             </div>
             <div class="app-topbar-right">
-              <button class="topbar-btn">Settings</button>
+              <span class="topbar-chip">Preview mode</span>
             </div>
           </div>
 
@@ -123,13 +123,54 @@ const appName = app.name;
                 Agent Chat
                 <div class="agent-online-dot"></div>
               </div>
-              <div class="sidebar-messages">
-                <div class="agent-bubble">
-                  Hello! I've scaffolded the initial environment. How can I help you customize it?
+              <div class="sidebar-messages" id="agent-messages" aria-live="polite">
+                <div class="agent-message">
+                  <div class="agent-bubble">
+                    Hello! I've scaffolded the initial environment. How can I help you customize it?
+                  </div>
                 </div>
               </div>
               <div class="sidebar-input-wrap">
-                <input type="text" placeholder="Ask the agent…" class="sidebar-input" />
+                <form class="sidebar-composer" id="agent-chat-form" data-app-name={app.name}>
+                  <div
+                    class="sidebar-attachment-list"
+                    id="agent-attachment-list"
+                    hidden
+                    aria-live="polite"
+                  ></div>
+                  <div class="sidebar-composer-row">
+                    <label class="sidebar-tool-btn" for="agent-attachment-input" title="Add attachments">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21.44 11.05l-8.49 8.49a6 6 0 01-8.49-8.49l9.19-9.2a4 4 0 115.66 5.66l-9.2 9.2a2 2 0 11-2.82-2.83l8.49-8.48"/>
+                      </svg>
+                      <span>Attach</span>
+                    </label>
+                    <input
+                      id="agent-attachment-input"
+                      class="sidebar-file-input"
+                      type="file"
+                      multiple
+                    />
+                    <textarea
+                      id="agent-chat-input"
+                      class="sidebar-input"
+                      rows="1"
+                      placeholder="Ask the agent or add attachments…"
+                    ></textarea>
+                    <button
+                      id="agent-send-btn"
+                      type="submit"
+                      class="sidebar-send-btn"
+                      aria-label="Send message"
+                    >
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M22 2L11 13"/>
+                        <path d="M22 2l-7 20-4-9-9-4z"/>
+                      </svg>
+                      <span>Send</span>
+                    </button>
+                  </div>
+                </form>
               </div>
             </aside>
           </div>
@@ -237,7 +278,7 @@ const appName = app.name;
     50% { opacity: 0.4; }
   }
 
-  .topbar-btn {
+  .topbar-chip {
     padding: 0.375rem 0.875rem;
     font-size: 0.875rem;
     font-weight: 500;
@@ -245,12 +286,9 @@ const appName = app.name;
     border-radius: var(--radius-md);
     background: transparent;
     color: var(--fg);
-    cursor: pointer;
-    transition: background var(--duration-fast) var(--ease);
     font-family: var(--font-sans);
+    white-space: nowrap;
   }
-
-  .topbar-btn:hover { background: var(--muted-bg); }
 
   .app-body {
     flex: 1;
@@ -418,6 +456,15 @@ const appName = app.name;
     gap: 0.875rem;
   }
 
+  .agent-message {
+    display: flex;
+    justify-content: flex-start;
+  }
+
+  .agent-message--user {
+    justify-content: flex-end;
+  }
+
   .agent-bubble {
     background: var(--muted-bg);
     border-radius: var(--radius-md);
@@ -426,6 +473,13 @@ const appName = app.name;
     font-size: 0.875rem;
     line-height: 1.55;
     color: var(--fg);
+    max-width: min(100%, 18rem);
+  }
+
+  .agent-bubble--user {
+    background: color-mix(in srgb, var(--primary-color) 14%, var(--card-bg));
+    border-top-left-radius: var(--radius-md);
+    border-top-right-radius: 0.25rem;
   }
 
   .sidebar-input-wrap {
@@ -433,9 +487,78 @@ const appName = app.name;
     border-top: 1px solid var(--border-color);
   }
 
+  .sidebar-composer {
+    display: flex;
+    flex-direction: column;
+    gap: 0.625rem;
+  }
+
+  .sidebar-composer-row {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 0.625rem;
+    align-items: end;
+  }
+
+  .sidebar-file-input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  .sidebar-tool-btn,
+  .sidebar-send-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.375rem;
+    min-height: 2.75rem;
+    padding: 0.625rem 0.875rem;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-color);
+    background: var(--muted-bg);
+    color: var(--fg);
+    cursor: pointer;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    font-family: var(--font-sans);
+    transition: background var(--duration-fast) var(--ease),
+                border-color var(--duration-fast) var(--ease),
+                transform var(--duration-fast) var(--ease);
+  }
+
+  .sidebar-tool-btn:hover,
+  .sidebar-send-btn:hover {
+    background: color-mix(in srgb, var(--muted-bg) 88%, var(--fg) 12%);
+  }
+
+  .sidebar-send-btn {
+    background: var(--fg);
+    color: var(--bg);
+    border-color: transparent;
+  }
+
+  .sidebar-send-btn:hover {
+    background: color-mix(in srgb, var(--fg) 88%, var(--primary-color) 12%);
+  }
+
+  .sidebar-send-btn:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+    transform: none;
+  }
+
   .sidebar-input {
     width: 100%;
-    padding: 0.5625rem 0.875rem;
+    min-height: 2.75rem;
+    max-height: 8rem;
+    padding: 0.75rem 0.875rem;
     background: var(--bg);
     border: 1px solid var(--border-color);
     border-radius: var(--radius-md);
@@ -443,6 +566,8 @@ const appName = app.name;
     color: var(--fg);
     font-family: var(--font-sans);
     transition: border-color var(--duration-fast) var(--ease);
+    resize: none;
+    overflow-y: auto;
   }
 
   .sidebar-input:focus {
@@ -451,6 +576,96 @@ const appName = app.name;
   }
 
   .sidebar-input::placeholder { color: var(--muted-fg); }
+
+  .sidebar-attachment-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .sidebar-attachment-list--message {
+    margin-top: 0.625rem;
+  }
+
+  .sidebar-attachment-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    max-width: 100%;
+    padding: 0.375rem 0.625rem;
+    border-radius: 999px;
+    border: 1px solid var(--border-color);
+    background: color-mix(in srgb, var(--muted-bg) 82%, var(--bg) 18%);
+    font-size: 0.75rem;
+    color: var(--fg);
+  }
+
+  .sidebar-attachment-chip span {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .sidebar-attachment-remove {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.125rem;
+    height: 1.125rem;
+    border: none;
+    border-radius: 999px;
+    background: transparent;
+    color: inherit;
+    cursor: pointer;
+    padding: 0;
+    font: inherit;
+  }
+
+  .sidebar-attachment-remove:hover {
+    background: color-mix(in srgb, var(--fg) 12%, transparent);
+  }
+
+  @media (max-width: 960px) {
+    .app-body {
+      flex-direction: column;
+    }
+
+    .app-main {
+      min-height: 22rem;
+    }
+
+    .agent-sidebar {
+      width: 100%;
+      min-height: 22rem;
+      border-left: none;
+      border-top: 1px solid var(--border-color);
+    }
+  }
+
+  @media (max-width: 640px) {
+    .app-topbar {
+      padding-inline: 0.875rem;
+    }
+
+    .tab-nav {
+      overflow-x: auto;
+    }
+
+    .tab-btn {
+      white-space: nowrap;
+    }
+
+    .sidebar-tool-btn span,
+    .sidebar-send-btn span {
+      display: none;
+    }
+
+    .sidebar-tool-btn,
+    .sidebar-send-btn {
+      padding-inline: 0.75rem;
+    }
+  }
 </style>
 
 <script>
@@ -468,4 +683,178 @@ const appName = app.name;
       }
     });
   });
+
+  const chatForm = document.getElementById('agent-chat-form');
+  const chatInput = document.getElementById('agent-chat-input');
+  const attachmentInput = document.getElementById('agent-attachment-input');
+  const attachmentList = document.getElementById('agent-attachment-list');
+  const sendButton = document.getElementById('agent-send-btn');
+  const messageList = document.getElementById('agent-messages');
+
+  if (
+    chatForm instanceof HTMLFormElement &&
+    chatInput instanceof HTMLTextAreaElement &&
+    attachmentInput instanceof HTMLInputElement &&
+    attachmentList instanceof HTMLDivElement &&
+    sendButton instanceof HTMLButtonElement &&
+    messageList instanceof HTMLDivElement
+  ) {
+    const selectedFiles = [];
+    const appName = chatForm.dataset.appName || 'your app';
+
+    const autoresizeInput = () => {
+      chatInput.style.height = 'auto';
+      chatInput.style.height = `${Math.min(chatInput.scrollHeight, 128)}px`;
+    };
+
+    const syncComposerState = () => {
+      sendButton.disabled = chatInput.value.trim().length === 0 && selectedFiles.length === 0;
+    };
+
+    const renderPendingAttachments = () => {
+      attachmentList.innerHTML = '';
+      attachmentList.hidden = selectedFiles.length === 0;
+
+      selectedFiles.forEach((file, index) => {
+        const chip = document.createElement('span');
+        chip.className = 'sidebar-attachment-chip';
+
+        const label = document.createElement('span');
+        label.textContent = file.name;
+        chip.appendChild(label);
+
+        const removeButton = document.createElement('button');
+        removeButton.type = 'button';
+        removeButton.className = 'sidebar-attachment-remove';
+        removeButton.dataset.index = String(index);
+        removeButton.setAttribute('aria-label', `Remove ${file.name}`);
+        removeButton.textContent = '×';
+        chip.appendChild(removeButton);
+
+        attachmentList.appendChild(chip);
+      });
+    };
+
+    const appendMessage = (role, text, attachments = []) => {
+      const message = document.createElement('div');
+      message.className = `agent-message ${role === 'user' ? 'agent-message--user' : ''}`.trim();
+
+      const bubble = document.createElement('div');
+      bubble.className = `agent-bubble ${role === 'user' ? 'agent-bubble--user' : ''}`.trim();
+
+      if (text) {
+        const body = document.createElement('div');
+        body.textContent = text;
+        bubble.appendChild(body);
+      }
+
+      if (attachments.length > 0) {
+        const chips = document.createElement('div');
+        chips.className = 'sidebar-attachment-list sidebar-attachment-list--message';
+
+        attachments.forEach((name) => {
+          const chip = document.createElement('span');
+          chip.className = 'sidebar-attachment-chip';
+          const label = document.createElement('span');
+          label.textContent = name;
+          chip.appendChild(label);
+          chips.appendChild(chip);
+        });
+
+        bubble.appendChild(chips);
+      }
+
+      message.appendChild(bubble);
+      messageList.appendChild(message);
+      messageList.scrollTop = messageList.scrollHeight;
+    };
+
+    const buildAssistantReply = (text, attachments) => {
+      const responseParts = [];
+
+      if (attachments.length > 0) {
+        responseParts.push(
+          attachments.length === 1
+            ? `Attachment received. I can fold it into the next ${appName} pass.`
+            : `${attachments.length} attachments received. I can use them to shape the next ${appName} iteration.`,
+        );
+      }
+
+      if (text) {
+        responseParts.push(`Next step noted: ${text}`);
+      } else {
+        responseParts.push(`Tell me what you want changed and I will map it into the scaffold.`);
+      }
+
+      return responseParts.join(' ');
+    };
+
+    attachmentList.addEventListener('click', (event) => {
+      const target = event.target;
+      if (!(target instanceof HTMLButtonElement)) return;
+
+      const index = Number.parseInt(target.dataset.index || '', 10);
+      if (!Number.isFinite(index)) return;
+
+      selectedFiles.splice(index, 1);
+      renderPendingAttachments();
+      syncComposerState();
+    });
+
+    attachmentInput.addEventListener('change', () => {
+      const files = Array.from(attachmentInput.files || []);
+
+      files.forEach((file) => {
+        const alreadySelected = selectedFiles.some(
+          (entry) =>
+            entry.name === file.name &&
+            entry.size === file.size &&
+            entry.lastModified === file.lastModified,
+        );
+
+        if (!alreadySelected) {
+          selectedFiles.push(file);
+        }
+      });
+
+      attachmentInput.value = '';
+      renderPendingAttachments();
+      syncComposerState();
+    });
+
+    chatInput.addEventListener('input', () => {
+      autoresizeInput();
+      syncComposerState();
+    });
+
+    chatInput.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter' && !event.shiftKey) {
+        event.preventDefault();
+        chatForm.requestSubmit();
+      }
+    });
+
+    chatForm.addEventListener('submit', (event) => {
+      event.preventDefault();
+
+      const text = chatInput.value.trim();
+      const attachments = selectedFiles.map((file) => file.name);
+      if (!text && attachments.length === 0) return;
+
+      appendMessage(role = 'user', text || 'Shared attachments for the current scaffold.', attachments);
+
+      chatInput.value = '';
+      selectedFiles.length = 0;
+      renderPendingAttachments();
+      autoresizeInput();
+      syncComposerState();
+
+      window.setTimeout(() => {
+        appendMessage('assistant', buildAssistantReply(text, attachments));
+      }, 280);
+    });
+
+    autoresizeInput();
+    syncComposerState();
+  }
 </script>
