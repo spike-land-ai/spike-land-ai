@@ -8,7 +8,7 @@ vi.mock("@/core-logic/api", () => ({
 }));
 
 function makeSSEResponse(events: string[]) {
-  const body = events.map((e) => `data: ${e}`).join("\n") + "\ndata: [DONE]\n";
+  const body = [...events.map((e) => `data: ${e}\n\n`), "data: [DONE]\n\n"].join("");
   return new Response(body, {
     status: 200,
     headers: { "Content-Type": "text/event-stream" },
@@ -16,6 +16,30 @@ function makeSSEResponse(events: string[]) {
 }
 
 describe("useChat", () => {
+  function mockFetch(chatResponses: Response[] = []) {
+    return vi.spyOn(globalThis, "fetch").mockImplementation(async (input) => {
+      const url = String(input);
+
+      if (url === "/api/settings/public") {
+        return new Response(JSON.stringify({ context_window: 200000 }), { status: 200 });
+      }
+
+      if (url === "/api/chat/threads") {
+        return new Response(JSON.stringify({ threads: [] }), { status: 200 });
+      }
+
+      if (url === "/api/chat") {
+        const next = chatResponses.shift();
+        if (!next) {
+          throw new Error("Unexpected /api/chat call");
+        }
+        return next;
+      }
+
+      throw new Error(`Unhandled fetch URL: ${url}`);
+    });
+  }
+
   beforeEach(() => {
     localStorage.clear();
     vi.restoreAllMocks();
@@ -25,37 +49,37 @@ describe("useChat", () => {
     localStorage.clear();
   });
 
-  it("starts with empty messages and no error", () => {
+  it("starts with empty items and no error", async () => {
+    mockFetch();
     const { result } = renderHook(() => useChat());
-    expect(result.current.messages).toEqual([]);
+
+    await vi.waitFor(() => {
+      expect(result.current.items).toEqual([]);
+    });
+
     expect(result.current.isStreaming).toBe(false);
     expect(result.current.error).toBeNull();
   });
 
-  it("restores messages from localStorage on mount", () => {
-    const stored = [{ id: "msg-1", role: "user", content: "Hello", timestamp: 1000 }];
-    localStorage.setItem("spike-chat-messages", JSON.stringify(stored));
-
+  it("loads public settings and thread list on mount", async () => {
+    const fetchSpy = mockFetch();
     const { result } = renderHook(() => useChat());
-    expect(result.current.messages).toHaveLength(1);
-    expect(result.current.messages[0].content).toBe("Hello");
-  });
 
-  it("handles malformed localStorage gracefully", () => {
-    localStorage.setItem("spike-chat-messages", "not-json");
-    const { result } = renderHook(() => useChat());
-    expect(result.current.messages).toEqual([]);
+    await vi.waitFor(() => {
+      expect(fetchSpy).toHaveBeenNthCalledWith(1, "/api/settings/public");
+      expect(fetchSpy).toHaveBeenNthCalledWith(2, "/api/chat/threads", { credentials: "include" });
+    });
+
+    expect(result.current.usage).toBeNull();
   });
 
   it("sends message and parses text_delta events", async () => {
-    const fetchSpy = vi
-      .spyOn(globalThis, "fetch")
-      .mockResolvedValueOnce(
-        makeSSEResponse([
-          JSON.stringify({ type: "text_delta", text: "Hello " }),
-          JSON.stringify({ type: "text_delta", text: "world" }),
-        ]),
-      );
+    const fetchSpy = mockFetch([
+      makeSSEResponse([
+        JSON.stringify({ type: "text_delta", text: "Hello " }),
+        JSON.stringify({ type: "text_delta", text: "world" }),
+      ]),
+    ]);
 
     const { result } = renderHook(() => useChat());
 
@@ -63,25 +87,37 @@ describe("useChat", () => {
       await result.current.sendMessage("Hi");
     });
 
-    expect(fetchSpy).toHaveBeenCalledTimes(1);
-    const [url, opts] = fetchSpy.mock.calls[0];
+    const [url, opts] = fetchSpy.mock.calls.find(([calledUrl]) => calledUrl === "/api/chat") ?? [];
     expect(url).toBe("/api/chat");
     expect(opts?.credentials).toBe("include");
 
-    expect(result.current.messages).toHaveLength(2);
-    expect(result.current.messages[0].role).toBe("user");
-    expect(result.current.messages[0].content).toBe("Hi");
-    expect(result.current.messages[1].role).toBe("assistant");
-    expect(result.current.messages[1].content).toBe("Hello world");
+    expect(result.current.items).toHaveLength(2);
+    expect(result.current.items[0]).toMatchObject({ kind: "user", content: "Hi" });
+    expect(result.current.items[1]).toMatchObject({
+      kind: "assistant_text",
+      content: "Hello world",
+    });
   });
 
   it("parses tool_call_start and tool_call_end events", async () => {
-    vi.spyOn(globalThis, "fetch").mockResolvedValueOnce(
+    mockFetch([
       makeSSEResponse([
-        JSON.stringify({ type: "tool_call_start", name: "search_tools", args: { q: "test" } }),
-        JSON.stringify({ type: "tool_call_end", name: "search_tools", result: "Found 3 results" }),
+        JSON.stringify({
+          type: "tool_call_start",
+          toolCallId: "call-1",
+          name: "search_tools",
+          args: { q: "test" },
+          transport: "mcp",
+        }),
+        JSON.stringify({
+          type: "tool_call_end",
+          toolCallId: "call-1",
+          result: "Found 3 results",
+          status: "done",
+          transport: "mcp",
+        }),
       ]),
-    );
+    ]);
 
     const { result } = renderHook(() => useChat());
 
@@ -89,24 +125,27 @@ describe("useChat", () => {
       await result.current.sendMessage("Search");
     });
 
-    const assistantMsg = result.current.messages[1];
-    expect(assistantMsg.toolCalls).toHaveLength(1);
-    expect(assistantMsg.toolCalls![0].name).toBe("search_tools");
-    expect(assistantMsg.toolCalls![0].status).toBe("done");
-    expect(assistantMsg.toolCalls![0].result).toBe("Found 3 results");
+    expect(result.current.items[1]).toMatchObject({
+      kind: "tool_call",
+      toolCallId: "call-1",
+      name: "search_tools",
+      status: "done",
+      result: "Found 3 results",
+    });
   });
 
-  it("parses browser_command events", async () => {
-    vi.spyOn(globalThis, "fetch").mockResolvedValueOnce(
+  it("parses browser transport tool-call events", async () => {
+    mockFetch([
       makeSSEResponse([
         JSON.stringify({
-          type: "browser_command",
-          tool: "browser_navigate",
+          type: "tool_call_start",
+          toolCallId: "req-123",
+          name: "browser_navigate",
           args: { url: "/tools" },
-          requestId: "req-123",
+          transport: "browser",
         }),
       ]),
-    );
+    ]);
 
     const { result } = renderHook(() => useChat());
 
@@ -114,16 +153,19 @@ describe("useChat", () => {
       await result.current.sendMessage("Go to tools");
     });
 
-    const assistantMsg = result.current.messages[1];
-    expect(assistantMsg.browserCommands).toHaveLength(1);
-    expect(assistantMsg.browserCommands![0].tool).toBe("browser_navigate");
-    expect(assistantMsg.browserCommands![0].requestId).toBe("req-123");
+    expect(result.current.items[1]).toMatchObject({
+      kind: "tool_call",
+      toolCallId: "req-123",
+      name: "browser_navigate",
+      status: "pending",
+      transport: "browser",
+    });
   });
 
   it("sets error on error event", async () => {
-    vi.spyOn(globalThis, "fetch").mockResolvedValueOnce(
+    mockFetch([
       makeSSEResponse([JSON.stringify({ type: "error", error: "Rate limited" })]),
-    );
+    ]);
 
     const { result } = renderHook(() => useChat());
 
@@ -135,9 +177,7 @@ describe("useChat", () => {
   });
 
   it("sets error on HTTP failure", async () => {
-    vi.spyOn(globalThis, "fetch").mockResolvedValueOnce(
-      new Response("Unauthorized", { status: 401 }),
-    );
+    mockFetch([new Response("Unauthorized", { status: 401 })]);
 
     const { result } = renderHook(() => useChat());
 
@@ -146,15 +186,16 @@ describe("useChat", () => {
     });
 
     expect(result.current.error).toBe("Unauthorized");
-    expect(result.current.messages[1].content).toBe(
-      "Sorry, something went wrong. Please try again.",
-    );
+    expect(result.current.items[1]).toMatchObject({
+      kind: "assistant_text",
+      content: "Sorry, something went wrong. Please try again.",
+    });
   });
 
-  it("clearMessages removes all messages and localStorage", async () => {
-    vi.spyOn(globalThis, "fetch").mockResolvedValueOnce(
+  it("newThread clears current items and selection", async () => {
+    mockFetch([
       makeSSEResponse([JSON.stringify({ type: "text_delta", text: "Hi" })]),
-    );
+    ]);
 
     const { result } = renderHook(() => useChat());
 
@@ -162,23 +203,20 @@ describe("useChat", () => {
       await result.current.sendMessage("Hello");
     });
 
-    expect(result.current.messages).toHaveLength(2);
+    expect(result.current.items).toHaveLength(2);
 
     act(() => {
-      result.current.clearMessages();
+      result.current.newThread();
     });
 
-    expect(result.current.messages).toEqual([]);
-    // localStorage may have "[]" due to useEffect re-persisting empty array,
-    // or null if removeItem was called — either indicates messages were cleared
-    const stored = localStorage.getItem("spike-chat-messages");
-    expect(stored === null || stored === "[]").toBe(true);
+    expect(result.current.items).toEqual([]);
+    expect(result.current.currentThreadId).toBeNull();
   });
 
   it("clearError clears the error state", async () => {
-    vi.spyOn(globalThis, "fetch").mockResolvedValueOnce(
+    mockFetch([
       makeSSEResponse([JSON.stringify({ type: "error", error: "Oops" })]),
-    );
+    ]);
 
     const { result } = renderHook(() => useChat());
 
@@ -196,7 +234,7 @@ describe("useChat", () => {
   });
 
   it("does not send empty or whitespace-only messages", async () => {
-    const fetchSpy = vi.spyOn(globalThis, "fetch");
+    const fetchSpy = mockFetch();
 
     const { result } = renderHook(() => useChat());
 
@@ -205,13 +243,13 @@ describe("useChat", () => {
       await result.current.sendMessage("   ");
     });
 
-    expect(fetchSpy).not.toHaveBeenCalled();
+    expect(fetchSpy).toHaveBeenCalledTimes(2);
   });
 
   it("skips malformed SSE data gracefully", async () => {
-    vi.spyOn(globalThis, "fetch").mockResolvedValueOnce(
+    mockFetch([
       makeSSEResponse(["not-json", JSON.stringify({ type: "text_delta", text: "Valid" })]),
-    );
+    ]);
 
     const { result } = renderHook(() => useChat());
 
@@ -219,7 +257,7 @@ describe("useChat", () => {
       await result.current.sendMessage("Hi");
     });
 
-    expect(result.current.messages[1].content).toBe("Valid");
+    expect(result.current.items[1]).toMatchObject({ kind: "assistant_text", content: "Valid" });
     expect(result.current.error).toBeNull();
   });
 });

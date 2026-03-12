@@ -183,7 +183,7 @@ async function waitForBrowserSettle() {
  * @param onResult - Callback invoked with `(toolCallId, result)` after execution.
  * @param router - Optional TanStack Router instance for client-side navigation.
  */
-export function useBrowserBridge({ items, onResult, router }: BrowserBridgeOptions) {
+export function useBrowserBridge({ items = [], onResult, router }: BrowserBridgeOptions) {
   const processedRef = useRef<Set<string>>(new Set());
   const surfaceMapRef = useRef<Map<string, SurfaceEntry[]>>(new Map());
 

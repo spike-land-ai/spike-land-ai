@@ -43,8 +43,7 @@ describe("ChatThread", () => {
     const textarea = screen.getByPlaceholderText(/Describe what you want to build/);
     fireEvent.change(textarea, { target: { value: "test message" } });
 
-    // The button has no text, so we find it by role or via parent
-    const sendBtn = screen.getByRole("button", { name: "" }); // Button with Send icon
+    const sendBtn = screen.getByRole("button", { name: "Send message" });
     fireEvent.click(sendBtn);
 
     expect(onSend).toHaveBeenCalledWith("test message");
@@ -58,7 +57,7 @@ describe("ChatThread", () => {
       /Describe what you want to build/,
     ) as HTMLTextAreaElement;
     fireEvent.change(textarea, { target: { value: "hello" } });
-    fireEvent.click(screen.getByRole("button", { name: "" }));
+    fireEvent.click(screen.getByRole("button", { name: "Send message" }));
 
     expect(textarea.value).toBe("");
   });
@@ -69,14 +68,14 @@ describe("ChatThread", () => {
 
     const textarea = screen.getByPlaceholderText(/Describe what you want to build/);
     fireEvent.change(textarea, { target: { value: "   " } });
-    fireEvent.click(screen.getByRole("button", { name: "" }));
+    fireEvent.click(screen.getByRole("button", { name: "Send message" }));
 
     expect(onSend).not.toHaveBeenCalled();
   });
 
   it("send button is disabled when input is empty", () => {
     render(<ChatThread messages={[]} onSendMessage={mockSend} />);
-    const sendBtn = screen.getByRole("button", { name: "" });
+    const sendBtn = screen.getByRole("button", { name: "Send message" });
     expect(sendBtn).toBeDisabled();
   });
 
@@ -86,7 +85,7 @@ describe("ChatThread", () => {
     const textarea = screen.getByPlaceholderText(/Describe what you want to build/);
     fireEvent.change(textarea, { target: { value: "hello" } });
 
-    const sendBtn = screen.getByRole("button", { name: "" });
+    const sendBtn = screen.getByRole("button", { name: "Send message" });
     expect(sendBtn).toBeDisabled();
   });
 

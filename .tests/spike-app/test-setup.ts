@@ -12,7 +12,53 @@ if (typeof window !== "undefined") {
   window.Element.prototype.scrollTo = vi.fn();
 }
 
+function ensureLocalStorage(): void {
+  if (typeof window === "undefined") return;
+  const candidate = window.localStorage as Storage | undefined;
+  if (
+    candidate &&
+    typeof candidate.getItem === "function" &&
+    typeof candidate.setItem === "function" &&
+    typeof candidate.removeItem === "function" &&
+    typeof candidate.clear === "function"
+  ) {
+    return;
+  }
+
+  const store = new Map<string, string>();
+  const shim: Storage = {
+    get length() {
+      return store.size;
+    },
+    clear() {
+      store.clear();
+    },
+    getItem(key: string) {
+      return store.get(key) ?? null;
+    },
+    key(index: number) {
+      return [...store.keys()][index] ?? null;
+    },
+    removeItem(key: string) {
+      store.delete(key);
+    },
+    setItem(key: string, value: string) {
+      store.set(key, String(value));
+    },
+  };
+
+  Object.defineProperty(window, "localStorage", {
+    configurable: true,
+    value: shim,
+  });
+  Object.defineProperty(globalThis, "localStorage", {
+    configurable: true,
+    value: shim,
+  });
+}
+
 beforeEach(async () => {
+  ensureLocalStorage();
   localStorage.setItem("spike-lang", "en");
   await i18n.changeLanguage("en");
 });

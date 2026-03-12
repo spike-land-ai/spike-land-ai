@@ -47,7 +47,7 @@ describe("CategoryRail", () => {
       "aria-pressed",
       "false",
     );
-    expect(screen.getByRole("button", { name: "Developer Tools" })).toHaveAttribute(
+    expect(screen.getByRole("button", { name: /Developer Tools/ })).toHaveAttribute(
       "aria-pressed",
       "true",
     );

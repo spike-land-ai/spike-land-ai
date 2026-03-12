@@ -1,15 +1,20 @@
 import { describe, expect, it, vi, beforeEach } from "vitest";
 import { renderHook } from "@testing-library/react";
 import { useBrowserBridge } from "@/ui/hooks/useBrowserBridge";
-import type { ChatMessage } from "@/ui/hooks/useChat";
+import type { ConversationItem } from "@/ui/hooks/useChat";
 
-function makeMessage(overrides: Partial<ChatMessage> = {}): ChatMessage {
+function makeToolCallItem(
+  overrides: Partial<Extract<ConversationItem, { kind: "tool_call" }>> = {},
+): Extract<ConversationItem, { kind: "tool_call" }> {
   return {
-    id: "msg-1",
-    role: "assistant",
-    content: "",
+    id: "item-1",
+    kind: "tool_call",
+    toolCallId: "tool-1",
+    name: "browser_screenshot",
+    args: {},
+    status: "pending",
+    transport: "browser",
     timestamp: Date.now(),
-    browserCommands: [],
     ...overrides,
   };
 }
@@ -26,28 +31,30 @@ describe("useBrowserBridge", () => {
 
   it("navigates internally using router for paths starting with /", () => {
     const onResult = vi.fn();
-    const messages = [
-      makeMessage({
-        browserCommands: [
-          { tool: "browser_navigate", args: { url: "/tools" }, requestId: "req-1" },
-        ],
+    const items = [
+      makeToolCallItem({
+        toolCallId: "req-1",
+        name: "browser_navigate",
+        args: { url: "/tools" },
       }),
     ];
 
-    renderHook(() => useBrowserBridge({ messages, onResult, router: mockRouter as never }));
+    renderHook(() => useBrowserBridge({ items, onResult, router: mockRouter as never }));
 
     expect(mockRouter.navigate).toHaveBeenCalledWith({ to: "/tools" });
   });
 
   it("navigates to section name by prepending /", () => {
     const onResult = vi.fn();
-    const messages = [
-      makeMessage({
-        browserCommands: [{ tool: "browser_navigate", args: { url: "store" }, requestId: "req-2" }],
+    const items = [
+      makeToolCallItem({
+        toolCallId: "req-2",
+        name: "browser_navigate",
+        args: { url: "store" },
       }),
     ];
 
-    renderHook(() => useBrowserBridge({ messages, onResult, router: mockRouter as never }));
+    renderHook(() => useBrowserBridge({ items, onResult, router: mockRouter as never }));
 
     expect(mockRouter.navigate).toHaveBeenCalledWith({ to: "/store" });
   });
@@ -55,15 +62,15 @@ describe("useBrowserBridge", () => {
   it("opens external URLs in new tab", () => {
     const openSpy = vi.spyOn(window, "open").mockReturnValue(null);
     const onResult = vi.fn();
-    const messages = [
-      makeMessage({
-        browserCommands: [
-          { tool: "browser_navigate", args: { url: "https://example.com" }, requestId: "req-3" },
-        ],
+    const items = [
+      makeToolCallItem({
+        toolCallId: "req-3",
+        name: "browser_navigate",
+        args: { url: "https://example.com" },
       }),
     ];
 
-    renderHook(() => useBrowserBridge({ messages, onResult, router: mockRouter as never }));
+    renderHook(() => useBrowserBridge({ items, onResult, router: mockRouter as never }));
 
     expect(openSpy).toHaveBeenCalledWith("https://example.com", "_blank");
     expect(mockRouter.navigate).not.toHaveBeenCalled();
@@ -75,15 +82,15 @@ describe("useBrowserBridge", () => {
     document.body.appendChild(div);
 
     const onResult = vi.fn();
-    const messages = [
-      makeMessage({
-        browserCommands: [
-          { tool: "browser_click", args: { selector: "#test-btn" }, requestId: "req-4" },
-        ],
+    const items = [
+      makeToolCallItem({
+        toolCallId: "req-4",
+        name: "browser_click",
+        args: { selector: "#test-btn" },
       }),
     ];
 
-    renderHook(() => useBrowserBridge({ messages, onResult, router: mockRouter as never }));
+    renderHook(() => useBrowserBridge({ items, onResult, router: mockRouter as never }));
 
     await vi.waitFor(() => {
       expect(onResult).toHaveBeenCalled();
@@ -96,15 +103,15 @@ describe("useBrowserBridge", () => {
 
   it("returns error for browser_click on missing element", async () => {
     const onResult = vi.fn();
-    const messages = [
-      makeMessage({
-        browserCommands: [
-          { tool: "browser_click", args: { selector: "#nonexistent" }, requestId: "req-5" },
-        ],
+    const items = [
+      makeToolCallItem({
+        toolCallId: "req-5",
+        name: "browser_click",
+        args: { selector: "#nonexistent" },
       }),
     ];
 
-    renderHook(() => useBrowserBridge({ messages, onResult, router: mockRouter as never }));
+    renderHook(() => useBrowserBridge({ items, onResult, router: mockRouter as never }));
 
     await vi.waitFor(() => {
       expect(onResult).toHaveBeenCalled();
@@ -112,19 +119,15 @@ describe("useBrowserBridge", () => {
 
     expect(onResult).toHaveBeenCalledWith(
       "req-5",
-      expect.objectContaining({ success: false, error: expect.stringContaining("#nonexistent") }),
+      expect.objectContaining({ success: false, error: expect.stringContaining("target not found") }),
     );
   });
 
   it("executes browser_read_text on body by default", async () => {
     const onResult = vi.fn();
-    const messages = [
-      makeMessage({
-        browserCommands: [{ tool: "browser_read_text", args: {}, requestId: "req-7" }],
-      }),
-    ];
+    const items = [makeToolCallItem({ toolCallId: "req-7", name: "browser_read_text" })];
 
-    renderHook(() => useBrowserBridge({ messages, onResult, router: mockRouter as never }));
+    renderHook(() => useBrowserBridge({ items, onResult, router: mockRouter as never }));
 
     await vi.waitFor(() => {
       expect(onResult).toHaveBeenCalled();
@@ -138,23 +141,19 @@ describe("useBrowserBridge", () => {
 
   it("does not process the same command twice (deduplication)", async () => {
     const onResult = vi.fn();
-    const messages = [
-      makeMessage({
-        browserCommands: [{ tool: "browser_screenshot", args: {}, requestId: "req-8" }],
-      }),
-    ];
+    const items = [makeToolCallItem({ toolCallId: "req-8", name: "browser_screenshot" })];
 
     const { rerender } = renderHook(
-      ({ msgs }) => useBrowserBridge({ messages: msgs, onResult, router: mockRouter as never }),
-      { initialProps: { msgs: messages } },
+      ({ currentItems }) =>
+        useBrowserBridge({ items: currentItems, onResult, router: mockRouter as never }),
+      { initialProps: { currentItems: items } },
     );
 
     await vi.waitFor(() => {
       expect(onResult).toHaveBeenCalledTimes(1);
     });
 
-    // Re-render with same messages — should not process again
-    rerender({ msgs: [...messages] });
+    rerender({ currentItems: [...items] });
 
     await new Promise((r) => setTimeout(r, 50));
     expect(onResult).toHaveBeenCalledTimes(1);
@@ -162,13 +161,9 @@ describe("useBrowserBridge", () => {
 
   it("returns error for unknown browser tool", async () => {
     const onResult = vi.fn();
-    const messages = [
-      makeMessage({
-        browserCommands: [{ tool: "browser_unknown", args: {}, requestId: "req-10" }],
-      }),
-    ];
+    const items = [makeToolCallItem({ toolCallId: "req-10", name: "browser_unknown" })];
 
-    renderHook(() => useBrowserBridge({ messages, onResult, router: mockRouter as never }));
+    renderHook(() => useBrowserBridge({ items, onResult, router: mockRouter as never }));
 
     await vi.waitFor(() => {
       expect(onResult).toHaveBeenCalled();
