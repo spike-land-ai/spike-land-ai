@@ -68,9 +68,11 @@ spa.get("/*", async (c) => {
 
   if (!object) {
     let fallback: R2ObjectBody | null = null;
+    let isPrerendered = false;
     for (const fallbackKey of resolveSpaFallbackKeys(path)) {
       fallback = await c.env.SPA_ASSETS.get(fallbackKey);
       if (fallback) {
+        isPrerendered = fallbackKey !== "index.html";
         break;
       }
     }
@@ -83,6 +85,7 @@ spa.get("/*", async (c) => {
     // 3. Last fallback: the SPA generic index.html shell
     if (!fallback) {
       fallback = await c.env.SPA_ASSETS.get("index.html");
+      isPrerendered = false;
     }
 
     if (!fallback) {
@@ -90,6 +93,17 @@ spa.get("/*", async (c) => {
     }
 
     let html = await fallback.text();
+
+    // Prerendered Astro pages already have full SEO meta tags — skip all injection.
+    if (isPrerendered) {
+      return new Response(html, {
+        status: getSpaShellStatusCode(path),
+        headers: {
+          "content-type": "text/html; charset=utf-8",
+          "cache-control": getSpaResponseCacheControl(true),
+        },
+      });
+    }
 
     // Inject dynamic metadata for /apps/:appId routes
     const appId =
@@ -133,6 +147,20 @@ spa.get("/*", async (c) => {
     if (blogSlug) {
       try {
         const row = await getBlogPostRow(c.env.DB, blogSlug);
+        if (!row) {
+          // No matching blog post — serve 404 shell with noindex
+          html = html.replace(
+            "</head>",
+            `<meta name="robots" content="noindex, nofollow" />\n</head>`,
+          );
+          return new Response(html, {
+            status: 404,
+            headers: {
+              "content-type": "text/html; charset=utf-8",
+              "cache-control": "public, max-age=0, must-revalidate",
+            },
+          });
+        }
         if (row) {
           const postTitle = escapeHtml(row.title);
           const postDesc = escapeHtml(row.description);
@@ -143,7 +171,7 @@ spa.get("/*", async (c) => {
               : null;
           const postImage = row.hero_image
             ? `https://spike.land${row.hero_image}${heroPrompt ? `?v=${hashImagePrompt(heroPrompt)}` : ""}`
-            : "https://spike.land/og-image.png";
+            : "https://spike.land/android-chrome-512x512.png";
           const postUrl = `https://spike.land${path}`;
 
           html = html.replace(/<title>[^<]*<\/title>/, `<title>${postTitle} — spike.land</title>`);

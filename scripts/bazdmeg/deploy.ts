@@ -131,14 +131,14 @@ function uploadFile(filePath: string, key: string): void {
 }
 
 export function deploySPA(): { uploaded: number; skipped: number } {
-  const distDir = join(process.cwd(), "src/spike-app/dist");
+  const distDir = join(process.cwd(), "packages/spike-web/dist");
   const sha = getHeadSha();
   const commitTime = getCommitTime();
 
   // Build spike-app
   console.log("  Building spike-app...");
   execSync("npm run build", {
-    cwd: join(process.cwd(), "src/spike-app"),
+    cwd: join(process.cwd(), "packages/spike-web"),
     stdio: "inherit",
   });
 
@@ -193,7 +193,7 @@ const WORKER_PACKAGES = [
 export function getPhase3Plan(): Phase3Plan {
   const state = loadDeployState();
   const currentSha = getHeadSha();
-  const spaDistExists = existsSync(join(process.cwd(), "src/spike-app/dist/index.html"));
+  const spaDistExists = existsSync(join(process.cwd(), "packages/spike-web/dist/index.html"));
   const workersPending = WORKER_PACKAGES.filter((pkg) => {
     const pkgDir = join(process.cwd(), "src", pkg);
     if (!existsSync(pkgDir)) return false;

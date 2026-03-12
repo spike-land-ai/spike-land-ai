@@ -73,7 +73,7 @@ describe("SPA cache headers", () => {
   });
 
   it("resolves prerender fallback keys from SPA paths", () => {
-    expect(resolveSpaFallbackKeys("/blog")).toEqual(["blog.html", "blog/index.html"]);
+    expect(resolveSpaFallbackKeys("/blog")).toEqual(["blog/index.html", "blog.html"]);
     expect(resolveSpaFallbackKeys("/docs/")).toEqual(["docs/index.html"]);
     expect(resolveSpaFallbackKeys("/")).toEqual([]);
   });
@@ -81,7 +81,13 @@ describe("SPA cache headers", () => {
   it("classifies known routes and API-like paths", () => {
     expect(isKnownSpaRoute("/")).toBe(true);
     expect(isKnownSpaRoute("/pricing")).toBe(true);
+    expect(isKnownSpaRoute("/apps")).toBe(true);
     expect(isKnownSpaRoute("/apps/demo")).toBe(true);
+    expect(isKnownSpaRoute("/blog")).toBe(true);
+    expect(isKnownSpaRoute("/blog/some-post")).toBe(true);
+    expect(isKnownSpaRoute("/docs")).toBe(true);
+    expect(isKnownSpaRoute("/docs/getting-started")).toBe(true);
+    expect(isKnownSpaRoute("/bugbook")).toBe(true);
     expect(isKnownSpaRoute("/unknown-route")).toBe(false);
     expect(isApiLikeSpaPath("/api/health")).toBe(true);
     expect(isApiLikeSpaPath("/mcp/tools")).toBe(true);

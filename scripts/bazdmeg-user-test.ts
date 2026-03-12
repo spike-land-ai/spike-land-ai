@@ -1,7 +1,11 @@
-import { PERSONAS } from "../src/code/@/lib/onboarding/personas.ts";
+import { PERSONAS } from "../src/frontend/monaco-editor/core-logic/lib/onboarding/personas.ts";
 import { spawnClaude } from "./bazdmeg/agent.ts";
-import { getOrCreateTab, getPageSnapshot, cleanup } from "../src/qa-studio/browser-session.ts";
-import { narrate } from "../src/qa-studio/narrate.ts";
+import {
+  getOrCreateTab,
+  getPageSnapshot,
+  cleanup,
+} from "../src/core/browser-automation/core-logic/browser-session.ts";
+import { narrate } from "../src/core/browser-automation/core-logic/narrate.ts";
 import * as fs from "node:fs";
 
 async function main() {
@@ -12,7 +16,7 @@ async function main() {
   try {
     const { page } = await getOrCreateTab(0);
     console.log("  [Browser] Navigating to https://spike.land...");
-    await page.goto("https://spike.land", { waitUntil: "networkidle" });
+    await page.goto("http://localhost:4321", { waitUntil: "networkidle" });
     const snapshot = await getPageSnapshot();
     if (snapshot?.tree) {
       const result = narrate(snapshot.tree, snapshot.title, snapshot.url);

@@ -17,8 +17,8 @@ version.get("/api/version", async (c) => {
     if (timeMatch?.[1]) buildTime = timeMatch[1];
   }
 
-  // Paginated list of all deployed assets
-  const assets: Array<{ key: string; size: number; etag: string; uploaded: string }> = [];
+  // Count total deployed assets without exposing the per-asset inventory
+  let totalAssets = 0;
   let cursor: string | undefined;
 
   do {
@@ -26,28 +26,11 @@ version.get("/api/version", async (c) => {
       ...(cursor !== undefined ? { cursor } : {}),
       limit: 1000,
     });
-    for (const obj of listing.objects) {
-      assets.push({
-        key: obj.key,
-        size: obj.size,
-        etag: obj.etag,
-        uploaded: obj.uploaded.toISOString(),
-      });
-    }
+    totalAssets += listing.objects.length;
     cursor = listing.truncated ? listing.cursor : undefined;
   } while (cursor);
 
-  // Extract available rollback SHAs from builds/ prefix
-  const rollbackShas = [
-    ...new Set(
-      assets
-        .filter((a) => a.key.startsWith("builds/"))
-        .map((a) => a.key.split("/")[1])
-        .filter(Boolean),
-    ),
-  ];
-
-  return c.json({ sha, buildTime, rollbackShas, assets });
+  return c.json({ sha, buildTime, totalAssets });
 });
 
 export { version };

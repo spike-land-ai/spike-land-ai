@@ -3,10 +3,14 @@ const EXACT_SPA_ROUTES = new Set([
   "/",
   "/about",
   "/analytics",
+  "/apps",
+  "/blog",
+  "/bugbook",
   "/build",
   "/callback",
   "/cockpit",
   "/dashboard",
+  "/docs",
   "/learn",
   "/login",
   "/mcp",
@@ -69,7 +73,7 @@ export interface SpaStaticAssetEdgeCacheSettings {
 }
 
 export function isHashedAssetKey(path: string): boolean {
-  return /\.[a-f0-9]{8,}\.\w+$/.test(path);
+  return /\.[a-zA-Z0-9_-]{8,}\.\w+$/.test(path);
 }
 
 export function normalizeSpaAssetKey(pathname: string): string {
@@ -137,17 +141,25 @@ export function resolveSpaFallbackKeys(pathname: string): string[] {
     return [];
   }
 
-  const fallbackKeys = [key.endsWith("/") ? `${key}index.html` : `${key}.html`];
-  if (!key.endsWith("/")) {
+  const fallbackKeys = [];
+
+  if (key.endsWith("/")) {
+    fallbackKeys.push(`${key}index.html`);
+  } else {
     fallbackKeys.push(`${key}/index.html`);
+    fallbackKeys.push(`${key}.html`);
   }
+
+  // If none of the specific path files exist, fallback to root index.html
+  // But wait, the main loop handles falling back to "index.html" at the very end
+  // We just provide the nested possibilities here.
   return fallbackKeys;
 }
 
 export function isKnownSpaRoute(path: string): boolean {
   return (
     EXACT_SPA_ROUTES.has(path) ||
-    PREFIXED_SPA_ROUTES.some((prefix) => path.startsWith(`${prefix}/`))
+    PREFIXED_SPA_ROUTES.some((prefix) => path === prefix || path.startsWith(`${prefix}/`))
   );
 }
 

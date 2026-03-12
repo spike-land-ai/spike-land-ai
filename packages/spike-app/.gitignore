@@ -1,4 +1,0 @@
-dist/
-.deploy-cache/
-*.log
-build_output.log

@@ -16,6 +16,7 @@ export * from "./fixer";
 export * from "./github-stars";
 export * from "./health";
 export * from "./live";
+export * from "./openai-compatible";
 export * from "./proxy";
 export * from "./quiz-badge";
 export * from "./r2";
