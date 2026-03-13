@@ -254,6 +254,7 @@ const dashboardRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/dashboard",
   component: Outlet,
+  notFoundComponent: NotFoundPage,
 });
 
 const dashboardIndexRoute = createRoute({
