@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { router } from "./router";
 import { ToastProvider } from "./components/Toast";
 import { ErrorBoundary } from "./components/ErrorBoundary";
+import { DrawerProvider } from "./components/drawer/DrawerProvider";
 import { reportError } from "../core-logic/reportError";
 import { beginBootstrapPageLoad } from "../core-logic/lib/pageLoadCounter";
 import { disableServiceWorkerCacheController } from "../core-logic/lib/serviceWorkerCache";
@@ -31,9 +32,11 @@ createRoot(rootEl).render(
   <StrictMode>
     <ErrorBoundary>
       <QueryClientProvider client={queryClient}>
-        <ToastProvider>
-          <RouterProvider router={router} />
-        </ToastProvider>
+        <DrawerProvider>
+          <ToastProvider>
+            <RouterProvider router={router} />
+          </ToastProvider>
+        </DrawerProvider>
       </QueryClientProvider>
     </ErrorBoundary>
   </StrictMode>,

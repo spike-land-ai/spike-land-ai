@@ -4,6 +4,7 @@ export * from "./useBugbook";
 export * from "./useCookieConsent";
 export * from "./useDarkMode";
 export * from "./useFocusTrap";
+export * from "./useInstalledApps";
 export * from "./useMonacoTypeAcquisition";
 export * from "./useQaStudioMcp";
 export * from "./useTranspiler";
