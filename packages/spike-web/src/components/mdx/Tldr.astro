@@ -1,3 +1,8 @@
 ---
 ---
-<div class="p-4 border border-dashed border-muted-foreground/30 rounded-lg text-center text-sm text-muted-foreground my-4">[Tldr Demo Component]</div>
+<div class="not-prose my-6 rounded-xl border border-primary/20 bg-primary/5 p-5">
+  <p class="mb-2 text-sm font-bold uppercase tracking-wider text-primary">TL;DR</p>
+  <div class="text-sm leading-relaxed text-muted-foreground [&>ul]:list-disc [&>ul]:pl-4 [&>ul]:space-y-1">
+    <slot />
+  </div>
+</div>

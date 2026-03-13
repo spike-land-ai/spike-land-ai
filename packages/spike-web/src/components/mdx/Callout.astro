@@ -1,3 +1,22 @@
 ---
+interface Props {
+  type?: 'info' | 'warning' | 'success' | 'error';
+}
+
+const { type = 'info' } = Astro.props;
+
+const styles: Record<string, { border: string; bg: string; icon: string }> = {
+  info: { border: 'border-blue-500/30', bg: 'bg-blue-500/5', icon: 'ℹ️' },
+  warning: { border: 'border-amber-500/30', bg: 'bg-amber-500/5', icon: '⚠️' },
+  success: { border: 'border-green-500/30', bg: 'bg-green-500/5', icon: '✅' },
+  error: { border: 'border-red-500/30', bg: 'bg-red-500/5', icon: '❌' },
+};
+
+const s = styles[type] ?? styles.info;
 ---
-<div class="p-4 border border-dashed border-muted-foreground/30 rounded-lg text-center text-sm text-muted-foreground my-4">[Callout Demo Component]</div>
+<div class:list={['not-prose my-6 rounded-xl border p-5', s.border, s.bg]}>
+  <div class="mb-2 text-lg">{s.icon}</div>
+  <div class="text-sm leading-relaxed text-muted-foreground">
+    <slot />
+  </div>
+</div>

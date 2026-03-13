@@ -1,3 +1,19 @@
 ---
+import { SpikeChatEmbed } from '../../../../../src/core/block-website/ui/SpikeChatEmbed';
+
+interface Props {
+  channelSlug?: string;
+  workspaceSlug?: string;
+  guestAccess?: boolean;
+  height?: number | string;
+  blogSlug?: string;
+  blogTitle?: string;
+  contentSnippet?: string;
+  persona?: string;
+}
+
+const props = Astro.props;
 ---
-<div class="p-4 border border-dashed border-muted-foreground/30 rounded-lg text-center text-sm text-muted-foreground my-4">[SpikeChatEmbed Demo Component]</div>
+<div class="not-prose my-8">
+  <SpikeChatEmbed client:visible {...props} />
+</div>

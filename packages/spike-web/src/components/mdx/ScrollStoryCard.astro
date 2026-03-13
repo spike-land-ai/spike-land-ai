@@ -1,3 +1,14 @@
 ---
+import { ScrollStoryCard } from '../../../../../src/core/block-website/animation-ui/ScrollStoryCard';
+
+interface Props {
+  title: string;
+  illustration: 'restaurant' | 'usb' | 'embassy' | 'brain';
+  mappings?: Array<{ left: string; right: string }>;
+}
+
+const { title, illustration, mappings } = Astro.props;
 ---
-<div class="p-4 border border-dashed border-muted-foreground/30 rounded-lg text-center text-sm text-muted-foreground my-4">[ScrollStoryCard Demo Component]</div>
+<div class="not-prose my-8">
+  <ScrollStoryCard client:visible title={title} illustration={illustration} mappings={mappings} />
+</div>

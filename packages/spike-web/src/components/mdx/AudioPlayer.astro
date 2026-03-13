@@ -1,3 +1,13 @@
 ---
+import { AudioPlayer } from '../../../../../src/core/block-website/ui/BlogCompatComponents';
+
+interface Props {
+  src: string;
+  title?: string;
+}
+
+const { src, title } = Astro.props;
 ---
-<div class="p-4 border border-dashed border-muted-foreground/30 rounded-lg text-center text-sm text-muted-foreground my-4">[AudioPlayer Demo Component]</div>
+<div class="not-prose my-8">
+  <AudioPlayer client:visible src={src} title={title} />
+</div>

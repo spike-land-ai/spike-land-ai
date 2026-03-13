@@ -1,0 +1,162 @@
+[
+  {
+    "id": "01",
+    "filename": "chat-overflow.png",
+    "scene": "SCENE 1 — The Problem",
+    "prompt": "A dark screen filled with endless scrolling AI chat messages rendered in glowing green terminal text on black background. The text is intentionally blurred and overwhelming, creating a sense of information overload. Mysterious fog and soft amber light seep from the edges of the frame. Square composition, cinematic lighting, mysterious dark-tech aesthetic, moody atmosphere.",
+    "negative_prompt": "bright colors, happy, cartoon, watermark, text overlay, UI chrome",
+    "aspect_ratio": "1:1",
+    "tier": "TIER_0_5K",
+    "seed": 42
+  },
+  {
+    "id": "02",
+    "filename": "builder-keyboard.png",
+    "scene": "SCENE 1 — The Problem",
+    "prompt": "Close-up of a developer's hands typing on a mechanical keyboard, reflected in a dark glossy monitor. Through the window behind, the lights of Brighton Pier blur into golden bokeh against a night sky. The monitor shows faint code. Cinematic, intimate, moody noir photography style. Square composition, shallow depth of field, mysterious atmosphere.",
+    "negative_prompt": "daytime, bright, cartoon, full body shot, watermark",
+    "aspect_ratio": "1:1",
+    "tier": "TIER_0_5K",
+    "seed": 43
+  },
+  {
+    "id": "03",
+    "filename": "tangled-threads.png",
+    "scene": "SCENE 2 — The Insight",
+    "prompt": "An abstract tangled ball of glowing luminescent threads suspended in pure darkness. Each thread is a different color — some vibrant cyan and amber, others dim and fading gray. The threads are chaotic, intertwined, representing messy chat transcripts becoming entropy. Dark background, dramatic lighting from within the tangle. Square composition, mysterious, abstract digital art.",
+    "negative_prompt": "text, watermark, human figures, bright background, cartoon",
+    "aspect_ratio": "1:1",
+    "tier": "TIER_0_5K",
+    "seed": 44
+  },
+  {
+    "id": "04",
+    "filename": "threads-compress.png",
+    "scene": "SCENE 2 — The Insight",
+    "prompt": "The same tangled thread ball now compressing and transforming. The dim gray threads dissolve into particles. Only six bright threads remain, forming a clean hexagonal geometric shape. The light intensifies at the center, amber and cyan glow. Particles scatter outward from the compression. Dark background, transformative moment captured. Square composition, luminous, mysterious.",
+    "negative_prompt": "text, watermark, bright background, messy, cartoon",
+    "aspect_ratio": "1:1",
+    "tier": "TIER_0_5K",
+    "seed": 45
+  },
+  {
+    "id": "05",
+    "filename": "prd-crystal.png",
+    "scene": "SCENE 2 — The Insight",
+    "prompt": "A floating crystalline hexagonal artifact with six perfectly defined facets, each subtly labeled with glowing text: intent, task, constraints, acceptance, context, priority. The crystal glows warm amber against a deep blue-black void. Light refracts through the crystal creating caustic patterns. Elegant, geometric, precious gem aesthetic. Square composition, mysterious, cinematic lighting.",
+    "negative_prompt": "messy, cluttered, bright background, cartoon, watermark",
+    "aspect_ratio": "1:1",
+    "tier": "TIER_0_5K",
+    "seed": 46
+  },
+  {
+    "id": "06",
+    "filename": "three-tier-platforms.png",
+    "scene": "SCENE 3 — How It Works",
+    "prompt": "Three floating transparent platforms stacked vertically in dark space, connected by upward-flowing light arrows. Bottom platform is simple and transparent labeled 'Passthrough'. Middle platform has a glowing pattern-matching grid labeled 'Template'. Top platform has a brain-like neural icon labeled 'Model'. Architectural, spatial, clean tech diagram aesthetic. Square composition, dark mysterious background, amber and cyan accent lighting.",
+    "negative_prompt": "cluttered, messy, bright background, cartoon, watermark, realistic humans",
+    "aspect_ratio": "1:1",
+    "tier": "TIER_0_5K",
+    "seed": 47
+  },
+  {
+    "id": "07",
+    "filename": "compression-comparison.png",
+    "scene": "SCENE 3 — How It Works",
+    "prompt": "A dramatic split-screen data visualization. Left side shows a dense wall of messy chat text highlighted in soft red, with a token counter showing '2847 tokens' in red. Right side shows a clean minimal PRD card with six structured fields highlighted in green, counter showing '127 tokens' in green. A large dramatic arrow between them with '95%' compression ratio. Dark background, cinematic data viz style. Square composition, mysterious tech aesthetic.",
+    "negative_prompt": "bright background, cartoon, watermark, cluttered borders",
+    "aspect_ratio": "1:1",
+    "tier": "TIER_0_5K",
+    "seed": 48
+  },
+  {
+    "id": "08",
+    "filename": "api-portal.png",
+    "scene": "SCENE 4 — The OpenAPI Endpoint",
+    "prompt": "A glowing sci-fi portal gateway rendered as a geometric arch, with the URL 'POST /v1/chat/completions' floating above it in elegant monospace font. Data streams flow through the portal, transforming from chaotic scattered particles on one side to ordered structured beams on the other. Deep blue and amber color palette. Square composition, mysterious portal energy, dark tech aesthetic, cinematic volumetric lighting.",
+    "negative_prompt": "bright daylight, cartoon, watermark, realistic humans, cluttered",
+    "aspect_ratio": "1:1",
+    "tier": "TIER_0_5K",
+    "seed": 49
+  },
+  {
+    "id": "09",
+    "filename": "terminal-curl.png",
+    "scene": "SCENE 4 — The OpenAPI Endpoint",
+    "prompt": "A dark hacker-aesthetic terminal screen showing a curl command hitting an API endpoint. Amber monospace text on pure black background. The command shows 'curl edge.spike.land/v1/chat/completions' with a JSON response below showing structured PRD output fields. Subtle screen glow reflected on a dark desk surface. Authentic developer terminal aesthetic. Square composition, mysterious, moody lighting.",
+    "negative_prompt": "bright colors, cartoon, watermark, UI chrome, colorful IDE",
+    "aspect_ratio": "1:1",
+    "tier": "TIER_0_5K",
+    "seed": 50
+  },
+  {
+    "id": "10",
+    "filename": "model-wheel.png",
+    "scene": "SCENE 4 — The OpenAPI Endpoint",
+    "prompt": "A circular model selection wheel with four AI provider logos arranged symmetrically — representing OpenAI, Anthropic, Google, and xAI. At the center, 'spike-agent-v1' glows as the hub. Between the user (bottom) and the models (top), a hexagonal PRD filter lens refracts and focuses the light. Dark space background, technical diagram meets constellation art. Square composition, balanced, mysterious, amber and cyan accents.",
+    "negative_prompt": "cluttered, bright background, cartoon, watermark, text heavy",
+    "aspect_ratio": "1:1",
+    "tier": "TIER_0_5K",
+    "seed": 51
+  },
+  {
+    "id": "11",
+    "filename": "cloudflare-constellation.png",
+    "scene": "SCENE 5 — Deploy Your Own",
+    "prompt": "The Cloudflare Workers logo reimagined as a glowing orange constellation of stars against a dark cosmic sky. Below it, a subtle terminal overlay shows 'wrangler deploy' in amber text. Edge compute nodes appear as smaller stars spreading across a stylized dark world map silhouette. Cosmic infrastructure visualization. Square composition, mysterious, dark space aesthetic, orange and amber glow.",
+    "negative_prompt": "bright daylight, cartoon, watermark, realistic earth photo, cluttered",
+    "aspect_ratio": "1:1",
+    "tier": "TIER_0_5K",
+    "seed": 52
+  },
+  {
+    "id": "12",
+    "filename": "env-vars-orbit.png",
+    "scene": "SCENE 5 — Deploy Your Own",
+    "prompt": "Floating translucent key-value configuration tiles orbiting around a central Cloudflare Workers icon like planets around a star. The tiles show 'PRD_COMPRESSION_MODE: auto' and 'GEMINI_API_KEY: ***' in clean monospace font. Soft amber glow on each tile, dark space background. Clean, configurational, orbital mechanics aesthetic. Square composition, mysterious, minimal, elegant dark tech.",
+    "negative_prompt": "bright background, cluttered, cartoon, watermark, realistic",
+    "aspect_ratio": "1:1",
+    "tier": "TIER_0_5K",
+    "seed": 53
+  },
+  {
+    "id": "13",
+    "filename": "pipeline-flow.png",
+    "scene": "SCENE 5 — Deploy Your Own",
+    "prompt": "A four-node pipeline flow diagram rendered as glowing neural nodes connected by luminous light trails in dark space. The nodes from left to right: 'PRD Filter' (brightest, pulsing amber), 'Router Agent', 'Docs Agent', 'Synthesis Agent'. Light flows left to right through the connections, carrying structured data. Neural network meets constellation art. Square composition, connected, luminous, mysterious dark background.",
+    "negative_prompt": "bright background, cartoon, watermark, cluttered text, realistic humans",
+    "aspect_ratio": "1:1",
+    "tier": "TIER_0_5K",
+    "seed": 54
+  },
+  {
+    "id": "14",
+    "filename": "builder-dawn.png",
+    "scene": "SCENE 6 — Why This Matters",
+    "prompt": "A solitary developer figure silhouetted against a dramatic dawn sky on Brighton beach. Pebble beach in foreground. A laptop sits open on the pebbles, its screen glowing with a small amber crystal PRD artifact. The sea reflects golden-pink sunrise light. The figure stands contemplative, looking at the horizon. Emotional, dawn light, solitary heroic moment. Square composition, cinematic, mysterious atmosphere.",
+    "negative_prompt": "crowd, bright midday, cartoon, watermark, urban, indoor",
+    "aspect_ratio": "1:1",
+    "tier": "TIER_0_5K",
+    "seed": 55
+  },
+  {
+    "id": "15",
+    "filename": "before-after.png",
+    "scene": "SCENE 6 — Why This Matters",
+    "prompt": "A dramatic before-and-after split composition. Left half: a cluttered chaotic desk with multiple monitors showing messy chat windows, sticky notes everywhere, papers scattered — representing team overhead and transcript chaos, tinted in cool blue-gray. Right half: a single clean minimal dark screen showing one glowing PRD crystal artifact and a green shipping notification — representing solo developer power, tinted warm amber. Square composition, high contrast, mysterious, cinematic.",
+    "negative_prompt": "bright, happy, cartoon, watermark, realistic humans faces",
+    "aspect_ratio": "1:1",
+    "tier": "TIER_0_5K",
+    "seed": 56
+  },
+  {
+    "id": "16",
+    "filename": "spike-constellation.png",
+    "scene": "SCENE 7 — Call to Action",
+    "prompt": "The spike.land logo reimagined as a luminous constellation in deep space. The hexagonal PRD crystal artifact orbits the logo like a moon. Below, the URL 'edge.spike.land' glows in elegant amber monospace text. A subtle 'Try it now' appears in softer light. Stars and nebula dust in the background. Brand identity meets cosmic mystery. Square composition, inviting yet mysterious, dark space aesthetic, amber and deep blue palette.",
+    "negative_prompt": "bright background, cartoon, watermark, cluttered, realistic",
+    "aspect_ratio": "1:1",
+    "tier": "TIER_0_5K",
+    "seed": 57
+  }
+]
