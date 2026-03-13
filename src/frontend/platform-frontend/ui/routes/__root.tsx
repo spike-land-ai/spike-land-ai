@@ -13,6 +13,7 @@ import { AppFooter } from "../components/AppFooter";
 import { CookieConsent } from "../components/CookieConsent";
 import { ThemeSwitcher } from "../components/ThemeSwitcher";
 import { WelcomeModal } from "../components/WelcomeModal";
+import { QuizPersonaBanner } from "../components/quiz/QuizPersonaBanner";
 import { apiUrl } from "../../core-logic/api";
 import { initGoogleAds } from "../../core-logic/google-ads";
 import { resolveSupportedLanguage } from "../i18n";
@@ -422,6 +423,11 @@ export function RootLayout() {
               <p>{t("common:jsRequiredDesc")}</p>
             </div>
           </noscript>
+          {pathname !== "/quiz" && (
+            <div className="rubik-container pt-4">
+              <QuizPersonaBanner />
+            </div>
+          )}
           <Outlet />
         </main>
 
