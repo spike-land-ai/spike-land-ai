@@ -20,6 +20,7 @@ import { internalAnalytics } from "./internal-analytics";
 import { internalAuthMiddleware } from "./internal-auth";
 import { landingRoute } from "./landing";
 import { learnitRoute } from "./learnit";
+import { createRoute } from "./create";
 
 export function createApp(): Hono<{ Bindings: Env; Variables: AuthVariables }> {
   const app = new Hono<{ Bindings: Env; Variables: AuthVariables }>();
@@ -67,6 +68,7 @@ export function createApp(): Hono<{ Bindings: Env; Variables: AuthVariables }> {
   app.route("/oauth", oauthRoute);
   app.route("/tools", publicToolsRoute);
   app.route("/apps", publicAppsRoute);
+  app.route("/create", createRoute);
 
   // Landing page route (serves HTML for browser GET /)
   app.route("/", landingRoute);
