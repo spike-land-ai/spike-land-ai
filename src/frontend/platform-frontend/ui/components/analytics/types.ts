@@ -98,3 +98,13 @@ export interface DashboardData {
     earliestEvent: number | null;
   };
 }
+
+/** Shape returned by /analytics/events */
+export interface RawAnalyticsEvent {
+  id: string;
+  source: string;
+  event_type: string;
+  metadata: string | null;
+  client_id: string;
+  created_at: number;
+}

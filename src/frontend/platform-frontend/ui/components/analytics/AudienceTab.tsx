@@ -1,6 +1,7 @@
 import type { TimeRange, GA4GeoData, GA4DevicesData, GA4RetentionData } from "./types";
 import { useGA4Data } from "./useGA4Data";
 import { MiniDonut } from "./MiniDonut";
+import { downloadCsv, csvFilename } from "./exportCsv";
 
 export function AudienceTab({ range }: { range: TimeRange }) {
   const { data: devices, loading: devLoading } = useGA4Data<GA4DevicesData>(
@@ -87,9 +88,23 @@ export function AudienceTab({ range }: { range: TimeRange }) {
         {/* Countries */}
         {geo && geo.countries.length > 0 && (
           <div className="rubik-panel p-6">
-            <h2 className="mb-4 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-              Countries
-            </h2>
+            <div className="mb-4 flex items-center justify-between">
+              <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+                Countries
+              </h2>
+              <button
+                type="button"
+                onClick={() =>
+                  downloadCsv(
+                    geo.countries.map((c) => ({ country: c.country, users: c.users, sessions: c.sessions })),
+                    csvFilename("audience-countries", range),
+                  )
+                }
+                className="flex items-center gap-1.5 rounded-md border border-border px-2.5 py-1 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+              >
+                Export CSV
+              </button>
+            </div>
             <div className="space-y-2">
               {geo.countries.map((c) => {
                 const maxUsers = geo.countries[0]?.users ?? 1;

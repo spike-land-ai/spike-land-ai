@@ -8,10 +8,12 @@ import { AcquisitionTab } from "../components/analytics/AcquisitionTab";
 import { BehaviorTab } from "../components/analytics/BehaviorTab";
 import { AudienceTab } from "../components/analytics/AudienceTab";
 import { PlatformTab } from "../components/analytics/PlatformTab";
+import { EventsTab } from "../components/analytics/EventsTab";
+import { RealTimeMetrics } from "../components/analytics/RealTimeMetrics";
 
 const ADMIN_EMAILS = new Set(["zoltan.erdos@spike.land", "zolika84@gmail.com"]);
 
-type TabId = "overview" | "acquisition" | "behavior" | "audience" | "platform";
+type TabId = "overview" | "acquisition" | "behavior" | "audience" | "platform" | "events" | "realtime";
 
 const TABS: { id: TabId; label: string }[] = [
   { id: "overview", label: "Overview" },
@@ -19,6 +21,8 @@ const TABS: { id: TabId; label: string }[] = [
   { id: "behavior", label: "Behavior" },
   { id: "audience", label: "Audience" },
   { id: "platform", label: "Platform" },
+  { id: "events", label: "Events" },
+  { id: "realtime", label: "Real-time" },
 ];
 
 const RANGE_GROUPS: { label: string; ranges: TimeRange[] }[] = [
@@ -219,6 +223,10 @@ export function AnalyticsPage() {
       {activeTab === "platform" && (
         <PlatformTab range={timeRange} data={d1Data} loading={d1Loading} />
       )}
+      {activeTab === "events" && (
+        <EventsTab range={timeRange} d1Data={d1Data} />
+      )}
+      {activeTab === "realtime" && <RealTimeMetrics />}
     </div>
   );
 }

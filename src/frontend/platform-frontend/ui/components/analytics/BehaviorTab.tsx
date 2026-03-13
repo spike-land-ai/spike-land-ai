@@ -1,5 +1,6 @@
 import type { TimeRange, GA4ContentData, DashboardData } from "./types";
 import { useGA4Data } from "./useGA4Data";
+import { downloadCsv, csvFilename } from "./exportCsv";
 
 function formatDuration(seconds: number): string {
   if (seconds < 60) return `${Math.round(seconds)}s`;
@@ -50,9 +51,28 @@ export function BehaviorTab({ range, d1Data }: { range: TimeRange; d1Data: Dashb
       {/* Top Pages (GA4) */}
       {data && data.pages.length > 0 && (
         <div className="rubik-panel p-6">
-          <h2 className="mb-4 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-            Top Pages (GA4)
-          </h2>
+          <div className="mb-4 flex items-center justify-between">
+            <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+              Top Pages (GA4)
+            </h2>
+            <button
+              type="button"
+              onClick={() =>
+                downloadCsv(
+                  data.pages.map((p) => ({
+                    path: p.path,
+                    views: p.views,
+                    avg_duration_s: p.avgDuration.toFixed(1),
+                    bounce_rate: (p.bounceRate * 100).toFixed(2),
+                  })),
+                  csvFilename("behavior-pages", range),
+                )
+              }
+              className="flex items-center gap-1.5 rounded-md border border-border px-2.5 py-1 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+            >
+              Export CSV
+            </button>
+          </div>
           <div className="overflow-x-auto">
             <table className="w-full text-left text-sm">
               <thead>

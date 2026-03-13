@@ -1,6 +1,7 @@
 import type { TimeRange, GA4OverviewData, GA4RealtimeData } from "./types";
 import { useGA4Data } from "./useGA4Data";
 import { SparklineChart } from "./SparklineChart";
+import { downloadCsv, csvFilename } from "./exportCsv";
 
 function MetricCard({
   label,
@@ -84,9 +85,23 @@ export function OverviewTab({ range }: { range: TimeRange }) {
       {/* Time Series */}
       {!isRealtime && overview && overview.timeSeries.length > 1 && (
         <div className="rubik-panel p-6">
-          <h2 className="mb-4 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-            Traffic Over Time
-          </h2>
+          <div className="mb-4 flex items-center justify-between">
+            <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+              Traffic Over Time
+            </h2>
+            <button
+              type="button"
+              onClick={() =>
+                downloadCsv(
+                  overview.timeSeries.map((d) => ({ date: d.date, sessions: d.sessions, users: d.users })),
+                  csvFilename("overview-traffic", range),
+                )
+              }
+              className="flex items-center gap-1.5 rounded-md border border-border px-2.5 py-1 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+            >
+              Export CSV
+            </button>
+          </div>
           <SparklineChart
             data={overview.timeSeries.map((d) => d.sessions)}
             secondaryData={overview.timeSeries.map((d) => d.users)}

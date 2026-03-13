@@ -1,67 +1,6 @@
-import type { TimeRange, DashboardData, FunnelRow, PlatformEvent } from "./types";
-
-const FUNNEL_ORDER = [
-  "signup_completed",
-  "mcp_server_connected",
-  "first_tool_call",
-  "second_session",
-  "upgrade_completed",
-];
-
-const FUNNEL_LABELS: Record<string, string> = {
-  signup_completed: "Signup",
-  mcp_server_connected: "MCP Connected",
-  first_tool_call: "First Tool Call",
-  second_session: "Second Session",
-  upgrade_completed: "Upgrade",
-};
-
-function ConversionFunnel({ data }: { data: FunnelRow[] }) {
-  const ordered = FUNNEL_ORDER.map((type) => {
-    const row = data.find((r) => r.event_type === type);
-    return {
-      type,
-      label: FUNNEL_LABELS[type] ?? type,
-      count: row?.unique_users ?? 0,
-    };
-  }).filter((step) => step.count > 0 || data.length > 0);
-
-  const maxCount = Math.max(...ordered.map((s) => s.count), 1);
-
-  if (ordered.every((s) => s.count === 0)) {
-    return (
-      <div className="flex h-48 items-center justify-center rounded-2xl border-2 border-dashed border-border text-muted-foreground">
-        No funnel data yet
-      </div>
-    );
-  }
-
-  return (
-    <div className="space-y-2">
-      {ordered.map((step, i) => {
-        const prevCount = i > 0 ? (ordered[i - 1]?.count ?? 0) : 0;
-        const pct = i > 0 && prevCount > 0 ? ((step.count / prevCount) * 100).toFixed(1) : null;
-        return (
-          <div key={step.type} className="space-y-1">
-            <div className="flex items-center justify-between text-sm">
-              <span className="font-medium text-foreground">{step.label}</span>
-              <div className="flex items-center gap-2">
-                <span className="text-foreground font-semibold">{step.count}</span>
-                {pct && <span className="text-xs text-muted-foreground">{pct}% of prev</span>}
-              </div>
-            </div>
-            <div className="h-3 w-full rounded-full bg-muted">
-              <div
-                className="h-3 rounded-full bg-primary transition-all"
-                style={{ width: `${Math.max(2, (step.count / maxCount) * 100)}%` }}
-              />
-            </div>
-          </div>
-        );
-      })}
-    </div>
-  );
-}
+import type { TimeRange, DashboardData, PlatformEvent } from "./types";
+import { downloadCsv, csvFilename } from "./exportCsv";
+import { FunnelView } from "./FunnelView";
 
 function relativeTime(timestamp: number): string {
   const diff = Date.now() - timestamp;
@@ -205,36 +144,34 @@ export function PlatformTab({
         </div>
 
         {/* Conversion Funnel */}
-        {showFunnel && data?.funnel && (
-          <div className="rubik-panel p-6">
-            <h2 className="mb-4 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-              Conversion Funnel
-            </h2>
-            <ConversionFunnel data={data.funnel} />
-          </div>
-        )}
-
-        {!showFunnel && !loading && (
-          <div className="rubik-panel p-6">
-            <h2 className="mb-4 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-              Conversion Funnel
-            </h2>
-            <div className="flex h-48 flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-border">
-              <p className="text-sm text-muted-foreground">Requires 7d+ range</p>
-              <p className="max-w-52 text-center text-xs text-muted-foreground/70">
-                Switch to a 7-day or longer time window to view the signup-to-upgrade funnel.
-              </p>
-            </div>
-          </div>
-        )}
+        <div className="rubik-panel p-6 lg:col-span-2">
+          <h2 className="mb-4 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+            Conversion Funnel
+          </h2>
+          <FunnelView data={data?.funnel ?? null} range={range} loading={loading} />
+        </div>
       </div>
 
       {/* Events by Type */}
       {summary?.eventsByType && summary.eventsByType.length > 0 && (
         <div className="rubik-panel p-6">
-          <h2 className="mb-4 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-            Events by Type
-          </h2>
+          <div className="mb-4 flex items-center justify-between">
+            <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+              Events by Type
+            </h2>
+            <button
+              type="button"
+              onClick={() =>
+                downloadCsv(
+                  summary.eventsByType.map((e) => ({ event_type: e.event_type, count: e.count })),
+                  csvFilename("platform-events", range),
+                )
+              }
+              className="flex items-center gap-1.5 rounded-md border border-border px-2.5 py-1 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+            >
+              Export CSV
+            </button>
+          </div>
           <div className="overflow-x-auto">
             <table className="w-full text-left text-sm">
               <thead>

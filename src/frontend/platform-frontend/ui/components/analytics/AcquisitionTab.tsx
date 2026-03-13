@@ -1,6 +1,7 @@
 import type { TimeRange, GA4AcquisitionData } from "./types";
 import { useGA4Data } from "./useGA4Data";
 import { MiniDonut } from "./MiniDonut";
+import { downloadCsv, csvFilename } from "./exportCsv";
 
 export function AcquisitionTab({ range }: { range: TimeRange }) {
   const { data, loading } = useGA4Data<GA4AcquisitionData>("/analytics/ga4/acquisition", range);
@@ -36,9 +37,28 @@ export function AcquisitionTab({ range }: { range: TimeRange }) {
       {/* Top Sources table */}
       {data.sources.length > 0 && (
         <div className="rubik-panel p-6">
-          <h2 className="mb-4 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-            Top Sources
-          </h2>
+          <div className="mb-4 flex items-center justify-between">
+            <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+              Top Sources
+            </h2>
+            <button
+              type="button"
+              onClick={() =>
+                downloadCsv(
+                  data.sources.map((s) => ({
+                    source: s.source,
+                    medium: s.medium,
+                    sessions: s.sessions,
+                    bounce_rate: (s.bounceRate * 100).toFixed(2),
+                  })),
+                  csvFilename("acquisition-sources", range),
+                )
+              }
+              className="flex items-center gap-1.5 rounded-md border border-border px-2.5 py-1 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+            >
+              Export CSV
+            </button>
+          </div>
           <div className="overflow-x-auto">
             <table className="w-full text-left text-sm">
               <thead>
