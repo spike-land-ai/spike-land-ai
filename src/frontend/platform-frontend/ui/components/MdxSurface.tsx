@@ -13,6 +13,7 @@ import rehypeRaw from "rehype-raw";
 import { FileText, Loader2 } from "lucide-react";
 import { MdxCommandCard } from "./MdxCommandCard";
 import { isExecutableShellLanguage, resolveMcpCommandBlock } from "./mcp-command-line";
+import { ContextBlock } from "./context/ContextBlock";
 
 const ToolSurface = lazy(() =>
   import("./tool-surface/ToolSurface").then((m) => ({ default: m.ToolSurface })),
@@ -62,6 +63,14 @@ export function MdxSurface({ appSlug, content: initialContent, className = "" }:
         remarkPlugins={[remarkGfm]}
         rehypePlugins={[rehypeRaw]}
         components={{
+          // Persona / feature-flag / role content gate
+          // MDX usage: <context-block persona="ai-indie">...</context-block>
+          "context-block": ({
+            node: _node,
+            ...props
+          }: { node?: unknown; [key: string]: unknown }) => {
+            return <ContextBlock {...(props as Record<string, string>)} />;
+          },
           // Interactive tool surface for executing MCP tools inline
           toolsurface: ({ node: _node, ...props }: { node?: unknown; [key: string]: unknown }) => {
             const name = (props as Record<string, string>).name;
