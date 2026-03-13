@@ -5,6 +5,10 @@ import { handleFetchApi } from "../../src/edge-api/backend/lazy-imports/fetchHan
 import { createMockEnv } from "../../src/edge-api/backend/edge/test-utils.js";
 import { handleCORS } from "../../src/edge-api/backend/core-logic/utils.js";
 
+vi.mock("../../src/edge-api/backend/core-logic/utils", () => ({
+  handleCORS: vi.fn(),
+}));
+
 interface MockWebSocket extends WebSocket {
   accept: Mock;
   addEventListener: Mock;
@@ -65,10 +69,6 @@ describe("FetchHandler", () => {
       passThroughOnException: () => {},
       props: {},
     } as unknown as ExecutionContext;
-
-    vi.mock("../../src/edge-api/backend/core-logic/utils", () => ({
-      handleCORS: vi.fn(),
-    }));
   });
 
   describe("CORS Handling", () => {
