@@ -46,6 +46,7 @@ function withSuspense(
  */
 export const ROUTE_PRD_MAP: Record<string, string> = {
   "/apps": "route:/apps",
+  "/chess": "route:/chess",
   "/blog": "route:/blog",
   "/dashboard": "route:/dashboard",
   "/cockpit": "route:/dashboard",
@@ -405,6 +406,12 @@ const bazdmegRoute = createRoute({
   component: withSuspense(() => import("./bazdmeg/BazdmegPage"), "BazdmegPage"),
 });
 
+const chessRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/chess",
+  component: withSuspense(() => import("./routes/chess"), "ChessPage"),
+});
+
 const whatWeDoRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/what-we-do",
@@ -455,6 +462,7 @@ const routeTree = rootRoute.addChildren([
   cockpitRoute,
   rubikChatRoute,
   bazdmegRoute,
+  chessRoute,
   whatWeDoRoute,
   migrateRoute,
   vibeCodeRoute,
