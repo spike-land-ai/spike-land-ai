@@ -1,3 +1,61 @@
 ---
+interface Props {
+  href: string;
+  label: string;
+  variant?: 'primary' | 'secondary' | 'outline';
+}
+
+const { href, label, variant = 'primary' } = Astro.props;
 ---
-<div class="p-4 border border-dashed border-muted-foreground/30 rounded-lg text-center text-sm text-muted-foreground my-4">[CTAButton Demo Component]</div>
+
+<a href={href} class:list={['cta-btn', `cta-btn--${variant}`]}>{label}</a>
+
+<style>
+  .cta-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.625rem 1.25rem;
+    border-radius: var(--radius-lg);
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-decoration: none;
+    letter-spacing: -0.01em;
+    transition: opacity var(--duration-fast) var(--ease),
+                transform var(--duration-fast) var(--ease),
+                box-shadow var(--duration-fast) var(--ease);
+    cursor: pointer;
+  }
+
+  .cta-btn:hover {
+    opacity: 0.88;
+    transform: translateY(-1px);
+  }
+
+  .cta-btn:active {
+    transform: translateY(0);
+  }
+
+  .cta-btn--primary {
+    background: var(--fg);
+    color: var(--bg);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .cta-btn--secondary {
+    background: var(--primary-color);
+    color: var(--primary-fg);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .cta-btn--outline {
+    background: transparent;
+    color: var(--fg);
+    border: 1.5px solid var(--border-color);
+  }
+
+  .cta-btn--outline:hover {
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+  }
+</style>

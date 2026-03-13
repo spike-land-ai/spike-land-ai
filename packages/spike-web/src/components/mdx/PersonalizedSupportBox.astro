@@ -1,3 +1,427 @@
 ---
+interface Props {
+  showMigrationTiers?: boolean;
+}
+
+const { showMigrationTiers = false } = Astro.props;
 ---
-<div class="p-4 border border-dashed border-muted-foreground/30 rounded-lg text-center text-sm text-muted-foreground my-4">[PersonalizedSupportBox Demo Component]</div>
+
+<div class="support-box rubik-panel" data-support-box>
+  <!-- Thank-you banner (shown when ?supported=1) -->
+  <div class="thank-you-banner" data-thank-you hidden>
+    Thank you for your support!
+  </div>
+
+  <!-- Section 1: Fistbump -->
+  <div class="support-section">
+    <h3 class="support-heading">Show Support</h3>
+    <p class="support-desc">If this was useful, give it a fistbump.</p>
+    <div class="fistbump-row">
+      <button class="fistbump-btn" data-fistbump-btn aria-label="Fistbump this post">
+        <span class="fistbump-emoji" data-fistbump-emoji>&#x1F44A;</span>
+        <span class="fistbump-count" data-fistbump-count>0</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Section 2: Donations -->
+  <div class="support-section">
+    <h3 class="support-heading">Buy Us a Coffee</h3>
+    <p class="support-desc">Help keep this content free and maintained.</p>
+    <div class="donate-row">
+      <button class="donate-btn" data-donate-btn data-amount="5">£5</button>
+      <button class="donate-btn" data-donate-btn data-amount="10">£10</button>
+      <button class="donate-btn" data-donate-btn data-amount="25">£25</button>
+      <div class="custom-amount-wrap">
+        <span class="custom-currency">£</span>
+        <input
+          type="number"
+          class="custom-amount-input"
+          data-custom-amount
+          placeholder="Other"
+          min="1"
+          max="10000"
+        />
+        <button class="donate-btn donate-btn--go" data-donate-custom-btn>Go</button>
+      </div>
+    </div>
+  </div>
+
+  {showMigrationTiers && (
+    <!-- Section 3: Migration Tiers -->
+    <div class="support-section">
+      <h3 class="support-heading">Migration Services</h3>
+      <p class="support-desc">Professional Next.js migration at every scale.</p>
+      <div class="tier-grid">
+        <div class="glass-card tier-card">
+          <span class="rubik-chip">Tier 1</span>
+          <h4 class="tier-name">Documentation</h4>
+          <p class="tier-price">$420</p>
+          <p class="tier-desc">Written migration plan with step-by-step guidance for your codebase.</p>
+          <button class="cta-tier-btn" data-tier-btn data-tier="blog">Get Started</button>
+        </div>
+        <div class="glass-card tier-card">
+          <span class="rubik-chip">Tier 2</span>
+          <h4 class="tier-name">Repo Migration Pass</h4>
+          <p class="tier-price">£1,000</p>
+          <p class="tier-desc">Automated migration scripts tailored to your project structure.</p>
+          <button class="cta-tier-btn" data-tier-btn data-tier="script">Get Started</button>
+        </div>
+        <div class="glass-card tier-card">
+          <span class="rubik-chip">Tier 3</span>
+          <h4 class="tier-name">MCP Migration Server</h4>
+          <p class="tier-price">$10,000</p>
+          <p class="tier-desc">Full MCP-powered migration server handling your entire codebase.</p>
+          <button class="cta-tier-btn" data-tier-btn data-tier="mcp">Get Started</button>
+        </div>
+      </div>
+      <p class="tier-note">Tiers 4-5 are enterprise engagements — <a href="mailto:hello@spike.land">contact us directly</a>.</p>
+    </div>
+  )}
+</div>
+
+<script>
+  document.addEventListener('astro:page-load', () => {
+    const boxes = document.querySelectorAll<HTMLElement>('[data-support-box]');
+    boxes.forEach(initSupportBox);
+  });
+
+  function getClientId(): string {
+    let id = localStorage.getItem('spike-client-id');
+    if (!id) {
+      id = crypto.randomUUID();
+      localStorage.setItem('spike-client-id', id);
+    }
+    return id;
+  }
+
+  function getSlug(): string {
+    return window.location.pathname.replace(/^\/blog\//, '').replace(/\/$/, '');
+  }
+
+  function initSupportBox(box: HTMLElement) {
+    const slug = getSlug();
+    const clientId = getClientId();
+
+    // Thank-you banner
+    const thankYou = box.querySelector<HTMLElement>('[data-thank-you]');
+    if (thankYou && new URLSearchParams(window.location.search).has('supported')) {
+      thankYou.hidden = false;
+    }
+
+    // Fistbump
+    const fistbumpBtn = box.querySelector<HTMLButtonElement>('[data-fistbump-btn]');
+    const fistbumpCount = box.querySelector<HTMLElement>('[data-fistbump-count]');
+    const fistbumpEmoji = box.querySelector<HTMLElement>('[data-fistbump-emoji]');
+    const bumped = localStorage.getItem(`spike-bumped-${slug}`);
+
+    if (bumped && fistbumpBtn) {
+      fistbumpBtn.classList.add('fistbump-btn--active');
+    }
+
+    // Fetch initial count
+    fetch(`/api/support/engagement/${slug}`)
+      .then(r => r.ok ? r.json() : null)
+      .then(data => {
+        if (data && fistbumpCount) {
+          fistbumpCount.textContent = String(data.fistbumps ?? data.count ?? 0);
+        }
+      })
+      .catch(() => {});
+
+    fistbumpBtn?.addEventListener('click', async () => {
+      if (localStorage.getItem(`spike-bumped-${slug}`)) return;
+      try {
+        const res = await fetch('/api/support/fistbump', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ slug, clientId }),
+        });
+        if (res.ok) {
+          localStorage.setItem(`spike-bumped-${slug}`, '1');
+          fistbumpBtn.classList.add('fistbump-btn--active');
+          if (fistbumpEmoji) fistbumpEmoji.style.transform = 'scale(1.3)';
+          setTimeout(() => { if (fistbumpEmoji) fistbumpEmoji.style.transform = ''; }, 300);
+          if (fistbumpCount) {
+            fistbumpCount.textContent = String(Number(fistbumpCount.textContent) + 1);
+          }
+        }
+      } catch {
+        // Graceful degradation
+      }
+    });
+
+    // Donations
+    async function donate(amount: number) {
+      try {
+        const res = await fetch('/api/support/donate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ slug, amount, clientId }),
+        });
+        if (res.ok) {
+          const data = await res.json();
+          if (data.url) window.location.href = data.url;
+        }
+      } catch {
+        // Graceful degradation
+      }
+    }
+
+    box.querySelectorAll<HTMLButtonElement>('[data-donate-btn]').forEach(btn => {
+      const amount = Number(btn.dataset.amount);
+      if (amount) btn.addEventListener('click', () => donate(amount));
+    });
+
+    const customInput = box.querySelector<HTMLInputElement>('[data-custom-amount]');
+    const customBtn = box.querySelector<HTMLButtonElement>('[data-donate-custom-btn]');
+    customBtn?.addEventListener('click', () => {
+      const val = Number(customInput?.value);
+      if (val > 0) donate(val);
+    });
+
+    // Migration tiers
+    box.querySelectorAll<HTMLButtonElement>('[data-tier-btn]').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const tier = btn.dataset.tier;
+        try {
+          const res = await fetch('/api/support/migration-checkout', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ tier, clientId }),
+          });
+          if (res.ok) {
+            const data = await res.json();
+            if (data.url) window.location.href = data.url;
+          }
+        } catch {
+          // Graceful degradation
+        }
+      });
+    });
+  }
+</script>
+
+<style>
+  .support-box {
+    margin: 2rem 0;
+  }
+
+  .thank-you-banner {
+    background: color-mix(in srgb, var(--primary-color) 12%, transparent);
+    color: var(--primary-color);
+    padding: 0.75rem 1rem;
+    border-radius: var(--radius-lg);
+    font-weight: 600;
+    text-align: center;
+    margin-bottom: 1.5rem;
+  }
+
+  .support-section {
+    padding: 1.5rem 0;
+  }
+
+  .support-section + .support-section {
+    border-top: 1px solid var(--border-color);
+  }
+
+  .support-heading {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: var(--fg);
+    margin: 0 0 0.25rem;
+  }
+
+  .support-desc {
+    color: var(--muted-fg);
+    font-size: 0.875rem;
+    margin: 0 0 1rem;
+  }
+
+  /* Fistbump */
+  .fistbump-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .fistbump-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border: 1.5px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    background: var(--card-bg);
+    color: var(--fg);
+    font-size: 1rem;
+    cursor: pointer;
+    transition: border-color var(--duration-fast) var(--ease),
+                background var(--duration-fast) var(--ease);
+  }
+
+  .fistbump-btn:hover {
+    border-color: var(--primary-color);
+  }
+
+  .fistbump-btn--active {
+    border-color: var(--primary-color);
+    background: color-mix(in srgb, var(--primary-color) 10%, transparent);
+  }
+
+  .fistbump-emoji {
+    display: inline-block;
+    transition: transform 0.3s var(--ease);
+  }
+
+  .fistbump-count {
+    font-weight: 600;
+    font-size: 0.875rem;
+  }
+
+  /* Donations */
+  .donate-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .donate-btn {
+    padding: 0.5rem 1rem;
+    border: 1.5px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    background: var(--card-bg);
+    color: var(--fg);
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: border-color var(--duration-fast) var(--ease),
+                background var(--duration-fast) var(--ease);
+  }
+
+  .donate-btn:hover {
+    border-color: var(--primary-color);
+    background: color-mix(in srgb, var(--primary-color) 8%, transparent);
+  }
+
+  .donate-btn--go {
+    background: var(--fg);
+    color: var(--bg);
+    border-color: var(--fg);
+  }
+
+  .donate-btn--go:hover {
+    opacity: 0.88;
+    background: var(--fg);
+    border-color: var(--fg);
+  }
+
+  .custom-amount-wrap {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    border: 1.5px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    padding: 0.25rem;
+    padding-left: 0.625rem;
+    background: var(--card-bg);
+  }
+
+  .custom-currency {
+    color: var(--muted-fg);
+    font-weight: 600;
+    font-size: 0.875rem;
+  }
+
+  .custom-amount-input {
+    width: 4rem;
+    border: none;
+    background: transparent;
+    color: var(--fg);
+    font-size: 0.875rem;
+    font-weight: 500;
+    outline: none;
+  }
+
+  .custom-amount-input::placeholder {
+    color: var(--muted-fg);
+  }
+
+  /* Migration Tiers */
+  .tier-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+  }
+
+  @media (max-width: 640px) {
+    .tier-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .tier-card {
+    padding: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .tier-name {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--fg);
+    margin: 0;
+  }
+
+  .tier-price {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--primary-color);
+    margin: 0;
+  }
+
+  .tier-desc {
+    font-size: 0.8125rem;
+    color: var(--muted-fg);
+    margin: 0;
+    flex: 1;
+  }
+
+  .cta-tier-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem 1rem;
+    background: var(--fg);
+    color: var(--bg);
+    border: none;
+    border-radius: var(--radius-lg);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity var(--duration-fast) var(--ease),
+                transform var(--duration-fast) var(--ease);
+  }
+
+  .cta-tier-btn:hover {
+    opacity: 0.88;
+    transform: translateY(-1px);
+  }
+
+  .cta-tier-btn:active {
+    transform: translateY(0);
+  }
+
+  .tier-note {
+    font-size: 0.8125rem;
+    color: var(--muted-fg);
+    margin-top: 1rem;
+  }
+
+  .tier-note a {
+    color: var(--primary-color);
+    text-decoration: underline;
+  }
+</style>
