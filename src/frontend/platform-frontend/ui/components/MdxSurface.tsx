@@ -2,6 +2,7 @@ import {
   useState,
   useEffect,
   useMemo,
+  useCallback,
   isValidElement,
   lazy,
   Suspense,
@@ -10,7 +11,7 @@ import {
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeRaw from "rehype-raw";
-import { FileText, Loader2 } from "lucide-react";
+import { FileText, Loader2, AlertCircle, RefreshCw } from "lucide-react";
 import { MdxCommandCard } from "./MdxCommandCard";
 import { isExecutableShellLanguage, resolveMcpCommandBlock } from "./mcp-command-line";
 
@@ -24,36 +25,68 @@ interface MdxSurfaceProps {
   className?: string;
 }
 
+type LoadState = "idle" | "loading" | "loaded" | "error";
+
 /**
  * MDX Surface: renders markdown/MDX content as an interactive app.
- * Supports embedding live MCP tool results via <toolresult> custom elements.
+ *
+ * Supports embedding live MCP tool surfaces via <toolsurface name="tool_name" />
+ * and displays embedded tool results via <toolresult name="tool_name">.
+ *
+ * Fetches MDX from /api/store/tools/:appSlug/mdx when content is not provided
+ * as a prop. Includes error display with retry button.
  */
 export function MdxSurface({ appSlug, content: initialContent, className = "" }: MdxSurfaceProps) {
-  const [content, setContent] = useState(initialContent || "");
-  const [isLoading, setIsLoading] = useState(!initialContent);
+  const [content, setContent] = useState(initialContent ?? "");
+  const [loadState, setLoadState] = useState<LoadState>(initialContent ? "loaded" : "idle");
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [retryCount, setRetryCount] = useState(0);
 
-  // Fetch MDX content from API if not provided
-  useEffect(() => {
+  const fetchContent = useCallback(() => {
     if (initialContent) {
       setContent(initialContent);
+      setLoadState("loaded");
       return;
     }
 
-    setIsLoading(true);
+    setLoadState("loading");
+    setErrorMessage(null);
+
     fetch(`/api/store/tools/${encodeURIComponent(appSlug)}/mdx`, { credentials: "include" })
-      .then((r) => {
+      .then(async (r) => {
         if (r.ok) return r.text();
-        return `# ${appSlug}\n\nNo MDX content available for this app.`;
+        const statusText = r.status === 404 ? "App not found" : `HTTP ${r.status}`;
+        throw new Error(statusText);
       })
       .then((text) => {
         setContent(text);
-        setIsLoading(false);
+        setLoadState("loaded");
       })
-      .catch(() => {
-        setContent(`# ${appSlug}\n\nFailed to load MDX content.`);
-        setIsLoading(false);
+      .catch((err: unknown) => {
+        const message = err instanceof Error ? err.message : "Failed to load content";
+        setErrorMessage(message);
+        setLoadState("error");
+        // Keep previous content visible while in error state
+        if (!content) {
+          setContent(`# ${appSlug}\n\nFailed to load MDX content.`);
+        }
       });
-  }, [appSlug, initialContent]);
+  }, [appSlug, initialContent, content]);
+
+  // Fetch on mount and on retry
+  useEffect(() => {
+    if (initialContent) {
+      setContent(initialContent);
+      setLoadState("loaded");
+      return;
+    }
+    fetchContent();
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- retryCount triggers re-fetch
+  }, [appSlug, initialContent, retryCount]);
+
+  const handleRetry = useCallback(() => {
+    setRetryCount((n) => n + 1);
+  }, []);
 
   const renderedContent = useMemo(() => {
     if (!content) return null;
@@ -64,7 +97,8 @@ export function MdxSurface({ appSlug, content: initialContent, className = "" }:
         components={{
           // Interactive tool surface for executing MCP tools inline
           toolsurface: ({ node: _node, ...props }: { node?: unknown; [key: string]: unknown }) => {
-            const name = (props as Record<string, string>).name;
+            const toolProps = props as Record<string, string>;
+            const name = toolProps.name ?? toolProps.tool;
             if (!name) return null;
             return (
               <div className="my-5">
@@ -76,14 +110,15 @@ export function MdxSurface({ appSlug, content: initialContent, className = "" }:
                     </div>
                   }
                 >
-                  <ToolSurface toolName={name} defaultExpanded />
+                  <ToolSurface toolName={name} appSlug={appSlug} defaultExpanded />
                 </Suspense>
               </div>
             );
           },
-          // Custom component for embedded tool results
+          // Embedded tool result display
           toolresult: ({ node: _node, ...props }: { node?: unknown; [key: string]: unknown }) => {
-            const name = (props as Record<string, string>).name || "unknown";
+            const resultProps = props as Record<string, ReactNode>;
+            const name = (resultProps.name as string | undefined) ?? "unknown";
             return (
               <div className="rubik-panel my-5 p-4">
                 <div className="mb-2 flex items-center gap-2">
@@ -93,7 +128,7 @@ export function MdxSurface({ appSlug, content: initialContent, className = "" }:
                   </span>
                 </div>
                 <div className="text-sm leading-7 text-muted-foreground">
-                  {(props as Record<string, ReactNode>).children || "Loading result..."}
+                  {resultProps.children ?? "Loading result..."}
                 </div>
               </div>
             );
@@ -184,14 +219,22 @@ export function MdxSurface({ appSlug, content: initialContent, className = "" }:
               {children}
             </blockquote>
           ),
+          ul: ({ children }) => (
+            <ul className="mb-4 space-y-1 pl-5 list-disc text-foreground/90">{children}</ul>
+          ),
+          ol: ({ children }) => (
+            <ol className="mb-4 space-y-1 pl-5 list-decimal text-foreground/90">{children}</ol>
+          ),
+          li: ({ children }) => <li className="text-[0.97rem] leading-7">{children}</li>,
+          hr: () => <hr className="my-6 border-border" />,
         }}
       >
         {content}
       </ReactMarkdown>
     );
-  }, [content]);
+  }, [content, appSlug]);
 
-  if (isLoading) {
+  if (loadState === "loading") {
     return (
       <div className={`flex items-center justify-center py-16 ${className}`}>
         <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
@@ -201,13 +244,41 @@ export function MdxSurface({ appSlug, content: initialContent, className = "" }:
 
   return (
     <div className={`rubik-panel flex h-full flex-col overflow-hidden ${className}`}>
+      {/* Header bar */}
       <div className="flex items-center justify-between gap-3 border-b border-border px-4 py-3">
         <div className="flex items-center gap-2">
           <FileText className="w-4 h-4 text-muted-foreground" />
           <span className="text-sm font-semibold tracking-[-0.02em]">MDX &mdash; {appSlug}</span>
         </div>
-        <span className="rubik-chip px-2.5 py-1 text-[10px]">editorial surface</span>
+        <div className="flex items-center gap-2">
+          {loadState === "error" && (
+            <button
+              type="button"
+              onClick={handleRetry}
+              aria-label="Retry loading MDX content"
+              className="inline-flex items-center gap-1.5 rounded-lg border border-destructive/40 bg-destructive/10 px-2.5 py-1 text-xs font-medium text-destructive transition-colors hover:bg-destructive/20 focus:outline-none focus:ring-2 focus:ring-destructive/30"
+            >
+              <RefreshCw className="w-3.5 h-3.5" />
+              Retry
+            </button>
+          )}
+          <span className="rubik-chip px-2.5 py-1 text-[10px]">editorial surface</span>
+        </div>
       </div>
+
+      {/* Error banner (non-blocking — content still shows below) */}
+      {loadState === "error" && errorMessage && (
+        <div
+          role="alert"
+          aria-live="assertive"
+          className="flex items-center gap-2 border-b border-destructive/20 bg-destructive/10 px-4 py-2.5 text-sm text-destructive"
+        >
+          <AlertCircle className="w-4 h-4 shrink-0" />
+          <span>{errorMessage}</span>
+        </div>
+      )}
+
+      {/* Content area */}
       <div className="flex-1 overflow-y-auto">
         <div className="mx-auto w-full max-w-3xl p-6 sm:p-8">{renderedContent}</div>
       </div>

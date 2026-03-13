@@ -1,108 +1,53 @@
-import { useState, useCallback, lazy, Suspense, useEffect } from "react";
-import { useParams, Link, useNavigate, useSearch } from "@tanstack/react-router";
-import { useApp } from "../../hooks/useApps";
-import { useAppSession } from "../../hooks/useAppSession";
+import { useEffect, useCallback, useState } from "react";
+import { useParams, Link } from "@tanstack/react-router";
+import { useApp, useApps, groupAppsByCategory } from "../../hooks/useApps";
 import { trackAnalyticsEvent } from "../../hooks/useAnalytics";
-import { AppMarkdownRenderer } from "../../src/components/tools/AppMarkdownRenderer";
-import { SpikeChatPanel } from "../../components/SpikeChatPanel";
-import { TerminalSurface } from "../../components/TerminalSurface";
 import { MdxSurface } from "../../components/MdxSurface";
-import type { AppUpdatedEvent } from "../../hooks/useSpikeChat";
+import { StoreAppCard } from "../../components/storefront/StoreAppCard";
 import {
-  RotateCcw,
   ArrowLeft,
-  MessageSquare,
-  TerminalIcon,
-  FileText,
-  Server,
+  Download,
+  ExternalLink,
+  Tag,
   Loader2,
+  PackageOpen,
 } from "lucide-react";
 
-const HackerNewsApp = lazy(() =>
-  import("../../apps/hackernews").then((m) => ({ default: m.HackerNewsApp })),
-);
-const PagesTemplateChooserApp = lazy(() =>
-  import("../../apps/pages-template-chooser").then((m) => ({ default: m.PagesTemplateChooserApp })),
-);
-const ChessArenaApp = lazy(() =>
-  import("../../apps/chess-arena").then((m) => ({ default: m.ChessArenaApp })),
-);
-const AiAutomatizalasApp = lazy(() =>
-  import("../../apps/ai-automatizalas").then((m) => ({ default: m.AiAutomatizalasApp })),
-);
-const SpikeChatApp = lazy(() =>
-  import("../../apps/spike-chat").then((m) => ({ default: m.SpikeChatApp })),
-);
+// ── App Detail Page ──────────────────────────────────────────────────────────
 
-type SurfaceType = "overview" | "chat" | "terminal" | "mdx";
-
-const SURFACES: { id: SurfaceType; label: string; icon: typeof MessageSquare }[] = [
-  { id: "overview", label: "Overview", icon: Server },
-  { id: "chat", label: "Chat", icon: MessageSquare },
-  { id: "terminal", label: "Terminal", icon: TerminalIcon },
-  { id: "mdx", label: "MDX", icon: FileText },
-];
-
-export function AppSessionPage() {
+/**
+ * Tool / App detail page for the store tools route.
+ *
+ * Renders:
+ * - App header (emoji, name, description, category badge, install CTA)
+ * - MDX surface with interactive tool embeds
+ * - Related apps sidebar (apps in the same category)
+ */
+export function AppDetailPage() {
   const { appSlug } = useParams({ strict: false });
-  const search = useSearch({ from: "/apps/$appSlug" }) as { surface?: SurfaceType };
-  const navigate = useNavigate();
-  const { data: app, isLoading, isError, error } = useApp(appSlug as string);
-  const [refreshKey, setRefreshKey] = useState(0);
+  const slug = appSlug as string;
 
-  // Track app view once the app data has loaded
+  const { data: app, isLoading, isError, error } = useApp(slug);
+  const { data: allApps } = useApps();
+
+  // Track page view
   useEffect(() => {
-    if (!app || !appSlug) return;
+    if (!app || !slug) return;
     trackAnalyticsEvent("app_view", {
-      appSlug,
+      appSlug: slug,
       appName: app.name,
       category: app.category ?? "",
     });
-  }, [appSlug, app]);
-
-  const { session, recordToolResult, resetSession, isToolAvailable } = useAppSession(
-    appSlug as string,
-    app?.graph || {},
-    app?.tools || [],
-  );
-
-  const channelId = `app-${appSlug}`;
-  const isHackerNews =
-    appSlug === "hackernews" || appSlug === "hn-reader" || appSlug === "hackernews-reader";
-  const isPagesTemplateChooser = appSlug === "pages-template-chooser";
-  const isChessArena = appSlug === "chess-arena";
-  const isAiAutomatizalas = appSlug === "ai-automatizalas";
-  const isSpikeChat = appSlug === "spike-chat";
-  const isShowcaseApp =
-    isHackerNews || isPagesTemplateChooser || isChessArena || isAiAutomatizalas || isSpikeChat;
-  const availableSurfaces = app?.tools.length
-    ? SURFACES
-    : SURFACES.filter((surface) => surface.id !== "terminal");
-  const activeSurface = availableSurfaces.some((surface) => surface.id === search.surface)
-    ? (search.surface as SurfaceType)
-    : "overview";
-
-  const setActiveSurface = useCallback(
-    (surface: SurfaceType) => {
-      void navigate({
-        to: "/apps/$appSlug",
-        params: { appSlug: appSlug ?? "" },
-        search: (prev) => ({ ...prev, surface }),
-      });
-    },
-    [appSlug, navigate],
-  );
-
-  const handleAppUpdated = useCallback((_event: AppUpdatedEvent) => {
-    // Trigger a refresh of the overview/preview when an app_updated event arrives
-    setRefreshKey((k) => k + 1);
-  }, []);
+  }, [slug, app]);
 
   if (isLoading) {
     return (
       <div className="flex h-64 items-center justify-center">
-        <div role="status" aria-live="polite" className="text-muted-foreground animate-pulse">
-          Loading app...
+        <div className="flex flex-col items-center gap-3">
+          <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
+          <span role="status" aria-live="polite" className="text-sm text-muted-foreground">
+            Loading app...
+          </span>
         </div>
       </div>
     );
@@ -110,253 +55,242 @@ export function AppSessionPage() {
 
   if (isError || !app) {
     return (
-      <div className="space-y-6">
-        <div className="rounded-xl border border-border bg-card p-8 text-center space-y-4">
-          <p className="text-muted-foreground">Unable to load app.</p>
+      <div className="mx-auto max-w-2xl py-16 px-4 text-center space-y-6">
+        <PackageOpen className="w-12 h-12 text-muted-foreground mx-auto" />
+        <div className="space-y-2">
+          <h2 className="text-xl font-semibold text-foreground">App not found</h2>
           <p className="text-sm text-muted-foreground">
-            {error instanceof Error ? error.message : "App not found."}
+            {error instanceof Error ? error.message : "This app could not be loaded."}
           </p>
-          <Link
-            to="/apps"
-            className="inline-flex rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
-          >
-            Back to Apps
-          </Link>
         </div>
+        <Link
+          to="/apps"
+          className="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground hover:bg-primary/90 transition-colors"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          Back to Apps
+        </Link>
       </div>
     );
   }
 
+  // Related apps: same category, excluding this app, max 6
+  const relatedApps = allApps
+    ? groupAppsByCategory(allApps.filter((a) => a.slug !== slug))
+        .find((g) => g.category === app.category)
+        ?.apps.slice(0, 6) ?? []
+    : [];
+
   return (
-    <div className="flex flex-col h-full max-w-6xl mx-auto">
-      {/* Header */}
-      <div className="flex items-center gap-4 border-b border-border pb-4 mb-0 px-2">
-        <Link
-          to="/apps"
-          className="p-2 -ml-2 rounded-full hover:bg-muted text-muted-foreground transition-colors"
-          title="Back to Apps"
-        >
-          <ArrowLeft className="w-5 h-5" />
-        </Link>
-        <div className="text-4xl">{app.emoji}</div>
-        <div className="flex-1 min-w-0">
-          <h1 className="text-2xl font-bold text-foreground tracking-tight">{app.name}</h1>
-          <p className="text-sm text-muted-foreground mt-0.5 truncate">{app.description}</p>
+    <div className="flex flex-col lg:flex-row min-h-screen gap-0">
+      {/* Main content column */}
+      <main className="flex-1 min-w-0 flex flex-col">
+        {/* App header */}
+        <AppHeader app={app} />
+
+        {/* MDX surface with interactive tools */}
+        <div className="flex-1">
+          <MdxSurface
+            appSlug={slug}
+            content={app.markdown || undefined}
+            className="h-full min-h-[60vh]"
+          />
         </div>
-      </div>
+      </main>
 
-      {/* Surface tabs */}
-      <div
-        className="flex gap-1 border-b border-border px-2 bg-muted/20"
-        role="tablist"
-        aria-label="App surfaces"
-      >
-        {availableSurfaces.map((surface) => {
-          const Icon = surface.icon;
-          const isActive = activeSurface === surface.id;
-          return (
-            <button
-              key={surface.id}
-              role="tab"
-              aria-selected={isActive}
-              aria-controls={`panel-${surface.id}`}
-              onClick={() => setActiveSurface(surface.id)}
-              className={`flex items-center gap-1.5 px-3 py-2.5 text-sm font-medium transition-colors
-                border-b-2 -mb-px ${
-                  isActive
-                    ? "border-primary text-foreground"
-                    : "border-transparent text-muted-foreground hover:text-foreground hover:border-border"
-                }`}
-            >
-              <Icon className="w-4 h-4" />
-              {surface.label}
-            </button>
-          );
-        })}
-      </div>
-
-      {/* Surface panels */}
-      <div className="flex-1 min-h-0 flex">
-        {/* Main surface content */}
-        <div
-          className="flex-1 min-w-0 overflow-hidden"
-          role="tabpanel"
-          id={`panel-${activeSurface}`}
+      {/* Related apps sidebar */}
+      {relatedApps.length > 0 && (
+        <aside
+          aria-label="Related apps"
+          className="w-full lg:w-72 xl:w-80 shrink-0 border-t lg:border-t-0 lg:border-l border-border bg-muted/10"
         >
-          {activeSurface === "overview" && (
-            <div className="flex flex-col lg:flex-row gap-8 p-4 overflow-y-auto h-full">
-              <div className="flex-1 min-w-0" key={refreshKey}>
-                {isHackerNews ? (
-                  <Suspense
-                    fallback={
-                      <div className="flex items-center justify-center py-16">
-                        <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
-                      </div>
-                    }
-                  >
-                    <HackerNewsApp />
-                  </Suspense>
-                ) : isPagesTemplateChooser ? (
-                  <Suspense
-                    fallback={
-                      <div className="flex items-center justify-center py-16">
-                        <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
-                      </div>
-                    }
-                  >
-                    <PagesTemplateChooserApp />
-                  </Suspense>
-                ) : isChessArena ? (
-                  <Suspense
-                    fallback={
-                      <div className="flex items-center justify-center py-16">
-                        <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
-                      </div>
-                    }
-                  >
-                    <ChessArenaApp />
-                  </Suspense>
-                ) : isAiAutomatizalas ? (
-                  <Suspense
-                    fallback={
-                      <div className="flex items-center justify-center py-16">
-                        <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
-                      </div>
-                    }
-                  >
-                    <AiAutomatizalasApp />
-                  </Suspense>
-                ) : isSpikeChat ? (
-                  <Suspense
-                    fallback={
-                      <div className="flex items-center justify-center py-16">
-                        <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
-                      </div>
-                    }
-                  >
-                    <SpikeChatApp />
-                  </Suspense>
-                ) : (
-                  <AppMarkdownRenderer
-                    content={app.markdown}
-                    appSlug={app.slug}
-                    graph={app.graph}
-                    session={session}
-                    recordToolResult={recordToolResult}
-                    isToolAvailable={isToolAvailable}
-                  />
-                )}
-              </div>
-
-              {/* Session sidebar (only for non-showcase apps) */}
-              {!isShowcaseApp && (
-                <div className="w-full lg:w-72 shrink-0">
-                  <div className="sticky top-4 space-y-4">
-                    <SessionPanel session={session} onReset={resetSession} />
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
-
-          {activeSurface === "chat" && (
-            <SpikeChatPanel
-              channelId={channelId}
-              onAppUpdated={handleAppUpdated}
-              className="h-full"
-            />
-          )}
-
-          {activeSurface === "terminal" && (
-            <TerminalSurface
-              appSlug={appSlug as string}
-              availableTools={app.tools}
-              className="h-full"
-            />
-          )}
-
-          {activeSurface === "mdx" && (
-            <MdxSurface appSlug={appSlug as string} content={app.markdown} className="h-full" />
-          )}
-        </div>
-      </div>
+          <RelatedAppsSidebar
+            apps={relatedApps}
+            category={app.category}
+            currentSlug={slug}
+          />
+        </aside>
+      )}
     </div>
   );
 }
 
-/** Sidebar showing session outputs and history */
-function SessionPanel({
-  session,
-  onReset,
-}: {
-  session: {
-    outputs: Record<string, unknown>;
-    history: Array<{ tool: string; timestamp: number }>;
+// ── App Header ────────────────────────────────────────────────────────────────
+
+interface AppHeaderProps {
+  app: {
+    slug: string;
+    name: string;
+    description: string;
+    emoji: string;
+    category: string;
+    tagline?: string;
+    pricing?: string;
+    tags?: string[];
+    tool_count?: number;
+    is_new?: boolean;
+    is_featured?: boolean;
   };
-  onReset: () => void;
-}) {
+}
+
+function AppHeader({ app }: AppHeaderProps) {
+  const [installed, setInstalled] = useState(false);
+
+  const handleInstall = useCallback(() => {
+    // Trigger install flow (no-op placeholder — backend install handled elsewhere)
+    setInstalled(true);
+    trackAnalyticsEvent("app_install_click", { appSlug: app.slug, appName: app.name });
+  }, [app.slug, app.name]);
+
   return (
-    <div className="rounded-xl border border-border bg-card overflow-hidden shadow-sm">
-      <div className="px-4 py-3 border-b border-border bg-muted/30 flex items-center justify-between">
-        <h3 className="font-semibold text-sm">Session State</h3>
-        <button
-          onClick={onReset}
-          className="p-1.5 rounded-md hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
-          title="Reset Session"
+    <header className="border-b border-border bg-card px-4 py-5 sm:px-6">
+      {/* Back nav */}
+      <nav className="mb-4" aria-label="Breadcrumb">
+        <Link
+          to="/apps"
+          className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
         >
-          <RotateCcw className="w-4 h-4" />
-        </button>
-      </div>
+          <ArrowLeft className="w-4 h-4" />
+          All Apps
+        </Link>
+      </nav>
 
-      <div className="p-4">
-        <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">
-          Stored Outputs
-        </h4>
-        {Object.keys(session.outputs).length === 0 ? (
-          <p className="text-sm text-muted-foreground italic">No outputs stored yet.</p>
-        ) : (
-          <div className="space-y-2">
-            {Object.entries(session.outputs).map(([key, val]) => (
-              <div key={key} className="bg-muted/50 p-2 rounded-lg border border-border/50">
-                <div className="text-[10px] font-mono font-bold text-primary mb-1 break-all">
-                  {key}
-                </div>
-                <div
-                  className="text-xs font-mono text-muted-foreground truncate"
-                  title={typeof val === "object" ? JSON.stringify(val) : String(val)}
+      {/* App identity row */}
+      <div className="flex flex-col sm:flex-row sm:items-start gap-4">
+        {/* Emoji icon */}
+        <div
+          aria-hidden="true"
+          className="flex h-20 w-20 shrink-0 items-center justify-center rounded-2xl bg-muted/40 text-4xl shadow-sm ring-1 ring-border/50"
+        >
+          {app.emoji || "🔧"}
+        </div>
+
+        {/* Text info */}
+        <div className="flex-1 min-w-0 space-y-2">
+          <div className="flex flex-wrap items-center gap-2">
+            <h1 className="text-2xl font-bold tracking-tight text-foreground">{app.name}</h1>
+            {app.is_new && (
+              <span className="rounded-full bg-primary/15 px-2.5 py-0.5 text-xs font-semibold text-primary">
+                New
+              </span>
+            )}
+            {app.is_featured && (
+              <span className="rounded-full bg-amber-500/15 px-2.5 py-0.5 text-xs font-semibold text-amber-600 dark:text-amber-400">
+                Featured
+              </span>
+            )}
+          </div>
+
+          <p className="text-sm text-muted-foreground leading-relaxed">
+            {app.tagline || app.description}
+          </p>
+
+          {/* Meta row */}
+          <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
+            {app.category && (
+              <span className="flex items-center gap-1">
+                <Tag className="w-3.5 h-3.5" />
+                {app.category}
+              </span>
+            )}
+            {app.tool_count != null && app.tool_count > 0 && (
+              <span>{app.tool_count} tool{app.tool_count === 1 ? "" : "s"}</span>
+            )}
+            {app.pricing && app.pricing !== "free" && (
+              <span className="capitalize">{app.pricing}</span>
+            )}
+          </div>
+
+          {/* Tags */}
+          {app.tags && app.tags.length > 0 && (
+            <div className="flex flex-wrap gap-1.5">
+              {app.tags.slice(0, 6).map((tag) => (
+                <span
+                  key={tag}
+                  className="rounded-md border border-border/60 bg-muted/40 px-2 py-0.5 text-[11px] font-medium text-muted-foreground"
                 >
-                  {typeof val === "object" ? JSON.stringify(val) : String(val)}
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
+                  {tag}
+                </span>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* CTA buttons */}
+        <div className="flex flex-col sm:items-end gap-2 shrink-0">
+          <button
+            type="button"
+            onClick={handleInstall}
+            disabled={installed}
+            className={`inline-flex items-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold transition-all focus:outline-none focus:ring-4 focus:ring-primary/20 ${
+              installed
+                ? "bg-green-500/15 text-green-700 dark:text-green-400 cursor-default"
+                : "bg-primary text-primary-foreground shadow-sm hover:bg-primary/90 hover:shadow-md"
+            }`}
+            aria-label={installed ? `${app.name} installed` : `Install ${app.name}`}
+          >
+            <Download className="w-4 h-4" />
+            {installed ? "Installed" : "Install"}
+          </button>
+
+          <a
+            href={`https://mcp.spike.land/apps/${app.slug}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-background px-3 py-2 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+            aria-label={`Open ${app.name} on spike.land`}
+          >
+            <ExternalLink className="w-3.5 h-3.5" />
+            spike.land
+          </a>
+        </div>
+      </div>
+    </header>
+  );
+}
+
+// ── Related Apps Sidebar ──────────────────────────────────────────────────────
+
+interface RelatedAppsSidebarProps {
+  apps: Array<{
+    slug: string;
+    name: string;
+    description: string;
+    emoji: string;
+    category: string;
+    tags: string[];
+    tagline: string;
+    pricing: string;
+    is_featured: boolean;
+    is_new: boolean;
+    tool_count: number;
+    sort_order: number;
+  }>;
+  category: string;
+  currentSlug: string;
+}
+
+function RelatedAppsSidebar({ apps, category }: RelatedAppsSidebarProps) {
+  return (
+    <div className="p-4 space-y-4">
+      <div className="flex items-center justify-between">
+        <h2 className="text-sm font-semibold text-foreground">More in {category}</h2>
+        <Link
+          to="/apps"
+          className="text-xs font-medium text-primary hover:text-primary/80 transition-colors"
+        >
+          See all
+        </Link>
       </div>
 
-      <div className="p-4 border-t border-border">
-        <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">
-          History ({session.history.length})
-        </h4>
-        {session.history.length === 0 ? (
-          <p className="text-sm text-muted-foreground italic">No tools executed.</p>
-        ) : (
-          <div className="space-y-3 max-h-64 overflow-y-auto pr-2">
-            {session.history
-              .slice()
-              .reverse()
-              .map((entry, i) => (
-                <div key={i} className="text-sm flex gap-2">
-                  <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 mt-1.5 shrink-0" />
-                  <div>
-                    <div className="font-mono font-medium">{entry.tool}</div>
-                    <div className="text-[10px] text-muted-foreground mt-0.5">
-                      {new Date(entry.timestamp).toLocaleTimeString()}
-                    </div>
-                  </div>
-                </div>
-              ))}
-          </div>
-        )}
+      <div className="space-y-2">
+        {apps.map((relatedApp) => (
+          <StoreAppCard
+            key={relatedApp.slug}
+            app={relatedApp}
+            layout="list"
+          />
+        ))}
       </div>
     </div>
   );
