@@ -60,6 +60,34 @@ function buildRouteMeta(t: (key: string) => string): Record<string, RouteMeta> {
       title: "Rubik 3.0 — spike.land",
       description: "Chat with Rubik 3.0 — spike.land's design + quality + product intelligence",
     },
+    "/chess": {
+      title: "Chess Arena — spike.land",
+      description: "Stateful chess gameplay with ELO ratings and challenge flows via MCP tools.",
+    },
+    "/quiz": {
+      title: "Quiz — spike.land",
+      description: "Test your knowledge on programming, AI, and developer topics.",
+    },
+    "/thank-you": {
+      title: "Thank You — spike.land",
+      description: "Thank you for your support of the spike.land community.",
+    },
+    "/learnit": {
+      title: "LearnIt — spike.land",
+      description: "AI-powered wiki that explains any technical topic at the depth you need.",
+    },
+    "/create": {
+      title: "Create — spike.land",
+      description: "Describe what you want to build and let AI generate a React app in seconds.",
+    },
+    "/migrate": {
+      title: "Migrate from Next.js — spike.land",
+      description: "Migration services to move Next.js projects to TanStack Start + Cloudflare Workers.",
+    },
+    "/store/category": {
+      title: "App Store Categories — spike.land",
+      description: "Browse apps by category in the spike.land open AI app store.",
+    },
   };
 }
 
@@ -123,16 +151,72 @@ function injectJsonLd(id: string, content: string) {
   el.textContent = content;
 }
 
+/**
+ * Primary desktop nav — flat list of the most important destinations.
+ * Keep this short (fits in one row on ≥1024px). Grouped sections appear in the mobile drawer.
+ */
 const NAV_LINK_ROUTES = [
   { to: "/apps", key: "apps" },
+  { to: "/create", label: "Create" },
+  { to: "/learnit", label: "LearnIt" },
   { to: "/vibe-code", key: "vibeCode" },
-  { to: "/rubik", key: "rubik3", label: "Rubik 3.0" },
+  { to: "/blog", key: "blog" },
   { to: "/pricing", key: "pricing" },
   { to: "/docs", key: "docs" },
-  { to: "/status", key: "status" },
-  { to: "/blog", key: "blog" },
-  { to: "/about", key: "about" },
 ] as const;
+
+type NavItem = { to: string; label: string; icon: string };
+
+/**
+ * Grouped nav sections for the mobile drawer. Each section shows a heading
+ * followed by its links.
+ */
+const NAV_SECTIONS: { heading: string; items: NavItem[] }[] = [
+  {
+    heading: "Discover",
+    items: [
+      { to: "/apps", label: "App Store", icon: "🏪" },
+      { to: "/store", label: "Store", icon: "🛍️" },
+    ],
+  },
+  {
+    heading: "Build",
+    items: [
+      { to: "/create", label: "Create", icon: "✨" },
+      { to: "/vibe-code", label: "Vibe Code", icon: "💻" },
+    ],
+  },
+  {
+    heading: "Learn",
+    items: [
+      { to: "/learnit", label: "LearnIt", icon: "📚" },
+      { to: "/quiz", label: "Quiz", icon: "❓" },
+      { to: "/blog", label: "Blog", icon: "📝" },
+      { to: "/docs", label: "Docs", icon: "📖" },
+    ],
+  },
+  {
+    heading: "Play",
+    items: [{ to: "/chess", label: "Chess", icon: "♟️" }],
+  },
+  {
+    heading: "You",
+    items: [
+      { to: "/dashboard", label: "Dashboard", icon: "📊" },
+      { to: "/analytics", label: "Analytics", icon: "📈" },
+      { to: "/settings", label: "Settings", icon: "⚙️" },
+    ],
+  },
+  {
+    heading: "Platform",
+    items: [
+      { to: "/pricing", label: "Pricing", icon: "💳" },
+      { to: "/migrate", label: "Migrate", icon: "🚀" },
+      { to: "/about", label: "About", icon: "ℹ️" },
+      { to: "/status", label: "Status", icon: "🟢" },
+    ],
+  },
+];
 
 export function RootLayout() {
   useAnalytics();
@@ -147,7 +231,12 @@ export function RootLayout() {
     () =>
       NAV_LINK_ROUTES.map((route) => ({
         to: route.to,
-        label: "label" in route && route.label ? route.label : t(`nav:${route.key}`),
+        label:
+          "label" in route && route.label
+            ? route.label
+            : "key" in route && route.key
+              ? t(`nav:${route.key}`)
+              : route.to.replace(/^\//, ""),
       })),
     [t],
   );
@@ -394,26 +483,59 @@ export function RootLayout() {
           <div
             ref={mobileNavRef}
             id="mobile-nav"
-            className="glass-panel fixed inset-0 z-40 flex flex-col gap-4 px-6 pt-20 lg:hidden"
+            className="glass-panel fixed inset-0 z-40 flex flex-col lg:hidden overflow-y-auto"
             role="dialog"
             aria-modal="true"
             aria-label={t("common:mobileNav")}
           >
-            <nav aria-label={t("common:mobileNavLinks")} className="rubik-panel p-4">
-              {navLinks.map(({ to, label }) => (
-                <Link
-                  key={to}
-                  to={to}
-                  aria-current={pathname === to ? "page" : undefined}
-                  className={`block rounded-2xl px-4 py-3 text-base font-medium transition-colors ${
-                    pathname === to
-                      ? "bg-[var(--card-bg)] text-foreground shadow-[var(--panel-shadow)]"
-                      : "text-muted-foreground hover:bg-[var(--card-bg)] hover:text-foreground"
-                  }`}
-                  onClick={() => setMobileNavOpen(false)}
-                >
-                  {label}
-                </Link>
+            {/* Close button row */}
+            <div className="flex items-center justify-between px-6 pt-5 pb-4 border-b border-border/60">
+              <Link to="/" className="flex items-center gap-2" onClick={() => setMobileNavOpen(false)}>
+                <div className="rubik-icon-badge h-8 w-8 rounded-xl text-xs font-semibold tracking-[-0.06em] text-foreground shadow-[var(--panel-shadow)]">
+                  SL
+                </div>
+                <span className="font-semibold text-foreground">spike.land</span>
+              </Link>
+              <button
+                type="button"
+                className="flex items-center justify-center rounded-xl border border-border bg-card p-2 text-muted-foreground hover:text-foreground transition-colors"
+                aria-label={t("common:closeNavMenu")}
+                onClick={() => setMobileNavOpen(false)}
+              >
+                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            <nav aria-label={t("common:mobileNavLinks")} className="flex-1 px-4 py-4 space-y-6">
+              {NAV_SECTIONS.map((section) => (
+                <div key={section.heading}>
+                  <p className="px-3 mb-1.5 text-[10px] font-semibold uppercase tracking-[0.15em] text-muted-foreground/60">
+                    {section.heading}
+                  </p>
+                  <div className="space-y-0.5">
+                    {section.items.map(({ to, label, icon }) => {
+                      const isActive = pathname === to || (to !== "/" && pathname.startsWith(`${to}/`));
+                      return (
+                        <Link
+                          key={to}
+                          to={to as "/"}
+                          aria-current={isActive ? "page" : undefined}
+                          className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors ${
+                            isActive
+                              ? "bg-card text-foreground shadow-[var(--panel-shadow)]"
+                              : "text-muted-foreground hover:bg-card/60 hover:text-foreground"
+                          }`}
+                          onClick={() => setMobileNavOpen(false)}
+                        >
+                          <span className="text-base w-5 text-center" aria-hidden="true">{icon}</span>
+                          {label}
+                        </Link>
+                      );
+                    })}
+                  </div>
+                </div>
               ))}
             </nav>
           </div>

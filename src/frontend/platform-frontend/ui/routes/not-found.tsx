@@ -52,6 +52,18 @@ export function NotFoundPage() {
           {t("notFound.blog")}
         </Link>
         <Link
+          to="/learnit"
+          className="rounded-2xl border border-border bg-card px-6 py-3 text-sm font-bold text-foreground hover:border-primary/30 transition-colors"
+        >
+          LearnIt
+        </Link>
+        <Link
+          to="/chess"
+          className="rounded-2xl border border-border bg-card px-6 py-3 text-sm font-bold text-foreground hover:border-primary/30 transition-colors"
+        >
+          Chess
+        </Link>
+        <Link
           to="/store"
           className="rounded-2xl border border-border bg-card px-6 py-3 text-sm font-bold text-foreground hover:border-primary/30 transition-colors"
         >
