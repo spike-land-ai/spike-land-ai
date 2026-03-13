@@ -327,6 +327,22 @@ const appsIndexRoute = createRoute({
   component: withSuspense(() => import("./routes/store"), "StorePage"),
 });
 
+// Category parent route (layout-only, renders Outlet)
+const appsCategoryRoute = createRoute({
+  getParentRoute: () => appsRoute,
+  path: "category",
+  component: Outlet,
+});
+
+const appsCategoryDetailRoute = createRoute({
+  getParentRoute: () => appsCategoryRoute,
+  path: "$categorySlug",
+  component: withSuspense(
+    () => import("./routes/store/category/$categorySlug"),
+    "CategoryDetailPage",
+  ),
+});
+
 const appSessionRoute = createRoute({
   getParentRoute: () => appsRoute,
   path: "$appSlug",
@@ -493,7 +509,11 @@ const routeTree = rootRoute.addChildren([
   dashboardRoute.addChildren([dashboardIndexRoute, bazdmegDashboardRoute]),
   learnRoute.addChildren([learnIndexRoute, learnSessionRoute, learnBadgeRoute]),
   messagesRoute.addChildren([messagesIndexRoute, messageThreadRoute]),
-  appsRoute.addChildren([appsIndexRoute, appSessionRoute]),
+  appsRoute.addChildren([
+    appsIndexRoute,
+    appsCategoryRoute.addChildren([appsCategoryDetailRoute]),
+    appSessionRoute,
+  ]),
   mcpRoute.addChildren([mcpIndexRoute, mcpAuthorizeRoute]),
   agencyRoute.addChildren([agencyPortfolioRoute]),
 ]);

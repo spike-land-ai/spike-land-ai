@@ -1,9 +1,21 @@
-import { useNavigate, useSearch } from "@tanstack/react-router";
+import { Link, useNavigate, useSearch } from "@tanstack/react-router";
 import { ArrowRight, Sparkles } from "lucide-react";
 import { useCallback, useMemo, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { CategoryRail, HeroShelf, StoreSection } from "../components/storefront";
 import { groupAppsByCategory, useApps } from "../hooks/useApps";
+
+/** Converts a display category name to the URL slug used by the category detail route. */
+function categoryToSlug(category: string): string {
+  return encodeURIComponent(
+    category
+      .toLowerCase()
+      .replace(/\s+/g, "-")
+      .replace(/[^a-z0-9-]/g, "-")
+      .replace(/-+/g, "-")
+      .replace(/^-|-$/g, ""),
+  );
+}
 
 // ---------------------------------------------------------------------------
 // Page-level skeleton helpers
@@ -174,12 +186,17 @@ export function StorePage() {
   const recommendedApps = useMemo(() => (apps ?? []).slice(3, 11), [apps]);
 
   const selectCategory = (category: string | null) => {
-    void navigate({
-      search: (prev) => ({
-        ...prev,
-        category: category ?? undefined,
-      }),
-    });
+    if (category === null) {
+      void navigate({
+        to: "/apps",
+        search: (prev) => ({ ...prev, category: undefined }),
+      });
+    } else {
+      void navigate({
+        to: "/apps/category/$categorySlug",
+        params: { categorySlug: categoryToSlug(category) },
+      });
+    }
   };
 
   // ----- Loading state -----
@@ -370,7 +387,12 @@ export function StorePage() {
                 apps={group.apps.slice(0, 4)}
                 categoryName={group.category}
                 layout="grid"
-                onViewAll={() => selectCategory(group.category)}
+                onViewAll={() =>
+                  navigate({
+                    to: "/apps/category/$categorySlug",
+                    params: { categorySlug: categoryToSlug(group.category) },
+                  })
+                }
               />
             ))}
           </>

@@ -1,4 +1,5 @@
 import { useRef, useCallback } from "react";
+import { Link, useRouterState } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import type { AppCategoryGroup } from "../../hooks/useApps";
 
@@ -12,6 +13,21 @@ interface CategoryRailProps {
 /** Number of skeleton rows to show while categories are loading. */
 const SKELETON_COUNT = 6;
 
+/**
+ * Converts a display category name to a URL-safe slug.
+ * e.g. "Code & Developer Tools" → "code---developer-tools"
+ */
+function categoryToSlug(category: string): string {
+  return encodeURIComponent(
+    category
+      .toLowerCase()
+      .replace(/\s+/g, "-")
+      .replace(/[^a-z0-9-]/g, "-")
+      .replace(/-+/g, "-")
+      .replace(/^-|-$/g, ""),
+  );
+}
+
 export function CategoryRail({
   groups,
   activeCategory,
@@ -19,15 +35,16 @@ export function CategoryRail({
   isLoading = false,
 }: CategoryRailProps) {
   const { t } = useTranslation("store");
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
 
-  // Refs for all focusable buttons in order: [Discover, ...groups]
-  const buttonRefs = useRef<Array<HTMLButtonElement | null>>([]);
+  // Refs for all focusable elements in order: [Discover, ...groups]
+  const itemRefs = useRef<Array<HTMLElement | null>>([]);
 
   const focusIndex = useCallback(
     (index: number) => {
-      const total = 1 + groups.length; // "Discover" + category buttons
+      const total = 1 + groups.length; // "Discover" + category links
       const clamped = (index + total) % total;
-      buttonRefs.current[clamped]?.focus();
+      itemRefs.current[clamped]?.focus();
     },
     [groups.length],
   );
@@ -56,6 +73,8 @@ export function CategoryRail({
     );
   }
 
+  const isOnAppsIndex = pathname === "/apps" || pathname === "/apps/";
+
   return (
     <nav
       aria-label={t("categoryRailLabel")}
@@ -67,36 +86,43 @@ export function CategoryRail({
         {t("categoryRailDesc")}
       </span>
 
-      <button
+      {/* Discover (always links to /apps index) */}
+      <Link
         ref={(el) => {
-          buttonRefs.current[0] = el;
+          itemRefs.current[0] = el;
         }}
-        type="button"
-        aria-pressed={activeCategory === null}
+        to="/apps"
+        aria-current={isOnAppsIndex && activeCategory === null ? "page" : undefined}
         onClick={() => onSelectCategory(null)}
         onKeyDown={(e) => handleKeyDown(e, 0)}
         className={`flex w-full items-center justify-between rounded-xl px-4 py-2.5 text-sm font-semibold transition-all ${
-          activeCategory === null
+          isOnAppsIndex && activeCategory === null
             ? "bg-primary text-primary-foreground shadow-sm"
             : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"
         }`}
       >
         <span>{t("discover")}</span>
-      </button>
+      </Link>
 
       <div className="my-2 h-px w-full bg-border/40" />
 
       {groups.map((group, i) => {
-        const isActive = activeCategory === group.category;
+        const slug = categoryToSlug(group.category);
+        const categoryPath = `/apps/category/${slug}`;
+        const isActive =
+          pathname === categoryPath ||
+          pathname.startsWith(`${categoryPath}/`) ||
+          activeCategory === group.category;
+
         return (
-          <button
+          <Link
             key={group.category}
             ref={(el) => {
-              buttonRefs.current[i + 1] = el;
+              itemRefs.current[i + 1] = el;
             }}
-            type="button"
-            aria-pressed={isActive}
-            onClick={() => onSelectCategory(group.category)}
+            to="/apps/category/$categorySlug"
+            params={{ categorySlug: slug }}
+            aria-current={isActive ? "page" : undefined}
             onKeyDown={(e) => handleKeyDown(e, i + 1)}
             className={`flex w-full items-center justify-between rounded-xl px-4 py-2.5 text-sm font-semibold transition-all ${
               isActive
@@ -110,7 +136,7 @@ export function CategoryRail({
                 {group.apps.length}
               </span>
             )}
-          </button>
+          </Link>
         );
       })}
     </nav>
