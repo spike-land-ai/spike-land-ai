@@ -24,7 +24,6 @@ import {
   type ResolvedSynthesisTarget,
 } from "../../core-logic/llm-provider.js";
 import { getRubik3SystemPrompt } from "../../core-logic/rubik-persona-prompt.js";
-
 const spikeChat = new Hono<{ Bindings: Env; Variables: Variables }>();
 const MAX_TOOL_LOOPS = 6;
 const MAX_HISTORY_MESSAGES = 16;
@@ -339,6 +338,22 @@ spikeChat.post("/api/spike-chat/browser-results", async (c) => {
     return c.json({ error: "sessionId and toolCallId are required" }, 400);
   }
 
+  // Try DO callback path first (zero-polling)
+  try {
+    const sessionStub = c.env.SPIKE_CHAT_SESSIONS.get(
+      c.env.SPIKE_CHAT_SESSIONS.idFromName(body.sessionId),
+    ) as DurableObjectStub & {
+      deliverBrowserResult(toolCallId: string, result: unknown): Promise<boolean>;
+    };
+    const delivered = await sessionStub.deliverBrowserResult(body.toolCallId, body.result ?? null);
+    if (delivered) {
+      return c.json({ ok: true });
+    }
+  } catch {
+    // DO unavailable — fall through to D1 path
+  }
+
+  // Fallback: D1 update (for sessions started before DO migration)
   const result = await c.env.DB.prepare(
     `UPDATE spike_chat_browser_results
      SET status = 'done',
@@ -361,6 +376,12 @@ spikeChat.post("/api/spike-chat", async (c) => {
     message?: string;
     history?: Array<{ role: string; content: string }>;
     persona?: string;
+    pageContext?: {
+      url?: string;
+      title?: string;
+      slug?: string;
+      contentSnippet?: string;
+    };
   }>();
   if (!body.message || typeof body.message !== "string") {
     return c.json({ error: "message is required" }, 400);
@@ -373,8 +394,30 @@ spikeChat.post("/api/spike-chat", async (c) => {
   const userId = c.get("userId") as string | undefined;
   const userMessage = body.message.trim();
   const requestId = (c.get("requestId") as string | undefined) ?? crypto.randomUUID();
-  const sessionId = `spike-chat-${requestId}`;
+  // Use stable session ID per user (persists across requests) with fallback for anon
+  const sessionId = userId ? `spike-chat-${userId}` : `spike-chat-${requestId}`;
   const persona = typeof body.persona === "string" ? body.persona.trim() : undefined;
+
+  // Get DO stub for session management (used for browser callbacks + history)
+  interface SessionDOStub extends DurableObjectStub {
+    addMessage(msg: {
+      role: string;
+      content: string;
+      timestamp: number;
+      toolCallId?: string;
+    }): Promise<void>;
+    waitForBrowserResult(toolCallId: string): Promise<unknown>;
+    appendEvent(data: string): number;
+    setMeta(key: string, value: string): Promise<void>;
+  }
+  let sessionDO: SessionDOStub | null = null;
+  try {
+    sessionDO = c.env.SPIKE_CHAT_SESSIONS.get(
+      c.env.SPIKE_CHAT_SESSIONS.idFromName(sessionId),
+    ) as unknown as SessionDOStub;
+  } catch {
+    // DO binding unavailable (local dev without DO support)
+  }
 
   // Resolve LLM provider (BYOK → platform fallback)
   const llmTarget = await resolveSynthesisTarget(c.env, userId, {
@@ -403,6 +446,19 @@ spikeChat.post("/api/spike-chat", async (c) => {
   const { stablePrefix, dynamicSuffix } = buildAetherSystemPrompt(userMemory);
   let fullSystemPrompt = dynamicSuffix ? `${stablePrefix}\n\n${dynamicSuffix}` : stablePrefix;
 
+  // Inject page context when the user is reading a specific page
+  if (body.pageContext) {
+    const ctx = body.pageContext;
+    const parts: string[] = ["## Current Page Context"];
+    if (ctx.title) parts.push(`The user is currently reading: "${ctx.title}"`);
+    if (ctx.url) parts.push(`URL: ${ctx.url}`);
+    if (ctx.contentSnippet) {
+      parts.push(`\nArticle excerpt:\n${ctx.contentSnippet.slice(0, 2000)}`);
+    }
+    parts.push("\nUse this context to answer questions about what the user is reading.");
+    fullSystemPrompt = `${fullSystemPrompt}\n\n${parts.join("\n")}`;
+  }
+
   // Merge Rubik-3 persona prompt when requested
   if (persona === "rubik-3") {
     fullSystemPrompt = `${fullSystemPrompt}\n\n${getRubik3SystemPrompt()}`;
@@ -419,21 +475,54 @@ spikeChat.post("/api/spike-chat", async (c) => {
     if (data === "[DONE]") {
       await writer.write(encoder.encode("data: [DONE]\n\n"));
     } else {
+      const serialized = JSON.stringify(data);
       const eventName =
         typeof data === "object" &&
         data !== null &&
         typeof (data as { type?: unknown }).type === "string"
           ? (data as { type: string }).type
           : null;
-      if (eventName) {
-        await writer.write(encoder.encode(`event: ${eventName}\n`));
+
+      // Append to DO event log for stream resumption
+      let seq: number | undefined;
+      if (sessionDO) {
+        try {
+          seq = sessionDO.appendEvent(serialized) as unknown as number;
+        } catch {
+          // DO unavailable — continue without event log
+        }
       }
-      await writer.write(encoder.encode(`data: ${JSON.stringify(data)}\n\n`));
+
+      let frame = "";
+      if (seq !== undefined) {
+        frame += `id: ${seq}\n`;
+      }
+      if (eventName) {
+        frame += `event: ${eventName}\n`;
+      }
+      frame += `data: ${serialized}\n\n`;
+      await writer.write(encoder.encode(frame));
     }
   };
 
   const bgTask = (async () => {
     try {
+      // Persist user message to DO session history
+      if (sessionDO) {
+        try {
+          await sessionDO.addMessage({
+            role: "user",
+            content: userMessage,
+            timestamp: Date.now(),
+          });
+          if (persona) {
+            await sessionDO.setMeta("persona", persona);
+          }
+        } catch {
+          // DO persistence is non-critical
+        }
+      }
+
       await sendEvent({
         type: "context_sync",
         sessionId,
@@ -537,6 +626,10 @@ spikeChat.post("/api/spike-chat", async (c) => {
             toolCatalog,
             tableName: "spike_chat_browser_results",
             contextIdColumn: "session_id",
+            // Use DO callback for zero-polling browser results when available
+            ...(sessionDO
+              ? { waitViaCallback: (tcId: string) => sessionDO.waitForBrowserResult(tcId) }
+              : {}),
           });
 
           await sendEvent({
@@ -560,6 +653,19 @@ spikeChat.post("/api/spike-chat", async (c) => {
             type: "error",
             error: `Stopped after ${MAX_TOOL_LOOPS} tool rounds to avoid an infinite loop.`,
           });
+        }
+      }
+
+      // Persist assistant response to DO session
+      if (sessionDO && assistantResponse) {
+        try {
+          await sessionDO.addMessage({
+            role: "assistant",
+            content: assistantResponse,
+            timestamp: Date.now(),
+          });
+        } catch {
+          // DO persistence is non-critical
         }
       }
 
@@ -625,6 +731,74 @@ spikeChat.post("/api/spike-chat", async (c) => {
       "X-Request-Id": requestId,
     },
   });
+});
+
+/** GET /api/spike-chat/history — retrieve compressed session history from DO. */
+spikeChat.get("/api/spike-chat/history", async (c) => {
+  const userId = c.get("userId") as string | undefined;
+  if (!userId) {
+    return c.json({ error: "Authentication required" }, 401);
+  }
+
+  const sessionId = `spike-chat-${userId}`;
+  try {
+    const stub = c.env.SPIKE_CHAT_SESSIONS.get(
+      c.env.SPIKE_CHAT_SESSIONS.idFromName(sessionId),
+    ) as DurableObjectStub & {
+      getHistory(): Promise<Array<{ role: string; content: string; timestamp: number }>>;
+    };
+    const history = await stub.getHistory();
+    return c.json({ sessionId, messages: history });
+  } catch {
+    return c.json({ sessionId, messages: [] });
+  }
+});
+
+/**
+ * GET /api/spike-chat/stream/:sessionId — SSE replay endpoint.
+ * Reconnects with Last-Event-ID to resume a stream from where the client left off.
+ */
+spikeChat.get("/api/spike-chat/stream/:sessionId", async (c) => {
+  const targetSessionId = c.req.param("sessionId");
+  const lastEventIdHeader = c.req.header("Last-Event-ID");
+  const lastEventId = lastEventIdHeader ? Number(lastEventIdHeader) : 0;
+
+  if (!targetSessionId) {
+    return c.json({ error: "sessionId is required" }, 400);
+  }
+
+  try {
+    const stub = c.env.SPIKE_CHAT_SESSIONS.get(
+      c.env.SPIKE_CHAT_SESSIONS.idFromName(targetSessionId),
+    ) as DurableObjectStub & {
+      replayEvents(lastEventId: number): Array<{ seq: number; data: string }>;
+    };
+    const events = stub.replayEvents(lastEventId) as unknown as Array<{
+      seq: number;
+      data: string;
+    }>;
+
+    const encoder = new TextEncoder();
+    const stream = new ReadableStream<Uint8Array>({
+      start(controller) {
+        for (const event of events) {
+          controller.enqueue(encoder.encode(`id: ${event.seq}\ndata: ${event.data}\n\n`));
+        }
+        controller.enqueue(encoder.encode("data: [DONE]\n\n"));
+        controller.close();
+      },
+    });
+
+    return new Response(stream, {
+      headers: {
+        "Content-Type": "text/event-stream",
+        "Cache-Control": "no-cache",
+        Connection: "keep-alive",
+      },
+    });
+  } catch {
+    return c.json({ error: "Session not found" }, 404);
+  }
 });
 
 export { spikeChat };

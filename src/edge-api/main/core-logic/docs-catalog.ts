@@ -86,6 +86,30 @@ export const DOCS_MANIFEST: DocEntry[] = [
       "PRD for COMPASS: bureaucratic literacy as a universal human right. Navigating services for 4B people across 193 countries.",
     filePath: "docs/compass-prd.md",
   },
+  {
+    slug: "openai-compatible-endpoint",
+    title: "OpenAI-Compatible Endpoint Guide",
+    category: "Blog",
+    description:
+      "How spike.land OpenAI-compatible endpoint works with local agent pipeline, spike-agent-v1, provider resolution, and local testing",
+    filePath: "content/blog/openai-compatible-endpoint-local-playground.mdx",
+  },
+  {
+    slug: "app-store-vision",
+    title: "The spike.land App Store",
+    category: "Blog",
+    description:
+      "spike.land vision as an open AI app store built on MCP runtime with composable tools, discovery, and install flows",
+    filePath: "content/blog/spike-land-app-store.mdx",
+  },
+  {
+    slug: "mcp-explained",
+    title: "MCP Explained: Universal Adapter for AI Tools",
+    category: "Blog",
+    description:
+      "What MCP is and how it works as a universal adapter for AI tools, with examples and integration patterns",
+    filePath: "content/blog/mcp-explained-universal-adapter-for-ai-tools.mdx",
+  },
 ];
 
 export const DOC_CATEGORIES = [...new Set(DOCS_MANIFEST.map((entry) => entry.category))];

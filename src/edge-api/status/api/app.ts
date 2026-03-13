@@ -6,6 +6,10 @@ import {
   type ServiceMetricHistory,
   type ServiceMetricRange,
 } from "../../common/core-logic/service-metrics.ts";
+import {
+  buildStandardHealthResponse,
+  getHealthHttpStatus,
+} from "../../common/core-logic/health-contract.ts";
 import type { Env } from "../core-logic/env.ts";
 import {
   createStatusSnapshot,
@@ -15,6 +19,8 @@ import {
   TIMEOUT_MS,
   type ProbeResult,
 } from "../core-logic/monitor.ts";
+import { detectIncidents } from "../core-logic/incident-detector.ts";
+import { getActiveIncidents, getRecentIncidents, type Incident } from "../core-logic/incidents.ts";
 
 const app = new Hono<{ Bindings: Env }>();
 
@@ -39,6 +45,10 @@ interface DashboardPayload {
     meanLatencyMs: number | null;
   };
   services: StatusServiceView[];
+  incidents: {
+    active: Incident[];
+    recent: Incident[];
+  };
 }
 
 function escapeHtml(value: string): string {
@@ -288,6 +298,19 @@ async function buildDashboardPayload(
       historyByName.get(service.label) ?? buildServiceMetricHistory(service.label, [], range, now),
   }));
 
+  // Run incident detector (opens/resolves based on probe transitions)
+  let activeIncidents: Incident[] = [];
+  let recentIncidents: Incident[] = [];
+  try {
+    await detectIncidents(env.STATUS_DB, results);
+    [activeIncidents, recentIncidents] = await Promise.all([
+      getActiveIncidents(env.STATUS_DB),
+      getRecentIncidents(env.STATUS_DB, 10),
+    ]);
+  } catch (err) {
+    console.error("[status] incident detection failed", err);
+  }
+
   return {
     overall: snapshot.overall,
     timestamp: new Date(now).toISOString(),
@@ -295,7 +318,60 @@ async function buildDashboardPayload(
     summary: snapshot.summary,
     platform: buildPlatformSummary(services),
     services,
+    incidents: {
+      active: activeIncidents,
+      recent: recentIncidents,
+    },
   };
+}
+
+function renderIncidentsSection(incidents: DashboardPayload["incidents"]): string {
+  if (incidents.active.length === 0 && incidents.recent.length === 0) {
+    return "";
+  }
+
+  function formatTs(ms: number): string {
+    return new Date(ms).toISOString().replace("T", " ").slice(0, 19) + " UTC";
+  }
+
+  function renderIncidentRow(incident: Incident): string {
+    const sevColor = incident.severity === "down" ? "var(--danger)" : "var(--warn)";
+    const statusLabel = incident.status === "open" ? "OPEN" : "RESOLVED";
+    const resolvedInfo = incident.resolved_at
+      ? ` · Resolved ${formatTs(incident.resolved_at)}`
+      : "";
+
+    return `
+      <div class="incident-row" style="border-left:3px solid ${sevColor}">
+        <div class="incident-header">
+          <strong>${escapeHtml(incident.service_name)}</strong>
+          <span class="status-badge" style="--status-color:${sevColor};font-size:.68rem;padding:5px 8px">${statusLabel}</span>
+        </div>
+        <p class="incident-meta">
+          ${escapeHtml(incident.severity.toUpperCase())} · Opened ${formatTs(incident.opened_at)}${resolvedInfo}
+        </p>
+        ${incident.notes ? `<p class="incident-notes">${escapeHtml(incident.notes)}</p>` : ""}
+      </div>`;
+  }
+
+  const sections: string[] = [];
+
+  if (incidents.active.length > 0) {
+    sections.push(`
+      <h2 style="font-size:1.1rem;margin:0 0 12px;color:var(--warn)">Active Incidents (${incidents.active.length})</h2>
+      ${incidents.active.map(renderIncidentRow).join("\n")}`);
+  }
+
+  if (incidents.recent.length > 0) {
+    sections.push(`
+      <h2 style="font-size:1.1rem;margin:18px 0 12px;color:var(--muted)">Recent Incidents</h2>
+      ${incidents.recent.map(renderIncidentRow).join("\n")}`);
+  }
+
+  return `
+    <section class="hero-panel" style="margin-top:18px;padding:22px 24px">
+      ${sections.join("\n")}
+    </section>`;
 }
 
 function renderHtml(payload: DashboardPayload): string {
@@ -613,6 +689,30 @@ h1{
   justify-content:space-between;
   gap:12px;
 }
+.incident-row{
+  padding:12px 16px;
+  margin-bottom:10px;
+  border-radius:12px;
+  background:rgba(255,255,255,.028);
+}
+.incident-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:12px;
+}
+.incident-meta{
+  margin:6px 0 0;
+  color:var(--muted);
+  font-size:.82rem;
+}
+.incident-notes{
+  margin:6px 0 0;
+  color:var(--muted);
+  font-size:.8rem;
+  font-family:"JetBrains Mono",monospace;
+  white-space:pre-wrap;
+}
 .footer a{
   color:#d6f6e6;
   text-decoration:underline;
@@ -674,6 +774,8 @@ h1{
       ${payload.services.map(renderServiceCard).join("\n")}
     </section>
 
+    ${renderIncidentsSection(payload.incidents)}
+
     <footer class="footer">
       <span>Last checked ${escapeHtml(payload.timestamp)} · Timeout ${TIMEOUT_MS}ms · Degraded threshold ${DEGRADED_THRESHOLD_MS}ms</span>
       <span><a href="/api/status?range=${payload.range.key}">JSON API</a></span>
@@ -684,7 +786,10 @@ h1{
 }
 
 // Own health
-app.get("/health", (c) => c.json({ status: "ok", service: "spike-status" }));
+app.get("/health", (c) => {
+  const payload = buildStandardHealthResponse({ service: "spike-status" });
+  return c.json(payload, getHealthHttpStatus(payload));
+});
 
 // JSON API
 app.get("/api/status", async (c) => {

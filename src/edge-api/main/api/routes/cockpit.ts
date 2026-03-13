@@ -2,7 +2,7 @@
  * Cockpit Metrics Endpoint
  *
  * GET /api/cockpit/metrics — admin-only metrics dashboard.
- * Access restricted to zoltan.erdos@spike.land.
+ * Access restricted to admin emails.
  * Requires auth.
  */
 
@@ -11,7 +11,7 @@ import type { Env, Variables } from "../../core-logic/env.js";
 
 const cockpit = new Hono<{ Bindings: Env; Variables: Variables }>();
 
-const ADMIN_EMAIL = "zoltan.erdos@spike.land";
+const ADMIN_EMAILS = new Set(["zoltan.erdos@spike.land", "zolika84@gmail.com"]);
 
 interface CountRow {
   count: number;
@@ -53,7 +53,7 @@ cockpit.get("/api/cockpit/metrics", async (c) => {
     .bind(userId)
     .first<{ email: string }>();
 
-  if (!userRow || userRow.email !== ADMIN_EMAIL) {
+  if (!userRow || !ADMIN_EMAILS.has(userRow.email)) {
     return c.json({ error: "Forbidden" }, 403);
   }
 

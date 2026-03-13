@@ -140,6 +140,25 @@ function SpikeChatEmbedCompat(props: Record<string, unknown>) {
   const guestAccess =
     props["guestAccess"] !== undefined ? props["guestAccess"] : props["guestaccess"];
   const height = props["height"];
+  const blogSlug =
+    typeof props["blogSlug"] === "string"
+      ? props["blogSlug"]
+      : typeof props["blogslug"] === "string"
+        ? props["blogslug"]
+        : undefined;
+  const blogTitle =
+    typeof props["blogTitle"] === "string"
+      ? props["blogTitle"]
+      : typeof props["blogtitle"] === "string"
+        ? props["blogtitle"]
+        : undefined;
+  const contentSnippet =
+    typeof props["contentSnippet"] === "string"
+      ? props["contentSnippet"]
+      : typeof props["contentsnippet"] === "string"
+        ? props["contentsnippet"]
+        : undefined;
+  const persona = typeof props["persona"] === "string" ? props["persona"] : undefined;
 
   return (
     <div className="not-prose my-12 overflow-hidden rounded-[2rem] border border-border/60 bg-card shadow-[var(--panel-shadow)]">
@@ -148,6 +167,10 @@ function SpikeChatEmbedCompat(props: Record<string, unknown>) {
         workspaceSlug={workspaceSlug}
         guestAccess={coerceBooleanProp(guestAccess)}
         height={coerceNumberProp(height, 500)}
+        blogSlug={blogSlug}
+        blogTitle={blogTitle}
+        contentSnippet={contentSnippet}
+        persona={persona}
       />
     </div>
   );
@@ -215,6 +238,7 @@ const CUSTOM_COMPONENT_MAP: Record<string, React.ComponentType<Record<string, un
   toolsbycategorygrid: lazyDemo(interactiveImport, "ToolsByCategoryGrid"),
   personalizedsupportbox: lazyDemo(interactiveImport, "PersonalizedSupportBox"),
   rentstorytoggle: lazyDemo(interactiveImport, "RentStoryToggle"),
+  openaiendpointdemo: lazyDemo(interactiveImport, "OpenAIEndpointDemo"),
   spikechatembed: SpikeChatEmbedCompat,
   toolcount: ToolCount as React.ComponentType<Record<string, unknown>>,
   audioplayer: AudioPlayer as React.ComponentType<Record<string, unknown>>,
@@ -770,6 +794,16 @@ export function BlogPostView({
 
         <div className="max-w-3xl mx-auto">
           <SupportWidget post={resolvedPost} />
+        </div>
+
+        <div className="max-w-3xl mx-auto">
+          <SpikeChatEmbed
+            blogSlug={resolvedPost.slug}
+            blogTitle={resolvedPost.title}
+            contentSnippet={processedContent?.slice(0, 2000)}
+            persona="rubik-3"
+            height={480}
+          />
         </div>
 
         <div className="mt-32 pt-16 border-t border-border/60">

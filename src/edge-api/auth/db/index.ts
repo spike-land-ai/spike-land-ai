@@ -11,6 +11,11 @@ import {
   shouldTrackServiceMetricRequest,
 } from "../../common/core-logic/service-metrics";
 import {
+  buildStandardHealthResponse,
+  getHealthHttpStatus,
+  timedCheck,
+} from "../../common/core-logic/health-contract";
+import {
   captureWorkerException,
   createWorkerSentryOptions,
   instrumentD1Bindings,
@@ -78,30 +83,23 @@ export default Sentry.withSentry((env: Env) => createWorkerSentryOptions("mcp-au
       // Health endpoint
       if (url.pathname === "/health") {
         const deep = url.searchParams.get("deep") === "true";
-        let d1Status = "ok";
+        const checks: Record<string, Awaited<ReturnType<typeof timedCheck>>> = {};
 
         if (deep) {
-          try {
+          checks["d1"] = await timedCheck(async () => {
             await instrumentedEnv.AUTH_DB.prepare("SELECT 1").first();
-          } catch {
-            d1Status = "degraded";
-          }
+          });
         }
 
-        const overall = d1Status === "ok" ? "ok" : "degraded";
+        const payload = buildStandardHealthResponse({
+          service: "mcp-auth",
+          checks,
+        });
         return withCors(
-          new Response(
-            JSON.stringify({
-              status: overall,
-              service: "mcp-auth",
-              timestamp: new Date().toISOString(),
-              ...(deep ? { d1: d1Status } : {}),
-            }),
-            {
-              status: overall === "ok" ? 200 : 503,
-              headers: { "Content-Type": "application/json" },
-            },
-          ),
+          new Response(JSON.stringify(payload), {
+            status: getHealthHttpStatus(payload),
+            headers: { "Content-Type": "application/json" },
+          }),
           request,
         );
       }

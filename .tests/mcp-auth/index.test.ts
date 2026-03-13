@@ -218,16 +218,23 @@ describe("worker fetch handler", () => {
       const req = makeRequest("GET", "/health");
       const res = await worker.fetch(req, makeEnv());
       expect(res.status).toBe(200);
-      const body = (await res.json()) as { status: string; service: string };
+      const body = (await res.json()) as {
+        status: string;
+        service: string;
+        version: string;
+        uptime_ms: number;
+      };
       expect(body.status).toBe("ok");
       expect(body.service).toBe("mcp-auth");
+      expect(typeof body.version).toBe("string");
+      expect(typeof body.uptime_ms).toBe("number");
     });
 
-    it("does not include d1 field in shallow health check", async () => {
+    it("does not include checks in shallow health check", async () => {
       const req = makeRequest("GET", "/health");
       const res = await worker.fetch(req, makeEnv());
       const body = (await res.json()) as Record<string, unknown>;
-      expect(body).not.toHaveProperty("d1");
+      expect(body).not.toHaveProperty("checks");
     });
 
     it("returns 200 with d1:ok for deep health check when DB is healthy", async () => {
@@ -240,9 +247,12 @@ describe("worker fetch handler", () => {
       const req = makeRequest("GET", "/health?deep=true");
       const res = await worker.fetch(req, env);
       expect(res.status).toBe(200);
-      const body = (await res.json()) as { status: string; d1: string };
+      const body = (await res.json()) as {
+        status: string;
+        checks: Record<string, { status: string }>;
+      };
       expect(body.status).toBe("ok");
-      expect(body.d1).toBe("ok");
+      expect(body.checks.d1.status).toBe("ok");
     });
 
     it("returns 503 with d1:degraded when DB throws in deep check", async () => {
@@ -257,9 +267,12 @@ describe("worker fetch handler", () => {
       const req = makeRequest("GET", "/health?deep=true");
       const res = await worker.fetch(req, env);
       expect(res.status).toBe(503);
-      const body = (await res.json()) as { status: string; d1: string };
+      const body = (await res.json()) as {
+        status: string;
+        checks: Record<string, { status: string }>;
+      };
       expect(body.status).toBe("degraded");
-      expect(body.d1).toBe("degraded");
+      expect(body.checks.d1.status).toBe("degraded");
     });
 
     it("applies CORS headers to health response", async () => {

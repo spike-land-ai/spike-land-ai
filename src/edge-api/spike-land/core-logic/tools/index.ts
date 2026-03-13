@@ -28,6 +28,7 @@ export * from "./lie-detector";
 export * from "./mcp-registry";
 export * from "./netsim";
 export * from "./orchestrator";
+export * from "./platform-health";
 export * from "./quiz";
 export * from "./reactions";
 export * from "./req-interview";

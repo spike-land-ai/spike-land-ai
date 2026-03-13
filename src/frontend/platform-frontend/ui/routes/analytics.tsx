@@ -9,7 +9,7 @@ import { BehaviorTab } from "../components/analytics/BehaviorTab";
 import { AudienceTab } from "../components/analytics/AudienceTab";
 import { PlatformTab } from "../components/analytics/PlatformTab";
 
-const FOUNDER_EMAIL = "zoltan.erdos@spike.land";
+const ADMIN_EMAILS = new Set(["zoltan.erdos@spike.land", "zolika84@gmail.com"]);
 
 type TabId = "overview" | "acquisition" | "behavior" | "audience" | "platform";
 
@@ -129,7 +129,7 @@ export function AnalyticsPage() {
   }, []);
 
   useEffect(() => {
-    if (!user || user.email !== FOUNDER_EMAIL) return;
+    if (!user || !ADMIN_EMAILS.has(user.email)) return;
     fetchD1Data(timeRange);
   }, [timeRange, fetchD1Data, user]);
 
@@ -171,7 +171,7 @@ export function AnalyticsPage() {
     );
   }
 
-  if (!user || user.email !== FOUNDER_EMAIL) {
+  if (!user || !ADMIN_EMAILS.has(user.email)) {
     return <Navigate to="/" />;
   }
 

@@ -15,6 +15,7 @@ import {
   parseModelSelection,
   resolveSynthesisTarget,
   synthesizeCompletion,
+  streamCompletion,
   type ProviderMessage,
   type UsageShape,
 } from "../../core-logic/llm-provider.js";
@@ -224,6 +225,7 @@ Local agents:
 
 Rules:
 - Prefer the local docs and MCP capability context below over generic prior knowledge.
+- The MCP tools listed below are available on the spike.land platform but NOT callable from this conversation. Mention them as capabilities the user can access via the platform.
 - If the local context is incomplete, say so plainly instead of inventing details.
 - Be direct and implementation-focused.
 - When relevant, mention the exact internal doc or tool name that informed the answer.
@@ -301,84 +303,6 @@ function finalizeUsage(
   };
 }
 
-function splitStreamingChunks(text: string): string[] {
-  const trimmed = text.trim();
-  if (!trimmed) {
-    return [];
-  }
-
-  const words = trimmed.split(/\s+/);
-  const chunks: string[] = [];
-  let current = "";
-
-  for (const word of words) {
-    const next = current ? `${current} ${word}` : word;
-    if (next.length > 120 && current) {
-      chunks.push(`${current} `);
-      current = word;
-      continue;
-    }
-    current = next;
-  }
-
-  if (current) {
-    chunks.push(current);
-  }
-
-  return chunks;
-}
-
-function buildStreamResponse(id: string, model: string, content: string) {
-  const created = Math.floor(Date.now() / 1000);
-  const encoder = new TextEncoder();
-  const chunks = splitStreamingChunks(content);
-
-  const stream = new ReadableStream<Uint8Array>({
-    start(controller) {
-      const send = (payload: unknown) => {
-        controller.enqueue(encoder.encode(`data: ${JSON.stringify(payload)}\n\n`));
-      };
-
-      send({
-        id,
-        object: "chat.completion.chunk",
-        created,
-        model,
-        choices: [{ index: 0, delta: { role: "assistant" }, finish_reason: null }],
-      });
-
-      for (const chunk of chunks) {
-        send({
-          id,
-          object: "chat.completion.chunk",
-          created,
-          model,
-          choices: [{ index: 0, delta: { content: chunk }, finish_reason: null }],
-        });
-      }
-
-      send({
-        id,
-        object: "chat.completion.chunk",
-        created,
-        model,
-        choices: [{ index: 0, delta: {}, finish_reason: "stop" }],
-      });
-
-      controller.enqueue(encoder.encode("data: [DONE]\n\n"));
-      controller.close();
-    },
-  });
-
-  return new Response(stream, {
-    headers: {
-      "Content-Type": "text/event-stream",
-      "Cache-Control": "no-cache, no-transform",
-      Connection: "keep-alive",
-    },
-  });
-}
-
 async function handleChatCompletion(c: Context<{ Bindings: Env; Variables: Variables }>) {
   let body: OpenAiChatCompletionRequest;
 
@@ -440,16 +364,26 @@ async function handleChatCompletion(c: Context<{ Bindings: Env; Variables: Varia
   }
 
   try {
+    if (body.stream) {
+      const streamResponse = await streamCompletion(synthesisTarget, providerMessages, {
+        temperature: body.temperature,
+        maxTokens: body.max_tokens,
+      });
+      return new Response(streamResponse.body, {
+        headers: {
+          "Content-Type": "text/event-stream",
+          "Cache-Control": "no-cache, no-transform",
+          Connection: "keep-alive",
+        },
+      });
+    }
+
     const synthesized = await synthesizeCompletion(synthesisTarget, providerMessages, {
       temperature: body.temperature,
       maxTokens: body.max_tokens,
     });
     const content = synthesized.content.trim();
     const id = `chatcmpl_${crypto.randomUUID().replace(/-/g, "")}`;
-
-    if (body.stream) {
-      return buildStreamResponse(id, parsedModel.value.publicModel, content);
-    }
 
     return c.json({
       id,

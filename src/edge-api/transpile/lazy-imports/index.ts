@@ -3,6 +3,10 @@ import {
   recordServiceRequestMetric,
   shouldTrackServiceMetricRequest,
 } from "../../common/core-logic/service-metrics";
+import {
+  buildStandardHealthResponse,
+  getHealthHttpStatus,
+} from "../../common/core-logic/health-contract";
 // Import WASM directly for Cloudflare Workers (wrangler CompiledWasm rule).
 // The Vite ?url import in the code package doesn't work in wrangler's bundler.
 import wasmModule from "esbuild-wasm/esbuild.wasm";
@@ -136,14 +140,11 @@ export default {
       const url = new URL(request.url);
 
       if (url.pathname === "/health" && request.method === "GET") {
-        return new Response(
-          JSON.stringify({
-            status: "ok",
-            service: "transpile",
-            timestamp: new Date().toISOString(),
-          }),
-          { status: 200, headers: { "Content-Type": "application/json" } },
-        );
+        const payload = buildStandardHealthResponse({ service: "transpile" });
+        return new Response(JSON.stringify(payload), {
+          status: getHealthHttpStatus(payload),
+          headers: { "Content-Type": "application/json" },
+        });
       }
 
       const params = url.searchParams;

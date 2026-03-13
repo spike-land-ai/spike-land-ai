@@ -17,12 +17,17 @@ bucket_name = "spike-app-assets"
 
 [durable_objects]
 bindings = [
-  { name = "LIMITERS", class_name = "RateLimiter" }
+  { name = "LIMITERS", class_name = "RateLimiter" },
+  { name = "SPIKE_CHAT_SESSIONS", class_name = "SpikeChatSessionDO" }
 ]
 
 [[migrations]]
 tag = "v1"
 new_classes = ["RateLimiter"]
+
+[[migrations]]
+tag = "v2"
+new_sqlite_classes = ["SpikeChatSessionDO"]
 
 # Custom domain — Cloudflare manages DNS automatically
 # QUIZ_BADGE_SECRET moved to wrangler secrets (run: wrangler secret put QUIZ_BADGE_SECRET)

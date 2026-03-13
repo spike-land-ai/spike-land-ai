@@ -1,6 +1,10 @@
 import { Hono } from "hono";
 import type { Env } from "../../core-logic/env.js";
 import { DOCS_MANIFEST, DOC_CATEGORIES as CATEGORIES } from "../../core-logic/docs-catalog.js";
+import {
+  acceptsMarkdown,
+  markdownResponse,
+} from "../../../common/core-logic/content-negotiation.js";
 
 const GITHUB_RAW_BASE = "https://raw.githubusercontent.com/spike-land-ai/spike-land-ai/main";
 
@@ -25,6 +29,22 @@ docsApi.get("/api/docs/:slug", async (c) => {
   const entry = DOCS_MANIFEST.find((d) => d.slug === slug);
 
   if (!entry) {
+    return c.json({ error: "Document not found" }, 404);
+  }
+
+  // Content negotiation: return raw markdown for agents
+  if (acceptsMarkdown(c)) {
+    try {
+      const res = await fetch(`${GITHUB_RAW_BASE}/${entry.filePath}`, {
+        headers: { "User-Agent": "spike-edge/1.0" },
+        cf: { cacheTtl: 3600, cacheEverything: true },
+      });
+      if (res.ok) {
+        return markdownResponse(await res.text(), "public, max-age=14400");
+      }
+    } catch {
+      // Fall through to 404
+    }
     return c.json({ error: "Document not found" }, 404);
   }
 

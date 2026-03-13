@@ -5,7 +5,6 @@ import {
   parseModelSelection,
   getPlatformKey,
   resolveSynthesisTarget,
-  DEFAULT_PROVIDER_MODELS,
   PUBLIC_MODEL_ID,
 } from "../llm-provider";
 import type { Env } from "../env";

@@ -2,6 +2,11 @@ import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { logger } from "hono/logger";
 import { captureWorkerException } from "../../common/core-logic/sentry";
+import {
+  buildStandardHealthResponse,
+  getHealthHttpStatus,
+  timedCheck,
+} from "../../common/core-logic/health-contract";
 import type { Env } from "../core-logic/env";
 import type { AuthVariables } from "./middleware";
 import { authMiddleware } from "./middleware";
@@ -14,6 +19,7 @@ import { internalByokRoute } from "./internal-byok";
 import { internalAnalytics } from "./internal-analytics";
 import { internalAuthMiddleware } from "./internal-auth";
 import { landingRoute } from "./landing";
+import { learnitRoute } from "./learnit";
 
 export function createApp(): Hono<{ Bindings: Env; Variables: AuthVariables }> {
   const app = new Hono<{ Bindings: Env; Variables: AuthVariables }>();
@@ -37,14 +43,24 @@ export function createApp(): Hono<{ Bindings: Env; Variables: AuthVariables }> {
   );
   app.use("*", logger());
 
-  app.get("/health", (c) =>
-    c.json({ status: "ok", service: "spike-land-mcp", timestamp: new Date().toISOString() }),
-  );
+  app.get("/health", async (c) => {
+    const d1Check = await timedCheck(async () => {
+      await c.env.DB.prepare("SELECT 1").first();
+    });
+    const payload = buildStandardHealthResponse({
+      service: "spike-land-mcp",
+      checks: { d1: d1Check },
+    });
+    return c.json(payload, getHealthHttpStatus(payload));
+  });
 
   // Internal routes (protected by x-internal-secret header)
   app.use("/internal/*", internalAuthMiddleware);
   app.route("/internal", internalByokRoute);
   app.route("/internal", internalAnalytics);
+
+  // LearnIt public HTTP routes
+  app.route("/", learnitRoute);
 
   // Public routes
   app.route("/.well-known", wellKnownRoute);

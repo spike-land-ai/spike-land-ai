@@ -28,6 +28,10 @@ import {
   recordServiceRequestMetric,
   shouldTrackServiceMetricRequest,
 } from "../../common/core-logic/service-metrics";
+import {
+  buildStandardHealthResponse,
+  getHealthHttpStatus,
+} from "../../common/core-logic/health-contract";
 
 declare const __BUILD_SHA__: string;
 declare const __BUILD_TIME__: string;
@@ -36,9 +40,13 @@ const app = new Hono<{ Bindings: Env }>();
 
 app.get("/version", (c) => c.json({ sha: __BUILD_SHA__, built: __BUILD_TIME__ }));
 
-app.get("/health", (c) =>
-  c.json({ status: "ok", service: "image-studio-mcp", timestamp: new Date().toISOString() }),
-);
+app.get("/health", (c) => {
+  const payload = buildStandardHealthResponse({
+    service: "image-studio-mcp",
+    version: __BUILD_SHA__,
+  });
+  return c.json(payload, getHealthHttpStatus(payload));
+});
 
 app.use(
   "*",

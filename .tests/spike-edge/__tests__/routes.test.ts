@@ -76,11 +76,21 @@ describe("health route", () => {
     const res = await app.request("/health", {}, env);
 
     expect(res.status).toBe(200);
-    const body = await res.json<{ status: string; r2: string; d1: string; timestamp: string }>();
+    const body = await res.json<{
+      status: string;
+      service: string;
+      timestamp: string;
+      version: string;
+      uptime_ms: number;
+      checks: Record<string, { status: string; latency_ms: number }>;
+    }>();
     expect(body.status).toBe("ok");
-    expect(body.r2).toBe("ok");
-    expect(body.d1).toBe("ok");
+    expect(body.service).toBe("spike-edge");
+    expect(body.checks.r2.status).toBe("ok");
+    expect(body.checks.d1.status).toBe("ok");
     expect(typeof body.timestamp).toBe("string");
+    expect(typeof body.version).toBe("string");
+    expect(typeof body.uptime_ms).toBe("number");
   });
 
   it("returns 503 with degraded status when R2 is unreachable", async () => {
@@ -92,10 +102,13 @@ describe("health route", () => {
 
     const res = await app.request("/health", {}, env);
     expect(res.status).toBe(503);
-    const body = await res.json<{ status: string; r2: string; d1: string; timestamp: string }>();
+    const body = await res.json<{
+      status: string;
+      checks: Record<string, { status: string }>;
+    }>();
     expect(body.status).toBe("degraded");
-    expect(body.r2).toBe("degraded");
-    expect(body.d1).toBe("ok");
+    expect(body.checks.r2.status).toBe("degraded");
+    expect(body.checks.d1.status).toBe("ok");
   });
 
   it("returns 503 with degraded status when D1 is unreachable", async () => {
@@ -113,10 +126,13 @@ describe("health route", () => {
 
     const res = await app.request("/health", {}, env);
     expect(res.status).toBe(503);
-    const body = await res.json<{ status: string; r2: string; d1: string }>();
+    const body = await res.json<{
+      status: string;
+      checks: Record<string, { status: string }>;
+    }>();
     expect(body.status).toBe("degraded");
-    expect(body.r2).toBe("ok");
-    expect(body.d1).toBe("degraded");
+    expect(body.checks.r2.status).toBe("ok");
+    expect(body.checks.d1.status).toBe("degraded");
   });
 });
 
@@ -814,7 +830,9 @@ describe("spa route", () => {
     const res = await app.request("/dashboard/settings", {}, env);
     expect(res.status).toBe(200);
     expect(res.headers.get("content-type")).toContain("text/html");
-    expect(res.headers.get("cache-control")).toBe("private, no-cache, no-store, must-revalidate");
+    expect(res.headers.get("cache-control")).toBe(
+      "public, max-age=0, s-maxage=60, stale-while-revalidate=300",
+    );
   });
 
   it("serves static asset with correct cache headers", async () => {
@@ -830,7 +848,7 @@ describe("spa route", () => {
     expect(res.status).toBe(200);
     // Non-hashed asset gets standard cache-control with stale-while-revalidate
     expect(res.headers.get("cache-control")).toBe(
-      "public, max-age=3600, stale-while-revalidate=3600",
+      "public, max-age=14400, stale-while-revalidate=86400",
     );
   });
 
@@ -1238,7 +1256,7 @@ describe("app middleware (index.ts)", () => {
 
     expect(res.headers.get("X-Content-Type-Options")).toBe("nosniff");
     expect(res.headers.get("Permissions-Policy")).toBe(
-      "camera=(), microphone=(), geolocation=(), payment=()",
+      'camera=(), microphone=(), geolocation=(), payment=(self "https://checkout.stripe.com")',
     );
     expect(res.headers.get("Content-Security-Policy")).toContain(
       "frame-ancestors 'self' https://*.spike.land",

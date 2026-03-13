@@ -38,6 +38,7 @@ import { cachePurge } from "./routes/cache-purge.js";
 import { chat } from "./routes/chat.js";
 import { settings } from "./routes/settings.js";
 import { spikeChat } from "./routes/spike-chat.js";
+import { spikeChatDebug } from "./routes/spike-chat-debug.js";
 import { spa } from "./routes/spa.js";
 import { wellKnown } from "./routes/well-known.js";
 import { sitemap } from "./routes/sitemap.js";
@@ -240,6 +241,9 @@ app.use("/api/chat", creditMeterMiddleware);
 // Auth and credit metering for Spike Chat (Grok-powered)
 app.use("/api/spike-chat", authMiddleware);
 app.use("/api/spike-chat", creditMeterMiddleware);
+app.use("/api/spike-chat/history", authMiddleware);
+app.use("/api/spike-chat/stream/*", authMiddleware);
+app.use("/api/spike-chat/debug/*", authMiddleware);
 
 // Error handling middleware
 app.onError((err, c) => {
@@ -322,6 +326,7 @@ app.route("/", fixer);
 app.route("/", settings);
 app.route("/", chat);
 app.route("/", spikeChat);
+app.route("/", spikeChatDebug);
 app.route("/", cachePurge);
 
 /** Track whether MCP_SERVICE binding is functional (avoids repeated failures in local dev). */
@@ -401,6 +406,41 @@ export const getApiAppsSlugHandler = async (
   });
 };
 app.get("/api/apps/:slug", getApiAppsSlugHandler);
+
+// LearnIt proxy — forward to MCP service, preserving Accept header for content negotiation
+export const getApiLearnitListHandler = async (
+  c: import("hono").Context<{ Bindings: Env; Variables: Variables }>,
+) => {
+  const url = "https://mcp.spike.land/api/learnit";
+  const response = await fetchMcpWithFallback(c.env, url, {
+    headers: { "X-Request-Id": c.get("requestId") },
+  });
+  return new Response(response.body, {
+    status: response.status,
+    statusText: response.statusText,
+    headers: new Headers(response.headers),
+  });
+};
+app.get("/api/learnit", getApiLearnitListHandler);
+
+export const getApiLearnitSlugHandler = async (
+  c: import("hono").Context<{ Bindings: Env; Variables: Variables }>,
+) => {
+  const slug = c.req.param("slug");
+  const url = `https://mcp.spike.land/api/learnit/${slug}`;
+  const headers: Record<string, string> = { "X-Request-Id": c.get("requestId") };
+  const accept = c.req.header("Accept");
+  if (accept) {
+    headers["Accept"] = accept;
+  }
+  const response = await fetchMcpWithFallback(c.env, url, { headers });
+  return new Response(response.body, {
+    status: response.status,
+    statusText: response.statusText,
+    headers: new Headers(response.headers),
+  });
+};
+app.get("/api/learnit/:slug", getApiLearnitSlugHandler);
 
 // Store tools endpoint — groups MCP registry tools by category for the store UI
 export const getApiStoreToolsHandler = async (
@@ -651,6 +691,7 @@ app.all("/api/*", apiCatchAllHandler);
 app.route("/", spa);
 
 export { RateLimiter, app };
+export { SpikeChatSessionDO } from "../edge/spike-chat-session-do.js";
 
 /** Log a one-time warning per isolate if SENTRY_DSN is not configured. */
 let sentryDsnWarned = false;

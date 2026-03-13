@@ -86,6 +86,7 @@ import { registerAuditTools } from "../../db/tools/audit";
 import { registerCrdtTools } from "../tools/crdt";
 import { registerNetsimTools } from "../tools/netsim";
 import { registerCachePurgeTools } from "../tools/cache-purge";
+import { registerPlatformHealthTools } from "../tools/platform-health";
 import { registerCausalityTools } from "../tools/causality";
 import { registerBftTools } from "../tools/bft";
 import { registerSessionTools } from "../tools/session";
@@ -262,6 +263,9 @@ export async function registerAllTools(
   safeRegister("registerQuizTools", () => registerQuizTools(registry, userId, db, env));
   safeRegister("registerCachePurgeTools", () =>
     registerCachePurgeTools(registry, userId, db, env?.spikeEdge, env?.mcpInternalSecret),
+  );
+  safeRegister("registerPlatformHealthTools", () =>
+    registerPlatformHealthTools(registry, userId, db, env?.spikeEdge),
   );
   safeRegister("registerBugbookFeedbackTools", () =>
     registerBugbookFeedbackTools(registry, userId, db, env?.spikeEdge, env?.mcpInternalSecret),

@@ -104,6 +104,8 @@ export async function executeAgentTool(params: {
     toolName: string,
     toolArgs: Record<string, unknown>,
   ) => Promise<void>;
+  /** Optional DO-based callback to replace D1 polling for browser results. */
+  waitViaCallback?: (toolCallId: string) => Promise<unknown>;
 }): Promise<ToolExecutionResult> {
   const {
     mcpService,
@@ -119,6 +121,7 @@ export async function executeAgentTool(params: {
     contextIdColumn,
     maxSearchResults,
     onBrowserInsert,
+    waitViaCallback,
   } = params;
 
   if (toolName.startsWith("browser_")) {
@@ -157,14 +160,10 @@ export async function executeAgentTool(params: {
       await onBrowserInsert(toolCallId, toolName, toolArgs);
     }
 
-    const browserResult = await waitForBrowserResult(
-      db,
-      contextId,
-      toolCallId,
-      userId,
-      tableName,
-      contextIdColumn,
-    );
+    // Prefer DO callback (zero-polling) over D1 polling
+    const browserResult = waitViaCallback
+      ? await waitViaCallback(toolCallId)
+      : await waitForBrowserResult(db, contextId, toolCallId, userId, tableName, contextIdColumn);
 
     return {
       transport: "browser",

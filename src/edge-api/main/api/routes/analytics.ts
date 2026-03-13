@@ -38,11 +38,11 @@ const VALID_RANGES: Record<string, number> = {
 
 const VALID_RANGE_KEYS = Object.keys(VALID_RANGES).join(", ");
 
-const ADMIN_EMAIL = "zoltan.erdos@spike.land";
+const ADMIN_EMAILS = new Set(["zoltan.erdos@spike.land", "zolika84@gmail.com"]);
 
 /**
  * Dual auth check: accepts either X-Internal-Secret (service-to-service)
- * or an authenticated founder session (userId → email → ADMIN_EMAIL).
+ * or an authenticated founder session (userId → email → ADMIN_EMAILS).
  */
 async function requireFounderOrSecret(
   c: import("hono").Context<{ Bindings: Env; Variables: Variables }>,
@@ -59,7 +59,7 @@ async function requireFounderOrSecret(
   }
 
   const email = c.get("userEmail") as string | undefined;
-  if (!email || email !== ADMIN_EMAIL) {
+  if (!email || !ADMIN_EMAILS.has(email)) {
     return { authorized: false, error: "Forbidden", status: 403 };
   }
 

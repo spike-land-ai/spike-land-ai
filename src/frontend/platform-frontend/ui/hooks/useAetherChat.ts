@@ -32,9 +32,15 @@ interface UseAetherChatReturn {
   toolCatalogCount: number;
   model: string | null;
   lastLearnedLesson: string | null;
+  /** The stable session ID (persists across page reloads for authenticated users). */
+  sessionId: string | null;
+  /** Whether the DO session is available (history loaded from server). */
+  sessionReady: boolean;
 }
 
 const STORAGE_KEY = "aether-chat-messages";
+const SESSION_ID_KEY = "aether-session-id";
+const LAST_EVENT_ID_KEY = "aether-last-event-id";
 
 const VALID_STAGES: ReadonlySet<string> = new Set<PipelineStage>([
   "classify",
@@ -118,8 +124,23 @@ export function useAetherChat(): UseAetherChatReturn {
   const [toolCatalogCount, setToolCatalogCount] = useState(0);
   const [model, setModel] = useState<string | null>(null);
   const [lastLearnedLesson, setLastLearnedLesson] = useState<string | null>(null);
+  const [sessionReady, setSessionReady] = useState(false);
   const abortRef = useRef<AbortController | null>(null);
-  const sessionIdRef = useRef<string | null>(null);
+  const sessionIdRef = useRef<string | null>(() => {
+    try {
+      return localStorage.getItem(SESSION_ID_KEY);
+    } catch {
+      return null;
+    }
+  });
+  const lastEventIdRef = useRef<number>(() => {
+    try {
+      const stored = localStorage.getItem(LAST_EVENT_ID_KEY);
+      return stored ? Number(stored) : 0;
+    } catch {
+      return 0;
+    }
+  });
 
   // Persist messages to localStorage (debounced)
   useEffect(() => {
@@ -128,6 +149,58 @@ export function useAetherChat(): UseAetherChatReturn {
     }, 1000);
     return () => clearTimeout(timeoutId);
   }, [messages]);
+
+  // Load session history from DO on mount (server-side truth)
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch(apiUrl("/spike-chat/history"), {
+          credentials: "include",
+        });
+        if (!res.ok || cancelled) return;
+        const data: unknown = await res.json();
+        if (cancelled || !isObject(data)) return;
+
+        const serverMessages = data["messages"];
+        const serverSessionId = typeof data["sessionId"] === "string" ? data["sessionId"] : null;
+
+        if (serverSessionId) {
+          sessionIdRef.current = serverSessionId;
+          localStorage.setItem(SESSION_ID_KEY, serverSessionId);
+        }
+
+        if (Array.isArray(serverMessages) && serverMessages.length > 0) {
+          // Merge: prefer server history if it has more messages than localStorage
+          setMessages((local) => {
+            if (serverMessages.length >= local.length) {
+              return serverMessages
+                .filter(
+                  (m: unknown): m is { role: string; content: string; timestamp: number } =>
+                    isObject(m) &&
+                    typeof m["role"] === "string" &&
+                    typeof m["content"] === "string",
+                )
+                .map((m) => ({
+                  id: makeId(),
+                  role: m.role as "user" | "assistant",
+                  content: m.content,
+                  timestamp: typeof m.timestamp === "number" ? m.timestamp : Date.now(),
+                }));
+            }
+            return local;
+          });
+        }
+        setSessionReady(true);
+      } catch {
+        // DO unavailable — use localStorage (already loaded)
+        setSessionReady(true);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const sendMessage = useCallback(
     async (content: string) => {
@@ -191,6 +264,19 @@ export function useAetherChat(): UseAetherChatReturn {
           buffer = lines.pop() ?? "";
 
           for (const line of lines) {
+            // Track SSE event IDs for stream resumption
+            if (line.startsWith("id: ")) {
+              const eventId = Number(line.slice(4).trim());
+              if (!Number.isNaN(eventId)) {
+                lastEventIdRef.current = eventId;
+                try {
+                  localStorage.setItem(LAST_EVENT_ID_KEY, String(eventId));
+                } catch {
+                  // localStorage unavailable
+                }
+              }
+              continue;
+            }
             if (!line.startsWith("data: ")) continue;
             const data = line.slice(6);
             if (data === "[DONE]") continue;
@@ -212,8 +298,16 @@ export function useAetherChat(): UseAetherChatReturn {
                 setTotalNoteCount(knownTotalNoteCount);
                 setToolCatalogCount(knownToolCatalogCount);
                 setModel(typeof parsed["model"] === "string" ? parsed["model"] : null);
-                sessionIdRef.current =
+                const syncedSessionId =
                   typeof parsed["sessionId"] === "string" ? parsed["sessionId"] : null;
+                sessionIdRef.current = syncedSessionId;
+                if (syncedSessionId) {
+                  try {
+                    localStorage.setItem(SESSION_ID_KEY, syncedSessionId);
+                  } catch {
+                    // localStorage unavailable
+                  }
+                }
               } else if (eventType === "memory_update") {
                 if (typeof parsed["activeNoteCount"] === "number") {
                   setNoteCount(parsed["activeNoteCount"]);
@@ -401,7 +495,10 @@ export function useAetherChat(): UseAetherChatReturn {
     setError(null);
     setLastLearnedLesson(null);
     sessionIdRef.current = null;
+    lastEventIdRef.current = 0;
     localStorage.removeItem(STORAGE_KEY);
+    localStorage.removeItem(SESSION_ID_KEY);
+    localStorage.removeItem(LAST_EVENT_ID_KEY);
   }, []);
 
   return {
@@ -418,5 +515,7 @@ export function useAetherChat(): UseAetherChatReturn {
     toolCatalogCount,
     model,
     lastLearnedLesson,
+    sessionId: sessionIdRef.current,
+    sessionReady,
   };
 }

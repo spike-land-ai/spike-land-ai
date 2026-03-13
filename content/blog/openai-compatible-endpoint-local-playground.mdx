@@ -18,6 +18,8 @@ your existing client should keep working, but your product should still be allow
 
 That is the job of the spike.land compatibility route.
 
+<OpenAIEndpointDemo></OpenAIEndpointDemo>
+
 It accepts the familiar `/v1` request shape, but it does not behave like a blind proxy. Instead, it routes the request through local platform context before handing final synthesis to the upstream model provider.
 
 If you are reading the code, the implementation lives in:

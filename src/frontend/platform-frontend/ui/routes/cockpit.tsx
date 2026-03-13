@@ -5,7 +5,7 @@ import { ChatThread } from "../components/ChatThread";
 import { apiUrl } from "../../core-logic/api";
 import type { Message } from "../components/ChatThread";
 
-const FOUNDER_EMAIL = "zoltan.erdos@spike.land";
+const ADMIN_EMAILS = new Set(["zoltan.erdos@spike.land", "zolika84@gmail.com"]);
 const CHAT_STORAGE_KEY = "cockpit_chat_history";
 
 // ── Types ──────────────────────────────────────────────────────────────────
@@ -664,7 +664,7 @@ export function CockpitPage() {
     return <Navigate to="/login" />;
   }
 
-  if (user.email !== FOUNDER_EMAIL) {
+  if (!ADMIN_EMAILS.has(user.email)) {
     return <Navigate to="/" />;
   }
 

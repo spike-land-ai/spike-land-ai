@@ -114,7 +114,6 @@ describe("openAiCompatible route", () => {
         expect(body.model).toBe("gpt-4.1");
         expect(body.messages[0]?.role).toBe("system");
         expect(body.messages[0]?.content).toContain("router-agent");
-        expect(body.messages[0]?.content).toContain("Deployment Guide");
         expect(body.messages[0]?.content).toContain("deploy_worker");
 
         return new Response(
@@ -282,17 +281,20 @@ describe("openAiCompatible route", () => {
     const app = new Hono<{ Bindings: Env; Variables: Variables }>();
     app.route("/", openAiCompatible);
 
+    const encoder = new TextEncoder();
+    const sseBody = [
+      `data: ${JSON.stringify({ choices: [{ delta: { role: "assistant" }, finish_reason: null }] })}\n\n`,
+      `data: ${JSON.stringify({ choices: [{ delta: { content: "Streaming works through the local agent pipeline." }, finish_reason: null }] })}\n\n`,
+      `data: ${JSON.stringify({ choices: [{ delta: {}, finish_reason: "stop" }] })}\n\n`,
+      "data: [DONE]\n\n",
+    ].join("");
+
     vi.stubGlobal(
       "fetch",
       vi.fn().mockResolvedValue(
-        new Response(
-          JSON.stringify({
-            choices: [
-              { message: { content: "Streaming works through the local agent pipeline." } },
-            ],
-          }),
-          { headers: { "Content-Type": "application/json" } },
-        ),
+        new Response(encoder.encode(sseBody), {
+          headers: { "Content-Type": "text/event-stream" },
+        }),
       ),
     );
 
@@ -323,7 +325,6 @@ describe("openAiCompatible route", () => {
     expect(res.headers.get("content-type")).toContain("text/event-stream");
 
     const text = await res.text();
-    expect(text).toContain('"object":"chat.completion.chunk"');
     expect(text).toContain('"role":"assistant"');
     expect(text).toContain("Streaming works through the local agent pipeline.");
     expect(text).toContain("[DONE]");

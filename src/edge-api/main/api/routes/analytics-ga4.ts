@@ -10,7 +10,7 @@ import { requireInternalSecret } from "../../core-logic/internal-auth.js";
 
 const analyticsGa4 = new Hono<{ Bindings: Env; Variables: Variables }>();
 
-const ADMIN_EMAIL = "zoltan.erdos@spike.land";
+const ADMIN_EMAILS = new Set(["zoltan.erdos@spike.land", "zolika84@gmail.com"]);
 
 async function requireFounderOrSecret(
   c: import("hono").Context<{ Bindings: Env; Variables: Variables }>,
@@ -23,7 +23,7 @@ async function requireFounderOrSecret(
     return { authorized: false, error: "Unauthorized", status: 401 };
   }
   const email = c.get("userEmail") as string | undefined;
-  if (!email || email !== ADMIN_EMAIL) {
+  if (!email || !ADMIN_EMAILS.has(email)) {
     return { authorized: false, error: "Forbidden", status: 403 };
   }
   return { authorized: true };

@@ -8,6 +8,10 @@ import type { Env } from "../../core-logic/env.js";
 import { getClientId, sendGA4Events } from "../../lazy-imports/ga4.js";
 import { safeCtx, withEdgeCache } from "../lib/edge-cache.js";
 import { buildBlogAnalyticsEvents } from "./blog-audience.js";
+import {
+  acceptsMarkdown,
+  markdownResponse,
+} from "../../../common/core-logic/content-negotiation.js";
 
 const blog = new Hono<{ Bindings: Env }>();
 const GITHUB_RAW_BASE = "https://raw.githubusercontent.com/spike-land-ai/spike-land-ai/main";
@@ -277,6 +281,43 @@ blog.get("/api/blog", async (c) => {
 blog.get("/api/blog/:slug", async (c) => {
   // Normalise: strip accidental .mdx suffix so old links still resolve
   const slug = c.req.param("slug").replace(/\.mdx$/i, "");
+
+  // Content negotiation: return raw MDX source (with frontmatter) for agents
+  if (acceptsMarkdown(c)) {
+    if (!BLOG_SLUG_RE.test(slug)) return c.json({ error: "Post not found" }, 404);
+
+    try {
+      const res = await fetch(`${GITHUB_RAW_BASE}/content/blog/${slug}.mdx`, {
+        headers: { "User-Agent": "spike-edge/1.0" },
+        cf: { cacheTtl: 300, cacheEverything: true },
+      });
+
+      if (!res.ok) return c.json({ error: "Post not found" }, 404);
+
+      const body = await res.text();
+
+      // Fire analytics in the background
+      try {
+        c.executionCtx.waitUntil(
+          getClientId(c.req.raw).then((clientId) =>
+            sendGA4Events(c.env, clientId, [
+              {
+                name: "blog_view",
+                params: { page_path: `/api/blog/${slug}`, slug, format: "markdown" },
+              },
+            ]),
+          ),
+        );
+      } catch {
+        /* no ExecutionContext in some environments */
+      }
+
+      return markdownResponse(body, "public, max-age=300");
+    } catch {
+      return c.json({ error: "Post not found" }, 404);
+    }
+  }
+
   const showDrafts = isLocalDev(c);
 
   let cached: Response | null = null;

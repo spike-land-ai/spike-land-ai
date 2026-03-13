@@ -22,6 +22,7 @@ export * from "../animation/StackCollapseDemo";
 export * from "../animation/AgentCoordinationDemo";
 export * from "../animation/ConvergenceDemo";
 export * from "../animation/DependencyCascadeDemo";
+export * from "../animation/OpenAIEndpointDemo";
 
 // Kinetic typography components
 export { Whisper } from "../animation/Whisper";

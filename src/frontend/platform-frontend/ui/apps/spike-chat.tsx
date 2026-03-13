@@ -15,6 +15,8 @@ import {
   Check,
   CheckCircle2,
   CircuitBoard,
+  Cloud,
+  CloudOff,
   Copy,
   Loader2,
   Send,
@@ -302,6 +304,8 @@ export function SpikeChatApp() {
     toolCatalogCount,
     model,
     lastLearnedLesson,
+    sessionId,
+    sessionReady,
   } = useAetherChat();
   const router = useRouter();
 
@@ -410,6 +414,14 @@ export function SpikeChatApp() {
                 <span className="rounded-full border border-border bg-card px-3 py-1">
                   {noteCount} active notes
                 </span>
+                <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-3 py-1">
+                  {sessionReady ? (
+                    <Cloud className="size-3 text-success-foreground" />
+                  ) : (
+                    <CloudOff className="size-3 text-muted-foreground" />
+                  )}
+                  {sessionReady ? "Session synced" : "Connecting..."}
+                </span>
               </div>
             </div>
 
@@ -447,7 +459,7 @@ export function SpikeChatApp() {
                   State
                 </div>
                 <p className="mt-2 text-sm font-semibold text-foreground">
-                  {isStreaming ? "Streaming" : "Ready"}
+                  {isStreaming ? "Streaming" : sessionReady ? "Ready" : "Connecting"}
                 </p>
               </div>
             </div>
@@ -588,6 +600,37 @@ export function SpikeChatApp() {
                     </p>
                     <p className="mt-1 text-sm leading-6 text-muted-foreground">
                       {lastLearnedLesson ?? "No new lesson extracted in this session yet."}
+                    </p>
+                  </div>
+                </div>
+              </section>
+
+              <section className="rounded-[28px] border border-border bg-card p-4 shadow-sm">
+                <div className="mb-3 flex items-center gap-2">
+                  {sessionReady ? (
+                    <Cloud className="size-4 text-success-foreground" />
+                  ) : (
+                    <CloudOff className="size-4 text-muted-foreground" />
+                  )}
+                  <h2 className="text-sm font-semibold tracking-tight text-foreground">Session</h2>
+                </div>
+                <div className="grid gap-2">
+                  <div className="rounded-2xl border border-border bg-background p-3">
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                      Status
+                    </p>
+                    <p className="mt-1 text-sm font-semibold text-foreground">
+                      {sessionReady ? "Synced with server" : "Loading session..."}
+                    </p>
+                  </div>
+                  <div className="rounded-2xl border border-border bg-background p-3">
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                      Persistence
+                    </p>
+                    <p className="mt-1 text-xs leading-5 text-muted-foreground">
+                      {sessionId
+                        ? "History persists across devices and page reloads via Durable Object."
+                        : "Sign in to enable cross-device session persistence."}
                     </p>
                   </div>
                 </div>
