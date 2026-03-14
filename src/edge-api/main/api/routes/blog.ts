@@ -395,8 +395,9 @@ blog.get("/api/blog/:slug", async (c) => {
   return cached;
 });
 
-// Serve blog images from R2 (supports both /api/blog-images/... and /blog/slug/file.ext paths)
+// Serve blog media from R2 (supports both /api/blog-images/... and /blog/slug/file.ext paths)
 const IMAGE_EXTS = new Set(["png", "jpg", "jpeg", "gif", "webp", "svg", "avif"]);
+const MEDIA_EXTS = new Set([...IMAGE_EXTS, "mp4", "webm", "m4a", "mp3", "ogg"]);
 
 const CONTENT_TYPES: Record<string, string> = {
   png: "image/png",
@@ -406,6 +407,11 @@ const CONTENT_TYPES: Record<string, string> = {
   webp: "image/webp",
   svg: "image/svg+xml",
   avif: "image/avif",
+  mp4: "video/mp4",
+  webm: "video/webm",
+  m4a: "audio/mp4",
+  mp3: "audio/mpeg",
+  ogg: "audio/ogg",
 };
 
 const IMAGE_STUDIO_URL = "https://image-studio-mcp.spike.land/api/tool";
@@ -568,17 +574,27 @@ async function resolveHeroPrompt(
   }
 
   const requestedPath = `/blog/${slug}/${filename}`;
-  const row = await getBlogPostRow(db, slug);
+  let row = await getBlogPostRow(db, slug);
+
   if (!row || row.hero_image !== requestedPath) {
-    return null;
+    // Fallback: find ANY post whose hero_image matches the requested path
+    const fallbackRow = await db
+      .prepare("SELECT * FROM blog_posts WHERE hero_image = ? LIMIT 1")
+      .bind(requestedPath)
+      .first<BlogPostRow>();
+    if (fallbackRow) {
+      row = await recoverRowHeroPrompt(fallbackRow);
+    } else if (!row) {
+      return null;
+    }
   }
 
-  let prompt = inferPromptFromRow(row, requestedPath);
+  let prompt = inferPromptFromRow(row, row!.hero_image ?? requestedPath);
 
   if (!prompt) {
-    const sourceRow = await fetchBlogPostSource(slug);
-    if (sourceRow?.hero_image === requestedPath) {
-      prompt = inferPromptFromRow(sourceRow, requestedPath);
+    const sourceRow = await fetchBlogPostSource(row!.slug);
+    if (sourceRow) {
+      prompt = inferPromptFromRow(sourceRow, sourceRow.hero_image ?? requestedPath);
     }
   }
 
@@ -683,12 +699,12 @@ blog.get("/api/blog-images/:slug/:filename", async (c) => {
   return resp ?? c.notFound();
 });
 
-// Backward-compatible: serve /blog/{slug}/{filename} for inline MDX images
+// Backward-compatible: serve /blog/{slug}/{filename} for inline MDX media (images, video, audio)
 blog.get("/blog/:slug/:filename", async (c, next) => {
   const { slug, filename } = c.req.param();
   const ext = filename.split(".").pop()?.toLowerCase() ?? "";
 
-  if (!IMAGE_EXTS.has(ext)) return next();
+  if (!MEDIA_EXTS.has(ext)) return next();
 
   const hostname = new URL(c.req.url).hostname;
   const resp = await serveBlogImage(

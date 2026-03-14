@@ -22,6 +22,9 @@ import {
   type ResolvedSynthesisTarget,
 } from "../../core-logic/llm-provider.js";
 import { getRubik3SystemPrompt } from "../../core-logic/rubik-persona-prompt.js";
+import { getErdosPersonaPrompt } from "../../core-logic/erdos-persona-prompt.js";
+import { getRadixPersonaPrompt } from "../../core-logic/radix-persona-prompt.js";
+import { getGovPersonaPrompt } from "../../core-logic/gov-persona-prompt.js";
 const spikeChat = new Hono<{ Bindings: Env; Variables: Variables }>();
 const MAX_TOOL_LOOPS = 3;
 const MAX_HISTORY_MESSAGES = 16;
@@ -581,6 +584,21 @@ spikeChat.post("/api/spike-chat", async (c) => {
   // Merge Rubik-3 persona prompt when requested
   if (persona === "rubik-3") {
     fullSystemPrompt = `${fullSystemPrompt}\n\n${getRubik3SystemPrompt()}`;
+  }
+
+  // Merge Erdős persona prompt when requested
+  if (persona === "erdos") {
+    fullSystemPrompt = `${fullSystemPrompt}\n\n${getErdosPersonaPrompt()}`;
+  }
+
+  // Merge Radix persona prompt when requested
+  if (persona === "radix") {
+    fullSystemPrompt = `${fullSystemPrompt}\n\n${getRadixPersonaPrompt()}`;
+  }
+
+  // Merge Gov persona prompt when requested
+  if (persona === "gov") {
+    fullSystemPrompt = `${fullSystemPrompt}\n\n${getGovPersonaPrompt()}`;
   }
 
   const intentSummary = classifyIntent(userMessage, body.pageContext);

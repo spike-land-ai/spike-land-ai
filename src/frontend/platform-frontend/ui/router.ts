@@ -52,7 +52,6 @@ export const ROUTE_PRD_MAP: Record<string, string> = {
   "/dashboard": "route:/dashboard",
   "/cockpit": "route:/dashboard",
   "/vibe-code": "route:/vibe-code",
-  "/pricing": "route:/pricing",
 };
 
 const rootRoute = createRootRoute({ component: RootLayout, notFoundComponent: NotFoundPage });
@@ -132,7 +131,9 @@ const settingsRoute = createRoute({
 const pricingRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/pricing",
-  component: withSuspense(() => import("./routes/pricing"), "PricingPage"),
+  beforeLoad: () => {
+    throw redirect({ to: "/" });
+  },
 });
 
 const storeRoute = createRoute({
@@ -523,6 +524,12 @@ const learnitTopicRoute = createRoute({
   component: withSuspense(() => import("./routes/learnit/$topic"), "LearnitTopicPage"),
 });
 
+const govRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/gov",
+  component: withSuspense(() => import("./routes/gov"), "GovPage"),
+});
+
 const startChecklistRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/spike-land-start-checklist",
@@ -563,6 +570,7 @@ const routeTree = rootRoute.addChildren([
   startChecklistRoute,
   aboutRoute,
   securityRoute,
+  govRoute,
   analyticsRoute,
   statusRoute,
   callbackRoute,

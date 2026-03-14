@@ -93,33 +93,147 @@ function getSpikeEdgeMetricService(request: Request): "Main Site" | "Edge API" |
 // Request ID middleware (must run before everything else)
 app.use("*", requestIdMiddleware);
 
+// Generic *.spike.land vanity host rewrite: <prefix>.spike.land → /<prefix>/*
+// Handles analytics.spike.land, gov.spike.land, dash.spike.land, etc. automatically.
+// Hosts that have their own dedicated routing (api, edge, mcp, auth-mcp, etc.) are excluded.
+const VANITY_HOST_EXCLUSIONS = new Set<string>([
+  PLATFORM_HOSTS.site,
+  PLATFORM_HOSTS.www,
+  PLATFORM_HOSTS.api,
+  PLATFORM_HOSTS.edge,
+  PLATFORM_HOSTS.authMcp,
+  PLATFORM_HOSTS.imageStudioMcp,
+  PLATFORM_HOSTS.chat,
+  PLATFORM_HOSTS.mcp,
+  PLATFORM_HOSTS.js,
+  PLATFORM_HOSTS.status,
+]);
+
+// Known valid vanity-host prefixes for typo correction (302 redirect).
+// These correspond to top-level routes in the SPA router.
+const KNOWN_VANITY_PREFIXES = [
+  "analytics",
+  "gov",
+  "dash",
+  "dashboard",
+  "blog",
+  "docs",
+  "apps",
+  "pricing",
+  "cockpit",
+  "settings",
+  "support",
+  "store",
+  "chess",
+  "workshop",
+  "learn",
+  "learnit",
+  "quiz",
+  "bugbook",
+  "messages",
+  "about",
+  "privacy",
+  "terms",
+  "version",
+  "status",
+  "login",
+  "create",
+  "packages",
+  "bazdmeg",
+  "vibe-code",
+] as const;
+
+/** Levenshtein distance between two strings (optimized single-row DP). */
+function levenshtein(a: string, b: string): number {
+  if (a === b) return 0;
+  if (a.length === 0) return b.length;
+  if (b.length === 0) return a.length;
+
+  const bLen = b.length;
+  const row = Array.from({ length: bLen + 1 }, (_, i) => i);
+
+  for (let i = 1; i <= a.length; i++) {
+    let prev = i;
+    for (let j = 1; j <= bLen; j++) {
+      const cost = a[i - 1] === b[j - 1] ? 0 : 1;
+      const val = Math.min(
+        row[j]! + 1, // deletion
+        prev + 1, // insertion
+        row[j - 1]! + cost, // substitution
+      );
+      row[j - 1] = prev;
+      prev = val;
+    }
+    row[bLen] = prev;
+  }
+  return row[bLen]!;
+}
+
+/**
+ * Find the closest known prefix for a typo'd subdomain.
+ * Returns the match if distance ≤ maxDistance, otherwise null.
+ */
+function findClosestPrefix(input: string, maxDistance = 2): string | null {
+  let bestMatch: string | null = null;
+  let bestDist = maxDistance + 1;
+  for (const known of KNOWN_VANITY_PREFIXES) {
+    const dist = levenshtein(input, known);
+    if (dist < bestDist) {
+      bestDist = dist;
+      bestMatch = known;
+    }
+    if (dist === 0) break; // exact match
+  }
+  return bestDist <= maxDistance ? bestMatch : null;
+}
+
 app.use("*", async (c, next) => {
   const host = getRequestHost(c.req.raw);
-  if (host === PLATFORM_HOSTS.analytics) {
-    const url = new URL(c.req.url);
-    const getExecutionContext = (): ExecutionContext | undefined => {
-      try {
-        return c.executionCtx;
-      } catch {
-        return undefined;
-      }
-    };
-    const forward = (pathname: string) => {
-      url.pathname = pathname;
-      const executionContext = getExecutionContext();
-      return executionContext
-        ? app.fetch(new Request(url.toString(), c.req.raw), c.env, executionContext)
-        : app.fetch(new Request(url.toString(), c.req.raw), c.env);
-    };
-    // Internally rewrite vanity-host requests so the browser stays on analytics.spike.land.
-    if (url.pathname === "/" || url.pathname === "/index.html") {
-      const res = await forward("/analytics");
-      return new Response(res.body, res);
+  if (!host.endsWith(".spike.land") || VANITY_HOST_EXCLUSIONS.has(host)) {
+    return next();
+  }
+  // Extract subdomain prefix: "analytics.spike.land" → "analytics"
+  const prefix = host.slice(0, host.indexOf(".spike.land"));
+  if (!prefix || prefix.includes(".")) {
+    return next();
+  }
+
+  // Typo correction: if prefix isn't a known vanity host, try fuzzy match
+  const isKnown = KNOWN_VANITY_PREFIXES.includes(prefix as (typeof KNOWN_VANITY_PREFIXES)[number]);
+  if (!isKnown) {
+    const corrected = findClosestPrefix(prefix);
+    if (corrected) {
+      // 302 redirect to the corrected subdomain, preserving path + query
+      const url = new URL(c.req.url);
+      url.hostname = `${corrected}.spike.land`;
+      return c.redirect(url.toString(), 302);
     }
-    if (!url.pathname.startsWith("/analytics")) {
-      const res = await forward(`/analytics${url.pathname}`);
-      return new Response(res.body, res);
+    // No close match — fall through to normal routing (may 404)
+  }
+
+  const url = new URL(c.req.url);
+  const getExecutionContext = (): ExecutionContext | undefined => {
+    try {
+      return c.executionCtx;
+    } catch {
+      return undefined;
     }
+  };
+  const forward = (pathname: string) => {
+    url.pathname = pathname;
+    const executionContext = getExecutionContext();
+    return executionContext
+      ? app.fetch(new Request(url.toString(), c.req.raw), c.env, executionContext)
+      : app.fetch(new Request(url.toString(), c.req.raw), c.env);
+  };
+  // Internally rewrite vanity-host requests so the browser stays on <prefix>.spike.land.
+  if (url.pathname === "/" || url.pathname === "/index.html") {
+    const res = await forward(`/${prefix}`);
+    return new Response(res.body, res);
+  }
+  if (!url.pathname.startsWith(`/${prefix}`)) {
+    const res = await forward(`/${prefix}${url.pathname}`);
+    return new Response(res.body, res);
   }
   return next();
 });

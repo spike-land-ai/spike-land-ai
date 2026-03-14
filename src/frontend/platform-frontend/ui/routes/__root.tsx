@@ -164,7 +164,6 @@ const NAV_LINK_ROUTES = [
   { to: "/learnit", label: "LearnIt" },
   { to: "/vibe-code", key: "vibeCode" },
   { to: "/blog", key: "blog" },
-  { to: "/pricing", key: "pricing" },
   { to: "/docs", key: "docs" },
 ] as const;
 
@@ -214,7 +213,6 @@ const NAV_SECTIONS: { heading: string; items: NavItem[] }[] = [
   {
     heading: "Platform",
     items: [
-      { to: "/pricing", label: "Pricing", icon: "💳" },
       { to: "/support", label: "Support", icon: "❤️" },
       { to: "/migrate", label: "Migrate", icon: "🚀" },
       { to: "/about", label: "About", icon: "ℹ️" },

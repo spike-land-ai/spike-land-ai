@@ -10,17 +10,20 @@ export const PLATFORM_HOSTS = {
   mcp: "mcp.spike.land",
   js: "js.spike.land",
   status: "status.spike.land",
+  gov: "gov.spike.land",
 } as const;
 
 export const MAIN_SITE_HOSTS = [
   PLATFORM_HOSTS.site,
   PLATFORM_HOSTS.www,
   PLATFORM_HOSTS.analytics,
+  PLATFORM_HOSTS.gov,
 ] as const;
 
 const AUTH_HOSTS = [
   PLATFORM_HOSTS.site,
   PLATFORM_HOSTS.analytics,
+  PLATFORM_HOSTS.gov,
   PLATFORM_HOSTS.imageStudioMcp,
   PLATFORM_HOSTS.authMcp,
 ] as const;
