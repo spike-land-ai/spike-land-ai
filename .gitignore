@@ -96,3 +96,6 @@ docker/caddy_config/
 
 
 __astro.env.local.save
+
+# Local-only tools (Ollama proxy, not deployed)
+src/mcp-tools/crystalline/
