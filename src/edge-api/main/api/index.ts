@@ -818,7 +818,7 @@ export const apiAuthAllHandler = async (
   const url = new URL(c.req.url);
   const isGetSession = url.pathname.endsWith("/get-session");
 
-  if (c.req.method === "POST" && !isGetSession) {
+  if (c.req.method === "POST" && !isGetSession && c.env.LIMITERS?.idFromName) {
     const rateLimitKey = c.req.header("cf-connecting-ip") ?? "anon";
     const rateLimitId = c.env.LIMITERS.idFromName(`auth:${rateLimitKey}`);
     const rateLimitStub = c.env.LIMITERS.get(rateLimitId);

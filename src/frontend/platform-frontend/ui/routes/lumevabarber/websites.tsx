@@ -1,20 +1,17 @@
 import { Link } from "@tanstack/react-router";
 import {
   ArrowRight,
-  Calendar,
   CheckCircle2,
-  Clock,
   CreditCard,
   Globe,
   Monitor,
   ShieldCheck,
   Smartphone,
-  Star,
   Zap,
 } from "lucide-react";
 
 import { cn } from "../../../styling/cn";
-import { type PricingTier, BRAND, SECTION_CLASSES, useIntersectionOnce } from "./shared";
+import { type PricingTier, SECTION_CLASSES, useIntersectionOnce } from "./shared";
 
 // ── Data ──────────────────────────────────────────────────────────────
 

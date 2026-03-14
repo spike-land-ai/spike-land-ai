@@ -135,20 +135,21 @@ proxy.post("/proxy/stripe", async (c) => {
 proxy.post("/proxy/ai", async (c) => {
   // Rate limit AI proxy requests — each call proxies to a paid upstream.
   // Key on the authenticated user ID when available; fall back to IP.
-  // The profile header is set by our own code (not passed from external callers).
-  const rateLimitKey =
-    (c.get("userId") as string | undefined) ?? c.req.header("cf-connecting-ip") ?? "anon";
-  const rateLimitId = c.env.LIMITERS.idFromName(`ai:${rateLimitKey}`);
-  const rateLimitStub = c.env.LIMITERS.get(rateLimitId);
-  const rateLimitResp = await rateLimitStub.fetch(
-    new Request("https://limiter.internal/", {
-      method: "POST",
-      headers: { "X-Rate-Limit-Profile": "POST_AI" },
-    }),
-  );
-  const cooldown = Number(await rateLimitResp.text());
-  if (cooldown > 0) {
-    return c.json({ error: "Rate limit exceeded", retryAfterSeconds: cooldown }, 429);
+  if (c.env.LIMITERS?.idFromName) {
+    const rateLimitKey =
+      (c.get("userId") as string | undefined) ?? c.req.header("cf-connecting-ip") ?? "anon";
+    const rateLimitId = c.env.LIMITERS.idFromName(`ai:${rateLimitKey}`);
+    const rateLimitStub = c.env.LIMITERS.get(rateLimitId);
+    const rateLimitResp = await rateLimitStub.fetch(
+      new Request("https://limiter.internal/", {
+        method: "POST",
+        headers: { "X-Rate-Limit-Profile": "POST_AI" },
+      }),
+    );
+    const cooldown = Number(await rateLimitResp.text());
+    if (cooldown > 0) {
+      return c.json({ error: "Rate limit exceeded", retryAfterSeconds: cooldown }, 429);
+    }
   }
 
   const body = await c.req.json<unknown>();

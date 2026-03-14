@@ -20,6 +20,8 @@ function logAuthEvent(
   const requestId = (c.get("requestId") as string | undefined) ?? null;
   const metadataJson = metadata !== null ? JSON.stringify(metadata) : null;
 
+  if (!c.env.DB) return;
+
   const write = c.env.DB.prepare(
     `INSERT INTO auth_audit_log
        (event_type, user_id, ip_address, user_agent, request_id, metadata)

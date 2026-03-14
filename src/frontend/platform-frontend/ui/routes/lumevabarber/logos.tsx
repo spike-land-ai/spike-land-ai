@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { Link } from "@tanstack/react-router";
 import {
   Award,
@@ -10,17 +9,10 @@ import {
   Share2,
   Smartphone,
   Sparkles,
-  Star,
   Store,
 } from "lucide-react";
 import { cn } from "../../../styling/cn";
-import {
-  type PricingTier,
-  BRAND,
-  SECTION_CLASSES,
-  useIntersectionOnce,
-  useCounter,
-} from "./shared";
+import { type PricingTier, SECTION_CLASSES, useIntersectionOnce } from "./shared";
 
 // ── Data ──────────────────────────────────────────────────────────────
 

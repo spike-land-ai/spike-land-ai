@@ -96,8 +96,20 @@ describe("version route", () => {
         get: spaAssetsGet,
         list: vi.fn().mockResolvedValue({
           objects: [
-            { key: "index.html", size: 1000, etag: "abc", uploaded: new Date() },
-            { key: "builds/abc123def/app.js", size: 500, etag: "def", uploaded: new Date() },
+            {
+              key: "index.html",
+              size: 1000,
+              etag: "abc",
+              uploaded: new Date(),
+              customMetadata: { "build-sha": "abc123def" },
+            },
+            {
+              key: "builds/abc123def/app.js",
+              size: 500,
+              etag: "def",
+              uploaded: new Date(),
+              customMetadata: { "build-sha": "abc123def" },
+            },
           ],
           truncated: false,
         }),
@@ -137,8 +149,8 @@ describe("version route", () => {
     const app = makeApp(version as unknown as Hono);
     const res = await app.request("/api/version", {}, env);
     expect(res.status).toBe(200);
-    const body = await res.json<{ assets: Array<{ key: string }> }>();
-    expect(body.assets.length).toBe(2);
+    const body = await res.json<{ totalAssets: number }>();
+    expect(body.totalAssets).toBe(2);
     expect(spaList).toHaveBeenCalledTimes(2);
   });
 });
@@ -1417,7 +1429,11 @@ describe("errors route", () => {
     app.route("/", base);
 
     const env = createMockEnv();
-    const res = await app.request("/errors", {}, env);
+    const res = await app.request(
+      "/errors",
+      { headers: { "x-internal-secret": "internal-secret-123" } },
+      env,
+    );
     expect(res.status).toBe(200);
   });
 
@@ -1431,7 +1447,11 @@ describe("errors route", () => {
     app.route("/", base);
 
     const env = createMockEnv();
-    const res = await app.request("/errors?service=spike-edge&range=7d&limit=10", {}, env);
+    const res = await app.request(
+      "/errors?service=spike-edge&range=7d&limit=10",
+      { headers: { "x-internal-secret": "internal-secret-123" } },
+      env,
+    );
     expect(res.status).toBe(200);
   });
 
@@ -1455,7 +1475,11 @@ describe("errors route", () => {
     } as unknown as D1Database;
 
     const env = createMockEnv({ DB: db });
-    const res = await app.request("/errors/summary?range=1h", {}, env);
+    const res = await app.request(
+      "/errors/summary?range=1h",
+      { headers: { "x-internal-secret": "internal-secret-123" } },
+      env,
+    );
     expect(res.status).toBe(200);
     const body = await res.json<{ total: number; range: string }>();
     expect(body.range).toBe("1h");
