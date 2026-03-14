@@ -404,7 +404,12 @@ describe("spikeChat route", () => {
     const streamingBodies = fetchBodies.filter((b) => b["stream"] === true);
     expect(streamingBodies).toHaveLength(1);
     expect(streamingBodies[0]?.["tools"]).toBeUndefined();
-    expect(mcpFetch).not.toHaveBeenCalled();
+    // mcpFetch may be called for BYOK key resolution but NOT for tool catalog or tool calls
+    const mcpUrls = mcpFetch.mock.calls.map(
+      (c: unknown[]) => new URL((c[0] as Request).url).pathname,
+    );
+    expect(mcpUrls).not.toContain("/tools");
+    expect(mcpUrls).not.toContain("/mcp");
     expect(text).toContain('"toolCatalogCount":0');
     expect(text).not.toContain('"type":"tool_call_start"');
     expect(text).toContain("multiple upstream calls");
