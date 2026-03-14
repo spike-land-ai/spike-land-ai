@@ -17,7 +17,7 @@ export { DEFAULT_TRANSFORM_OPTIONS } from "./types.ts";
 export { rewriteImports } from "./import-rewriter.ts";
 export { convertApiRoute, buildRouteTree } from "./route-converter.ts";
 export { convertDataLoaders } from "./data-loader-converter.ts";
-export { convertConfig, rewriteEnvVars } from "./config-converter.ts";
+export { convertConfig, rewriteEnvVars, convertRewritesAndRedirects } from "./config-converter.ts";
 export { convertMiddleware } from "./middleware-converter.ts";
 
 import type { RepoFile, MigrationReport, TransformResult } from "./types.ts";
@@ -133,7 +133,7 @@ export function migrateNextjsProject(
     allWarnings.push(...routeResult.warnings);
   }
 
-  // 5. Config output
+  // 7. Config output
   const configResult = results.find((r) => r.filename === "vite.config.ts");
   const config = configResult?.transformed ?? generateDefaultViteConfig();
 

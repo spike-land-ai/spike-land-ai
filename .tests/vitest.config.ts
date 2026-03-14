@@ -320,6 +320,7 @@ const packages: Record<string, PkgConfig> = {
       tests("spike-edge/**/*.test.ts"),
       src("edge-api/main/api/__tests__/**/*.test.ts"),
       src("edge-api/main/core-logic/__tests__/**/*.test.ts"),
+      src("edge-api/main/core-logic/nextjs-transform/__tests__/**/*.test.ts"),
     ],
     aliases: { "cloudflare:workers": src("edge-api/main/core-logic/cloudflare-workers.ts") },
     coverageExclude: [],
