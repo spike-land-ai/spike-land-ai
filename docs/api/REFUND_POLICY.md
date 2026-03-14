@@ -63,7 +63,7 @@ Economy analytics.
 
 ## Contact
 
-For refund inquiries not handled automatically, contact zoltan.erdos@spike.land with:
+For refund inquiries not handled automatically, contact hello@spike.land with:
 
 - Your account email
 - Job ID (visible in enhancement history)

@@ -91,7 +91,7 @@ anonymous access.
 ## Features
 
 - Fetches images from PUBLIC albums only (owned by super admin:
-  `zolika84@gmail.com`)
+  `hello@spike.land`)
 - Returns only images with COMPLETED enhancement jobs
 - Includes both original and enhanced URLs for before/after comparisons
 - Limited to 12 images by default
@@ -449,7 +449,7 @@ export function PublicGalleryMobile() {
 
 The endpoint executes the following query logic:
 
-1. **Find Super Admin**: Queries the `User` table for email `zolika84@gmail.com`
+1. **Find Super Admin**: Queries the `User` table for email `hello@spike.land`
    - Selects only the `id` field for efficiency
    - Returns 404 if not found
 
@@ -761,7 +761,7 @@ test("public albums gallery loads correctly", async ({ page }) => {
 
 ```bash
 # Check if super admin exists
-psql $DATABASE_URL -c "SELECT id, email FROM users WHERE email = 'zolika84@gmail.com';"
+psql $DATABASE_URL -c "SELECT id, email FROM users WHERE email = 'hello@spike.land';"
 
 # Check public albums
 psql $DATABASE_URL -c "SELECT id, name, privacy FROM albums WHERE privacy = 'PUBLIC';"
@@ -774,13 +774,13 @@ psql $DATABASE_URL -c "SELECT status, COUNT(*) FROM enhancement_jobs GROUP BY st
 
 **Problem**: API returns `{"error": "Super admin user not found"}`
 
-**Cause**: Super admin account (`zolika84@gmail.com`) doesn't exist in database
+**Cause**: Super admin account (`hello@spike.land`) doesn't exist in database
 
 **Solution**:
 
 ```bash
 # Create super admin user (development only)
-psql $DATABASE_URL -c "INSERT INTO users (id, email, name) VALUES (gen_random_uuid(), 'zolika84@gmail.com', 'Super Admin');"
+psql $DATABASE_URL -c "INSERT INTO users (id, email, name) VALUES (gen_random_uuid(), 'hello@spike.land', 'Super Admin');"
 ```
 
 ### 500 Error

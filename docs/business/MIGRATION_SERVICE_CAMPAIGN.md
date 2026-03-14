@@ -8,7 +8,7 @@ Reference document for the migration service paid acquisition campaign. Created 
 | ----------------- | -------------------------------------------- |
 | Campaign type     | Performance Max                              |
 | Goal              | Conversions (purchases)                      |
-| Account           | zoltan.erdos@spike.land                      |
+| Account           | hello@spike.land                      |
 | Google Ads ID     | `AW-17978085462`                             |
 | Daily budget      | $30 (GBP equivalent ~£24)                   |
 | Location          | United Kingdom + United States + EU (DE, NL, FR) |
@@ -179,7 +179,7 @@ Lower than the main campaign because:
 
 ## Step-by-Step Setup in Google Ads
 
-1. Sign in at ads.google.com with zoltan.erdos@spike.land
+1. Sign in at ads.google.com with hello@spike.land
 2. New Campaign > Performance Max
 3. Goal: Conversions (select all five conversion actions above)
 4. Business info: spike.land, Software / Developer Tools

@@ -50,15 +50,15 @@ single-founder risk fast enough for the platform thesis to remain financeable.
 | Legal Name | SPIKE LAND LTD |
 | Company Number | 16906682 |
 | Incorporation Date | 12 December 2025 |
-| Registered Office | 42 Mighell Street, Apartment 70, Brighton BN2 0AU |
+| Registered Office | Brighton, UK |
 | SIC Codes | 62090, 63120 |
-| Director | Zoltan Erdos |
+| Director | Founder |
 | Current ownership | Founder-owned, no prior fundraise |
 | Employees | 1 |
 
 Founder context:
 
-- Zoltan Erdos is a full-stack engineer with enterprise delivery experience,
+- Founder is a full-stack engineer with enterprise delivery experience,
   including four years at Investec.
 - The initial platform was built end-to-end with AI assistance, proving unusual
   technical leverage, but also creating a real bus-factor risk that must be

@@ -69,7 +69,7 @@ Risk scores are the product of severity (1-5) and likelihood (1-5), giving a max
 | TK-04 | Security vulnerabilities in open-source MCP surface | 4 | 3 | 12 | Medium |
 | TK-05 | D1 (Cloudflare) as primary database — no independent persistence layer | 4 | 2 | 8 | Low |
 
-**TK-01 Mitigation:** The custom React implementation (react-ts-worker) represents a meaningful technical bet. If Zoltan departs, this becomes effectively unmaintainable. Document the architecture thoroughly. Consider whether it remains in scope for commercial product or is quarantined as a research artifact. Timeline: 3 months.
+**TK-01 Mitigation:** The custom React implementation (react-ts-worker) represents a meaningful technical bet. If the Founder departs, this becomes effectively unmaintainable. Document the architecture thoroughly. Consider whether it remains in scope for commercial product or is quarantined as a research artifact. Timeline: 3 months.
 
 **TK-04 Mitigation:** Open-source exposure means vulnerabilities are public. Implement automated dependency scanning (Dependabot or equivalent), a responsible disclosure policy, and a security contact address. Timeline: Immediate, prior to commercial launch.
 
@@ -320,7 +320,7 @@ At year 5, the company either: (a) achieves £2-5m ARR and becomes a profitable 
 
 ### Bear Case: What Kills the Company
 
-**Scenario A — Founder burnout or departure.** The company is entirely dependent on a single person. If Zoltan Erdos steps back for any reason — health, competing opportunity, personal circumstances — the company has no operational continuity. Without a commercial layer, there are no customers to fight for the company's survival. The open-source codebase would continue to exist on GitHub, but the company would cease to operate. This is the most probable path to failure.
+**Scenario A — Founder burnout or departure.** The company is entirely dependent on a single person. If Founder steps back for any reason — health, competing opportunity, personal circumstances — the company has no operational continuity. Without a commercial layer, there are no customers to fight for the company's survival. The open-source codebase would continue to exist on GitHub, but the company would cease to operate. This is the most probable path to failure.
 
 **Scenario B — Commercial stall.** The company raises seed capital, builds a team, but fails to convert developer interest into paying customers. Developer platforms have notoriously long adoption curves and low willingness-to-pay at the individual level. If the company spends 18 months building community without building revenue infrastructure, it exhausts its runway before achieving commercial traction. At this point, it is too early for a strategic acquirer and too small for a venture rescue round.
 

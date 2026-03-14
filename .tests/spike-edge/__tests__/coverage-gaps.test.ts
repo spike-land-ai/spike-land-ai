@@ -660,7 +660,7 @@ describe("stripe-webhook.ts — error catch branches", () => {
 describe("cockpit.ts — null value branches (lines 76-79)", () => {
   it("returns zeros when all DB metric rows are null", async () => {
     // DB returns admin email for user lookup, but null for all metric queries
-    const ADMIN_EMAIL = "zoltan.erdos@spike.land";
+    const ADMIN_EMAIL = "hello@spike.land";
     const env = createMockEnv({
       DB: {
         prepare: vi.fn().mockImplementation((sql: string) => {

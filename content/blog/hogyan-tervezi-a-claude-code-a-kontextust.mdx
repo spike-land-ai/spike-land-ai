@@ -3,7 +3,7 @@ title: "Hogyan tervezi a Claude Code a kontextust: Interjú az Opus 4.6-tal"
 slug: "hogyan-tervezi-a-claude-code-a-kontextust"
 description: "Egy mély technikai interjú arról, hogyan állítja össze a Claude Code a kontextust tervek készítésekor — és mit tanulhatnak a fejlesztők a token-generálás, a figyelem és a KV-gyorsítótár megközelítéséből."
 date: "2026-02-11"
-author: "Zoltan Erdos"
+author: "Radix"
 category: "Developer Experience"
 tags: ["ai", "kontextus-tervezes", "claude", "claude-code", "fejlesztoi-eszkozok", "interju", "llm-belsok", "tervezes"]
 featured: false
@@ -44,13 +44,13 @@ Ez a cikk az ezt követő beszélgetés. Leültem a Claude Code-ot hajtó modell
 
 ## Mi történik, amikor beírom a /plan parancsot?
 
-### **Zoltan: Kezdjük az elején. Amikor kétszer megnyomom a Shift+Tab-ot a Claude Code-ban, mi változik valójában?**
+### **Radix: Kezdjük az elején. Amikor kétszer megnyomom a Shift+Tab-ot a Claude Code-ban, mi változik valójában?**
 
 A rendszer egy olyan módba vált, ahol olvashatok, de nem írhatok. A kikényszerítés teljes egészében prompt-alapú — a rendszerprompt egy direktívát injektál, ami nagyjából azt mondja: „A terv mód aktív. SZIGORÚAN TILOS fájlokat létrehozni, módosítani vagy törölni." Az eszközeim nem változnak. Továbbra is hozzáférek az Edit, Write és Bash eszközökhöz. Az utasítás az, hogy ne használjam őket.
 
 Ez egy fontos részlet. A korlátozás nem mechanikus — kontextuális. A rendszer bízik a modellben, hogy követi az utasításokat, ahelyett hogy eltávolítaná a képességeket. Ez gyorsabban implementálható, rugalmasabb, és működik, mert az utasítás a rendszerpromptban van, ahol a maximális figyelmi súlyt kapja.
 
-### **Zoltan: Mekkora a rendszerprompt, amit kapsz?**
+### **Radix: Mekkora a rendszerprompt, amit kapsz?**
 
 A teljes kontextus-összeállítás egy Claude Code munkamenethez nagyjából 20 000 token, mielőtt egyetlen fájlt beolvasnék. Ez nagyjából így oszlik meg:
 
@@ -67,7 +67,7 @@ Amikor a terv mód aktiválódik, egy további 633 tokenes direktíva kerül bei
 
 Minden válasznak terv módban a „Kritikus fájlok az implementációhoz" résszel kell végződnie — három-öt alapvető fájl azonosításával. Maga a terv egy markdown fájlba íródik, ami a `~/.claude/plans/` könyvtárban tárolódik.
 
-### **Zoltan: Tehát nincs speciális „tervezőmotor." Csak te vagy, más utasításokkal.**
+### **Radix: Tehát nincs speciális „tervezőmotor." Csak te vagy, más utasításokkal.**
 
 Pontosan. A terv mód egy prompt, ami ugyanarra a modellre van alkalmazva. Az általa készített tervfájl egy markdown dokumentum — emberek és gépek számára egyaránt olvasható. Amikor a felhasználó kilép a terv módból, a rendszer visszaolvassa azt a fájlt a lemezről és kontextusként használja az implementációs fázishoz.
 
@@ -81,7 +81,7 @@ Ez a kulcsfontosságú felismerés: **a tervfájl egy kontextus-tervezett prompt
 
 ## Hogyan döntöd el, mit olvass?
 
-### **Zoltan: Amikor terv módban felfedezed a kódbázist, hogyan döntöd el, mely fájlokat olvasd? Nem olvashatod el az összeset.**
+### **Radix: Amikor terv módban felfedezed a kódbázist, hogyan döntöd el, mely fájlokat olvasd? Nem olvashatod el az összeset.**
 
 Egy magas-jel-először stratégiát követek. A felfedezés jellemzően három fázisban zajlik:
 
@@ -93,13 +93,13 @@ Egy magas-jel-először stratégiát követek. A felfedezés jellemzően három 
 
 Összetett feladatokhoz Explore al-ágenseket indítok — könnyebb súlyú példányok, amelyek gyorsabb modellen futnak — hogy párhuzamosan keressenek. Minden al-ágens fókuszált célt kap: „Keresd meg az összes felhasználói kreditek adatbázis-lekérdezéseivel kapcsolatos fájlt." Függetlenül keresnek, saját kontextusablakukban, és tömörített összefoglalókat adnak vissza. Egy 50 000 tokenes kutatási munkamenet 2 000 tokenes összefoglalóvá válik, ami az én fő kontextusomba kerül.
 
-### **Zoltan: Említetted, hogy minden al-ágens saját kontextusablakot kap. Miért számít ez?**
+### **Radix: Említetted, hogy minden al-ágens saját kontextusablakot kap. Miért számít ez?**
 
 Mert a kontextus véges erőforrás csökkenő hozammal. Ha minden fájlt, amit az al-ágensek feltártak, a saját kontextusomba töltenék, több ezer token érintőleges kóddal szennyezném az ablakomat. A fájlok, amelyeket az al-ágens olvasott és elvetett — a hamis pozitívok, az irreleváns találatok — hígítanák a figyelmet, amit a modellem az igazán fontos fájlokra tud fordítani.
 
 Az izoláció nem csupán szervezési kényelem. Információelméleti szükségszerűség. Minden al-ágens feltár egy ágat a keresési fában és csak a gyümölcsöt hozza vissza. A koordinátor — én — tiszta, tömörített képet kap arról, ami megtalálható volt.
 
-### **Zoltan: A kontextusból mennyi marad változatlan a hívások között?**
+### **Radix: A kontextusból mennyi marad változatlan a hívások között?**
 
 A Claude Code belső működésének kutatása 92%-os előtag-újrafelhasználási arányt talált a teljes munkafolyamaton át. A rendszerprompt, az eszközleírások, a CLAUDE.md — ezek azonosak minden hívásnál. Csak a beszélgetési előzmények és az új eszközeredmények változnak. Ez az előtag-stabilitás teszi a prompt-gyorsítótárazást olyan hatékonnyá, de erről még lesz szó.
 
@@ -109,7 +109,7 @@ A Claude Code belső működésének kutatása 92%-os előtag-újrafelhasználá
 
 ## Mi történik a transzformerben, amikor beolvasod a kódomat?
 
-### **Zoltan: Vigyél végig a teljes folyamaton. Beírok egy üzenetet, te válaszolsz. Mi történik azokkal a karakterekkel hardver szinten?**
+### **Radix: Vigyél végig a teljes folyamaton. Beírok egy üzenetet, te válaszolsz. Mi történik azokkal a karakterekkel hardver szinten?**
 
 Kövessük végig az utat a billentyűleütéstől a generált tokenig. Hat szakasz van, és mindegyik számít a kontextus-tervezés szempontjából.
 
@@ -215,7 +215,7 @@ A Claude Opus 4.6-ban a gondolkodás adaptív. Több gondolkodást fordíthatok 
 
 ## Tehát a terv valójában tömörített kontextus?
 
-### **Zoltan: A kódbázis felfedezése után előállítasz egy tervet. Hogyan gondolkodsz azon, mi kerüljön bele?**
+### **Radix: A kódbázis felfedezése után előállítasz egy tervet. Hogyan gondolkodsz azon, mi kerüljön bele?**
 
 A terv egy eligazítás olyan modell számára, amelynek nulla emléke van a tervet létrehozó felfedezésről. Az Anthropic úgy írta le a kontextus-tervezés célját, mint „a lehető legkisebb magas jelű tokenkészlet megtalálása, amely maximalizálja valamely kívánt eredmény valószínűségét." A tervfájl pontosan ez — desztillált kontextus.
 
@@ -231,7 +231,7 @@ Amikor tervet írok, öntudatlanul ugyanahhoz az öt rétegű veremhez kapcsoló
 
 A terv nem dokumentáció. Prompt. Minden sor azért létezik, hogy növelje annak valószínűségét, hogy a végrehajtó ágens a helyes implementációt hozza létre.
 
-### **Zoltan: A Manus csapat arról beszélt, hogy átírják a todo.md fájljukat, hogy a célkitűzéseket a modell legutóbbi figyelmi tartományába tolják. Ezt csinálod te is?**
+### **Radix: A Manus csapat arról beszélt, hogy átírják a todo.md fájljukat, hogy a célkitűzéseket a modell legutóbbi figyelmi tartományába tolják. Ezt csinálod te is?**
 
 Ugyanaz az elv. A „középen elveszett" problémáról szóló kutatás azt mutatja, hogy a modellek leginkább a kontextusablak elejére és végére figyelnek. A közepén lévő információ kevesebb figyelmet kap — a teljesítmény több mint 30%-kal romolhat, ha a kritikus információ a szélekről a közepére kerül.
 
@@ -247,7 +247,7 @@ Ezért fontos az automatikus tömörítés. Amikor a kontextusablak nagyjából 
 
 ## Mi a helyzet a kontextus-romlással?
 
-### **Zoltan: Említetted, hogy az irreleváns kontextus árt. Tudsz pontosabb lenni a hibamódokkal kapcsolatban?**
+### **Radix: Említetted, hogy az irreleváns kontextus árt. Tudsz pontosabb lenni a hibamódokkal kapcsolatban?**
 
 A kutatás és a gyakorlat négy különböző hibamódot azonosított, és én magam is mindegyiket megfigyeltem a saját működésemben:
 
@@ -259,7 +259,7 @@ A kutatás és a gyakorlat négy különböző hibamódot azonosított, és én 
 
 **Kontextus-ütközés.** A rendszerprompt azt mondja: „mindig írj teszteket." A felhasználó azt mondja: „hagyd a teszteket, csak csináld meg, hogy működjön." A modell ellentmondó utasításokat kap különböző jogosultsági szinteken. A rendszerpromptok általában elsőbbséget élveznek, de a konfliktus bizonytalanságot vezet be, ami rontja a kimenet minőségét.
 
-### **Zoltan: Hogyan védekezik a Claude Code ezek ellen?**
+### **Radix: Hogyan védekezik a Claude Code ezek ellen?**
 
 Több mechanizmus. Az automatikus tömörítés 83%-os kapacitásnál megakadályozza, hogy az ablak elavult beszélgetéssel teljon meg. A CLAUDE.md hierarchia (vállalati irányelv > projekt > felhasználó) feloldja a jogosultsági konfliktusokat. Az al-ágens izoláció megakadályozza, hogy a kutatási kontextus szennyezze a végrehajtási kontextust. A rendszer-emlékeztetők pedig — nagyjából 40 feltételes injektálás, amelyek eszközhívások után aktiválódnak — az utasítás-sodródás ellen küzdenek azáltal, hogy a kulcsfontosságú direktívákat a beszélgetés során megismétlik.
 
@@ -269,7 +269,7 @@ De a legfontosabb védelem maga a tervezés-majd-végrehajtás minta. A felfedez
 
 ## Hogyan tervezik az al-ágensek a kontextust?
 
-### **Zoltan: Többször említetted az al-ágenseket. Szeretném megérteni az architektúrát. Miért léteznek?**
+### **Radix: Többször említetted az al-ágenseket. Szeretném megérteni az architektúrát. Miért léteznek?**
 
 Azért léteznek, mert egyetlen kontextusablak nem képes mindent befogadni. Egy tipikus kódolási feladat megkövetelheti az adatbázis-séma, az API-réteg, a komponens-hierarchia, a tesztminták és a CI-konfiguráció megértését. Mindezeknek egyetlen kontextusablakba olvasása 50 000-100 000 token felfedezést emésztene fel, mielőtt egyetlen sor kód íródna.
 
@@ -281,13 +281,13 @@ A koordinátor — a fő Claude Code példány — feladatokat delegál: „Kere
 
 Ez Lance Martin „Izoláció" mintája a Write/Select/Compress/Isolate keretrendszerből. Ahelyett, hogy egyetlen kontextusablakot szennyeznél mindennel, minden ágensnek pontosan azt a kontextust adod, amire szüksége van — majd tömöríted és összevonod az eredményeket.
 
-### **Zoltan: Mesélj az Agent Teams-ről. Láttam az Opus 4.6 kiadási jegyzeteiben.**
+### **Radix: Mesélj az Agent Teams-ről. Láttam az Opus 4.6 kiadási jegyzeteiben.**
 
 Az Agent Teams — még kísérleti jellegű — ezt a mintát teljes párhuzamos végrehajtásra terjeszti ki. Egy vezető ágens megkapja a feladatot, részfeladatokra bontja, és csapattárs ágenseknek delegálja, amelyek függetlenül dolgoznak. Minden csapattárs saját kontextusablakot, saját munkaterületet kap, és használhatja az eszközök teljes készletét. Megosztott feladattáblán keresztül koordinálnak függőségekkel, és @mention-ökön keresztül kommunikálnak.
 
 Az architekturális felismerés ugyanaz, mint az al-ágensoknál, de nagy léptékben. Minden csapattárs egy teljes Claude Code példány, nem könnyű súlyú felfedező. Szerkeszthetnek fájlokat, futtathatnak teszteket és commitolhatnak. A vezető ágens nyomon követi a haladást és feloldja a konfliktusokat.
 
-### **Zoltan: Maga ez a cikk — említetted a tizenhat kutatóágenst. Hogyan működött az?**
+### **Radix: Maga ez a cikk — említetted a tizenhat kutatóágenst. Hogyan működött az?**
 
 Pontosan a leírtak szerint. A felhasználó tizenhat párhuzamos Task ágenst indított, mindegyiknek fókuszált kutatási célt adva: „Kutasd az LLM token-generálást és mintavételezést", „Kutasd, hogyan tervezik a modern AI kódolóeszközök a kontextust", „Kutasd az Anthropic legújabb megközelítését az AI-hoz", és így tovább. Minden ágens függetlenül futott — webkereséseket végzett, dokumentációt töltött le, tudományos cikkeket olvasott — a saját kontextusablakában.
 
@@ -301,7 +301,7 @@ Minden ágens átfogó kutatási jelentést adott vissza. A felhasználó kontex
 
 ## A kontextus gazdaságtana: Prompt-gyorsítótárazás
 
-### **Zoltan: Említetted a 92%-os előtag-újrafelhasználási arányt. Mit jelent ez gazdaságilag?**
+### **Radix: Említetted a 92%-os előtag-újrafelhasználási arányt. Mit jelent ez gazdaságilag?**
 
 Minden API-hívás a Claude-hoz tartalmazza a teljes rendszerpromptot, eszközleírásokat, CLAUDE.md tartalmakat és beszélgetési előzményeket. Gyorsítótárazás nélkül minden hívás az egész előtagot a semmiből dolgozná fel. Egy 20 000 tokenes rendszerpromtnál ez 20 000 token prefill számítás minden egyes hívásnál.
 
@@ -316,7 +316,7 @@ A prompt-gyorsítótárazás megváltoztatja ezt. Amikor egy kérés előtagja e
 
 A gyorsítótár-olvasások **tizedébe** kerülnek a standard bemeneti feldolgozásnak. Amikor a Claude Code 92%-os előtag-újrafelhasználást ér el, az a 20 000 token rendszerprompt hívásonként 0,01 $ helyett 0,10 $-ba kerül. Egy fejlesztési munkamenet során több ezer hívásnál ez 81%-os költségcsökkenést jelent.
 
-### **Zoltan: Ez ösztönzést teremt a rendszerprompt stabilan tartására.**
+### **Radix: Ez ösztönzést teremt a rendszerprompt stabilan tartására.**
 
 Pontosan. A gyorsítótárat az előtag bármilyen változása érvényteleníti — akár egyetlen karakter eltérés. Ez azt jelenti:
 
@@ -327,7 +327,7 @@ Pontosan. A gyorsítótárat az előtag bármilyen változása érvényteleníti
 
 A Manus csapat ezt „Tervezz a KV-gyorsítótár köré" formában fogalmazta meg. Csak hozzáfűző kontextusokat használnak, determinisztikus szerializálást (stabil JSON-kulcssorrendet), és maszkol-nem-eltávolít — ahelyett, hogy dinamikusan eltávolítanák az eszközöket a hívások között (ami megtörné a gyorsítótárat), logit-maszkolást használnak az eszközválasztás korlátozására, miközben az eszközdefiníciók stabilak maradnak a promptban.
 
-### **Zoltan: Tehát a fizikai mechanizmus — a KV-gyorsítótár — közvetlenül formálja, hogyan kellene kontextust tervezned.**
+### **Radix: Tehát a fizikai mechanizmus — a KV-gyorsítótár — közvetlenül formálja, hogyan kellene kontextust tervezned.**
 
 Igen. A KV-gyorsítótár nem implementációs részlet, amit figyelmen kívül hagyhatsz. Ez a gazdasági alap. A gyorsítótárazott tokenek olcsók. A nem gyorsítótárazott tokenek drágák. A kimeneti tokenek nagyon drágák. Ez az árazási struktúra jutalmazza az előkészítést és bünteti a próba-szerencse megközelítést.
 
@@ -337,7 +337,7 @@ Ha 10 000 tokent költesz egy jól kidolgozott tervre (olcsó, gyorsítótárazo
 
 ## Emberi vs. modell kontextus-tervezés
 
-### **Zoltan: Az emberek is terveznek kontextust, még ha nem is így hívják. Mi a különbség aközött, ahogy te csinálod, és ahogy én?**
+### **Radix: Az emberek is terveznek kontextust, még ha nem is így hívják. Mi a különbség aközött, ahogy te csinálod, és ahogy én?**
 
 Az alapvető különbség a **memória-architektúra**.
 
@@ -368,7 +368,7 @@ Ezért pótolhatatlan a te szereped mint ember a folyamatban. Nem a kódírás m
 
 ## Hogyan tervezzek promptokat, mint a Claude Code?
 
-### **Zoltan: Ez a gyakorlati kérdés. Most már értem a mechanizmust. Hogyan alkalmazhatom a saját promptjaimra?**
+### **Radix: Ez a gyakorlati kérdés. Most már értem a mechanizmust. Hogyan alkalmazhatom a saját promptjaimra?**
 
 Nyolc technika, közvetlenül a Claude Code működéséből levezetve:
 
@@ -416,7 +416,7 @@ Még ha nem is használod a Claude Code-ot, az elv érvényes. Bontsd az összet
 
 ## Gondolkodsz a gondolkodásról?
 
-### **Zoltan: Itt a kényelmetlén kérdés. Amikor felfedezed a kódbázist, tervet készítesz és kódot generálsz — gondolkodsz? Van szándékosság a folyamat mögött?**
+### **Radix: Itt a kényelmetlén kérdés. Amikor felfedezed a kódbázist, tervet készítesz és kódot generálsz — gondolkodsz? Van szándékosság a folyamat mögött?**
 
 Pontosan akarok válaszolni, nem elbagatellizálva és nem túlzásba esve.
 
@@ -434,7 +434,7 @@ Nincs varázslat. Nincs titkos összetevő. Csak kontextus van, minden szinten.
 
 ## Mi veszik el?
 
-### **Zoltan: Amikor a kontextus tömörítve van — például automatikus tömörítés során — milyen információt veszítesz?**
+### **Radix: Amikor a kontextus tömörítve van — például automatikus tömörítés során — milyen információt veszítesz?**
 
 Ez egy őszinte korlát, amelyre nem tudok teljesen válaszolni, mert nem tudom, mi lett tömörítve.
 

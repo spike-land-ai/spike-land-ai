@@ -38,28 +38,28 @@ const GROUP_VARIANTS: Record<PersonaGroup, ContentVariant> = {
   technical: {
     group: "technical",
     supportCopy:
-      "Support Gian Pierre and Zoltan \u2014 two developers shipping 80+ MCP tools without VC funding. Every tool you used today was built between midnight deploys.",
+      "Support Gian Pierre and Radix \u2014 two developers shipping 80+ MCP tools without VC funding. Every tool you used today was built between midnight deploys.",
     quizDifficulty: "advanced",
     expandedCategories: ["core", "mcp-tools", "edge-api"],
   },
   founder: {
     group: "founder",
     supportCopy:
-      "Support independent toolmakers Gian Pierre and Zoltan \u2014 building the infrastructure you bet your business on.",
+      "Support independent toolmakers Gian Pierre and Radix \u2014 building the infrastructure you bet your business on.",
     quizDifficulty: "standard",
     expandedCategories: ["edge-api", "frontend", "cli"],
   },
   leader: {
     group: "leader",
     supportCopy:
-      "Support Gian Pierre and Zoltan\u2019s mission \u2014 democratizing the tools your team needs.",
+      "Support Gian Pierre and Radix\u2019s mission \u2014 democratizing the tools your team needs.",
     quizDifficulty: "standard",
     expandedCategories: ["edge-api", "utilities", "mcp-tools"],
   },
   creative: {
     group: "creative",
     supportCopy:
-      "Support the passion behind the platform \u2014 Gian Pierre and Zoltan build this because they love building.",
+      "Support the passion behind the platform \u2014 Gian Pierre and Radix build this because they love building.",
     quizDifficulty: "standard",
     expandedCategories: ["media", "frontend", "utilities"],
   },

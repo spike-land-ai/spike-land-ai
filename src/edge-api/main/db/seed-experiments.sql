@@ -7,7 +7,7 @@ INSERT INTO experiments (id, name, dimension, variants, status, traffic_pct, cre
    'active', 100, strftime('%s','now') * 1000, strftime('%s','now') * 1000),
 
   ('exp-cta-text', 'CTA Button Text', 'cta_text',
-   '[{"id":"control","config":{"ctaText":"Donate ${amount}"},"weight":25},{"id":"alive","config":{"ctaText":"Keep spike.land alive — ${amount}"},"weight":25},{"id":"join","config":{"ctaText":"Join {n} supporters — ${amount}"},"weight":25},{"id":"coffee","config":{"ctaText":"Buy Zoltan a coffee — ${amount}"},"weight":25}]',
+   '[{"id":"control","config":{"ctaText":"Donate ${amount}"},"weight":25},{"id":"alive","config":{"ctaText":"Keep spike.land alive — ${amount}"},"weight":25},{"id":"join","config":{"ctaText":"Join {n} supporters — ${amount}"},"weight":25},{"id":"coffee","config":{"ctaText":"Buy Radix a coffee — ${amount}"},"weight":25}]',
    'active', 100, strftime('%s','now') * 1000, strftime('%s','now') * 1000),
 
   ('exp-social-proof', 'Social Proof Display', 'social_proof',

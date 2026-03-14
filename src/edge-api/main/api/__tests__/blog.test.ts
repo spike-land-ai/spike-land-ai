@@ -403,7 +403,7 @@ title: "The Universal Interface Wasn't GraphQL"
 slug: "the-universal-interface-wasnt-graphql"
 description: "Fallback description"
 date: "2026-03-08"
-author: "Zoltan Erdos"
+author: "Radix"
 category: "Architecture"
 tags: ["chat", "mcp"]
 featured: true

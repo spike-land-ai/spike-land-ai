@@ -129,7 +129,7 @@ export function WorkshopPage() {
         </div>
 
         <a
-          href="mailto:zoltan.erdos@spike.land?subject=MCP%20Workshop%20Interest"
+          href="mailto:hello@spike.land?subject=MCP%20Workshop%20Interest"
           className="mt-6 inline-flex items-center gap-2 rounded-xl bg-primary px-7 py-3 text-sm font-bold text-primary-foreground hover:bg-primary/90 active:scale-[0.97] transition-all duration-200"
         >
           Reserve your seat

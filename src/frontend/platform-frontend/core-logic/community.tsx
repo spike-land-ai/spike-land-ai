@@ -73,11 +73,11 @@ export function CommunityPage() {
             <span className="text-sm text-muted-foreground">Issues, discussions, and code</span>
           </a>
           <a
-            href="mailto:zoltan.erdos@spike.land"
+            href="mailto:hello@spike.land"
             className="flex items-center gap-3 rounded-xl border border-border bg-card p-4 transition-colors hover:border-primary/40"
           >
             <span className="font-semibold text-foreground">Email</span>
-            <span className="text-sm text-muted-foreground">zoltan.erdos@spike.land</span>
+            <span className="text-sm text-muted-foreground">hello@spike.land</span>
           </a>
           <a
             href="/messages"

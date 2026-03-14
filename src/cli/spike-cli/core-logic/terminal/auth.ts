@@ -3,18 +3,18 @@ import type { ChatClientOptions } from "../../ai/client";
 export function resolveTerminalChatClientOptions(
   options: Pick<ChatClientOptions, "model">,
 ): ChatClientOptions {
-  const authToken = process.env["CLAUDE_CODE_OAUTH_TOKEN"];
   const apiKey = process.env["ANTHROPIC_API_KEY"];
+  const authToken = process.env["CLAUDE_CODE_OAUTH_TOKEN"];
 
-  if (!authToken && !apiKey) {
+  if (!apiKey && !authToken) {
     throw new Error(
-      "Terminal agent requires CLAUDE_CODE_OAUTH_TOKEN or ANTHROPIC_API_KEY in the environment",
+      "Terminal agent requires ANTHROPIC_API_KEY or CLAUDE_CODE_OAUTH_TOKEN in the environment",
     );
   }
 
+  // Prefer API key over OAuth token — OAuth may not be allowed for all orgs
   return {
-    ...(authToken ? { authToken } : {}),
-    ...(apiKey ? { apiKey } : {}),
+    ...(apiKey ? { apiKey } : authToken ? { authToken } : {}),
     ...(options.model ? { model: options.model } : {}),
   };
 }

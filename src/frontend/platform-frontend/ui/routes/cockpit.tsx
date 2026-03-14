@@ -5,7 +5,7 @@ import { ChatThread } from "../components/ChatThread";
 import { apiUrl } from "../../core-logic/api";
 import type { Message } from "../components/ChatThread";
 
-const ADMIN_EMAILS = new Set(["zoltan.erdos@spike.land", "zolika84@gmail.com"]);
+const ADMIN_EMAILS = new Set(["hello@spike.land", "hello@spike.land"]);
 const CHAT_STORAGE_KEY = "cockpit_chat_history";
 
 // ── Types ──────────────────────────────────────────────────────────────────

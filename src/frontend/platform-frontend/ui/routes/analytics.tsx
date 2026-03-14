@@ -11,9 +11,16 @@ import { PlatformTab } from "../components/analytics/PlatformTab";
 import { EventsTab } from "../components/analytics/EventsTab";
 import { RealTimeMetrics } from "../components/analytics/RealTimeMetrics";
 
-const ADMIN_EMAILS = new Set(["zoltan.erdos@spike.land", "zolika84@gmail.com"]);
+const ADMIN_EMAILS = new Set(["hello@spike.land", "hello@spike.land"]);
 
-type TabId = "overview" | "acquisition" | "behavior" | "audience" | "platform" | "events" | "realtime";
+type TabId =
+  | "overview"
+  | "acquisition"
+  | "behavior"
+  | "audience"
+  | "platform"
+  | "events"
+  | "realtime";
 
 const TABS: { id: TabId; label: string }[] = [
   { id: "overview", label: "Overview" },
@@ -223,9 +230,7 @@ export function AnalyticsPage() {
       {activeTab === "platform" && (
         <PlatformTab range={timeRange} data={d1Data} loading={d1Loading} />
       )}
-      {activeTab === "events" && (
-        <EventsTab range={timeRange} d1Data={d1Data} />
-      )}
+      {activeTab === "events" && <EventsTab range={timeRange} d1Data={d1Data} />}
       {activeTab === "realtime" && <RealTimeMetrics />}
     </div>
   );

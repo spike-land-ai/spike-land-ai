@@ -10,7 +10,7 @@ time.
 A developer's PR sat untouched for three days. The code was good. The tests
 passed. The feature worked exactly as requested.
 
-Then they heard the conversation: "That one from Zoltan? I will just rewrite it
+Then they heard the conversation: "That one from Radix? I will just rewrite it
 myself. Faster than reviewing all that AI stuff."
 
 Everything from that developer took 3-4x longer to review. Not because the code

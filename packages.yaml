@@ -169,6 +169,16 @@ packages:
     publish:
       registries: [github, npm]
 
+  math-engine:
+    kind: mcp-server
+    version: 0.1.0
+    description: AI-powered math engine — multi-agent proofs, Erdos conjectures, audit gap resolution
+    entry: mcp/index.ts
+    bin: mcp/index.js
+    deps: [mcp-server-base]
+    publish:
+      registries: [github]
+
   mcp-image-studio:
     kind: mcp-server
     version: 2.0.0
@@ -480,7 +490,7 @@ packages:
       d1_databases:
         - binding: DB
           database_name: spike-chat
-          database_id: TO_BE_CREATED
+          database_id: 4e93ca4f-84d4-4c50-9e03-5356ee092981
           migrations_dir: db/migrations
       durable_objects:
         - name: CHANNEL_DO

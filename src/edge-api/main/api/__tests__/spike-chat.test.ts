@@ -157,7 +157,7 @@ function createAuthedApp() {
 }
 
 /** Create a mock DB with users table lookup + notes support */
-function createMockDb(email = "zoltan.erdos@spike.land") {
+function createMockDb(email = "hello@spike.land") {
   return {
     prepare: vi.fn().mockReturnValue({
       bind: vi.fn().mockReturnValue({

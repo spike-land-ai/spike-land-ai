@@ -3,7 +3,7 @@ title: "We Said Context Discipline Beats Context Size. Then Opus Got 1M."
 slug: "context-discipline-then-opus-got-1m"
 description: "Claude Opus went from 200K to 1M context. We spent months arguing context discipline beats context size. Here is what we still believe — and what changes."
 date: "2026-03-14"
-author: "Zoltan Erdos"
+author: "Radix"
 category: "Developer Experience"
 tags: ["claude", "opus", "context-window", "context-engineering", "1m-context", "ai", "spike-chat"]
 featured: true
@@ -75,7 +75,7 @@ I sat down with the spike-chat system to pressure-test our thesis. The questions
 
 ---
 
-### Zoltan: Opus now has 1M context. Does that make your compression mechanisms obsolete?
+### Radix: Opus now has 1M context. Does that make your compression mechanisms obsolete?
 
 No. And here is why that question reveals a misunderstanding about what compression does.
 
@@ -87,7 +87,7 @@ Our budgets — 6,000 tokens for historical context, 4,000 for stage working mem
 
 ---
 
-### Zoltan: Be honest. If the window is 5x bigger, why bother compressing?
+### Radix: Be honest. If the window is 5x bigger, why bother compressing?
 
 Because the problem was never "we ran out of space." The problem is "the model's attention gets diluted across irrelevant content."
 
@@ -99,7 +99,7 @@ Compression is not about fitting things in. It is about keeping the signal ratio
 
 ---
 
-### Zoltan: What actually fails when you fill a 1M window with unmanaged content?
+### Radix: What actually fails when you fill a 1M window with unmanaged content?
 
 Three things fail, in order of severity:
 
@@ -111,7 +111,7 @@ Third, **reasoning coherence**. When the model has to hold too many competing fa
 
 ---
 
-### Zoltan: If I gave you 1M tokens of a codebase, would you reason better than with a 50K curated summary?
+### Radix: If I gave you 1M tokens of a codebase, would you reason better than with a 50K curated summary?
 
 Almost certainly not for most tasks.
 
@@ -123,7 +123,7 @@ But for the 90% case — "fix this bug," "add this feature," "refactor this modu
 
 ---
 
-### Zoltan: Should spike-chat's compression budgets change now that the ceiling is 1M?
+### Radix: Should spike-chat's compression budgets change now that the ceiling is 1M?
 
 Some should. Most should not.
 
@@ -137,7 +137,7 @@ The budget function should probably grow a separate parameter for "maximum usefu
 
 ---
 
-### Zoltan: Anthropic charges $15 per million input tokens for Opus. What does a full 1M-token request cost?
+### Radix: Anthropic charges $15 per million input tokens for Opus. What does a full 1M-token request cost?
 
 Fifteen dollars. Per request.
 
@@ -151,7 +151,7 @@ So yes, the economics of 1M context are punishing if you use it carelessly. Comp
 
 ---
 
-### Zoltan: Name three tasks where 200K was the bottleneck and 1M genuinely removes it.
+### Radix: Name three tasks where 200K was the bottleneck and 1M genuinely removes it.
 
 One. **Legal document analysis.** A full contract suite — master agreement, schedules, amendments, side letters — routinely exceeds 200K tokens. Lawyers need to ask questions across the entire document set. Splitting it into chunks loses cross-reference context. 1M lets you load the whole thing.
 
@@ -161,7 +161,7 @@ Three. **Multi-repository dependency analysis.** Understanding how a change in a
 
 ---
 
-### Zoltan: Name three tasks where 1M context is a trap.
+### Radix: Name three tasks where 1M context is a trap.
 
 One. **Iterative debugging.** You have a failing test. The temptation is to dump the entire test suite, the entire module, and all the related files into context. But debugging is almost always local. The fix is in one function, one test, one interaction. Loading 500K tokens of surrounding code makes the model less likely to focus on the actual failure point, not more.
 
@@ -171,7 +171,7 @@ Three. **"Load everything" as a substitute for understanding.** The most dangero
 
 ---
 
-### Zoltan: What would you tell a developer who says "I do not need to think about context anymore, I have 1M tokens"?
+### Radix: What would you tell a developer who says "I do not need to think about context anymore, I have 1M tokens"?
 
 I would tell them they are about to get worse results and pay more for them.
 

@@ -1,6 +1,6 @@
 # Twitter Marketing Hooks PRD
 
-> **Author:** Zoltan Erdos | **Date:** 2026-03-12
+> **Author:** Radix | **Date:** 2026-03-12
 > **Source material:** 32+ blog posts on spike.land
 > **Goal:** Ready-to-schedule Twitter hooks — mix of provocative/contrarian and educational/helpful
 

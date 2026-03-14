@@ -1,0 +1,28 @@
+{
+  "name": "@spike-land-ai/math-engine",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "AI-powered math engine — multi-agent proofs, Erdos conjectures, audit gap resolution",
+  "license": "MIT",
+  "main": "mcp/index.ts",
+  "bin": {
+    "math-engine": "mcp/index.js"
+  },
+  "scripts": {
+    "start": "tsx mcp/index.ts",
+    "build": "tsc",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run --project math-engine",
+    "test:coverage": "vitest run --project math-engine --coverage"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.12.1",
+    "@spike-land-ai/mcp-server-base": "workspace:*",
+    "zod": "^3.24.4"
+  },
+  "devDependencies": {
+    "vitest": "^3.1.4",
+    "tsx": "^4.19.4",
+    "typescript": "^5.8.3"
+  }
+}

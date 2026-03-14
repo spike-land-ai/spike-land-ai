@@ -9,7 +9,7 @@
 
 ## EXECUTIVE SUMMARY
 
-SPIKE LAND LTD is a pre-revenue, founder-led SaaS platform offering a managed Model Context Protocol (MCP) runtime and registry. The company targets enterprise software development teams and AI consultancies with browser automation (QA Studio) and agent orchestration capabilities. Founded December 2025 by Zoltan Erdos (sole shareholder, founder-operator), the company is seeking up to £250,000 SEIS funding with an internal pre-money valuation of £3.5M–£5.5M.
+SPIKE LAND LTD is a pre-revenue, founder-led SaaS platform offering a managed Model Context Protocol (MCP) runtime and registry. The company targets enterprise software development teams and AI consultancies with browser automation (QA Studio) and agent orchestration capabilities. Founded December 2025 by the Founder (sole shareholder, founder-operator), the company is seeking up to £250,000 SEIS funding with an internal pre-money valuation of £3.5M–£5.5M.
 
 **Critical Finding:** Commercial readiness is severely constrained (8/80 = 10%). The platform is technically sophisticated (943,723 lines of TypeScript) but lacks foundational commercial infrastructure: no billing system, no metering, published pricing exists but is untested. The founder carries 100% of sales, strategy, and execution risk. Revenue is zero. The company has 7 months until its Q3 2027 kill criteria trigger.
 
@@ -25,9 +25,9 @@ SPIKE LAND LTD is a pre-revenue, founder-led SaaS platform offering a managed Mo
 | **Company Registration Number** | 16906682 | [E-001] |
 | **Incorporation Date** | 12 December 2025 | [E-001] |
 | **Legal Jurisdiction** | United Kingdom | [E-001] |
-| **HQ Address** | 42 Mighell Street, Apartment 70, Brighton BN2 0AU, UK | [E-001] |
-| **Current Director(s)** | Zoltan Erdos | [E-001] |
-| **Shareholder Structure** | Zoltan Erdos 100% | [E-001] |
+| **HQ Address** | Brighton, UK | [E-001] |
+| **Current Director(s)** | Founder | [E-001] |
+| **Shareholder Structure** | Founder 100% | [E-001] |
 | **Companies House Status** | Active | [E-001] |
 
 **Key Governance Observations:**
@@ -42,11 +42,11 @@ SPIKE LAND LTD is a pre-revenue, founder-led SaaS platform offering a managed Mo
 
 | Role | Individual | Experience | Status |
 |------|-----------|-----------|--------|
-| **Founder / CEO / CTO** | Zoltan Erdos | 12+ years full-stack development | Full-time, sole operator |
+| **Founder / CEO / CTO** | Founder | 12+ years full-stack development | Full-time, sole operator |
 | **Head of Growth / DevRel** | *Planned* | £70–90k salary | Not hired |
 | **Senior Engineer** | *Planned* | £80–100k salary | Not hired |
 
-**Zoltan Erdos Profile:**
+**Founder Profile:**
 
 - **Education**: Eotvos Lorand University, Budapest (Computer Science & Mathematics) [E-003]
 - **Career History**:
@@ -73,7 +73,7 @@ SPIKE LAND LTD is a pre-revenue, founder-led SaaS platform offering a managed Mo
 - Timing: Contingent on SEIS funding and early customer traction [E-005]
 
 **Team Composition Assessment:** [CL-001]
-The single-founder model creates acute organizational fragility. While Zoltan's technical depth (12+ years, fintech exposure) is genuine, he lacks a co-founder to anchor sales/product prioritization, a CFO to manage burn and fundraising, or operational leadership to reduce key-man risk. The company cannot simultaneously execute engineering, sales discovery, investor relations, and operational setup. *No evidence of external advisory, board oversight, or operational delegation.*
+The single-founder model creates acute organizational fragility. While the Founder's technical depth (12+ years, fintech exposure) is genuine, he lacks a co-founder to anchor sales/product prioritization, a CFO to manage burn and fundraising, or operational leadership to reduce key-man risk. The company cannot simultaneously execute engineering, sales discovery, investor relations, and operational setup. *No evidence of external advisory, board oversight, or operational delegation.*
 
 ---
 

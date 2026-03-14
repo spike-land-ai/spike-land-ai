@@ -90,7 +90,7 @@ async function main() {
     );
 
     // Check Contact Sales section
-    const contactSales = await page.$('a[href="mailto:zoltan.erdos@spike.land"]');
+    const contactSales = await page.$('a[href="mailto:hello@spike.land"]');
     log(
       "Pricing: Contact Sales",
       !!contactSales,

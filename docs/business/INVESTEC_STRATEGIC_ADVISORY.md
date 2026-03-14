@@ -4,7 +4,7 @@
 > **Prepared by**: Integrity-led specialist bank, investor advisory function
 > **Date**: March 2026
 > **Classification**: Confidential
-> **Audience**: Zoltan Erdos, Founder
+> **Audience**: Founder, Founder
 > **Purpose**: Pre-investor action plan
 
 ---

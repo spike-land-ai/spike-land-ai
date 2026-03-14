@@ -13,8 +13,8 @@ export function TermsPage() {
           these Terms of Service (&ldquo;Terms&rdquo;). If you do not agree to all Terms, you may
           not use the Platform. These Terms constitute a legally binding agreement between you and
           SPIKE LAND LTD, a company registered in England and Wales (company number 16906682), whose
-          registered address is Apartment 70, 42 Mighell Street, Brighton, BN2 0AU, United Kingdom
-          (&ldquo;we&rdquo;, &ldquo;us&rdquo;, or &ldquo;our&rdquo;).
+          registered address is Brighton, UK (&ldquo;we&rdquo;, &ldquo;us&rdquo;, or
+          &ldquo;our&rdquo;).
         </p>
       </section>
 
@@ -150,10 +150,10 @@ export function TermsPage() {
           </a>{" "}
           or email us at{" "}
           <a
-            href="mailto:zoltan.erdos@spike.land"
+            href="mailto:hello@spike.land"
             className="text-primary underline hover:text-primary/80"
           >
-            zoltan.erdos@spike.land
+            hello@spike.land
           </a>
           .
         </p>

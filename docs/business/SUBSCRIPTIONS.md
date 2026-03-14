@@ -122,7 +122,7 @@ header format.
 | Field                    | Detail                                                                                                                  |
 | ------------------------ | ----------------------------------------------------------------------------------------------------------------------- |
 | **Cost**                 | $0/mo (free tier: 3,000 emails/mo)                                                                                      |
-| **What We Use**          | Welcome emails, purchase confirmations, transactional notifications (`RESEND_API_KEY`, `EMAIL_FROM=zoltan.erdos@spike.land`) |
+| **What We Use**          | Welcome emails, purchase confirmations, transactional notifications (`RESEND_API_KEY`, `EMAIL_FROM=hello@spike.land`) |
 | **Why This Provider**    | Excellent developer API, React email templates, generous free tier                                                      |
 | **Cheaper Alternatives** | Loops (free tier), Postmark (similar pricing), AWS SES ($0.10/1000 emails)                                              |
 

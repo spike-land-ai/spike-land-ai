@@ -1,9 +1,9 @@
 ---
-title: "We Migrate Next.js Apps Without Guesswork"
+title: "Your Next.js App Is Paying Rent to a Landlord Who Stopped Fixing the Plumbing"
 slug: "nextjs-migration-service"
-description: "Most migrations fail because teams try to rewrite the app before they understand the architecture. We extract the structure first, automate the mechanical work, and turn the process into a repeatable MCP capability on spike.land."
+description: "Most migrations fail because teams rewrite before they read. We extract architecture first, automate the mechanical work, and turn it into a repeatable MCP capability. Here is how."
 date: "2026-03-10"
-author: "Zoltan Erdos"
+author: "Radix"
 category: "Services"
 tags: ["nextjs", "migration", "tanstack-start", "vite", "cloudflare-workers", "mcp", "architecture", "bazdmeg"]
 featured: true
@@ -13,140 +13,100 @@ heroImage: "/blog/nextjs-migration-service/hero.jpg"
 heroPrompt: "A cinematic developer-focused illustration of a large aging Next.js codebase being decoded into clean architectural layers, then transformed into a lighter edge-native system. Show dependency graphs, routing trees, diff views, and a glowing pull request emerging from the process. Dark mode, premium neon cyan and amber accents, clean futuristic UI aesthetic."
 ---
 
-![A cinematic developer-focused illustration of a large aging Next.js codebase being decoded into clean architectural layers, then transformed into a lighter edge-native system. Show dependency graphs, routing trees, diff views, and a glowing pull request emerging from the process. Dark mode, premium neon cyan and amber accents, clean futuristic UI aesthetic.](/blog/nextjs-migration-service/hero.jpg)
+![A cinematic developer-focused illustration of a large aging Next.js codebase being decoded into clean architectural layers, then transformed into a lighter edge-native system.](/blog/nextjs-migration-service/hero.jpg)
 
 <Tldr>
 
-- Most Next.js migrations fail because people start with rewriting code instead of reading architecture.
+- Most Next.js migrations fail because people start rewriting code instead of reading architecture.
 - We handle migration in five tiers: documentation, repo-level automation, PR-generating MCP infrastructure, fixing Next.js itself, and — for £1,000,000 — running Next.js in the browser with zero install.
-- This service is one commercial wedge on top of spike.land's full-stack framework for MCP-native software.
-- The technical foundation is the same one behind the BAZDMEG method: requirement clarity, structural analysis, deterministic transformation, and aggressive verification.
+- The technical foundation is the BAZDMEG method: requirement clarity, structural analysis, deterministic transformation, aggressive verification.
 - This is not "[vibe migrate my app](/blog/the-vibe-coding-paradox)." It is a reviewable migration system.
 
 </Tldr>
 
-## The Hook
+## You Already Know Something Is Wrong
 
-Most legacy Next.js apps are not hard to migrate because they are old.
+You felt it last Tuesday.
 
-They are hard to migrate because nobody can still see the structure.
+The build took eleven minutes. You watched the progress bar crawl while your coffee went cold and your mental context evaporated into the void between keystrokes.
 
-Years of framework conventions, Vercel-specific assumptions, mixed rendering models, middleware glue, half-finished server abstractions, and business logic leaking through UI code make the repo feel bigger than it is. Teams look at that mess and conclude the same thing:
+You felt it when you opened `next.config.js` and found 847 lines of configuration that nobody wrote on purpose. It accumulated. Like sediment. Like debt. Like the kitchen drawer everyone shoves things into because the real cabinet is too far away.
 
-"We probably need a rewrite."
+You felt it when the Vercel bill arrived and you realized you are paying more for build minutes than for the infrastructure that actually serves your users.
 
-Usually, they do not.
+Here is the part nobody says out loud:
 
-They need a way to read the architecture first.
+**Your framework stopped being leverage and became rent.**
 
-That is the whole idea behind this service.
+And the landlord stopped fixing the plumbing three releases ago.
 
-We do not start by rewriting files.  
-We start by extracting the actual structure of the system: routing patterns, dependency boundaries, runtime assumptions, edge concerns, data-loading behavior, and framework-specific coupling.
+---
 
-Once that structure is visible, the migration stops being a heroic rewrite and becomes what it should have been all along:
+## The Lie Every Team Eventually Tells Itself
 
-a sequence of explicit, reviewable transformations.
+When the pain gets loud enough, every team arrives at the same conclusion:
 
-## Why This Exists
+> "We probably need a rewrite."
 
-A while ago, I wrote about [why Next.js started feeling like tech debt for me](/blog/nextjs-vs-tanstack-start).
+They do not.
 
-The trigger was boring and expensive: a Vercel bill where almost all of the spend was build minutes. Build queues got long. PR feedback slowed down. Hydration issues became harder to reason about than the actual product logic. The framework stopped feeling like leverage and started feeling like rent.
+What they need is a way to see what they already have.
 
-That post led to a much better question than "is Next.js bad?"
+Years of framework conventions, Vercel-specific assumptions, mixed rendering models, middleware glue, half-finished server abstractions, and business logic bleeding through UI code make the repo feel bigger than it is. The complexity is not in the code. **The complexity is in the invisibility of the structure.**
+
+The architecture is still there. Encoded in imports, dependency boundaries, routing patterns, and runtime assumptions. Nobody can see it because the framework buried it under convention.
+
+That is the whole insight behind this service.
+
+We do not start by rewriting files. We start by making the invisible visible.
+
+Once the structure is visible, the migration stops being a heroic rewrite and becomes what it should have been all along: a sequence of explicit, reviewable transformations.
+
+---
+
+## Why Reading Comes Before Writing
+
+I wrote about [why Next.js started feeling like tech debt](/blog/nextjs-vs-tanstack-start) a while back. The trigger was boring: a Vercel bill where almost all the spend was build minutes. Build queues backed up. PR feedback slowed. Hydration issues became harder to reason about than actual product logic.
+
+The framework stopped feeling like leverage and started feeling like rent.
+
+That post led to a better question than "is Next.js bad?"
 
 Someone asked:
 
-> "This is helpful, but I have eight apps on Next.js. I'm not going to document my own migration. Can you just do it for me?"
+> "I have eight apps on Next.js. Can you just do this for me?"
 
-Yes.
+Yes. But not with blind search-and-replace. And not with AI prompts pretending to understand architecture.
 
-But not with blind search-and-replace.
-And not with hand-wavy AI prompts pretending to understand your architecture.
+The only version worth building is one with a real method behind it — the same one behind everything we ship: [BAZDMEG](https://spike.land/bazdmeg), laid out fully in [It Feels Like Cheating (Because It Is)](/blog/it-feels-like-cheating).
 
-The only version worth selling is one that has a real method behind it.
+---
 
-## Why This Belongs Inside spike.land
+## The Method: Six Steps, Same Order Every Time
 
-spike.land is not just a registry or a hosted MCP endpoint. It is a full-stack
-framework for MCP-native software.
+This is not a methodology poster. This is the actual sequence we run. Every time. No shortcuts.
 
-That matters here because the migration service is not a separate consultancy
-business bolted onto the side. It is the same underlying framework
-commercialized from the other direction.
+**1. Read the repo.** No destructive pipeline first. Inspect routing, detect framework imports, classify concerns, identify runtime dependencies. The migration equivalent of `bazdmeg:status`.
 
-When starting from a blank requirement, spike.land formalizes business logic as
-typed capabilities and turns that into a running app.
+**2. Preview the transformation.** Before touching anything, generate a map: what moves, what gets rewritten, what stays, what looks suspicious. The migration equivalent of `bazdmeg:dry-run`.
 
-When starting from an existing codebase, this service reads the structure,
-separates mechanical work from judgment, and turns migration into a typed,
-reviewable capability.
+**3. Separate mechanical from judgment.** This is the split that makes everything else possible. Route rewrites, config conversion, import replacement, directory reshaping — mechanical. Vercel platform assumptions, long-lived Node.js dependencies, custom SSR business logic — judgment. Hard repos become workable the moment you stop treating everything like custom engineering.
 
-That is why the ladder runs from documentation to deterministic repo pass to
-MCP server. It is a productization path, not just a stack of service packages.
+**4. Apply the deterministic pass.** Only after the preview matches intent. The boring parts become explicit and repeatable.
 
-## The Method Behind The Migration
+**5. Verify everything.** TypeScript must pass. Lint must pass. Tests must pass. Business flows must hold. If the diff cannot be explained by a human reviewer, it is not done.
 
-The migration work sits on the same foundation as [BAZDMEG](https://spike.land/bazdmeg) — the thinking behind which is laid out in [It Feels Like Cheating (Because It Is)](/blog/it-feels-like-cheating):
+**6. Escalate only what deserves human attention.** That is where expertise earns its value.
 
-- requirement clarity before code generation
-- safe entrypoints before destructive actions
-- repo state read before mutation
-- deterministic passes before agent escalation
-- tests as truth, not vibes
-- ownership of every diff
+This sequencing mirrors a principle from [Think Slowly, Ship Fast](/blog/think-slowly-ship-fast): decide before you generate, not after. The same principle drove our [990-file monorepo reorganization](/blog/where-does-your-code-belong) — the architecture was already in the imports. The script just read it.
 
-That matters because migrations are risky work. They touch routing, runtime, deployment, caching, environment handling, server assumptions, asset behavior, and business logic boundaries all at once.
+---
 
-If you start with an invasive pipeline, you are gambling.
+## What The Code Actually Becomes
 
-If you start with structure, you can make the migration auditable.
+This is not abstract. Here is a real transformation.
 
-That is why the flow is:
-
-1. read the repo
-2. detect the architecture
-3. preview the transformation
-4. apply the mechanical pass
-5. verify the output
-6. escalate only the edge cases that deserve human judgment
-
-This sequencing mirrors a broader principle about how AI-assisted work succeeds. The reasoning behind it is laid out in [Think Slowly, Ship Fast](/blog/think-slowly-ship-fast): decide before you generate, not after.
-
-The same principle shows up elsewhere in our work too. When we [reorganized 990 TypeScript files](/blog/where-does-your-code-belong) in our monorepo, the trick was not taste. It was dependency analysis. The architecture was already in the imports. The script just read it.
-
-Migration works the same way.
-
-The codebase already contains the truth about what it is. You just need a system that can read it.
-
-## What We Are Actually Migrating To
-
-This is not a generic "leave Next.js somehow" service.
-
-It is a migration from Next.js toward an explicit, edge-native stack:
-
-| From | To |
-|---|---|
-| Next.js App Router / Pages Router | TanStack Router |
-| `next.config.js` | `vite.config.ts` |
-| Vercel deployment model | Cloudflare Workers |
-| Next.js middleware | Hono middleware |
-| `getServerSideProps`, ISR patterns | explicit loaders, client-first rendering, edge handlers |
-| `next/image`, `next/font` | direct imports and standard platform-native handling |
-
-The reasoning behind this target stack — why edge-native Cloudflare Workers replaced both Next.js and AWS for us — is covered in [The Universal Interface Wasn't GraphQL](/blog/the-universal-interface-wasnt-graphql).
-
-That does not mean every feature maps 1:1.
-
-It means the target stack is opinionated, explicit, and cheaper to reason about.
-
-That is the real benefit. Not "new shiny tool."
-A simpler runtime model, faster local loops, fewer hidden conventions, and less framework rent.
-
-### What The Code Actually Looks Like
-
-Here is a concrete example. A typical Next.js API route:
+**Before** — a typical Next.js API route:
 
 ```typescript
 // pages/api/health.ts (Next.js)
@@ -157,7 +117,7 @@ export default async function handler(req, res) {
 }
 ```
 
-Becomes an explicit Hono handler on Cloudflare Workers:
+**After** — an explicit Hono handler on Cloudflare Workers:
 
 ```typescript
 // routes/health.ts (Hono + Cloudflare Workers)
@@ -179,9 +139,9 @@ health.get("/health", async (c: Context<{ Bindings: Env }>) => {
 export { health };
 ```
 
-No file-based routing convention. Typed bindings via `c.env` instead of environment variables. The handler is an explicit function, not a default export that relies on framework magic.
+No file-based routing convention. Typed bindings via `c.env` instead of environment variables. The handler is an explicit function, not a default export relying on framework magic.
 
-Auth middleware follows the same pattern — explicit, composable, no hidden conventions:
+Auth middleware follows the same pattern — explicit, composable, visible:
 
 ```typescript
 // middleware/auth.ts (Hono)
@@ -190,359 +150,155 @@ app.use("/api/checkout", authMiddleware);
 app.use("/api/billing/*", authMiddleware);
 ```
 
-Every protected route is visible in one place. No `_middleware.ts` files scattered across directories.
+Every protected route in one place. No `_middleware.ts` files scattered across directories. These are from [our production edge API](https://github.com/spike-land-ai).
 
-These are not contrived examples. They are from [our production edge API](https://github.com/spike-land-ai).
+The full target stack:
 
-## Why Sophisticated Legacy Projects Are Still In Scope
+| From | To |
+|---|---|
+| Next.js App Router / Pages Router | TanStack Router |
+| `next.config.js` | `vite.config.ts` |
+| Vercel deployment model | Cloudflare Workers |
+| Next.js middleware | Hono middleware |
+| `getServerSideProps`, ISR | explicit loaders, edge handlers |
+| `next/image`, `next/font` | direct imports, platform-native handling |
 
-Because the migration is not treated as a giant rewrite.
+The real benefit is not "new shiny tool." It is a simpler runtime model, faster local loops, fewer hidden conventions, and less framework rent. The full reasoning: [The Universal Interface Wasn't GraphQL](/blog/the-universal-interface-wasnt-graphql).
 
-This is where the technical background matters.
+---
 
-Hard codebases usually break migration efforts for three reasons:
+## Why Hard Repos Are Still In Scope
 
-1. **Framework coupling is implicit.**  
-   Data loading, auth, routing, rendering, and deploy assumptions are mixed together.
+Most migrations die against complex codebases for three reasons. And all three are solvable once you name them.
 
-2. **Business logic is in the wrong layer.**  
-   Server logic leaks into UI, UI state leaks into backend assumptions, and nobody is sure what is authoritative.
+1. **Framework coupling is implicit.** Data loading, auth, routing, rendering, and deploy assumptions — mixed together, invisible, load-bearing.
 
-3. **The team cannot separate mechanical work from judgment.**  
-   So everything gets treated like custom engineering, which makes the project too expensive to attempt.
+2. **Business logic is in the wrong layer.** Server logic leaks into UI, UI state leaks into backend assumptions, nobody is sure what is authoritative.
 
-We handle those problems differently.
+3. **Teams cannot separate mechanical work from judgment.** So everything gets treated like custom engineering, making the project too expensive to attempt.
 
-Mechanical changes get formalized.
+**Mechanical changes get formalized:** route rewrites, config conversion, import replacement, directory reshaping, environment remapping, deploy config, asset and middleware rewiring.
 
-Examples:
-- route file rewrites
-- config conversion
-- import replacement
-- directory reshaping
-- environment variable remapping
-- deploy config changes
-- asset and middleware rewiring
+**Judgment-heavy changes get isolated:** Vercel-only platform assumptions, long-lived Node.js dependencies, custom SSR business logic, ad hoc middleware side effects, undocumented Next.js internals.
 
-Judgment-heavy changes get isolated.
+The hard parts do not disappear. They stop contaminating the whole migration.
 
-Examples:
-- Vercel-only platform assumptions
-- long-lived Node.js runtime dependencies
-- custom SSR behavior that is really business logic
-- ad hoc middleware side effects
-- code that relied on undocumented Next.js behavior
+---
 
-That split is what makes advanced repos workable.
+## The Proof That Structure Transfers
 
-Not because the hard parts disappear, but because they stop contaminating the whole migration.
+Gian Pierre — [a chemist who walked into a codebase](/blog/a-chemist-walked-into-a-codebase) — validated the core hypothesis: large codebases are not as chaotic as they look. Their structure is encoded in imports, dependencies, boundaries, and runtime assumptions. A script sorted hundreds of our files because the repo already contained the architecture. We were not inventing structure. We were reading it.
 
-## Why Gian Pierre Matters Here
+One operator is not statistical proof of scale. But it is evidence that the method crosses the developer boundary when the structure is made visible enough. The right role for human expertise is not brute-forcing the migration by hand — it is stepping in where deterministic passes hit real business complexity.
 
-Gian Pierre helped shape the thinking behind this work earlier by validating a simple idea — first as [a chemist who walked into a codebase](/blog/a-chemist-walked-into-a-codebase) and shipped real apps by starting with requirements:
-
-large codebases are not as chaotic as they look.
-
-Their structure is still there, encoded in imports, dependencies, boundaries, and runtime assumptions.
-
-That was obvious in our reorganization work. A script could sort hundreds of files because the repo already contained the architecture. We were not inventing structure. We were reading it.
-
-That same idea carries over here.
-
-One strong operator is not statistical proof of scale.
-
-That is not what this section is claiming.
-
-Gian Pierre is evidence that the method crosses the developer boundary when the
-structure is made visible enough. He is not the story because he hand-edits
-every file. He is the story because he sees systems where other people see
-mess.
-
-If the support is there, he will look at the migration cases that actually need expert judgment: old repos, ugly repos, mixed-pattern repos, high-sediment repos.
-
-That is the right role for human expertise.
-
-Not brute-forcing the entire migration by hand, but stepping in where structure extraction and deterministic passes hit real business complexity.
+---
 
 ## The Five Tiers
 
-### Tier 1 - Documentation: $420
+Every team is at a different stage of pain. The tiers meet you where you are — and they double as a productization ladder.
 
-This tier exists for teams that are not ready to commit to migration work yet, but need a serious map.
+### Tier 1 — Documentation: $420
 
-It is also the field-research layer for the broader framework.
+You are not ready to commit. You need a map.
 
-If funded, Gian Pierre will migrate eight real Next.js projects — ranging from content sites and SaaS dashboards to e-commerce storefronts and internal tools — and document what actually happens: the false starts, the dead ends, the framework-specific traps, the easy wins, and the parts that are truly mechanical versus the parts that require judgment.
+Eight real Next.js projects — content sites, SaaS dashboards, e-commerce storefronts, internal tools — migrated and documented. What transfers cleanly. What breaks. What patterns hold. Pages Router, App Router, mixed rendering, middleware-heavy auth, Vercel-specific optimizations, third-party integration density.
 
-The projects are chosen to cover the most common Next.js patterns: Pages Router, App Router, mixed rendering, middleware-heavy auth, Vercel-specific optimizations, and third-party integration density. The goal is not to cherry-pick easy wins but to map the real surface area of migration work.
+Not cherry-picked wins. The real surface area.
 
-This is not theory.
-It is paid field research.
-
-**What you get:**  
-a detailed migration case study across eight real projects, showing what transfers cleanly, what breaks, and what patterns hold up in production
-
-**Best for:**  
-teams that need clarity before they decide
-
-**Timeline:**  
-3 weeks from project start, if support is in place
+**What you get:** detailed migration case studies across eight real projects
+**Timeline:** 3 weeks
+**Best for:** teams that need clarity before they decide
 
 ---
 
-### Tier 2 - Repo Migration Pass: £1,000
+### Tier 2 — Repo Migration Pass: £1,000
 
-Most migration work is not intellectually interesting. It is repetitive.
+Most migration work is not intellectually interesting. It is repetitive. Changing route definitions. Translating config. Replacing framework imports. Rewiring middleware. Updating environment handling.
 
-Changing route definitions. Translating config. Replacing framework imports. Rewiring middleware. Moving deploy assumptions. Cleaning up file structure. Updating environment handling.
+That work should not consume human attention when it can be made deterministic.
 
-That work should not consume human attention if it can be made deterministic.
+You still own the merge. You still review the output. You still make the final call. That is deliberate.
 
-Tier 2 runs the migration against your repo, applies the mechanical pass, handles the predictable edge cases, and returns a reviewable diff.
-
-This is the point where the field research becomes a deterministic product
-surface.
-
-You still own the merge.
-You still review the output.
-You still make the final call.
-
-That is deliberate.
-
-**What you get:**  
-an automated migration pass on your repo, a clean diff to review, and escalation for repo-specific weirdness if support is available
-
-**Best for:**  
-small teams and indie developers who want the migration accelerated without giving up control
-
-**Timeline:**  
-about 1 week from repo access
+**What you get:** automated migration pass on your repo, clean diff to review, escalation for edge cases
+**Timeline:** ~1 week from repo access
+**Best for:** small teams and indie devs who want acceleration without losing control
 
 ---
 
-### Tier 3 - MCP Migration Server: $10,000
+### Tier 3 — MCP Migration Server: $10,000
 
-This is the full system.
+This is the full system. Instead of a one-off script, migration becomes a capability.
 
-Instead of running a one-off script, we formalize migration as a capability. If you want to understand how MCP systems are structured, [MCP Explained: The Universal Adapter for AI Tools](/blog/mcp-explained-universal-adapter-for-ai-tools) covers the full request lifecycle.
+The MCP server reads your repo, inspects structure, applies migration rules, generates the transformation, and opens a real pull request. For how MCP systems work: [MCP Explained](/blog/mcp-explained-universal-adapter-for-ai-tools). The engineering pattern — agents writing their own tools — is in [The Architecture of Scale](/blog/the-architecture-of-scale-building-tools).
 
-The MCP server reads your repo, inspects the structure, applies migration rules, generates the transformation, and opens a real pull request. The engineering pattern behind this — agents that can write their own tools when the framework is invisible — is described in [The Architecture of Scale](/blog/the-architecture-of-scale-building-tools).
+Repeatable. Inspectable. Maintainable as the target stack evolves.
 
-That is a different class of offer.
-
-It means the migration becomes repeatable, inspectable, and maintainable as the target stack evolves.
-
-You are not buying "some engineering time."
-You are buying a migration system pointed at your codebase, running on the same
-platform principles as the rest of spike.land.
-
-**What you get:**  
-a working MCP migration server for your repo, a generated PR, and one year of maintenance as the target stack evolves
-
-**Best for:**  
-teams with multiple apps, recurring migration needs, or enough engineering pain that systematizing the work is cheaper than repeating it manually
-
-**Timeline:**
-about 2 weeks from contract
+**What you get:** working MCP migration server for your repo, generated PR, one year of maintenance
+**Timeline:** ~2 weeks from contract
+**Best for:** teams with multiple apps or recurring migration needs
 
 ---
 
-### Tier 4 - Fix Next.js Itself: £100,000
+### Tier 4 — Fix Next.js Itself: £100,000
 
-This is not a joke.
+Not a joke.
 
-For a hundred thousand pounds, Gian Pierre will contribute the changes upstream to Next.js so that your existing codebase — with its current syntax, current conventions, current file structure — runs natively on Cloudflare Workers, Hono, and Vite without a migration at all.
+Contribute the changes upstream so existing codebases — current syntax, current conventions, current file structure — run natively on Cloudflare Workers, Hono, and Vite. No migration pass. No rewrite. No new routing library. The old syntax just works on the new runtime.
 
-No migration pass. No rewrite. No new routing library.
-
-The old syntax just works on the new runtime.
-
-This is the version where Next.js becomes the adapter instead of the bottleneck.
-
-Gian Pierre says he will do it this weekend.
-
-If he cannot deliver — and he can deliver absolutely anything — the money funds [COMPASS](https://spike.land/docs/compass-prd), Gian Pierre's flagship project and the first pet project of spike.land. COMPASS goes public on March 21st. A universal bureaucracy navigator for the 4 billion people who miss services they are eligible for. 193 countries, 400+ languages, free forever.
+If we cannot deliver, the money funds [COMPASS](https://spike.land/docs/compass-prd) — a universal bureaucracy navigator for 4 billion people who miss services they are eligible for. 193 countries, 400+ languages, free forever.
 
 Either way, the money does something that matters.
 
-**What you get:**
-upstream contributions to Next.js that make the framework natively compatible with edge-native deployment targets, so nobody else has to migrate either
-
-**Best for:**
-organizations where the cost of migrating hundreds of apps exceeds the cost of fixing the framework once
-
-**Timeline:**
-this weekend, if Gian Pierre is right. Otherwise, COMPASS launches March 21st.
+**What you get:** upstream contributions making Next.js natively edge-compatible
+**Best for:** organizations where migrating hundreds of apps costs more than fixing the framework once
 
 ---
 
-### Tier 5 - Next.js In The Browser: £1,000,000
+### Tier 5 — Next.js In The Browser: £1,000,000
 
-This is the full overhaul. By Zoltan himself.
+The full runtime overhaul. Next.js projects run inside the browser. No install. No build. No setup. Open a URL and the app is running.
 
-For one million pounds, your Next.js projects run inside the browser. No install. No build. No setup time. You open a URL and the app is running.
-
-The database runs on the edge — or in the browser. Dynamic app boundaries replace static build-time decisions. The entire Next.js execution model gets rebuilt from the ground up to work as a zero-install, browser-native platform.
+Edge database. Dynamic app boundaries. The entire execution model rebuilt as a zero-install, browser-native platform.
 
 This is not a migration. This is a new runtime.
 
-**What you get:**
-a browser-native Next.js runtime where your existing projects run without installation, build steps, or server infrastructure — edge database, dynamic boundaries, instant start
-
-**Best for:**
-organizations that want to eliminate deployment entirely — or anyone who has looked at their CI pipeline and thought "why does this exist"
-
-**Timeline:**
-Zoltan delivers. If somehow he does not — Gian Pierre steps in, and the money funds COMPASS.
+**What you get:** browser-native Next.js runtime — no installation, no build steps, no server infrastructure
+**Best for:** organizations that want to eliminate deployment entirely
 
 ---
 
-The tiers are designed to meet you where you are, but they are also a
-productization ladder. Most teams start with Tier 1 or Tier 2. Tier 3 is for
-recurring needs. Tier 4 is for the industry. Tier 5 is for the future.
-
-## What The Technical Pipeline Looks Like
-
-This is the simplified version of how the migration is approached.
-
-### 1. Safe Read
-
-No destructive pipeline first.
-
-We inspect the repo state, understand the routing model, identify framework-specific imports, detect runtime dependencies, and classify the codebase by concern.
-
-This is the migration equivalent of `bazdmeg:status`.
-
-### 2. Preview
-
-Before applying anything, we generate a preview of what the migration would do.
-
-What will move.
-What will be rewritten.
-What will be left alone.
-What looks suspicious.
-What likely needs human review.
-
-This is the migration equivalent of `bazdmeg:dry-run`.
-
-### 3. Deterministic Pass
-
-Only after the preview matches intent do we run the real transformation.
-
-This includes:
-- routing translation
-- config rewrites
-- import replacement
-- edge/runtime adaptation
-- deploy target changes
-- project structure cleanup
-
-The key is that the boring parts are explicit and repeatable.
-
-### 4. Verification
-
-After the transformation:
-- TypeScript must pass
-- lint must pass
-- relevant tests must pass
-- business-critical flows must still hold
-- generated diff must be understandable by a human reviewer
-
-The reason this verification step is fast rather than ceremonial is covered in [Tool-First Testing vs Browser Testing: A Benchmark](/blog/tool-first-testing-benchmark) — MCP tool tests run 99x faster than browser-driven E2E and eliminate flakiness entirely.
-
-If the diff cannot be explained, it is not done.
-
-### 5. Escalation
-
-Only the real edge cases get human attention.
-
-That is where support earns its value.
-
 ## What Does Not Migrate Automatically
 
-This is not magic, so the boundaries matter.
+False confidence is expensive. So here are the boundaries:
 
-The following usually need custom treatment:
-
-- deeply Vercel-specific infrastructure behavior
-- code that assumes long-lived Node.js APIs or server processes
-- undocumented Next.js internals
-- application logic that was accidentally encoded inside framework behavior
-- repos with weak test coverage on core business paths (if this describes your repo, read [The Testing Pyramid Is Upside Down](/blog/the-testing-pyramid-is-upside-down) before you start)
-
-We say this up front because false confidence is expensive.
+- Deeply Vercel-specific infrastructure behavior
+- Code assuming long-lived Node.js APIs or server processes
+- Undocumented Next.js internals
+- Application logic accidentally encoded inside framework behavior
+- Repos with weak test coverage on core paths (read [The Testing Pyramid Is Upside Down](/blog/the-testing-pyramid-is-upside-down) first)
 
 A migration service should reduce risk, not hide it.
 
-## Why The Pricing Makes Sense
+---
 
-The pricing is not based on hype.
-It is based on what type of work you are buying.
+## The Question You Are Really Asking
 
-**$420** buys risk reduction through field-tested documentation.
-**£1,000** buys a repo-level mechanical migration pass plus reviewable output.
-**$10,000** buys a repeatable migration capability with ongoing maintenance.
-**£100,000** buys a fix to Next.js itself so nobody has to migrate at all.
-**£1,000,000** buys a browser-native Next.js runtime with zero install, edge database, and no build step.
+You are not asking "should I migrate from Next.js?"
 
-The alternative is usually some combination of:
-- a full sprint of senior engineering time
-- framework lock-in that keeps costing money
-- a migration attempt that stalls halfway because nobody [separated structure from chaos](/blog/you-cannot-automate-chaos)
+You already know the answer. You felt it when the build took eleven minutes. You felt it when the Vercel bill arrived. You felt it when you realized you spend more time fighting the framework than building the product.
 
-That is more expensive than any tier here.
+The real question is: **can I do it without losing three months to a rewrite that stalls halfway?**
 
-## Who This Is For
+Yes. If you read the architecture before you rewrite the code.
 
-This is a good fit if:
-
-- your Next.js app has become operationally annoying
-- build and deployment friction now outweigh framework convenience
-- your team wants a reviewable migration path, not a rewrite fantasy
-- your product logic can survive being made more explicit
-- you want to move toward a lighter edge-native model
-
-This is not a good fit if:
-
-- your app depends heavily on Vercel-only features
-- your backend assumes a permanent Node.js runtime
-- you want a no-review black box that mutates production code and hopes for the best
-- your team is not prepared to verify business logic after structural change
-
-## FAQ
-
-**Is this a rewrite?**  
-No. The whole point is to avoid treating it like one. The migration starts with extracting structure, then applying explicit transformations.
-
-**Can we roll back?**  
-Yes. Tier 2 returns a diff. Tier 3 opens a PR. Your main branch does not change until you merge.
-
-**Does this work for App Router and Pages Router?**  
-Yes. Both are in scope.
-
-**What if the app has blockers?**  
-We tell you before paid migration work starts. If a repo contains real blockers, the correct answer is not to bluff.
-
-**Why not just use an AI coding agent directly?**
-Because a raw agent without structure will confidently produce migration slop. We have [written about what happens when you skip this step](/blog/what-i-learned-from-my-worst-pull-request). The value here is not "AI exists." The value is requirement discipline, structural reading, deterministic transformation, and human review only where needed.
-
-**Do I have to fully commit to the target stack before using any of this?**
-No. If you want to start smaller, you can [embed spike.land MCP tools in your existing project](/blog/mcp-apps-from-any-origin) without a full migration.
-
-**What is the link to BAZDMEG?**  
-Same mindset: safe read first, preview second, destructive action last, ownership always. The method matters more than the model.
+---
 
 ## Start Here
 
-If you are still deciding whether leaving Next.js is worth it, [read the original post first](/blog/nextjs-vs-tanstack-start).
+If you are still deciding, [read the original comparison first](/blog/nextjs-vs-tanstack-start).
 
-If you have already decided and want to know which tier fits, go to [/migrate](/migrate).
+If you have already decided, go to [/migrate](/migrate). Describe your app in one paragraph. We will tell you which tier fits — or whether you should not migrate at all.
 
-Describe your app in one paragraph.
-We will tell you whether it belongs in Tier 1, Tier 2, Tier 3, Tier 4, Tier 5, or whether you should not migrate at all.
-
-Because the goal is not to sell migration theater.
-
-The goal is to turn a hard repo into a reviewable change.
+The goal is not to sell migration theater. The goal is to turn a hard repo into a reviewable change.
 
 <PersonalizedSupportBox showMigrationTiers />

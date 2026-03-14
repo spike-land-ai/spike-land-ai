@@ -64,7 +64,7 @@ pre-revenue stage.
 | **Incorporation**     | 12 December 2025                                                                                                                 |
 | **Jurisdiction**      | England & Wales                                                                                                                  |
 | **SIC Codes**         | 62090 (IT Consultancy), 63120 (Web Portals)                                                                                      |
-| **Director**          | Zoltan Erdos (100% Shareholder)                                                                                                  |
+| **Director**          | Founder (100% Shareholder)                                                                                                  |
 | **Registered Office** | Brighton, UK                                                                                                                     |
 | **Products**          | **Spike Land** — Managed Deployment Platform with MCP Registry; **spike-cli** — MCP Multiplexer CLI for developers and AI agents |
 

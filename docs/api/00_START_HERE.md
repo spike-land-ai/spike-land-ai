@@ -316,7 +316,7 @@ See [openapi.yaml](./openapi.yaml) - Complete specification
 
 ### Contact
 
-- Email: zoltan.erdos@spike.land
+- Email: hello@spike.land
 - Website: https://spike.land
 - GitHub: https://github.com/spike-land-ai/spike.land
 
@@ -362,7 +362,7 @@ Choose your role above and start reading the appropriate guide. Most developers
 can get started in 30-45 minutes.
 
 If you get stuck, check [INDEX.md](./INDEX.md) for detailed navigation or
-contact zoltan.erdos@spike.land.
+contact hello@spike.land.
 
 ---
 

@@ -198,7 +198,7 @@ function TierCard({ tier }: { tier: MigrationTier }) {
       tier.id === "blog-post" ? 420 : tier.id === "script" ? 1000 : 10000,
       tier.currency,
     );
-    window.location.href = `mailto:zoltan.erdos@spike.land?subject=Migration%20Sponsorship%3A%20${encodeURIComponent(tier.name)}&body=Hi%20Zoltan%2C%0A%0AI%27d%20like%20to%20sponsor%20%22${encodeURIComponent(tier.name)}%22%20(${encodeURIComponent(tier.price)}).%0A%0A`;
+    window.location.href = `mailto:hello@spike.land?subject=Migration%20Sponsorship%3A%20${encodeURIComponent(tier.name)}&body=Hi%20Radix%2C%0A%0AI%27d%20like%20to%20sponsor%20%22${encodeURIComponent(tier.name)}%22%20(${encodeURIComponent(tier.price)}).%0A%0A`;
   }
 
   const panelClass = tier.highlighted ? "rubik-panel-strong" : "rubik-panel";
@@ -370,8 +370,8 @@ export function MigratePage() {
           aria-live="polite"
           className="rounded-2xl border border-primary/20 bg-primary/8 p-4 text-center text-sm font-bold text-primary"
         >
-          Thank you for commissioning{" "}
-          {tierSuccessLabels[successTier] ?? successTier}! We&apos;ll be in touch within 24h.
+          Thank you for commissioning {tierSuccessLabels[successTier] ?? successTier}! We&apos;ll be
+          in touch within 24h.
         </div>
       )}
 
@@ -430,7 +430,7 @@ export function MigratePage() {
             </svg>
           </a>
           <a
-            href="mailto:zoltan.erdos@spike.land?subject=Next.js%20Migration%20Question"
+            href="mailto:hello@spike.land?subject=Next.js%20Migration%20Question"
             onClick={() => trackAnalyticsEvent("migration_interest", { section: "hero_contact" })}
             className="inline-flex items-center gap-2 rounded-xl border border-border bg-background px-7 py-3 text-sm font-semibold text-foreground hover:border-primary/24 hover:text-primary transition-colors"
           >
@@ -586,9 +586,9 @@ export function MigratePage() {
         </div>
 
         <p className="mt-4 text-center text-sm text-muted-foreground">
-          All commissions go directly to Gian Pier. Zoltan handles coordination.{" "}
+          All commissions go directly to Gian Pier. Radix handles coordination.{" "}
           <a
-            href="mailto:zoltan.erdos@spike.land"
+            href="mailto:hello@spike.land"
             className="text-primary underline hover:text-primary/80"
           >
             Questions? Just email.
@@ -611,7 +611,7 @@ export function MigratePage() {
             {
               step: "01",
               title: "You pick a tier and email us",
-              body: "No checkout flow, no SaaS friction. Just email zoltan.erdos@spike.land with which tier you want to commission. We'll confirm scope and payment details.",
+              body: "No checkout flow, no SaaS friction. Just email hello@spike.land with which tier you want to commission. We'll confirm scope and payment details.",
             },
             {
               step: "02",
@@ -675,11 +675,11 @@ export function MigratePage() {
           migration candidate? Email is fine. No pitch deck, no discovery call, no CRM sequence.
         </p>
         <a
-          href="mailto:zoltan.erdos@spike.land?subject=Next.js%20Migration%20Question"
+          href="mailto:hello@spike.land?subject=Next.js%20Migration%20Question"
           onClick={() => trackAnalyticsEvent("migration_interest", { section: "final_cta_email" })}
           className="mt-6 inline-flex items-center gap-2 rounded-xl bg-foreground px-7 py-3 text-sm font-bold text-background hover:bg-foreground/90 active:scale-[0.97] transition-all duration-200"
         >
-          zoltan.erdos@spike.land
+          hello@spike.land
         </a>
         <p className="mt-4 text-xs text-muted-foreground">Response within 24h on weekdays.</p>
       </section>

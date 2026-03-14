@@ -49,9 +49,9 @@
 | **Company Number**            | 16906682                                    |
 | **Application Reference**     | 112-184507                                  |
 | **Corporation Tax Reference** | BRCT00003618256                             |
-| **Registered Office**         | 42 Mighell Street, Apartment 70, Brighton BN2 0AU |
-| **Director(s)**               | Zoltan Erdos                                |
-| **Shareholder(s)**            | Zoltan Erdos (100%)                         |
+| **Registered Office**         | Brighton, UK |
+| **Director(s)**               | Founder                                |
+| **Shareholder(s)**            | Founder (100%)                         |
 | **SIC Codes**                 | 62090 (IT consultancy), 63120 (Web portals) |
 | **Application Date**          | December 2025                               |
 | **Incorporation Date**        | 12 December 2025                            |
@@ -67,7 +67,7 @@
 - [x] Provide required details:
   - Company name: SPIKE LAND LTD
   - Registered office address
-  - Director details (Zoltan Erdos)
+  - Director details (Founder)
   - Shareholder details (1 share @ £1)
   - SIC codes: 62090, 63120
 - [x] Application submitted (Reference: 112-184507)

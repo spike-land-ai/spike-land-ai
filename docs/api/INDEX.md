@@ -748,7 +748,7 @@ Detailed documentation for image operations:
 ### For API Users
 
 - Start: docs/api/README.md
-- Questions: contact zoltan.erdos@spike.land
+- Questions: contact hello@spike.land
 - Issues: GitHub Issues
 
 ### For Maintainers

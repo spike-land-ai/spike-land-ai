@@ -86,7 +86,7 @@ function makePlans(
       description: t("plans.enterprise.description") as string,
       features: translateList(t, "plans.enterprise.features").map((text) => ({ text })),
       cta: t("plans.enterprise.cta") as string,
-      ctaHref: "mailto:zoltan.erdos@spike.land",
+      ctaHref: "mailto:hello@spike.land",
       highlighted: false,
     },
   ];
@@ -345,10 +345,7 @@ export function PricingPage() {
 
       <p className="text-center text-sm text-muted-foreground">
         {t("customPlanPrefix")}{" "}
-        <a
-          href="mailto:zoltan.erdos@spike.land"
-          className="text-primary underline hover:text-primary/80"
-        >
+        <a href="mailto:hello@spike.land" className="text-primary underline hover:text-primary/80">
           {t("customPlanLink")}
         </a>
       </p>
@@ -361,10 +358,7 @@ export function PricingPage() {
         {t("vatNotice")}
         <br />
         {t("academicPrefix")}{" "}
-        <a
-          href="mailto:zoltan.erdos@spike.land"
-          className="text-primary underline hover:text-primary/80"
-        >
+        <a href="mailto:hello@spike.land" className="text-primary underline hover:text-primary/80">
           {t("academicLink")}
         </a>
         .

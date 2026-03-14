@@ -61,6 +61,7 @@
       "@spike-land-ai/spike-review": ["./src/mcp-tools/code-review/mcp/index.ts"],
       "@spike-land-ai/spike-review/*": ["./src/mcp-tools/code-review/mcp/*"],
       "@spike-land-ai/hackernews-mcp": ["./src/mcp-tools/hackernews/mcp/index.ts"],
+      "@spike-land-ai/math-engine": ["./src/mcp-tools/math-engine/mcp/index.ts"],
       "@spike-land-ai/mcp-image-studio": ["./src/mcp-tools/image-studio/core-logic/index.ts"],
       "@spike-land-ai/mcp-image-studio/register": [
         "./src/mcp-tools/image-studio/lazy-imports/register.ts"

@@ -159,7 +159,7 @@ Four. The site was created in 2021. I moved to Brighton in 2023. I started spike
 
 [Beat.]
 
-Five. There is a "Prince of Spikeland" and his name is not Zoltan.
+Five. There is a "Prince of Spikeland" and his name is not Radix.
 
 [VISUAL: A question mark appears over a silhouette of a person.]
 

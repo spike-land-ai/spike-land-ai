@@ -34,7 +34,7 @@ const RECENT_MESSAGE_CHAR_LIMIT = 1_200;
 const OLDER_ASSISTANT_CHAR_LIMIT = 320;
 const OLDER_USER_CHAR_LIMIT = 240;
 const TOOL_HINT_LIMIT = 12;
-const ALLOWED_CHAT_EMAILS = new Set(["zoltan.erdos@spike.land", "zolika84@gmail.com"]);
+const ALLOWED_CHAT_EMAILS = new Set(["hello@spike.land", "hello@spike.land"]);
 const TOOL_INTENT_PATTERNS = [
   /\b(search|find|look up|lookup|latest|current|today|browse|inspect|check)\b/i,
   /\b(open|navigate|click|fill|screenshot|scroll|read)\b/i,

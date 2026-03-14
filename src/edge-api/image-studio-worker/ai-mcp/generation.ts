@@ -18,8 +18,8 @@ export function createGeminiGeneration(
   const useGateway = !userApiKey && env.CF_AIG_TOKEN;
 
   const IMAGE_MODELS = [
-    preferredImageModel || "gemini-2.0-flash-preview-image-generation",
-    "gemini-2.0-flash-exp",
+    preferredImageModel || "gemini-2.5-flash-image",
+    "gemini-3.1-flash-image-preview",
   ];
 
   async function callGeminiOnce(

@@ -414,7 +414,7 @@ const CONTENT_TYPES: Record<string, string> = {
   ogg: "audio/ogg",
 };
 
-const IMAGE_STUDIO_URL = "https://image-studio-mcp.spike.land/api/tool";
+const IMAGE_STUDIO_URL = "https://image-studio-mcp.spikeland.workers.dev/api/tool";
 const IMAGE_STUDIO_GENERATE_TOOL = "img_generate";
 const IMAGE_STUDIO_JOB_STATUS_TOOL = "img_job_status";
 const HERO_GENERATION_POLL_ATTEMPTS = 15;
@@ -618,7 +618,10 @@ async function serveBlogImage(
   const ext = filename.split(".").pop()?.toLowerCase() ?? "";
   const key = `blog-images/${slug}/${filename}`;
   const contentType = CONTENT_TYPES[ext] || "application/octet-stream";
-  const heroPrompt = await resolveHeroPrompt(db, slug, filename, requestedPrompt);
+  const isImageExt = IMAGE_EXTS.has(ext);
+  const heroPrompt = isImageExt
+    ? await resolveHeroPrompt(db, slug, filename, requestedPrompt)
+    : null;
   const versionedCache = versionToken
     ? "public, max-age=31536000, immutable"
     : "public, max-age=14400";

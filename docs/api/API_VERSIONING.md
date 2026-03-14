@@ -403,13 +403,13 @@ What to do:
 2. Test integration against v2
 3. Deploy updated code by May 31, 2026
 
-Questions? Support: zoltan.erdos@spike.land
+Questions? Support: hello@spike.land
 ```
 
 ### Support During Migration
 
 - **Documentation**: Migration guides for each breaking change
-- **Support Channel**: `zoltan.erdos@spike.land` for questions
+- **Support Channel**: `hello@spike.land` for questions
 - **Example Code**: SDKs and code samples for v2
 - **Discussion Forum**: GitHub Discussions for peer support
 

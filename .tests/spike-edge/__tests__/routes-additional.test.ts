@@ -164,7 +164,7 @@ describe("well-known route", () => {
     const res = await app.request("/.well-known/security.txt", {}, env);
     expect(res.status).toBe(200);
     const text = await res.text();
-    expect(text).toContain("Contact: mailto:zoltan.erdos@spike.land");
+    expect(text).toContain("Contact: mailto:hello@spike.land");
     expect(text).toContain("Expires:");
     expect(text).toContain("Canonical: https://spike.land/.well-known/security.txt");
   });
@@ -957,7 +957,7 @@ describe("cockpit route", () => {
   it("returns metrics for admin user", async () => {
     let callIdx = 0;
     const responses = [
-      { email: "zoltan.erdos@spike.land" }, // userRow
+      { email: "hello@spike.land" }, // userRow
       { count: 100 }, // userCount
       { count: 5 }, // activeSubs
       { count: 80 }, // toolCount

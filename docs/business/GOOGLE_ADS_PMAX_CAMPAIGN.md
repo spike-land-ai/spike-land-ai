@@ -8,7 +8,7 @@ Reference document for the first paid acquisition campaign. Created 2026-03-07.
 | ---------------- | ------------------------------------------- |
 | Campaign type    | Performance Max                             |
 | Goal             | Website traffic (page views)                |
-| Account          | zoltan.erdos@spike.land                     |
+| Account          | hello@spike.land                     |
 | Daily budget     | $50 (GBP equivalent ~£40)                  |
 | Location         | United Kingdom                              |
 | Language         | English                                     |
@@ -186,7 +186,7 @@ Get this from: Google Ads > Tools > Conversions > New conversion action > Websit
 
 ## Step-by-Step Setup in Google Ads
 
-1. Sign in at ads.google.com with zoltan.erdos@spike.land
+1. Sign in at ads.google.com with hello@spike.land
 2. New Campaign > Performance Max
 3. Goal: Website traffic
 4. Business info: spike.land, 478-352-4878, Software / Developer Tools

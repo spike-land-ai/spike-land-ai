@@ -1,7 +1,6 @@
 # CEO Decisions - Spike Land Platform
 
-> **Purpose**: This document records strategic decisions made by the CEO (Zoltan
-> Erdos) for the Spike Land platform. These decisions guide development
+> **Purpose**: This document records strategic decisions made by the CEO (Founder) for the Spike Land platform. These decisions guide development
 > priorities, technology choices, and business direction.
 
 ---
@@ -12,7 +11,7 @@
 
 #### DEC-008: No Pre-Funding Equity Promises; Build The Bench Around Outputs
 
-**Decision Date**: March 11, 2026 **Decision Maker**: Zoltan Erdos (CEO)
+**Decision Date**: March 11, 2026 **Decision Maker**: Founder (CEO)
 **Status**: ACTIVE
 
 **Decision**: The company shall not promise or distribute founder-scale equity
@@ -47,7 +46,7 @@ contribution.
 
 #### DEC-007: Agent AI Cost Optimization (Gemini / Claude Code OAuth)
 
-**Decision Date**: March 2, 2026 **Decision Maker**: Zoltan Erdos (CEO)
+**Decision Date**: March 2, 2026 **Decision Maker**: Founder (CEO)
 **Status**: ACTIVE
 
 **Decision**: Agents and CLI tools shall NOT use the Anthropic API via standard
@@ -85,7 +84,7 @@ sessions (`CLAUDE_CODE_OAUTH_TOKEN`).
 
 #### DEC-006: Decorative Animations Policy
 
-**Decision Date**: February 27, 2026 **Decision Maker**: Zoltan Erdos (CEO)
+**Decision Date**: February 27, 2026 **Decision Maker**: Founder (CEO)
 **Status**: ACTIVE
 
 **Decision**: The site shall not include infinite background animations or
@@ -119,7 +118,7 @@ CPU-heavy particle effects just for decoration.
 
 #### DEC-005: No `yarn install --immutable` in CI — Use Plain `yarn`
 
-**Decision Date**: February 26, 2026 **Decision Maker**: Zoltan Erdos (CEO)
+**Decision Date**: February 26, 2026 **Decision Maker**: Founder (CEO)
 **Status**: ACTIVE
 
 **Decision**: CI scripts shall use plain `yarn` for dependency installation,
@@ -151,7 +150,7 @@ never `yarn install --immutable`.
 
 #### DEC-004: No Anthropic API Key — OAuth-Only Authentication
 
-**Decision Date**: February 19, 2026 **Decision Maker**: Zoltan Erdos (CEO)
+**Decision Date**: February 19, 2026 **Decision Maker**: Founder (CEO)
 **Status**: ACTIVE
 
 **Decision**: `ANTHROPIC_API_KEY` shall NOT be used anywhere in the Spike Land
@@ -214,7 +213,7 @@ Claude Code auth flow:
 
 #### DEC-003: No Sharp Dependency - Client-Side Image Optimization
 
-**Decision Date**: January 29, 2026 **Decision Maker**: Zoltan Erdos (CEO)
+**Decision Date**: January 29, 2026 **Decision Maker**: Founder (CEO)
 **Status**: ACTIVE
 
 **Decision**: Sharp shall NOT be used as a direct dependency for image
@@ -267,7 +266,7 @@ mismatches in the comparison slider.
 
 #### DEC-001: No Sentry in Tech Stack
 
-**Decision Date**: December 11, 2025 **Decision Maker**: Zoltan Erdos (CEO)
+**Decision Date**: December 11, 2025 **Decision Maker**: Founder (CEO)
 **Status**: SUPERSEDED (February 2026)
 
 **Decision**: Sentry shall NOT be included in the Spike Land tech stack for
@@ -306,7 +305,7 @@ The SDK is disabled in development
 
 #### DEC-002: Gemini Model for Image Enhancement
 
-**Decision Date**: December 11, 2025 **Decision Maker**: Zoltan Erdos (CEO)
+**Decision Date**: December 11, 2025 **Decision Maker**: Founder (CEO)
 **Status**: ACTIVE
 
 **Decision**: The official AI model for image enhancement in Pixel is
@@ -432,5 +431,5 @@ agent maintains their own notes file with health scores and experiences.
 
 ---
 
-**Document Owner**: [Zoltan Erdos](./ZOLTAN_ERDOS.md) (CEO) | **Last Updated**:
+**Document Owner**: [Founder](./ZOLTAN_ERDOS.md) (CEO) | **Last Updated**:
 February 26, 2026 | **Version**: 1.3

@@ -10,7 +10,7 @@
 
 - SPIKE LAND LTD
 - Managed runtime for typed AI-callable tools
-- Founder: Zoltan Erdos
+- Founder: Radix
 
 ---
 

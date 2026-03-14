@@ -1538,7 +1538,7 @@ not needed.
 
 For API issues or questions:
 
-- Email: zoltan.erdos@spike.land
+- Email: hello@spike.land
 - GitHub Issues: https://github.com/spike-land-ai/spike.land/issues
 - Documentation: https://spike.land/docs
 - API Reference: [API_REFERENCE.md](./API_REFERENCE.md)

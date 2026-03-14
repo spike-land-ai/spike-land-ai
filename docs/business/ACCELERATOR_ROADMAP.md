@@ -23,7 +23,7 @@
 | ---------------- | -------------------------------------------------------------------------------------- |
 | **Company**      | SPIKE LAND LTD (UK #16906682)                                                          |
 | **Incorporated** | December 12, 2025                                                                      |
-| **Founder**      | Zoltan Erdos (100% shareholder)                                                        |
+| **Founder**      | Radix (100% shareholder)                                                        |
 | **Location**     | Brighton, UK                                                                           |
 | **Product**      | Spike Land - Managed Deployment Platform with MCP Registry (web dashboard + spike-cli) |
 | **Stage**        | Pre-launch (product ready, marketing gap)                                              |

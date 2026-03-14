@@ -66,7 +66,7 @@ Selected "Bootstrapped" funding tier. Includes Gemini API / Vertex AI credits.
 
 **Application Status**:
 
-- [x] Account created (zoltan.erdos@spike.land)
+- [x] Account created (hello@spike.land)
 - [x] Application submitted
 - [ ] Under review (expect 3-5 business days, up to 10 for new billing accounts)
 - [ ] Approved / Rejected
@@ -139,8 +139,8 @@ fine-tuning capabilities.
 | **Equity** | 0%                                                                   |
 | **Status** | APPLIED - Feb 2026                                                   |
 
-**Details**: Account created via Google OAuth (zoltan.erdos@spike.land). Account
-ID: `zoltan-erdos-00fj1q3`. Already received $6 welcome credits.
+**Details**: Account created via Google OAuth (hello@spike.land). Account
+ID: `founder-00fj1q3`. Already received $6 welcome credits.
 
 **Application Status**:
 

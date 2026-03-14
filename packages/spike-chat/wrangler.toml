@@ -16,7 +16,7 @@ new_classes = ["ChannelDurableObject", "PresenceDurableObject"]
 [[d1_databases]]
 binding = "DB"
 database_name = "spike-chat"
-database_id = "TO_BE_CREATED"
+database_id = "4e93ca4f-84d4-4c50-9e03-5356ee092981"
 migrations_dir = "db/migrations"
 
 [[services]]

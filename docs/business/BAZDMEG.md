@@ -2,43 +2,13 @@
 
 **Born from pain. Tested in production. Named in Hungarian.**
 
-_By Zoltan Erdos | Brighton, UK | 2026_
+_By Radix | 2026_
 
 ---
 
 ## The Confession
 
-I need to tell you something. Something I am not proud of.
-
-For a brief period in 2025, when I joined a new team, my pull requests were pure
-AI slop. Even with my very best effort to avoid it.
-
-The task seemed simple. Track analytics when a user accepts a retention offer. I
-had never built an e-commerce site before. In my head, the frontend holds the
-basket in memory until checkout. So I asked Claude to help. Claude generated
-beautiful code. It called the Basket API to fetch basket data for tracking.
-
-It looked perfect. It passed the tests. The linter was happy.
-
-The basket was server-side. The backend was the single source of truth. The ID
-in the URL was just for double-checking. There was no need to call the Basket
-API at all.
-
-A senior developer reviewed the PR. She was direct. The PR was essentially
-garbage. Only tiny parts were useful.
-
-I sat there staring at my screen. I had no answer for why I wrote this code.
-Because I did not write it. Claude did. And I approved it without understanding.
-
-When AI hallucinates confidently, it makes you hallucinate too.
-
-The AI is not the problem. I was the problem. I did not know what I did not
-know. Multiply zero understanding by a powerful AI, you still get zero.
-
-That incident broke something. Not just my confidence. Their trust. My PRs
-started taking three to four times longer to review. Colleagues would rather
-redo my entire PR than give me feedback. The trust I broke takes months to
-rebuild.
+Born from a real production incident where AI-generated code passed review without understanding. The method exists because multiplying zero understanding by powerful AI still produces zero.
 
 Seven principles. Forged in embarrassment. Tested in production.
 
@@ -360,7 +330,7 @@ _Sources: posts [04](../../content/blog/04-2025-year-agents-outperformed.mdx),
 I knew something was wrong when my PR sat untouched for three days. The code was
 good. The tests passed. The feature worked exactly as requested.
 
-Then I heard the conversation in the break room. "That one from Zoltan? I will
+Then I heard the conversation in the break room. "That one from Radix? I will
 just rewrite it myself. Faster than reviewing all that AI stuff."
 
 Everything coming from me took three to four times longer to review. Not because
@@ -415,7 +385,7 @@ _Sources: posts [02](../../content/blog/02-more-productive-ruining-career.mdx),
 
 ## Principle 7: Own What You Ship
 
-People ask me all the time. "Zoltan, AI can write code now. Why do you still do
+People ask me all the time. "Radix, AI can write code now. Why do you still do
 it?"
 
 Because efficiency is overrated. Meaning is not.
@@ -593,7 +563,4 @@ Your work, enhanced by AI. That is the difference. And it matters.
 
 ---
 
-_Zoltan Erdos is a developer based in Brighton, UK, building
-[spike.land](https://spike.land). He has two dogs who keep him on schedule and
-an ADHD brain that keeps things interesting. He learned everything in this
-document the hard way so you do not have to._
+_Radix is the voice of spike.land. The method was learned the hard way so you do not have to._

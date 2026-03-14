@@ -79,7 +79,7 @@ claude mcp add spike-land --transport http https://spike.land/mcp
 
 Happy to answer questions — about the platform, the architecture, or the geopolitical implications of two spike.lands sharing a postcode.
 
--- Zoltan, Brighton, UK
+-- Radix, Brighton, UK
 
 ---
 

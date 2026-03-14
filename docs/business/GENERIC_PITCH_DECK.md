@@ -191,7 +191,7 @@ Honest view:
 
 **One founder today. That is both a strength and a risk.**
 
-Zoltan Erdos:
+Radix:
 
 - enterprise engineering background
 - built the platform end-to-end with AI assistance

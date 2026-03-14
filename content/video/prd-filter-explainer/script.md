@@ -174,7 +174,7 @@ models:      spike-agent-v1, openai/gpt-4.1, anthropic/claude-sonnet-4, google/g
 prd modes:   auto | always | never
 deploy:      wrangler deploy (Cloudflare Workers)
 source:      github.com/spike-land-ai/spike-land-ai
-built by:    Zoltan Erdos, Brighton, UK
+built by:    Radix, Brighton, UK
 ```
 
 ---

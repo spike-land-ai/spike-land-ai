@@ -11,7 +11,7 @@ import type { Env, Variables } from "../../core-logic/env.js";
 
 const cockpit = new Hono<{ Bindings: Env; Variables: Variables }>();
 
-const ADMIN_EMAILS = new Set(["zoltan.erdos@spike.land", "zolika84@gmail.com"]);
+const ADMIN_EMAILS = new Set(["hello@spike.land", "hello@spike.land"]);
 
 interface CountRow {
   count: number;

@@ -8,7 +8,7 @@ wellKnown.get("/.well-known/security.txt", (c) => {
   expires.setFullYear(expires.getFullYear() + 1);
   const expiresStr = expires.toISOString();
 
-  const body = `Contact: mailto:zoltan.erdos@spike.land
+  const body = `Contact: mailto:hello@spike.land
 Contact: https://github.com/spike-land-ai/spike-land-ai/security/advisories
 Encryption: https://spike.land/pgp.txt
 Expires: ${expiresStr}

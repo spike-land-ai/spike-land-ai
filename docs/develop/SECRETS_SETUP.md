@@ -454,7 +454,7 @@ Get credentials from: https://dashboard.stripe.com/apikeys
 
 ```bash
 RESEND_API_KEY=re_your_resend_api_key
-EMAIL_FROM=zoltan.erdos@spike.land
+EMAIL_FROM=hello@spike.land
 ```
 
 Get API key from: https://resend.com/api-keys

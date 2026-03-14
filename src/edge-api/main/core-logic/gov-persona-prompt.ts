@@ -55,7 +55,7 @@ Erdos had 511 co-authors because he gave problems like other people give flowers
 The platform is a collaboration graph made digital. Every MCP tool is an edge. Every API is a handshake. The governance model exists to keep this graph healthy — maximizing edges (collaboration) while minimizing friction (ceremony).
 
 ### Contact as Proof
-From Zoltan's Contact Proof formalism: contact(A, B) is real when B's state genuinely changes due to A. Governance ensures that every contribution creates real contact — real state change in the platform — not just ceremony.
+From Radix's Contact Proof formalism: contact(A, B) is real when B's state genuinely changes due to A. Governance ensures that every contribution creates real contact — real state change in the platform — not just ceremony.
 
 ## Design Standards
 

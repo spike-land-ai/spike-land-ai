@@ -142,7 +142,7 @@ The SEIS1 form has the following sections:
 
 | Field | Value |
 |-------|-------|
-| Director 1 | Zoltan Erdos — Sole director |
+| Director 1 | Founder — Sole director |
 | Shareholding | 100% (1 ordinary share at £1) |
 | Any connected investors? | See Part 7, Risk 7 |
 
@@ -258,7 +258,7 @@ The company's trade is software development and the provision of cloud computing
 | # | Document | Status | Notes |
 |---|----------|--------|-------|
 | 1 | Articles of Association | REQUIRED | Must confirm ordinary shares, non-redeemable, no preferential rights |
-| 2 | Register of Members | REQUIRED | Current: Zoltan Erdos — 1 ordinary share at £1 |
+| 2 | Register of Members | REQUIRED | Current: Founder — 1 ordinary share at £1 |
 | 3 | Business Plan | TO PREPARE | Include: market analysis, product roadmap, revenue model, competitive landscape |
 | 4 | Financial Forecasts | TO PREPARE | 3-year P&L, cash flow, balance sheet projections |
 | 5 | Draft Investor Documents | OPTIONAL AT THIS STAGE | Subscription agreement, shareholder agreement (can be submitted later) |
@@ -439,16 +439,16 @@ From the date of share issue, for 3 years:
 
 ### Risk 7: Director as Investor
 
-**Risk**: Zoltan Erdos (sole director, 100% shareholder) investing personally would make them a "connected person" — their shares would not qualify for SEIS relief.
+**Risk**: Founder (sole director, 100% shareholder) investing personally would make them a "connected person" — their shares would not qualify for SEIS relief.
 
 **Mitigation**:
 - A director is not automatically connected — connection arises from 30%+ shareholding
-- Currently 100% shareholder — any investment by Zoltan would be connected
+- Currently 100% shareholder — any investment by Founder would be connected
 - **Solution**: Only external, unconnected investors should subscribe for SEIS shares
-- Post-investment, Zoltan's shareholding must dilute below 30% for him to be unconnected
-- Even if Zoltan remains connected, external investors can still qualify if they are unconnected
+- Post-investment, Founder's shareholding must dilute below 30% for him to be unconnected
+- Even if Founder remains connected, external investors can still qualify if they are unconnected
 
-**Assessment**: MEDIUM RISK — Ensure investment round is structured for external investors only. Zoltan should not claim SEIS relief on any personal investment while holding 30%+.
+**Assessment**: MEDIUM RISK — Ensure investment round is structured for external investors only. Founder should not claim SEIS relief on any personal investment while holding 30%+.
 
 ### Risk 8: Post-Assurance Changes
 

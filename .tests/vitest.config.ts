@@ -44,6 +44,7 @@ const packagePathMap: Record<string, string> = {
   "google-analytics-mcp": "mcp-tools/google-analytics",
   "google-ads-mcp": "mcp-tools/google-ads",
   "hackernews-mcp": "mcp-tools/hackernews",
+  "math-engine": "mcp-tools/math-engine",
   "iwd-spotlight-mcp": "mcp-tools/iwd-spotlight",
   "image-studio-worker": "edge-api/image-studio-worker",
   "mcp-auth": "edge-api/auth",
@@ -198,6 +199,11 @@ const packages: Record<string, PkgConfig> = {
   "google-analytics-mcp": { tier: 2, pool: "forks" },
   "google-ads-mcp": { tier: 2, pool: "forks" },
   "hackernews-mcp": { tier: 2, pool: "forks" },
+  "math-engine": {
+    tier: 2,
+    pool: "forks",
+    includeTests: [src("mcp-tools/math-engine/__tests__/**/*.test.ts")],
+  },
   "iwd-spotlight-mcp": { tier: 2, pool: "forks" },
 
   "image-studio-worker": {

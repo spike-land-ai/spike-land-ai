@@ -113,7 +113,7 @@ From DPA Section 6, the following cross-border transfer mechanisms are in place:
 
 ## Completion Checklist
 
-- [x] DPA reviewed by director (Zoltan Erdos) -- 2026-03-07
+- [x] DPA reviewed by director (Founder) -- 2026-03-07
 - [x] DPA in effect -- auto-incorporated via Self-Serve Subscription Agreement (v6.3, June 20, 2025)
 - [x] PDF copy of DPA saved to company records -- `docs/legal/Cloudflare_Customer_DPA_v6.3_June_20_2025.pdf`
 - [x] Sub-processor list reviewed -- 2026-03-07
