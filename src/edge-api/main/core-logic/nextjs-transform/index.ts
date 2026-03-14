@@ -24,7 +24,7 @@ import type { RepoFile, MigrationReport, TransformResult } from "./types.ts";
 import { rewriteImports } from "./import-rewriter.ts";
 import { buildRouteTree } from "./route-converter.ts";
 import { convertDataLoaders } from "./data-loader-converter.ts";
-import { convertConfig, rewriteEnvVars } from "./config-converter.ts";
+import { convertConfig, rewriteEnvVars, convertRewritesAndRedirects } from "./config-converter.ts";
 import { convertMiddleware } from "./middleware-converter.ts";
 
 /**
@@ -45,7 +45,21 @@ export function migrateNextjsProject(
     allWarnings.push(...result.warnings);
   }
 
-  // 2. Convert middleware
+  // 2. Convert rewrites and redirects from config
+  for (const f of configFiles) {
+    const rewriteResult = convertRewritesAndRedirects(f.content);
+    if (rewriteResult.code && !rewriteResult.code.startsWith("// No rewrites")) {
+      results.push({
+        filename: "middleware/rewrites.ts",
+        original: "",
+        transformed: rewriteResult.code,
+        warnings: rewriteResult.warnings,
+      });
+      allWarnings.push(...rewriteResult.warnings);
+    }
+  }
+
+  // 3. Convert middleware
   const middlewareFiles = files.filter((f) => f.path.match(/middleware\.(ts|js)$/));
   for (const f of middlewareFiles) {
     const result = convertMiddleware(f.path, f.content);
