@@ -260,6 +260,22 @@ app.use("*", async (c, next) => {
     const res = await forward(`/${prefix}`);
     return new Response(res.body, res);
   }
+  // Static assets must NOT get the prefix — they live at the root of the
+  // R2 bucket, not under /<prefix>/. Covers Astro build output, fonts,
+  // favicons, manifests, sitemaps, and image assets.
+  if (
+    url.pathname.startsWith("/_astro/") ||
+    url.pathname.startsWith("/fonts/") ||
+    url.pathname.startsWith("/favicon") ||
+    url.pathname.startsWith("/blog/") ||
+    url.pathname.endsWith(".xml") ||
+    url.pathname.endsWith(".webmanifest") ||
+    url.pathname.endsWith(".png") ||
+    url.pathname.endsWith(".svg") ||
+    url.pathname.endsWith(".ico")
+  ) {
+    return next();
+  }
   if (!url.pathname.startsWith(`/${prefix}`)) {
     const res = await forward(`/${prefix}${url.pathname}`);
     return new Response(res.body, res);
