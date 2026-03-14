@@ -31,6 +31,17 @@ const EXACT_SPA_ROUTES = new Set([
   "/what-we-do",
   "/bazdmeg",
   "/agency/portfolio",
+  "/gov",
+  "/ai",
+  "/chess",
+  "/quiz",
+  "/create",
+  "/support",
+  "/lumevabarber",
+  "/learnit",
+  "/workshop",
+  "/status",
+  "/messages",
 ]);
 const PREFIXED_SPA_ROUTES = [
   "/apps",
