@@ -21,6 +21,14 @@ export default defineConfig({
     build: {
       sourcemap: sentryBuildEnabled ? "hidden" : false,
     },
+    server: {
+      proxy: {
+        "/api": {
+          target: "http://localhost:8787",
+          changeOrigin: true,
+        },
+      },
+    },
     plugins: [
       tailwindcss(),
       ...(sentryBuildEnabled
